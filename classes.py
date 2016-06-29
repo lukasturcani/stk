@@ -29,8 +29,8 @@ class Cage:
     @classmethod
     def init_empty(cls):
         obj = cls()
-        string = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
-                  'p','q','r','s','t','u','v','w','x','y','z']
+        string = ['a','b','c','d','e','f','g','h','i','j','k','l','m',
+                  'n','o', 'p','q','r','s','t','u','v','w','x','y','z']
         obj.bb = np.random.choice(string)
         obj.lk = np.random.choice(string)
         obj.fitness = abs(np.random.sample())
@@ -69,8 +69,9 @@ class Selection:
 
     def fittest(self, population, size):        
         if len(population) < size:
-            raise ValueError(("Size of selected population must be less than" 
-                                " or equal to size of original population."))                           
+            raise ValueError(("Size of selected population" 
+                              " must be less than or equal to" 
+                              " size of original population."))                           
         
         ordered_pop = list(population.all_members())
         ordered_pop.sort(key=attrgetter('fitness'), reverse=True)    
@@ -124,8 +125,9 @@ class Population:
                 self.settings = arg
                 continue
                              
-            raise TypeError(("Population must be initialized with"
-                             " 'Population', 'Cage' and 1 'Settings' type."))
+            raise TypeError(("Population must be"
+                             " initialized with 'Population',"
+                             " 'Cage' and 1 'Settings' type."))
                                     
     def all_members(self):       
         for ind in self.members:
@@ -139,7 +141,7 @@ class Population:
             if type(arg) is Population:
                 if not duplicates:
                     self.members.append(cage for cage in arg 
-                                                        if cage not in self)
+                                                    if cage not in self)
                 if duplicates:
                     self.members.append(cage for cage in arg)
 
@@ -177,7 +179,8 @@ class Population:
         
     def __sub__(self, other):        
         new_pop = Population(self.settings)        
-        new_pop.add_members(*list(cage for cage in self if cage not in other))
+        new_pop.add_members(*list(cage for cage in self 
+                                                if cage not in other))
         return new_pop
         
     def __add__(self, other):
@@ -194,8 +197,8 @@ class Population:
         for cage in self.members:
             output_string += "\t"  + str(cage) + "\n"
         
-        output_string += ("\tSub-populations\n" + "   -----------------\n" +
-                            "\t")
+        output_string += (("\tSub-populations\n" + 
+                           "   -----------------\n\t"))
         
         for pop in self.populations:
             output_string += str(id(pop)) + ", "
