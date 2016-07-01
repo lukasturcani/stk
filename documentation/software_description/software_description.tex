@@ -15,17 +15,25 @@
 \pagebreak
 
 \section{Document description}
-The role of this document is to provide an overview of the MMEA program and its constituent code. It is not intended to provide a detailed account of the software or its features. Any changes to the software should adhere to the descriptions and guidelines presented here, as it is mostly an account of the design philosophy rather than specific functions, methods, classes, etc. This document should not need to be changed unless the code is altered a fundamental level.
+The role of this document is to provide an overview of the MMEA program and its constituent code. It is not intended to provide a detailed account of the software or its features. Any changes to the software should adhere to the descriptions and guidelines presented here, as it is mostly an account of the design rather than specific functions, methods, classes, etc. As a result, this document should be relatively resilient to changes in the code.
        
 \section{Program overview}
+
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale=0.25]{./figures/program_overview/MMEA_flow.png}
+	\includegraphics[width=\textwidth]{./figures/program_overview/MMEA_flow_horizontal.png}
 	\caption{Flow diagram of MMEA execution.}
 	\label{flow_diagram}
 \end{figure}
 
+MMEA is a genetic algorithm.
+
 \section{Design goals}
+
+\begin{enumerate}
+	\item Extensibility and maintainability.
+	\item Speed.
+\end{enumerate}
 
 \section{Class overview}
 
