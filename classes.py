@@ -190,9 +190,10 @@ class Population:
             
         """    
         
-        # Generate `populations` and `members` attributes.
+        # Generate `populations`, `members` and `ga_tools` attributes.
         self.populations = []
         self.members = []
+        self.ga_tools = None
     
         # Determine type of supplied arguments and place in the
         # appropriate attribute.  ``Population`` types added to
@@ -208,15 +209,25 @@ class Population:
             
             if type(arg) is Cage:
                 self.members.append(arg)
-                continue
+                continue           
             
-            if type(arg) is GATools and not hasattr(self, 'ga_tools'):              
+            if type(arg) is GATools and self.ga_tools is None:
                 self.ga_tools = arg
                 continue
-                             
-            raise TypeError(("Population must be"
+
+            # Some methods create a new ``Population`` instance by using 
+            # another as a template. In these cases the `ga_tools` 
+            # attribute of the template population is passed to the 
+            # initializer. If the template instance did not have a 
+            # defined ``GATools`` instance, the default ``None`` 
+            # argument is passed. The following 2 lines prevent 
+            # exceptions being raised in such a scenario.
+            if arg is None:
+                continue
+
+            raise TypeError(("Population can only be"
                              " initialized with 'Population',"
-                             " 'Cage' and 1 'GATools' type."))
+                             " 'Cage' and 1 'GATools' type."), arg)
                                     
     def all_members(self):
         """
@@ -241,32 +252,29 @@ class Population:
         for pop in self.populations:
             yield from pop.all_members()
             
-    def add_members(self, *args, duplicates=False):
+    def add_members(self, population, duplicates=False):
         """
-        Adds ``Cage`` or ``Population`` instances into `members`.        
+        Adds ``Cage`` instances into `members`.        
         
-        Any number of ``Cage`` or ``Population`` instances can be
-        supplied to this method. ``Cage`` instances are added into the
-        `members` attribute directly. In the case of ``Population`` 
-        instances, the ``Cage`` instances held within it are added into 
-        the `members` attribute. The supplied ``Population`` instance 
-        itself is not added. This means that any information the 
-        ``Population`` instance had about subpopulations is lost. This 
-        is because all of its ``Cage`` instances are added into 
-        `members` attribute equally, regardless of which subpopulation 
-        they were originally in.
+        The ``Cage`` instances held within the supplied ``Population`` 
+        instance, `population`, are added into the `members` attribute 
+        of `self`. The supplied `population` itself is not added. This 
+        means that any information the `population` instance had about 
+        subpopulations is lost. This is because all of its ``Cage`` 
+        instances are added into the `members` attribute equally, 
+        regardless of which subpopulation they were originally in.
 
         The `duplicates` parameter indicates whether multiple instances
         of the same cage are allowed to be added into the population.
         Note that the sameness of a cage is judged by the `same_cage`
         method of the ``Cage`` class, which is invoked by the ``in``
         operator within this method. See the `__contains__` method of 
-        ``Population`` for details on how the ``in`` operator uses the 
-        `same_cage` method.
+        the ``Population`` class for details on how the ``in`` operator 
+        uses the `same_cage` method.
         
         Parameters
         ----------
-        *args : Cage, Population
+        population : Population
             ``Cage`` instances to be added to the `members` attribute
             and/or ``Population`` instances who's members, as generated 
             by `all_members`, will be added to the `members` attribute.
@@ -277,50 +285,14 @@ class Population:
             instance of the same cage to be added. Whether two cages
             are the same is defined by the `same_cage` method of the
             ``Cage`` class.
-            
-        Raises
-        ------
-        TypeError
-            If a provided argument not of ``Cage`` or ``Population``
-            type.
         
         """
         
-        # Go through supplied arguments and determine their type. If the 
-        # type is ``Population`` add the ``Cage`` instances it contains
-        # into the `members` attribute via a generator. If the type is 
-        # ``Cage``, add it to the `members` attribute directly.
-        # Raise ``TypeError`` if supplied argument is not of ``Cage`` or 
-        # ``Population type.
-        for arg in args:
-            if type(arg) is Population:                
-                # Use the first generator if duplicate ``Cage`` 
-                # instances can be added. Use the second if they cannot.
-                if duplicates:
-                    self.members.append(cage for cage in arg)
-
-                else:
-                    self.members.append(cage for cage in arg 
+        if duplicates:
+            self.members.extend(cage for cage in population)
+        else:
+            self.members.extend(cage for cage in population
                                                     if cage not in self)
-                continue
-                
-            if type(arg) is Cage:                
-                # Check if the ``Cage`` instance is already present. 
-                is_duplicate = arg in self
-                
-                # Add it to the population only if duplicates are 
-                # allowed or if duplicates are not allowed and it is not 
-                # a duplicate.
-                if duplicates:
-                    self.members.append(arg)
-                elif not duplicates and not is_duplicate:
-                    self.members.append(arg)
-                continue                                    
-            
-            # Raise a ``TypeError`` if a supplied argument is not a 
-            # ``Cage`` or ``Population`` type.
-            raise TypeError(("Supplied arguments must be of ``Cage`` or"
-                             " ``Population`` type."))
     
     def select(self, type_='generational'):
         """
@@ -540,20 +512,27 @@ class Population:
             pop3 = pop1 - pop2,        
         
         returns a new population, pop3. The returned population contains 
-        all the ``Cage`` instances by in pop1 except those also in pop2.
+        all the ``Cage`` instances in pop1 except those also in pop2.
         This refers to all of the ``Cage`` instances, including those
         held within any subpopulations. The returned population is 
         flat. This means all information about subpopulations in pop1 is 
         lost as all the ``Cage`` instances are held in the `members` 
         attribute of pop3.
 
+        The resulting population, pop3, will inherit the `ga_tools` 
+        attribute from pop1.
+
         Parameters
         ----------
         other : Population
+            A collection of ``Cage`` instances to be removed from 
+            `self`, if held by it.
             
         Returns
         -------
         Population
+            A flat population of ``Cage`` instances which are not also
+            held in `other`.
 
         """
 
@@ -605,16 +584,23 @@ class Population:
         for cage in self.members:
             output_string += "\t"  + str(cage) + "\n"
         
+        if len(self.members) == 0:
+            output_string += "\tNone\n\n"
+        
         output_string += (("\tSub-populations\n" + 
                            "   -----------------\n\t"))
         
         for pop in self.populations:
             output_string += str(id(pop)) + ", "
+
+        if len(self.populations) == 0:
+            output_string += "None\n\n"
         
         output_string += "\n\n"
 
         for pop in self.populations:
             output_string += str(pop)
+
         
         return output_string
         
