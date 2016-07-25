@@ -606,8 +606,6 @@ class Population:
         
     def __repr__(self):
         return str(self)
-        
-
 
     """
     The following methods are inteded for convenience while 
