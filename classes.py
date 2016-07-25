@@ -112,32 +112,36 @@ class Population:
 
     This is the central class of MMEA. The GA is invoked by calling the
     ``gen_offspring``, ``gen_mutants`` and ``select`` methods of this 
-    class on a given instance. However, this class is a container of ``Cage`` and other 
-    ``Population`` instances first and foremost. It delegates GA operations to
-    its `ga_tools` attribute. Any functionality related to the GA should be 
-    delegated to this attribute. The ``gen_offspring`` and ``gen_mutants``
-    methods can serve as a guide to how this should be done.  
-    A comphrehensive account of how the interaction between these two
-    classes is provided in the developer's guide.
+    class on a given instance. However, this class is a container of 
+    ``Cage`` and other ``Population`` instances first and foremost. It 
+    delegates GA operations to its `ga_tools` attribute. Any 
+    functionality related to the GA should be delegated to this 
+    attribute. The ``gen_offspring`` and ``gen_mutants`` methods can 
+    serve as a guide to how this should be done. A comphrehensive 
+    account of how the interaction between these two classes is provided 
+    in the developer's guide.
     
-    For consistency and maintainability, collections ``Cage`` or ``Population`` instances should always be placed
-    in a ``Population`` instance. As a result, any function which should return
-    multiple ``Cage`` or ``Population`` instances can be expected
-    to return a single ``Population`` instance holding the desired instances.
-    Some functions will have to return the population organized in a specific way.
-    For example, functions generating the parent pool will generate a population
-    with no direct members but multiple subpopulations of 2 members each. More specific
-    guidelines are provided within the ``Mating`` class.
+    For consistency and maintainability, collections of ``Cage`` or 
+    ``Population`` instances should always be placed in a ``Population`` 
+    instance. As a result, any function which should return multiple 
+    ``Cage`` or ``Population`` instances can be expected to return a 
+    single ``Population`` instance holding the desired instances. Some 
+    functions will have to return the population organized in a specific 
+    way. For example, functions generating the parent pool will generate 
+    a population with no direct members but multiple subpopulations of 2 
+    members each. More specific guidelines are provided within the 
+    ``Mating`` class.
     
-    The only operations directly addressed by this class and definined within
-    it are those relevant to its role as a container. It supports
-    all expected and necessary container operations such as iteration, indexing, membership 
-    checks (via the 'is in' operator) as would be expected. Additional 
-    operations such as comparison via the ``==``, ``>``, etc. operators is also supported. 
-    Details of the various implementations and a full list of supported operations 
-    can be found by examining the included methods. Note that all comparison
-    operations are accounted for with the ``total_ordering`` decorator, even
-    if they are not explicity defined.
+    The only operations directly addressed by this class and definined 
+    within it are those relevant to its role as a container. It supports
+    all expected and necessary container operations such as iteration, 
+    indexing, membership checks (via the ``is in`` operator) as would be 
+    expected. Additional operations such as comparison via the ``==``, 
+    ``>``, etc. operators is also supported. Details of the various 
+    implementations and a full list of supported operations can be found 
+    by examining the included methods. Note that all comparison 
+    operations are accounted for with the ``total_ordering`` decorator, 
+    even if they are not explicity defined.
 
     Attributes
     ----------
@@ -145,8 +149,8 @@ class Population:
         A list of other instances of the ``Population`` class. This
         allows the implementation of subpopulations or 'evolutionary 
         islands'. This attribute is also used for grouping cages within
-        a given population such as when grouping parents together from 
-        within a parent pool.
+        a given population such as when grouping parents together in a 
+        parent pool.
         
     members : list
         A list of ``Cage`` instances. These are the members of the
@@ -221,7 +225,9 @@ class Population:
             # initializer. If the template instance did not have a 
             # defined ``GATools`` instance, the default ``None`` 
             # argument is passed. The following 2 lines prevent 
-            # exceptions being raised in such a scenario.
+            # exceptions being raised in such a scenario. A consequence
+            # of this is that any number of ``None`` arguments can be 
+            # passed to the initializer. 
             if arg is None:
                 continue
 
