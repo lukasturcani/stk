@@ -105,12 +105,12 @@ def test_add_members_duplicates():
     
     Because uninitialized cages are used and ``Cages`` compare with the 
     `is` operator on the basis of their linkers and building blocks 
-    rather than on the their `__id__` the `is in` operator is not used. 
+    rather than on the their `__id__` the  ``in`` operator is not used. 
     This is because the cages have no `bb` or `lk` attributes as they 
     are not initialized.
     
     Instead, lists are consisting of the id values of the cages are 
-    generated and those are compared with the `is in` operator.
+    generated and those are compared with the ``in`` operator.
     
     """
     
@@ -196,6 +196,17 @@ def test_add_members_no_duplicates():
     receiver.add_members(supplier_different)
     assert receiver_size + len(supplier_different) == len(receiver)
     
+def test_add_subpopulations():
+    """
+    Add a population as a subpopulation to another.
+    
+    """
+
+    pop1 = generate_population()
+    pop2 = generate_population()
+    pop1.add_subpopulation(pop2)
+    assert pop2 in pop1.populations    
+    
 def test_getitem():
     """
     Test that the '[]' operator is working.
@@ -215,22 +226,97 @@ def test_getitem():
     with pytest.raises(TypeError):
         pop[5.5]
 
-def test_
+def test_sub():
+    """
+    Exclude members of one population from another.    
+    
+    """
+ 
+    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' 
+   
+    subtractee = generate_population()
+    for index, cage in enumerate(subtractee):
+        cage.bb = values[index]
+        cage.lk = values[index]
+
+    subtractor_same = generate_population()
+    for index, cage in enumerate(subtractor_same):
+        cage.bb = values[index]
+        cage.lk = values[index]   
+    
+    subtractor_different = generate_population()                  
+    for index, cage in enumerate(subtractor_different):
+        cage.bb = values[index]
+        cage.lk = values[index+1]                      
+       
+    # Removing cages not present in a population should return the 
+    # same population.
+    result_pop1 = subtractee - subtractor_different  
+    assert all(cage in subtractee for cage in result_pop1)
+    assert len(result_pop1) == len(subtractee)
+    
+    # Removing cages should also return a flat population, even if 
+    # none were actually removed.
+    assert not result_pop1.populations
+     
+    # Removing cages present in a population should get rid of them.
+    result_pop2 = subtractee - subtractor_same
+    assert len(result_pop2) == 0
+    
+def test_add():
+    """
+    Create a new population from two others.
+
+    The added populations should have their internal structure 
+    presevered. This means that the way their subpopulations are 
+    structured is not changed.    
+    
+    """
+
+    addee = generate_population()
+    adder = generate_population()
+    result = addee + adder        
+    assert len(result) == len(addee) + len(adder)
+    
+    # Check that internal structure is maintained
+    assert not result.members
+    assert result.populations
+    assert result.populations[0].members
+    assert result.populations[0].populations
+    assert result.populations[0].populations[0].members
+    assert result.populations[0].populations[0].populations
+    assert result.populations[0].populations[0].populations[0].members
+    subsubsub_pop = result.populations[0].populations[0].populations[0]
+    assert not subsubsub_pop.populations
                       
+def test_contains():
+    """                      
+    Ensure the 'in' operator works.
+    """
+
+    # Make a population from some cages and initialize.
+    cages = [Cage.__new__(Cage) for x in range(0,10)]        
+    
+    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'    
+    for index, cage in enumerate(cages):
+        cage.bb = values[index]
+        cage.lk = values[index]     
+
+    pop = Population(*cages[:-1])
+    
+    # Check that a cage that should not be in it is not.
+    assert cages[-1] not in pop
+    # Check that a cage that should be in it is.
+    assert cages[3] in pop
                       
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
+    # Ensure that the cage is found even if it is in a subpopulation.
+    subpop_cages = [Cage.__new__(Cage) for x in range(0,10)] 
+    for index, cage in enumerate(subpop_cages):
+        cage.bb = values[index]
+        cage.lk = values[index+1]                      
+        
+    pop.add_subpopulation(Population(*subpop_cages))
+    assert subpop_cages[2] in pop
                       
                       
                       
