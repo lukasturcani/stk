@@ -299,6 +299,22 @@ class Population:
         else:
             self.members.extend(cage for cage in population
                                                     if cage not in self)
+    def add_subpopulation(self, population):
+        """
+        Appends a population into the `populations` attribute.        
+        
+        Parameters
+        ----------
+        population : Population
+            The population to added as a subpopulation.
+            
+        Returns
+        -------
+        None
+        
+        """
+        
+        self.populations.append(population)
     
     def select(self, type_='generational'):
         """
