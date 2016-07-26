@@ -267,8 +267,8 @@ class Population:
         of `self`. The supplied `population` itself is not added. This 
         means that any information the `population` instance had about 
         subpopulations is lost. This is because all of its ``Cage`` 
-        instances are added into the `members` attribute equally, 
-        regardless of which subpopulation they were originally in.
+        instances are added into the `members` attribute, regardless of 
+        which subpopulation they were originally in.
 
         The `duplicates` parameter indicates whether multiple instances
         of the same cage are allowed to be added into the population.
@@ -493,7 +493,8 @@ class Population:
             return Population(*cages, self.ga_tools)
 
         # If `key` is not ``int`` or ``slice`` raise ``TypeError``.        
-        raise TypeError("Index must be an integer or slice.")
+        raise TypeError("Index must be an integer or slice, not"
+                        " {}.".format(type(key).__name__))
         
     def __len__(self):
         """
