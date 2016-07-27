@@ -3,14 +3,26 @@ import pytest
 import itertools as it
 from collections import Counter
 
-def generate_population():
+def generate_population(offset=False):
     """
     Returns a population of subpopulations and direct members.
    
     """
-    #Generate a bunch of cages.
-    cages = [Cage.__new__(Cage) for x in range(0,22)]    
+
+    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'    
     
+    #Generate a bunch of cages.
+    if offset:
+        cages = [Cage(values[x], values[x], values[x+1]) 
+                                                for x in range(0,22)]
+    if not offset:
+        cages = [Cage(values[x], values[x], values[x]) 
+                                                for x in range(0,22)]
+                                                
+#    for cage in cages:
+#        if not hasattr(cage, 'bb'):
+#            print('no bb')
+        
     # Generate a couple of populations to be used as subpopulations.
     sub1 = Population(*cages[0:4])
     sub2 = Population(*cages[4:9])
@@ -24,44 +36,7 @@ def generate_population():
     # Initialize final population of subpopulations and cages.
     return Population(sub1, sub2, *cages[-3:])
     
-def initialize_population(population, offset=False):
-    """
-    Initializes a population's attributes.
-    
-    The ``Cage`` instances in a population are initialized to a filler
-    value (a string) to allow tests to run with the fewest dependencies
-    possible.
-    
-    Parameters
-    ----------
-    population : Population
-        The ``Population`` instance to be initialized.    
-    
-    offset : bool (default = False)
-        ``False`` means that all attributes are initialized to the 
-        same value while ``True`` means that one of the attributes is
-        initialized to a value different to the rest.
-        
-    Returns
-    -------
-    None : NoneType
-        The population is modified directly.
-    
-    """
-    
-    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'         
-    
-    if offset:
-        for index, cage in enumerate(population):
-            cage.bb = values[index]
-            cage.lk = values[index]    
-            cage.topography = values[index+1]        
-    
-    if not offset:
-        for index, cage in enumerate(population):
-            cage.bb = values[index]
-            cage.lk = values[index]    
-            cage.topography = values[index]         
+       
 
 def test_init():
     """
@@ -100,7 +75,23 @@ def test_init():
     # Due to a technicality (see __init__ source code) any number of 
     # ``None`` type arguments can be supplied. Valid, should pass.
     Population(*[None for x in range(0,10)])
+ 
+def test_caching():
+    """
+    Cages created with same arguments should return the same instance.
+
+    """
     
+    pop1 = generate_population()
+    pop2 = generate_population()
+    pop3 = generate_population(offset=True)
+    
+    for cage1, cage2, cage3 in zip(pop1, pop2, pop3):
+        assert cage1 is cage2
+        assert cage1 is not cage3
+        assert cage2 is not cage3
+    
+   
 def test_all_members():
     """
     Check that all members, direct and in subpopulations, are returned.
@@ -141,62 +132,43 @@ def test_add_members_duplicates():
     
     Duplicate additions should be allowed.    
     
-    Because uninitialized cages are used and ``Cages`` compare with the 
-    `is` operator on the basis of their linkers and building blocks 
-    rather than on the their `__id__` the  ``in`` operator is not used. 
-    This is because the cages have no `bb` or `lk` attributes as they 
-    are not initialized.
-    
-    Instead, lists are consisting of the id values of the cages are 
-    generated and those are compared with the ``in`` operator.
-    
     """
     
     # Create a population to be added and one to be added to.
-    receiver = generate_population()
-    receiver_ids = [id(cage) for cage in receiver]
-    
+    receiver = generate_population()    
     supplier = generate_population()
-    supplier_ids = [id(cage) for cage in supplier]
 
-    # Cages in `supplier` should not be in `reciever` yet.
-    assert all(id_val not in receiver_ids for id_val in supplier_ids)
     # Add all cages in `supplier` to `receiver`.
     receiver.add_members(supplier, duplicates=True)
-    # Recalcualte id list from `members` attribute as this is the 
-    # intended destination.
-    receiver_ids = [id(cage) for cage in receiver.members]
+
     # Cages in `supplier` should now be held in `members` attribute of 
     # `receiver`.
-    assert all(id_val in receiver_ids for id_val in supplier_ids)
-                      
-    # Add supplier cages a second time, demonstarting that duplicates
-    # are allowed.
-    receiver.add_members(supplier, duplicates=True)
+    assert all(cage in receiver.members for cage in supplier)
+
+    # The reverse should not be true.
+    assert not all(cage in supplier.members for cage in receiver)    
     
-    # Count the frequency of each `__id__` in `receiver.members`.
+    # Count the frequency of each cage` in `receiver.members`.
     count = Counter(receiver.members)
-    # Ensure that each of suppliers ids is present twice.
-    assert all(count[cage] == 2 for cage in supplier)
+
+    # Some should be present twice.
+    assert 2 in count.values()
+    
+    # No other frequency should be present.
+    assert all(freq == 1 or freq == 2 for freq in count.values())    
     
 def test_add_members_no_duplicates():
     """
     Members in population added to `members` of another.
     
     Duplicate additions not allowed.
-
-    Duplicates are found via the ``==`` operator on the `bb` and `lk`
-    attributes of a cage. The attributes here are initialized to 
-    simple strings - not indicative of the what the attributes will be
-    set to in a realistic setting. Likely a `BuildingBlock` class etc.    
-
+    
     """
 
       
     # Generate an initial populaiton, initialize the cage's `bb`, `lk` 
     # and `topography` attributes.
     receiver = generate_population()
-    initialize_population(receiver)
         
     # Note size of receiver population.
     receiver_size = len(receiver)        
@@ -204,9 +176,9 @@ def test_add_members_no_duplicates():
     # Same as above but with another population. Note the objects are 
     # different instances, but their `lk`, `bb` and `topography` 
     # attributes are the same. As a result they should compare equal to 
-    # those in `receiver`.
+    # those in `receiver`. Indeed, due to caching the same instances 
+    # should be found in both populations.
     supplier_same = generate_population()
-    initialize_population(supplier_same)
         
     # Add supplier to the receiver. None of the suppliers cages should
     # be added and therefore the len of supplier should be the same as 
@@ -218,8 +190,7 @@ def test_add_members_no_duplicates():
     # Generate another population. This time the `bb`, `lk` and 
     # `topography` of the cages will have different combinations to the 
     # receiver population.
-    supplier_different = generate_population()
-    initialize_population(supplier_different, offset=True)
+    supplier_different = generate_population(offset=True)
         
     # Add `supplier_different` to `receiver`. All of the cages should be
     # addable as none should be duplicates. The size of the `receiver`
@@ -246,9 +217,7 @@ def test_remove_duplicates_between_subpops():
     """
 
     subpop1 = generate_population()
-    initialize_population(subpop1)
-    subpop2 = generate_population()      
-    initialize_population(subpop2)
+    subpop2 = generate_population()
     
     main = subpop1 + subpop2
     main_count = Counter(main)
@@ -282,13 +251,9 @@ def test_sub():
     """
     
     subtractee = generate_population()
-    initialize_population(subtractee)
-
     subtractor_same = generate_population()
-    initialize_population(subtractor_same)
-    
-    subtractor_different = generate_population()                  
-    initialize_population(subtractor_different, offset=True)                    
+    subtractor_different = generate_population(offset=True)                  
+                    
        
     # Removing cages not present in a population should return the 
     # same population.
@@ -336,8 +301,7 @@ def test_contains():
     """
 
     # Make a population from some cages and initialize.
-    cages = [Cage.__new__(Cage) for x in range(0,10)]        
-    initialize_population(cages)
+    cages = [cage for cage in generate_population()]        
 
     pop = Population(*cages[:-1])
     
@@ -347,8 +311,7 @@ def test_contains():
     assert cages[3] in pop
                       
     # Ensure that the cage is found even if it is in a subpopulation.
-    subpop_cages = [Cage.__new__(Cage) for x in range(0,10)] 
-    initialize_population(subpop_cages)                     
+    subpop_cages = generate_population()                   
         
     pop.add_subpopulation(Population(*subpop_cages))
     assert subpop_cages[2] in pop
