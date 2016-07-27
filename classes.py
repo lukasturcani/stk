@@ -18,14 +18,30 @@ class Cached(type):
             self.__cache[args] = obj
             return obj
 
+class StructUnit:
+    def __init__(self, smiles_prist):
+        pass
+
+class BuildingBlock(StructUnit):
+    pass
+class Linker(StructUnit):
+    pass
+
 class Cage(metaclass=Cached):
     def __init__(self, *args):
         if len(args) == 3:
             self.testing_init(*args)
 
+    def std_init(self, ):
+        pass
+    def bb_only_init(self, ):
+        pass
+    def lk_only_init(self, ):
+        pass
+    
     def same_cage(self, other):
         return (self.bb == other.bb and self.lk == other.lk and 
-                                    self.topography == other.topography)
+                                    self.topology == other.topology)
         
     def __str__(self):
         return str(self.__dict__) + "\n"
@@ -40,10 +56,10 @@ class Cage(metaclass=Cached):
     
     """
 
-    def testing_init(self, bb_str, lk_str, topography_str):
+    def testing_init(self, bb_str, lk_str, topology_str):
         self.bb = bb_str
         self.lk = lk_str
-        self.topography = topography_str
+        self.topology = topology_str
 
     @classmethod
     def init_empty(cls):
