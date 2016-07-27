@@ -163,14 +163,14 @@ def test_add_members_no_duplicates():
 
       
     # Generate an initial populaiton, initialize the cage's `bb`, `lk` 
-    # and `topography` attributes.
+    # and `topology` attributes.
     receiver = generate_population()
         
     # Note size of receiver population.
     receiver_size = len(receiver)        
         
     # Same as above but with another population. Note the objects are 
-    # different instances, but their `lk`, `bb` and `topography` 
+    # different instances, but their `lk`, `bb` and `topology` 
     # attributes are the same. As a result they should compare equal to 
     # those in `receiver`. Indeed, due to caching the same instances 
     # should be found in both populations.
@@ -184,7 +184,7 @@ def test_add_members_no_duplicates():
     assert receiver_size == len(receiver)
     
     # Generate another population. This time the `bb`, `lk` and 
-    # `topography` of the cages will have different combinations to the 
+    # `topology` of the cages will have different combinations to the 
     # receiver population.
     supplier_different = generate_population(offset=True)
         
