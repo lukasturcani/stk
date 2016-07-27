@@ -4,11 +4,10 @@ from operator import attrgetter
 import itertools
 import weakref
 
-class Cached(type):
-    
+class Cached(type):   
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)        
-        self.__cache = weakref.WeakKeyDictionary()
+        self.__cache = weakref.WeakValueDictionary()
     
     def __call__(self, *args):
         if args in self.__cache.keys():
@@ -32,15 +31,6 @@ class Cage(metaclass=Cached):
     
     def __repr__(self):
         return str(self.__dict__) + "\n"
-        
-    @classmethod    
-    def testing_init(cls, bb_str, lk_str, topography_str):
-        obj = cls.__new__(cls)
-        obj.bb = bb_str
-        obj.lk = lk_str
-        obj.topography = topography_str
-        
-
 
     """
     The following methods are inteded for convenience while 
@@ -48,6 +38,11 @@ class Cage(metaclass=Cached):
     execution of the program.
     
     """
+
+    def testing_init(self, bb_str, lk_str, topography_str):
+        self.bb = bb_str
+        self.lk = lk_str
+        self.topography = topography_str
 
     @classmethod
     def init_empty(cls):
@@ -647,8 +642,6 @@ class Population:
         Returns
         -------
         bool
-            
-        
         
         """
 
