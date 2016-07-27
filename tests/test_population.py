@@ -24,6 +24,44 @@ def generate_population():
     # Initialize final population of subpopulations and cages.
     return Population(sub1, sub2, *cages[-3:])
     
+def initialize_population(population, offset=False):
+    """
+    Initializes a population's attributes.
+    
+    The ``Cage`` instances in a population are initialized to a filler
+    value (a string) to allow tests to run with the fewest dependencies
+    possible.
+    
+    Parameters
+    ----------
+    population : Population
+        The ``Population`` instance to be initialized.    
+    
+    offset : bool (default = False)
+        ``False`` means that all attributes are initialized to the 
+        same value while ``True`` means that one of the attributes is
+        initialized to a value different to the rest.
+        
+    Returns
+    -------
+    None : NoneType
+        The population is modified directly.
+    
+    """
+    
+    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'         
+    
+    if offset:
+        for index, cage in enumerate(population):
+            cage.bb = values[index]
+            cage.lk = values[index]    
+            cage.topography = values[index+1]        
+    
+    if not offset:
+        for index, cage in enumerate(population):
+            cage.bb = values[index]
+            cage.lk = values[index]    
+            cage.topography = values[index]         
 
 def test_init():
     """
@@ -154,45 +192,39 @@ def test_add_members_no_duplicates():
 
     """
 
-    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'    
-    
-    # Generate an initial populaiton, initialize the cage's `bb` and 
-    # `lk` attributes.
+      
+    # Generate an initial populaiton, initialize the cage's `bb`, `lk` 
+    # and `topography` attributes.
     receiver = generate_population()
-    for index, cage in enumerate(receiver):
-        cage.bb = values[index]
-        cage.lk = values[index]
+    initialize_population(receiver)
         
     # Note size of receiver population.
     receiver_size = len(receiver)        
         
     # Same as above but with another population. Note the objects are 
-    # different instances, but their `lk` and `bb` attributes are the 
-    # same. As a result they should compare equal to those in 
-    # `receiver`.
+    # different instances, but their `lk`, `bb` and `topography` 
+    # attributes are the same. As a result they should compare equal to 
+    # those in `receiver`.
     supplier_same = generate_population()
-    for index, cage in enumerate(supplier_same):
-        cage.bb = values[index]
-        cage.lk = values[index]
+    initialize_population(supplier_same)
         
     # Add supplier to the receiver. None of the suppliers cages should
-    # be added and therefore the len of supplier shoudl be the same as 
+    # be added and therefore the len of supplier should be the same as 
     # at the start.
     receiver.add_members(supplier_same)
 
     assert receiver_size == len(receiver)
     
-    # Generate another population. This time the 'bb' and 'lk' of the 
-    # cages will have different combinations to the receiver population.
+    # Generate another population. This time the `bb`, `lk` and 
+    # `topography` of the cages will have different combinations to the 
+    # receiver population.
     supplier_different = generate_population()
-    for index, cage in enumerate(supplier_different):
-        cage.bb = values[index]
-        cage.lk = values[index+1]    
-
+    initialize_population(supplier_different, offset=True)
+        
     # Add `supplier_different` to `receiver`. All of the cages should be
     # addable as none should be duplicates. The size of the `receiver`
     # population should increase by the size of the `supplier_different`    
-    # pop.
+    # population.
     receiver.add_members(supplier_different)
     assert receiver_size + len(supplier_different) == len(receiver)
     
@@ -206,6 +238,23 @@ def test_add_subpopulations():
     pop2 = generate_population()
     pop1.add_subpopulation(pop2)
     assert pop2 in pop1.populations    
+
+def test_remove_duplicates_between_subpops():
+    """
+    Ensure that duplicates are correctly removed from a population.    
+    
+    """
+
+    subpop1 = generate_population()
+    initialize_population(subpop1)
+    subpop2 = generate_population()      
+    initialize_population(subpop2)
+    
+    main = subpop1 + subpop2
+    main_count = Counter(main)
+    assert all(val == 2 for val in main_count.values())
+    
+    
     
 def test_getitem():
     """
@@ -231,23 +280,15 @@ def test_sub():
     Exclude members of one population from another.    
     
     """
- 
-    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' 
-   
+    
     subtractee = generate_population()
-    for index, cage in enumerate(subtractee):
-        cage.bb = values[index]
-        cage.lk = values[index]
+    initialize_population(subtractee)
 
     subtractor_same = generate_population()
-    for index, cage in enumerate(subtractor_same):
-        cage.bb = values[index]
-        cage.lk = values[index]   
+    initialize_population(subtractor_same)
     
     subtractor_different = generate_population()                  
-    for index, cage in enumerate(subtractor_different):
-        cage.bb = values[index]
-        cage.lk = values[index+1]                      
+    initialize_population(subtractor_different, offset=True)                    
        
     # Removing cages not present in a population should return the 
     # same population.
@@ -296,11 +337,7 @@ def test_contains():
 
     # Make a population from some cages and initialize.
     cages = [Cage.__new__(Cage) for x in range(0,10)]        
-    
-    values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'    
-    for index, cage in enumerate(cages):
-        cage.bb = values[index]
-        cage.lk = values[index]     
+    initialize_population(cages)
 
     pop = Population(*cages[:-1])
     
@@ -311,9 +348,7 @@ def test_contains():
                       
     # Ensure that the cage is found even if it is in a subpopulation.
     subpop_cages = [Cage.__new__(Cage) for x in range(0,10)] 
-    for index, cage in enumerate(subpop_cages):
-        cage.bb = values[index]
-        cage.lk = values[index+1]                      
+    initialize_population(subpop_cages)                     
         
     pop.add_subpopulation(Population(*subpop_cages))
     assert subpop_cages[2] in pop
