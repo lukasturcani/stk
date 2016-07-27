@@ -18,10 +18,6 @@ def generate_population(offset=False):
     if not offset:
         cages = [Cage(values[x], values[x], values[x]) 
                                                 for x in range(0,22)]
-                                                
-#    for cage in cages:
-#        if not hasattr(cage, 'bb'):
-#            print('no bb')
         
     # Generate a couple of populations to be used as subpopulations.
     sub1 = Population(*cages[0:4])
@@ -217,13 +213,81 @@ def test_remove_duplicates_between_subpops():
     """
 
     subpop1 = generate_population()
-    subpop2 = generate_population()
-    
+    subpop2 = generate_population()    
     main = subpop1 + subpop2
-    main_count = Counter(main)
+    
+    # Show that cages are duplicated.
+    main_count = Counter(main)   
     assert all(val == 2 for val in main_count.values())
     
+    # Show that duplicates are not in the same subpopulations.
+    subpop_count = Counter(main.populations[0])
+    assert all(val == 1 for val in subpop_count.values())
     
+    # Remove duplicates regardless of where they are.
+    main.remove_duplicates(between_subpops=True)
+    main_count = Counter(main)
+    assert all(val == 1 for val in main_count.values()) 
+
+    # Check that internal structure is maintained.
+    assert not main.members
+    assert main.populations
+    assert main.populations[0].populations
+    assert main.populations[0].populations[0].populations
+    subsubsubpop = main.populations[0].populations[0].populations[0]
+    assert not subsubsubpop.populations
+    
+def test_remove_duplicates_not_between_subpops():
+    """
+    Ensures duplicates are removed from within subpopulations only.
+    
+    """
+    
+    # Create a population from two identical subpopulations.        
+    subpop1 = generate_population()
+    subpop2 = generate_population()
+    main = subpop1 + subpop2
+
+    # Verify that duplicates are present.
+    count = Counter(main)
+    assert all(val == 2 for val in count.values())
+
+    # Removing duplicates should not change the size of the population
+    # as all the duplicates are in different subpopulations.
+    main_size = len(main)
+    main.remove_duplicates(between_subpops=False)
+    assert len(main) == main_size
+    
+    # Add one of the subpopulations in the `members` attribute of 
+    # another, while allowing duplicates.
+    subpop1.add_members(subpop2, duplicates=True)
+    subpop1_size = len(subpop1)
+    
+    # Verify duplicates are present in `members` and in general.    
+    count2 = Counter(subpop1)
+    count2_members = Counter(subpop1.members)
+    assert all(val == 2 for val in count2.values())
+    assert 2 in count2_members.values()
+    
+    # Find the number of duplicates in `members`.
+    num_dupes = 0
+    for x in count2_members.values():
+        if x == 2:
+            num_dupes += 1
+
+    # Remove only duplicates within the same subpopulations.
+    subpop1.remove_duplicates(between_subpops=False)
+    # Size should decrease by the number of duplicates in `members`.
+    assert len(subpop1) == subpop1_size - num_dupes
+
+    # Check that internal structure is maintained.
+    assert subpop1.members
+    assert subpop1.populations
+    assert subpop1.populations[0].members
+    assert subpop1.populations[0].populations
+    assert subpop1.populations[0].populations[0].members
+    assert not subpop1.populations[0].populations[0].populations
+
     
 def test_getitem():
     """
@@ -297,7 +361,8 @@ def test_add():
                       
 def test_contains():
     """                      
-    Ensure the 'in' operator works.
+    Ensure the `in` operator works.
+    
     """
 
     # Make a population from some cages and initialize.
