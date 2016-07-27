@@ -3,6 +3,7 @@ from functools import wraps
 from operator import attrgetter
 import itertools
 import weakref
+from .convenience_functions import dedupe
 
 class Cached(type):   
     def __init__(self, *args, **kwargs):
@@ -335,7 +336,7 @@ class Population:
         
         self.populations.append(population)
         
-    def remove_duplicates(self, between_subpops=False):
+    def remove_duplicates(self, between_subpops=True, top_seen=None):
         """
         Removes duplicates from a population while preserving structure.        
         
@@ -363,9 +364,21 @@ class Population:
         
         """
         
-        seen = set()
+        if between_subpops:
+            if top_seen is None:
+                seen = set()
+            if type(top_seen) == set:
+                seen = top_seen
+                
+            self.members = list(dedupe(self.members, seen=seen))
+            for subpop in self.populations:
+                subpop.remove_duplicates(between_subpops, top_seen=seen)
         
-    
+        if not between_subpops:
+            self.members = list(dedupe(self.members))
+            for subpop in self.populations:
+                subpop.remove_duplicates(between_subpops=False)
+        
     def select(self, type_='generational'):
         """
         Selects some members to form a new ``Population`` instance.
