@@ -2,21 +2,45 @@ import numpy as np
 from functools import wraps
 from operator import attrgetter
 import itertools
+import weakref
 
-class Cage:
-    def __init__(self):
-        pass  
+class Cached(type):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)        
+        self.__cache = weakref.WeakKeyDictionary()
+    
+    def __call__(self, *args):
+        if args in self.__cache.keys():
+            return self.__cache[args]
+        else:
+            obj = super().__call__(*args)
+            self.__cache[args] = obj
+            return obj
+
+class Cage(metaclass=Cached):
+    def __init__(self, *args):
+        if len(args) == 3:
+            self.testing_init(*args)
 
     def same_cage(self, other):
-        return self.bb == other.bb and self.lk == other.lk
+        return (self.bb == other.bb and self.lk == other.lk and 
+                                    self.topography == other.topography)
         
     def __str__(self):
         return str(self.__dict__) + "\n"
     
     def __repr__(self):
         return str(self.__dict__) + "\n"
-    
-    
+        
+    @classmethod    
+    def testing_init(cls, bb_str, lk_str, topography_str):
+        obj = cls.__new__(cls)
+        obj.bb = bb_str
+        obj.lk = lk_str
+        obj.topography = topography_str
+        
+
 
     """
     The following methods are inteded for convenience while 
@@ -310,11 +334,42 @@ class Population:
             
         Returns
         -------
-        None
+        None : NoneType
         
         """
         
         self.populations.append(population)
+        
+    def remove_duplicates(self, between_subpops=False):
+        """
+        Removes duplicates from a population while preserving structure.        
+        
+        The question of which ``Cage`` instance is preserved from a 
+        choice of two is difficult to answer. The iteration through a 
+        population is depth-first so a rule such as ``the cage in the
+        topmost population is preserved`` is not possible to define. 
+        However, this question is only relevant if duplicates are being 
+        removed from between subpopulations. In this case it is assumed 
+        that the fact that only a single instance is present is more 
+        important than which one. As a result it should be of no 
+        consquence which cage is preserved from two different 
+        subpopulations. This is however may be subject to change.
+        
+        Parameters
+        ----------
+        between_subpops : bool (default = False)
+            When ``False`` duplicates are only removed from within a
+            given subpopulation. If ``True`` all duplicates are removed,
+            regardless of which subpopulation they are in.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        seen = set()
+        
     
     def select(self, type_='generational'):
         """
