@@ -6,6 +6,9 @@ import weakref
 from convenience_functions import dedupe
 from rdkit import Chem as chem
 from rdkit.Chem import AllChem as ac
+from collections import namedtuple
+from operator import attrgetter
+from copy import deepcopy
 
 class Cached(type):   
     def __init__(self, *args, **kwargs):
@@ -20,20 +23,65 @@ class Cached(type):
             self.__cache[args] = obj
             return obj
 
-class StructUnit:
+class MoleculeData(object):
+    """ class to store info about a molecule """
+    def __init__(self, id_ = 0, name = "", number = 0, atoms = None, bonds= None,
+                 tot_atoms = 0, heavy_atoms = 0, elements = None, coordinates = None,
+                 trasl_coordinates = None, rot_coordinates = None, heavy_atom_idx = None):
+        self.id = id_
+        self.name = name
+        self.number = number
+        self.tot_atoms = tot_atoms
+        self.heavy_atoms = heavy_atoms
+        self.elements = elements
+        self.coordinates = coordinates
+        self.trasl_coordinates = trasl_coordinates
+        self.rot_coordinates = rot_coordinates
+        self.heavy_atom_idx = heavy_atom_idx
+        
+        if atoms == None:
+            self.atoms = {}
+        else:
+            self.atoms = atoms
+        
+        if bonds == None:
+            self.bonds = []
+        else:
+            self.bonds = bonds
 
+        if elements == None:
+            self.elements = []
+        else:
+            self.elements = elements
+            
+        if coordinates == None:
+            self.coordinates = []
+        else:
+            self.coordinates = np.array(coordinates)
+            
+        if heavy_atom_idx == None:
+            self.heavy_atom_idx = []
+        else:
+            self.heavy_atom_idx = heavy_atom_idx
+
+
+
+FGInfo = namedtuple('FGInfo', ['name', 'smarts', 
+                               'target_atomic_num', 'heavy_atomic_num',
+                               'heavy_symbol'])
+class StructUnit:
     functional_group_list = [
-                             ("[N]([H])[H]", "Amine", "Rh", "Del", "Del"),
-                             ("C(=O)[H]", "Aldehyde", "Y", "Del", "Del"),
-                             ("C(=O)O[H]", "Carboxylic Acid", "Zr", "Del", "Del"),
-                             ("C(=O)N([H])[H]", "Amide", "Nb", "Del", "Del", "Del"), 
-                             ("C(=O)S[H]", "Thioacid", "Mo", "Del", "Del", "Del"),
-                             ("O[H]", "Alcohol", "Tc", "Del"), 
-                             ("[S][H]", "Thiol", "Ru", "Del"),    
-                             ("N=O", "Nitroso", "Pd", "O"),
-                             ("[B](O[H])O[H]", "Boronic Acid", "Ag", "Del", "Del", "Del", "Del"), 
-                             ("O[H]", "Alcohol BA", "O", "Cd"),
-                             ("", None, "None")
+                        
+                    FGInfo("aldehyde", "C(=O)[H]", 6, 39, "Y"), 
+                    FGInfo("carboxylic acid", "C(=O)O[H]", 6, 40, "Zr"),
+                    FGInfo("amide", "C(=O)N([H])[H]", 6, 41, "Nb"),
+                    FGInfo("thioacid", "C(=O)S[H]", 6, 42, "Mo"),
+                    FGInfo("alcohol", "O[H]", 8, 43, "Tc"),
+                    FGInfo("thiol", "[S][H]", 16, 44, "Ru"),
+                    FGInfo("amine", "[N]([H])[H]", 7, 45, "Rh"),    
+                    FGInfo("nitroso", "N=O", 7, 46, "Pd"),
+                    FGInfo("boronic acid", "[B](O[H])O[H]", 5, 47, "Ag")
+                             
                              ]
 
     def __init__(self, prist_mol_file):
@@ -41,145 +89,44 @@ class StructUnit:
         self.prist_mol = chem.MolFromMolFile(prist_mol_file, 
                                              sanitize=False, 
                                              removeHs=False)
-        
+                                             
         self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
                                              isomericSmiles=True,
                                              allHsExplicit=True)
-    
-    def flag_functional_group_atoms(self, functionality):
-        """    
-        Reads the functionality of the molecule and creates of list of flags
-        which contains info about the atoms that need to be substituted or
-        deleted.
-        It employes RdKit 
-    
-                
-        #    you get a list of tuples [(0, 1, 12), (.....)] where all the indeces of the
-        #    atoms in the functional groups are contained.    
-            
-        #    Now I have to make a specific case for each functional_group
-        #    
-        #    In the case of "Aldehyde":
-        #    tuple[0] = Atom to be substituted with the heavy atom
-        #    tuple[1] = Atom to be deleted
-        #    tuple[2] = Atom to be deleted
-        #    
-        #    if functional_group == functional_group_list[0]:
-        #        sub = "Rh"
-        #        del = "Del"
-        #        none = "None"
-            
-        """   
 
-        # REPLACE WITH DICITONARY HERE!!!
-        for func_grp_data in StructUnit.functional_group_list:
-            if func_grp_data[1] == functionality:
-                functional_group = chem.MolFromSmarts(func_grp_data[0])
-                functionality_code = func_grp_data[0]
-        matches = molecule.GetSubstructMatches(functional_group)
-    
-        return 0
+    def find_functional_group_atoms(self, functionality):
+        """
+
+
+        """        
         
-        flags = []
-        
-        for atom in molecule.GetAtoms():
-            if any(atom.GetIdx() in func for func in matches):
-                for func in matches:
-                    if atom.GetIdx() in func:
-                        pos = func.index(atom.GetIdx())
-                        
-                        if functionality_code == functional_group_list[0][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[0][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[0][3])
-                            elif pos == 2:
-                                flags.append(functional_group_list[0][4])
-                                
-                        elif functionality_code == functional_group_list[1][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[1][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[1][3])
-                            elif pos == 2:
-                                flags.append(functional_group_list[1][4])
-                                
-                        elif functionality_code == functional_group_list[2][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[2][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[2][3])
-                            elif pos == 2:
-                                flags.append(functional_group_list[2][4])
-                                
-                        elif functionality_code == functional_group_list[3][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[3][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[3][3])
-                            elif pos == 2:
-                                flags.append(functional_group_list[3][4])
-                            elif pos == 3:
-                                flags.append(functional_group_list[3][5])
-                        
-                        elif functionality_code == functional_group_list[4][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[4][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[4][3])
-                            elif pos == 2:
-                                flags.append(functional_group_list[4][4])
-                            elif pos == 3:
-                                flags.append(functional_group_list[4][5])
-                                
-                        elif functionality_code == functional_group_list[5][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[5][2])
-                            if pos == 1:
-                                flags.append(functional_group_list[5][3])
-                                
-                        elif functionality_code == functional_group_list[6][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[6][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[6][3])
-                                
-                        elif functionality_code == functional_group_list[7][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[7][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[7][3])
-                                
-                        elif functionality_code == functional_group_list[8][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[8][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[8][3])
-                            elif pos == 2:
-                                flags.append(functional_group_list[8][4])
-                            elif pos == 3:
-                                flags.append(functional_group_list[8][5])
-                            elif pos == 4:
-                                flags.append(functional_group_list[8][6])
-                                
-                        elif functionality_code == functional_group_list[9][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[9][2])
-                            elif pos == 1:
-                                flags.append(functional_group_list[9][3])
-                        
-                        elif functionality_code == functional_group_list[10][0]:
-                            if pos == 0:
-                                flags.append(functional_group_list[10][2])
-            else:
-                flags.append("None")
+        func_grp = next((x for x in StructUnit.functional_group_list if 
+                                        x.name == functionality), None)
+                          
+        func_grp_mol = chem.MolFromSmarts(func_grp.smarts)
+        return self.prist_mol.GetSubstructMatches(func_grp_mol)
        
-        ac.EmbedMolecule(molecule)
-        ac.UFFOptimizeMolecule(molecule)
-    #    mol_file = MolFileV2000ToV3000(molecule)
-        mol_file = chem.MolToMolBlock(molecule, forceV3000 = True)
-        return mol_file, flags
-    
+
+    def generate_heavy_mol(self, functionality):
+
+        func_grp = next((x for x in StructUnit.functional_group_list if 
+                                        x.name == functionality), None)        
+        matches = self.find_functional_group_atoms(functionality)       
+
+        heavy_mol = deepcopy(self.prist_mol)      
+        
+        for func_grp_ids in matches:
+            for atom_id in func_grp_ids:
+                atom = heavy_mol.GetAtomWithIdx(atom_id)
+                if atom.GetAtomicNum() == func_grp.target_atomic_num:
+                    atom.SetAtomicNum(func_grp.heavy_atomic_num)
+        
+        self.heavy_mol = heavy_mol
+        chem.MolToMolFile(heavy_mol, )
+        self.heavy_mol_file = 
+        self.heavy_smiles =         
+        
+        
 class BuildingBlock(StructUnit):
     pass
         
