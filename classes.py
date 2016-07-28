@@ -3,12 +3,14 @@ from functools import wraps
 from operator import attrgetter
 import itertools
 import weakref
-from convenience_functions import dedupe
+from convenience_functions import dedupe, flatten
+import rdkit
 from rdkit import Chem as chem
 from rdkit.Chem import AllChem as ac
 from collections import namedtuple
 from operator import attrgetter
 from copy import deepcopy
+import os
 
 class Cached(type):   
     def __init__(self, *args, **kwargs):
@@ -22,49 +24,6 @@ class Cached(type):
             obj = super().__call__(*args)
             self.__cache[args] = obj
             return obj
-
-class MoleculeData(object):
-    """ class to store info about a molecule """
-    def __init__(self, id_ = 0, name = "", number = 0, atoms = None, bonds= None,
-                 tot_atoms = 0, heavy_atoms = 0, elements = None, coordinates = None,
-                 trasl_coordinates = None, rot_coordinates = None, heavy_atom_idx = None):
-        self.id = id_
-        self.name = name
-        self.number = number
-        self.tot_atoms = tot_atoms
-        self.heavy_atoms = heavy_atoms
-        self.elements = elements
-        self.coordinates = coordinates
-        self.trasl_coordinates = trasl_coordinates
-        self.rot_coordinates = rot_coordinates
-        self.heavy_atom_idx = heavy_atom_idx
-        
-        if atoms == None:
-            self.atoms = {}
-        else:
-            self.atoms = atoms
-        
-        if bonds == None:
-            self.bonds = []
-        else:
-            self.bonds = bonds
-
-        if elements == None:
-            self.elements = []
-        else:
-            self.elements = elements
-            
-        if coordinates == None:
-            self.coordinates = []
-        else:
-            self.coordinates = np.array(coordinates)
-            
-        if heavy_atom_idx == None:
-            self.heavy_atom_idx = []
-        else:
-            self.heavy_atom_idx = heavy_atom_idx
-
-
 
 FGInfo = namedtuple('FGInfo', ['name', 'smarts', 
                                'target_atomic_num', 'heavy_atomic_num',
@@ -94,38 +53,70 @@ class StructUnit:
                                              isomericSmiles=True,
                                              allHsExplicit=True)
 
-    def find_functional_group_atoms(self, functionality):
+        self.func_grp = next((x for x in 
+                                StructUnit.functional_group_list if 
+                                x.name in prist_mol_file), None)
+        
+        self.generate_heavy_attrs()
+
+    def generate_heavy_attrs(self):        
+        func_grp_atom_ids = flatten(self.find_functional_group_atoms())       
+
+        self.heavy_mol = deepcopy(self.prist_mol)      
+        
+        for atom_id in func_grp_atom_ids:
+            atom = self.heavy_mol.GetAtomWithIdx(atom_id)
+            if atom.GetAtomicNum() == self.func_grp.target_atomic_num:
+                atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
+        
+        heavy_file_name = list(os.path.splitext(self.prist_mol_file))
+        heavy_file_name.insert(1,'HEAVY')
+        heavy_file_name.insert(2, self.func_grp.name)
+        self.heavy_mol_file = '_'.join(heavy_file_name)     
+        
+        chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
+                          includeStereo=True, kekulize=False,
+                          forceV3000=True) 
+
+        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol, 
+                                             isomericSmiles=True,
+                                             allHsExplicit=True)        
+
+    def find_functional_group_atoms(self):
         """
 
 
-        """        
+        """
         
-        func_grp = next((x for x in StructUnit.functional_group_list if 
-                                        x.name == functionality), None)
-                          
-        func_grp_mol = chem.MolFromSmarts(func_grp.smarts)
-        return self.prist_mol.GetSubstructMatches(func_grp_mol)
-       
+        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts)
+        return self.prist_mol.GetSubstructMatches(func_grp_mol)        
 
-    def generate_heavy_mol(self, functionality):
-
-        func_grp = next((x for x in StructUnit.functional_group_list if 
-                                        x.name == functionality), None)        
-        matches = self.find_functional_group_atoms(functionality)       
-
-        heavy_mol = deepcopy(self.prist_mol)      
+    def shift_heavy_mol(self, x, y, z):
+        conformer = chem.Conformer(self.heavy_mol.GetConformer())
         
-        for func_grp_ids in matches:
-            for atom_id in func_grp_ids:
-                atom = heavy_mol.GetAtomWithIdx(atom_id)
-                if atom.GetAtomicNum() == func_grp.target_atomic_num:
-                    atom.SetAtomicNum(func_grp.heavy_atomic_num)
+        for atom in self.heavy_mol.GetAtoms():            
+            atom_id = atom.GetIdx()
+            atom_position = conformer.GetAtomPosition(atom_id)
+            
+            new_x = atom_position.x + x
+            new_y = atom_position.y + y
+            new_z = atom_position.z + z
+            
+            new_coords = rdkit.Geometry.rdGeometry.Point3D(new_x, 
+                                                           new_y, new_z)            
+            
+            conformer.SetAtomPosition(atom_id, new_coords)
         
-        self.heavy_mol = heavy_mol
-        chem.MolToMolFile(heavy_mol, )
-        self.heavy_mol_file = 
-        self.heavy_smiles =         
+        new_heavy = deepcopy(self.heavy_mol)
+        new_heavy.RemoveAllConformers()
+        new_heavy.AddConformer(conformer)
+        return new_heavy        
         
+    def get_heavy_coords(self):
+        conformer = self.heavy_mol.GetConformer()
+        for atom in self.heavy_mol.GetAtoms():        
+            atom_position = conformer.GetAtomPosition(atom.GetIdx())
+            yield atom_position.x, atom_position.y, atom_position.z
         
 class BuildingBlock(StructUnit):
     pass
@@ -137,15 +128,21 @@ class Cage(metaclass=Cached):
     def __init__(self, *args):
         if len(args) == 3:
             self.testing_init(*args)
+        if len(args) == 4:
+            self.std_init(*args)
 
-    def std_init(self, bb_smiles, lk_smiles, topology):
-        self.bb = BuildingBlock(bb_smiles)
-        self.lk = Linker(lk_smiles)        
+    def std_init(self, bb_file, lk_file, topology, full_path):
+        self.bb = BuildingBlock(bb_file)
+        self.lk = Linker(lk_file)        
         self.topology = topology
+        self.full_path = full_path
         
     def bb_only_init(self, ):
         pass
     def lk_only_init(self, ):
+        pass
+
+    def assemble_structural_units(self):
         pass
     
     def same_cage(self, other):
@@ -157,98 +154,6 @@ class Cage(metaclass=Cached):
     
     def __repr__(self):
         return str(self.__dict__) + "\n"
-
-
-    
-    def build_cage(outputfile, shape, bb_smile, bb_func, lk_smile = "",
-                  lk_func = None):
-        """This function is the one which prepares all the conditions for the 
-        assembly. 
-        ==========================================================================
-        Parameters:
-            shape = Topology employed to build the cage (defined in the topology.py 
-                    module)
-            bb_smile = string containing the SMILE for the building block
-            bb_func = Code used to characterize the functional group to be
-                                substituted (defined in GA_rdkit_functions.py)
-            lk_smile = string containing the SMILE for the linker
-                        (Default is empty, "")*
-            lk_func = Code used to characterize the functional group to be
-                                substituted (defined in GA_rdkit_functions.py).
-                                Default is None.*
-            outputfile = name of the outputfile
-            
-            *Default values for the linker are "" and None as the user can decide to
-            generate a cage where no linker is employed (both vertices and edges
-            are occupied by the same molecule)
-            
-        Returns:
-            heavy_atom_file?
-            bb_num?
-            bb_heavy_atom_count?
-            lk_num?
-            lk_heavy_atom_count?
-        ==========================================================================
-        
-        1) Read in the smiles
-        2) Knows which are the functions to substitute/modify with heavy atoms
-        3) Generates the bb_heavy.mol and lk_heavy.mol files
-        4) Calls the assembly function, which produces the heavy_atom cage
-        5) Reads the file in and creates bonds between the heavy atoms (addition)
-        6) Substitutes the final atoms in the final cage (final_sub)
-        
-        """
-        
-        # Reading in the SMILES create the bb_new.mol and lk_new.mol files
-        # Apply the FlagFunctionalGroupAtom 
-        # First to Building Block
-        with open("bb_mol.mol", "w") as bb_input:
-            bb_input.write(grf.FlagFunctionalGroupAtom(bb_smile, bb_func)[0])
-        
-        # Create flags to substitute functional groups with heavy atoms
-        bb_flag = grf.FlagFunctionalGroupAtom(bb_smile, bb_func)[1]
-        bb_read = readmol.Mol("bb_mol.mol")
-        bb_mol = bb_read.molecules
-        # Generates a new mol file containing the heavy atoms
-        bb_heavy_atom = grf.GenerateHeavyFile(bb_mol, bb_flag, "bb_heavy.mol")[0]
-        bb_heavy_atom_count = grf.GenerateHeavyFile(bb_mol, bb_flag, "bb_heavy.mol")[1]
-        # Then to the Linker if lk_smile != "" and lk_func != None
-        if lk_smile != "" and lk_func != None:
-            with open("lk_mol.mol", "w") as lk_input:
-                lk_input.write(grf.FlagFunctionalGroupAtom(lk_smile, lk_func)[0])
-            lk_input.close()
-            # Create flags to substitute functional groups with heavy atoms
-            lk_flag = grf.FlagFunctionalGroupAtom(lk_smile, lk_func)[1]
-            lk_read = readmol.Mol("lk_mol.mol")
-            lk_mol = lk_read.molecules
-            # Generates a new mol file containing the heavy atoms
-            lk_heavy_atom = grf.GenerateHeavyFile(lk_mol, lk_flag, "lk_heavy.mol")[0]
-            lk_heavy_atom_count = grf.GenerateHeavyFile(lk_mol, lk_flag, "lk_heavy.mol")[1]         
-        else:
-            pass
-        
-        
-        # Apply the assemble_bb_lk function
-        a = assemble_bb_lk(shape)
-        bb_num = assemble_bb_lk(shape)[2]
-        lk_num = assemble_bb_lk(shape)[3]
-        # Save assembled system to outputfile
-        readmol.write_mol(a[0], a[1], outputfile)
-        
-        # Creating the heavy atom file
-        heavy_atom_file_name = outputfile[:-4] + "HEAVY.mol"
-        
-        # Create final bonds between bb and lk in the assembled file
-        grf.AdditionDifferent(outputfile, bb_heavy_atom, bb_heavy_atom_count,
-                              lk_heavy_atom, lk_heavy_atom_count, heavy_atom_file_name,
-                              shape)
-        # Final substitution of heavy atoms with the correct atoms
-        grf.final_sub(heavy_atom_file_name, outputfile)
-        
-    #    print("BB_NUM", bb_num, "LK_NUM", lk_num)
-    #    print("BB SUB ATOMS", bb_heavy_atom_count, "LK SUB ATOMS", lk_heavy_atom_count)
-        return  heavy_atom_file_name, bb_num, bb_heavy_atom_count, lk_num, lk_heavy_atom_count
-
 
     """
     The following methods are inteded for convenience while 
@@ -560,13 +465,17 @@ class Population:
         The question of which ``Cage`` instance is preserved from a 
         choice of two is difficult to answer. The iteration through a 
         population is depth-first so a rule such as ``the cage in the
-        topmost population is preserved`` is not possible to define. 
-        However, this question is only relevant if duplicates are being 
-        removed from between subpopulations. In this case it is assumed 
-        that the fact that only a single instance is present is more 
-        important than which one. As a result it should be of no 
-        consquence which cage is preserved from two different 
-        subpopulations. This is however may be subject to change.
+        topmost population is preserved`` is not the case here. Rather,
+        the first ``Cage`` instance iterated through is preserved.
+        
+        However, this question is only relevant if duplicates in 
+        different subpopulations are being removed. In this case it is 
+        assumed that it is more important to have a single instance than
+        to worry about which subpopulation it is in.
+        
+        If the duplicates are being removed from within subpopulations,
+        each subpopulation will end up with a single instance of all
+        cages held before. There is no ``choice``.
         
         Parameters
         ----------
@@ -847,6 +756,11 @@ class Population:
     def __add__(self, other):
         """
         Allows use fo the ``+`` operator.
+        
+        Creates a new ``Population`` instance which holds two 
+        subpopulations and no direct members. The two subpopulations
+        are the two ``Population`` instances on which the ``+`` operator
+        was applied.
         
         Parameters
         ----------
