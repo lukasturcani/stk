@@ -3,7 +3,9 @@ from functools import wraps
 from operator import attrgetter
 import itertools
 import weakref
-from .convenience_functions import dedupe
+from convenience_functions import dedupe
+from rdkit import Chem as chem
+from rdkit.Chem import AllChem as ac
 
 class Cached(type):   
     def __init__(self, *args, **kwargs):
@@ -19,11 +21,168 @@ class Cached(type):
             return obj
 
 class StructUnit:
-    def __init__(self, smiles_prist):
-        pass
 
+    functional_group_list = [
+                             ("[N]([H])[H]", "Amine", "Rh", "Del", "Del"),
+                             ("C(=O)[H]", "Aldehyde", "Y", "Del", "Del"),
+                             ("C(=O)O[H]", "Carboxylic Acid", "Zr", "Del", "Del"),
+                             ("C(=O)N([H])[H]", "Amide", "Nb", "Del", "Del", "Del"), 
+                             ("C(=O)S[H]", "Thioacid", "Mo", "Del", "Del", "Del"),
+                             ("O[H]", "Alcohol", "Tc", "Del"), 
+                             ("[S][H]", "Thiol", "Ru", "Del"),    
+                             ("N=O", "Nitroso", "Pd", "O"),
+                             ("[B](O[H])O[H]", "Boronic Acid", "Ag", "Del", "Del", "Del", "Del"), 
+                             ("O[H]", "Alcohol BA", "O", "Cd"),
+                             ("", None, "None")
+                             ]
+
+    def __init__(self, prist_mol_file):
+        self.prist_mol_file = prist_mol_file
+        self.prist_mol = chem.MolFromMolFile(prist_mol_file, 
+                                             sanitize=False, 
+                                             removeHs=False)
+        
+        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
+                                             isomericSmiles=True,
+                                             allHsExplicit=True)
+    
+    def flag_functional_group_atoms(self, functionality):
+        """    
+        Reads the functionality of the molecule and creates of list of flags
+        which contains info about the atoms that need to be substituted or
+        deleted.
+        It employes RdKit 
+    
+                
+        #    you get a list of tuples [(0, 1, 12), (.....)] where all the indeces of the
+        #    atoms in the functional groups are contained.    
+            
+        #    Now I have to make a specific case for each functional_group
+        #    
+        #    In the case of "Aldehyde":
+        #    tuple[0] = Atom to be substituted with the heavy atom
+        #    tuple[1] = Atom to be deleted
+        #    tuple[2] = Atom to be deleted
+        #    
+        #    if functional_group == functional_group_list[0]:
+        #        sub = "Rh"
+        #        del = "Del"
+        #        none = "None"
+            
+        """   
+
+        # REPLACE WITH DICITONARY HERE!!!
+        for func_grp_data in StructUnit.functional_group_list:
+            if func_grp_data[1] == functionality:
+                functional_group = chem.MolFromSmarts(func_grp_data[0])
+                functionality_code = func_grp_data[0]
+        matches = molecule.GetSubstructMatches(functional_group)
+    
+        return 0
+        
+        flags = []
+        
+        for atom in molecule.GetAtoms():
+            if any(atom.GetIdx() in func for func in matches):
+                for func in matches:
+                    if atom.GetIdx() in func:
+                        pos = func.index(atom.GetIdx())
+                        
+                        if functionality_code == functional_group_list[0][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[0][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[0][3])
+                            elif pos == 2:
+                                flags.append(functional_group_list[0][4])
+                                
+                        elif functionality_code == functional_group_list[1][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[1][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[1][3])
+                            elif pos == 2:
+                                flags.append(functional_group_list[1][4])
+                                
+                        elif functionality_code == functional_group_list[2][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[2][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[2][3])
+                            elif pos == 2:
+                                flags.append(functional_group_list[2][4])
+                                
+                        elif functionality_code == functional_group_list[3][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[3][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[3][3])
+                            elif pos == 2:
+                                flags.append(functional_group_list[3][4])
+                            elif pos == 3:
+                                flags.append(functional_group_list[3][5])
+                        
+                        elif functionality_code == functional_group_list[4][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[4][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[4][3])
+                            elif pos == 2:
+                                flags.append(functional_group_list[4][4])
+                            elif pos == 3:
+                                flags.append(functional_group_list[4][5])
+                                
+                        elif functionality_code == functional_group_list[5][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[5][2])
+                            if pos == 1:
+                                flags.append(functional_group_list[5][3])
+                                
+                        elif functionality_code == functional_group_list[6][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[6][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[6][3])
+                                
+                        elif functionality_code == functional_group_list[7][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[7][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[7][3])
+                                
+                        elif functionality_code == functional_group_list[8][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[8][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[8][3])
+                            elif pos == 2:
+                                flags.append(functional_group_list[8][4])
+                            elif pos == 3:
+                                flags.append(functional_group_list[8][5])
+                            elif pos == 4:
+                                flags.append(functional_group_list[8][6])
+                                
+                        elif functionality_code == functional_group_list[9][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[9][2])
+                            elif pos == 1:
+                                flags.append(functional_group_list[9][3])
+                        
+                        elif functionality_code == functional_group_list[10][0]:
+                            if pos == 0:
+                                flags.append(functional_group_list[10][2])
+            else:
+                flags.append("None")
+       
+        ac.EmbedMolecule(molecule)
+        ac.UFFOptimizeMolecule(molecule)
+    #    mol_file = MolFileV2000ToV3000(molecule)
+        mol_file = chem.MolToMolBlock(molecule, forceV3000 = True)
+        return mol_file, flags
+    
 class BuildingBlock(StructUnit):
     pass
+        
 class Linker(StructUnit):
     pass
 
@@ -32,8 +191,11 @@ class Cage(metaclass=Cached):
         if len(args) == 3:
             self.testing_init(*args)
 
-    def std_init(self, ):
-        pass
+    def std_init(self, bb_smiles, lk_smiles, topology):
+        self.bb = BuildingBlock(bb_smiles)
+        self.lk = Linker(lk_smiles)        
+        self.topology = topology
+        
     def bb_only_init(self, ):
         pass
     def lk_only_init(self, ):
@@ -48,6 +210,98 @@ class Cage(metaclass=Cached):
     
     def __repr__(self):
         return str(self.__dict__) + "\n"
+
+
+    
+    def build_cage(outputfile, shape, bb_smile, bb_func, lk_smile = "",
+                  lk_func = None):
+        """This function is the one which prepares all the conditions for the 
+        assembly. 
+        ==========================================================================
+        Parameters:
+            shape = Topology employed to build the cage (defined in the topology.py 
+                    module)
+            bb_smile = string containing the SMILE for the building block
+            bb_func = Code used to characterize the functional group to be
+                                substituted (defined in GA_rdkit_functions.py)
+            lk_smile = string containing the SMILE for the linker
+                        (Default is empty, "")*
+            lk_func = Code used to characterize the functional group to be
+                                substituted (defined in GA_rdkit_functions.py).
+                                Default is None.*
+            outputfile = name of the outputfile
+            
+            *Default values for the linker are "" and None as the user can decide to
+            generate a cage where no linker is employed (both vertices and edges
+            are occupied by the same molecule)
+            
+        Returns:
+            heavy_atom_file?
+            bb_num?
+            bb_heavy_atom_count?
+            lk_num?
+            lk_heavy_atom_count?
+        ==========================================================================
+        
+        1) Read in the smiles
+        2) Knows which are the functions to substitute/modify with heavy atoms
+        3) Generates the bb_heavy.mol and lk_heavy.mol files
+        4) Calls the assembly function, which produces the heavy_atom cage
+        5) Reads the file in and creates bonds between the heavy atoms (addition)
+        6) Substitutes the final atoms in the final cage (final_sub)
+        
+        """
+        
+        # Reading in the SMILES create the bb_new.mol and lk_new.mol files
+        # Apply the FlagFunctionalGroupAtom 
+        # First to Building Block
+        with open("bb_mol.mol", "w") as bb_input:
+            bb_input.write(grf.FlagFunctionalGroupAtom(bb_smile, bb_func)[0])
+        
+        # Create flags to substitute functional groups with heavy atoms
+        bb_flag = grf.FlagFunctionalGroupAtom(bb_smile, bb_func)[1]
+        bb_read = readmol.Mol("bb_mol.mol")
+        bb_mol = bb_read.molecules
+        # Generates a new mol file containing the heavy atoms
+        bb_heavy_atom = grf.GenerateHeavyFile(bb_mol, bb_flag, "bb_heavy.mol")[0]
+        bb_heavy_atom_count = grf.GenerateHeavyFile(bb_mol, bb_flag, "bb_heavy.mol")[1]
+        # Then to the Linker if lk_smile != "" and lk_func != None
+        if lk_smile != "" and lk_func != None:
+            with open("lk_mol.mol", "w") as lk_input:
+                lk_input.write(grf.FlagFunctionalGroupAtom(lk_smile, lk_func)[0])
+            lk_input.close()
+            # Create flags to substitute functional groups with heavy atoms
+            lk_flag = grf.FlagFunctionalGroupAtom(lk_smile, lk_func)[1]
+            lk_read = readmol.Mol("lk_mol.mol")
+            lk_mol = lk_read.molecules
+            # Generates a new mol file containing the heavy atoms
+            lk_heavy_atom = grf.GenerateHeavyFile(lk_mol, lk_flag, "lk_heavy.mol")[0]
+            lk_heavy_atom_count = grf.GenerateHeavyFile(lk_mol, lk_flag, "lk_heavy.mol")[1]         
+        else:
+            pass
+        
+        
+        # Apply the assemble_bb_lk function
+        a = assemble_bb_lk(shape)
+        bb_num = assemble_bb_lk(shape)[2]
+        lk_num = assemble_bb_lk(shape)[3]
+        # Save assembled system to outputfile
+        readmol.write_mol(a[0], a[1], outputfile)
+        
+        # Creating the heavy atom file
+        heavy_atom_file_name = outputfile[:-4] + "HEAVY.mol"
+        
+        # Create final bonds between bb and lk in the assembled file
+        grf.AdditionDifferent(outputfile, bb_heavy_atom, bb_heavy_atom_count,
+                              lk_heavy_atom, lk_heavy_atom_count, heavy_atom_file_name,
+                              shape)
+        # Final substitution of heavy atoms with the correct atoms
+        grf.final_sub(heavy_atom_file_name, outputfile)
+        
+    #    print("BB_NUM", bb_num, "LK_NUM", lk_num)
+    #    print("BB SUB ATOMS", bb_heavy_atom_count, "LK SUB ATOMS", lk_heavy_atom_count)
+        return  heavy_atom_file_name, bb_num, bb_heavy_atom_count, lk_num, lk_heavy_atom_count
+
 
     """
     The following methods are inteded for convenience while 
@@ -110,7 +364,7 @@ class Selection:
         
         ordered_pop = list(population.all_members())
         ordered_pop.sort(key=attrgetter('fitness'), reverse=True)    
-        return Population(*ordered_pop[:size], population.ga_tools)
+        return Population(population.ga_tools, *ordered_pop[:size])
         
     def roulette(self, population):
         pass
