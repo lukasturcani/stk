@@ -1,7 +1,8 @@
-from ..classes import Population, Cage, GATools
 import pytest
 import itertools as it
 from collections import Counter
+
+from ..classes import Population, Cage, GATools
 
 def generate_population(offset=False):
     """
