@@ -2,8 +2,23 @@ from rdkit import Chem as chem
 import math
 import numpy as np
 
-#from .molecular import StructUnit
 
+from .molecular import StructUnit
+
+                                         
+class MolFileData:
+    __slots__ = ['mol_file_content', 'count_line', 'at_num', 
+                 'bond_number', 'atom1_list', 'atom2_list']
+    
+    def __init__(self, mol_file_content, count_line, at_num, 
+                 bond_number, atom1_list, atom2_list):
+         self.mol_file_content = mol_file_content
+         self.count_line = count_line
+         self.at_num = at_num
+         self.bond_number = bond_number
+         self.atom1_list = atom1_list
+         self.atom2_list = atom2_list
+    
 class Atom(object):
     """
     the Atom class is used to find the distances between metal atoms in geometry
@@ -30,7 +45,7 @@ class Atom(object):
     @staticmethod
     def extract_mol_file_data(mol_file):
     
-        new_mol_file_content = ""
+        mol_file_content = ""
         with open(mol_file, "r") as mol_file:
             
             atom1_element = None    
@@ -56,7 +71,7 @@ class Atom(object):
                     at_num = line[3]            
                     
                 if write_line == True:            
-                    new_mol_file_content += raw_line
+                    mol_file_content += raw_line
                         
                 if "M  V30 BEGIN ATOM" in raw_line:
                     take_atom = True
@@ -67,7 +82,6 @@ class Atom(object):
                     continue
                 
                 if "M  V30 BEGIN BOND" in raw_line:
-                    print('??????????????????????')                    
                     take_bond = True
                     continue
                 
@@ -120,12 +134,12 @@ class Atom(object):
                                               atom_x, atom_y, atom_z))
                             type2_heavy_atom_number += 1
                             continue  
-                    print(take_bond)
-                    if take_bond == True and len(line) == 6:            
-                        print('!!!!!!!')                        
-                        bond_number = int(line[2])
+
+                if take_bond == True and len(line) == 6:                   
+                    bond_number = int(line[2])
         
-        return new_mol_file_content, count_line, at_num, bond_number, atom1_list, atom2_list
+        return MolFileData(mol_file_content, count_line, at_num, 
+                           bond_number, atom1_list, atom2_list)
         
     def assign_molecule_number(self):       
         if self.element == Atom.bb:
@@ -389,7 +403,7 @@ class Topology:
         """           
         
     
-        new_mol_file_content, count_line, at_num, bond_number, atom1_list, atom2_list = Atom.extract_mol_file_data(self.cage.full_path)
+        mol_file_data = Atom.extract_mol_file_data(self.cage.full_path)
             
         Atom.bb_heavy_atoms_per_molecule = self.heavy_atoms_per_bb  
         Atom.lk_heavy_atoms_per_molecule = self.heavy_atoms_per_lk   
@@ -402,24 +416,24 @@ class Topology:
         Atom.linked_mols = []
         Atom.linked_atoms = []
         
-        for atom in atom1_list:
+        for atom in mol_file_data.atom1_list:
             atom.assign_molecule_number()
         
-        for atom in atom2_list:
+        for atom in mol_file_data.atom2_list:
             atom.assign_molecule_number()
         
-        for atom1 in atom1_list:
-            for atom2 in atom2_list:
+        for atom1 in mol_file_data.atom1_list:
+            for atom2 in mol_file_data.atom2_list:
                 atom1.distance(atom2)   
     
-        for atom1 in atom1_list:
-            for atom2 in atom2_list:
+        for atom1 in mol_file_data.atom1_list:
+            for atom2 in mol_file_data.atom2_list:
                 atom1.pair_up('4+6', Nitro=False)
         
         double_bond_combs = (("Rh","Y"), ("Nb","Y"), ("Mb","Rh"))    
         
         for atom in Atom.linked_atoms:
-            bond_number += 1
+            mol_file_data.bond_number += 1
             double_bond_present = [atom[1] in tup and atom[3] in tup for 
                                     tup in double_bond_combs]
             
@@ -428,22 +442,22 @@ class Topology:
             else:
                 bond_order = "1"
                 
-            new_mol_file_content += "M  V30 {2} {3} {0} {1}\n".format(
-                              atom[0], atom[2], bond_number, bond_order)
+            mol_file_data.mol_file_content += "M  V30 {2} {3} {0} {1}\n".format(
+                              atom[0], atom[2], mol_file_data.bond_number, bond_order)
         
         
-        new_mol_file_content += ("M  V30 END BOND\nM  V30 END CTAB\nM"  
+        mol_file_data.mol_file_content += ("M  V30 END BOND\nM  V30 END CTAB\nM"  
                                                                  " END")
 
 
-        new_mol_file_content = new_mol_file_content.replace(" VAL=1", 
+        mol_file_data.mol_file_content = mol_file_data.mol_file_content.replace(" VAL=1", 
                                                                     "")
-        new_mol_file_content = new_mol_file_content.replace(count_line, 
-             "M  V30 COUNTS {0} {1} 0 0 0\n".format(at_num,bond_number))
+        mol_file_data.mol_file_content = mol_file_data.mol_file_content.replace(mol_file_data.count_line, 
+             "M  V30 COUNTS {0} {1} 0 0 0\n".format(mol_file_data.at_num,mol_file_data.bond_number))
         
         new_mol_file_name = self.cage.full_path
         new_mol_file = open(new_mol_file_name, "w")
-        new_mol_file.write(new_mol_file_content)
+        new_mol_file.write(mol_file_data.mol_file_content)
         new_mol_file.close()
         return 1
         
