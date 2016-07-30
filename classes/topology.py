@@ -1,11 +1,10 @@
 from rdkit import Chem as chem
 import math
 import numpy as np
-
+import itertools as itertools
 
 from .molecular import StructUnit
 
-                                         
 class MolFileData:
     __slots__ = ['mol_file_content', 'count_line', 'at_num', 
                  'bond_number', 'atom1_list', 'atom2_list']
@@ -161,34 +160,6 @@ class Atom(object):
         
         return r
         
-    def pair_up(self, shape, Nitro):
-        """
-        Here is described the pairing for all the other cages, which 
-        works differently depending on the specific topology.
-        """
-        
-        v3_v2 = ("2+3", "4+6", "6+9", "8+12", "20+30")
-
-        v4_v2 = ("2+3w", "2+4w", "3+6w", "4+8w", 
-                     "6+12w", "8+16w", "12+24w")
-        if Nitro:
-            return self.pair_up_nitro()
-        if shape in v3_v2:
-            return self.pair_up_v3_v2()
-                    
-        if shape in v4_v2:
-            return self.pair_up_v4_v2()
-        
-        if shape == "1+1":
-            return self.pair_up_1plus1()
-        
-        if shape == "2+2":
-            return self.pair_up_2plus2()
-
-        
-        if shape == "4+4":
-            return self.pair_up_4plus4()
-
     def pair_up_nitro(self):
         """
         This case is specific for the Nitroso cages, for which a double 
@@ -384,6 +355,8 @@ class Atom(object):
 class Topology:
     heavy_symbols = {x.heavy_symbol for x 
                         in StructUnit.functional_group_list}
+    double_bond_combs = (("Rh","Y"), ("Nb","Y"), ("Mb","Rh")) 
+    
     def __init__(self, cage):
         self.cage = cage
         
@@ -391,9 +364,11 @@ class Topology:
     def build_cage(self):
         self.place_mols()
         self.join_mols()
+        self.final_sub()
         
     def build_heavy_cage(self):
-        pass
+        self.join_mols()
+        
     def bulid_prist_cage(self):
         pass
 
@@ -402,8 +377,9 @@ class Topology:
         takens an input file with disconnected moleucles and connects them
         """           
         
-    
-        mol_file_data = Atom.extract_mol_file_data(self.cage.full_path)
+        
+        mol_file_data = Atom.extract_mol_file_data(
+                                               self.cage.heavy_mol_file)
             
         Atom.bb_heavy_atoms_per_molecule = self.heavy_atoms_per_bb  
         Atom.lk_heavy_atoms_per_molecule = self.heavy_atoms_per_lk   
@@ -411,15 +387,11 @@ class Topology:
         Atom.bb = self.cage.bb.func_grp.heavy_symbol
         Atom.lk = self.cage.lk.func_grp.heavy_symbol
         
-    #    bond_list = 
-        
         Atom.linked_mols = []
         Atom.linked_atoms = []
         
-        for atom in mol_file_data.atom1_list:
-            atom.assign_molecule_number()
-        
-        for atom in mol_file_data.atom2_list:
+        for atom in itertools.chain(mol_file_data.atom1_list,
+                                    mol_file_data.atom2_list):
             atom.assign_molecule_number()
         
         for atom1 in mol_file_data.atom1_list:
@@ -428,14 +400,12 @@ class Topology:
     
         for atom1 in mol_file_data.atom1_list:
             for atom2 in mol_file_data.atom2_list:
-                atom1.pair_up('4+6', Nitro=False)
-        
-        double_bond_combs = (("Rh","Y"), ("Nb","Y"), ("Mb","Rh"))    
+                self.pair_up_func(atom1)
         
         for atom in Atom.linked_atoms:
             mol_file_data.bond_number += 1
             double_bond_present = [atom[1] in tup and atom[3] in tup for 
-                                    tup in double_bond_combs]
+                                    tup in Topology.double_bond_combs]
             
             if True in double_bond_present:
                 bond_order = "2"
@@ -455,14 +425,27 @@ class Topology:
         mol_file_data.mol_file_content = mol_file_data.mol_file_content.replace(mol_file_data.count_line, 
              "M  V30 COUNTS {0} {1} 0 0 0\n".format(mol_file_data.at_num,mol_file_data.bond_number))
         
-        new_mol_file_name = self.cage.full_path
+        new_mol_file_name = self.cage.heavy_mol_file
         new_mol_file = open(new_mol_file_name, "w")
         new_mol_file.write(mol_file_data.mol_file_content)
         new_mol_file.close()
-        return 1
+        
+        
+    def final_sub(self):
+        with open(self.cage.heavy_mol_file, "r") as add:
+            new_file= ""
+            for line in add:
+                line = line.replace(self.cage.bb.func_grp.heavy_symbol,
+                                    self.cage.bb.func_grp.target_symbol)
+                line = line.replace(self.cage.lk.func_grp.heavy_symbol,
+                                    self.cage.lk.func_grp.target_symbol)
+                new_file += line
+    
+        with open(self.cage.prist_mol_file, "w") as f:
+            f.write(new_file)
         
 
-    
+      
 class FourPlusSix(Topology):
     def __init__(self, cage):
         super().__init__(cage)
@@ -472,14 +455,15 @@ class FourPlusSix(Topology):
         self.bb_num = 4
         self.lk_num = 6
         
-    
+        self.pair_up_func = Atom.pair_up_v4_v2
+        
     def place_mols(self):
         bb_placement = self.place_bbs()
         lk_placement = self.place_lks()
         self.cage.heavy_mol = chem.CombineMols(bb_placement, 
                                                    lk_placement) 
                                                    
-        chem.MolToMolFile(self.cage.heavy_mol, self.cage.full_path,
+        chem.MolToMolFile(self.cage.heavy_mol, self.cage.heavy_mol_file,
                           includeStereo=True, kekulize=False,
                           forceV3000=True)
         
