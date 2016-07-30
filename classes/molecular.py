@@ -14,7 +14,12 @@ import math
 
 from ..convenience_functions import dedupe, flatten
 
-class Cached(type):   
+class Cached(type):
+    """
+    A metaclass for creating classes which create cached instances.
+    
+    """    
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)        
         self.__cache = weakref.WeakValueDictionary()
@@ -26,20 +31,97 @@ class Cached(type):
             obj = super().__call__(*args)
             self.__cache[args] = obj
             return obj
-
-
-_FGInfo = namedtuple('FGInfo', ['name', 'smarts', 
-                                'target_atomic_num', 'heavy_atomic_num',
-                                'target_symbol', 'heavy_symbol'])                                
-class FGInfo(_FGInfo):
+                               
+class FGInfo:
     """
-    Contains key information for substitutions.
+    Contains key information for functional group substitutions.
     
+    The point of this class is to register which atom is substituted
+    for which, when an atom in a functional group is substituted with a 
+    heavy metal atom. If MMEA is to incorporate a new functional group, 
+    a new ``FGInfo`` instance should be added to the 
+    `functional_group_list` class attribute of ``FGInfo``. 
     
+    Adding a new ``FGInfo`` instace to `functional_group_list` will 
+    allow the `Topology.join_mols` method to connect this functional 
+    group to (all) others during assembly. 
+    
+    If this new functional group is to connect to another functional 
+    group with a double bond during assembly, the symbols of the heavy 
+    atoms of both functional groups should be added to the 
+    `double_bond_combs` list. The order in which the heavy symbols are 
+    placed in the tuple does not matter.
+    
+    This should be all that is necessary to allow a MMEA to join up a
+    new functional group during assembly.    
+    
+    Class attributes
+    ----------------
+    functional_groups_list : list of FGInfo instances
+        This list holds all ``FGInfo`` instances used by MMEA. If a new
+        functional group is to be used by MMEA, a new ``FGInfo`` 
+        instance must be added to this list.
+        
+    double_bond_combs : list of tuples of strings
+        When assembly is carried out, if the heavy atoms being joined
+        forme a tuple in this list, they will be joined with a double
+        rather than single bond. If a single bond is desired there is no
+        need to change this variable.
+
+    Attributes
+    ----------
+    name : str
+        The name of the functional group.
+    
+    smarts : str
+        A ``SMARTS`` string describing the functional group.
+    
+    target_atomic_num : int
+        The atomic number of the atom, which is substituted with a heavy 
+        atom, in the functional group.
+    
+    heavy_atomic_num : int
+        The atomic number of the heavy atom which replaces the target 
+        atom in the functional group.
+    
+    target_symbol : str
+        The atomic symbol of the atom, which is substituted with a heavy 
+        atom, in the functional group.        
+    
+    heavy_symbol : str
+        The atomic symbol of the heavy atom which replaces the target 
+        atom in the functional group.
     
     """
-    pass
+    
+    __slots__ = ['name', 'smarts', 'target_atomic_num', 
+                 'heavy_atomic_num', 'target_symbol', 'heavy_symbol'] 
+    
+    def __init__(self, name, smarts, target_atomic_num, 
+                 heavy_atomic_num, target_symbol, heavy_symbol):
+         self.name = name
+         self.smarts = smarts
+         self.target_atomic_num = target_atomic_num
+         self.heavy_atomic_num = heavy_atomic_num
+         self.target_symbol = target_symbol
+         self.heavy_symbol = heavy_symbol
 
+FGInfo.functional_group_list = [
+                        
+            FGInfo("aldehyde", "C(=O)[H]", 6, 39, "C", "Y"), 
+            FGInfo("carboxylic acid", "C(=O)O[H]", 6, 40, "C", "Zr"),
+            FGInfo("amide", "C(=O)N([H])[H]", 6, 41, "C", "Nb"),
+            FGInfo("thioacid", "C(=O)S[H]", 6, 42, "C", "Mo"),
+            FGInfo("alcohol", "O[H]", 8, 43, "O", "Tc"),
+            FGInfo("thiol", "[S][H]", 16, 44, "S", "Ru"),
+            FGInfo("amine", "[N]([H])[H]", 7, 45, "N", "Rh"),    
+            FGInfo("nitroso", "N=O", 7, 46, "N", "Pd"),
+            FGInfo("boronic acid", "[B](O[H])O[H]", 5, 47, "B", "Ag")
+                             
+                             ]
+
+FGInfo.double_bond_combs = [("Rh","Y"), ("Nb","Y"), ("Mb","Rh")]
+        
 class StructUnit:
     """
     Represents the building blocks of molecules examined by MMEA.
@@ -49,7 +131,7 @@ class StructUnit:
     This is not the be confused with building-blocks* of cages. 
     Building-blocks* of cages are examples of the ``building blocks`` 
     referred to here. To be clear, the ``StructUnit`` class represents 
-    all building blocks of the molecules, such as linkers and 
+    all building blocks of the molecules, such as both the linkers and 
     building-blocks* of cages.
     
     To avoid confusion, in the documentation general building blocks 
@@ -57,12 +139,12 @@ class StructUnit:
     while building-blocks* of cages are always referred to as 
     ``building-blocks*``. 
     
-    The goal of this class is the conveniently store and perform 
-    operations on the building blocks of assembled molecules. The 
-    class stores information regarding the rdkit instance of the 
-    building block, the ``SMILES`` string and the location of its 
-    ``.mol`` file. See the attributes section of this docstring for 
-    more details.
+    The goal of this class is the conveniently store information about, 
+    and perform operations on, single instances of the building blocks 
+    used to form the assembled molecules. The class stores information 
+    regarding the rdkit instance of the building block, its ``SMILES`` 
+    string and the location of its ``.mol`` file. See the attributes 
+    section of this docstring for a full list of information stored.
     
     This class also takes care of perfoming substitutions of the 
     functional groups in the building blocks via the 
@@ -77,21 +159,21 @@ class StructUnit:
     example is the `shift_heavy_mol` method. This method is invoked
     by other processes in MMEA (such as in the creation of assembled 
     molecules - see the `place_mols` documentation of the ``Topolgy`` 
-    class) and is generally very useful. Similar class such as 
+    class) and is generally very useful. Similar methods such as 
     `set_heavy_mol_position` may be added in the future. Refer to the 
     documentation of `shift_heavy_mol` below for more details. Note that 
     this paragraph is not an exhaustive list of useful operations.
     
-    The class is intended to be inherited from. As mentioned 
-    before, ``StructUnit`` is a general building block. If one wants to
-    represent a specific building block, such as a linker or 
+    The ``StructUnit`` class is intended to be inherited from. As 
+    mentioned before, ``StructUnit`` is a general building block. If one 
+    wants to represent a specific building block, such as a linker or 
     building-block* (of a cage) a new class should be created. This new
     class will will inherit ``StructUnit``. In this way, any operations 
     which apply generally to building blocks can be stored here and any
     which apply specifically to one kind of building block such as a 
     linker or building-block* can be placed within its own class.
     
-    Consider a useful example of this approach. When setting the 
+    Consider a useful result of this approach. When setting the 
     coordinates of linkers or building-blocks* during assembly of a 
     cage, it is necessary to know if the molecule you are placing is a 
     building-block* or linker. This is because a building-block* will go 
@@ -120,9 +202,9 @@ class StructUnit:
     one instance of each class derived from ``StructUnit`` at most. It 
     holds information which applies to every building-block* or linker
     present in a class. As a result it does not hold information 
-    regarding how a individual building-blocks* and linkers are joined
+    regarding how individual building-blocks* and linkers are joined
     up in a cage. That is the cage's problem. Specifically cage's 
-    `topology` attributes problem.
+    `topology` attribute's problem.
     
     In summary, the intended use of this class is to answer questions
     such as (not exhaustive):
@@ -147,18 +229,21 @@ class StructUnit:
           
     Questions which this class should not answer include:
     
-        > How many building-blocks* does this cage have?
-        > What is the position of a linker within this cage?
-        > Create a bond between this ``Linker`` and ``BuildingBlock``.
-
-    Class attributes
-    ----------------
-    functional_groups_list : list of FGInfo instances
-        This list holds all ``FGInfo`` instances used by MMEA. If a new
-        functional group is to be used by MMEA, a new ``FGInfo`` 
-        instance must be added to this list. For details on extending 
-        the MMEA to use more functional groups consult the ``FGInfo`` 
-        class string or the developer's guide.
+        > How many building-blocks* does this cage have? (Ask the 
+          ``Cage`` instance.)
+        > What is the position of a linker within this cage? (Ask the 
+          ``Cage`` instance.)
+        > Create a bond between this ``Linker`` and ``BuildingBlock``. 
+          (Ask the ``Cage`` instance.)
+          
+    A good guide is to ask ``Can this question be answered by examining
+    a single building block in and of itself?``. 
+    
+    This should be kept in mind when extending MMEA as well. If a 
+    functionality which only requires a building block ``in a vaccuum`` 
+    is to be added, it should be placed here. If it requires the 
+    building blocks relationship to other objects there should be a 
+    better place for it (if not, make one). 
 
     Attributes
     ----------
@@ -201,20 +286,6 @@ class StructUnit:
     
     """
     
-    functional_groups_list = [
-                        
-            FGInfo("aldehyde", "C(=O)[H]", 6, 39, "C", "Y"), 
-            FGInfo("carboxylic acid", "C(=O)O[H]", 6, 40, "C", "Zr"),
-            FGInfo("amide", "C(=O)N([H])[H]", 6, 41, "C", "Nb"),
-            FGInfo("thioacid", "C(=O)S[H]", 6, 42, "C", "Mo"),
-            FGInfo("alcohol", "O[H]", 8, 43, "O", "Tc"),
-            FGInfo("thiol", "[S][H]", 16, 44, "S", "Ru"),
-            FGInfo("amine", "[N]([H])[H]", 7, 45, "N", "Rh"),    
-            FGInfo("nitroso", "N=O", 7, 46, "N", "Pd"),
-            FGInfo("boronic acid", "[B](O[H])O[H]", 5, 47, "B", "Ag")
-                             
-                             ]
-
     def __init__(self, prist_mol_file):
         self.prist_mol_file = prist_mol_file
         self.prist_mol = chem.MolFromMolFile(prist_mol_file, 
@@ -224,23 +295,109 @@ class StructUnit:
         self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
                                              isomericSmiles=True,
                                              allHsExplicit=True)
-
+        
+        # Define a generator which yields an ``FGInfo`` instance from
+        # the `FGInfo.functional_group_list`. The yielded ``FGInfo``
+        # instance represents the functional group found on the pristine
+        # molecule used for initialization. The generator determines 
+        # the functional group of the molecule from the path of its 
+        # ``.mol`` file. 
+        
+        # The database of precursors should be organized such that any 
+        # given ``.mol`` file has the name of its functional group in
+        # its path. Ideally, this will happen because the ``.mol`` file
+        # is in a folder named after the functional group the molecule 
+        # in the ``.mol`` file contains. This means each ``.mol`` file 
+        # should have the name of only one functional group in its path. 
+        # If this is not the case, the generator will return the 
+        # functional group which appears first in 
+        # `FGInfo.functional_group_list`.
+        
+        # Calling the ``next`` function on this generator causes it to
+        # yield the first (and what should be the only) result. The
+        # generator will return ``None`` if it does not find the name of
+        # a functional group in the path of the ``.mol`` file.
         self.func_grp = next((x for x in 
-                                StructUnit.functional_group_list if 
+                                FGInfo.functional_group_list if 
                                 x.name in prist_mol_file), None)
         
+        # Calling this function generates all the attributes assciated
+        # with the molecule the functional group has been subtituted
+        # with heavy atoms.
         self._generate_heavy_attrs()
 
-    def _generate_heavy_attrs(self):        
-        func_grp_atom_ids = flatten(self.find_functional_group_atoms())       
+    def _generate_heavy_attrs(self):
+        """
+        Adds attributes associated with a substituted functional group.
+        
+        This function is private because it should not be used outside 
+        of the initializer.
+        
+        In essence, this function first finds all atoms in the molecule 
+        which form a functional group. It then switches the atoms in the 
+        functional groups of the molecule for heavy atoms. This new
+        molecule is then stored in the ``StructUnit`` instance in the 
+        form of an ``rdkit.Chem.rdchem.Mol``, a SMILES string and a 
+        ``.mol`` file path.
 
+        Modifies
+        --------
+        self : StructUnit
+            Adds the `heavy_mol`, `heavy_mol_file` and `heavy_smiles`
+            attributes to ``self``.
+        
+        Returns
+        -------
+        None : NoneType                
+
+        """
+        
+        # First create a copy of the ``rdkit.Chem.rdchem.Mol`` instance
+        # representing the pristine molecule. This is so that after 
+        # any changes are made, the pristine molecule's data is not 
+        # corrupted. This second copy which will turn into the 
+        # substituted ``rdkit.Chem.rdchem.Mol`` will be operated on.
         self.heavy_mol = deepcopy(self.prist_mol)      
         
+        # Generate of list of atom ids corresponding to the ids of 
+        # atoms found in functional groups. The ids correspond to the 
+        # ids of the atom within the ``rdkit.Chem.rdchem.Mol`` instance.
+        
+        # The ``flatten`` generator here prevents the need for a nested 
+        # loop. The 'find_functiional_group_atoms' method returns a
+        # tuple of tuples. The outer tuple groups the different 
+        # functional groups while the inner tuple holds the atom ids 
+        # that form the same functional group. For example, a possible
+        # return value could be: ((1,2,3), (4,5,6), (7,8,9)).
+        
+        # Normally, to get to the atom ids an initial for loop would 
+        # iterate through the inner tuples such as (1,2,3) and (2,3,4)
+        # and a nested for loop would then iterate through the atom ids
+        # such as 1, 2 and 3. The ``flatten`` generator yields the
+        # atom id, no matter how containers it is in. It could be in a 
+        # tuple within a tuple within a tuple within a tuple within a 
+        # tuple. ``flatten`` would still yield the atom ids, never any 
+        # container. For details on how ``flatten`` is implemented see 
+        # its definition in the ``convenience_functions`` module.
+        func_grp_atom_ids = flatten(self.find_functional_group_atoms())        
+        
+        # Go through the atom ids of the atoms in functional groups. 
+        # Return the ``rdkit.Chem.rdchem.Atom`` instance in the 
+        # ``rdkit.Chem.rdchem.Mol`` instance which has that atom id.
+        # If that atom is the element which needs to be substituted for
+        # a heavy atom, do so by changing the atomic number in the 
+        # ``rdkit.Chem.rdchem.Atom`` instance. The atomic number to
+        # change it to is supplied by the ``FGInfo`` instance of 
+        # ``self``. The ``FGInfo`` instance will be initialized to the 
+        # functional group present in the molecule.
         for atom_id in func_grp_atom_ids:
             atom = self.heavy_mol.GetAtomWithIdx(atom_id)
             if atom.GetAtomicNum() == self.func_grp.target_atomic_num:
                 atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
         
+        # Change the pristine ``.mol`` file name to include the word
+        # ``HEAVY`` at the end. This generates the name of the 
+        # substituted version of the ``.mol`` file.
         heavy_file_name = list(os.path.splitext(self.prist_mol_file))
         heavy_file_name.insert(1,'HEAVY')
         heavy_file_name.insert(2, self.func_grp.name)
@@ -256,6 +413,12 @@ class StructUnit:
 
     def find_functional_group_atoms(self):
         """
+        Returns a container with the atom ids of all atoms in functional groups.
+
+        Returns
+        -------
+        tuple : tuple of tuples
+            
 
 
         """
