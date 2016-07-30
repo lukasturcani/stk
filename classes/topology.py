@@ -3,7 +3,7 @@ import math
 import numpy as np
 import itertools as itertools
 
-from .molecular import StructUnit
+from .molecular import FGInfo
 
 class MolFileData:
     __slots__ = ['mol_file_content', 'count_line', 'at_num', 
@@ -354,8 +354,8 @@ class Atom(object):
 
 class Topology:
     heavy_symbols = {x.heavy_symbol for x 
-                        in StructUnit.functional_group_list}
-    double_bond_combs = (("Rh","Y"), ("Nb","Y"), ("Mb","Rh")) 
+                        in FGInfo.functional_group_list}
+
     
     def __init__(self, cage):
         self.cage = cage
@@ -405,7 +405,7 @@ class Topology:
         for atom in Atom.linked_atoms:
             mol_file_data.bond_number += 1
             double_bond_present = [atom[1] in tup and atom[3] in tup for 
-                                    tup in Topology.double_bond_combs]
+                                    tup in FGInfo.double_bond_combs]
             
             if True in double_bond_present:
                 bond_order = "2"
