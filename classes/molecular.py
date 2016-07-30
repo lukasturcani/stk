@@ -396,7 +396,7 @@ class StructUnit:
                 atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
         
         # Change the pristine ``.mol`` file name to include the word
-        # ``HEAVY`` at the end. This generates the name of the 
+        # ``HEAVY_`` at the end. This generates the name of the 
         # substituted version of the ``.mol`` file.
         heavy_file_name = list(os.path.splitext(self.prist_mol_file))
         heavy_file_name.insert(1,'HEAVY')
@@ -413,42 +413,150 @@ class StructUnit:
 
     def find_functional_group_atoms(self):
         """
-        Returns a container with the atom ids of all atoms in functional groups.
+        Returns a container of atom ids of atoms in functional groups.
+
+        The ``StructUnit`` instance (`self`) represents a molecule. 
+        This molecule is in turn represented in rdkit by a 
+        ``rdkit.Chem.rdchem.Mol`` instance. This rdkit molecule instance 
+        is held by `self` in the `prist_mol` attribute. In rdkit the
+        molecule instance is made up of constitutent atoms which are
+        ``rdkit.Chem.rdchem.Atom`` instances. Within an rdkit molecule,
+        each such atom instance has its own id. These are the ids
+        contained in the tuple returned by this function. Simple right?   
 
         Returns
         -------
-        tuple : tuple of tuples
-            
-
+        tuple of tuples of ints
+            The form of the returned tuple is:
+            ((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with
+            ids 1 to 9 are in a functional group and that the atoms 1, 2
+            and 3 all form one functional group together. So do 4, 5 and 
+            5 and so on.
 
         """
         
+        # Generate a ``rdkit.Chem.rdchem.Mol`` instance which represents
+        # the functional group of the molecule.        
         func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts)
+        
+        # Do a substructure search on the the molecule in `prist_mol`
+        # to find which atoms match the functional group. Return the
+        # atom ids of those atoms.
         return self.prist_mol.GetSubstructMatches(func_grp_mol)        
 
     def shift_heavy_mol(self, x, y, z):
+        """
+        Shifts the coordinates of all atoms in `heavy_mol`.
+        
+        The `heavy_mol` attribute holds a ``rdkit.Chem.rdchem.Mol``
+        instance. This instance holds holds a 
+        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
+        holds the positions of the atoms within that conformer. This
+        function creates a new conformer with all the coordinates
+        shifted by `x`, `y` and `z` as appropriate. This function does
+        not change the existing conformer.
+        
+        To be clear, consider the following code:
+        
+            >>> b = a.shift_heavy_mol(10,10,10)
+            >>> c = a.shift_heavy_mol(10,10,10)
+        
+        In the preceeding code where ``a`` is a ``StructUnit`` instance, 
+        ``b`` and ``c`` are two new ``rdkit.Chem.rdchem.Mol`` instances. 
+        The ``rdkit.Chem.rdchem.Mol`` instances held by ``a`` in 
+        `prist_mol` and `heavy_mol` are completely unchanged. As are any 
+        other attributes of ``a``. Both ``b`` and ``c`` are rdkit 
+        molecule instances with conformers which are exactly the same.
+        Both of these conformers are exactly like the conformer of the 
+        heavy rdkit molecule in ``a`` except all the atomic positions
+        are increased by 10 in the x, y and z directions. 
+        
+        Because a was not modified by runnig the method, running it
+        with the same arguments leads to the same result. This is why
+        the conformers in ``b`` and ``c`` are the same.
+
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance which has a modified version of 
+            the conformer found in `heavy_mol. Note that the conformer 
+            instance is stored by this attribute indirectly. The 
+            modification is that all atoms in the conformer are shifted 
+            by amount given in the `x`, `y` and `z` arguments.
+        
+        """
+        
+        # The function does not modify the existing conformer, as a 
+        # result a new instance is created and used for modification.
         conformer = chem.Conformer(self.heavy_mol.GetConformer())
         
-        for atom in self.heavy_mol.GetAtoms():            
+        # For each atom, get the atomic positions from the conformer 
+        # and add `x`, `y` and `z` to them, as appropriate. This induces 
+        # the shift. Create a new geometry instance from these new
+        # coordinate values. The geometry instance is used by rdkit to
+        # store the coordinates of atoms. Finally, set the conformers
+        # atomic position to the values stored in this newly generated
+        # geometry instance.
+        for atom in self.heavy_mol.GetAtoms():
+            
+            # Remember the id of the atom you are currently using. It 
+            # is used to change the position of the correct atom at the
+            # end of the loop.
             atom_id = atom.GetIdx()
+            
+            # `atom_position` in an instance holding in the x, y and z 
+            # coordinates of an atom in its 'x', 'y' and 'z' attributes.
             atom_position = conformer.GetAtomPosition(atom_id)
             
+            # Inducing the shift.
             new_x = atom_position.x + x
             new_y = atom_position.y + y
             new_z = atom_position.z + z
             
+            # Creating a new geometry instance.
             new_coords = rdkit.Geometry.rdGeometry.Point3D(new_x, 
                                                            new_y, new_z)            
             
+            # Changes the position of the atom in the conformer to the
+            # values stored in the new geometry instance.
             conformer.SetAtomPosition(atom_id, new_coords)
         
+        # Create a new copy of the rdkit molecule instance representing
+        # the substituted molecule - the original instance is not to be
+        # modified.
         new_heavy = deepcopy(self.heavy_mol)
+        
+        # 
         new_heavy.RemoveAllConformers()
         new_heavy.AddConformer(conformer)
         return new_heavy        
         
     def get_heavy_coords(self):
+        """
+        Yields the x, y and z coordinates of atoms in `heavy_mol`.        
+
+        The `heavy_mol` attribute holds a ``rdkit.Chem.rdchem.Mol``
+        instance. This instance holds holds a 
+        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
+        holds the positions of the atoms within that conformer. This
+        generator yields those coordinates.
+        
+        Yields
+        ------
+        tuple of ints
+            The tuple itself represents the complete position in space.
+            Each int represents the value of the x, y or z coordinate of 
+            an atom. The x, y and z coordinates are located in the tuple
+            in that order. 
+        
+        """
+        # Get the conformer from the instance in the `heavy_mol` 
+        # attribute. 
         conformer = self.heavy_mol.GetConformer()
+        
+        # Go through all the atoms and ask the conformer to return
+        # the position of each atom. This is done by supplying the 
+        # conformers `GetAtomPosition` method with the atom's id.
         for atom in self.heavy_mol.GetAtoms():        
             atom_position = conformer.GetAtomPosition(atom.GetIdx())
             yield atom_position.x, atom_position.y, atom_position.z
