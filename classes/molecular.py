@@ -1,5 +1,5 @@
 import numpy as np
-from functools import wraps
+from functools import wraps, total_ordering
 from operator import attrgetter
 import itertools
 import weakref
@@ -237,7 +237,7 @@ class StructUnit:
           (Ask the ``Cage`` instance.)
           
     A good guide is to ask ``Can this question be answered by examining
-    a single building block in and of itself?``. 
+    a single building block molecule in and of itself?``. 
     
     This should be kept in mind when extending MMEA as well. If a 
     functionality which only requires a building block ``in a vaccuum`` 
@@ -576,45 +576,211 @@ class BuildingBlock(StructUnit):
         
 class Linker(StructUnit):
     """
-    Holds information about the likners of a cage.
+    Holds information about the linkers of a cage.
     
     """
     
     pass
 
+@total_ordering
 class Cage(metaclass=Cached):
+    """
+    A class for MMEA individuals which are porous molecular cages.
+    
+    The goal of this class is to represent an individual used by a GA.
+    As such, it holds attributes that are to be expected for this 
+    purpose. Mainly, it has a fitness value stored in its `fitness` 
+    attribute and a genetic code - as defined by its `bb`, `lk` and 
+    `topology` attributes. Changing any one of these three attributes 
+    will result in a different cage, while providing the same attributes
+    again should yield the same cage.
+    
+    Because of this, as well as the computational cost associated with
+    cage creation, instances of this class are cached. This means that
+    providing the same arguments to the initializer will not build a 
+    different instance with the same attribute values. It will yield the 
+    original instance, retrieved from memory.
+    
+    To prevent unecessary bulk to this class any information that can
+    be categoraized is. For example, a cage has a building-block* and a
+    linker. Both of these structural units have information associated
+    with them. These are things like ``SMILES`` strings, ``.mol`` files
+    and more. All of these things are held within the instances held by
+    the `bb` and `lk` attributes. Equally, anything to do with topolgy 
+    should be held by a ``Topology`` instance in the topology attribute.
+    
+    If new inormation associated with cages is to be added at some point
+    in the future, and that information can be grouped together in a
+    logical category, a new class should be created to store and 
+    manipulate this data. It should not be given to the cage directly.
+    Alternatively if more information to do with one of the already 
+    present categories, it should be added there.
+    
+    However information dealing with the cage as a whole can be added
+    directly to attributes. You can see examples of such attributes 
+    alone. Topology is an exception to this because, despite applying to 
+    the cage as a whole, it a complex aspect with its own functions and 
+    data. Simple identifiers such as ``.mol`` files and ``SMILES`` 
+    strings do not benefit from being grouped together. (Unless they
+    pertain to specific substructures within the cages such as linkers
+    and building-blocks* - as mentioned before.)
+    
+    This class also supports comparison operations, these act on the 
+    fitness value assiciated with a cage. Comparison operations not 
+    explicitly defined are included via the ``total_ordering`` 
+    decorator. For other operations and methods supported by this class 
+    examine the rest of the class definition.
+
+    Finally, a word of caution. The equality operator ``==`` compares 
+    fitness values. This means two cages, made from different building 
+    blocks, can compare equal if they happen to have the same fitness. 
+    The operator is not to be used to check if one cage is the same 
+    structurally as another. To do this check use the `same_cage` 
+    method. In addition the ``is`` operator is implemented as is default
+    in Python. It compares whether two objects are in the same location 
+    in memory. Because the ``Cage`` class is cached the ``is`` operator
+    could in principle be used instead of the `same_cage` method. 
+    However, this is not intended use and not guarnteed to work in 
+    future implementations. If caching stops being implemented such code 
+    would break.
+    
+        
+    Attributes
+    ----------
+    bb : BuildingBlock
+        This attribute represents a single building-block* molecule and
+        holds information pertaining to that function.
+    
+    lk : Linker
+        This attribute represents a single linker molecule and holds 
+        information pertaining to that function.
+
+    topology : A child class of ``Topology``
+        Represents the topology of the cage. Any information to do with
+        how individual building blocks of the cage are organized and
+        joined up in space is held by this attribute. For more details
+        about what information and functions this entails see  the 
+        docstring of the ``Topology`` class and its derived classes.
+
+    prist_mol_file : str
+        The full path of the ``.mol`` file holding the pristine version
+        of the cage molecule.
+
+    prist_mol : rdkit.Chem.rdchem.Mol
+        An rdkit molecule instance representing the cage molecule.
+
+    prist_smiles : str
+        A ``SMILES`` string which represents the pristine cage molecule.
+        
+    heavy_mol_file : str
+        The full path of the ``.mol`` file holding the substituted
+        version of the cage molecule.
+
+    heavy_mol : rdkit.Chem.rdchem.Mol
+        A rdkit molecule instance holding the substituted version of the
+        cage molecule.
+
+    heavy_smiles : str
+        A ``SMILES`` string representing the substitued version of the 
+        cage molecule.
+
+    fitness : float
+        The fitness value of the cage, as determined by the chosen
+        fitness function.         
+    
+    """
+    
     def __init__(self, *args):
+        """
+        Initializes ``Cage`` instances.
+        
+        Several different initializers for this class are available.
+        Which one is chosen depends on the number of arguments provided
+        to the initializer. When 3 arguments are provided the
+        initializer used for testing is used. When the 4 arguments are
+        provided the standarnd initializer used when running MMEA is 
+        used. For details on what the parameters passed should be check
+        documentation of the individual initializers.
+        
+        """
+        
         if len(args) == 3:
             self.testing_init(*args)
         if len(args) == 4:
             self.std_init(*args)
+        
+        # A numerical fitness is assigned by fitness functions evoked
+        # by a ``Population`` instance's `GATools` attribute.
+        self.fitness = None
 
     def std_init(self, bb_file, lk_file, topology, prist_mol_file):
+        """
+        Initialize a ``Cage`` instance used during MMEA runtime.
+        
+        Parameters
+        ---------
+        bb_file : str
+            The full path of the ``.mol`` file storing the pristine
+            molecule to be used a building-block*.
+            
+        lk_file : str
+            The full path of the ``.mol`` file storing the pristine
+            molecule to be used a linker.
+            
+        topology : A child class of ``Topology``
+            The class which defines the topology of the cage. Such 
+            classes are defined in the topology module. The class will
+            be a child class which inherits the base class ``Topology``.
+            
+        prist_mol_file : str
+            The full path of the ``.mol`` file where the cage molecule
+            will be stored.
+            
+        """
+        
         self.bb = BuildingBlock(bb_file)
-        self.lk = Linker(lk_file)        
+        self.lk = Linker(lk_file)
+
+        # A ``Topology`` subclass instance must be initiazlied with a 
+        # copy of the cage it is describing.        
         self.topology = topology(self)
         self.prist_mol_file = prist_mol_file
         
+        # This generates the name of the heavy ``.mol`` file by adding
+        # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
         heavy_mol_file = list(os.path.splitext(prist_mol_file))
         heavy_mol_file.insert(1,'HEAVY')        
         self.heavy_mol_file = '_'.join(heavy_mol_file) 
         
+        # Ask the ``Topology`` instance to assemble/build the cage. This
+        # creates the cage's ``.mol`` file all  the building blocks and
+        # linkers joined up. Both the substituted and pristine versions.
         self.topology.build_cage()
-        
-    def bb_only_init(self, ):
-        pass
-    def lk_only_init(self, ):
-        pass
     
     def same_cage(self, other):
+        """
+        Check if the `other` instance describes the same cage structure.
+        
+        """
+        # Compare the building blocks and topology making up the cage.
+        # If these are the same then the cages have the same structure.
         return (self.bb == other.bb and self.lk == other.lk and 
                                     self.topology == other.topology)
+    
+    def __eq__(self, other):
+        return self.fitness == other.fitness
         
+    def __lt__(self, other):
+        return self.fitness < other.fitness
+    
     def __str__(self):
         return str(self.__dict__) + "\n"
     
     def __repr__(self):
         return str(self.__dict__) + "\n"
+        
+    def __hash__(self):
+        return id(self)
 
     """
     The following methods are inteded for convenience while 
