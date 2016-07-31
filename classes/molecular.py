@@ -526,7 +526,12 @@ class StructUnit:
         # modified.
         new_heavy = deepcopy(self.heavy_mol)
         
-        # 
+        # The new rdkit molecule was copied from the one held in the
+        # `heavy_mol` attribute, as result it has a copy of its
+        # conformer. To prevent the rdkit molecule from holding multiple
+        # conformers the `RemoveAllConformers` method is run first. The
+        # shifted confer is then given to the rdkit molecule, which is
+        # returned.
         new_heavy.RemoveAllConformers()
         new_heavy.AddConformer(conformer)
         return new_heavy        
