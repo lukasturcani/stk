@@ -95,9 +95,9 @@ def test_all_members():
 
     """    
     
-    #Generate a bunch of cages.
-    cages = [Cage.__new__(Cage) for x in range(0,22)]    
-    
+    # Generate a bunch of cages.
+    cages = [Cage(x,'a','b') for x in range(0,22)]    
+        
     # Generate a couple of ``Populations`` to be used as subpopulations.
     sub1 = Population(*cages[0:4])
     sub2 = Population(*cages[4:9])
@@ -112,14 +112,15 @@ def test_all_members():
     main = Population(sub1, sub2, *cages[-3:])
 
     # Place the results of ``all_members`` into a list.
-    all_members = [cage for cage in main.all_members()]
+    all_members = Population(*[cage for cage in main.all_members()])
 
     # Check that each generated cage is in `all_members`. Should pass.
     assert all(cage in all_members for cage in cages)  
     
     # Add a cage to `cages`. Now there should be a cage in `cages`, not 
     # present in main. Should fail.
-    cages.append(Cage.__new__(Cage))      
+    cages.append(Cage('alpha', 'beta', 'gamma'))
+     
     with pytest.raises(AssertionError):
         assert all(cage in all_members for cage in cages)
         
@@ -139,11 +140,16 @@ def test_add_members_duplicates():
     receiver.add_members(supplier, duplicates=True)
 
     # Cages in `supplier` should now be held in `members` attribute of 
-    # `receiver`.
-    assert all(cage in receiver.members for cage in supplier)
+    # `receiver`. A new ``Population`` instance must be created for 
+    # these tests because `members` is a ``list`` which have a different
+    # definition of `__contains`__ to ``Population``. Identity needs to 
+    # be compared by with lists equality (via ``__eq__``) is compared. 
+    assert all(cage in Population(*receiver.members) 
+                                                for cage in supplier)
 
     # The reverse should not be true.
-    assert not all(cage in supplier.members for cage in receiver)    
+    assert not all(cage in Population(*supplier.members) 
+                                                for cage in receiver)    
     
     # Count the frequency of each cage` in `receiver.members`.
     count = Counter(receiver.members)
