@@ -72,23 +72,7 @@ def test_init():
     # Due to a technicality (see __init__ source code) any number of 
     # ``None`` type arguments can be supplied. Valid, should pass.
     Population(*[None for x in range(0,10)])
- 
-def test_caching():
-    """
-    Cages created with same arguments should return the same instance.
-
-    """
-    
-    pop1 = generate_population()
-    pop2 = generate_population()
-    pop3 = generate_population(offset=True)
-    
-    for cage1, cage2, cage3 in zip(pop1, pop2, pop3):
-        assert cage1 is cage2
-        assert cage1 is not cage3
-        assert cage2 is not cage3
-    
-   
+        
 def test_all_members():
     """
     Check that all members, direct and in subpopulations, are returned.

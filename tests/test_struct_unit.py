@@ -7,22 +7,28 @@ def get_mol_file():
     # iterates through the directory, where the ``if`` condition ensures
     # that the desired ``.mol`` file is found. It is the one in the 
     # ``data`` directory. Finally the full path of the ``.mol`` file is 
-    # generated using the ``os.path.join`` function. A ``StructUnit``
-    # instance is then initiated from this ``.mol`` file. This approach
-    # means that the test should work on any machine as it does not 
-    # depend on absolute paths to find the ``.mol`` file. It also means
-    # that the test does not need to be run from a specific directory.    
-    mol_file = os.walk(os.getcwd())  
-    a = next(iter((x[0], x[2][0]) for x in mol_file if 'data' in x[0]))   
-    return os.path.join(*a) 
+    # generated using the ``os.path.join`` function. This approach means
+    # that the test should work on any machine as it does not depend on
+    # absolute paths to find the ``.mol`` file. It also means that the 
+    # test does not need to be run from a specific directory.    
+    mol_file = os.walk(os.getcwd())    
+    for x in mol_file:
+        if 'data' in x[0]:
+            for y in x[2]:
+                if '.mol' in y and 'HEAVY' not in y:
+                    yield os.path.join(x[0], y)
+
 
 
 def test_init():
     """
     Ensures that StructUnit instances are initiated correctly.
+    
+    This function uses the ``aldehyde2f_3.mol`` file.
 
     """     
-    mol_file = get_mol_file() 
+    mol_file = next(x for x in get_mol_file() 
+                                        if 'aldehyde2f_3.mol' in x)
     struct_unit = StructUnit(mol_file)
      
     # Check that heavy attributes were created by the initializer.
@@ -59,13 +65,16 @@ def test_init():
 def test_find_functional_group_atoms():
     """
     Make sure correct atoms are found in the functional groups.
+    
+    This function uses the ``aldehyde2f_3.mol`` file.
 
     """    
     # These are the expected atom ids for the test molecule.
     expected = ((1, 0, 12), (10, 11, 19))    
     
     # Initializing the test molecule.    
-    mol_file = get_mol_file()
+    mol_file = next(x for x in get_mol_file() 
+                                        if 'aldehyde2f_3.mol' in x)
     struct_unit = StructUnit(mol_file)
         
     func_grp_atoms = struct_unit.find_functional_group_atoms()
@@ -76,9 +85,12 @@ def test_shift_heavy_mol():
     """
     Ensure that shifting the position of a ``StructUnit`` works.    
     
+    This function uses the ``aldehyde2f_3.mol`` file.    
+    
     """
     # Initializing the test molecule.    
-    mol_file = get_mol_file()
+    mol_file = next(x for x in get_mol_file() 
+                                        if 'aldehyde2f_3.mol' in x)
     struct_unit = StructUnit(mol_file)
 
     # Shifting the same molecule twice should return two 
@@ -115,7 +127,9 @@ def test_shift_heavy_mol():
         
 def test_get_heavy_coords():
     """
-    Make sure the correct output is provided.    
+    Make sure the correct output is provided.
+
+    This function uses the ``aldehyde2f_3.mol`` file.
     
     """
     
@@ -131,7 +145,8 @@ def test_get_heavy_coords():
                   (3.1861, 0.7105, 0.5183), (-0.4645, -1.2363, 0.3984), 
                   (3.4403, -2.2326, 2.277)]
 
-    mol_file = get_mol_file()
+    mol_file = next(x for x in get_mol_file() 
+                                        if 'aldehyde2f_3.mol' in x)
     struct_unit = StructUnit(mol_file)
     output = list(struct_unit.get_heavy_coords())
     
