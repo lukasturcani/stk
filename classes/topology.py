@@ -2,6 +2,7 @@ from rdkit import Chem as chem
 import math
 import numpy as np
 import itertools as itertools
+import re
 
 from .molecular import FGInfo
 
@@ -417,11 +418,11 @@ class Topology:
         
         
         mol_file_data.mol_file_content += ("M  V30 END BOND\nM  V30 END CTAB\nM"  
-                                                                 " END")
+                                                                 "  END")
 
+        p = re.compile(r" VAL=.")
+        mol_file_data.mol_file_content = re.sub(p, "", mol_file_data.mol_file_content)
 
-        mol_file_data.mol_file_content = mol_file_data.mol_file_content.replace(" VAL=1", 
-                                                                    "")
         mol_file_data.mol_file_content = mol_file_data.mol_file_content.replace(mol_file_data.count_line, 
              "M  V30 COUNTS {0} {1} 0 0 0\n".format(mol_file_data.at_num,mol_file_data.bond_number))
         
