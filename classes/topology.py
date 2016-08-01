@@ -7,6 +7,45 @@ import re
 from .molecular import FGInfo
 
 class MolFileData:
+    """
+    Used to store data collected from a ``.mol`` file during assembly.
+    
+    This class is used during assembly to keep track of the content
+    which should be written to the final ``.mol`` file of the assembled
+    molecule.
+    
+    Attributes
+    ----------
+    mol_file_content : str
+        This attribute holds a string with all of the ``.mol`` file 
+        content. This content is edited to include the additional bonds
+        need to assemble a larger molecule.
+    
+    count_line : str
+        Represents the ``count line`` in the ``.mol`` file. This line
+        holds the atom and bond number. The bond number needs to be
+        edited during course of assembly.
+        
+    at_num : str
+        This attribute holds the number of atoms defined in the ``.mol``
+        file. It is held a string for convenience as it is read from a
+        string and later written to one.
+
+    bond_number : int
+        Holds the number of bonds in the ``.mol`` file.
+
+    atom1_list : list of ``Atom`` instances
+        All the heavy atoms representing one of the functional groups
+        are placed into ``Atom`` instances which are stored here. Each
+        functional group has its own such attribute/list.
+        
+    atom2_list : list of ``Atom`` instances      
+        All the heavy atoms representing one of the functional groups
+        are placed into ``Atom`` instances which are stored here. Each
+        functional group has its own such attribute/list.
+    
+    """
+    
     __slots__ = ['mol_file_content', 'count_line', 'at_num', 
                  'bond_number', 'atom1_list', 'atom2_list']
     
@@ -21,8 +60,50 @@ class MolFileData:
     
 class Atom(object):
     """
-    the Atom class is used to find the distances between metal atoms in geometry
-    file where the atoms are disconnected. this allows the connection of correct atoms
+    Used to store and manipulate data collected from a ``.mol`` file.    
+
+    This class is used during assembly to keep track of which atoms need
+    to be linked together by writing bonds to the ``.mol`` file. It is 
+    also used to find the distances between heavy atoms in the ``.mol``
+    file. This allows the creation of bonds between the correct atoms. A
+    full list of operations performed by this class can be found by 
+    examining its entire definition.
+    
+    Class attributes
+    ----------------
+    bb :
+    
+    bb_heavy_atoms_per_molecule :     
+    
+    lk :
+    
+    lk_heavy_atoms_per_molecule :
+    
+    linked_mols :    
+    
+    
+    Attributes
+    ----------
+    element : 
+    
+    number :
+    
+    heavy_atom_num :
+    
+    x :
+    
+    y : 
+    
+    z :
+    
+    min_parter :
+    
+    min_distance :
+    
+    distances : set
+    
+    paired : bool
+
     """
     bb = None
     bb_heavy_atoms_per_molecule = None
