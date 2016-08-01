@@ -106,31 +106,30 @@ class FGInfo:
     
     """
     
-    __slots__ = ['name', 'smarts', 'target_atomic_num', 
-                 'heavy_atomic_num', 'target_symbol', 'heavy_symbol',
-                 'delete'] 
+    __slots__ = ['name', 'smarts_start', 'smarts_end', 'target_atomic_num', 
+                 'heavy_atomic_num', 'target_symbol', 'heavy_symbol'] 
     
-    def __init__(self, name, smarts, target_atomic_num, 
-                 heavy_atomic_num, target_symbol, heavy_symbol, delete):
+    def __init__(self, name, smarts_start, smarts_end, target_atomic_num, 
+                 heavy_atomic_num, target_symbol, heavy_symbol):
          self.name = name
-         self.smarts = smarts
+         self.smarts_start = smarts_start
+         self.smarts_end = smarts_end
          self.target_atomic_num = target_atomic_num
          self.heavy_atomic_num = heavy_atomic_num
          self.target_symbol = target_symbol
          self.heavy_symbol = heavy_symbol
-         self.delete = delete
 
 FGInfo.functional_group_list = [
                         
-    FGInfo("aldehyde", "C(=O)[H]", 6, 39, "C", "Y", {8, 1}), 
-    FGInfo("carboxylic acid", "C(=O)O[H]", 6, 40, "C", "Zr", {1}),
-    FGInfo("amide", "C(=O)N([H])[H]", 6, 41, "C", "Nb", {1}),
-    FGInfo("thioacid", "C(=O)S[H]", 6, 42, "C", "Mo", {1}),
-    FGInfo("alcohol", "O[H]", 8, 43, "O", "Tc", {1}),
-    FGInfo("thiol", "[S][H]", 16, 44, "S", "Ru", {1}),
-    FGInfo("amine", "[N]([H])[H]", 7, 45, "N", "Rh", {1}),       
-    FGInfo("nitroso", "N=O", 7, 46, "N", "Pd", {1}),
-    FGInfo("boronic acid", "[B](O[H])O[H]", 5, 47, "B", "Ag", {1})
+    FGInfo("aldehyde", "C(=O)[H]", "[Y]", 6, 39, "C", "Y"), 
+    FGInfo("carboxylic acid", "C(=O)O[H]", "[Zr]=O", 6, 40, "C", "Zr"),
+    FGInfo("amide", "C(=O)N([H])[H]", "[Nb]=O", 6, 41, "C", "Nb"),
+    FGInfo("thioacid", "C(=O)S[H]", "[Mo]=O", 6, 42, "C", "Mo"),
+    FGInfo("alcohol", "O[H]", "[Tc]", 8, 43, "O", "Tc"),
+    FGInfo("thiol", "[S][H]", "[Ru]", 16, 44, "S", "Ru"),
+    FGInfo("amine", "[N]([H])[H]", "[Rh]", 7, 45, "N", "Rh"),       
+    FGInfo("nitroso", "N=O","[Pd]", 7, 46, "N", "Pd"),
+    FGInfo("boronic acid", "[B](O[H])O[H]", "[Ag]", 5, 47, "B", "Ag")
                              
                              ]
 
@@ -377,9 +376,6 @@ class StructUnit:
         # for heavy atoms.        
         self._make_atoms_heavy_in_heavy()
         
-        # Removes any atoms attached to the heavy atom which would be 
-        # lost in a condensation reaction.
-        self._delete_extra_atoms_in_heavy()
         
         # Change the pristine ``.mol`` file name to include the word
         # ``HEAVY_`` at the end. This generates the name of the 
@@ -551,77 +547,16 @@ class StructUnit:
         for atom in self.heavy_mol.GetAtoms():        
             atom_position = conformer.GetAtomPosition(atom.GetIdx())
             yield atom_position.x, atom_position.y, atom_position.z
-
-
-    def _delete_extra_atom_in_heavy(self):
-        """
-        
-        """
-        
-        editable_mol = chem.EditableMol(self.heavy_mol)
-        found = False
-        for atom in self.heavy_mol.GetAtoms():
-            if (atom.GetAtomicNum() == self.func_grp.heavy_atomic_num and
-                len(atom.GetNeighbors()) > 1):
-                for neighbor in atom.GetNeighbors():
-                    if neighbor.GetAtomicNum() in self.func_grp.delete:
-                        editable_mol.RemoveAtom(neighbor.GetIdx())
-                        found = True
-                        break
-                break
-                
-        
-        self.heavy_mol = editable_mol.GetMol()
-        return found
-    
-    def _delete_extra_atoms_in_heavy(self):
-        """
-        
-        """
-        
-        for x in iter(lambda:self._delete_extra_atom_in_heavy(), False):
-            continue
-    
+  
     def _make_atoms_heavy_in_heavy(self):
         """
 
         """        
         
-        # Generate of list of atom ids corresponding to the ids of 
-        # atoms found in functional groups. The ids correspond to the 
-        # ids of the atom within the ``rdkit.Chem.rdchem.Mol`` instance.
-        
-        # The ``flatten`` generator here prevents the need for a nested 
-        # loop. The 'find_functiional_group_atoms' method returns a
-        # tuple of tuples. The outer tuple groups the different 
-        # functional groups while the inner tuple holds the atom ids 
-        # that form the same functional group. For example, a possible
-        # return value could be: ((1,2,3), (4,5,6), (7,8,9)).
-        
-        # Normally, to get to the atom ids an initial for loop would 
-        # iterate through the inner tuples such as (1,2,3) and (2,3,4)
-        # and a nested for loop would then iterate through the atom ids
-        # such as 1, 2 and 3. The ``flatten`` generator yields the
-        # atom id, no matter how containers it is in. It could be in a 
-        # tuple within a tuple within a tuple within a tuple within a 
-        # tuple. ``flatten`` would still yield the atom ids, never any 
-        # container. For details on how ``flatten`` is implemented see 
-        # its definition in the ``convenience_functions`` module.
-        func_grp_atom_ids = flatten(self.find_functional_group_atoms())        
-        
-        # Go through the atom ids of the atoms in functional groups. 
-        # Return the ``rdkit.Chem.rdchem.Atom`` instance in the 
-        # ``rdkit.Chem.rdchem.Mol`` instance which has that atom id.
-        # If that atom is the element which needs to be substituted for
-        # a heavy atom, do so by changing the atomic number in the 
-        # ``rdkit.Chem.rdchem.Atom`` instance. The atomic number to
-        # change it to is supplied by the ``FGInfo`` instance of 
-        # ``self``. The ``FGInfo`` instance will be initialized to the 
-        # functional group present in the molecule.
-        for atom_id in func_grp_atom_ids:
-            atom = self.heavy_mol.GetAtomWithIdx(atom_id)
-            if atom.GetAtomicNum() == self.func_grp.target_atomic_num:
-                atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
+        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
+        func_grp_mol_end = chem.MolFromSmarts(self.func_grp.smarts_end)
+        rms = ac.ReplaceSubstructs(self.prist_mol, func_grp_mol, func_grp_mol_end, replaceAll=True)
+        self.heavy_mol = rms[0]
                 
 class BuildingBlock(StructUnit):
     """
@@ -823,7 +758,6 @@ class Cage(metaclass=Cached):
         # Add Hydrogens to the pristine version of the molecule and
         # ensure this updated molecule is added to the ``.mol`` file as 
         # well. The ``GetSSSR`` function and optimization ensure that 
-        # the added Hydrogen atoms are placed correctly in space.
         self.prist_mol = chem.AddHs(self.prist_mol)
         chem.GetSSSR(self.prist_mol)
         ac.MMFFOptimizeMolecule(self.prist_mol)  
