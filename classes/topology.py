@@ -32,17 +32,22 @@ class MolFileData:
         string and later written to one.
 
     bond_number : int
-        Holds the number of bonds in the ``.mol`` file.
+        Holds the number of bonds in the ``.mol`` file. This will be 
+        written to the final ``.mol`` file generated during assembly.
+        As a result it will be added to for each new bond created during
+        assembly.
 
     atom1_list : list of ``Atom`` instances
-        All the heavy atoms representing one of the functional groups
-        are placed into ``Atom`` instances which are stored here. Each
-        functional group has its own such attribute/list.
+        All the heavy atoms representing one of the functional groups in
+        a ``.mol`` file are placed into ``Atom`` instances which are 
+        stored here. Each functional group has its own such 
+        attribute/list.
         
     atom2_list : list of ``Atom`` instances      
-        All the heavy atoms representing one of the functional groups
-        are placed into ``Atom`` instances which are stored here. Each
-        functional group has its own such attribute/list.
+        All the heavy atoms representing one of the functional groups in
+        a ``.mol`` file are placed into ``Atom`` instances which are 
+        stored here. Each functional group has its own such 
+        attribute/list.
     
     """
     
@@ -125,49 +130,134 @@ class Atom(object):
 
     @staticmethod
     def extract_mol_file_data(mol_file):
+        """
+        Reads a ``.mol`` file and stores its data.
+        
+        This function reads the ``.mol`` containing heavy building
+        blocks before they are connected during assembly. The data
+        extracted by this function is used to connect the right
+        molecules.
+        
+        Parameters
+        ----------
+        mol_file : str
+            Full path of the ``.mol`` file which holds the heavy
+            assembled molecule. This is the file that needs to be edited
+            so that bonds are created to form an assembled molecule.
+        
+        Returns
+        -------
+        MolFileData
+            An object used for storing the content of a ``.mol`` file
+            being edited during assembly.
+        
+        """
     
+        # This function goes through the ``.mol`` file holding 
+        # disconnected heavy molecules, line by line. The first time a 
+        # line describing a heavy atom is found its element is saved as
+        # the ``atom1_element``. An ``Atom`` instance representing this 
+        # atom is added to ``atom1_list`` and the count, 
+        # ``type1_heavy_atom_number``, is incremented.  The next time an 
+        # atom of this element is encountered an ``Atom`` object is
+        # again created and added to the list and the count incremented.
+    
+        # After the first heavy atom is encountered, the next heavy atom
+        # of a different element is used the initiate the ``atom2`` 
+        # variables. The process is otherwise the same for heavy atoms
+        # of this element as was the case for the first.
+    
+        # In the meantime, every line that is iterated through is saved
+        # in the string ``mol_file__content``. This content is used by
+        # other functions to write the final cage structure to a 
+        # ``.mol`` file.
+    
+        # Once the file is iterated through, the data collected is 
+        # returned in a ``MolFileData`` object.
         mol_file_content = ""
         with open(mol_file, "r") as mol_file:
             
+            # Store the atomic symbols of the heavy elements in the 
+            # ``.mol`` file as a string.
             atom1_element = None    
             atom2_element = None
+            
+            # Store ``Atom`` instances desrcibing heavy atoms in the 
+            # ``.mol`` file.
             atom1_list = []
             atom2_list = []
         
+            # This flag is ``True`` when the lines being iterated 
+            # through belong to the block describing atoms in the 
+            # ``.mol`` file. It is ``False`` otherwise.
             take_atom = False
+            
+            # This flag is ``True`` when the lines being iterated 
+            # through belong to the block describing bonds in the 
+            # ``.mol`` file. It is ``False`` otherwise.            
             take_bond = False
+            
+            # This flag is ``True`` when the lines being iterated
+            # will be added to the string holding the ``.mol`` file 
+            # content. Some lines do not need to be copied and are added
+            # to the final ``.mol`` later. This is because they need to
+            # reflect the changes made during the course of the assembly
+            # so copying them makes little sense.
             write_line = True
         
+            # Count the total of heavy atoms of each type in the 
+            # ``.mol`` file.
             type1_heavy_atom_number = 1
             type2_heavy_atom_number = 1
         
-            for raw_line in mol_file:           
+            for raw_line in mol_file:
+                
+                # Split the line into a list of ``words``.
                 line = raw_line.split()
                 
+                # Indicates that the bond block has ended. After this
+                # point the lines do not need to be saved.
                 if "M  V30 END BOND" in raw_line:
                     write_line = False            
-                    
+                
+                # This string indicates the ``count line`` which holds
+                # the total number of atoms in the ``.mol`` file. This
+                # number needs to be saved, as the does line itself.
                 if "M  V30 COUNTS" in raw_line:
                     count_line = raw_line
                     at_num = line[3]            
-                    
+                
+                # If the ``write_line`` flag is ``True`` copy the line.
                 if write_line == True:            
                     mol_file_content += raw_line
-                        
+                
+                # This string indicates that the atom block begins on
+                # the next line. Set the appropriate flag to ``True`` so
+                # that atomic data starts being collected.
                 if "M  V30 BEGIN ATOM" in raw_line:
                     take_atom = True
                     continue
                 
+                # This string indicates taht the atom block has ended.
+                # Set the appropriate flag to ``False`` so that atomic
+                # data stops being collected.
                 if "M  V30 END ATOM" in raw_line:
                     take_atom = False
                     continue
                 
+                # This string indicates that the bond block is about to
+                # start. Set the appropriate flag to ``True`` so that
+                # bond data is collected.
                 if "M  V30 BEGIN BOND" in raw_line:
                     take_bond = True
                     continue
                 
                 if take_atom == True:                 
-
+                    # If the flag was set to true the line describes an
+                    # atom. As a result the second word in the line is
+                    # the atoms id number, the next is the elemental 
+                    # symbol and the next 3 are the x, y and z 
+                    # coordinates, respectively.
                     atom_id = line[2]
                     atomic_symbol = line[3]
                     atom_x = float(line[4])
@@ -222,7 +312,12 @@ class Atom(object):
         return MolFileData(mol_file_content, count_line, at_num, 
                            bond_number, atom1_list, atom2_list)
         
-    def assign_molecule_number(self):       
+    def assign_molecule_number(self):
+        """
+        
+        
+        """
+        
         if self.element == Atom.bb:
             self.mol_number = math.ceil(self.heavy_atom_num / 
                                     Atom.bb_heavy_atoms_per_molecule)  
@@ -233,6 +328,10 @@ class Atom(object):
         return 1
     
     def distance(self, atom2):
+        """
+        
+        """
+        
         x_diff_sq = (self.x - atom2.x) ** 2
         y_diff_sq = (self.y - atom2.y) ** 2
         z_diff_sq = (self.z - atom2.z) ** 2
@@ -435,6 +534,11 @@ class Atom(object):
                     del self.distances[min_partner]
 
 class Topology:
+    """
+
+    
+    
+    """
     heavy_symbols = {x.heavy_symbol for x 
                         in FGInfo.functional_group_list}
 
@@ -529,6 +633,10 @@ class Topology:
 
       
 class FourPlusSix(Topology):
+    """
+    
+    """
+    
     def __init__(self, cage):
         super().__init__(cage)
         self.heavy_atoms_per_bb = 3
