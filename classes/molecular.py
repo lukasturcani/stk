@@ -419,7 +419,7 @@ class StructUnit:
         
         # Generate a ``rdkit.Chem.rdchem.Mol`` instance which represents
         # the functional group of the molecule.        
-        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts)
+        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
         
         # Do a substructure search on the the molecule in `prist_mol`
         # to find which atoms match the functional group. Return the
