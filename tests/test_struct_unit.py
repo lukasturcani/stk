@@ -136,17 +136,30 @@ def test_get_heavy_coords():
     
     assert exp_output == output
     
-def test_functional_group_substitutions():
+def test_amine_substitution():
     """
+    Ensure that the amine functional group is correctly replaced.    
+    
     """
+    exp_smiles = ("[H][C]([H])([H])[C]1=[C]([Rh])[C](=[O])[C]2=[C]"
+                  "([C]1=[O])[N]1[C](=[C]2[C]([H])([H])[O][C](=[O])"
+                  "[Rh])[C]([H])([H])[C]([H])([Rh])[C]1([H])[H]")
+    mol_file = next(x for x in get_mol_file() 
+                                        if 'amine3f_14.mol' in x)   
+    mol = StructUnit(mol_file)
+    assert mol.heavy_smiles == exp_smiles
 
-    pass    
+def test_aldehyde_substitution():
+    """
+    Ensure that the aldehyde functional group is correctly replaced.    
     
-    
-    
-    
-    
-    
+    """
+    exp_smiles = ("[H][N]1[C](=[N][Y])[C]([H])([H])[N]([H])[C]([H])"
+                  "([H])[C]1=[N][Y]")
+    mol_file = next(x for x in get_mol_file() 
+                                        if 'aldehyde2f_3.mol' in x)   
+    mol = StructUnit(mol_file)
+    assert mol.heavy_smiles == exp_smiles
     
     
     

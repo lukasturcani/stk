@@ -74,8 +74,13 @@ class FGInfo:
     name : str
         The name of the functional group.
     
-    smarts : str
-        A ``SMARTS`` string describing the functional group.
+    smarts_start : str
+        A ``SMARTS`` string describing the functional group before 
+        substitution by a heavy atom.
+        
+    smarts_end : str
+        A ``SMARTS`` string describing the functinal group after
+        substitution by a heavy atom.
     
     target_atomic_num : int
         The atomic number of the atom, which is substituted with a heavy 
@@ -92,17 +97,6 @@ class FGInfo:
     heavy_symbol : str
         The atomic symbol of the heavy atom which replaces the target 
         atom in the functional group.
-    
-    delete : set of ints
-        When additional atoms need to be removed from the functional
-        group atom being substituted, they should be placed in a set
-        in this variable. For example, when an aldehyde reacts it loses
-        not only the Hydrogen atoms on the central carbon but also the
-        oxygen atom. As a result the atomic number of oxygen should be
-        placed in a set in this attribute.
-        
-        If no addtional atoms need to be removed (Hydrogen atoms are
-        removed by default) this attribute should be an empty set.
     
     """
     
@@ -346,12 +340,11 @@ class StructUnit:
         This function is private because it should not be used outside 
         of the initializer.
         
-        In essence, this function first finds all atoms in the molecule 
-        which form a functional group. It then switches the atoms in the 
-        functional groups of the molecule for heavy atoms. This new
-        molecule is then stored in the ``StructUnit`` instance in the 
-        form of an ``rdkit.Chem.rdchem.Mol``, a SMILES string and a 
-        ``.mol`` file path.
+        The function creates rdkit molecule where all of the functional
+        group atoms have been replaced by the desired atom as indicated
+        in the ``FGInfo`` instance of `self`. It also creates ``.mol``
+        file holding this molecule and a ``SMILES`` string representing
+        it.
 
         Modifies
         --------
@@ -364,6 +357,13 @@ class StructUnit:
         None : NoneType                
 
         """
+        
+        # In essence, this function first finds all atoms in the 
+        # molecule which form a functional group. It then switches the 
+        # atoms in the functional groups of the molecule for heavy 
+        # atoms. This new molecule is then stored in the ``StructUnit`` 
+        # instance in the form of an ``rdkit.Chem.rdchem.Mol``, a SMILES 
+        # string and a ``.mol`` file path.
         
         # First create a copy of the ``rdkit.Chem.rdchem.Mol`` instance
         # representing the pristine molecule. This is so that after 
@@ -550,12 +550,20 @@ class StructUnit:
   
     def _make_atoms_heavy_in_heavy(self):
         """
+        Converts functional group in `heavy_mol` to substituted version.
 
         """        
         
+        # The function creates rdkit molecules of the functional group
+        # before and after substitution. It then uses rdkit's 
+        # ``ReplaceSubstructs`` method to implement the substitution.
+        # The resulting rdkit molecule is given to the `heavy_mol`
+        # attribute.                
+        
         func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
         func_grp_mol_end = chem.MolFromSmarts(self.func_grp.smarts_end)
-        rms = ac.ReplaceSubstructs(self.prist_mol, func_grp_mol, func_grp_mol_end, replaceAll=True)
+        rms = ac.ReplaceSubstructs(self.prist_mol, func_grp_mol, 
+                                   func_grp_mol_end, replaceAll=True)
         self.heavy_mol = rms[0]
                 
 class BuildingBlock(StructUnit):
@@ -757,7 +765,10 @@ class Cage(metaclass=Cached):
                                              
         # Add Hydrogens to the pristine version of the molecule and
         # ensure this updated molecule is added to the ``.mol`` file as 
-        # well. The ``GetSSSR`` function and optimization ensure that 
+        # well. The ``GetSSSR`` function and optimization ensure that
+        # the added Hydrogen atoms are placed in reasonable positions.
+        # The ``GetSSSR`` function itself is just prerequisite for
+        # running the optimization.
         self.prist_mol = chem.AddHs(self.prist_mol)
         chem.GetSSSR(self.prist_mol)
         ac.MMFFOptimizeMolecule(self.prist_mol)  
