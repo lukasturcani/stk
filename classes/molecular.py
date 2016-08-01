@@ -12,6 +12,7 @@ from copy import deepcopy
 import os
 import math
 
+
 from ..convenience_functions import dedupe, flatten
 
 class Cached(type):
@@ -92,31 +93,44 @@ class FGInfo:
         The atomic symbol of the heavy atom which replaces the target 
         atom in the functional group.
     
+    delete : set of ints
+        When additional atoms need to be removed from the functional
+        group atom being substituted, they should be placed in a set
+        in this variable. For example, when an aldehyde reacts it loses
+        not only the Hydrogen atoms on the central carbon but also the
+        oxygen atom. As a result the atomic number of oxygen should be
+        placed in a set in this attribute.
+        
+        If no addtional atoms need to be removed (Hydrogen atoms are
+        removed by default) this attribute should be an empty set.
+    
     """
     
     __slots__ = ['name', 'smarts', 'target_atomic_num', 
-                 'heavy_atomic_num', 'target_symbol', 'heavy_symbol'] 
+                 'heavy_atomic_num', 'target_symbol', 'heavy_symbol',
+                 'delete'] 
     
     def __init__(self, name, smarts, target_atomic_num, 
-                 heavy_atomic_num, target_symbol, heavy_symbol):
+                 heavy_atomic_num, target_symbol, heavy_symbol, delete):
          self.name = name
          self.smarts = smarts
          self.target_atomic_num = target_atomic_num
          self.heavy_atomic_num = heavy_atomic_num
          self.target_symbol = target_symbol
          self.heavy_symbol = heavy_symbol
+         self.delete = delete
 
 FGInfo.functional_group_list = [
                         
-            FGInfo("aldehyde", "C(=O)[H]", 6, 39, "C", "Y"), 
-            FGInfo("carboxylic acid", "C(=O)O[H]", 6, 40, "C", "Zr"),
-            FGInfo("amide", "C(=O)N([H])[H]", 6, 41, "C", "Nb"),
-            FGInfo("thioacid", "C(=O)S[H]", 6, 42, "C", "Mo"),
-            FGInfo("alcohol", "O[H]", 8, 43, "O", "Tc"),
-            FGInfo("thiol", "[S][H]", 16, 44, "S", "Ru"),
-            FGInfo("amine", "[N]([H])[H]", 7, 45, "N", "Rh"),    
-            FGInfo("nitroso", "N=O", 7, 46, "N", "Pd"),
-            FGInfo("boronic acid", "[B](O[H])O[H]", 5, 47, "B", "Ag")
+    FGInfo("aldehyde", "C(=O)[H]", 6, 39, "C", "Y", {8, 1}), 
+    FGInfo("carboxylic acid", "C(=O)O[H]", 6, 40, "C", "Zr", {1}),
+    FGInfo("amide", "C(=O)N([H])[H]", 6, 41, "C", "Nb", {1}),
+    FGInfo("thioacid", "C(=O)S[H]", 6, 42, "C", "Mo", {1}),
+    FGInfo("alcohol", "O[H]", 8, 43, "O", "Tc", {1}),
+    FGInfo("thiol", "[S][H]", 16, 44, "S", "Ru", {1}),
+    FGInfo("amine", "[N]([H])[H]", 7, 45, "N", "Rh", {1}),       
+    FGInfo("nitroso", "N=O", 7, 46, "N", "Pd", {1}),
+    FGInfo("boronic acid", "[B](O[H])O[H]", 5, 47, "B", "Ag", {1})
                              
                              ]
 
@@ -359,41 +373,13 @@ class StructUnit:
         # substituted ``rdkit.Chem.rdchem.Mol`` will be operated on.
         self.heavy_mol = deepcopy(self.prist_mol)      
         
-        # Generate of list of atom ids corresponding to the ids of 
-        # atoms found in functional groups. The ids correspond to the 
-        # ids of the atom within the ``rdkit.Chem.rdchem.Mol`` instance.
+        # Subtitutes the relevent functional group atoms in `heavy_mol`
+        # for heavy atoms.        
+        self._make_atoms_heavy_in_heavy()
         
-        # The ``flatten`` generator here prevents the need for a nested 
-        # loop. The 'find_functiional_group_atoms' method returns a
-        # tuple of tuples. The outer tuple groups the different 
-        # functional groups while the inner tuple holds the atom ids 
-        # that form the same functional group. For example, a possible
-        # return value could be: ((1,2,3), (4,5,6), (7,8,9)).
-        
-        # Normally, to get to the atom ids an initial for loop would 
-        # iterate through the inner tuples such as (1,2,3) and (2,3,4)
-        # and a nested for loop would then iterate through the atom ids
-        # such as 1, 2 and 3. The ``flatten`` generator yields the
-        # atom id, no matter how containers it is in. It could be in a 
-        # tuple within a tuple within a tuple within a tuple within a 
-        # tuple. ``flatten`` would still yield the atom ids, never any 
-        # container. For details on how ``flatten`` is implemented see 
-        # its definition in the ``convenience_functions`` module.
-        func_grp_atom_ids = flatten(self.find_functional_group_atoms())        
-        
-        # Go through the atom ids of the atoms in functional groups. 
-        # Return the ``rdkit.Chem.rdchem.Atom`` instance in the 
-        # ``rdkit.Chem.rdchem.Mol`` instance which has that atom id.
-        # If that atom is the element which needs to be substituted for
-        # a heavy atom, do so by changing the atomic number in the 
-        # ``rdkit.Chem.rdchem.Atom`` instance. The atomic number to
-        # change it to is supplied by the ``FGInfo`` instance of 
-        # ``self``. The ``FGInfo`` instance will be initialized to the 
-        # functional group present in the molecule.
-        for atom_id in func_grp_atom_ids:
-            atom = self.heavy_mol.GetAtomWithIdx(atom_id)
-            if atom.GetAtomicNum() == self.func_grp.target_atomic_num:
-                atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
+        # Removes any atoms attached to the heavy atom which would be 
+        # lost in a condensation reaction.
+        self._delete_extra_atoms_in_heavy()
         
         # Change the pristine ``.mol`` file name to include the word
         # ``HEAVY_`` at the end. This generates the name of the 
@@ -404,7 +390,7 @@ class StructUnit:
         self.heavy_mol_file = '_'.join(heavy_file_name)     
         
         chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
-                          includeStereo=True, kekulize=False,
+                          includeStereo=False, kekulize=False,
                           forceV3000=True) 
 
         self.heavy_smiles = chem.MolToSmiles(self.heavy_mol, 
@@ -565,7 +551,78 @@ class StructUnit:
         for atom in self.heavy_mol.GetAtoms():        
             atom_position = conformer.GetAtomPosition(atom.GetIdx())
             yield atom_position.x, atom_position.y, atom_position.z
+
+
+    def _delete_extra_atom_in_heavy(self):
+        """
         
+        """
+        
+        editable_mol = chem.EditableMol(self.heavy_mol)
+        found = False
+        for atom in self.heavy_mol.GetAtoms():
+            if (atom.GetAtomicNum() == self.func_grp.heavy_atomic_num and
+                len(atom.GetNeighbors()) > 1):
+                for neighbor in atom.GetNeighbors():
+                    if neighbor.GetAtomicNum() in self.func_grp.delete:
+                        editable_mol.RemoveAtom(neighbor.GetIdx())
+                        found = True
+                        break
+                break
+                
+        
+        self.heavy_mol = editable_mol.GetMol()
+        return found
+    
+    def _delete_extra_atoms_in_heavy(self):
+        """
+        
+        """
+        
+        for x in iter(lambda:self._delete_extra_atom_in_heavy(), False):
+            continue
+    
+    def _make_atoms_heavy_in_heavy(self):
+        """
+
+        """        
+        
+        # Generate of list of atom ids corresponding to the ids of 
+        # atoms found in functional groups. The ids correspond to the 
+        # ids of the atom within the ``rdkit.Chem.rdchem.Mol`` instance.
+        
+        # The ``flatten`` generator here prevents the need for a nested 
+        # loop. The 'find_functiional_group_atoms' method returns a
+        # tuple of tuples. The outer tuple groups the different 
+        # functional groups while the inner tuple holds the atom ids 
+        # that form the same functional group. For example, a possible
+        # return value could be: ((1,2,3), (4,5,6), (7,8,9)).
+        
+        # Normally, to get to the atom ids an initial for loop would 
+        # iterate through the inner tuples such as (1,2,3) and (2,3,4)
+        # and a nested for loop would then iterate through the atom ids
+        # such as 1, 2 and 3. The ``flatten`` generator yields the
+        # atom id, no matter how containers it is in. It could be in a 
+        # tuple within a tuple within a tuple within a tuple within a 
+        # tuple. ``flatten`` would still yield the atom ids, never any 
+        # container. For details on how ``flatten`` is implemented see 
+        # its definition in the ``convenience_functions`` module.
+        func_grp_atom_ids = flatten(self.find_functional_group_atoms())        
+        
+        # Go through the atom ids of the atoms in functional groups. 
+        # Return the ``rdkit.Chem.rdchem.Atom`` instance in the 
+        # ``rdkit.Chem.rdchem.Mol`` instance which has that atom id.
+        # If that atom is the element which needs to be substituted for
+        # a heavy atom, do so by changing the atomic number in the 
+        # ``rdkit.Chem.rdchem.Atom`` instance. The atomic number to
+        # change it to is supplied by the ``FGInfo`` instance of 
+        # ``self``. The ``FGInfo`` instance will be initialized to the 
+        # functional group present in the molecule.
+        for atom_id in func_grp_atom_ids:
+            atom = self.heavy_mol.GetAtomWithIdx(atom_id)
+            if atom.GetAtomicNum() == self.func_grp.target_atomic_num:
+                atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
+                
 class BuildingBlock(StructUnit):
     """
     Holds information about the building-blocks* of a cage.
@@ -643,8 +700,7 @@ class Cage(metaclass=Cached):
     However, this is not intended use and not guarnteed to work in 
     future implementations. If caching stops being implemented such code 
     would break.
-    
-        
+
     Attributes
     ----------
     bb : BuildingBlock
@@ -756,10 +812,52 @@ class Cage(metaclass=Cached):
         # creates the cage's ``.mol`` file all  the building blocks and
         # linkers joined up. Both the substituted and pristine versions.
         self.topology.build_cage()
-    
+        
+        # Use the assembled cage in the ``.mol`` files to generate
+        # rdkit instances of the pristine and substituted cages and
+        # their ``SMILES`` strings.
+        self.prist_mol = chem.MolFromMolFile(self.prist_mol_file,
+                                             sanitize=False, 
+                                             removeHs=False)
+                                             
+        # Add Hydrogens to the pristine version of the molecule and
+        # ensure this updated molecule is added to the ``.mol`` file as 
+        # well. The ``GetSSSR`` function and optimization ensure that 
+        # the added Hydrogen atoms are placed correctly in space.
+        self.prist_mol = chem.AddHs(self.prist_mol)
+        chem.GetSSSR(self.prist_mol)
+        ac.MMFFOptimizeMolecule(self.prist_mol)  
+        
+        chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
+                          includeStereo=False, kekulize=False,
+                          forceV3000=True)                                             
+                                             
+        self.heavy_mol = chem.MolFromMolFile(self.heavy_mol_file,
+                                             sanitize=False, 
+                                             removeHs=False)
+        
+        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
+                                             isomericSmiles=True, 
+                                             allHsExplicit=True)                                               
+        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
+                                             isomericSmiles=True,
+                                             allHsExplicit=True) 
+                                             
     def same_cage(self, other):
         """
         Check if the `other` instance describes the same cage structure.
+        
+        Parameters
+        ----------
+        other : Cage
+            The ``Cage`` instance you are checking has the same 
+            structure.
+        
+        Returns
+        -------
+        bool
+            Returns ``True`` if the building-block*, linker and 
+            topology of the cages are all the same.
         
         """
         # Compare the building blocks and topology making up the cage.
