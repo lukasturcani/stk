@@ -264,48 +264,75 @@ class Atom(object):
                     atom_y = float(line[5])
                     atom_z = float(line[6])
 
-                    atom_is_heavy = atomic_symbol in Topology.heavy_symbols
+                    # This flag is ``True`` if the atom described in the
+                    # line has the same element as one of the elements
+                    # belonging to the functional groups used by MMEA.
+                    atom_is_heavy = (atomic_symbol in 
+                                                Topology.heavy_symbols)
+                    
+                    # These flags check to see if a heavy atom element
+                    # was previously found.                    
                     atom1_found = atom1_element != None
                     atom2_found = atom2_element != None
                     
-                    if atom_is_heavy and not atom1_found and not atom2_found:
+                    # If the atom in the line is heavy and is the first
+                    # heavy atom of any type found in the ``.mol`` file.
+                    if( atom_is_heavy and not atom1_found 
+                                      and not atom2_found):
                             
+                            # Registers its atomic symbol as the atomic
+                            # symbol of the first heavy element.
                             atom1_element = atomic_symbol
-                            atom1_list.append(Atom(atomic_symbol, atom_id, 
-                                              type1_heavy_atom_number, 
-                                              atom_x, atom_y, atom_z))
                             
+                            # Register a ``Atom`` instance for the atom.
+                            atom1_list.append(
+                                        Atom(atomic_symbol, atom_id, 
+                                             type1_heavy_atom_number, 
+                                              atom_x, atom_y, atom_z))
+                                              
+                            # Increment the relevant count.
                             type1_heavy_atom_number += 1                    
                             continue
-                        
-                    if (atom_is_heavy and atom1_found and not atom2_found and 
-                                    atomic_symbol != atom1_element):
+                    
+                    # If the atom in the line is heavy and is the second
+                    # type of heavy element to be found - but not
+                    # necessarily the second heavy atom to be found.
+                    if (atom_is_heavy and atom1_found 
+                                    and not atom2_found 
+                                    and atomic_symbol != atom1_element):
                             
                             atom2_element = atomic_symbol
-                            atom2_list.append(Atom(atomic_symbol, atom_id, 
-                                              type2_heavy_atom_number, 
+                            atom2_list.append(
+                                        Atom(atomic_symbol, atom_id, 
+                                             type2_heavy_atom_number, 
                                               atom_x, atom_y, atom_z))
                             type2_heavy_atom_number += 1                        
                             continue
-                        
+                    
+                    # If the atom in the line is heavy and is the second
+                    # or later atom of the first heavy element found.
                     if (atom_is_heavy and atom1_found and 
                                     atom1_element == atomic_symbol):
                             
-                            atom1_list.append(Atom(atomic_symbol, atom_id, 
-                                              type1_heavy_atom_number, 
+                            atom1_list.append(
+                                            Atom(atomic_symbol, atom_id, 
+                                             type1_heavy_atom_number, 
                                               atom_x, atom_y, atom_z))
                             type1_heavy_atom_number += 1
                             continue
-                            
+                    # If the atom in the line is heavy and is the second
+                    # or later atom of the second heavy element found.
                     if (atom_is_heavy and atom2_found and 
                                     atom2_element == atomic_symbol):
                              
-                            atom2_list.append(Atom(atomic_symbol, atom_id, 
-                                                   type2_heavy_atom_number, 
-                                              atom_x, atom_y, atom_z))
+                            atom2_list.append(
+                                            Atom(atomic_symbol, atom_id, 
+                                               type2_heavy_atom_number, 
+                                               atom_x, atom_y, atom_z))
                             type2_heavy_atom_number += 1
                             continue  
-
+                # If this conditions are true the line holds the number
+                # of bonds in the ``.mol`` file. Save this number.
                 if take_bond == True and len(line) == 6:                   
                     bond_number = int(line[2])
         
@@ -314,9 +341,25 @@ class Atom(object):
         
     def assign_molecule_number(self):
         """
+        Provides the id of the molecule in which the atom is found.
         
+        Before the building blocks are connected during assembly, the 
+        building block molecules are placed together in a ``.mol`` file.
+        Each of these molecules will have it own id, to prevent heavy
+        atoms in the same mocule being connected during assembly.        
         
         """
+        
+        # If a building block (note not building-block*) has ``x`` 
+        # functional groups,the first ``x`` heavy atom molecules of one 
+        # element belong to the first building block molecule, the next 
+        # ``x`` heavy atoms belong to the second building block molecule
+        # (of that type) and so on. As a result, the id of the molecule
+        # the heavy atom belongs to can be found by taking which heavy
+        # atom of that element it was and dividing it by the number 
+        # of functional groups per building block of that type. The 
+        # whole number part of the resulting float is the id of the 
+        # molecule.
         
         if self.element == Atom.bb:
             self.mol_number = math.ceil(self.heavy_atom_num / 
@@ -329,6 +372,7 @@ class Atom(object):
     
     def distance(self, atom2):
         """
+        Finds the distance between two atoms.
         
         """
         
@@ -343,8 +387,11 @@ class Atom(object):
         
     def pair_up_nitro(self):
         """
+        Finds atoms pairs to join in Nitroso cages.        
+        
         This case is specific for the Nitroso cages, for which a double 
         counting for the atoms needs to be avoided.
+        
         """
         if self.paired == True:
             return None
@@ -535,28 +582,68 @@ class Atom(object):
 
 class Topology:
     """
-
+    Represents the topology of an assembled molecule.
     
+    The ``Topology`` class is concerned with how individual building 
+    blocks are placed and connected in space to form an assembled 
+    molecule used by MMEA. It also takes care of assmebling these
+    molecules, though some tasks are delegated to the ``Atom`` class for
+    this.
+    
+    This class directly defines any operations and attributes that are
+    needed by any topology, be it a tetrahedron, octahedron or even a
+    polymer. However, this class is not used directly by MMEA. It is
+    intended to be inherited from. Any individual within MMEA will have
+    a `topology` attribute which refers to an instnace of a class 
+    derived from this. Derived classes of ``Topology`` define things
+    specific to that one topology. For example the number of functional
+    groups in building block molecules used to make that specific
+    topology. Additionally, each derived class of ``Topology`` must 
+    define which ``pair_up`` function defined in the ``Atom`` class it
+    uses for pairing up its heavy atoms.
+    
+    Finally, each class derived from ``Topology`` must define methods
+    which place building blocks in the correct positions in the ``.mol``
+    file.
+    
+    Class attributes
+    ----------------
+    heavy_symbols : set of str
+        The atomic symbols of heavy elements used in substitutions by
+        MMEA.
+    
+    Attributes
+    ----------
+    cage : Cage
+        The cage instance which has the given topology. This provides
+        easy access to the cages attributes to the ``Topology`` 
+        instance.
     
     """
     heavy_symbols = {x.heavy_symbol for x 
                         in FGInfo.functional_group_list}
-
     
     def __init__(self, cage):
         self.cage = cage
         
 
     def build_cage(self):
+        """
+        
+        """
+        
+        # This function places the individual building block molecules
+        # into a single ``.mol`` file. These molecules should be placed
+        # on a given set of vertices or edges, depending on the topology
+        # desired. Bonds are then created between the placed molecules.
+        # This is done using the heavy atoms as identifiers. As a 
+        # result, this creates the heavy atom substituted version of the 
+        # cage. To produce the pristine verion of the cage, 
+        # ``final_sub`` is called which replaces the heavy atoms with
+        # their pristine counterparts / functional groups.
         self.place_mols()
         self.join_mols()
         self.final_sub()
-        
-    def build_heavy_cage(self):
-        self.join_mols()
-        
-    def bulid_prist_cage(self):
-        pass
 
     def join_mols(self):
         """
@@ -634,7 +721,36 @@ class Topology:
       
 class FourPlusSix(Topology):
     """
+    Defines the tetrahedral, 4+6, topology.
+
+    This is a topology of cages where 4 building-blocks* are placed on
+    vertices and 6 linkers are placed on the edges between them. This
+    class defines functions which places these molecules in the correct
+    positions in the ``.mol`` file.
+
+    Attributes
+    ----------
+    This class also inhertis all the attributes of the ``Topology`` 
+    class.
     
+    heavy_atoms_per_bb : int (default=3, do not change)
+        The number of heavy atoms (functional groups) in a 
+        building-block* molecule used for this topolgy.
+    
+    heavy_atoms_per_lk : int (default=2, do not change)
+        The number of heavy atoms (functional groups) in a linker 
+        molecule used for this topology.
+   
+    bb_num : int (default=4, do not change)
+        The number of building-block* molecules used in this topology.
+        
+    lk_num : int (default=6, do not change)
+        The number of linker molecules used in this topology.
+   
+    pair_up_func : function (default=Atom.pair_up_v4_v2, do not change)
+        The function used to find atoms in different building-block* and
+        linker molecules which need to have a bond created between them.
+   
     """
     
     def __init__(self, cage):
@@ -648,6 +764,10 @@ class FourPlusSix(Topology):
         self.pair_up_func = Atom.pair_up_v4_v2
         
     def place_mols(self):
+        """
+        
+        """
+        
         bb_placement = self.place_bbs()
         lk_placement = self.place_lks()
         self.cage.heavy_mol = chem.CombineMols(bb_placement, 
