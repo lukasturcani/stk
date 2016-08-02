@@ -1,6 +1,6 @@
 from .test_population import generate_population
 from .test_struct_unit import get_mol_file
-from ..classes import Cage, FourPlusSix
+from ..classes import Cage, FourPlusSix, BuildingBlock, Linker
 
 def test_caching():
     """
@@ -24,13 +24,13 @@ def test_comparison():
     """
     
     # Generate cages with various fitnesses.
-    a = Cage('a','a','a')
+    a = Cage('a','a','a', 1)
     a.fitness = 1
     
-    b = Cage('b', 'b', 'b')
+    b = Cage('b', 'b', 'b', 1)
     b.fitness = 1
     
-    c = Cage('c', 'c', 'c')
+    c = Cage('c', 'c', 'c', 1)
     c.fitness = 2
     
     # Comparison operators should compare their fitness.
@@ -40,7 +40,7 @@ def test_comparison():
     assert c > b
     assert c >= a
 
-def test_same_cage():
+def test_same():
     """
     Tests the `same_cage` method.    
     
@@ -49,15 +49,15 @@ def test_same_cage():
     
     """
     
-    a = Cage('a', 'b', 'c')
-    b = Cage('a', 'a', 'b')
-    c = Cage('a', 'a', 'b')
-    d = Cage('a', 'b', 'a')
+    a = Cage('a', 'b', 'c', 'd')
+    b = Cage('a', 'a', 'b', 'd')
+    c = Cage('a', 'a', 'b', 'd')
+    d = Cage('a', 'b', 'a', 'd')
 
-    assert not a.same_cage(b)
-    assert b.same_cage(c)    
-    assert c.same_cage(b)
-    assert not d.same_cage(c)
+    assert not a.same(b)
+    assert b.same(c)    
+    assert c.same(b)
+    assert not d.same(c)
     
 def test_init():
     """
@@ -77,8 +77,10 @@ def test_init():
     lk_file = next(x for x in get_mol_file() 
                                         if 'aldehyde2f_3.mol' in x)    
     
-    cage = Cage(bb_file, lk_file, FourPlusSix, 
-                    'you_can_delete_this.mol')
+    bb = BuildingBlock(bb_file)
+    lk = Linker(lk_file)    
+    building_blocks = (bb, lk)
+    cage = Cage(building_blocks, FourPlusSix, 'you_can_delete_this.mol')
     
     assert hasattr(cage, 'prist_mol_file')
     assert hasattr(cage, 'heavy_mol_file')
