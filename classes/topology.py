@@ -629,6 +629,14 @@ class Topology:
 
     def build_cage(self):
         """
+        Creates ``.mol`` files of the heavy and pristine cage.
+        
+        Modifies
+        --------
+        .mol files
+            This function modifies 2 ``.mol`` files. It creates the 
+            ``.mol`` files holding the assembled heavy and pristine cage
+            molecules.
         
         """
         
@@ -684,27 +692,57 @@ class Topology:
                 bond_order = "2"
             else:
                 bond_order = "1"
-                
-            mol_file_data.mol_file_content += "M  V30 {2} {3} {0} {1}\n".format(
-                              atom[0], atom[2], mol_file_data.bond_number, bond_order)
+            
+            mol_file_content = mol_file_data.mol_file_content
+            mol_file_content += ("M  V30 {2} {3} {0} {1}"
+                                               "\n").format(atom[0], 
+                                                            atom[2], 
+                                              mol_file_data.bond_number, 
+                                              bond_order)
         
         
-        mol_file_data.mol_file_content += ("M  V30 END BOND\nM  V30 END CTAB\nM"  
-                                                                 "  END")
+        mol_file_content += ("M  V30 END BOND\nM  V30 END CTAB\nM  END")
 
         p = re.compile(r" VAL=.")
-        mol_file_data.mol_file_content = re.sub(p, "", mol_file_data.mol_file_content)
+        mol_file_content = re.sub(p, "", mol_file_content)
 
-        mol_file_data.mol_file_content = mol_file_data.mol_file_content.replace(mol_file_data.count_line, 
-             "M  V30 COUNTS {0} {1} 0 0 0\n".format(mol_file_data.at_num,mol_file_data.bond_number))
+        mol_file_content = mol_file_content.replace(
+                                            mol_file_data.count_line, 
+                                "M  V30 COUNTS {0} {1} 0 0 0\n".format(
+                                mol_file_data.at_num,
+                                mol_file_data.bond_number))
         
         new_mol_file_name = self.cage.heavy_mol_file
         new_mol_file = open(new_mol_file_name, "w")
-        new_mol_file.write(mol_file_data.mol_file_content)
+        new_mol_file.write(mol_file_content)
         new_mol_file.close()
         
         
     def final_sub(self):
+        """
+        Replaces heavy atoms with functional group atoms they represent.        
+        
+        Once a heavy cage has been assembled the pristine cage is formed
+        by replacing the heavy atoms. This function does this by editing
+        the heavy ``.mol`` file and changing the appropriate symbols.
+        
+        Modifies
+        --------
+        .mol file
+            This function creates a ``.mol`` file holding the pristine
+            assembled cage.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # Read the assembled heavy cage file, line by line. Any time
+        # a heavy atomic symbol is found, replace it with the 
+        # corresponding light element. Save all lines to a string and
+        # write this string to a new file. Do not change the original
+        # file because it is meant to hold the heavy cage. 
         with open(self.cage.heavy_mol_file, "r") as add:
             new_file= ""
             for line in add:
@@ -716,8 +754,6 @@ class Topology:
     
         with open(self.cage.prist_mol_file, "w") as f:
             f.write(new_file)
-        
-
       
 class FourPlusSix(Topology):
     """
@@ -765,9 +801,27 @@ class FourPlusSix(Topology):
         
     def place_mols(self):
         """
+        Places all building block molecules on correct coordinates.
+
+        The building block molecules are placed in their appropraite 
+        positions on the topology. This means that the building-blocks* 
+        are placed on vertices and linkers on edges. This function
+        only places the molecules, it does not join them. It saves the 
+        structure to a ``.mol`` file and an rdkit molecule instance for
+        later use. Both are placed in the appropriate attribtes of the 
+        ``Cage`` instance the topology is describing.
+        
+        Modifies
+        --------
+        self.cage.heavy_mol : 
+        
+        .mol file
+            
         
         """
         
+        # Building-blocks* and linkers have different rules for 
+        # placement so each is treated by its own function.
         bb_placement = self.place_bbs()
         lk_placement = self.place_lks()
         self.cage.heavy_mol = chem.CombineMols(bb_placement, 
@@ -779,6 +833,24 @@ class FourPlusSix(Topology):
         
     
     def place_bbs(self):
+        """
+        Places all building-blocks* on their appropriate coordinates.
+        
+        This function creates a new rdkit molecule made up of 4
+        building-block* molecules. Each of the building-block* molecules
+        is placed on the vertex of a tetrahedron. The molecules are held
+        within the same rdkit molecule instance but are otherwise 
+        unconnected.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule which is made up of the building-block*
+            molecules all placed on the vertices of a tetrahedron. The
+            individual molecules are unconnected.
+        
+        """
+        
         position1 = self.cage.bb.shift_heavy_mol(0,50,0)
         position2 = self.cage.bb.shift_heavy_mol(0,0,25)
         position3 = self.cage.bb.shift_heavy_mol(25,0,-25)
@@ -789,6 +861,22 @@ class FourPlusSix(Topology):
         return chem.CombineMols(combined_mol, combined_mol2)       
         
     def place_lks(self):
+        """
+        Places all linkers on their appropriate coordinates.
+
+        This function creates a new rdkit molecule made up of 6 linker
+        molecules. Each of the linker molecules is placed on the edge of 
+        a tetrahedron. The molecules are held within the same rdkit 
+        molecule instance but are otherwise unconnected.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule which is made up of the linker molecules 
+            all placed on the edges of a tetrahedron. The individual 
+            molecules are unconnected.
+        
+        """
         position1 = self.cage.lk.shift_heavy_mol(0, 0, -25)
         position2 = self.cage.lk.shift_heavy_mol(-12.5, 0, 0)
         position3 = self.cage.lk.shift_heavy_mol(12.5, 0, 0)
@@ -803,3 +891,9 @@ class FourPlusSix(Topology):
         
         combined_mol4 = chem.CombineMols(combined_mol, combined_mol2)
         return chem.CombineMols(combined_mol3, combined_mol4)
+        
+        
+        
+        
+        
+        
