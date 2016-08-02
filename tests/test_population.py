@@ -14,10 +14,10 @@ def generate_population(offset=False):
     
     #Generate a bunch of cages.
     if offset:
-        cages = [Cage(values[x], values[x], values[x+1]) 
+        cages = [Cage(values[x], values[x], values[x+1], 1) 
                                                 for x in range(0,22)]
     if not offset:
-        cages = [Cage(values[x], values[x], values[x]) 
+        cages = [Cage(values[x], values[x], values[x], 1) 
                                                 for x in range(0,22)]
         
     # Generate a couple of populations to be used as subpopulations.
@@ -80,7 +80,7 @@ def test_all_members():
     """    
     
     # Generate a bunch of cages.
-    cages = [Cage(x,'a','b') for x in range(0,22)]    
+    cages = [Cage(x,'a','b', 1) for x in range(0,22)]    
         
     # Generate a couple of ``Populations`` to be used as subpopulations.
     sub1 = Population(*cages[0:4])
@@ -103,7 +103,7 @@ def test_all_members():
     
     # Add a cage to `cages`. Now there should be a cage in `cages`, not 
     # present in main. Should fail.
-    cages.append(Cage('alpha', 'beta', 'gamma'))
+    cages.append(Cage('alpha', 'beta', 'gamma', 'delta'))
      
     with pytest.raises(AssertionError):
         assert all(cage in all_members for cage in cages)
@@ -290,11 +290,17 @@ def test_getitem():
     # should be transferred to the members attribute.    
     pop = generate_population()
     flat_pop = pop[:]
+    
+    # Change the fitness of one of the memebers. Fitness should not used
+    # in the test for ``in`` and therefore the fact that it is differnt
+    # should not matter.
+    flat_pop[1].fitness = 555
+
     assert all(cage in flat_pop.members for cage in pop)
     # Verify lack of subpopulations.
     assert not flat_pop.populations
     # An integer index should return a ``Cage`` instance.
-    assert type(pop[5]) is Cage
+    assert isinstance(pop[5], Cage)
     # Non integer/slice indices are not supported
     with pytest.raises(TypeError):
         pop[5.5]

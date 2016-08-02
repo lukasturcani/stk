@@ -565,7 +565,9 @@ class StructUnit:
         rms = ac.ReplaceSubstructs(self.prist_mol, func_grp_mol, 
                                    func_grp_mol_end, replaceAll=True)
         self.heavy_mol = rms[0]
-                
+        self.heavy_mol.RemoveAllConformers()
+        ac.EmbedMolecule(self.heavy_mol)      
+        
 class BuildingBlock(StructUnit):
     """
     Holds information about the building-blocks* of a cage.
@@ -583,7 +585,128 @@ class Linker(StructUnit):
     pass
 
 @total_ordering
-class Cage(metaclass=Cached):
+class MacroMolecule(metaclass=Cached):
+    """
+    
+    """
+    
+    def __init__(self, building_blocks, topology, prist_mol_file):
+        """
+        Initialize a ``Cage`` instance used during MMEA runtime.
+        
+        Parameters
+        ---------
+        bb_file : str
+            The full path of the ``.mol`` file storing the pristine
+            molecule to be used a building-block*.
+            
+        lk_file : str
+            The full path of the ``.mol`` file storing the pristine
+            molecule to be used a linker.
+            
+        topology : A child class of ``Topology``
+            The class which defines the topology of the cage. Such 
+            classes are defined in the topology module. The class will
+            be a child class which inherits the base class ``Topology``.
+            
+        prist_mol_file : str
+            The full path of the ``.mol`` file where the cage molecule
+            will be stored.
+            
+        """
+        # A numerical fitness is assigned by fitness functions evoked
+        # by a ``Population`` instance's `GATools` attribute.
+        self.fitness = None
+                
+        self.building_blocks = tuple(building_blocks)
+
+        # A ``Topology`` subclass instance must be initiazlied with a 
+        # copy of the cage it is describing.        
+        self.topology = topology(self)
+        self.prist_mol_file = prist_mol_file
+        
+        # This generates the name of the heavy ``.mol`` file by adding
+        # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
+        heavy_mol_file = list(os.path.splitext(prist_mol_file))
+        heavy_mol_file.insert(1,'HEAVY')        
+        self.heavy_mol_file = '_'.join(heavy_mol_file) 
+        
+        # Ask the ``Topology`` instance to assemble/build the cage. This
+        # creates the cage's ``.mol`` file all  the building blocks and
+        # linkers joined up. Both the substituted and pristine versions.
+        self.topology.build()
+        
+        # Use the assembled cage in the ``.mol`` files to generate
+        # rdkit instances of the pristine and substituted cages and
+        # their ``SMILES`` strings.
+        self.prist_mol = chem.MolFromMolFile(self.prist_mol_file,
+                                             sanitize=False, 
+                                             removeHs=False)
+                                             
+        # Add Hydrogens to the pristine version of the molecule and
+        # ensure this updated molecule is added to the ``.mol`` file as 
+        # well. The ``GetSSSR`` function and optimization ensure that
+        # the added Hydrogen atoms are placed in reasonable positions.
+        # The ``GetSSSR`` function itself is just prerequisite for
+        # running the optimization.
+        self.prist_mol = chem.AddHs(self.prist_mol)
+        chem.GetSSSR(self.prist_mol)
+        ac.MMFFOptimizeMolecule(self.prist_mol)  
+        
+        chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
+                          includeStereo=False, kekulize=False,
+                          forceV3000=True)                                             
+                                             
+        self.heavy_mol = chem.MolFromMolFile(self.heavy_mol_file,
+                                             sanitize=False, 
+                                             removeHs=False)
+        
+        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
+                                             isomericSmiles=True, 
+                                             allHsExplicit=True)                                               
+        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
+                                             isomericSmiles=True,
+                                             allHsExplicit=True)     
+
+    def same(self, other):
+        """
+        Check if the `other` instance describes the same cage structure.
+        
+        Parameters
+        ----------
+        other : Cage
+            The ``Cage`` instance you are checking has the same 
+            structure.
+        
+        Returns
+        -------
+        bool
+            Returns ``True`` if the building-block*, linker and 
+            topology of the cages are all the same.
+        
+        """
+        # Compare the building blocks and topology making up the cage.
+        # If these are the same then the cages have the same structure.
+        return (self.building_blocks == other.building_blocks and 
+                                    self.topology == other.topology)
+    
+    def __eq__(self, other):
+        return self.fitness == other.fitness
+        
+    def __lt__(self, other):
+        return self.fitness < other.fitness
+    
+    def __str__(self):
+        return str(self.__dict__) + "\n"
+    
+    def __repr__(self):
+        return str(self.__dict__) + "\n"
+        
+    def __hash__(self):
+        return id(self)
+    
+
+class Cage(MacroMolecule):
     """
     A class for MMEA individuals which are porous molecular cages.
     
@@ -702,129 +825,13 @@ class Cage(metaclass=Cached):
         documentation of the individual initializers.
         
         """
-        
+    
         if len(args) == 3:
-            self.testing_init(*args)
+            super().__init__(*args)
+        
         if len(args) == 4:
-            self.std_init(*args)
-        
-        # A numerical fitness is assigned by fitness functions evoked
-        # by a ``Population`` instance's `GATools` attribute.
-        self.fitness = None
-
-    def std_init(self, bb_file, lk_file, topology, prist_mol_file):
-        """
-        Initialize a ``Cage`` instance used during MMEA runtime.
-        
-        Parameters
-        ---------
-        bb_file : str
-            The full path of the ``.mol`` file storing the pristine
-            molecule to be used a building-block*.
-            
-        lk_file : str
-            The full path of the ``.mol`` file storing the pristine
-            molecule to be used a linker.
-            
-        topology : A child class of ``Topology``
-            The class which defines the topology of the cage. Such 
-            classes are defined in the topology module. The class will
-            be a child class which inherits the base class ``Topology``.
-            
-        prist_mol_file : str
-            The full path of the ``.mol`` file where the cage molecule
-            will be stored.
-            
-        """
-        
-        self.bb = BuildingBlock(bb_file)
-        self.lk = Linker(lk_file)
-
-        # A ``Topology`` subclass instance must be initiazlied with a 
-        # copy of the cage it is describing.        
-        self.topology = topology(self)
-        self.prist_mol_file = prist_mol_file
-        
-        # This generates the name of the heavy ``.mol`` file by adding
-        # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
-        heavy_mol_file = list(os.path.splitext(prist_mol_file))
-        heavy_mol_file.insert(1,'HEAVY')        
-        self.heavy_mol_file = '_'.join(heavy_mol_file) 
-        
-        # Ask the ``Topology`` instance to assemble/build the cage. This
-        # creates the cage's ``.mol`` file all  the building blocks and
-        # linkers joined up. Both the substituted and pristine versions.
-        self.topology.build_cage()
-        
-        # Use the assembled cage in the ``.mol`` files to generate
-        # rdkit instances of the pristine and substituted cages and
-        # their ``SMILES`` strings.
-        self.prist_mol = chem.MolFromMolFile(self.prist_mol_file,
-                                             sanitize=False, 
-                                             removeHs=False)
-                                             
-        # Add Hydrogens to the pristine version of the molecule and
-        # ensure this updated molecule is added to the ``.mol`` file as 
-        # well. The ``GetSSSR`` function and optimization ensure that
-        # the added Hydrogen atoms are placed in reasonable positions.
-        # The ``GetSSSR`` function itself is just prerequisite for
-        # running the optimization.
-        self.prist_mol = chem.AddHs(self.prist_mol)
-        chem.GetSSSR(self.prist_mol)
-        ac.MMFFOptimizeMolecule(self.prist_mol)  
-        
-        chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
-                          includeStereo=False, kekulize=False,
-                          forceV3000=True)                                             
-                                             
-        self.heavy_mol = chem.MolFromMolFile(self.heavy_mol_file,
-                                             sanitize=False, 
-                                             removeHs=False)
-        
-        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
-                                             isomericSmiles=True, 
-                                             allHsExplicit=True)                                               
-        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
-                                             isomericSmiles=True,
-                                             allHsExplicit=True) 
-                                             
-    def same_cage(self, other):
-        """
-        Check if the `other` instance describes the same cage structure.
-        
-        Parameters
-        ----------
-        other : Cage
-            The ``Cage`` instance you are checking has the same 
-            structure.
-        
-        Returns
-        -------
-        bool
-            Returns ``True`` if the building-block*, linker and 
-            topology of the cages are all the same.
-        
-        """
-        # Compare the building blocks and topology making up the cage.
-        # If these are the same then the cages have the same structure.
-        return (self.bb == other.bb and self.lk == other.lk and 
-                                    self.topology == other.topology)
-    
-    def __eq__(self, other):
-        return self.fitness == other.fitness
-        
-    def __lt__(self, other):
-        return self.fitness < other.fitness
-    
-    def __str__(self):
-        return str(self.__dict__) + "\n"
-    
-    def __repr__(self):
-        return str(self.__dict__) + "\n"
-        
-    def __hash__(self):
-        return id(self)
-
+            self.testing_init(*args)
+                                           
     """
     The following methods are inteded for convenience while 
     debugging or testing and should not be used during typical 
@@ -832,10 +839,11 @@ class Cage(metaclass=Cached):
     
     """
 
-    def testing_init(self, bb_str, lk_str, topology_str):
-        self.bb = bb_str
-        self.lk = lk_str
+    def testing_init(self, bb_str, lk_str, topology_str, _):
+        self.building_blocks = (bb_str, lk_str)
         self.topology = topology_str
+        self.fitness = 3.14
+
 
     @classmethod
     def init_empty(cls):

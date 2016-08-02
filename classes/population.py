@@ -2,7 +2,7 @@ import itertools
 
 
 
-from .molecular import Cage
+from .molecular import MacroMolecule, Cage
 from .ga import GATools
 from ..convenience_functions import dedupe, flatten
 
@@ -107,15 +107,15 @@ class Population:
         # was supplied or if an argument was not ``GATools``, ``Cage`` 
         # or ``Population`` type.
         for arg in args:
-            if type(arg) is Population:
+            if isinstance(arg, Population):
                 self.populations.append(arg)
                 continue
             
-            if type(arg) is Cage:
+            if isinstance(arg, MacroMolecule):
                 self.members.append(arg)
                 continue           
             
-            if type(arg) is GATools and self.ga_tools is None:
+            if isinstance(arg, GATools) and self.ga_tools is None:
                 self.ga_tools = arg
                 continue
 
@@ -195,10 +195,10 @@ class Population:
         """
         
         if duplicates:
-            self.members.extend(cage for cage in population)
+            self.members.extend(mol for mol in population)
         else:
-            self.members.extend(cage for cage in population
-                                                    if cage not in self)
+            self.members.extend(mol for mol in population
+                                                    if mol not in self)
     def add_subpopulation(self, population):
         """
         Appends a population into the `populations` attribute.        
@@ -451,9 +451,9 @@ class Population:
         # ``Cage`` instances. The returned ``Population`` will have the 
         # same `ga_tools` attribute as original ``Population`` instance.        
         if type(key) is slice:
-            cages = itertools.islice(self.all_members(), 
+            mols = itertools.islice(self.all_members(), 
                                      key.start, key.stop, key.step)
-            return Population(*cages, self.ga_tools)
+            return Population(*mols, self.ga_tools)
 
         # If `key` is not ``int`` or ``slice`` raise ``TypeError``.        
         raise TypeError("Index must be an integer or slice, not"
@@ -507,8 +507,8 @@ class Population:
         """
 
         new_pop = Population(self.ga_tools)        
-        new_pop.add_members(cage for cage in self 
-                                                if cage not in other)
+        new_pop.add_members(mol for mol in self 
+                                                if mol not in other)
         return new_pop
         
     def __add__(self, other):
@@ -547,15 +547,15 @@ class Population:
         
         """
 
-        return any(item.same_cage(cage) for cage in self.all_members())
+        return any(item.same(mol) for mol in self.all_members())
 
     def __str__(self):
         output_string = (" Population " + str(id(self)) + "\n" + 
                             "--------------------------\n" + 
                             "\tMembers\n" + "   ---------\n")
         
-        for cage in self.members:
-            output_string += "\t"  + str(cage) + "\n"
+        for mol in self.members:
+            output_string += "\t"  + str(mol) + "\n"
         
         if len(self.members) == 0:
             output_string += "\tNone\n\n"
