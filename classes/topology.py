@@ -5,7 +5,8 @@ import itertools as itertools
 import re
 
 from MMEA.classes.molecular import FGInfo, BuildingBlock, Linker
-from MMEA.classes.mol_reader import Atom
+
+
 class Topology:
     """
     Represents the topology of an assembled molecule.
@@ -40,9 +41,9 @@ class Topology:
     
     Attributes
     ----------
-    cage : Cage
-        The cage instance which has the given topology. This provides
-        easy access to the cages attributes to the ``Topology`` 
+    macro_mol : MacroMolecule
+        The macromolecule instance which has the given topology. This 
+        provides easy access to the cages attributes to the ``Topology`` 
         instance.
     
     """
@@ -63,6 +64,10 @@ class Topology:
             This function modifies 2 ``.mol`` files. It creates the 
             ``.mol`` files holding the assembled heavy and pristine cage
             molecules.
+            
+        Returns
+        -------
+        None : NoneType
         
         """
         
@@ -79,7 +84,7 @@ class Topology:
         self.join_mols()
         self.final_sub()
 
-    def join_mols(self):
+    def join_cage_mols(self):
         """
         takens an input file with disconnected moleucles and connects them
         """           
@@ -146,6 +151,9 @@ class Topology:
         new_mol_file = open(new_mol_file_name, "w")
         new_mol_file.write(mol_file_content)
         new_mol_file.close()
+
+    def join_polymer_mols(self):
+        pass
         
         
     def final_sub(self):
@@ -190,6 +198,7 @@ class Topology:
     
         with open(self.macro_mol.prist_mol_file, "w") as f:
             f.write(new_file)
+
       
 class FourPlusSix(Topology):
     """
@@ -225,8 +234,8 @@ class FourPlusSix(Topology):
    
     """
     
-    def __init__(self, cage):
-        super().__init__(cage)
+    def __init__(self, macro_mol):
+        super().__init__(macro_mol)
         self.heavy_atoms_per_bb = 3
         self.heavy_atoms_per_lk = 2
         
@@ -234,6 +243,7 @@ class FourPlusSix(Topology):
         self.lk_num = 6
         
         self.pair_up_func = Atom.pair_up_v4_v2
+        self.join_mols = self.join_cage_mols
         
     def place_mols(self):
         """
@@ -335,8 +345,15 @@ class FourPlusSix(Topology):
         combined_mol4 = chem.CombineMols(combined_mol, combined_mol2)
         return chem.CombineMols(combined_mol3, combined_mol4)
         
+class BlockCopolymer(Topology):
+    def __init__(self, macro_mol, repeating_unit):
+        super().__init__(macro_mol)
+        self.repeating_unit = repeating_unit
+        self.join_mols = join_polymer_mols
         
+    def place_mols(self):
+        pass
+    
+    
         
-        
-        
-        
+from MMEA.classes.mol_reader import Atom        
