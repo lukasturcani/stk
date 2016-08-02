@@ -589,8 +589,30 @@ class MacroMolecule(metaclass=Cached):
     """
     
     """
+
+    def __init__(self, *args):
+        """
+        Initializes ``Cage`` instances.
+        
+        Several different initializers for this class are available.
+        Which one is chosen depends on the number of arguments provided
+        to the initializer. When 3 arguments are provided the
+        initializer used for testing is used. When the 4 arguments are
+        provided the standarnd initializer used when running MMEA is 
+        used. For details on what the parameters passed should be check
+        documentation of the individual initializers.
+        
+        """
     
-    def __init__(self, building_blocks, topology, prist_mol_file):
+        if len(args) == 3:
+            self.std_init(*args)
+        
+        if len(args) == 4:
+            self.testing_init(*args)
+
+
+    
+    def std_init(self, building_blocks, topology, prist_mol_file):
         """
         Initialize a ``Cage`` instance used during MMEA runtime.
         
@@ -670,12 +692,12 @@ class MacroMolecule(metaclass=Cached):
 
     def same(self, other):
         """
-        Check if the `other` instance describes the same cage structure.
+        Check if the `other` instance has the same molecular structure.
         
         Parameters
         ----------
-        other : Cage
-            The ``Cage`` instance you are checking has the same 
+        other : MacroMolecule
+            The ``MacroMolecule`` instance you are checking has the same 
             structure.
         
         Returns
@@ -704,7 +726,22 @@ class MacroMolecule(metaclass=Cached):
         
     def __hash__(self):
         return id(self)
+
+    """
+    The following methods are inteded for convenience while 
+    debugging or testing and should not be used during typical 
+    execution of the program.
     
+    """
+
+    def testing_init(self, bb_str, lk_str, topology_str, _):
+        self.building_blocks = (bb_str, lk_str)
+        self.topology = topology_str
+        self.fitness = 3.14
+
+
+    def random_fitness(self):
+        self.fitness = np.random.randint(0,100)
 
 class Cage(MacroMolecule):
     """
@@ -811,54 +848,91 @@ class Cage(MacroMolecule):
         fitness function.         
     
     """
-    
-    def __init__(self, *args):
-        """
-        Initializes ``Cage`` instances.
+    pass
         
-        Several different initializers for this class are available.
-        Which one is chosen depends on the number of arguments provided
-        to the initializer. When 3 arguments are provided the
-        initializer used for testing is used. When the 4 arguments are
-        provided the standarnd initializer used when running MMEA is 
-        used. For details on what the parameters passed should be check
-        documentation of the individual initializers.
-        
-        """
-    
-        if len(args) == 3:
-            super().__init__(*args)
-        
-        if len(args) == 4:
-            self.testing_init(*args)
-                                           
+
+class Polymer(MacroMolecule):
     """
-    The following methods are inteded for convenience while 
-    debugging or testing and should not be used during typical 
-    execution of the program.
     
     """
-
-    def testing_init(self, bb_str, lk_str, topology_str, _):
-        self.building_blocks = (bb_str, lk_str)
-        self.topology = topology_str
-        self.fitness = 3.14
-
-
-    @classmethod
-    def init_empty(cls):
-        obj = cls()
-        string = ['a','b','c','d','e','f','g','h','i','j','k','l','m',
-                  'n','o', 'p','q','r','s','t','u','v','w','x','y','z']
-        obj.bb = np.random.choice(string)
-        obj.lk = np.random.choice(string)
-        obj.fitness = abs(np.random.sample())
-        return obj
-
-
-
+    def __init__(self, building_blocks, topology, repeating_unit,
+                 prist_mol_file):
+        """
+        Initialize a ``Cage`` instance used during MMEA runtime.
         
+        Parameters
+        ---------
+        bb_file : str
+            The full path of the ``.mol`` file storing the pristine
+            molecule to be used a building-block*.
+            
+        lk_file : str
+            The full path of the ``.mol`` file storing the pristine
+            molecule to be used a linker.
+            
+        topology : A child class of ``Topology``
+            The class which defines the topology of the cage. Such 
+            classes are defined in the topology module. The class will
+            be a child class which inherits the base class ``Topology``.
+            
+        prist_mol_file : str
+            The full path of the ``.mol`` file where the cage molecule
+            will be stored.
+            
+        """
+        # A numerical fitness is assigned by fitness functions evoked
+        # by a ``Population`` instance's `GATools` attribute.
+        self.fitness = None
+                
+        self.building_blocks = tuple(building_blocks)
+
+        # A ``Topology`` subclass instance must be initiazlied with a 
+        # copy of the cage it is describing.        
+        self.topology = topology(self, genetic_string)
+        self.prist_mol_file = prist_mol_file
         
+        # This generates the name of the heavy ``.mol`` file by adding
+        # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
+        heavy_mol_file = list(os.path.splitext(prist_mol_file))
+        heavy_mol_file.insert(1,'HEAVY')        
+        self.heavy_mol_file = '_'.join(heavy_mol_file) 
+        
+        # Ask the ``Topology`` instance to assemble/build the cage. This
+        # creates the cage's ``.mol`` file all  the building blocks and
+        # linkers joined up. Both the substituted and pristine versions.
+        self.topology.build()
+        
+        # Use the assembled cage in the ``.mol`` files to generate
+        # rdkit instances of the pristine and substituted cages and
+        # their ``SMILES`` strings.
+        self.prist_mol = chem.MolFromMolFile(self.prist_mol_file,
+                                             sanitize=False, 
+                                             removeHs=False)
+                                             
+        # Add Hydrogens to the pristine version of the molecule and
+        # ensure this updated molecule is added to the ``.mol`` file as 
+        # well. The ``GetSSSR`` function and optimization ensure that
+        # the added Hydrogen atoms are placed in reasonable positions.
+        # The ``GetSSSR`` function itself is just prerequisite for
+        # running the optimization.
+        self.prist_mol = chem.AddHs(self.prist_mol)
+        chem.GetSSSR(self.prist_mol)
+        ac.MMFFOptimizeMolecule(self.prist_mol)  
+        
+        chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
+                          includeStereo=False, kekulize=False,
+                          forceV3000=True)                                             
+                                             
+        self.heavy_mol = chem.MolFromMolFile(self.heavy_mol_file,
+                                             sanitize=False, 
+                                             removeHs=False)
+        
+        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
+                                             isomericSmiles=True, 
+                                             allHsExplicit=True)                                               
+        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
+                                             isomericSmiles=True,
+                                             allHsExplicit=True)       
         
         
         

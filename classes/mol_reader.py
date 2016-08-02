@@ -1,4 +1,5 @@
-from MMEA.classes.topology import Topology
+import math
+import numpy as np
 
 class MolFileData:
     """
@@ -573,3 +574,11 @@ class Atom(object):
                     return None
                 else:
                     del self.distances[min_partner]
+                    
+                    
+                    
+                    
+                    
+from MMEA.classes.topology import Topology                    
+                    
+                    
