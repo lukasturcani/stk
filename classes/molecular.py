@@ -66,6 +66,17 @@ class FGInfo:
         form a tuple in this list, they will be joined with a double
         rather than single bond. If a single bond is desired there is no
         need to change this variable.
+        
+    heavy_symbols : set of str
+        A set of all the heavy symbols used by ``FGInfo`` instances in 
+        MMEA. This set updates itself automatically. There is no need to
+        modify it when changes are made to any part of MMEA.
+        
+    heavy_atomic_nums : set of ints
+        A set of all atomic numbers of heavy atoms used by ``FGInfo``
+        instances in MMEA. This set updates itself automatically. There
+        is no need to modify it when chagnes are made to any part of
+        MMEA.
 
     Attributes
     ----------
@@ -125,6 +136,12 @@ FGInfo.functional_group_list = [
                              ]
 
 FGInfo.double_bond_combs = [("Rh","Y"), ("Nb","Y"), ("Mb","Rh")]
+
+FGInfo.heavy_symbols = {x.heavy_symbol for x 
+                                        in FGInfo.functional_group_list}
+                        
+FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
+                                        in FGInfo.functional_group_list}
         
 class StructUnit:
     """
@@ -675,41 +692,45 @@ class MacroMolecule(metaclass=Cached):
     Attributes
     ----------
     building_blocks : list of ``StructUnit`` instances
-        
+        This attribute holds ``StructUnit`` instances which represent
+        the monomers forming the macromolecule. Only one ``StructUnit``
+        instance is needed per monomer, even if multiples of a monomer 
+        join up to form the macromolecule
 
 
     topology : A child class of ``Topology``
-        Represents the topology of the cage. Any information to do with
-        how individual building blocks of the cage are organized and
-        joined up in space is held by this attribute. For more details
-        about what information and functions this entails see  the 
-        docstring of the ``Topology`` class and its derived classes.
+        Represents the topology of the macromolecule. Any information to 
+        do with how individual building blocks of the macromolecule are 
+        organized and joined up in space is held by this attribute. For 
+        more details about what information and functions this entails 
+        see the docstring of the ``Topology`` class and its derived 
+        classes.
 
     prist_mol_file : str
         The full path of the ``.mol`` file holding the pristine version
-        of the cage molecule.
+        of the macromolecule.
 
     prist_mol : rdkit.Chem.rdchem.Mol
-        An rdkit molecule instance representing the cage molecule.
+        An rdkit molecule instance representing the macromolecule.
 
     prist_smiles : str
-        A ``SMILES`` string which represents the pristine cage molecule.
+        A ``SMILES`` string which represents the pristine macromolecule.
         
     heavy_mol_file : str
         The full path of the ``.mol`` file holding the substituted
-        version of the cage molecule.
+        version of the macromolecule.
 
     heavy_mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance holding the substituted version of the
-        cage molecule.
+        macromolecule.
 
     heavy_smiles : str
         A ``SMILES`` string representing the substitued version of the 
-        cage molecule.
+        macromolecule.
 
     fitness : float
-        The fitness value of the cage, as determined by the chosen
-        fitness function.         
+        The fitness value of the macromolecule, as determined by the 
+        chosen fitness function.         
     
     """
 
@@ -721,11 +742,12 @@ class MacroMolecule(metaclass=Cached):
         Which one is chosen depends on the number of arguments provided
         to the initializer. When 3 arguments are provided the
         initializer used for testing is used. When the 4 arguments are
-        provided the standarnd initializer used when running MMEA is 
-        used. For details on what the parameters passed should be check
+        provided the standarnd initializer used for running MMEA is 
+        used. For details on what the parameters should be passed check
         documentation of the individual initializers.
         
         """
+        
         if topology_args == None:
             topology_args = []
 
@@ -745,24 +767,26 @@ class MacroMolecule(metaclass=Cached):
         
         Parameters
         ---------
-        bb_file : str
-            The full path of the ``.mol`` file storing the pristine
-            molecule to be used a building-block*.
-            
-        lk_file : str
-            The full path of the ``.mol`` file storing the pristine
-            molecule to be used a linker.
-            
+        building_blocks : list of ``StructUnit`` instances
+            A list of ``StructUnit`` instances which represent the 
+            monomers forming the macromolecule.
+
         topology : A child class of ``Topology``
-            The class which defines the topology of the cage. Such 
-            classes are defined in the topology module. The class will
-            be a child class which inherits the base class ``Topology``.
+            The class which defines the topology of the macromolecule. 
+            Such classes are defined in the topology module. The class 
+            will be a child class which inherits the base class 
+            ``Topology``.
             
         prist_mol_file : str
-            The full path of the ``.mol`` file where the cage molecule
+            The full path of the ``.mol`` file where the macromolecule
             will be stored.
             
+        topology_args : list
+            Any additional arguments needed to initialize the topology
+            class supplied in the `topology` argument.
+            
         """
+        
         if topology_args == None:
             topology_args = []
 
@@ -810,9 +834,19 @@ class MacroMolecule(metaclass=Cached):
 
     def get_heavy_as_graph(self):
         """
-        Returns the heavy molecule as a mathematical graph.        
+        Returns a mathematical graph representing the heavy molecule.        
+        
+        Returns
+        -------
+        networkx.Graph
+            A graph where the nodes are the ids of the atoms in the
+            rdkit instance of the molecule and the edges are the bonds.
         
         """
+        
+        # Create a graph instance and add the atom ids as nodes. Use the
+        # the atom ids from each end of a bond to define edges. Do this
+        # for all bonds to account for all edges.
         
         graph = nx.Graph()        
         
@@ -821,27 +855,97 @@ class MacroMolecule(metaclass=Cached):
         
         for bond in self.heavy_mol.GetBonds():
             graph.add_edge(bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
-        
-        
+             
         return graph
 
     def heavy_get_atom_coords(self, atom_id):
+        """
+        Returns the coordinates of an atom in `heavy_mol`.        
+        
+        Parameters
+        ----------
+        atom_id : int
+            The id of the atom whose coordinates you want to find.
+            
+        Returns
+        -------
+        tuple of ints
+            The tuple represents the x, y and z coordinates of the atom,
+            respectively.         
+        
+        """
+        
+        # Get the conformer which holds all the positional information.        
         conformer = self.heavy_mol.GetConformer()
+        # Get the position of the desired atom from the conformer.
         position = conformer.GetAtomPosition(atom_id)
+        # Unpack and return the individual coordinates.
         return position.x, position.y, position.z        
         
     def heavy_distance(self, atom1_id, atom2_id):
+        """
+        Returns the distance between atoms in `heavy_mol`.
+        
+        Parameters
+        ----------
+        atom1_id : int
+            The id of the first atom.
+        
+        atom2_id : int
+            The id of the second atom.
+            
+        Returns 
+        -------
+        scipy.double
+            The distance between the first and second atoms.
+
+        """
+        
+        # Get the atomic positions of each atom and use the scipy 
+        # function to calculate their distance in Euclidean space.              
         atom1_coords = self.heavy_get_atom_coords(atom1_id)
         atom2_coords = self.heavy_get_atom_coords(atom2_id)
         
         return euclidean(atom1_coords, atom2_coords)
         
     def get_heavy_atom_distances(self):
-        for atom1, atom2 in itertools.combinations(self.heavy_mol.GetAtoms(), 2):
-            if atom1.GetAtomicNum() in self.topology.heavy_atomic_nums and atom2.GetAtomicNum() in self.topology.heavy_atomic_nums:               
+        """
+        Yield distances between all pairs of heavy atoms in `heavy_mol`.
+        
+        All distances are only yielded once. This means that if the 
+        distance between atoms with ids ``1`` and ``2``is yielded as
+        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be 
+        yielded.
+        
+        Only distances between heavy atoms used for functional group
+        substitutions are considered. Distances between heavy atoms
+        and regular atoms or between two regular atoms are not yielded.
+        
+        Yields
+        ------
+        tuple of form (scipy.double, int, int)
+            This tuple holds the distance between two heavy atoms. The 
+            first element is the distance and the next two are the 
+            relevant atom ids.
+
+        """
+                
+        # Iterate through each pair of atoms - do not allow iterating
+        # through the same pair twice. In otherwords, recombinations of 
+        # the same pair are not allowed.
+        for atom1, atom2 in itertools.combinations(
+                                        self.heavy_mol.GetAtoms(), 2):
+ 
+            # Only yield if both atoms are heavy. 
+            if (atom1.GetAtomicNum() in FGInfo.heavy_atomic_nums and 
+                atom2.GetAtomicNum() in FGInfo.heavy_atomic_nums):               
+                
+                # Get the atom ids, use them to calculate the distance
+                # and yield the resulting data.
                 atom1_id = atom1.GetIdx()
                 atom2_id = atom2.GetIdx()
-                yield self.heavy_distance(atom1_id, atom2_id), atom1_id, atom2_id
+                yield (self.heavy_distance(atom1_id, atom2_id), 
+                      atom1_id, atom2_id)
 
     def same(self, other):
         """
@@ -860,8 +964,10 @@ class MacroMolecule(metaclass=Cached):
             topology of the cages are all the same.
         
         """
-        # Compare the building blocks and topology making up the cage.
-        # If these are the same then the cages have the same structure.
+        
+        # Compare the building blocks and topology making up the 
+        # macromolecule. If these are the same then the cages have the 
+        # same structure.
         return (self.building_blocks == other.building_blocks and 
                                     self.topology == other.topology)
     
@@ -898,6 +1004,7 @@ class MacroMolecule(metaclass=Cached):
 
 class Cage(MacroMolecule):
     """
+    Used to represent molecular cages.
     
     """
     pass
@@ -905,5 +1012,16 @@ class Cage(MacroMolecule):
 
 class Polymer(MacroMolecule):
     """
+    Used to represent polymers.
     
     """
+    pass
+
+
+
+
+
+
+
+
+
