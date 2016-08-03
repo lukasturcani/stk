@@ -7,6 +7,7 @@ import itertools as itertools
 import re
 import networkx as nx
 from functools import partial
+import heapq
 
 from MMEA.classes.molecular import FGInfo, BuildingBlock, Linker
 from MMEA.convenience_functions import flatten
@@ -185,20 +186,51 @@ class Topology:
                 
         self.macro_mol.heavy_mol = editable_mol.GetMol()
 
-
-    def unpaired_diff_element_atoms(self, atom_id, heavy_mols):
-        for atom2_id in flatten(heavy_mols):
-            atom1 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom_id)
-            atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
-            
-            atom1_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom_id in x)           
+    def pair_up_polymer(self, heavy_mols):
+        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
+        
+        self.paired = set()
+        self.paired_mols = set()
+        
+        distances = sorted(self.macro_mol.get_heavy_atom_distances())
+        num_bonds_made= 0
+        for _, atom1_id, atom2_id in distances:
+            atom1_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom1_id in x)           
             atom2_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom2_id in x)
             mol_pair = str(sorted((atom1_mol, atom2_mol)))
+            
+            if (atom1_id not in self.paired and atom2_id not in self.paired and 
+                mol_pair not in self.paired_mols and atom1_mol != atom2_mol):
+                    bond_type= self.determine_bond_type(atom1_id, atom2_id)
+                    editable_mol.AddBond(atom1_id, atom2_id, bond_type)
+                    self.paired.add(atom1_id)
+                    self.paired.add(atom2_id)
+                    self.paired_mols.add(mol_pair)
+                    
+                    num_bonds_made += 1                    
+                    if num_bonds_made >= len(self.repeating_unit)-1:
+                        break
+        
+        self.macro_mol.heavy_mol = editable_mol.GetMol()
+        chem.MolToMolFile(self.macro_mol.heavy_mol, 'hi.mol')
+        raise Exception()
+        
+
+    def unpaired_diff_element_atoms(self, atom1_id, heavy_mols):
+        for atom2_id in flatten(heavy_mols):
+            atom1 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom1_id)
+            atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
+            
+            atom1_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom1_id in x)           
+            atom2_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom2_id in x)
+            mol_pair = str(sorted((atom1_mol, atom2_mol)))
+            
             if (atom1.GetAtomicNum() != atom2.GetAtomicNum() and 
                 atom2_id not in self.paired and mol_pair not in self.paired_mols):
                 yield atom2_id
-            
-            
+
+
+                        
     def min_distance_partner(self, atom_id, partner_pool):
         distance_func = partial(self.macro_mol.heavy_distance, atom_id)
         return min(partner_pool, key=distance_func)
@@ -361,13 +393,23 @@ class FourPlusSix(Topology):
         return chem.CombineMols(combined_mol3, combined_mol4)
         
 class BlockCopolymer(Topology):
+
+    keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"    
+    
     def __init__(self, macro_mol, repeating_unit):
         super().__init__(macro_mol)
         self.repeating_unit = repeating_unit
-        self.pair_up = join_polymer_mols
-        
+        self.pair_up = self.pair_up_polymer
+        self.monomer_keys = {}
+        for key, monomer in zip(BlockCopolymer.keys, self.macro_mol.building_blocks):
+            self.monomer_keys[key] = monomer
+    
+    
     def place_mols(self):
-        pass
-    
-    
+        distance = 30
+        self.macro_mol.heavy_mol = chem.Mol()
+        for index, key in enumerate(self.repeating_unit):
+            shifted_monomer = self.monomer_keys[key].shift_heavy_mol(distance*index,0,0)
+            self.macro_mol.heavy_mol = chem.CombineMols(shifted_monomer, self.macro_mol.heavy_mol)
+        
       

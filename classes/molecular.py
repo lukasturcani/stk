@@ -371,7 +371,7 @@ class StructUnit:
         # any changes are made, the pristine molecule's data is not 
         # corrupted. This second copy which will turn into the 
         # substituted ``rdkit.Chem.rdchem.Mol`` will be operated on.
-        self.heavy_mol = deepcopy(self.prist_mol)      
+        self.heavy_mol = chem.Mol(self.prist_mol)      
         
         # Subtitutes the relevent functional group atoms in `heavy_mol`
         # for heavy atoms.        
@@ -707,6 +707,12 @@ class MacroMolecule(metaclass=Cached):
         
         return euclidean(atom1_coords, atom2_coords)
         
+    def get_heavy_atom_distances(self):
+        for atom1, atom2 in itertools.combinations(self.heavy_mol.GetAtoms(), 2):
+            if atom1.GetAtomicNum() in self.topology.heavy_atomic_nums and atom2.GetAtomicNum() in self.topology.heavy_atomic_nums:               
+                atom1_id = atom1.GetIdx()
+                atom2_id = atom2.GetIdx()
+                yield self.heavy_distance(atom1_id, atom2_id), atom1_id, atom2_id
 
     def same(self, other):
         """
