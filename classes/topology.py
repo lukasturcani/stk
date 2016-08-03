@@ -1,11 +1,15 @@
+import rdkit
 from rdkit import Chem as chem
+from rdkit.Chem import AllChem as ac
 import math
 import numpy as np
 import itertools as itertools
 import re
+import networkx as nx
+from functools import partial
 
 from MMEA.classes.molecular import FGInfo, BuildingBlock, Linker
-
+from MMEA.convenience_functions import flatten
 
 class Topology:
     """
@@ -49,6 +53,9 @@ class Topology:
     """
     heavy_symbols = {x.heavy_symbol for x 
                         in FGInfo.functional_group_list}
+                        
+    heavy_atomic_nums = {x.heavy_atomic_num for x 
+                        in FGInfo.functional_group_list}
     
     def __init__(self, macro_mol):
         self.macro_mol = macro_mol
@@ -84,76 +91,28 @@ class Topology:
         self.join_mols()
         self.final_sub()
 
-    def join_cage_mols(self):
-        """
-        takens an input file with disconnected moleucles and connects them
-        """           
-        
-        
-        mol_file_data = Atom.extract_mol_file_data(
-                                          self.macro_mol.heavy_mol_file)
 
-        mol_file_content = mol_file_data.mol_file_content        
-        
-        Atom.bb_heavy_atoms_per_molecule = self.heavy_atoms_per_bb  
-        Atom.lk_heavy_atoms_per_molecule = self.heavy_atoms_per_lk   
-        
-        cage_bb = next(x for x in self.macro_mol.building_blocks if
-                                    isinstance(x, BuildingBlock))
-        cage_lk = next(x for x in self.macro_mol.building_blocks if
-                                    isinstance(x, Linker))
-        
-        Atom.bb = cage_bb.func_grp.heavy_symbol
-        Atom.lk = cage_lk.func_grp.heavy_symbol
-        
-        Atom.linked_mols = []
-        Atom.linked_atoms = []
-        
-        for atom in itertools.chain(mol_file_data.atom1_list,
-                                    mol_file_data.atom2_list):
-            atom.assign_molecule_number()
-        
-        for atom1 in mol_file_data.atom1_list:
-            for atom2 in mol_file_data.atom2_list:
-                atom1.distance(atom2)   
-    
-        for atom1 in mol_file_data.atom1_list:
-            for atom2 in mol_file_data.atom2_list:
-                self.pair_up_func(atom1)
-        
-        for atom in Atom.linked_atoms:
-            mol_file_data.bond_number += 1
-            double_bond_present = [atom[1] in tup and atom[3] in tup for 
-                                    tup in FGInfo.double_bond_combs]
-            
-            if True in double_bond_present:
-                bond_order = "2"
-            else:
-                bond_order = "1"
-                
-            mol_file_content += "M  V30 {2} {3} {0} {1}\n".format(
-                              atom[0], atom[2], 
-                              mol_file_data.bond_number, bond_order)
-        
-        
-        mol_file_content += "M  V30 END BOND\nM  V30 END CTAB\nM  END"
 
-        p = re.compile(r" VAL=.")
-        mol_file_content = re.sub(p, "", mol_file_content)
-
-        mol_file_content = mol_file_content.replace(
-                                            mol_file_data.count_line, 
-                                "M  V30 COUNTS {0} {1} 0 0 0\n".format(
-                                             mol_file_data.at_num,
-                                             mol_file_data.bond_number))
+    def join_mols(self):
+        heavy_graph = self.macro_mol.get_heavy_as_graph()
+        molecules = [x.nodes() for x in 
+                    nx.connected_component_subgraphs(heavy_graph)]
         
-        new_mol_file_name = self.macro_mol.heavy_mol_file
-        new_mol_file = open(new_mol_file_name, "w")
-        new_mol_file.write(mol_file_content)
-        new_mol_file.close()
+        heavy_mols = self.extract_heavy_atoms(molecules)
+        self.pair_up(heavy_mols)            
 
-    def join_polymer_mols(self):
-        pass
+
+    def extract_heavy_atoms(self, molecules):
+        heavy_mols = []
+        for molecule in molecules:
+            heavy_mol = []
+            for atom_id in molecule:
+                if self.macro_mol.heavy_mol.GetAtomWithIdx(atom_id).GetAtomicNum() in Topology.heavy_atomic_nums:
+                    heavy_mol.append(atom_id)
+            heavy_mols.append(heavy_mol) 
+        return heavy_mols
+
+
         
         
     def final_sub(self):
@@ -175,29 +134,96 @@ class Topology:
         None : NoneType
         
         """
-
-        cage_bb = next(x for x in self.macro_mol.building_blocks if
-                                    isinstance(x, BuildingBlock))
-        cage_lk = next(x for x in self.macro_mol.building_blocks if
-                                    isinstance(x, Linker))
-
         
-        # Read the assembled heavy cage file, line by line. Any time
-        # a heavy atomic symbol is found, replace it with the 
-        # corresponding light element. Save all lines to a string and
-        # write this string to a new file. Do not change the original
-        # file because it is meant to hold the heavy cage. 
-        with open(self.macro_mol.heavy_mol_file, "r") as add:
-            new_file= ""
-            for line in add:
-                line = line.replace(cage_bb.func_grp.heavy_symbol,
-                                    cage_bb.func_grp.target_symbol)
-                line = line.replace(cage_lk.func_grp.heavy_symbol,
-                                    cage_lk.func_grp.target_symbol)
-                new_file += line
-    
-        with open(self.macro_mol.prist_mol_file, "w") as f:
-            f.write(new_file)
+        
+        # Add Hydrogens to the pristine version of the molecule and
+        # ensure this updated molecule is added to the ``.mol`` file as 
+        # well. The ``GetSSSR`` function and optimization ensure that
+        # the added Hydrogen atoms are placed in reasonable positions.
+        # The ``GetSSSR`` function itself is just prerequisite for
+        # running the optimization.
+        self.macro_mol.prist_mol = chem.Mol(self.macro_mol.heavy_mol)
+        
+        for atom in self.macro_mol.prist_mol.GetAtoms():
+            atomic_num = atom.GetAtomicNum()
+            if atomic_num in Topology.heavy_atomic_nums:
+                target_atomic_num = next(x.target_atomic_num for x in 
+                                    FGInfo.functional_group_list if 
+                                    x.heavy_atomic_num == atomic_num)                
+                atom.SetAtomicNum(target_atomic_num)
+            
+        
+        
+        self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol)
+        chem.GetSSSR(self.macro_mol.prist_mol)
+        ac.MMFFOptimizeMolecule(self.macro_mol.prist_mol)
+
+    def pair_up_diff_element_atoms(self, heavy_mols):
+        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
+        
+        self.paired = set()
+        self.paired_mols = set()
+        
+        for atom_id in flatten(heavy_mols):
+            if atom_id not in self.paired:
+                
+                partner_pool = self.unpaired_diff_element_atoms(atom_id, 
+                                                         heavy_mols)
+                partner = self.min_distance_partner(atom_id, 
+                                                    partner_pool)
+                
+                                    
+                bond_type = self.determine_bond_type(atom_id, partner)
+                editable_mol.AddBond(atom_id, partner, bond_type)
+
+                atom_mol_num = next(heavy_mols.index(x) for x in heavy_mols if atom_id in x)
+                partner_mol_num = next(heavy_mols.index(x) for x in heavy_mols if partner in x)                 
+                
+                self.paired.add(atom_id)
+                self.paired.add(partner)
+                self.paired_mols.add(str(sorted((atom_mol_num, partner_mol_num))))
+                
+        self.macro_mol.heavy_mol = editable_mol.GetMol()
+
+
+    def unpaired_diff_element_atoms(self, atom_id, heavy_mols):
+        for atom2_id in flatten(heavy_mols):
+            atom1 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom_id)
+            atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
+            
+            atom1_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom_id in x)           
+            atom2_mol =  next(heavy_mols.index(x) for x in heavy_mols if atom2_id in x)
+            mol_pair = str(sorted((atom1_mol, atom2_mol)))
+            if (atom1.GetAtomicNum() != atom2.GetAtomicNum() and 
+                atom2_id not in self.paired and mol_pair not in self.paired_mols):
+                yield atom2_id
+            
+            
+    def min_distance_partner(self, atom_id, partner_pool):
+        distance_func = partial(self.macro_mol.heavy_distance, atom_id)
+        return min(partner_pool, key=distance_func)
+
+    def determine_bond_type(self, atom1_id, atom2_id):
+        atom1 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom1_id)
+        atom1_atomic_n = atom1.GetAtomicNum()
+        atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
+        atom2_atomic_n = atom2.GetAtomicNum()
+                
+        
+        atom1_symbol = next(x.heavy_symbol for x in 
+                            FGInfo.functional_group_list if 
+                            atom1_atomic_n == x.heavy_atomic_num)
+        atom2_symbol = next(x.heavy_symbol for x in 
+                            FGInfo.functional_group_list if 
+                            atom2_atomic_n == x.heavy_atomic_num)        
+        
+        double_bond_present = (atom1_symbol in tup and atom2_symbol in tup
+                                for tup in FGInfo.double_bond_combs)
+        if True in double_bond_present:
+            return rdkit.Chem.rdchem.BondType.DOUBLE
+        else:
+            return rdkit.Chem.rdchem.BondType.SINGLE
+
 
       
 class FourPlusSix(Topology):
@@ -235,16 +261,9 @@ class FourPlusSix(Topology):
     """
     
     def __init__(self, macro_mol):
-        super().__init__(macro_mol)
-        self.heavy_atoms_per_bb = 3
-        self.heavy_atoms_per_lk = 2
-        
-        self.bb_num = 4
-        self.lk_num = 6
-        
-        self.pair_up_func = Atom.pair_up_v4_v2
-        self.join_mols = self.join_cage_mols
-        
+        super().__init__(macro_mol)        
+        self.pair_up = self.pair_up_diff_element_atoms
+
     def place_mols(self):
         """
         Places all building block molecules on correct coordinates.
@@ -272,11 +291,7 @@ class FourPlusSix(Topology):
         lk_placement = self.place_lks()
         self.macro_mol.heavy_mol = chem.CombineMols(bb_placement, 
                                                    lk_placement) 
-                                                   
-        chem.MolToMolFile(self.macro_mol.heavy_mol, 
-                          self.macro_mol.heavy_mol_file,
-                          includeStereo=True, kekulize=False,
-                          forceV3000=True)
+
         
     
     def place_bbs(self):
@@ -349,11 +364,10 @@ class BlockCopolymer(Topology):
     def __init__(self, macro_mol, repeating_unit):
         super().__init__(macro_mol)
         self.repeating_unit = repeating_unit
-        self.join_mols = join_polymer_mols
+        self.pair_up = join_polymer_mols
         
     def place_mols(self):
         pass
     
     
-        
-from MMEA.classes.mol_reader import Atom        
+      

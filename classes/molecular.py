@@ -11,7 +11,8 @@ from operator import attrgetter
 from copy import deepcopy
 import os
 import math
-
+import networkx as nx
+from scipy.spatial.distance import euclidean
 
 from ..convenience_functions import dedupe, flatten
 
@@ -566,7 +567,7 @@ class StructUnit:
                                    func_grp_mol_end, replaceAll=True)
         self.heavy_mol = rms[0]
         self.heavy_mol.RemoveAllConformers()
-        ac.EmbedMolecule(self.heavy_mol)      
+        ac.EmbedMolecule(self.heavy_mol)
         
 class BuildingBlock(StructUnit):
     """
@@ -658,30 +659,18 @@ class MacroMolecule(metaclass=Cached):
         # linkers joined up. Both the substituted and pristine versions.
         self.topology.build()
         
+        chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
+                          includeStereo=False, kekulize=False,
+                          forceV3000=True) 
+                          
         # Use the assembled cage in the ``.mol`` files to generate
         # rdkit instances of the pristine and substituted cages and
         # their ``SMILES`` strings.
-        self.prist_mol = chem.MolFromMolFile(self.prist_mol_file,
-                                             sanitize=False, 
-                                             removeHs=False)
-                                             
-        # Add Hydrogens to the pristine version of the molecule and
-        # ensure this updated molecule is added to the ``.mol`` file as 
-        # well. The ``GetSSSR`` function and optimization ensure that
-        # the added Hydrogen atoms are placed in reasonable positions.
-        # The ``GetSSSR`` function itself is just prerequisite for
-        # running the optimization.
-        self.prist_mol = chem.AddHs(self.prist_mol)
-        chem.GetSSSR(self.prist_mol)
-        ac.MMFFOptimizeMolecule(self.prist_mol)  
-        
         chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
                           includeStereo=False, kekulize=False,
-                          forceV3000=True)                                             
+                          forceV3000=True) 
                                              
-        self.heavy_mol = chem.MolFromMolFile(self.heavy_mol_file,
-                                             sanitize=False, 
-                                             removeHs=False)
+
         
         self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
                                              isomericSmiles=True, 
@@ -689,6 +678,35 @@ class MacroMolecule(metaclass=Cached):
         self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
                                              isomericSmiles=True,
                                              allHsExplicit=True)     
+
+    def get_heavy_as_graph(self):
+        """
+        Returns the heavy molecule as a mathematical graph.        
+        
+        """
+        
+        graph = nx.Graph()        
+        
+        for atom in self.heavy_mol.GetAtoms():
+            graph.add_node(atom.GetIdx())
+        
+        for bond in self.heavy_mol.GetBonds():
+            graph.add_edge(bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+        
+        
+        return graph
+
+    def heavy_get_atom_coords(self, atom_id):
+        conformer = self.heavy_mol.GetConformer()
+        position = conformer.GetAtomPosition(atom_id)
+        return position.x, position.y, position.z        
+        
+    def heavy_distance(self, atom1_id, atom2_id):
+        atom1_coords = self.heavy_get_atom_coords(atom1_id)
+        atom2_coords = self.heavy_get_atom_coords(atom2_id)
+        
+        return euclidean(atom1_coords, atom2_coords)
+        
 
     def same(self, other):
         """
@@ -888,7 +906,7 @@ class Polymer(MacroMolecule):
 
         # A ``Topology`` subclass instance must be initiazlied with a 
         # copy of the cage it is describing.        
-        self.topology = topology(self, genetic_string)
+        self.topology = topology(self, repeating_unit)
         self.prist_mol_file = prist_mol_file
         
         # This generates the name of the heavy ``.mol`` file by adding
