@@ -6,15 +6,10 @@ import weakref
 import rdkit
 from rdkit import Chem as chem
 from rdkit.Chem import AllChem as ac
-from collections import namedtuple
-from operator import attrgetter
 from copy import deepcopy
 import os
-import math
 import networkx as nx
 from scipy.spatial.distance import euclidean
-
-from ..convenience_functions import dedupe, flatten
 
 class Cached(type):
     """
@@ -26,12 +21,13 @@ class Cached(type):
         super().__init__(*args, **kwargs)        
         self.__cache = weakref.WeakValueDictionary()
     
-    def __call__(self, *args):
-        if args in self.__cache.keys():
-            return self.__cache[args]
+    def __call__(self, *args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key in self.__cache.keys():
+            return self.__cache[key]
         else:
-            obj = super().__call__(*args)
-            self.__cache[args] = obj
+            obj = super().__call__(*args, **kwargs)
+            self.__cache[key] = obj
             return obj
                                
 class FGInfo:
@@ -46,16 +42,17 @@ class FGInfo:
     
     Adding a new ``FGInfo`` instace to `functional_group_list` will 
     allow the `Topology.join_mols` method to connect this functional 
-    group to (all) others during assembly. 
+    group to (all) others during assembly. Nothing excepting adding this
+    instance should need to be done to incorporate new functional 
+    groups.
     
     If this new functional group is to connect to another functional 
     group with a double bond during assembly, the symbols of the heavy 
     atoms of both functional groups should be added to the 
-    `double_bond_combs` list. The order in which the heavy symbols are 
-    placed in the tuple does not matter.
-    
-    This should be all that is necessary to allow a MMEA to join up a
-    new functional group during assembly.    
+    `double_bond_combs` class attribute. The order in which the heavy 
+    symbols are placed in the tuple does not matter. Again, this is all
+    that needs to be done for MMEA to create double bonds between
+    certain functional groups.  
     
     Class attributes
     ----------------
@@ -66,7 +63,7 @@ class FGInfo:
         
     double_bond_combs : list of tuples of strings
         When assembly is carried out, if the heavy atoms being joined
-        forme a tuple in this list, they will be joined with a double
+        form a tuple in this list, they will be joined with a double
         rather than single bond. If a single bond is desired there is no
         need to change this variable.
 
@@ -84,20 +81,19 @@ class FGInfo:
         substitution by a heavy atom.
     
     target_atomic_num : int
-        The atomic number of the atom, which is substituted with a heavy 
-        atom, in the functional group.
+        The atomic number of the atom being substituted by a heavy atom.
     
     heavy_atomic_num : int
         The atomic number of the heavy atom which replaces the target 
-        atom in the functional group.
+        atom.
     
     target_symbol : str
-        The atomic symbol of the atom, which is substituted with a heavy 
-        atom, in the functional group.        
+        The atomic symbol of the atom, being substituted by a heavy 
+        atom.       
     
     heavy_symbol : str
         The atomic symbol of the heavy atom which replaces the target 
-        atom in the functional group.
+        atom.
     
     """
     
@@ -132,14 +128,14 @@ FGInfo.double_bond_combs = [("Rh","Y"), ("Nb","Y"), ("Mb","Rh")]
         
 class StructUnit:
     """
-    Represents the building blocks of molecules examined by MMEA.
+    Represents the building blocks of macromolecules examined by MMEA.
     
     ``Building blocks`` in this case refers to the smallest molecular 
     unit of the assembled molecules (such as cages) examined by MMEA. 
     This is not the be confused with building-blocks* of cages. 
     Building-blocks* of cages are examples of the ``building blocks`` 
     referred to here. To be clear, the ``StructUnit`` class represents 
-    all building blocks of the molecules, such as both the linkers and 
+    all building blocks of macromolecules, such as both the linkers and 
     building-blocks* of cages.
     
     To avoid confusion, in the documentation general building blocks 
@@ -147,9 +143,9 @@ class StructUnit:
     while building-blocks* of cages are always referred to as 
     ``building-blocks*``. 
     
-    The goal of this class is the conveniently store information about, 
+    The goal of this class is to conveniently store information about, 
     and perform operations on, single instances of the building blocks 
-    used to form the assembled molecules. The class stores information 
+    used to form the macromolecules. The class stores information 
     regarding the rdkit instance of the building block, its ``SMILES`` 
     string and the location of its ``.mol`` file. See the attributes 
     section of this docstring for a full list of information stored.
@@ -158,28 +154,30 @@ class StructUnit:
     functional groups in the building blocks via the 
     `_generate_functional_group_atoms` method. This method is 
     automatically invoked by the initialzer, so each initialized
-    instance of ``StructUnit`` should atomatically have all of the 
+    instance of ``StructUnit`` should automatically have all of the 
     attributes associated with the substituted version of the molecular 
     building block.
     
     More information regarding what operations the class supports can be
-    found by examining the methods documented below. A noteworthy 
-    example is the `shift_heavy_mol` method. This method is invoked
-    by other processes in MMEA (such as in the creation of assembled 
-    molecules - see the `place_mols` documentation of the ``Topolgy`` 
-    class) and is generally very useful. Similar methods such as 
+    found by examining the methods below. A noteworthy example is the 
+    `shift_heavy_mol` method. This method is invoked by other processes 
+    in MMEA (such as during the assembly of macromolecules - see the 
+    `place_mols` documentation of the ``Topolgy`` class) and is 
+    generally very useful. Similar methods such as 
     `set_heavy_mol_position` may be added in the future. Refer to the 
-    documentation of `shift_heavy_mol` below for more details. Note that 
+    documentation of `shift_heavy_mol` for more details. Note that 
     this paragraph is not an exhaustive list of useful operations.
     
     The ``StructUnit`` class is intended to be inherited from. As 
     mentioned before, ``StructUnit`` is a general building block. If one 
     wants to represent a specific building block, such as a linker or 
     building-block* (of a cage) a new class should be created. This new
-    class will will inherit ``StructUnit``. In this way, any operations 
+    class will inherit ``StructUnit``. In this way, any operations 
     which apply generally to building blocks can be stored here and any
     which apply specifically to one kind of building block such as a 
-    linker or building-block* can be placed within its own class.
+    linker or building-block* can be placed within its own class. Due to
+    inheritance, instances of a derived class are able to use operation
+    of the parent class.
     
     Consider a useful result of this approach. When setting the 
     coordinates of linkers or building-blocks* during assembly of a 
@@ -272,7 +270,7 @@ class StructUnit:
     heavy_mol_file : str
         The full path of the ``.mol`` file (V3000) holding the 
         substituted molecule. This attribute is initialized by the 
-        initializer indirectly when it calls the `generate_heavy_attrs` 
+        initializer indirectly when it calls the `_generate_heavy_attrs` 
         method. 
     
     heavy_mol : rdkit.Chem.rdchem.Mol
@@ -401,11 +399,11 @@ class StructUnit:
         The ``StructUnit`` instance (`self`) represents a molecule. 
         This molecule is in turn represented in rdkit by a 
         ``rdkit.Chem.rdchem.Mol`` instance. This rdkit molecule instance 
-        is held by `self` in the `prist_mol` attribute. In rdkit the
-        molecule instance is made up of constitutent atoms which are
-        ``rdkit.Chem.rdchem.Atom`` instances. Within an rdkit molecule,
-        each such atom instance has its own id. These are the ids
-        contained in the tuple returned by this function. Simple right?   
+        is held in the `prist_mol` attribute. The rdkit molecule 
+        instance is made up of constitutent atoms which are
+        ``rdkit.Chem.rdchem.Atom`` instances. Each atom instance has its
+        own id. These are the ids contained in the tuple returned by 
+        this function.   
 
         Returns
         -------
@@ -571,7 +569,7 @@ class StructUnit:
         
 class BuildingBlock(StructUnit):
     """
-    Holds information about the building-blocks* of a cage.
+    Represents the building-blocks* of a cage.
     
     """
     
@@ -579,7 +577,7 @@ class BuildingBlock(StructUnit):
         
 class Linker(StructUnit):
     """
-    Holds information about the linkers of a cage.
+    Represents the linkers of a cage.
     
     """
     
@@ -588,12 +586,136 @@ class Linker(StructUnit):
 @total_ordering
 class MacroMolecule(metaclass=Cached):
     """
+    A class for MMEA assembled macromolecules.
+    
+    The goal of this class is to represent an individual used by the GA.
+    As such, it holds attributes that are to be expected for this 
+    purpose. Mainly, it has a fitness value stored in its `fitness` 
+    attribute and a genetic code - as defined by its `building_blocks` 
+    and  `topology` attributes. If a change is made to either of these 
+    attributes, they should describe a different macromolecule. On the
+    other hand, the same attributes should always describe the same 
+    macromolecule.
+    
+    Because of this, as well as the computational cost associated with
+    macromolecule initialization, instances of this class are cached. 
+    This means that providing the same arguments to the initializer will 
+    not build a different instance with the same attribute values. It 
+    will yield the original instance, retrieved from memory.
+    
+    To prevent bloating this class, any information that can be 
+    categorized is. For example, storing information that concerns
+    building blocks ``in a vaccuum`` is stored in ``StructUnit`` 
+    instances. Equally, manipulations of such data is also performed by
+    those instances. Similarly, anything to do with topolgy should be 
+    held by a ``Topology`` instance in the topology attribute. There is
+    a notable exception to this however. This happens when retrieving 
+    topological information directly from rdkit molecule instances 
+    representing the macromolecule. Examples include the 
+    `heavy_distance` and `get_heavy_as_graph` methods. This is because
+    information about atomic coordinates is stored in the rdkit molecule 
+    instances, which are stored directly by this class.
+    
+    It should also be noted that only a single copy of each 
+    ``StructUnit`` instance representing a specific building block needs
+    to be held. How many of such building blocks are need to assemble
+    the cage is the handled by the ``Topology`` class, which only needs
+    a single copy of each building block to work with.    
+    
+    If new inormation associated with macromolecules, but not directly 
+    concerning them as a whole, is to be added at some point in the 
+    future, and that information can be grouped together in a logical 
+    category, a new class should be created to store and manipulate this 
+    data. It should not be given to the macromolecule directly. 
+    Alternatively if more information to do with one of the already 
+    categories, it should be added there. The attribute 
+    `building_blocks` and its composing ``StructUnit`` instaces are an
+    example of this approach.
+    
+    However information dealing with the cage as a whole can be added
+    directly to attributes of this class. You can see examples of such 
+    attributes below. Simple identifiers such as ``.mol`` files and 
+    ``SMILES`` strings do not benefit from being grouped together. 
+    (Unless they pertain to specific substructures within the cages such 
+    as linkers and building-blocks* - as mentioned before.) Topology is 
+    an exception to this because despite applying to the cage as a 
+    whole, it a complex aspect with its own functions and data. 
+    
+    The goal is simplicity. Having too many categories causes unneeded
+    complexity as does having too few.
+    
+    This class is not intended to be used directly but should be 
+    inherited by subclasses representing specific macromolecules. The
+    ``Cage`` and ``Polymer`` classes are examples of this. Any 
+    information or methods that apply generally to all macromolecules
+    should be defined within this class while specific non-general data
+    should be included in derived classes.
+    
+    This class also supports comparison operations, these act on the 
+    fitness value assiciated with a macromolecule. Comparison operations 
+    not explicitly defined are included via the ``total_ordering`` 
+    decorator. For other operations and methods supported by this class 
+    examine the rest of the class definition.
+
+    Finally, a word of caution. The equality operator ``==`` compares 
+    fitness values. This means two macromolecules, made from different 
+    building blocks, can compare equal if they happen to have the same 
+    fitness. The operator is not to be used to check if one 
+    macromolecule is the same structurally as another. To do this check 
+    use the `same` method. This method may be overwritten in derived 
+    classes, as necessary. In addition the ``is`` operator is 
+    implemented as is default in Python. It compares whether two objects 
+    are in the same location n memory. Because the ``MacroMolecule`` 
+    class is cached the ``is`` operator could in principle be used 
+    instead of the `same` method (including in derived classes). 
+    However, this is not intended use and is not guuranteed to work in 
+    future implementations. If caching stops being implemented such code 
+    would break.
+
+    Attributes
+    ----------
+    building_blocks : list of ``StructUnit`` instances
+        
+
+
+    topology : A child class of ``Topology``
+        Represents the topology of the cage. Any information to do with
+        how individual building blocks of the cage are organized and
+        joined up in space is held by this attribute. For more details
+        about what information and functions this entails see  the 
+        docstring of the ``Topology`` class and its derived classes.
+
+    prist_mol_file : str
+        The full path of the ``.mol`` file holding the pristine version
+        of the cage molecule.
+
+    prist_mol : rdkit.Chem.rdchem.Mol
+        An rdkit molecule instance representing the cage molecule.
+
+    prist_smiles : str
+        A ``SMILES`` string which represents the pristine cage molecule.
+        
+    heavy_mol_file : str
+        The full path of the ``.mol`` file holding the substituted
+        version of the cage molecule.
+
+    heavy_mol : rdkit.Chem.rdchem.Mol
+        A rdkit molecule instance holding the substituted version of the
+        cage molecule.
+
+    heavy_smiles : str
+        A ``SMILES`` string representing the substitued version of the 
+        cage molecule.
+
+    fitness : float
+        The fitness value of the cage, as determined by the chosen
+        fitness function.         
     
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args, topology_args=None):
         """
-        Initializes ``Cage`` instances.
+        Initializes ``MacroMolecule`` instances.
         
         Several different initializers for this class are available.
         Which one is chosen depends on the number of arguments provided
@@ -604,18 +726,22 @@ class MacroMolecule(metaclass=Cached):
         documentation of the individual initializers.
         
         """
+        if topology_args == None:
+            topology_args = []
+
     
         if len(args) == 3:
-            self.std_init(*args)
+            self.std_init(*args, topology_args=topology_args)
         
         if len(args) == 4:
             self.testing_init(*args)
 
 
     
-    def std_init(self, building_blocks, topology, prist_mol_file):
+    def std_init(self, building_blocks, topology, prist_mol_file,
+                 topology_args=None):
         """
-        Initialize a ``Cage`` instance used during MMEA runtime.
+        Initialize a ``MacroMolecule`` used during MMEA runtime.
         
         Parameters
         ---------
@@ -637,6 +763,9 @@ class MacroMolecule(metaclass=Cached):
             will be stored.
             
         """
+        if topology_args == None:
+            topology_args = []
+
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
         self.fitness = None
@@ -645,7 +774,7 @@ class MacroMolecule(metaclass=Cached):
 
         # A ``Topology`` subclass instance must be initiazlied with a 
         # copy of the cage it is describing.        
-        self.topology = topology(self)
+        self.topology = topology(self, *topology_args)
         self.prist_mol_file = prist_mol_file
         
         # This generates the name of the heavy ``.mol`` file by adding
@@ -769,107 +898,6 @@ class MacroMolecule(metaclass=Cached):
 
 class Cage(MacroMolecule):
     """
-    A class for MMEA individuals which are porous molecular cages.
-    
-    The goal of this class is to represent an individual used by a GA.
-    As such, it holds attributes that are to be expected for this 
-    purpose. Mainly, it has a fitness value stored in its `fitness` 
-    attribute and a genetic code - as defined by its `bb`, `lk` and 
-    `topology` attributes. Changing any one of these three attributes 
-    will result in a different cage, while providing the same attributes
-    again should yield the same cage.
-    
-    Because of this, as well as the computational cost associated with
-    cage creation, instances of this class are cached. This means that
-    providing the same arguments to the initializer will not build a 
-    different instance with the same attribute values. It will yield the 
-    original instance, retrieved from memory.
-    
-    To prevent unecessary bulk to this class any information that can
-    be categoraized is. For example, a cage has a building-block* and a
-    linker. Both of these structural units have information associated
-    with them. These are things like ``SMILES`` strings, ``.mol`` files
-    and more. All of these things are held within the instances held by
-    the `bb` and `lk` attributes. Equally, anything to do with topolgy 
-    should be held by a ``Topology`` instance in the topology attribute.
-    
-    If new inormation associated with cages is to be added at some point
-    in the future, and that information can be grouped together in a
-    logical category, a new class should be created to store and 
-    manipulate this data. It should not be given to the cage directly.
-    Alternatively if more information to do with one of the already 
-    present categories, it should be added there.
-    
-    However information dealing with the cage as a whole can be added
-    directly to attributes. You can see examples of such attributes 
-    alone. Topology is an exception to this because, despite applying to 
-    the cage as a whole, it a complex aspect with its own functions and 
-    data. Simple identifiers such as ``.mol`` files and ``SMILES`` 
-    strings do not benefit from being grouped together. (Unless they
-    pertain to specific substructures within the cages such as linkers
-    and building-blocks* - as mentioned before.)
-    
-    This class also supports comparison operations, these act on the 
-    fitness value assiciated with a cage. Comparison operations not 
-    explicitly defined are included via the ``total_ordering`` 
-    decorator. For other operations and methods supported by this class 
-    examine the rest of the class definition.
-
-    Finally, a word of caution. The equality operator ``==`` compares 
-    fitness values. This means two cages, made from different building 
-    blocks, can compare equal if they happen to have the same fitness. 
-    The operator is not to be used to check if one cage is the same 
-    structurally as another. To do this check use the `same_cage` 
-    method. In addition the ``is`` operator is implemented as is default
-    in Python. It compares whether two objects are in the same location 
-    in memory. Because the ``Cage`` class is cached the ``is`` operator
-    could in principle be used instead of the `same_cage` method. 
-    However, this is not intended use and not guarnteed to work in 
-    future implementations. If caching stops being implemented such code 
-    would break.
-
-    Attributes
-    ----------
-    bb : BuildingBlock
-        This attribute represents a single building-block* molecule and
-        holds information pertaining to that function.
-    
-    lk : Linker
-        This attribute represents a single linker molecule and holds 
-        information pertaining to that function.
-
-    topology : A child class of ``Topology``
-        Represents the topology of the cage. Any information to do with
-        how individual building blocks of the cage are organized and
-        joined up in space is held by this attribute. For more details
-        about what information and functions this entails see  the 
-        docstring of the ``Topology`` class and its derived classes.
-
-    prist_mol_file : str
-        The full path of the ``.mol`` file holding the pristine version
-        of the cage molecule.
-
-    prist_mol : rdkit.Chem.rdchem.Mol
-        An rdkit molecule instance representing the cage molecule.
-
-    prist_smiles : str
-        A ``SMILES`` string which represents the pristine cage molecule.
-        
-    heavy_mol_file : str
-        The full path of the ``.mol`` file holding the substituted
-        version of the cage molecule.
-
-    heavy_mol : rdkit.Chem.rdchem.Mol
-        A rdkit molecule instance holding the substituted version of the
-        cage molecule.
-
-    heavy_smiles : str
-        A ``SMILES`` string representing the substitued version of the 
-        cage molecule.
-
-    fitness : float
-        The fitness value of the cage, as determined by the chosen
-        fitness function.         
     
     """
     pass
@@ -879,112 +907,3 @@ class Polymer(MacroMolecule):
     """
     
     """
-    def __init__(self, building_blocks, topology, repeating_unit,
-                 prist_mol_file):
-        """
-        Initialize a ``Cage`` instance used during MMEA runtime.
-        
-        Parameters
-        ---------
-        bb_file : str
-            The full path of the ``.mol`` file storing the pristine
-            molecule to be used a building-block*.
-            
-        lk_file : str
-            The full path of the ``.mol`` file storing the pristine
-            molecule to be used a linker.
-            
-        topology : A child class of ``Topology``
-            The class which defines the topology of the cage. Such 
-            classes are defined in the topology module. The class will
-            be a child class which inherits the base class ``Topology``.
-            
-        prist_mol_file : str
-            The full path of the ``.mol`` file where the cage molecule
-            will be stored.
-            
-        """
-        # A numerical fitness is assigned by fitness functions evoked
-        # by a ``Population`` instance's `GATools` attribute.
-        self.fitness = None
-                
-        self.building_blocks = tuple(building_blocks)
-
-        # A ``Topology`` subclass instance must be initiazlied with a 
-        # copy of the cage it is describing.        
-        self.topology = topology(self, repeating_unit)
-        self.prist_mol_file = prist_mol_file
-        
-        # This generates the name of the heavy ``.mol`` file by adding
-        # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
-        heavy_mol_file = list(os.path.splitext(prist_mol_file))
-        heavy_mol_file.insert(1,'HEAVY')        
-        self.heavy_mol_file = '_'.join(heavy_mol_file) 
-        
-        # Ask the ``Topology`` instance to assemble/build the cage. This
-        # creates the cage's ``.mol`` file all  the building blocks and
-        # linkers joined up. Both the substituted and pristine versions.
-        self.topology.build()
-        
-        # Use the assembled cage in the ``.mol`` files to generate
-        # rdkit instances of the pristine and substituted cages and
-        # their ``SMILES`` strings.
-        self.prist_mol = chem.MolFromMolFile(self.prist_mol_file,
-                                             sanitize=False, 
-                                             removeHs=False)
-                                             
-        # Add Hydrogens to the pristine version of the molecule and
-        # ensure this updated molecule is added to the ``.mol`` file as 
-        # well. The ``GetSSSR`` function and optimization ensure that
-        # the added Hydrogen atoms are placed in reasonable positions.
-        # The ``GetSSSR`` function itself is just prerequisite for
-        # running the optimization.
-        self.prist_mol = chem.AddHs(self.prist_mol)
-        chem.GetSSSR(self.prist_mol)
-        ac.MMFFOptimizeMolecule(self.prist_mol)  
-        
-        chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
-                          includeStereo=False, kekulize=False,
-                          forceV3000=True)                                             
-                                             
-        self.heavy_mol = chem.MolFromMolFile(self.heavy_mol_file,
-                                             sanitize=False, 
-                                             removeHs=False)
-        
-        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
-                                             isomericSmiles=True, 
-                                             allHsExplicit=True)                                               
-        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
-                                             isomericSmiles=True,
-                                             allHsExplicit=True)       
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
