@@ -18,6 +18,6 @@ def test_init():
     
     building_blocks = (lk1, lk2, lk3, lk4)    
     
-    polymer = Polymer(building_blocks, BlockCopolymer, "AAABBACDABCDD",
-                      'you_can_delete_this2.mol')
+    polymer = Polymer(building_blocks, BlockCopolymer, 'you_can_delete_this2.mol', 
+                      topology_args= ["AAABBACDABCDD"])
     
