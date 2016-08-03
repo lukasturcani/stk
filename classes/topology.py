@@ -38,12 +38,6 @@ class Topology:
     which place building blocks in the correct positions in the ``.mol``
     file.
     
-    Class attributes
-    ----------------
-    heavy_symbols : set of str
-        The atomic symbols of heavy elements used in substitutions by
-        MMEA.
-    
     Attributes
     ----------
     macro_mol : MacroMolecule
@@ -52,11 +46,7 @@ class Topology:
         instance.
     
     """
-    heavy_symbols = {x.heavy_symbol for x 
-                        in FGInfo.functional_group_list}
-                        
-    heavy_atomic_nums = {x.heavy_atomic_num for x 
-                        in FGInfo.functional_group_list}
+
     
     def __init__(self, macro_mol):
         self.macro_mol = macro_mol
@@ -108,7 +98,7 @@ class Topology:
         for molecule in molecules:
             heavy_mol = []
             for atom_id in molecule:
-                if self.macro_mol.heavy_mol.GetAtomWithIdx(atom_id).GetAtomicNum() in Topology.heavy_atomic_nums:
+                if self.macro_mol.heavy_mol.GetAtomWithIdx(atom_id).GetAtomicNum() in FGInfo.heavy_atomic_nums:
                     heavy_mol.append(atom_id)
             heavy_mols.append(heavy_mol) 
         return heavy_mols
@@ -147,7 +137,7 @@ class Topology:
         
         for atom in self.macro_mol.prist_mol.GetAtoms():
             atomic_num = atom.GetAtomicNum()
-            if atomic_num in Topology.heavy_atomic_nums:
+            if atomic_num in FGInfo.heavy_atomic_nums:
                 target_atomic_num = next(x.target_atomic_num for x in 
                                     FGInfo.functional_group_list if 
                                     x.heavy_atomic_num == atomic_num)                
