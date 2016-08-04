@@ -4,7 +4,7 @@ import itertools
 
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
-from ..convenience_functions import dedupe, flatten
+from ..convenience_functions import dedupe
 
 class Population:
     """
