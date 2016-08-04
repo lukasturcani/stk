@@ -31,6 +31,8 @@ class Topology:
     derived from ``Topology`` must define methods which place building 
     blocks in the correct positions, such as chosen edges or vertices.
 
+    Instances of this class should not be created directly. Only via a
+    derived class.
     
     Attributes
     ----------
@@ -66,9 +68,18 @@ class Topology:
         Creates rdkit instances the heavy and pristine macromolecules.
         
         This function also places the created rdkit instances in the
-        `prist_mol` and `heavy_mol` attributes of `self.macro_mol` which
-        is the ``MacroMolecule`` instance holding the ``Topology``
-        instance.
+        `prist_mol` and `heavy_mol` attributes of `self.macro_mol`.
+        `self.macro_mol` is the ``MacroMolecule`` instance holding the 
+        ``Topology`` instance carrying out `build`.
+        
+        To carry out `build` an instance of a class derived from 
+        ``Topology`` must be used. This is because instances of such
+        classes define a `pair_up` attribute during initialization.
+        (This should be done by default, not passed as an argument to
+        the initializer.) The `pair_up` attribute holds the pair up 
+        function defined within ``Topology``, which should be used by
+        `build`. (`pair_up` is used within the `join_mols` subroutine of
+        `build`.)
         
         Modifies
         --------
@@ -214,26 +225,26 @@ class Topology:
         """
         Replaces heavy atoms with functional group atoms they represent.        
         
-        Once a heavy cage has been assembled the pristine cage is formed
-        by replacing the heavy atoms. This function does this by editing
-        the heavy ``.mol`` file and changing the appropriate symbols.
+        Once a heavy cage has been assembled the pristine macromolecule 
+        is formed by replacing the heavy atoms and adding Hydrogens 
+        where appropriate.
         
         Modifies
         --------
-        
+        self.macro_molecule.prist_mol
+            Creates this attribute. It holds the rdkit instances of the
+            assembled pristine macromolecule.
         
         Returns
         -------
         None : NoneType
         
         """
-        
-        
-        # Add Hydrogens to the pristine version of the molecule and
-        # ensure this updated molecule is added to the ``.mol`` file as 
-        # well. The ``GetSSSR`` function and optimization ensure that
-        # the added Hydrogen atoms are placed in reasonable positions.
-        # The ``GetSSSR`` function itself is just prerequisite for
+
+        # Add Hydrogens to the pristine version of the molecule. The 
+        # ``GetSSSR`` function and optimization ensure that the added 
+        # Hydrogen atoms are placed in reasonable positions. The 
+        # ``GetSSSR`` function itself is just prerequisite for
         # running the optimization.
         self.macro_mol.prist_mol = chem.Mol(self.macro_mol.heavy_mol)
         
@@ -416,7 +427,7 @@ class Topology:
         # Turn the ``EditableMol`` into an rdkit molecule instance and
         # place that into the ``MacroMolecule``'s attribute.        
         self.macro_mol.heavy_mol = editable_mol.GetMol()
-        chem.MolToMolFile(self.macro_mol.heavy_mol, 'hi.mol')
+
 
 
     def unpaired_diff_element_atoms(self, atom1_id, heavy_mols):
@@ -547,7 +558,6 @@ class Topology:
         atom1_atomic_n = atom1.GetAtomicNum()
         atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
         atom2_atomic_n = atom2.GetAtomicNum()
-                
         
         atom1_symbol = next(x.heavy_symbol for x in 
                             FGInfo.functional_group_list if 
@@ -556,9 +566,9 @@ class Topology:
                             FGInfo.functional_group_list if 
                             atom2_atomic_n == x.heavy_atomic_num)        
         
-        double_bond_present = (atom1_symbol in tup and 
-                               atom2_symbol in tup for tup in 
-                                           FGInfo.double_bond_combs)
+        double_bond_present = ((atom1_symbol, atom2_symbol) == tup or 
+                               (atom2_symbol, atom1_symbol) == tup for 
+                               tup in FGInfo.double_bond_combs)
         
         if True in double_bond_present:
             return rdkit.Chem.rdchem.BondType.DOUBLE
@@ -599,18 +609,19 @@ class FourPlusSix(Topology):
         """
         Places all building block molecules on correct coordinates.
 
-        The building block molecules are placed in their appropraite 
-        positions on the topology. This means that the building-blocks* 
-        are placed on vertices and linkers on edges. This function
-        only places the molecules, it does not join them. It saves the 
-        structure a rdkit molecule instance for later use. Both are 
-        placed in the appropriate attribtes of the 
+        The building block molecules are placed in their appropriate 
+        positions based on the topology. This means that the 
+        building-blocks* are placed on vertices and linkers on edges. #
+        This function only places the molecules, it does not join them. 
+        It saves the structure a rdkit molecule instance for later use. 
+        This rdkit instace is placed in the `heavy_mol` attribute of the 
         ``Cage`` instance the topology is describing.
         
         Modifies
         --------
         self.macro_mol.heavy_mol
-            
+            Places an rdkit instance with disconnected building blocks
+            placed on edges and vertices in this attribute.    
         
         """
         
@@ -707,6 +718,7 @@ class BlockCopolymer(Topology):
     
     def place_mols(self):
         """
+        Places monomer in a line, seperated by an equal distance.        
         
         """
         
