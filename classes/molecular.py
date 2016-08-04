@@ -546,7 +546,7 @@ class StructUnit:
         
         Yields
         ------
-        tuple of ints
+        tuple of floats
             The tuple itself represents the complete position in space.
             Each int represents the value of the x, y or z coordinate of 
             an atom. The x, y and z coordinates are located in the tuple
