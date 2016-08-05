@@ -11,6 +11,22 @@ class GAInput:
                 line = line.split()
                 if not line:
                     continue
-                if 'generational_select_func' in line:
-                    params = {key : value for key, value in line[:]}
-                    self.gen_select_func = FunctionData(line[1], )
+                
+                kw = line[0]
+                
+                if '_select_func' in kw:
+                                     
+                    name = line[1]                    
+                    params = {}
+                    for i, word in enumerate(line):
+                        if i >= 2:
+                            word = word.split("=")
+                            params[word[0]] = word[1]
+                    if 'gen' in kw:
+                        self.gen_select_func = FunctionData(name, **params)
+                    if 'parent' in kw:
+                        self.mating_select_func = FunctionData(name, **params)
+                    if 'mutant' in kw:
+                        self.mutant_select_func = FunctionData(name, **params)
+                        
+                    
