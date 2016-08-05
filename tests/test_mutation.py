@@ -27,7 +27,7 @@ lk2 = Linker(lk2_file)
 building_blocks2 = (bb2, lk2)
 mol2 = Cage(building_blocks2, EightPlusTwelve, 'you_can_delete_this4.mol')
 
-def test_mutation_population_integration():
+def test_bb_lk_exchange():
     
         mol.fitness = 1
         mol2.fitness = 2
@@ -47,12 +47,7 @@ def test_mutation_population_integration():
         for mol3 in pop2:
             assert mol3 not in pop1
     
-        
-    
-    
-    
-    
-    
+
     
     
     
