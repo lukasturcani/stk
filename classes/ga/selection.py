@@ -1,6 +1,9 @@
-from .containers import FunctionData
-from ..population import Population
 from operator import attrgetter
+import itertools
+ 
+# Note that import of the Population class occurs at the end of the
+# file. There is a good reason for this.
+from .containers import FunctionData
 
 class Selection:
     """
@@ -69,11 +72,18 @@ class Selection:
     method name and the appropriate parameter values is passed to
     the initializer of ``Selection``.
     
-    Finally, because selection algorithms added as method to this class
-    only need to be within the class but do not need access to the 
-    instance of the class, the `self` parameter of methods is not 
-    needed. This means the selection methods can be decorated with 
-    ``staticmethod``.
+    Selection algorithms added as method to this class only need to be 
+    within the class but do not need access to the instance of the 
+    class, the `self` parameter of methods is not needed. This means the 
+    selection methods can be decorated with ``staticmethod``.
+    
+    Selection algorithms which produce parents pools must return a 
+    ``Population`` instance with the following structure. The `members`
+    attribute is empty and the `subpopulation` attribute contains
+    ``Population`` instances, each with to ``MacroMolecule`` instances
+    in the `members` attribute. These two ``MacroMolecule`` instances
+    represent a parent pair. Selection algorithms should be grouped
+    together by their expected use when written into the class body.    
     
     Attributes
     ----------
@@ -94,15 +104,17 @@ class Selection:
         self.mating = mating
         self.mutation = mutation
     
-    @classmethod
-    def default(cls):
-        func_data = FunctionData('fittest', size=5)
-        return cls(*[func_data for x in range(0,3)])
-    
     def __call__(self, population, type_):
         func_data = self.__dict__[type_]
         func = getattr(self, func_data.name)
         return func(population, **func_data.params)        
+
+    """
+    The following selection algorithms can be used for generational
+    selection and the selection of mutants. They cannot be used for
+    selection of parents.
+    
+    """
 
     @staticmethod
     def fittest(population, size):        
@@ -118,9 +130,20 @@ class Selection:
     @staticmethod    
     def roulette(population):
         pass
+
+    """
+    The following selection algorithms can be used for the selection of
+    parents only.    
+    
+    """
+
     @staticmethod
     def all_combinations(population):
-        pass
+        parent_pool = Population()        
+        for mol1, mol2 in itertools.combinations(population, 2):
+            parent_pool.add_subpopulation(Population(mol1, mol2))
+        
+        return parent_pool
     
     
     """
@@ -129,3 +152,11 @@ class Selection:
     execution of the program.
     
     """
+
+    @classmethod
+    def default(cls):
+        func_data = FunctionData('fittest', size=5)
+        return cls(*[func_data for x in range(0,3)])
+        
+        
+from ..population import Population
