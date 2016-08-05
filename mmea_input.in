@@ -1,0 +1,15 @@
+generational_select_func fittest size=10
+parent_select_func all_combinations
+mutant_select_func fittest size=3
+
+mating_func bb_lk_exchange
+mutation_func random_bb
+
+bb_db C:\Users\lukas\Projects\MMEA\Database_prec\amines3f
+lk_db C:\Users\lukas\Projects\MMEA\Database_prec\aldehydes2f
+
+topologies EightPlusTwelve FourPlusSix
+
+pop_size 20
+num_generations 10
+num_mutations 5 
