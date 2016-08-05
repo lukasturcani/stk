@@ -14,8 +14,11 @@ class Mutation:
         func = getattr(self, self.func_data.name)
         
         for parent in parent_pool:
-            mutant = func(parent, **self.func_data.params)
-            mutant_pop(mutant)
+            try:
+                mutant = func(parent, **self.func_data.params)
+                mutant_pop.members.append(mutant)
+            except:
+                continue
 
         mutant_pop -= population
             
@@ -24,6 +27,7 @@ class Mutation:
 
     def random_bb(self, cage, database):
         bb_file = np.random.choice(os.listdir(database))
+        bb_file = os.path.join(database, bb_file)
         bb = BuildingBlock(bb_file)
         lk = next(x for x in cage.building_blocks if 
                                                 isinstance(x, Linker))        
