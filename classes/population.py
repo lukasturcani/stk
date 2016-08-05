@@ -138,6 +138,16 @@ class Population:
                              " 'MacroMolecule' and 1 'GATools' type."), 
                                                                     arg)
                                     
+
+    @classmethod
+    def init_random_cages(cls, bb_db, lk_db, topologies, size, ga_tools):
+        
+        cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies, 
+                        "init_{}.mol".format(x)) for x in range(0,size))
+        
+        return cls(*cage_gen, ga_tools)
+
+    
     def all_members(self):
         """
         Yields all members in the population and its subpopulations.

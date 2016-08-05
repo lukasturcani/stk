@@ -4,8 +4,8 @@ from rdkit.Chem import AllChem as ac
 import networkx as nx
 from functools import partial
 
-from MMEA.classes.molecular import FGInfo, BuildingBlock, Linker
-from MMEA.convenience_functions import flatten
+from .molecular import FGInfo, BuildingBlock, Linker
+from ..convenience_functions import flatten
 
 class Topology:
     """
@@ -241,11 +241,7 @@ class Topology:
         
         """
 
-        # Add Hydrogens to the pristine version of the molecule. The 
-        # ``GetSSSR`` function and optimization ensure that the added 
-        # Hydrogen atoms are placed in reasonable positions. The 
-        # ``GetSSSR`` function itself is just prerequisite for
-        # running the optimization.
+
         self.macro_mol.prist_mol = chem.Mol(self.macro_mol.heavy_mol)
         
         for atom in self.macro_mol.prist_mol.GetAtoms():
@@ -259,8 +255,6 @@ class Topology:
         
         
         self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol)
-        chem.GetSSSR(self.macro_mol.prist_mol)
-        ac.MMFFOptimizeMolecule(self.macro_mol.prist_mol)
 
     def pair_up_diff_element_atoms(self, heavy_mols):
         """

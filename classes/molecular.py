@@ -310,6 +310,12 @@ class StructUnit:
     """
     
     def __init__(self, prist_mol_file):
+        heavy_dir = next((name for name in os.listdir(os.getcwd()) if 
+                        os.path.isdir(name) and "HEAVY" == name), False)
+
+        if not heavy_dir:        
+            os.mkdir("HEAVY")
+        
         self.prist_mol_file = prist_mol_file
         self.prist_mol = chem.MolFromMolFile(prist_mol_file, 
                                              sanitize=False, 
@@ -399,7 +405,10 @@ class StructUnit:
         heavy_file_name = list(os.path.splitext(self.prist_mol_file))
         heavy_file_name.insert(1,'HEAVY')
         heavy_file_name.insert(2, self.func_grp.name)
-        self.heavy_mol_file = '_'.join(heavy_file_name)     
+        self.heavy_mol_file = '_'.join(heavy_file_name)
+        self.heavy_mol_file = os.path.split(self.heavy_mol_file)[1]
+        self.heavy_mol_file = os.path.join(os.getcwd(), "HEAVY", 
+                                           self.heavy_mol_file)
         
         chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
                           includeStereo=False, kekulize=False,
@@ -830,7 +839,9 @@ class MacroMolecule(metaclass=Cached):
                                              allHsExplicit=True)                                               
         self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
                                              isomericSmiles=True,
-                                             allHsExplicit=True)     
+                                             allHsExplicit=True)
+                                             
+        self.random_fitness()
 
     def get_heavy_as_graph(self):
         """
@@ -1007,7 +1018,34 @@ class Cage(MacroMolecule):
     Used to represent molecular cages.
     
     """
-    pass
+    @classmethod
+    def init_random(cls, bb_db, lk_db, topologies, prist_mol_file):
+        """
+        Makes ``Cage`` from random building blocks and topology.
+        
+        Parameters
+        ----------
+        bb_db : str
+        
+        lk_db : str
+        
+        topologies : list of ``Topology`` child classes.
+        
+        prist_mol_file : str
+        
+        """
+        
+        bb_file = np.random.choice(os.listdir(bb_db))
+        bb_file = os.path.join(bb_db, bb_file)
+        bb = BuildingBlock(bb_file)
+        
+        lk_file = np.random.choice(os.listdir(lk_db))
+        lk_file = os.path.join(lk_db, lk_file)
+        lk = Linker(lk_file)
+        
+        topology = np.random.choice(topologies)
+        
+        return cls((bb, lk), topology, prist_mol_file)
         
 
 class Polymer(MacroMolecule):

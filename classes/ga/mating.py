@@ -11,8 +11,11 @@ class Mating:
         func = getattr(self, self.func_data.name)
         
         for parents in parent_pool.populations:
-            offspring = func(*parents, **self.func_data.params)
-            offspring_pop.add_members(offspring)
+            try:
+                offspring = func(*parents, **self.func_data.params)
+                offspring_pop.add_members(offspring)
+            except:
+                continue
 
         offspring_pop -= population
             
