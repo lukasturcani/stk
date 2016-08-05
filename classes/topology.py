@@ -697,7 +697,69 @@ class FourPlusSix(Topology):
         
         combined_mol4 = chem.CombineMols(combined_mol, combined_mol2)
         return chem.CombineMols(combined_mol3, combined_mol4)
+ 
+class EightPlusTwelve(FourPlusSix):
+    
+    def place_bbs(self):
+        cage_bb = next(x for x in self.macro_mol.building_blocks if 
+                                        isinstance(x, BuildingBlock))
+
+        position1 = cage_bb.shift_heavy_mol(0,0,0)
+        position2 = cage_bb.shift_heavy_mol(50,0,0)
+        position3 = cage_bb.shift_heavy_mol(0,50,0)
+        position4 = cage_bb.shift_heavy_mol(50,50,0)
+
+        combined_mol = chem.CombineMols(position1, position2)
+        combined_mol2 = chem.CombineMols(position3, position4)
+        one = chem.CombineMols(combined_mol, combined_mol2)   
         
+        position1 = cage_bb.shift_heavy_mol(0,0,50)
+        position2 = cage_bb.shift_heavy_mol(50,0,50)
+        position3 = cage_bb.shift_heavy_mol(0,50,50)
+        position4 = cage_bb.shift_heavy_mol(50,50,50)
+
+        combined_mol = chem.CombineMols(position1, position2)
+        combined_mol2 = chem.CombineMols(position3, position4)
+        two = chem.CombineMols(combined_mol, combined_mol2)          
+        
+        return chem.CombineMols(one, two)
+        
+    def place_lks(self):
+        cage_lk = next(x for x in self.macro_mol.building_blocks if 
+                                        isinstance(x, Linker))
+
+        position1 = cage_lk.shift_heavy_mol(25,0,0)
+        position2 = cage_lk.shift_heavy_mol(0,25,0)
+        position3 = cage_lk.shift_heavy_mol(25,50,0)
+        position4 = cage_lk.shift_heavy_mol(50,25,0)
+
+        combined_mol = chem.CombineMols(position1, position2)
+        combined_mol2 = chem.CombineMols(position3, position4)
+        one = chem.CombineMols(combined_mol, combined_mol2)   
+        
+        position1 = cage_lk.shift_heavy_mol(25,0,50)
+        position2 = cage_lk.shift_heavy_mol(0,25,50)
+        position3 = cage_lk.shift_heavy_mol(25,50,50)
+        position4 = cage_lk.shift_heavy_mol(50,25,50)
+
+        combined_mol = chem.CombineMols(position1, position2)
+        combined_mol2 = chem.CombineMols(position3, position4)
+        two = chem.CombineMols(combined_mol, combined_mol2)          
+
+        three = chem.CombineMols(one, two) 
+
+        position1 = cage_lk.shift_heavy_mol(0,0,25)
+        position2 = cage_lk.shift_heavy_mol(50,0,25)
+        position3 = cage_lk.shift_heavy_mol(0,50,25)
+        position4 = cage_lk.shift_heavy_mol(50,50,25)
+
+        combined_mol = chem.CombineMols(position1, position2)
+        combined_mol2 = chem.CombineMols(position3, position4)
+        four = chem.CombineMols(combined_mol, combined_mol2)         
+        
+        
+        return chem.CombineMols(three, four)
+       
 class BlockCopolymer(Topology):
     """
     A class for describing the repeating units of polymers.    
@@ -730,4 +792,7 @@ class BlockCopolymer(Topology):
             self.macro_mol.heavy_mol = chem.CombineMols(shifted_monomer, 
                                             self.macro_mol.heavy_mol)
         
+
+
+
       
