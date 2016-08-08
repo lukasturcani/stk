@@ -1,6 +1,6 @@
 import itertools
-
-
+import shutil
+import os
 
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
@@ -143,7 +143,8 @@ class Population:
     def init_random_cages(cls, bb_db, lk_db, topologies, size, ga_tools):
         
         cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies, 
-                        "init_{}.mol".format(x)) for x in range(0,size))
+                    os.path.join(os.getcwd(),"init_{}.mol".format(x))) 
+                        for x in range(size))
         
         return cls(*cage_gen, ga_tools)
 
@@ -402,6 +403,30 @@ class Population:
         """
 
         return self.ga_tools.mutation(self)
+        
+    def write_population_to_dir(self, dir_path):
+        """
+        Copies ``.mol`` files of members to a directory.
+        
+        This copies both the heavy and pristine versions of the ``.mol``
+        file.        
+        
+        Parameters
+        ----------
+        dir_path : str
+            The full of the directory into which the ``.mol`` files
+            are copied.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        for member in self:
+            shutil.copy(member.prist_mol_file, dir_path)
+            shutil.copy(member.heavy_mol_file, dir_path)
+                
         
     def __iter__(self):
         """

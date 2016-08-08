@@ -117,15 +117,12 @@ class Selection:
     """
 
     @staticmethod
-    def fittest(population, size):        
-        if len(population) < size:
-            raise ValueError(("Size of selected population" 
-                              " must be less than or equal to" 
-                              " size of original population."))                           
-        
+    def fittest(population):        
+                          
         ordered_pop = list(population.all_members())
         ordered_pop.sort(key=attrgetter('fitness'), reverse=True)    
-        return Population(population.ga_tools, *ordered_pop[:size])
+        for ind in ordered_pop:
+            yield ind
     
     @staticmethod    
     def roulette(population):
@@ -139,11 +136,9 @@ class Selection:
 
     @staticmethod
     def all_combinations(population):
-        parent_pool = Population()        
         for mol1, mol2 in itertools.combinations(population, 2):
-            parent_pool.add_subpopulation(Population(mol1, mol2))
+            yield mol1, mol2
         
-        return parent_pool
     
     
     """
