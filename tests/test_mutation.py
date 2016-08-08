@@ -27,17 +27,17 @@ lk2 = Linker(lk2_file)
 building_blocks2 = (bb2, lk2)
 mol2 = Cage(building_blocks2, EightPlusTwelve, 'you_can_delete_this4.mol')
 
-def test_bb_lk_exchange():
+def test_random_bb():
     
         mol.fitness = 1
         mol2.fitness = 2
         # Make a ``GATools`` attribute and give it to the population.
         rand_bb = FunctionData('random_bb', database=r'C:\Users\lukas\Projects\MMEA\Database_prec\amines3f')
-        sel = FunctionData('fittest', size=1)
+        sel = FunctionData('fittest')
 
         
         selector = Selection('a', 'a', sel)
-        mutator = Mutation(rand_bb)
+        mutator = Mutation(rand_bb, 1)
         ga_tools = GATools(selector, 'a', mutator)
 
 

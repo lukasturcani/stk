@@ -1,14 +1,12 @@
-generational_select_func fittest size=10
+init_func init_random_cages bb_db=C:\Users\lukas\Projects\MMEA\Database_prec\amines3f lk_db=C:\Users\lukas\Projects\MMEA\Database_prec\aldehydes2f topologies=EightPlusTwelve,FourPlusSix
+
+generational_select_func fittest
 parent_select_func all_combinations
-mutant_select_func fittest size=3
+mutant_select_func fittest
 
 mating_func bb_lk_exchange
-mutation_func random_bb
+mutation_func random_bb database=C:\Users\lukas\Projects\MMEA\Database_prec\amines3f
 
-bb_db C:\Users\lukas\Projects\MMEA\Database_prec\amines3f
-lk_db C:\Users\lukas\Projects\MMEA\Database_prec\aldehydes2f
-
-topologies EightPlusTwelve FourPlusSix
 
 pop_size 20
 num_generations 10

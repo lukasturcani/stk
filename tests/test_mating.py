@@ -36,7 +36,7 @@ def test_bb_lk_exchange():
 
         
         selector = Selection('a', all_combs, 'a')
-        mator = Mating(bb_lk_exchange)
+        mator = Mating(bb_lk_exchange, 1)
         ga_tools = GATools(selector, mator, 'b')
 
 

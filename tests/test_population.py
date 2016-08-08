@@ -1,8 +1,12 @@
 import pytest
 import itertools as it
 from collections import Counter
+import shutil
+import os
 
-from ..classes import Population, Cage, GATools
+from ..classes import (Population, Cage, GATools, FourPlusSix,  
+                       BuildingBlock, Linker)
+from .test_struct_unit import get_mol_file
 
 def generate_population(offset=False):
     """
@@ -378,7 +382,33 @@ def test_contains():
     pop.add_subpopulation(Population(*subpop_cages))
     assert subpop_cages[2] in pop
                       
-                      
+def test_write_population_to_dir():
+    try:    
+        shutil.rmtree('write_pop_test')
+    except:
+        pass
+    
+    os.mkdir('write_pop_test')
+    bb_file = next(x for x in get_mol_file() 
+                                        if 'amine3f_14.mol' in x)
+    lk_file = next(x for x in get_mol_file() 
+                                        if 'aldehyde2f_3.mol' in x) 
+    
+    bb = BuildingBlock(bb_file)
+    lk = Linker(lk_file)    
+    building_blocks = (bb, lk)
+    mol = Cage(building_blocks, FourPlusSix, 'you_can_delete_this3.mol')    
+    pop = Population(mol)
+    pop.write_population_to_dir(os.path.join(os.getcwd(), 
+                                             'write_pop_test'))
+    assert len(os.listdir('write_pop_test')) == len(pop)*2
+    try:
+        shutil.rmtree('write_pop_test')
+    except:
+        pass
+    
+    
+    
                       
                       
     
