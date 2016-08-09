@@ -531,7 +531,7 @@ class StructUnit:
         # Create a new copy of the rdkit molecule instance representing
         # the substituted molecule - the original instance is not to be
         # modified.
-        new_heavy = deepcopy(self.heavy_mol)
+        new_heavy = chem.Mol(self.heavy_mol)
         
         # The new rdkit molecule was copied from the one held in the
         # `heavy_mol` attribute, as result it has a copy of its

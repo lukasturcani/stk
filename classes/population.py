@@ -26,11 +26,8 @@ class Population:
     placed in a ``Population`` instance. As a result, any function which 
     should return multiple ``MacroMolecule`` or ``Population`` instances 
     can be expected to return a single ``Population`` instance holding 
-    the desired instances. Some functions will have to return the 
-    population organized in a specific way. For example, functions 
-    generating the parent pool will generate a population with no direct 
-    members but multiple subpopulations of 2 members each. More specific 
-    guidelines are provided within the ``Mating`` class.
+    the desired instances. Some functions may have to return the 
+    population organized in a specific way, depending on use.
     
     The only operations directly addressed by this class and definined 
     within it are those relevant to its role as a container. It supports
@@ -47,10 +44,10 @@ class Population:
     ----------
     populations : list of ``Population`` instances
         A list of other instances of the ``Population`` class. This
-        allows the implementation of subpopulations or 'evolutionary 
+        allows the implementation of subpopulations or evolutionary 
         islands. This attribute is also used for grouping macromolecules 
-        within a given population such as when grouping parents together 
-        in a parent pool.
+        within a given population for organizational purposes if need 
+        be.
         
     members : list of ``MacroMolecule`` instances
         A list of ``MacroMolecule`` instances. These are the members of 
@@ -83,9 +80,9 @@ class Population:
         *args : MacroMolecule, Population, GATools
             A population is initialized with as many ``MacroMolecule`` 
             or ``Population`` arguments as required. These are placed 
-            into the `members` or `populations` attributes, respectively. 
-            A single ``GATools`` instance may be included and will be
-            placed into the `ga_tools` attribute. 
+            into the `members` or `populations` attributes, 
+            respectively. A single ``GATools`` instance may be included 
+            and will be placed into the `ga_tools` attribute. 
         
         Raises
         ------
@@ -141,6 +138,35 @@ class Population:
 
     @classmethod
     def init_random_cages(cls, bb_db, lk_db, topologies, size, ga_tools):
+        """
+        Creates a population of cages built from provided databases.        
+        
+        All cages are held in the populations `members` attribute.
+
+        From the supplied databases a linker and building-block*
+        molecule is selected which form a cage. This is done until
+        `size` cages have been formed. After this, all of them are
+        returned together in a ``Population`` instance.        
+        
+        Parameters
+        ----------
+        bb_db : str
+            The full path of the database of building-block* molecules.
+            
+        lk_db : str
+            The full path of the database of linker molecules.
+            
+        topolgies : iterable of ``Topology`` child classes
+            An iterable holding topologies which should be randomly 
+            selected for cage initialization.            
+            
+        size : int
+            The size of the population to be initialized.
+        
+        ga_tools : GATools
+            The GATools instance to be used by created population.
+        
+        """
         
         cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies, 
                     os.path.join(os.getcwd(),"init_{}.mol".format(x))) 
@@ -286,6 +312,16 @@ class Population:
         
         """
         
+        # Whether duplicates are being removed from within a single 
+        # subpopulation or from different subpopulations, the duplicate
+        # must be removed from the `members` attribute of some 
+        # ``Population`` instance. This means ``dedupe`` can be run
+        # on the `members` attribute of every population or
+        # subpopulation. The only difference is that when duplicates
+        # must be removed between different subpopulations a global
+        # ``seen`` set must be defined for the entire top level
+        # ``Population`` instance. This can be passed each time dedupe
+        # is being called on a subpopulation's `members` attribute.
         if between_subpops:
             if top_seen is None:
                 seen = set()
@@ -296,6 +332,10 @@ class Population:
             for subpop in self.populations:
                 subpop.remove_duplicates(between_subpops, top_seen=seen)
         
+        # If duplicates are only removed from within the same
+        # subpopulation, only the `members` attribute of each
+        # subpopulation needs to be cleared of duplicates. To do this,
+        # each `members` attribute is deduped recursively.
         if not between_subpops:
             self.members = list(dedupe(self.members))
             for subpop in self.populations:
