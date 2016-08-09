@@ -12,7 +12,7 @@ class Selection:
     Whenever a population needs to have some of its members selected
     for the creation of a parent pool or the next generation it 
     delegates this task to an instance of this class. The population has
-    this instnace stored in its `ga_tools.selection` attribute.
+    this instance stored in its `ga_tools.selection` attribute.
     
     Each instance of this class supports being called. What a calling an
     instance does depends on the arguments the instance was initialized 
@@ -21,18 +21,18 @@ class Selection:
     instance.
     
     During initialization the functions which the ``Selection`` instance
-    will use when its called are defined. Initialization therefore
-    takes the names of methods defined in this class (as strings) and 
-    saves them into the instance's `generational`, `mating` and 
-    `mutation` attributes. These attributes should therefore always 
-    hold the names of methods that are to be used for the given purpose
-    - such as generational selection. The selection algorithms should be 
-    written as methods within this class.
+    will use when called are defined. Initialization therefore takes the 
+    names of methods defined in this class (as strings) and saves them 
+    into the instance's `generational`, `mating` and `mutation` 
+    attributes. These attributes should therefore always hold the names 
+    of methods that are to be used for the given purpose - such as 
+    generational selection. The selection algorithms should be written 
+    as methods within this class.
     
-    When this class is called it requires a ``Population`` instance and 
-    a string to be provided as arguments. The ``Population`` instance
-    is the population which is to have some of its members selected.
-    Consider the following code:
+    When an instance of this class is called it requires a 
+    ``Population`` instance and a string to be provided as arguments. 
+    The ``Population`` instance is the population which is to have some 
+    of its members selected. Consider the following code:
         
         >>> pop.select('generational')
     
@@ -40,14 +40,14 @@ class Selection:
     attribute, which holds an initialized ``Selection`` instance.
     
     The method `select` invoked in the code automatically provides
-    the instance ``pop`` to its ``Selection`` instance when it carries 
-    out a call to this instance. This means that each time `select` is 
-    called on a population, the ``Selection`` instance will always act 
-    on the population it is held by. Different populations can use
-    different selection algorithms by holding ``Selection`` instances
-    initialized with different method names. (Note that a ``Population``
-    instance holds a ``Selection`` instance indirectly via its 
-    `ga_tools` attribute.)
+    the instance ``pop`` to its ``Selection`` instance, which is called 
+    by the method. This means that each time `select` is called on a 
+    population, the ``Selection`` instance will always act on the 
+    population it is held by. Different populations can use different 
+    selection algorithms by holding ``Selection`` instances initialized 
+    with different method names. (Note that a ``Population`` instance 
+    holds a ``Selection`` instance indirectly via its `ga_tools` 
+    attribute.)
     
     The string provided to the `select` method is passed all the way
     down to the ``Selection`` instance being called. This is the second
@@ -66,47 +66,79 @@ class Selection:
     initialization. When the ``Selection`` instance is initialzed it
     is not just with the names of the selection methods to be used. It
     provided with the names of the methods and any paramters that the
-    methods will need to use. For example the number of individuals
-    that need to be selected. These parameters are packed into the
+    methods will need to use. These parameters are packed into the 
     ``FunctionData`` class. The ``FunctionData`` instance holding the
     method name and the appropriate parameter values is passed to
     the initializer of ``Selection``.
     
-    Selection algorithms added as method to this class only need to be 
+    Selection algorithms added as methods to this class only need to be 
     within the class but do not need access to the instance of the 
     class, the `self` parameter of methods is not needed. This means the 
     selection methods can be decorated with ``staticmethod``.
     
-    Selection algorithms which produce parents pools must return a 
-    ``Population`` instance with the following structure. The `members`
-    attribute is empty and the `subpopulation` attribute contains
-    ``Population`` instances, each with to ``MacroMolecule`` instances
-    in the `members` attribute. These two ``MacroMolecule`` instances
-    represent a parent pair. Selection algorithms should be grouped
+    Selection algorithms are to be implemented as generators. Selection 
+    algorithms which produce parents pools must yield a tuple of
+    ``MacroMolecule`` instances. Selection algorithms should be grouped
     together by their expected use when written into the class body.    
     
     Attributes
     ----------
     generational : FunctionData
+        This holds the ``FunctionData`` object representing the
+        selection function used for selecting the next generation of 
+        individuals along with any parameters the function may require.
 
     mating : FunctionData
-
+        Holds the ``FunctionData`` object representing the selection 
+        function used for selecting parents, along with any parameters
+        the function may require.
+        
     mutation : FunctionData    
+        Holds the ``FunctionData`` object representing the selection
+        function used for selection individuals for mutation, along with
+        any parameters the function may require.
     
     """
     
-    def __init__(self, generational, mating, mutation):
-        """
-        
-        """
-        
+    def __init__(self, generational, mating, mutation):        
         self.generational = generational
         self.mating = mating
         self.mutation = mutation
     
     def __call__(self, population, type_):
+        """
+        Implements the selection algorithm chosen during initializaiton.        
+        
+        Parameters
+        ----------
+        population : Population
+            The population from which members should be selected.
+
+        type_ : str
+            The name of a ``Selection`` attribute. The name corresponds
+            to the type of selection that is desired, ie generational,
+            mating or mutation.
+            
+        Returns
+        -------
+        generator
+            A generator which yields selected members of the population.
+            The generator will yield ``MacroMolecule`` instances unless
+            it yields parents for mating. In this case it yields a tuple
+            of ``MacroMolecule`` instances.
+        
+        """
+        
+        # Get the attribute with the name provided as a string in 
+        # `type_`. This returns a ``FunctionData`` object holding the
+        # name of the method which needs to be implemented and any
+        # required parameters and their values.
         func_data = self.__dict__[type_]
+        # Using the name of the method, get the method object with 
+        # ``getattr``.
         func = getattr(self, func_data.name)
+        # Call the method on the population and provide any additional
+        # parameters which may be necessary.
         return func(population, **func_data.params)        
 
     """
@@ -118,7 +150,30 @@ class Selection:
 
     @staticmethod
     def fittest(population):        
-                          
+        """
+        Yields members of the population, fittest first.
+        
+        This yields members regardless of which subpopulation they are
+        in.        
+        
+        Parameters
+        ----------
+        population : Population
+            The population who's members need to be selected.
+        
+        Yields
+        ------
+        MacroMolecule
+            The next fittest ``MacroMolecule`` instance held by the
+            population.
+        
+        """
+        
+        # Make a list of all the indiviudals in the the population and
+        # sort that list using the `fitness` attribute as the key.
+        # Reverse the sort so that highest fitness is at index 0. Yield
+        # from the sorted list.
+        
         ordered_pop = list(population.all_members())
         ordered_pop.sort(key=attrgetter('fitness'), reverse=True)    
         for ind in ordered_pop:
@@ -136,10 +191,29 @@ class Selection:
 
     @staticmethod
     def all_combinations(population):
-        for mol1, mol2 in itertools.combinations(population, 2):
-            yield mol1, mol2
+        """
+        Yields every possible pairing of individuals from a population.
         
-    
+        This yields members regardless of which subpopulation they are 
+        in. Each pair is only returned once. This means if (1,2) is 
+        returned (2,1) will not be.
+        
+        Parameters
+        ----------
+        population : Population
+            The population from which parents should be selected.        
+        
+        Yields
+        ------
+        tuple of 2 MacroMolecule instances
+            The ``MacroMolecule`` instances which together form a parent
+            pair.
+        
+        """
+        
+        # Get all combinations of size 2.        
+        for mol1, mol2 in itertools.combinations(population, 2):
+            yield mol1, mol2 
     
     """
     The following methods are inteded for convenience while 
