@@ -392,8 +392,6 @@ class Population:
         """
         Returns a population of mutant ``MacroMolecule`` instances.        
         
-        
-        
         Returns
         -------
         Population
