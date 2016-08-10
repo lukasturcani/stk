@@ -18,10 +18,10 @@ def generate_population(offset=False):
     
     #Generate a bunch of cages.
     if offset:
-        cages = [Cage(values[x], values[x], values[x+1], 1) 
+        cages = [Cage.testing_init(values[x], values[x], values[x+1]) 
                                                 for x in range(0,22)]
     if not offset:
-        cages = [Cage(values[x], values[x], values[x], 1) 
+        cages = [Cage.testing_init(values[x], values[x], values[x]) 
                                                 for x in range(0,22)]
         
     # Generate a couple of populations to be used as subpopulations.
@@ -84,7 +84,7 @@ def test_all_members():
     """    
     
     # Generate a bunch of cages.
-    cages = [Cage(x,'a','b', 1) for x in range(0,22)]    
+    cages = [Cage.testing_init(x,'a','b') for x in range(0,22)]    
         
     # Generate a couple of ``Populations`` to be used as subpopulations.
     sub1 = Population(*cages[0:4])
@@ -107,7 +107,7 @@ def test_all_members():
     
     # Add a cage to `cages`. Now there should be a cage in `cages`, not 
     # present in main. Should fail.
-    cages.append(Cage('alpha', 'beta', 'gamma', 'delta'))
+    cages.append(Cage.testing_init('alpha', 'beta', 'gamma'))
      
     with pytest.raises(AssertionError):
         assert all(cage in all_members for cage in cages)

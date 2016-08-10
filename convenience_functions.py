@@ -1,3 +1,5 @@
+
+
 def dedupe(iterable, seen=None):
     if seen is None:
         seen = set()        
@@ -12,6 +14,4 @@ def flatten(iterable, excluded_types={str}):
             yield from flatten(x)
         else:
             yield x            
-            
 
-a = [[1],[1],[1],[[2],[2],['str']]]
