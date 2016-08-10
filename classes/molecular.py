@@ -22,7 +22,7 @@ class CachedMacroMol(type):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)        
-        self.__cache = weakref.WeakValueDictionary()
+        self._cache = weakref.WeakValueDictionary()
     
     def __call__(self, *args, **kwargs):
         # Sort the first argument which corresponds to an iterable of
@@ -36,11 +36,11 @@ class CachedMacroMol(type):
         # is the same. However even in this case you want to return the
         # cached instance.
         key = str(args[:-1]) + str(kwargs)
-        if key in self.__cache.keys():
-            return self.__cache[key]
+        if key in self._cache.keys():
+            return self._cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
-            self.__cache[key] = obj
+            self._cache[key] = obj
             return obj
 
 class Cached(type):
@@ -120,9 +120,10 @@ class FGInfo:
         A ``SMARTS`` string describing the functional group before 
         substitution by a heavy atom.
         
-    smarts_end : str
-        A ``SMARTS`` string describing the functinal group after
-        substitution by a heavy atom.
+    del_tags : list of DelAtom instances
+        Every member of this list represents an atom on the functional
+        group which should be deleted. Only one atom is deleted per
+        group member.
     
     target_atomic_num : int
         The atomic number of the atom being substituted by a heavy atom.
@@ -154,16 +155,31 @@ class FGInfo:
          self.target_symbol = target_symbol
          self.heavy_symbol = heavy_symbol
 
+# This dictionary gives convenient access to the rdkit bond types.
 bond = {'=' : rdkit.Chem.rdchem.BondType.DOUBLE,
         '-' : rdkit.Chem.rdchem.BondType.SINGLE}
-
+# An atom is deleted based on what type of bond connects it to the
+# substituted functional group atom. The element of the atom is ofcourse
+# a factor as well. When both of these are satisfied the atom is
+# removed. The ``DelAtom`` class conveniently stores this information.
+# Bond type is an rdkit bond type (see the bond dictionary above for
+# the two possible values it may take) and atomic num in an integer.
 DelAtom = namedtuple('DelAtom', ['bond_type', 'atomic_num'])
+
 FGInfo.functional_group_list = [
                         
-    FGInfo("aldehyde", "C(=O)[H]", [DelAtom(bond['='], 8)], 6, 39, "C", "Y"), 
-    FGInfo("carboxylic acid", "C(=O)O[H]", [DelAtom(bond['-'], 8)], 6, 40, "C", "Zr"),
-    FGInfo("amide", "C(=O)N([H])[H]", [DelAtom(bond['-'], 7)], 6, 41, "C", "Nb"),
-    FGInfo("thioacid", "C(=O)S[H]", [DelAtom(bond['-'], 16), ], 6, 42, "C", "Mo"),
+    FGInfo("aldehyde", "C(=O)[H]", [ DelAtom(bond['='], 8) ], 
+                                                       6, 39, "C", "Y"), 
+    
+    FGInfo("carboxylic acid", "C(=O)O[H]", [ DelAtom(bond['-'], 8) ], 
+                                                      6, 40, "C", "Zr"),
+    
+    FGInfo("amide", "C(=O)N([H])[H]", [ DelAtom(bond['-'], 7) ], 
+                                                      6, 41, "C", "Nb"),
+    
+    FGInfo("thioacid", "C(=O)S[H]", [ DelAtom(bond['-'], 16) ], 
+                                                      6, 42, "C", "Mo"),
+    
     FGInfo("alcohol", "O[H]", [], 8, 43, "O", "Tc"),
     FGInfo("thiol", "[S][H]", [], 16, 44, "S", "Ru"),
     FGInfo("amine", "[N]([H])[H]", [], 7, 45, "N", "Rh"),       
@@ -694,6 +710,9 @@ class StructUnit(metaclass=Cached):
         
     def __lt__(self, other):
         return self.prist_mol_file < other.prist_mol_file
+        
+    def __hash__(self):
+        return id(self)
 
 class BuildingBlock(StructUnit):
     """
@@ -1081,11 +1100,16 @@ class MacroMolecule(metaclass=CachedMacroMol):
     """
     @classmethod
     def testing_init(cls, bb_str, lk_str, topology_str):
-        cage = cls.__new__(cls)        
-        cage.building_blocks = (bb_str, lk_str)
-        cage.topology = topology_str
-        cage.fitness = 3.14
-        return cage
+        key = (bb_str, lk_str, topology_str)
+        if key in MacroMolecule._cache.keys():
+            return MacroMolecule._cache[key]
+        else:            
+            cage = cls.__new__(cls)        
+            cage.building_blocks = (bb_str, lk_str)
+            cage.topology = topology_str
+            cage.fitness = 3.14
+            MacroMolecule._cache[key] = cage
+            return cage
 
 
     def random_fitness(self):
@@ -1096,6 +1120,7 @@ class Cage(MacroMolecule):
     Used to represent molecular cages.
     
     """
+    
     @classmethod
     def init_random(cls, bb_db, lk_db, topologies, prist_mol_file):
         """
