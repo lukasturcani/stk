@@ -4,6 +4,8 @@ import rdkit
 from ..classes import StructUnit, FGInfo
 
 
+
+
 def get_mol_file():
     # The following lines first create a directory tree starting from
     # the current working directory. A generator expression then
@@ -21,7 +23,22 @@ def get_mol_file():
                 if '.mol' in y and 'HEAVY' not in y:
                     yield os.path.join(x[0], y)
 
+def test_caching():
+    bb_file = next(x for x in get_mol_file() 
+                                    if 'amine3f_14.mol' in x)
+    lk_file = next(x for x in get_mol_file() 
+                                    if 'aldehyde2f_3.mol' in x) 
 
+    bb = StructUnit(bb_file)
+    bb2 = StructUnit(bb_file)
+    
+    lk = StructUnit(lk_file)
+    lk2 = StructUnit(lk_file)
+    
+    assert bb is bb2
+    assert bb is not lk
+    assert lk is lk2
+    assert lk2 is not bb2
 
 def test_init():
     """
