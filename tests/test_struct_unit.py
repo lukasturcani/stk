@@ -145,11 +145,12 @@ def test_aldehyde_substitution():
     Ensure that the aldehyde functional group is correctly replaced.    
     
     """
-    exp_smiles = ("[H][N]1[C](=[N][Y])[C]([H])([H])[N]([H])[C]([H])"
-                  "([H])[C]1=[N][Y]")
+    exp_smiles = ("[H][N]1/[C](=[N]/[Y])[C]([H])([H])[N]([H])[C]([H])"
+                    "([H])/[C]1=[N]\[Y]")
     mol_file = next(x for x in get_mol_file() 
                                         if 'aldehyde2f_3.mol' in x)   
     mol = StructUnit(mol_file)
+    print(mol.heavy_smiles)
     assert mol.heavy_smiles == exp_smiles
     
     

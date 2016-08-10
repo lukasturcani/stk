@@ -10,6 +10,38 @@ from copy import deepcopy
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
+from collections import namedtuple
+
+from ..convenience_functions import flatten
+
+class CachedMacroMol(type):
+    """
+    A metaclass for creating classes which create cached instances.
+    
+    """    
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)        
+        self.__cache = weakref.WeakValueDictionary()
+    
+    def __call__(self, *args, **kwargs):
+        # Sort the first argument which corresponds to an iterable of
+        # StructUnit instances. You want (bb1, lk1) to register as the
+        # same as (lk1, bb1). Because this creates the same cage.         
+        _, *other_args = args
+        args = [sorted(args[0])]              
+        args.extend(other_args)
+        # Do not take the last arg because this is the name of the
+        # ``.mol`` file. This will likely be different even if the cage
+        # is the same. However even in this case you want to return the
+        # cached instance.
+        key = str(args[:-1]) + str(kwargs)
+        if key in self.__cache.keys():
+            return self.__cache[key]
+        else:
+            obj = super().__call__(*args, **kwargs)
+            self.__cache[key] = obj
+            return obj
 
 class Cached(type):
     """
@@ -29,6 +61,7 @@ class Cached(type):
             obj = super().__call__(*args, **kwargs)
             self.__cache[key] = obj
             return obj
+
                                
 class FGInfo:
     """
@@ -108,30 +141,34 @@ class FGInfo:
     
     """
     
-    __slots__ = ['name', 'smarts_start', 'smarts_end', 'target_atomic_num', 
+    __slots__ = ['name', 'smarts_start', 'del_tags', 'target_atomic_num', 
                  'heavy_atomic_num', 'target_symbol', 'heavy_symbol'] 
     
-    def __init__(self, name, smarts_start, smarts_end, target_atomic_num, 
+    def __init__(self, name, smarts_start, del_tags, target_atomic_num, 
                  heavy_atomic_num, target_symbol, heavy_symbol):
          self.name = name
          self.smarts_start = smarts_start
-         self.smarts_end = smarts_end
+         self.del_tags = del_tags
          self.target_atomic_num = target_atomic_num
          self.heavy_atomic_num = heavy_atomic_num
          self.target_symbol = target_symbol
          self.heavy_symbol = heavy_symbol
 
+bond = {'=' : rdkit.Chem.rdchem.BondType.DOUBLE,
+        '-' : rdkit.Chem.rdchem.BondType.SINGLE}
+
+DelAtom = namedtuple('DelAtom', ['bond_type', 'atomic_num'])
 FGInfo.functional_group_list = [
                         
-    FGInfo("aldehyde", "C(=O)[H]", "[Y]", 6, 39, "C", "Y"), 
-    FGInfo("carboxylic acid", "C(=O)O[H]", "[Zr]=O", 6, 40, "C", "Zr"),
-    FGInfo("amide", "C(=O)N([H])[H]", "[Nb]=O", 6, 41, "C", "Nb"),
-    FGInfo("thioacid", "C(=O)S[H]", "[Mo]=O", 6, 42, "C", "Mo"),
-    FGInfo("alcohol", "O[H]", "[Tc]", 8, 43, "O", "Tc"),
-    FGInfo("thiol", "[S][H]", "[Ru]", 16, 44, "S", "Ru"),
-    FGInfo("amine", "[N]([H])[H]", "[Rh]", 7, 45, "N", "Rh"),       
-    FGInfo("nitroso", "N=O","[Pd]", 7, 46, "N", "Pd"),
-    FGInfo("boronic acid", "[B](O[H])O[H]", "[Ag]", 5, 47, "B", "Ag")
+    FGInfo("aldehyde", "C(=O)[H]", [DelAtom(bond['='], 8)], 6, 39, "C", "Y"), 
+    FGInfo("carboxylic acid", "C(=O)O[H]", [DelAtom(bond['-'], 8)], 6, 40, "C", "Zr"),
+    FGInfo("amide", "C(=O)N([H])[H]", [DelAtom(bond['-'], 7)], 6, 41, "C", "Nb"),
+    FGInfo("thioacid", "C(=O)S[H]", [DelAtom(bond['-'], 16), ], 6, 42, "C", "Mo"),
+    FGInfo("alcohol", "O[H]", [], 8, 43, "O", "Tc"),
+    FGInfo("thiol", "[S][H]", [], 16, 44, "S", "Ru"),
+    FGInfo("amine", "[N]([H])[H]", [], 7, 45, "N", "Rh"),       
+    FGInfo("nitroso", "N=O", [], 7, 46, "N", "Pd"),
+    FGInfo("boronic acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
                              
                              ]
 
@@ -142,8 +179,8 @@ FGInfo.heavy_symbols = {x.heavy_symbol for x
                         
 FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
                                         in FGInfo.functional_group_list}
-        
-class StructUnit:
+@total_ordering        
+class StructUnit(metaclass=Cached):
     """
     Represents the building blocks of macromolecules examined by MMEA.
     
@@ -267,6 +304,12 @@ class StructUnit:
     is to be added, it should be placed here. If it requires the 
     building blocks relationship to other objects there should be a 
     better place for it (if not, make one). 
+
+    PS. The ``StructUnit`` class supports ordering so that the parameter
+    `building_blocks` in the ``MacroMolecule`` initializer can be
+    sorted. This is necessary to correctly implement Caching. See the
+    ``Caching`` class for more details. Do not use comparison operations
+    of this class outside of this function.
 
     Attributes
     ----------
@@ -577,22 +620,81 @@ class StructUnit:
         """
         Converts functional group in `heavy_mol` to substituted version.
 
+        The function changes the type of the central atom of the
+        functional group and deletes any hydrogen atoms in the
+        functional group. It also deletes any atoms in the functional
+        group that have been tagged for deletion.        
+        
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            The rdkit molecule has atoms removed and converted to 
+            different elements, as described in the docstring.
+
         """        
+           
+        del_ids = []
+        for atom_id in flatten(self.find_functional_group_atoms()):
+            atom = self.heavy_mol.GetAtomWithIdx(atom_id)
+            if atom.GetAtomicNum() == self.func_grp.target_atomic_num:            
+                atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
+                del_ids.extend(self._delete_tag_ids(atom))
+                for n in atom.GetNeighbors():
+                    if n.GetAtomicNum() == 1:
+                        del_ids.append(n.GetIdx())
+
+                
+        editable_mol = chem.EditableMol(self.heavy_mol)
+        for del_id in sorted(del_ids, reverse=True):
+            editable_mol.RemoveAtom(del_id)
+        self.heavy_mol = editable_mol.GetMol()
         
-        # The function creates rdkit molecules of the functional group
-        # before and after substitution. It then uses rdkit's 
-        # ``ReplaceSubstructs`` method to implement the substitution.
-        # The resulting rdkit molecule is given to the `heavy_mol`
-        # attribute.                
+
         
-        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
-        func_grp_mol_end = chem.MolFromSmarts(self.func_grp.smarts_end)
-        rms = ac.ReplaceSubstructs(self.prist_mol, func_grp_mol, 
-                                   func_grp_mol_end, replaceAll=True)
-        self.heavy_mol = rms[0]
-        self.heavy_mol.RemoveAllConformers()
-        ac.EmbedMolecule(self.heavy_mol)
+    def _delete_tag_ids(self, heavy_atom):
+        """
+        Returns the ids of neighbor atoms tagged for deletion.
         
+        These are neighbors to `heavy_atom`.
+
+        Parameters
+        ----------
+        heavy_atom : rdkit.Chem.rdchem.Atom
+            The heavy atom who's neighbors should be deleted.
+            
+        Returns
+        -------
+        list of ints
+            The ids of neighbor atoms which have been tagged for
+            deletion.
+        
+        """
+        
+        heavy_id = heavy_atom.GetIdx()
+        
+        del_ids = []
+        for del_atom in self.func_grp.del_tags:
+            for n in heavy_atom.GetNeighbors():
+                n_id = n.GetIdx()
+
+                bond = self.heavy_mol.GetBondBetweenAtoms(heavy_id, 
+                                                          n_id)
+                bond_type = bond.GetBondType()
+
+                if (n.GetAtomicNum() == del_atom.atomic_num and
+                    bond_type == del_atom.bond_type and
+                    n_id not in del_ids):
+                    del_ids.append(n_id)
+                    break
+        
+        return del_ids
+                
+    def __eq__(self, other):
+        return self.prist_mol_file == other.prist_mol_file
+        
+    def __lt__(self, other):
+        return self.prist_mol_file < other.prist_mol_file
+
 class BuildingBlock(StructUnit):
     """
     Represents the building-blocks* of a cage.
@@ -610,7 +712,7 @@ class Linker(StructUnit):
     pass
 
 @total_ordering
-class MacroMolecule(metaclass=Cached):
+class MacroMolecule(metaclass=CachedMacroMol):
     """
     A class for MMEA assembled macromolecules.
     
@@ -743,36 +845,10 @@ class MacroMolecule(metaclass=Cached):
     
     """
 
-    def __init__(self, *args, topology_args=None):
-        """
-        Initializes ``MacroMolecule`` instances.
-        
-        Several different initializers for this class are available.
-        Which one is chosen depends on the number of arguments provided
-        to the initializer. When 3 arguments are provided the
-        initializer used for testing is used. When the 4 arguments are
-        provided the standarnd initializer used for running MMEA is 
-        used. For details on what the parameters should be passed check
-        documentation of the individual initializers.
-        
-        """
-        
-        if topology_args == None:
-            topology_args = []
-
-    
-        if len(args) == 3:
-            self.std_init(*args, topology_args=topology_args)
-        
-        if len(args) == 4:
-            self.testing_init(*args)
-
-
-    
-    def std_init(self, building_blocks, topology, prist_mol_file,
+    def __init__(self, building_blocks, topology, prist_mol_file,
                  topology_args=None):
         """
-        Initialize a ``MacroMolecule`` used during MMEA runtime.
+        Initialize a ``MacroMolecule`` instance.
         
         Parameters
         ---------
@@ -1003,11 +1079,13 @@ class MacroMolecule(metaclass=Cached):
     execution of the program.
     
     """
-
-    def testing_init(self, bb_str, lk_str, topology_str, _):
-        self.building_blocks = (bb_str, lk_str)
-        self.topology = topology_str
-        self.fitness = 3.14
+    @classmethod
+    def testing_init(cls, bb_str, lk_str, topology_str):
+        cage = cls.__new__(cls)        
+        cage.building_blocks = (bb_str, lk_str)
+        cage.topology = topology_str
+        cage.fitness = 3.14
+        return cage
 
 
     def random_fitness(self):
