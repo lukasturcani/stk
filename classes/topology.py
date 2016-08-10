@@ -250,17 +250,15 @@ class Topology:
                                     FGInfo.functional_group_list if 
                                     x.heavy_atomic_num == atomic_num)                
                 atom.SetAtomicNum(target_atomic_num)
-                atom.UpdatePropertyCache()
-#                atom.SetChiralTag(chem.ChiralType.CHI_TETRAHEDRAL_CW)
-                
+#                atom.UpdatePropertyCache()
 
-
-        self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol)
-        chem.AssignAtomChiralTagsFromStructure(self.macro_mol.prist_mol)
-        chem.AssignStereochemistry(self.macro_mol.prist_mol)
-        for atom in self.macro_mol.prist_mol.GetAtoms():
-            if atom.HasProp('_CIPCode'):
-                print(atom.GetProp('_CIPCode'))
+#        self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol,
+#                                              addCoords=True)
+#        chem.AssignAtomChiralTagsFromStructure(self.macro_mol.prist_mol)
+#        chem.AssignStereochemistry(self.macro_mol.prist_mol)
+#        for atom in self.macro_mol.prist_mol.GetAtoms():
+#            if atom.HasProp('_CIPCode'):
+#                print(atom.GetProp('_CIPCode'))
 
     def pair_up_diff_element_atoms(self, heavy_mols):
         """

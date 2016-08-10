@@ -1,6 +1,6 @@
 from .test_population import generate_population
 from .test_struct_unit import get_mol_file
-from ..classes import MacroMolecule, FourPlusSix, BuildingBlock, Linker, Cage
+from ..classes import MacroMolecule, FourPlusSix, BuildingBlock, Linker, Cage, EightPlusTwelve
 
 
 bb_file = next(x for x in get_mol_file() 
@@ -18,15 +18,32 @@ def test_caching():
     Cages created with same arguments should return the same instance.
 
     """
+    lk2 = Linker(lk_file)
+    bb2 = BuildingBlock(bb_file)
+    building_blocks2 = (lk2, bb2)
+    mol2 = MacroMolecule(building_blocks2, FourPlusSix, 'you_can_delete_this2.mol')
     
-    pop1 = generate_population()
-    pop2 = generate_population()
-    pop3 = generate_population(offset=True)
+    assert mol is mol2
+
+    lk2 = Linker(lk_file)
+    bb2 = BuildingBlock(bb_file)
+    building_blocks2 = (lk2, bb2)
+    mol2 = MacroMolecule(building_blocks2, EightPlusTwelve, 'you_can_delete_this2.mol')    
+    assert mol is not mol2
     
-    for cage1, cage2, cage3 in zip(pop1, pop2, pop3):
-        assert cage1 is cage2
-        assert cage1 is not cage3
-        assert cage2 is not cage3
+    
+    bb3_file = next(x for x in get_mol_file() 
+                                    if 'amine3f_5.mol' in x)
+    lk3_file = next(x for x in get_mol_file() 
+                                    if 'aldehyde2f_74.mol' in x)
+                                        
+    bb3 = BuildingBlock(bb3_file)
+    lk3 = Linker(lk3_file)
+    building_blocks3 = (bb3,lk3)
+    mol3 = MacroMolecule(building_blocks3, FourPlusSix, 'you_can_delete_this3.mol')
+
+    assert mol is not mol3
+    assert mol2 is not mol3
 
 def test_comparison():
     """
@@ -35,13 +52,13 @@ def test_comparison():
     """
     
     # Generate cages with various fitnesses.
-    a = MacroMolecule('a','a','a', 1)
+    a = MacroMolecule.testing_init('a','a','a')
     a.fitness = 1
     
-    b = MacroMolecule('b', 'b', 'b', 1)
+    b = MacroMolecule.testing_init('b', 'b', 'b')
     b.fitness = 1
     
-    c = MacroMolecule('c', 'c', 'c', 1)
+    c = MacroMolecule.testing_init('c', 'c', 'c')
     c.fitness = 2
     
     # Comparison operators should compare their fitness.
@@ -60,10 +77,10 @@ def test_same():
     
     """
     
-    a = MacroMolecule('a', 'b', 'c', 'd')
-    b = MacroMolecule('a', 'a', 'b', 'd')
-    c = MacroMolecule('a', 'a', 'b', 'd')
-    d = MacroMolecule('a', 'b', 'a', 'd')
+    a = MacroMolecule.testing_init('a', 'b', 'c')
+    b = MacroMolecule.testing_init('a', 'a', 'b')
+    c = MacroMolecule.testing_init('a', 'a', 'b')
+    d = MacroMolecule.testing_init('a', 'b', 'a')
 
     assert not a.same(b)
     assert b.same(c)    
@@ -81,13 +98,13 @@ def test_get_heavy_as_graph():
         
 def test_heavy_get_atom_coords():
     
-    expected_output = (5, 50, -1)
+    expected_output = (1, 52, 1)
     output = tuple(int(x) for x in mol.heavy_get_atom_coords(21))
     assert expected_output == output
 
 def test_heavy_distance():
 
-    assert int(mol.heavy_distance(22, 51)) == 54
+    assert int(mol.heavy_distance(22, 51)) == 62
     
 def test_get_atom_distances():
     assert len(list(mol.get_heavy_atom_distances())) == 276
