@@ -27,6 +27,10 @@ class GATools:
     their `ga_tools` attribute. All the instances which carry out GA
     operations on the population are held conveniently together in an 
     instance of this class.
+    
+    This class also holds the name of the method in the ``Optimization``
+    class which is to be used for optimizing the structures of
+    ``MacroMolecule`` instances.
 
     Attributes
     ----------
@@ -39,13 +43,17 @@ class GATools:
     
     mutation : Mutation
         The ``Mutation`` instance which mutates a population's members
+        
+    opt_func_name : str
+        The name of the method in the ``Optimization`` class to be used
+        for ``MacroMolecule`` optimizations.
     
     """
     
-    __slots__ = ['selection', 'mating', 'mutation']    
+    __slots__ = ['selection', 'mating', 'mutation', 'opt_func_name']    
     
-    def __init__(self, selection, mating, mutation):
+    def __init__(self, selection, mating, mutation, opt_func_name):
         self.selection = selection
         self.mating = mating
         self.mutation = mutation
-        
+        self.opt_func_name = opt_func_name

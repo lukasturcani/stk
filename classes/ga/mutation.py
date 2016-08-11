@@ -136,6 +136,7 @@ class Mutation:
         lk = next(x for x in cage.building_blocks if 
                                                 isinstance(x, Linker))        
         return Cage((bb, lk), type(cage.topology), 
+                    cage.optimize.func_name,
             os.path.join(os.getcwd(), self.name.format(self.n_calls)))
         
 from ..population import Population

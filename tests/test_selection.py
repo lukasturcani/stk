@@ -23,7 +23,7 @@ def test_selection_population_integration():
     fittest3 = FunctionData('fittest')
     
     selector = Selection(fittest, fittest2, fittest3)
-    ga_tools = GATools(selector, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'rdkit_optimization')
     pop1.ga_tools = ga_tools
     
     pop2 = pop1.select('generational')
@@ -40,7 +40,7 @@ def test_selection_population_integration():
 def test_fittest():
     fittest = FunctionData('fittest')
     selector = Selection(fittest, fittest, fittest)
-    ga_tools = GATools(selector, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'rdkit_optimization')
     pop1.ga_tools = ga_tools
 
     #Set fitnesses and labels
@@ -58,7 +58,7 @@ def test_fittest():
 def test_all_combinations():
     all_combs = FunctionData('all_combinations')
     selector = Selection('a', all_combs, 'b')
-    ga_tools = GATools(selector, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'rdkit_optimization')
     pop1.ga_tools = ga_tools
     
     #Set fitnesses and labels
