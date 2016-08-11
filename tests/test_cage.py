@@ -24,7 +24,8 @@ def test_init():
     bb = BuildingBlock(bb_file)
     lk = Linker(lk_file)    
     building_blocks = (bb, lk)
-    cage = Cage(building_blocks, FourPlusSix, 'you_can_delete_this.mol')
+    cage = Cage(building_blocks, FourPlusSix, 'rdkit_optimization', 
+                                            'you_can_delete_this.mol')
     
     assert hasattr(cage, 'prist_mol_file')
     assert hasattr(cage, 'heavy_mol_file')

@@ -76,6 +76,9 @@ def test_init():
     # Due to a technicality (see __init__ source code) any number of 
     # ``None`` type arguments can be supplied. Valid, should pass.
     Population(*[None for x in range(0,10)])
+
+def test_init_random_cages():
+    pass
         
 def test_all_members():
     """
@@ -397,7 +400,8 @@ def test_write_population_to_dir():
     bb = BuildingBlock(bb_file)
     lk = Linker(lk_file)    
     building_blocks = (bb, lk)
-    mol = Cage(building_blocks, FourPlusSix, 'you_can_delete_this3.mol')    
+    mol = Cage(building_blocks, FourPlusSix, 
+               'rdkit_optimization', 'you_can_delete_this3.mol')    
     pop = Population(mol)
     pop.write_population_to_dir(os.path.join(os.getcwd(), 
                                              'write_pop_test'))
@@ -407,7 +411,7 @@ def test_write_population_to_dir():
     except:
         pass
     
-    
+ 
     
                       
                       
