@@ -14,9 +14,13 @@ from collections import namedtuple
 
 from ..convenience_functions import flatten
 
+
 class CachedMacroMol(type):
     """
     A metaclass for creating classes which create cached instances.
+    
+    This class is tailored to the needs of createding cached
+    ``MacroMolecule`` instances.
     
     """    
     
@@ -246,7 +250,7 @@ class StructUnit(metaclass=Cached):
     which apply generally to building blocks can be stored here and any
     which apply specifically to one kind of building block such as a 
     linker or building-block* can be placed within its own class. Due to
-    inheritance, instances of a derived class are able to use operation
+    inheritance, instances of a derived class are able to use operations
     of the parent class.
     
     Consider a useful result of this approach. When setting the 
@@ -323,9 +327,13 @@ class StructUnit(metaclass=Cached):
 
     PS. The ``StructUnit`` class supports ordering so that the parameter
     `building_blocks` in the ``MacroMolecule`` initializer can be
-    sorted. This is necessary to correctly implement Caching. See the
-    ``Caching`` class for more details. Do not use comparison operations
-    of this class outside of this function.
+    sorted. This is necessary to correctly implement caching of
+    ``MacroMolecule`` instances. See the ``CachedMacroMol`` class for 
+    more details. Do not use comparison operations of this class outside 
+    of this function.
+
+    PPS. The ``StructUnit`` class is itself cached via the ``Cached``
+    metaclass.
 
     Attributes
     ----------
@@ -454,7 +462,8 @@ class StructUnit(metaclass=Cached):
         self.heavy_mol = chem.Mol(self.prist_mol)      
         
         # Subtitutes the relevent functional group atoms in `heavy_mol`
-        # for heavy atoms.        
+        # for heavy atoms and deletes Hydrogen atoms of the functional
+        # group.
         self._make_atoms_heavy_in_heavy()
         
         
@@ -636,7 +645,7 @@ class StructUnit(metaclass=Cached):
         """
         Converts functional group in `heavy_mol` to substituted version.
 
-        The function changes the type of the central atom of the
+        The function changes the element of the central atom of the
         functional group and deletes any hydrogen atoms in the
         functional group. It also deletes any atoms in the functional
         group that have been tagged for deletion.        
@@ -647,8 +656,18 @@ class StructUnit(metaclass=Cached):
             The rdkit molecule has atoms removed and converted to 
             different elements, as described in the docstring.
 
+        Returns
+        -------
+        None : NoneType
+
         """        
-           
+         
+        # Go through all atom ids corresponding to a functional group
+        # atoms. If the element of the atom corresponds to the atom
+        # which must be substituted, do so. For each substituted atom
+        # check if any of its neighbors are tagged for deletion and
+        # tag all the neighboring Hydrogen atoms for deletion. An atom
+        # tagged for deletion will have its id added to ``del_ids``.
         del_ids = []
         for atom_id in flatten(self.find_functional_group_atoms()):
             atom = self.heavy_mol.GetAtomWithIdx(atom_id)
@@ -659,10 +678,14 @@ class StructUnit(metaclass=Cached):
                     if n.GetAtomicNum() == 1:
                         del_ids.append(n.GetIdx())
 
-                
+        # Make an EditableMol and delete all of its atoms which have
+        # been tagged for deletion. Delete ids with larger ids first to
+        # prevent rdkit from raising range errors.      
         editable_mol = chem.EditableMol(self.heavy_mol)
         for del_id in sorted(del_ids, reverse=True):
             editable_mol.RemoveAtom(del_id)
+        
+        
         self.heavy_mol = editable_mol.GetMol()
         
 
@@ -689,6 +712,10 @@ class StructUnit(metaclass=Cached):
         heavy_id = heavy_atom.GetIdx()
         
         del_ids = []
+        
+        # For each deletion tag, go through all the neighors that
+        # `heavy_atom` has. If the atom's element and bond type matches
+        # the deletion tag, add the atom's id to the ``del_ids`` list.        
         for del_atom in self.func_grp.del_tags:
             for n in heavy_atom.GetNeighbors():
                 n_id = n.GetIdx()
@@ -836,6 +863,12 @@ class MacroMolecule(metaclass=CachedMacroMol):
         see the docstring of the ``Topology`` class and its derived 
         classes.
 
+    optimize : Optimization
+        This is an instance of the ``Optimization`` class. Calling it
+        performs the optimization procedure the instance was initialized 
+        with. The instance is initialized with the method who's name
+        is supplied as the `opt_func_name` parameter in the initializer.
+
     prist_mol_file : str
         The full path of the ``.mol`` file holding the pristine version
         of the macromolecule.
@@ -864,8 +897,9 @@ class MacroMolecule(metaclass=CachedMacroMol):
     
     """
 
-    def __init__(self, building_blocks, topology, prist_mol_file,
-                 topology_args=None):
+    def __init__(self, building_blocks, topology, opt_func_name, 
+                 prist_mol_file, topology_args=None, 
+                                 opt_func_args=None):
         """
         Initialize a ``MacroMolecule`` instance.
         
@@ -880,7 +914,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
             Such classes are defined in the topology module. The class 
             will be a child class which inherits the base class 
             ``Topology``.
-            
+        
+        opt_func_name : str
+            The name of the ``Optimization`` class method which defines
+            the optimization procedure for pristine molecules.
+        
         prist_mol_file : str
             The full path of the ``.mol`` file where the macromolecule
             will be stored.
@@ -889,11 +927,18 @@ class MacroMolecule(metaclass=CachedMacroMol):
             Any additional arguments needed to initialize the topology
             class supplied in the `topology` argument.
             
+        opt_func_args : list
+            Any addtional arguments needed to run the chosen 
+            optimization function
+            
         """
         
-        if topology_args == None:
+        if topology_args is None:
             topology_args = []
 
+        if opt_func_args is None:
+            opt_func_args = []
+            
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
         self.fitness = None
@@ -915,6 +960,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # creates the cage's ``.mol`` file all  the building blocks and
         # linkers joined up. Both the substituted and pristine versions.
         self.topology.build()
+
+        # Optimize the structure of the pristine molecule
+        self.optimize = Optimization(self, opt_func_name, opt_func_args)        
+        self.optimize()
         
         chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
                           includeStereo=False, kekulize=False,
@@ -935,6 +984,8 @@ class MacroMolecule(metaclass=CachedMacroMol):
         self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
                                              isomericSmiles=True,
                                              allHsExplicit=True)
+                                             
+
                                              
         self.random_fitness()
 
@@ -987,6 +1038,30 @@ class MacroMolecule(metaclass=CachedMacroMol):
         position = conformer.GetAtomPosition(atom_id)
         # Unpack and return the individual coordinates.
         return position.x, position.y, position.z        
+
+    def prist_get_atom_coords(self, atom_id):
+        """
+        Returns the coordinates of an atom in `pirst_mol`.        
+        
+        Parameters
+        ----------
+        atom_id : int
+            The id of the atom whose coordinates you want to find.
+            
+        Returns
+        -------
+        tuple of ints
+            The tuple represents the x, y and z coordinates of the atom,
+            respectively.         
+        
+        """
+        
+        # Get the conformer which holds all the positional information.        
+        conformer = self.prist_mol.GetConformer()
+        # Get the position of the desired atom from the conformer.
+        position = conformer.GetAtomPosition(atom_id)
+        # Unpack and return the individual coordinates.
+        return position.x, position.y, position.z  
         
     def heavy_distance(self, atom1_id, atom2_id):
         """
@@ -1014,6 +1089,32 @@ class MacroMolecule(metaclass=CachedMacroMol):
         
         return euclidean(atom1_coords, atom2_coords)
         
+    def prist_distance(self, atom1_id, atom2_id):
+        """
+        Returns the distance between atoms in `prist_mol`.
+        
+        Parameters
+        ----------
+        atom1_id : int
+            The id of the first atom.
+        
+        atom2_id : int
+            The id of the second atom.
+            
+        Returns 
+        -------
+        scipy.double
+            The distance between the first and second atoms.
+
+        """
+        
+        # Get the atomic positions of each atom and use the scipy 
+        # function to calculate their distance in Euclidean space.              
+        atom1_coords = self.prist_get_atom_coords(atom1_id)
+        atom2_coords = self.prist_get_atom_coords(atom2_id)
+        
+        return euclidean(atom1_coords, atom2_coords)
+
     def get_heavy_atom_distances(self):
         """
         Yield distances between all pairs of heavy atoms in `heavy_mol`.
@@ -1162,7 +1263,7 @@ class Polymer(MacroMolecule):
 
 
 
-
+from .optimization import Optimization
 
 
 

@@ -15,7 +15,8 @@ lk_file = next(x for x in get_mol_file()
 bb = BuildingBlock(bb_file)
 lk = Linker(lk_file)    
 building_blocks = (bb, lk)
-mol = Cage(building_blocks, FourPlusSix, 'you_can_delete_this3.mol')
+mol = Cage(building_blocks, FourPlusSix, 
+           'rdkit_optimization','you_can_delete_this3.mol')
 
 bb2_file = next(x for x in get_mol_file() 
                                     if 'amine3f_5.mol' in x)
@@ -25,7 +26,8 @@ lk2_file = next(x for x in get_mol_file()
 bb2 = BuildingBlock(bb2_file)
 lk2 = Linker(lk2_file)    
 building_blocks2 = (bb2, lk2)
-mol2 = Cage(building_blocks2, EightPlusTwelve, 'you_can_delete_this4.mol')
+mol2 = Cage(building_blocks2, EightPlusTwelve, 
+            'rdkit_optimization', 'you_can_delete_this4.mol')
 
 def test_random_bb():
     
@@ -38,7 +40,7 @@ def test_random_bb():
         
         selector = Selection('a', 'a', sel)
         mutator = Mutation(rand_bb, 1)
-        ga_tools = GATools(selector, 'a', mutator)
+        ga_tools = GATools(selector, 'a', mutator, 'rdkit_optimization')
 
 
         pop1 = Population(ga_tools, mol, mol2)
@@ -46,7 +48,8 @@ def test_random_bb():
 
         for mol3 in pop2:
             assert mol3 not in pop1
-    
+        
+        assert len(pop2) == 1
 
     
     

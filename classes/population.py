@@ -168,7 +168,8 @@ class Population:
         
         """
         
-        cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies, 
+        cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies,
+                                         ga_tools.opt_func_name,
                     os.path.join(os.getcwd(),"init_{}.mol".format(x))) 
                         for x in range(size))
         
