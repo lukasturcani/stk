@@ -60,10 +60,11 @@ def func_line_parser(line):
             for i, topology in enumerate(p_vals):
                 p_vals[i] = getattr(MMEA.classes, p_vals[i])
         if len(p_vals) == 1:
-            p_vals = p_vals[0]                
+            p_vals = p_vals[0].replace('~!~', ' ')                
         param_dict[p_name] = p_vals
         
     return FunctionData(name, **param_dict)
+    
 class GAInput:
     """
     A class for concisely holding information from MMEA's input file.
@@ -151,7 +152,10 @@ class GAInput:
     mutation_func : FunctionData
         The ``Mutation`` class method used to mutate ``MacroMolecule`` 
         instances to generate mutants. Must correspond to a method 
-        defined within the ``Mutation`` class.    
+        defined within the ``Mutation`` class.
+        
+    opt_func : FunctionData
+        
     
     """
     

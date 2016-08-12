@@ -863,12 +863,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
         see the docstring of the ``Topology`` class and its derived 
         classes.
 
-    optimize : Optimization
-        This is an instance of the ``Optimization`` class. Calling it
-        performs the optimization procedure the instance was initialized 
-        with. The instance is initialized with the method who's name
-        is supplied as the `opt_func_name` parameter in the initializer.
-
     prist_mol_file : str
         The full path of the ``.mol`` file holding the pristine version
         of the macromolecule.
@@ -891,15 +885,20 @@ class MacroMolecule(metaclass=CachedMacroMol):
         A ``SMILES`` string representing the substitued version of the 
         macromolecule.
 
+    optimized : bool (default = False)
+        This is a flag to indicate if a molecule has been previously
+        optimized. Optimization functions set this flag to ``True``
+        after an optimization.
+
     fitness : float
         The fitness value of the macromolecule, as determined by the 
-        chosen fitness function.         
+        chosen fitness function. This attribute is created by fitness
+        functions.
     
     """
 
-    def __init__(self, building_blocks, topology, opt_func_name, 
-                 prist_mol_file, topology_args=None, 
-                                 opt_func_args=None):
+    def __init__(self, building_blocks, topology, prist_mol_file, 
+                 topology_args=None):
         """
         Initialize a ``MacroMolecule`` instance.
         
@@ -915,10 +914,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             will be a child class which inherits the base class 
             ``Topology``.
         
-        opt_func_name : str
-            The name of the ``Optimization`` class method which defines
-            the optimization procedure for pristine molecules.
-        
         prist_mol_file : str
             The full path of the ``.mol`` file where the macromolecule
             will be stored.
@@ -927,18 +922,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
             Any additional arguments needed to initialize the topology
             class supplied in the `topology` argument.
             
-        opt_func_args : list
-            Any addtional arguments needed to run the chosen 
-            optimization function
-            
         """
         
         if topology_args is None:
             topology_args = []
 
-        if opt_func_args is None:
-            opt_func_args = []
-            
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
         self.fitness = None
@@ -960,10 +948,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # creates the cage's ``.mol`` file all  the building blocks and
         # linkers joined up. Both the substituted and pristine versions.
         self.topology.build()
-
-        # Optimize the structure of the pristine molecule
-        self.optimize = Optimization(self, opt_func_name, opt_func_args)        
-        self.optimize()
         
         chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
                           includeStereo=False, kekulize=False,
@@ -985,9 +969,9 @@ class MacroMolecule(metaclass=CachedMacroMol):
                                              isomericSmiles=True,
                                              allHsExplicit=True)
                                              
-
-                                             
+        self.optimized = False
         self.random_fitness()
+
 
     def get_heavy_as_graph(self):
         """
@@ -1259,11 +1243,6 @@ class Polymer(MacroMolecule):
     """
     pass
 
-
-
-
-
-from .optimization import Optimization
 
 
 
