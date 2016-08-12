@@ -37,7 +37,7 @@ selector = Selection(ga_input.generational_select_func,
                      ga_input.mutant_select_func)
 mator = Mating(ga_input.mating_func, ga_input.num_matings)
 mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations)
-ga_tools = GATools(selector, mator, mutator)
+ga_tools = GATools(selector, mator, mutator, ga_input.opt_func)
 
 # Generate an initial population.
 pop_init = getattr(Population, ga_input.init_func.name)
@@ -66,10 +66,13 @@ for x in range(ga_input.num_generations):
     print('Adding offsping and mutants to population.')
     pop += offspring + mutants
     
+    print('Optimizing population')
+    pop.optimize_population()
+    
     print('Selecting members of the next generation.')
     pop = Population(ga_tools, *(islice(pop.select('generational'),
                                         0, ga_input.pop_size)))
-    
+
     # Create a folder within a generational folder for the the ``.mol``
     # files corresponding to molecules selected for the next generation.
     # Place the ``.mol`` files into that folder.
