@@ -189,14 +189,12 @@ class Mating:
         # building block pairings determined earlier.
         for index, topology in enumerate(topologies):
             
-            opt_func_name = cage1.optimize.func_name
-            
             offspring1 = Cage((build_block1, counterpart1), topology, 
-                              opt_func_name, os.path.join(os.getcwd(),
+                              os.path.join(os.getcwd(),
                               self.name.format(self.n_calls, index, 1)))
                               
             offspring2 = Cage((build_block2, counterpart2), topology,
-                              opt_func_name, os.path.join(os.getcwd(),
+                              os.path.join(os.getcwd(),
                               self.name.format(self.n_calls, index, 2)))
             offspring_pop.add_members((offspring1, offspring2))
             

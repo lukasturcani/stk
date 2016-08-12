@@ -5,6 +5,7 @@ import os
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
 from ..convenience_functions import dedupe
+from ..optimization import optimize_all
 
 class Population:
     """
@@ -169,7 +170,6 @@ class Population:
         """
         
         cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies,
-                                         ga_tools.opt_func_name,
                     os.path.join(os.getcwd(),"init_{}.mol".format(x))) 
                         for x in range(size))
         
@@ -466,7 +466,13 @@ class Population:
             shutil.copy(member.prist_mol_file, dir_path)
             shutil.copy(member.heavy_mol_file, dir_path)
                 
-        
+    
+    def optimize_population(self):
+        optimize_all(self.ga_tools.optimization, self)
+    
+    def calculate_member_fitness(self):
+        pass
+    
     def __iter__(self):
         """
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.        
