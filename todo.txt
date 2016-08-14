@@ -4,3 +4,4 @@
 -implement parallelisation
 -implement orientation
 -implement fitness function
+-implement limited mutation
