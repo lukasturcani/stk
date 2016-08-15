@@ -3,7 +3,7 @@ import MMEA.classes
 
 def func_line_parser(line):
     """
-    Creates a ``FunctionData`` instance based on data in file line.
+    Creates a ``FunctionData`` instance based on data in line.
     
     This function must be applied only to lines which hold information
     about functions to be used by MMEA and their parameters.
@@ -25,7 +25,7 @@ def func_line_parser(line):
     
     """
     
-    # Split the line into components. Each component is a text separated
+    # Split the line into components. Each component is text separated
     # by whitespace. Compenents = ``words``.
     words = line.split()   
     # The first 2 words are the keyword defining the ``GAInput`` 
@@ -44,9 +44,9 @@ def func_line_parser(line):
     # joined by ``,`` using a split on this symbol. If only one 
     # parameter value was present the length of the list after the ``,``
     # split will be 1. In this case make just this one value the value 
-    # in ``param_dict`` correspond to the key. If more than one 
+    # in ``param_dict`` corresponding to the key. If more than one 
     # parameter value was present add all of them as the value in 
-    # ``param_dict`` by making the value in ``param_dict`` the list 
+    # ``param_dict`` by making the value in ``param_dict`` a list 
     # holding all the values.    
     for param in params:
         p_name, p_vals = param.split("=")
@@ -60,6 +60,9 @@ def func_line_parser(line):
             for i, topology in enumerate(p_vals):
                 p_vals[i] = getattr(MMEA.classes, p_vals[i])
         if len(p_vals) == 1:
+            # Sometimes file paths may include a space. Within the
+            # input file the space in a path should be changed to 
+            # ``~!~``. Here it is remade into a space.
             p_vals = p_vals[0].replace('~!~', ' ')                
         param_dict[p_name] = p_vals
         
@@ -84,9 +87,9 @@ class GAInput:
     to the name of one of the attributes defined in the ``Attributes``
     section of this docstring. For keywords which define a simple value
     such as ``pop_size`` or ``num_generations`` they are simply followed
-    by the desired value, seperated by whitespace (excluding a newline).
+    by the a space and the desired value.
     
-    For lines where the keyword indicates a function is to be defined
+    For lines where the keyword indicates a function is to being defined
     the syntax is as follows:
         
         keyword function_or_method_name param1_name=param1_value 
@@ -106,6 +109,16 @@ class GAInput:
           the other by a ``,`` and NO WHITESPACE.
         > parameter names and value definitions are placed on the same
           line and separated by a whitespace.
+          
+    In some cases the parameter which needs to be provided will be a
+    path. In cases where the path involves a space replace any space
+    with ``~!~``. When the input file is read by this class it is remade
+    into a space. For example if the path to MacroModel needs to be
+    provided as a parameter:
+    
+        macromodel_path=C:\Program~!~Files\Schrodinger2016-2
+    
+    Notice the space in ``Program Files`` was replaced.
     
     Attributes
     ----------
@@ -155,8 +168,9 @@ class GAInput:
         defined within the ``Mutation`` class.
         
     opt_func : FunctionData
-        
-    
+        The function from the ``optimization.py`` module to be used for
+        optimizing ``MacroMolecule`` instances.
+
     """
     
     def __init__(self, input_file):
@@ -171,7 +185,12 @@ class GAInput:
         """
         
         self.input_file = input_file
+        
+        # Read the input file and extract its information.
         self._extract_data()
+        
+        # If the input file did not specify the number of matings or
+        # mutations it is assumed that none are wanted.
         if not hasattr(self, 'num_matings'):
             self.num_matings = 0
         
@@ -205,7 +224,7 @@ class GAInput:
         # attribute and its value. If the keyword defines a function
         # call the function which which exctracts data from function-
         # defining lines. If the keyword is not recognized, raise a 
-        # NameError.        
+        # ``NameError``.        
         with open(self.input_file, 'r') as input_file:
             for raw_line in input_file:
                 line = raw_line.split()
