@@ -21,16 +21,13 @@ class FunctionData:
         
 class GATools:
     """
-    Stores ``Selection``, ``Mating`` and ``Mutation`` instances.
+    Stores objects which carry out GA operations on populations.
     
     Instances of this class are held by ``Population`` instances in
     their `ga_tools` attribute. All the instances which carry out GA
     operations on the population are held conveniently together in an 
-    instance of this class.
-    
-    This class also holds the name of the method in the ``Optimization``
-    class which is to be used for optimizing the structures of
-    ``MacroMolecule`` instances.
+    instance of this class. The optimization function used by the GA
+    is also stored here as is the fitness function.
 
     Attributes
     ----------
@@ -45,9 +42,14 @@ class GATools:
         The ``Mutation`` instance which mutates a population's members
         
     optimization : FuncionData
-        Holds the name of the method in the ``Optimization`` class to be 
+        Holds the name of the function in ``optimization.py`` to be 
         used for ``MacroMolecule`` optimizations and any additional 
         parameters the function may require.
+        
+    fitness : FunctionData
+        Holds the name of the function in ``fitness.py`` to be used for
+        calculating the fitness of ``MacroMolecule`` instances. It also
+        holds any additional paramters the function may require.
     
     """
     
