@@ -33,7 +33,15 @@ if 'output' in os.listdir():
     
 # Create a new output directory and move into it. Save its path as the
 # root directory.
-os.mkdir('output')
+    
+# Wait for previous operations to finish before starting these.
+mk_complete = False    
+while not mk_complete:
+    try:
+        os.mkdir('output')
+        mk_complete = True
+    except:
+        pass    
 os.chdir('output')
 root_dir = os.getcwd()
 os.mkdir('initial')
