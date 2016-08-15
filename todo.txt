@@ -6,6 +6,7 @@
 -implement fitness function
 -implement limited mutation
 -implement population storage and initialization from stored populations
+-implement chirality check
 -write developer's guide
 -write user's guide
 -make mating and mutation parallel
