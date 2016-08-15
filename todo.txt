@@ -1,6 +1,7 @@
 -implement current design of GA but remove parallelism
 -update all documentation, add missing tests
--implement storage of failed initializations
+-implement storage of failed initializations/optimizations etc.
+-fix them
 -implement parallelisation
 -implement orientation
 -implement fitness function

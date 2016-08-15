@@ -44,9 +44,10 @@ class GATools:
     mutation : Mutation
         The ``Mutation`` instance which mutates a population's members
         
-    opt_func_name : str
-        The name of the method in the ``Optimization`` class to be used
-        for ``MacroMolecule`` optimizations.
+    optimization : FuncionData
+        Holds the name of the method in the ``Optimization`` class to be 
+        used for ``MacroMolecule`` optimizations and any additional 
+        parameters the function may require.
     
     """
     
