@@ -5,6 +5,7 @@
 -implement orientation
 -implement fitness function
 -implement limited mutation
+-implement population storage and initialization from stored populations
 -write developer's guide
 -write user's guide
 -make mating and mutation parallel
