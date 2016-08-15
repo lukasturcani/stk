@@ -7,3 +7,4 @@
 -implement limited mutation
 -write developer's guide
 -write user's guide
+-make mating and mutation parallel
