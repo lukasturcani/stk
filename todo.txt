@@ -5,3 +5,5 @@
 -implement orientation
 -implement fitness function
 -implement limited mutation
+-write developer's guide
+-write user's guide
