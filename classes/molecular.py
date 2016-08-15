@@ -79,9 +79,9 @@ class FGInfo:
     
     Adding a new ``FGInfo`` instace to `functional_group_list` will 
     allow the `Topology.join_mols` method to connect this functional 
-    group to (all) others during assembly. Nothing excepting adding this
-    instance should need to be done to incorporate new functional 
-    groups.
+    group to (all) others during assembly. Nothing except adding this
+    instance should need to be done in order to incorporate new 
+    functional groups.
     
     If this new functional group is to connect to another functional 
     group with a double bond during assembly, the symbols of the heavy 
@@ -126,8 +126,8 @@ class FGInfo:
         
     del_tags : list of DelAtom instances
         Every member of this list represents an atom on the functional
-        group which should be deleted. Only one atom is deleted per
-        group member.
+        group which should be deleted during assembly. One atom in each
+        functional group is removed for each list member.
     
     target_atomic_num : int
         The atomic number of the atom being substituted by a heavy atom.
@@ -146,8 +146,9 @@ class FGInfo:
     
     """
     
-    __slots__ = ['name', 'smarts_start', 'del_tags', 'target_atomic_num', 
-                 'heavy_atomic_num', 'target_symbol', 'heavy_symbol'] 
+    __slots__ = ['name', 'smarts_start', 'del_tags', 
+                 'target_atomic_num', 'heavy_atomic_num', 
+                 'target_symbol', 'heavy_symbol'] 
     
     def __init__(self, name, smarts_start, del_tags, target_atomic_num, 
                  heavy_atomic_num, target_symbol, heavy_symbol):
@@ -219,10 +220,10 @@ class StructUnit(metaclass=Cached):
     
     The goal of this class is to conveniently store information about, 
     and perform operations on, single instances of the building blocks 
-    used to form the macromolecules. The class stores information 
-    regarding the rdkit instance of the building block, its ``SMILES`` 
-    string and the location of its ``.mol`` file. See the attributes 
-    section of this docstring for a full list of information stored.
+    used to form macromolecules. The class stores information regarding
+    the rdkit instance of the building block, its ``SMILES`` string and
+    the location of its ``.mol`` file. See the attributes section of 
+    this docstring for a full list of information stored.
     
     This class also takes care of perfoming substitutions of the 
     functional groups in the building blocks via the 
@@ -254,16 +255,16 @@ class StructUnit(metaclass=Cached):
     of the parent class.
     
     Consider a useful result of this approach. When setting the 
-    coordinates of linkers or building-blocks* during assembly of a 
-    cage, it is necessary to know if the molecule you are placing is a 
+    coordinates of linkers or building-blocks* during assembly, it is 
+    necessary to know if the molecule you are placing is a 
     building-block* or linker. This is because a building-block* will go 
     on vertex (in this example, this may or may not be generally true)
     and a linker will go on an edge. 
     
     Assume that there is a ``Linker`` and a ``BuildingBlock`` class 
     which inherit from ``StructUnit``. As luck would have it, these 
-    classes are in fact implemented in MMEA. Even if nothing is present
-    in the class definition itself, both classes will have all the 
+    classes are implemented in MMEA. Even if nothing is present in the
+    class definition itself, both classes will have all the 
     attributes and methods associated with ``StructUnit``. This means
     the positions of the rdkit molecules held in instances of those 
     classes can be shifted with the `shift_heavy_mol` method.
@@ -279,12 +280,17 @@ class StructUnit(metaclass=Cached):
     
     A final note on the intended use. Each instance of an assembled 
     molecule class (such as an instance of the ``Cage`` class) will have
-    one instance of each class derived from ``StructUnit`` at most. It 
-    holds information which applies to every building-block* or linker
-    present in a class. As a result it does not hold information 
-    regarding how individual building-blocks* and linkers are joined
-    up in a cage. That is the cage's problem. Specifically cage's 
-    `topology` attribute's problem.
+    1 instance of a ``StructUnit`` derived class for each type of 
+    building block present. For example, if a cage is made by comining 4 
+    of one kind of building-block* with 6 of some kind of linker only 
+    one instance of ``BuildingBlock`` and one instance of ``Linker`` is 
+    to be held. The fact that there are 4 of one kind of building-block*
+    arranged in some way to form a  cage is the ``Cage`` instance's 
+    `topology` attribute's problem. If however the cage was for some 
+    reason built from 2 of one kind of building-block*, 2 of another 
+    kind of building-block* and 6 of 1 type of linker, then 2 
+    ``BuildingBlock`` instances would need to be held (and 1 
+    ``Linker``).
     
     In summary, the intended use of this class is to answer questions
     such as (not exhaustive):
@@ -377,9 +383,25 @@ class StructUnit(metaclass=Cached):
     """
     
     def __init__(self, prist_mol_file):
+        """
+        Initializes a ``StructUnit`` instance.
+        
+        Parameters
+        ----------
+        prist_mol_file : str
+            The full path of the ``.mol`` file holding the building
+            block structure.
+            
+        """
+        
+        # Heavy versions of ``StructUnit`` instances will be placed
+        # in a folder named ``HEAVY``. This folder is placed in the 
+        # current working directory. The iterator checks to see if the
+        # folder already exists. If not, it returns ``False`` instead
+        # of the folder name.
         heavy_dir = next((name for name in os.listdir(os.getcwd()) if 
                         os.path.isdir(name) and "HEAVY" == name), False)
-
+        # If ``HEAVY`` folder not created yet, make it.
         if not heavy_dir:        
             os.mkdir("HEAVY")
         
@@ -449,10 +471,11 @@ class StructUnit(metaclass=Cached):
         
         # In essence, this function first finds all atoms in the 
         # molecule which form a functional group. It then switches the 
-        # atoms in the functional groups of the molecule for heavy 
-        # atoms. This new molecule is then stored in the ``StructUnit`` 
-        # instance in the form of an ``rdkit.Chem.rdchem.Mol``, a SMILES 
-        # string and a ``.mol`` file path.
+        # target atoms in the functional groups for heavy atoms and
+        # deletes any tagged for deletion. This new molecule is then 
+        # stored in the ``StructUnit`` instance in the form of an 
+        # ``rdkit.Chem.rdchem.Mol``, a SMILES string and a ``.mol`` file 
+        # path.
         
         # First create a copy of the ``rdkit.Chem.rdchem.Mol`` instance
         # representing the pristine molecule. This is so that after 
@@ -460,13 +483,12 @@ class StructUnit(metaclass=Cached):
         # corrupted. This second copy which will turn into the 
         # substituted ``rdkit.Chem.rdchem.Mol`` will be operated on.
         self.heavy_mol = chem.Mol(self.prist_mol)      
-        
-        # Subtitutes the relevent functional group atoms in `heavy_mol`
+
+        # Subtitutes the relevant functional group atoms in `heavy_mol`
         # for heavy atoms and deletes Hydrogen atoms of the functional
-        # group.
+        # group as well as any other atoms tagged for deletion.
         self._make_atoms_heavy_in_heavy()
-        
-        
+
         # Change the pristine ``.mol`` file name to include the word
         # ``HEAVY_`` at the end. This generates the name of the 
         # substituted version of the ``.mol`` file.
@@ -546,16 +568,16 @@ class StructUnit(metaclass=Cached):
         heavy rdkit molecule in ``a`` except all the atomic positions
         are increased by 10 in the x, y and z directions. 
         
-        Because a was not modified by runnig the method, running it
-        with the same arguments leads to the same result. This is why
-        the conformers in ``b`` and ``c`` are the same.
+        Because ``a`` was not modified by runnig the method, running it
+        again with the same arguments leads to the same result. This is 
+        why the conformers in ``b`` and ``c`` are the same.
 
         Returns
         -------
         rdkit.Chem.rdchem.Mol
             An rdkit molecule instance which has a modified version of 
-            the conformer found in `heavy_mol. Note that the conformer 
-            instance is stored by this attribute indirectly. The 
+            the conformer found in `heavy_mol`. Note that the conformer 
+            instance is stored by `heavy_mol` indirectly. The
             modification is that all atoms in the conformer are shifted 
             by amount given in the `x`, `y` and `z` arguments.
         
@@ -605,8 +627,8 @@ class StructUnit(metaclass=Cached):
         # `heavy_mol` attribute, as result it has a copy of its
         # conformer. To prevent the rdkit molecule from holding multiple
         # conformers the `RemoveAllConformers` method is run first. The
-        # shifted confer is then given to the rdkit molecule, which is
-        # returned.
+        # shifted conformer is then given to the rdkit molecule, which 
+        # is returned.
         new_heavy.RemoveAllConformers()
         new_heavy.AddConformer(conformer)
         return new_heavy        
@@ -625,11 +647,12 @@ class StructUnit(metaclass=Cached):
         ------
         tuple of floats
             The tuple itself represents the complete position in space.
-            Each int represents the value of the x, y or z coordinate of 
-            an atom. The x, y and z coordinates are located in the tuple
-            in that order. 
+            Each float represents the value of the x, y or z coordinate 
+            of an atom. The x, y and z coordinates are located in the 
+            tuple in that order. 
         
         """
+        
         # Get the conformer from the instance in the `heavy_mol` 
         # attribute. 
         conformer = self.heavy_mol.GetConformer()
@@ -684,12 +707,9 @@ class StructUnit(metaclass=Cached):
         editable_mol = chem.EditableMol(self.heavy_mol)
         for del_id in sorted(del_ids, reverse=True):
             editable_mol.RemoveAtom(del_id)
-        
-        
+               
         self.heavy_mol = editable_mol.GetMol()
-        
-
-        
+             
     def _delete_tag_ids(self, heavy_atom):
         """
         Returns the ids of neighbor atoms tagged for deletion.
@@ -763,7 +783,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
     A class for MMEA assembled macromolecules.
     
     The goal of this class is to represent an individual used by the GA.
-    As such, it holds attributes that are to be expected for this 
+    As such, it holds attributes that are to be expected for this
     purpose. Mainly, it has a fitness value stored in its `fitness` 
     attribute and a genetic code - as defined by its `building_blocks` 
     and  `topology` attributes. If a change is made to either of these 
@@ -779,7 +799,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
     
     To prevent bloating this class, any information that can be 
     categorized is. For example, storing information that concerns
-    building blocks ``in a vaccuum`` is stored in ``StructUnit`` 
+    building blocks ``in a vacuum`` is stored in ``StructUnit``
     instances. Equally, manipulations of such data is also performed by
     those instances. Similarly, anything to do with topolgy should be 
     held by a ``Topology`` instance in the topology attribute. There is
@@ -845,6 +865,12 @@ class MacroMolecule(metaclass=CachedMacroMol):
     However, this is not intended use and is not guuranteed to work in 
     future implementations. If caching stops being implemented such code 
     would break.
+    
+    Optimization of structures of ``MacroMolecule`` instances is not
+    done by this class. This is because in order to run optimization
+    functions in parallel, they cannot be defined as methods. As a
+    result optimizations are implemented functionally in the
+    ``optimization.py`` module.
 
     Attributes
     ----------
@@ -853,7 +879,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
         the monomers forming the macromolecule. Only one ``StructUnit``
         instance is needed per monomer, even if multiples of a monomer 
         join up to form the macromolecule
-
 
     topology : A child class of ``Topology``
         Represents the topology of the macromolecule. Any information to 
@@ -911,8 +936,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         topology : A child class of ``Topology``
             The class which defines the topology of the macromolecule. 
             Such classes are defined in the topology module. The class 
-            will be a child class which inherits the base class 
-            ``Topology``.
+            will be a child class which inherits ``Topology``.
         
         prist_mol_file : str
             The full path of the ``.mol`` file where the macromolecule
@@ -981,7 +1005,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         -------
         networkx.Graph
             A graph where the nodes are the ids of the atoms in the
-            rdkit instance of the molecule and the edges are the bonds.
+            rdkit molecule and the edges are the bonds.
         
         """
         
@@ -1010,7 +1034,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             
         Returns
         -------
-        tuple of ints
+        tuple of floats
             The tuple represents the x, y and z coordinates of the atom,
             respectively.         
         
@@ -1034,7 +1058,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             
         Returns
         -------
-        tuple of ints
+        tuple of floats
             The tuple represents the x, y and z coordinates of the atom,
             respectively.         
         
