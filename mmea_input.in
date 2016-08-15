@@ -10,5 +10,5 @@ mutation_func random_bb database=C:\Users\lukas\Projects\MMEA\Database_prec\amin
 opt_func macromodel_opt macromodel_path=C:\Program~!~Files\Schrodinger2016-2
 
 pop_size 2
-num_generations 10
+num_generations 5
 num_mutations 1 

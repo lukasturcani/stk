@@ -479,7 +479,7 @@ class StructUnit(metaclass=Cached):
                                            self.heavy_mol_file)
         
         chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
-                          includeStereo=False, kekulize=False,
+                          includeStereo=True, kekulize=False,
                           forceV3000=True) 
 
         self.heavy_smiles = chem.MolToSmiles(self.heavy_mol, 
@@ -950,14 +950,14 @@ class MacroMolecule(metaclass=CachedMacroMol):
         self.topology.build()
         
         chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
-                          includeStereo=False, kekulize=False,
+                          includeStereo=True, kekulize=False,
                           forceV3000=True) 
                           
         # Use the assembled cage in the ``.mol`` files to generate
         # rdkit instances of the pristine and substituted cages and
         # their ``SMILES`` strings.
         chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
-                          includeStereo=False, kekulize=False,
+                          includeStereo=True, kekulize=False,
                           forceV3000=True) 
                                              
 
