@@ -1,6 +1,8 @@
 import os
 import numpy as np
 
+# More imports at the bottom of module.
+
 class Mutation:
     """
     Carries out mutations operations on a population.
@@ -35,7 +37,7 @@ class Mutation:
         corresponding values the function may require.
     
     num_mutations : int
-        The number of mutations thats need to be performed each
+        The number of mutations that needs to be performed each
         generation.
     
     n_calls : int
@@ -58,10 +60,10 @@ class Mutation:
         """
         Carries out mutation operations on the supplied population.
         
-        This function initially selects members of the population to
-        be mutated. These are then mutated. This goes on until
-        either all possible molecules have been mutated or the required
-        number of successful mutation operations have been performed.
+        This function selects members of the population to be mutated
+        and mutates them. This goes on until either all possible 
+        molecules have been mutated or the required number of successful 
+        mutation operations have been performed.
         
         The mutants generated are returned together in a ``Population`` 
         instance. Any molecules that are created as a result of mutation 
@@ -98,8 +100,8 @@ class Mutation:
                 if num_mutations == self.num_mutations:
                     break
 
-            except:
-                continue
+            except Exception as ex:
+                MacroMolError(ex, parent, 'Error during mutation.') 
 
         mutant_pop -= population
             
@@ -140,3 +142,4 @@ class Mutation:
         
 from ..population import Population
 from ..molecular import BuildingBlock, Linker, Cage, Polymer
+from ..exception import MacroMolError

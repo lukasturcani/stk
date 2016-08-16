@@ -4,7 +4,7 @@ from collections import Counter
 import shutil
 import os
 
-from ..classes import (Population, Cage, GATools, FourPlusSix,  
+from ...classes import (Population, Cage, GATools, FourPlusSix,  
                        BuildingBlock, Linker)
 from .test_struct_unit import get_mol_file
 
@@ -401,7 +401,7 @@ def test_write_population_to_dir():
     lk = Linker(lk_file)    
     building_blocks = (bb, lk)
     mol = Cage(building_blocks, FourPlusSix, 
-               'rdkit_optimization', 'you_can_delete_this3.mol')    
+               'you_can_delete_this3.mol')    
     pop = Population(mol)
     pop.write_population_to_dir(os.path.join(os.getcwd(), 
                                              'write_pop_test'))

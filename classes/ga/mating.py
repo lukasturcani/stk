@@ -1,5 +1,7 @@
 import os
 
+# More imports at the bottom of module.
+
 class Mating:
     """
     Carries out mating operations on the population.
@@ -34,7 +36,7 @@ class Mating:
         values the function may require.
     
     num_matings : int
-        The number of matings thats need to be performed each
+        The number of matings that need to be performed each
         generation.
     
     n_calls : int
@@ -58,10 +60,10 @@ class Mating:
         """
         Carries out mating operations on the supplied population.
         
-        This function initially selects members of the population to
-        be mated. The parents are then mated. This goes on until
-        either all possible parents have been mated or the required
-        number of successful mating operations have been performed.
+        This function selects members of the population and mates them
+        until either all possible parents have been mated or the 
+        required number of successful mating operations have been 
+        performed.
         
         The offspring generated are returned together in a 
         ``Population`` instance. Any molecules that are created as a 
@@ -106,9 +108,11 @@ class Mating:
                                 num_matings, self.num_matings))
                 if num_matings == self.num_matings:
                     break
-            except:
-                continue
-
+            except Exception as ex:
+                for i, parent in enumerate(parents):
+                    MacroMolError(ex, parent, 
+                    'Error during mating. Parent {0}.'.format(i))                
+                
         # Make sure that only original molecules are left in the 
         # offspring population.
         offspring_pop -= population
@@ -203,3 +207,4 @@ class Mating:
         
 from ..population import Population
 from ..molecular import BuildingBlock, Linker, Cage, Polymer
+from ..exception import MacroMolError
