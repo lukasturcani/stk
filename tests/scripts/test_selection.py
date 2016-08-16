@@ -1,7 +1,7 @@
 from operator import attrgetter
 
 from .test_population import generate_population
-from ..classes import GATools, Selection, FunctionData
+from ...classes import GATools, Selection, FunctionData
 
 labels = "abcdefghijklmnopqrstuvwxyz"
 # Make a population.

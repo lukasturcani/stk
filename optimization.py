@@ -6,6 +6,8 @@ import subprocess as sp
 from multiprocessing import Pool
 from functools import partial
 
+# More imports at the bottom of script.
+
 def optimize_all(func_data, population):
     """
     Apply optimization function to all population members in parallel.
@@ -119,55 +121,60 @@ def optimize_all_serial(func_data, population):
     for member in population:
         p_func(member)
 
-def update_prist_attrs_from_PDB(macro_mol, pdb_file):
+def update_prist_attrs_from_mol2(macro_mol):
     """
-    Replaces instance in `prist_mol` and content in `prist_mol_file`.
+    Replaces instance in `prist_mol` from the optimized ``.mol2`` file.
     
-    This function takes an ``.pdb`` file as input and uses the structure
-    within it to form a new rdkit molecule instance. This new rdkit 
-    molecule instance is placed in the `prist_mol` attribute of 
-    `macro_mol`.
+    This function uses a ``.mol2`` file's structure to form a new rdkit 
+    molecule instance. This new rdkit molecule instance is placed in the 
+    `prist_mol` attribute of `macro_mol`.
     
-    The function then creates a ``.mol`` file (V3000) which holds the
-    same data as the ``.pdb` file. This new ``.mol`` file replaces the
-    ``.mol`` file held in `prist_mol_file`. It is replaced literally,
-    with the old file being deleted and a new one with the same name
-    and path being put it its place. This means that the path in
-    `prist_mol_file` does not need to be changed. Only the structure 
-    that the file holds is replaced.
+    The ``.mol2`` file should be in the same location that the ``.mol``
+    file is. It is converted to a ``.mol`` file so that the ``.mol``
+    file in `prist_mol_file` holds the optimized structure.
+        
     
     Parameters
     ----------
     macro_mol : MacroMolecule
-        The macro_molecule who's pristine attributes are to be updated.
-        
-    pdb_file : str
-        The full path of the ``.pdb`` file used to update the pristine
-        attributes.
+        The macro_molecule who's `prist_mol` and `prist_mol_file` 
+        attributes are to be updated. Note that the `prist_mol_file`
+        attribute itself is not changed. Only the data in the file it
+        points to.
         
     Modifies
     --------
     macro_mol.prist_mol
         A new rdkit instance is placed in this attribute. The rdkit
-        instances holds the molecule described by the ``.pdb`` file.
-    
+        instances holds the molecule described by the ``.mol2`` file.
+        
     macro_mol.prist_mol_file's content
-        The content of the ``.mol`` file located at 
-        `macro_mol.prist_mol_file`, is changed so that it holds the same 
-        molecule as `pdb_file`.
+        The content in this ``.mol`` file is replaced with the structure
+        of the optimized molecule held in a ``.mol2`` file.
         
     Returns
     -------
     None : NoneType
     
     """
-    # Update the `prist_mol` attribute.
-    macro_mol.prist_mol = chem.MolFromPDBFile(pdb_file, removeHs=False)
     
-    # Update the content of the ``.mol`` file.
-    chem.MolToMolFile(macro_mol.prist_mol, macro_mol.prist_mol_file, 
-                      includeStereo=True, kekulize=False, 
-                      forceV3000=True)
+    # Get the name of the ``.mol2`` file. It should be in the same
+    # directory and have the same name as the ``.mol`` file. Only a
+    # different extension.
+    mol2 = macro_mol.prist_mol_file.replace('.mol', '.mol2')    
+    
+    # Update the `prist_mol` attribute.
+    print(os.path.isfile(mol2))
+    macro_mol.prist_mol = chem.MolFromMol2File(mol2, removeHs=False,
+                                              sanitize=False)
+
+#    try:
+#        chem.SanitizeMol(macro_mol.prist_mol)
+#    except Exception as ex:
+#        MacroMolError(ex, macro_mol, 'Sanitizing after optimization.')
+    
+    # Update content in ``prist_mol_file``.
+    macro_mol.write_mol_file('prist')
     
 def rdkit_optimization(macro_mol):
     """
@@ -209,8 +216,8 @@ def rdkit_optimization(macro_mol):
     ac.MMFFOptimizeMolecule(macro_mol.prist_mol)
     
     # Update the content of the ``.mol`` file.
-    chem.MolToMolFile(macro_mol.prist_mol, macro_mol.prist_mol_file, 
-                      includeStereo=True, kekulize=False, 
+    chem.MolToMolFile(macro_mol.prist_mol, macro_mol.prist_mol_file,
+                      includeStereo=True, kekulize=False,
                       forceV3000=True)
     
     macro_mol.optimized = True
@@ -293,14 +300,10 @@ def macromodel_opt(macro_mol,
     sp.run(opt_cmd, shell=True)
     
     # Get the ``.mae`` file output from the optimization and convert it
-    # to a ``.pdb`` file.
-    pdb_file = _convert_mae_to_pdb(macro_mol, macromodel_path)
+    # to a ``.mol2`` file.
+    _convert_mae_to_mol2(macro_mol, macromodel_path)
     
-
-    try:
-        update_prist_attrs_from_PDB(macro_mol, pdb_file) 
-    except Exception as ex:
-        print(ex)
+    update_prist_attrs_from_mol2(macro_mol) 
 
     # This command ensures that programs opened as a result of the 
     # optimization close. If this is not done after a population is
@@ -462,9 +465,9 @@ def _create_mae_file(macro_mol, macromodel_path):
     sp.call(convrt_cmd, shell=True)    
     return mae_file
 
-def _convert_mae_to_pdb(macro_mol, macromodel_path):
+def _convert_mae_to_mol2(macro_mol, macromodel_path):
     """
-    Converts a ``.mae`` file to a ``.pdb`` file.
+    Converts a ``.mae`` file to a ``.mol2`` file.
 
     This function is called by ``macromodel_opt``. It is private because
     it should probably not be used outside of this context.
@@ -473,7 +476,7 @@ def _convert_mae_to_pdb(macro_mol, macromodel_path):
     ----------
     macro_mol : MacroMolecule
         The macromolecule being optimized. The ``.mae`` file holding its
-        optimized structure is converted to a ``.pdb`` file. Both
+        optimized structure is converted to a ``.mol2`` file. Both
         versions are kept.
         
     macromodel_path : str
@@ -483,51 +486,48 @@ def _convert_mae_to_pdb(macro_mol, macromodel_path):
     
     Modifies
     --------    
-    This function creates a new ``.pdb`` file from the optimized 
+    This function creates a new ``.mol2`` file from the optimized 
     ``.mae`` file. This new file is placed in the same folder as the 
-    ``.mol`` file of the pristine molecule and has the same name. Only 
-    the extensions are different.
+    ``.mae`` file.
     
     Returns
     -------
-    str
-        The full path of the ``.pdb`` file created.
+    None : NoneType
     
     """
     
     # Replace extensions to get the names of the various files.
-    pdb = macro_mol.prist_mol_file.replace(".mol", ".pdb")
+    mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
     # ``out`` is the full path of the optimized ``.mae`` file.
     out = macro_mol.prist_mol_file.replace(".mol", 
                                                 "-out.maegz")
     
     # ``convrt_cmd`` is the command entered into the console for turning
-    # a ``.mae`` file to ``.pdb``. It consists of the path to the 
-    # program ``pdbconvert`` followed by the option ``-imae`` and then 
-    # the full path of the optimized ``.mae`` file. The option ``-opdb`` 
-    # specifies that the output should be a ``.pdb`` file. This option 
-    # is followed by the name of the ``.pdb`` file. On a Windows machine 
-    # the path must be placed in quotes and include the ``.exe`` 
-    # extension. Overall on a Windows and Unix machine the line should 
-    # look something like:
+    # a ``.mae`` file to ``.mol2``. It consists of the path to the 
+    # program ``structconvert`` followed by the option ``-imae`` and 
+    # then the full path of the optimized ``.mae`` file. The option 
+    # ``-omol2`` specifies that the output should be a ``.mol2`` file. 
+    # This option is followed by the name of the ``.mol2`` file. On a 
+    # Windows machine the path must be placed in quotes and include the 
+    # ``.exe`` extension. Overall on a Windows and Unix machine the line 
+    # should look something like:
     #   C:\\Program Files\\Schrodinger2016-2\\utilities\\...
-    #  ...pdbconvert.exe" -imae mol_file.mae -opdb mol_file.pdb
+    #  ...structconvert.exe" -imae mol_file.mae -omol2 mol_file.mol2
     # and
     #   $SCHRODINGER/utilities/structconvert -imae mol_file.mae... 
-    # ... -opdb mol_file.pdb
+    # ... -mol2 mol_file.mol2
     # respectively.    
     convrt_cmd = os.path.join(macromodel_path, 'utilities', 
-                                                          'pdbconvert')
+                                                     'structconvert')
     # For Windows systems add the ``.exe`` extension and encapsulate
     # path in quotes.
     if os.name == 'nt':
         convrt_cmd = '"' + convrt_cmd + '.exe"'                
-    convrt_cmd = convrt_cmd + " -imae " + out + " -opdb " + pdb
+    convrt_cmd = convrt_cmd + " -imae " + out + " -omol2 " + mol2
    
    # Execute the file conversion.
     sp.run(convrt_cmd, shell=True)
 
-    return pdb
 #        OPCD 1234567123456712345671234567 FFFFF.FFFF FFFFF.FFFF FFFFF.FFFF FFFFF.FFFF
 def _fix_params_in_com_file(macro_mol, main_string):
     """
@@ -801,4 +801,17 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     return fix_block
 
+def do_not_optimize(macro_mol):
+    """
+    Skips the optimization step.
+    
+    This is very useful when debugging so you do not waste your time
+    waiting for molecules to get optimized. Use this in the input file
+    in place of an optimization function when necessary.
+    
+    """
+    
+    return None
+    
 from .classes import FGInfo
+from .classes.exception import MacroMolError

@@ -1,4 +1,4 @@
-from ..classes import Polymer, Linker, BlockCopolymer
+from ...classes import Polymer, Linker, BlockCopolymer
 from .test_struct_unit import get_mol_file
 
 def test_init():
@@ -19,6 +19,7 @@ def test_init():
     building_blocks = (lk1, lk2, lk3, lk4)    
     
     polymer = Polymer(building_blocks, BlockCopolymer, 
-                      'rdkit_optimization', 'you_can_delete_this2.mol', 
-                      topology_args= ["AAABBACDABCDD"])
+                       'you_can_delete_this2.mol', 
+                      topology_args = ["AAABBACDABCDD"])
     
+    assert hasattr(polymer, 'optimized')

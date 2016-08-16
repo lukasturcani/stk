@@ -1,5 +1,5 @@
 from .test_struct_unit import get_mol_file
-from ..classes import Cage, FourPlusSix, BuildingBlock, Linker
+from ...classes import Cage, FourPlusSix, BuildingBlock, Linker
 
 
 
@@ -24,7 +24,7 @@ def test_init():
     bb = BuildingBlock(bb_file)
     lk = Linker(lk_file)    
     building_blocks = (bb, lk)
-    cage = Cage(building_blocks, FourPlusSix, 'rdkit_optimization', 
+    cage = Cage(building_blocks, FourPlusSix, 
                                             'you_can_delete_this.mol')
     
     assert hasattr(cage, 'prist_mol_file')
@@ -34,4 +34,4 @@ def test_init():
     assert hasattr(cage, 'prist_smiles')
     assert hasattr(cage, 'heavy_smiles')
     assert hasattr(cage, 'topology')
-    
+    assert hasattr(cage, 'optimized')
