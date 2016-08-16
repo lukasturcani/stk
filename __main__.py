@@ -85,13 +85,16 @@ for x in range(ga_input.num_generations):
     print('Adding offsping and mutants to population.')
     pop += offspring + mutants
     
+    print('Removing duplicates, if any.')    
+    pop.remove_duplicates()    
+    
     print('Optimizing population')
     pop.optimize_population()
     
     print('Selecting members of the next generation.')
     pop = Population(ga_tools, *(islice(pop.select('generational'),
                                         0, ga_input.pop_size)))
-
+    
     # Create a folder within a generational folder for the the ``.mol``
     # files corresponding to molecules selected for the next generation.
     # Place the ``.mol`` files into that folder.

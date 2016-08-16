@@ -1,7 +1,7 @@
 import os
 import rdkit
 
-from ..classes import StructUnit, FGInfo
+from ...classes import StructUnit, FGInfo
 
 
 

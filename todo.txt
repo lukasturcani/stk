@@ -1,5 +1,4 @@
--update all documentation, add missing tests
--implement storage of failed initializations/optimizations etc.
+-add missing tests (including : failure capture of macromolecules)
 -fix them
 -implement parallelisation
 -implement orientation
@@ -10,3 +9,10 @@
 -write developer's guide
 -write user's guide
 -make mating and mutation parallel
+-add more selection functions
+
+
+
+DONE!
+------------
+-implement storage of failed initializations/optimizations etc.

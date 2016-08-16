@@ -57,15 +57,13 @@ class Topology:
         and cannot be added to sets a result.
         
     """
-
     
     def __init__(self, macro_mol):
         self.macro_mol = macro_mol
         
-
     def build(self):
         """
-        Creates rdkit instances the heavy and pristine macromolecules.
+        Creates rdkit instances of heavy and pristine macromolecules.
         
         This function also places the created rdkit instances in the
         `prist_mol` and `heavy_mol` attributes of `self.macro_mol`.
@@ -166,6 +164,10 @@ class Topology:
         """
         Returns atom ids of heavy atoms, grouped by molecule.
         
+        This function is only usable during assembly. After assembly
+        all heavy atoms will be on the same molecule. This makes
+        grouping the heavy atoms by molecule somewhat nonsensical.
+        
         Parameters
         ----------
         molecules : iterable of iterables of ints
@@ -251,8 +253,10 @@ class Topology:
                                     x.heavy_atomic_num == atomic_num)                
                 atom.SetAtomicNum(target_atomic_num)
                 atom.UpdatePropertyCache()
-
-        chem.SanitizeMol(self.macro_mol.prist_mol)
+        
+        # Updating the property cache recalculates valencies. This means
+        # Hydrogen atoms are added in places where they are missing.
+        self.macro_mol.prist_mol.UpdatePropertyCache()
         self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol,
                                               addCoords=True)
 
@@ -693,6 +697,10 @@ class FourPlusSix(Topology):
         return chem.CombineMols(combined_mol3, combined_mol4)
  
 class EightPlusTwelve(FourPlusSix):
+    """
+    Defines a square-like topology.    
+    
+    """
     
     def place_bbs(self):
         cage_bb = next(x for x in self.macro_mol.building_blocks if 

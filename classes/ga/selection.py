@@ -17,17 +17,16 @@ class Selection:
     Each instance of this class supports being called. What a calling an
     instance does depends on the arguments the instance was initialized 
     with and what arguments were supplied during the call. In all cases
-    the call implements a selection algorithm on a ``Population`` 
-    instance.
+    the call implements returns a generator. This generator yields
+    members of a ``Population`` instance in accordance to some selection
+    algorithm.
     
-    During initialization the functions which the ``Selection`` instance
-    will use when called are defined. Initialization therefore takes the 
-    names of methods defined in this class (as strings) and saves them 
-    into the instance's `generational`, `mating` and `mutation` 
-    attributes. These attributes should therefore always hold the names 
-    of methods that are to be used for the given purpose - such as 
-    generational selection. The selection algorithms should be written 
-    as methods within this class.
+    Initialization of this class takes the names of methods defined in 
+    this class (as strings) and saves them into the instance's 
+    `generational`, `mating` and `mutation` attributes. These attributes 
+    should therefore always hold the names of methods that are to be 
+    used for the given purpose - such as generational selection. The 
+    selection algorithms should be written as methods within this class.
     
     When an instance of this class is called it requires a 
     ``Population`` instance and a string to be provided as arguments. 
@@ -36,18 +35,17 @@ class Selection:
         
         >>> pop.select('generational')
     
-    Here ``pop`` is a ``Population`` instance with a ``GATools`` 
+    Here ``pop`` is a ``Population`` instance with a `ga_tools` 
     attribute, which holds an initialized ``Selection`` instance.
     
     The method `select` invoked in the code automatically provides
-    the instance ``pop`` to its ``Selection`` instance, which is called 
-    by the method. This means that each time `select` is called on a 
-    population, the ``Selection`` instance will always act on the 
-    population it is held by. Different populations can use different 
-    selection algorithms by holding ``Selection`` instances initialized 
-    with different method names. (Note that a ``Population`` instance 
-    holds a ``Selection`` instance indirectly via its `ga_tools` 
-    attribute.)
+    the instance ``pop`` to the ``Selection`` instance it contains. The 
+    function then calls the ``Selection`` instance. This means that each 
+    time `select` is called on a population, the ``Selection`` instance 
+    will always act on the population it is held by. Different 
+    populations can use different selection algorithms by holding 
+    different ``Selection`` instances. Alternatively, they can perform
+    the same selection algorithms by sharing a ``Selection`` instance.
     
     The string provided to the `select` method is passed all the way
     down to the ``Selection`` instance being called. This is the second

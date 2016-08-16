@@ -11,9 +11,10 @@ import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
 from collections import namedtuple
+import types
 
-from ..convenience_functions import flatten
-
+from ..convenience_functions import flatten, periodic_table
+from .exception import MacroMolError
 
 class CachedMacroMol(type):
     """
@@ -760,7 +761,17 @@ class StructUnit(metaclass=Cached):
         
     def __hash__(self):
         return id(self)
-
+    
+    def __str__(self):
+        return self.prist_mol_file
+    
+    def __repr__(self):
+        repr_ =  "{0!r}".format(type(self))
+        repr_ = repr_.replace(">", 
+        ", prist_mol_file={0.prist_mol_file!r}>".format(self))
+        repr_ = repr_.replace("class ", "class=")
+        return repr_
+        
 class BuildingBlock(StructUnit):
     """
     Represents the building-blocks* of a cage.
@@ -927,6 +938,13 @@ class MacroMolecule(metaclass=CachedMacroMol):
         """
         Initialize a ``MacroMolecule`` instance.
         
+        The initialization is exectued inside a try block. This allows
+        error handling for cases where cage initialization failed for
+        some reason. In this case, when an exception occurs during
+        initialization all the parameters which were provided to the 
+        initializer are saved to a file ``failures.txt`` which should
+        be located in the same directory as the ``output`` folder.
+        
         Parameters
         ---------
         building_blocks : list of ``StructUnit`` instances
@@ -948,6 +966,21 @@ class MacroMolecule(metaclass=CachedMacroMol):
             
         """
         
+        try:
+            self._std_init(building_blocks, topology, prist_mol_file, 
+                                 topology_args)
+            
+        except Exception as ex:
+            dummy = types.SimpleNamespace()
+            dummy.building_blocks = building_blocks
+            dummy.topology = topology
+            dummy.prist_mol_file = prist_mol_file
+            dummy.topology_args = topology_args
+            MacroMolError(ex, dummy, 'During initialization.')
+                
+    def _std_init(self, building_blocks, topology, prist_mol_file, 
+                 topology_args):
+            
         if topology_args is None:
             topology_args = []
 
@@ -958,8 +991,12 @@ class MacroMolecule(metaclass=CachedMacroMol):
         self.building_blocks = tuple(building_blocks)
 
         # A ``Topology`` subclass instance must be initiazlied with a 
-        # copy of the cage it is describing.        
+        # copy of the cage it is describing.     
         self.topology = topology(self, *topology_args)
+        # The topology_args attribute is saved for error handling. See
+        # MacroMolError class.
+        self.topology_args = topology_args
+        
         self.prist_mol_file = prist_mol_file
         
         # This generates the name of the heavy ``.mol`` file by adding
@@ -973,16 +1010,12 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # linkers joined up. Both the substituted and pristine versions.
         self.topology.build()
         
-        chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
-                          includeStereo=True, kekulize=False,
-                          forceV3000=True) 
-                          
+        self.write_mol_file('prist')
+        
         # Use the assembled cage in the ``.mol`` files to generate
         # rdkit instances of the pristine and substituted cages and
         # their ``SMILES`` strings.
-        chem.MolToMolFile(self.prist_mol, self.prist_mol_file,
-                          includeStereo=True, kekulize=False,
-                          forceV3000=True) 
+        self.write_mol_file('heavy')
                                              
 
         
@@ -996,6 +1029,70 @@ class MacroMolecule(metaclass=CachedMacroMol):
         self.optimized = False
         self.random_fitness()
 
+    def write_mol_file(self, rdkit_mol_type):
+        
+        if rdkit_mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            get_atom_coords = self.prist_get_atom_coords
+            file_name = self.prist_mol_file
+
+        elif rdkit_mol_type == 'heavy':
+            rdkit_mol= self.heavy_mol
+            get_atom_coords = self.heavy_get_atom_coords
+            file_name = self.heavy_mol_file
+
+        else:
+            raise ValueError(("The argument `rdkit_mol_type` must be "
+                              "either 'prist' or 'heavy'."))
+    
+        main_string = ("\n"
+                       "     RDKit          3D\n"
+                       "\n"
+                       "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
+                       "M  V30 BEGIN CTAB\n"
+                       "M  V30 COUNTS {0} {1} 0 0 0\n"
+                       "M  V30 BEGIN ATOM\n"
+                       "!!!ATOM!!!BLOCK!!!HERE!!!\n"
+                       "M  V30 END ATOM\n"
+                       "M  V30 BEGIN BOND\n"
+                       "!!!BOND!!!BLOCK!!!HERE!!!\n"
+                       "M  V30 END BOND\n"
+                       "M  V30 END CTAB\n"
+                       "M  END\n")
+
+        # id atomic_symbol x y z
+        atom_line = "M  V30 {0} {1} {2:.4f} {3:.4f} {4:.4f} 0\n"
+        atom_block = ""        
+        
+        # id bond_order atom1 atom2
+        bond_line = "M  V30 {0} {1} {2} {3}\n"
+        bond_block = ""
+        
+        
+        main_string = main_string.format(rdkit_mol.GetNumAtoms(),
+                                         rdkit_mol.GetNumBonds())
+                                         
+        for atom in rdkit_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_sym = periodic_table[atom.GetAtomicNum()]
+            x, y, z = get_atom_coords(atom_id)
+            atom_block += atom_line.format(atom_id+1, atom_sym, x, y, z)
+            
+        for bond in rdkit_mol.GetBonds():
+            bond_id = bond.GetIdx()
+            atom1_id = bond.GetBeginAtomIdx() + 1
+            atom2_id = bond.GetEndAtomIdx() + 1
+            bond_order = int(bond.GetBondTypeAsDouble())
+            bond_block += bond_line.format(bond_id, bond_order, 
+                                           atom1_id, atom2_id)
+
+        main_string = main_string.replace("!!!ATOM!!!BLOCK!!!HERE!!!\n",
+                                          atom_block)
+        main_string = main_string.replace("!!!BOND!!!BLOCK!!!HERE!!!\n",
+                                          bond_block)
+        
+        with open(file_name, 'w') as f:
+            f.write(main_string)
 
     def get_heavy_as_graph(self):
         """

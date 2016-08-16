@@ -2,7 +2,7 @@ import networkx as nx
 import rdkit.Chem as chem
 import rdkit
 
-from ..classes import BuildingBlock, Linker, MacroMolecule, FourPlusSix, FGInfo
+from ...classes import BuildingBlock, Linker, MacroMolecule, FourPlusSix, FGInfo
 from .test_struct_unit import get_mol_file
 
 bb_file = next(x for x in get_mol_file() 
