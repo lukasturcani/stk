@@ -1,0 +1,6 @@
+\contentsline {section}{\numberline {1}Document description}{2}
+\contentsline {section}{\numberline {2}Program overview}{2}
+\contentsline {section}{\numberline {3}Design goals}{2}
+\contentsline {section}{\numberline {4}Class overview}{2}
+\contentsline {section}{\numberline {5}Style guide}{2}
+\contentsline {section}{\numberline {6}Extending MMEA}{2}
