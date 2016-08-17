@@ -6,6 +6,7 @@ import subprocess as sp
 from multiprocessing import Pool
 from functools import partial
 
+
 # More imports at the bottom of script.
 
 def optimize_all(func_data, population):
@@ -164,14 +165,7 @@ def update_prist_attrs_from_mol2(macro_mol):
     mol2 = macro_mol.prist_mol_file.replace('.mol', '.mol2')    
     
     # Update the `prist_mol` attribute.
-    print(os.path.isfile(mol2))
-    macro_mol.prist_mol = chem.MolFromMol2File(mol2, removeHs=False,
-                                              sanitize=False)
-
-#    try:
-#        chem.SanitizeMol(macro_mol.prist_mol)
-#    except Exception as ex:
-#        MacroMolError(ex, macro_mol, 'Sanitizing after optimization.')
+    macro_mol.prist_mol = mol_from_mol2_file(mol2)
     
     # Update content in ``prist_mol_file``.
     macro_mol.write_mol_file('prist')
@@ -303,8 +297,12 @@ def macromodel_opt(macro_mol,
     # to a ``.mol2`` file.
     _convert_mae_to_mol2(macro_mol, macromodel_path)
     
-    update_prist_attrs_from_mol2(macro_mol) 
-
+    try:
+        update_prist_attrs_from_mol2(macro_mol) 
+    except Exception as ex:
+        MacroMolError(ex, macro_mol, 
+        'During ``update_prist_attrs_from_mol2`` call.')
+        
     # This command ensures that programs opened as a result of the 
     # optimization close. If this is not done after a population is
     # optimized, it is often the case the folders containing it cannot 
@@ -815,3 +813,4 @@ def do_not_optimize(macro_mol):
     
 from .classes import FGInfo
 from .classes.exception import MacroMolError
+from .convenience_functions import mol_from_mol2_file

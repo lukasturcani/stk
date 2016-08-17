@@ -6,6 +6,7 @@ import weakref
 import rdkit
 from rdkit import Chem as chem
 from rdkit.Chem import AllChem as ac
+import rdkit.Geometry.rdGeometry as rdkit_geo
 from copy import deepcopy
 import os
 import networkx as nx
@@ -240,7 +241,7 @@ class StructUnit(metaclass=Cached):
     in MMEA (such as during the assembly of macromolecules - see the 
     `place_mols` documentation of the ``Topolgy`` class) and is 
     generally very useful. Similar methods such as 
-    `set_heavy_mol_position` may be added in the future. Refer to the 
+    `set_heavy_mol_position` are also implemented. Refer to the 
     documentation of `shift_heavy_mol` for more details. Note that 
     this paragraph is not an exhaustive list of useful operations.
     
@@ -378,8 +379,13 @@ class StructUnit(metaclass=Cached):
         was substituted in the pristine molecule and which atom was 
         substituted for which. Furthermore, it also holds the atomic 
         numbers of the atom which was substitued and the one used in its 
-        palce. For details on how this information is stored see the 
+        place. For details on how this information is stored see the 
         ``FGInfo`` class string.
+        
+    heavy_ids : list of ints
+        A list holding the atom ids of the substituted atoms in the 
+        heavy molecule. The id correspond to the id in the rkdit 
+        molecule.
     
     """
     
@@ -439,6 +445,8 @@ class StructUnit(metaclass=Cached):
         self.func_grp = next((x for x in 
                                 FGInfo.functional_group_list if 
                                 x.name in prist_mol_file), None)
+        
+        self.heavy_ids = []        
         
         # Calling this function generates all the attributes assciated
         # with the molecule the functional group has been subtituted
@@ -612,8 +620,7 @@ class StructUnit(metaclass=Cached):
             new_z = atom_position.z + z
             
             # Creating a new geometry instance.
-            new_coords = rdkit.Geometry.rdGeometry.Point3D(new_x, 
-                                                           new_y, new_z)            
+            new_coords = rdkit_geo.Point3D(new_x, new_y, new_z)            
             
             # Changes the position of the atom in the conformer to the
             # values stored in the new geometry instance.
@@ -633,10 +640,155 @@ class StructUnit(metaclass=Cached):
         new_heavy.RemoveAllConformers()
         new_heavy.AddConformer(conformer)
         return new_heavy        
+
+    def set_heavy_mol_position(self, position):
+        """
+        Returns rdkit instance of heavy building block at `position`. 
         
+        This method translates the heavy building block molecule so that
+        its centroid is on the point `position`.
+        
+        Unlike `shift_heavy_mol` this method does change the original
+        rdkit molecule found in `heav_mol`. A copy is NOT created. This
+        method does not change the ``.mol`` file however.
+        
+        Parameters
+        ----------
+        position : numpy.array
+            This array holds the position on which the heavy building 
+            block should be placed.
+            
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed so that the
+            centroid falls on `position`.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance which has a centroid placed at 
+            `position`.
+        
+        """
+        
+        centroid = self.get_heavy_centroid()
+        shift = centroid - position
+        new_conf = self.shift_heavy_mol(shift).GetConformer()
+
+        self.heavy_mol.RemoveAllConformers()
+        self.heavy_mol.AddConformer(new_conf)
+        
+        return self.heavy_mol
+
+    def rotate_heavy_mol(self, x, y , z):
+        """
+        Rotates the building block about its centroid.
+        
+        This method rotates the heavy building block molecule about the 
+        x, y and z exes by `x`, `y` and `z`, respectively. The rotation
+        is centered on the centroid.
+        
+        Unlike `shift_heavy_mol` this method does change the original
+        rdkit molecule found in `heav_mol`. A copy is NOT created. This
+        method does not change the ``.mol`` file however.
+        
+        Parameters
+        ----------
+        x : float
+            The size of the rotation about the x-axis in radians.
+            
+        y : float
+            The size of the rotation about the y-axis in radians.
+            
+        z : float
+            The size of the rotation about the z-axis in radians.
+            
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed so that the
+            all atomic positions are rotated about the centroid by `x`, 
+            `y`, and `z`.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance which has a centroid placed at 
+            `position`.
+        
+        References
+        ----------
+        The matrix equation used for the 3D rotation matrix was taken
+        from:
+            
+            http://web.mit.edu/2.05/www/Handout/HO2.PDF
+            
+            Date accessed: 17/08/2016
+        
+        """
+        
+        e11 = np.cos(z)*np.cos(y)     
+        e12 = np.cos(z)*np.sin(y)*np.sin(x) - np.sin(z)*np.cos(x)
+        e13 = np.cos(z)*np.sin(y)*np.cos(x) + np.sin(z)*np.sin(x)
+        
+        e21 = np.sin(z)*np.cos(y)
+        e22 = np.sin(z)*np.sin(y)*np.sin(x) + np.cos(z)*np.cos(x)
+        e23 = np.sin(z)*np.sin(y)*np.cos(x) - np.cos(z)*np.sin(x)
+
+        e31 = -np.sin(y)
+        e32 = np.cos(y)*np.sin(x)
+        e33 = np.cos(y)*np.cos(x)
+        
+        rot_mat = np.array([[e11,e12,e13],
+                            [e21,e22,e23],
+                            [e31,e32,e33]])
+
+        conf = self.heavy_mol.GetConformer()        
+        
+        for atom in self.heavy_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            x, y, z = self.get_heavy_atom_coords(atom_id)
+            pos_vector = np.array([x,y,z])
+            
+            new_pos = np.dot(rot_mat, pos_vector)
+            conf.SetAtomPosition(atom_id, rdkit_geo.Point3D(*new_pos))
+
+
+    def get_heavy_centroid(self):
+        """
+        Returns the centroid of the heavy rdkit molecule.
+
+        Returns
+        -------
+        numpy.array
+            A numpy array holding the position of the centroid.
+        
+        """
+        
+        coord_num = self.heavy_mol.GetNumAtoms()
+        x_sum = 0
+        y_sum = 0
+        z_sum = 0
+        for x, y, z in self.get_heavy_coords():
+            x_sum += x
+            y_sum += y
+            z_sum += z
+        
+        centroid = np.array([x_sum, y_sum, z_sum]) 
+
+        return np.divide(centroid, coord_num)
+
+    def get_heavy_atom_coords(self, atom_id):
+        conf = self.heavy_mol.GetConformer()
+        atom_position = conf.GetAtomPosition(atom_id)
+        return atom_position.x, atom_position.y, atom_position.z
+
     def get_heavy_coords(self):
         """
         Yields the x, y and z coordinates of atoms in `heavy_mol`.        
+
+        This yields the coordinates of every atom.
 
         The `heavy_mol` attribute holds a ``rdkit.Chem.rdchem.Mol``
         instance. This instance holds holds a 
@@ -697,6 +849,8 @@ class StructUnit(metaclass=Cached):
             atom = self.heavy_mol.GetAtomWithIdx(atom_id)
             if atom.GetAtomicNum() == self.func_grp.target_atomic_num:            
                 atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
+                self.heavy_ids.append(atom_id)
+                
                 del_ids.extend(self._delete_tag_ids(atom))
                 for n in atom.GetNeighbors():
                     if n.GetAtomicNum() == 1:
@@ -752,7 +906,7 @@ class StructUnit(metaclass=Cached):
                     break
         
         return del_ids
-                
+           
     def __eq__(self, other):
         return self.prist_mol_file == other.prist_mol_file
         
@@ -786,7 +940,67 @@ class Linker(StructUnit):
     
     """
     
-    pass
+    def set_heavy_mol_orientation(self, direction):
+        """
+        Returns a rdkit instance orientated along `direction`.
+        
+        This method rotates the heavy linker molecule about its centroid
+        until the heavy atoms are aligned with the vector described by 
+        `direction`.  In other words, the directional between the two 
+        heavy atoms in the linker is made equal to the vector in 
+        `direction`, using only rotation.
+
+        Unlike `shift_heavy_mol` this method does change the original
+        rdkit molecule found in `heav_mol`. A copy is NOT created. This
+        method does not change the ``.mol`` file however.
+        
+        Parameters
+        ----------
+        direction : numpy.array
+            This array holds the directional vector along which the 
+            heavy atoms in the linker should be placed.
+            
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed so that the
+            the vector between the 2 heavy atoms has the same direction
+            as  `direction`.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance which is rotated so that the 2 
+            heavy atoms have their directional vector aligned with
+            `direction`.
+        
+        """
+    
+        heavy_dir = self.get_heavy_direction_vector()
+        
+        numerator = np.dot(heavy_dir, direction)
+        denominator = (np.linalg.norm(heavy_dir) * 
+                        np.linalg.norm(direction))
+        
+        theta = np.arccos(numerator/denominator)
+        
+        
+    
+    def get_heavy_direction_vector(self):
+        """
+        
+        """
+        
+        pos_vects = []
+        for atom_id in self.heavy_ids:
+            x,y,z = self.get_heavy_atom_coords(atom_id)
+            pos_vects.append(np.array([x,y,z]))
+        
+        p1, p2 = pos_vects
+        
+        return p1 - p2
+        
+
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):
@@ -1009,15 +1223,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # creates the cage's ``.mol`` file all  the building blocks and
         # linkers joined up. Both the substituted and pristine versions.
         self.topology.build()
-        
-        self.write_mol_file('prist')
-        
-        # Use the assembled cage in the ``.mol`` files to generate
-        # rdkit instances of the pristine and substituted cages and
-        # their ``SMILES`` strings.
-        self.write_mol_file('heavy')
-                                             
+    
 
+        # Write the ``.mol`` files and create the ``SMILES`` strings.
+        self.write_mol_file('prist')
+        self.write_mol_file('heavy')
         
         self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
                                              isomericSmiles=True, 
@@ -1030,6 +1240,44 @@ class MacroMolecule(metaclass=CachedMacroMol):
         self.random_fitness()
 
     def write_mol_file(self, rdkit_mol_type):
+        """
+        Writes a V3000 ``.mol`` file of the macromolecule.
+
+        The heavy or pristine molecule can be written via the argument
+        `rdkit_mol_type`. The molecule is written to the location in the
+        `prist_mol_file`/`heavy_mol_file` attribute. The function uses
+        the structure of the rdkit molecules held in the `prist_mol` and
+        `heavy_mol` attributes as the basis for what is written to the
+        file.
+
+        Parameters
+        ----------
+        rdkit_mol_type : str
+            Allowed values for this parameter 'prist' and 'heavy'.
+        
+        Modifies
+        --------
+        prist_mol_file's content
+            If the string 'prist' was passed, the content in this
+            ``.mol`` file will be replaced with the structure of the 
+            current rdkit molecule in `prist_mol`.
+            
+        heavy_mol_file's content
+            If the string 'heavy' was passed, the content in this
+            ``.mol`` file will be replaced with the structure of the 
+            current rdkit molecule in `heavy_mol`.
+                
+        Returns
+        -------
+        None : NoneType
+        
+        Raises
+        ------
+        ValueError
+            If the `rdkit_mol_type` value is not either 'prist' or 
+            'heavy'.
+        
+        """
         
         if rdkit_mol_type == 'prist':
             rdkit_mol = self.prist_mol
@@ -1058,7 +1306,9 @@ class MacroMolecule(metaclass=CachedMacroMol):
                        "!!!BOND!!!BLOCK!!!HERE!!!\n"
                        "M  V30 END BOND\n"
                        "M  V30 END CTAB\n"
-                       "M  END\n")
+                       "M  END\n"
+                       "\n"
+                       "$$$$\n")
 
         # id atomic_symbol x y z
         atom_line = "M  V30 {0} {1} {2:.4f} {3:.4f} {4:.4f} 0\n"
