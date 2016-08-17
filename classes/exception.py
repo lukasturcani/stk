@@ -72,7 +72,7 @@ class MacroMolError(Exception):
         self.macro_mol = macro_mol
         self.notes = notes
         self.write_to_file()
-        print('MacroMolError written to file.')
+        print('MacroMolError written to ``failures.txt``.')
         
     def write_to_file(self):
         """
