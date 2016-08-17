@@ -7,6 +7,11 @@ from functools import partial
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..convenience_functions import flatten
 
+class Edge:
+    def __init__(position, direction):
+        self.position = position
+        self.direction = direction
+
 class Topology:
     """
     Represents the topology of an assembled molecule.
