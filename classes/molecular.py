@@ -673,13 +673,49 @@ class StructUnit(metaclass=Cached):
         """
         
         centroid = self.get_heavy_centroid()
-        shift = centroid - position
-        new_conf = self.shift_heavy_mol(shift).GetConformer()
+        shift = position - centroid
+        new_conf = self.shift_heavy_mol(*shift).GetConformer()
 
         self.heavy_mol.RemoveAllConformers()
         self.heavy_mol.AddConformer(new_conf)
         
         return self.heavy_mol
+
+    def get_heavy_mol_position_matrix(self):
+        """
+        Returns position of all atoms in heavy molecule as numpy matrix. 
+        
+        Returns
+        -------
+        numpy.matrix
+            A matrix where the rows are the x, y and z coordinates from
+            top to bottom and the columns are the positions of each atom
+            in the heavy molecule.
+        
+        """
+
+        pos_mat = np.matrix([])
+
+        for atom in self.heavy_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            pos_vect = np.array([*self.get_heavy_atom_coords(atom_id)])
+            pos_mat = np.insert(pos_mat, [0, 0, 0], pos_vect)
+
+        pos_mat = pos_mat.reshape(-1, 3)
+
+        return pos_mat.T
+
+    def set_heavy_mol_from_position_matrix(self, pos_mat):
+        
+        conf = self.heavy_mol.GetConformer()
+        for i, coord_mat in enumerate(pos_mat.T):
+            coord = rdkit_geo.Point3D(coord_mat.item(0), 
+                                      coord_mat.item(1), 
+                                      coord_mat.item(2))
+            conf.SetAtomPosition(i, coord)
+            
+    
+        
 
     def rotate_heavy_mol(self, x, y , z):
         """
@@ -687,7 +723,9 @@ class StructUnit(metaclass=Cached):
         
         This method rotates the heavy building block molecule about the 
         x, y and z exes by `x`, `y` and `z`, respectively. The rotation
-        is centered on the centroid.
+        is centered on the centroid. A positive value for the rotation
+        angle corresponds to an anti-clockwise rotation, given that the
+        rotation axis is pointing ``out of the page``.
         
         Unlike `shift_heavy_mol` this method does change the original
         rdkit molecule found in `heav_mol`. A copy is NOT created. This
@@ -753,8 +791,7 @@ class StructUnit(metaclass=Cached):
             
             new_pos = np.dot(rot_mat, pos_vector)
             conf.SetAtomPosition(atom_id, rdkit_geo.Point3D(*new_pos))
-
-
+    
     def get_heavy_centroid(self):
         """
         Returns the centroid of the heavy rdkit molecule.
@@ -779,10 +816,15 @@ class StructUnit(metaclass=Cached):
 
         return np.divide(centroid, coord_num)
 
+    def get_prist_atom_coords(self, atom_id):
+        conf = self.prist_mol.GetConformer()
+        atom_position = conf.GetAtomPosition(atom_id)
+        return tuple([*atom_position])
+
     def get_heavy_atom_coords(self, atom_id):
         conf = self.heavy_mol.GetConformer()
         atom_position = conf.GetAtomPosition(atom_id)
-        return atom_position.x, atom_position.y, atom_position.z
+        return tuple([*atom_position])
 
     def get_heavy_coords(self):
         """
@@ -815,8 +857,8 @@ class StructUnit(metaclass=Cached):
         # conformers `GetAtomPosition` method with the atom's id.
         for atom in self.heavy_mol.GetAtoms():        
             atom_position = conformer.GetAtomPosition(atom.GetIdx())
-            yield atom_position.x, atom_position.y, atom_position.z
-  
+            yield atom_position.x, atom_position.y, atom_position.z  
+
     def _make_atoms_heavy_in_heavy(self):
         """
         Converts functional group in `heavy_mol` to substituted version.
@@ -933,6 +975,11 @@ class BuildingBlock(StructUnit):
     """
     
     pass
+
+def z_rot_mat(gamma):
+    return np.matrix([[np.cos(gamma), -np.sin(gamma), 0],
+                      [np.sin(gamma), np.cos(gamma), 0],
+                      [0, 0, 1]])
         
 class Linker(StructUnit):
     """
@@ -975,14 +1022,51 @@ class Linker(StructUnit):
             `direction`.
         
         """
+
+        
+        og_centroid = self.get_heavy_centroid()
+        
+        # Shift the centroid to the origin so that rotation axis passes
+        # through the origin.
+
+        self.set_heavy_mol_position(np.array([0,0,0]))
+
+        # Get the rotation axis.
+        rot_axis = np.cross(self.get_heavy_direction_vector(), 
+                            direction)
+                            
     
-        heavy_dir = self.get_heavy_direction_vector()
         
-        numerator = np.dot(heavy_dir, direction)
-        denominator = (np.linalg.norm(heavy_dir) * 
-                        np.linalg.norm(direction))
+        # Rotate space around z axis so that rotation axis lies on the 
+        # xz plane.
         
-        theta = np.arccos(numerator/denominator)
+        end_axis = np.array([rot_axis[0], 0 , rot_axis[2]])
+        
+        theta = self.get_heavy_theta(end_axis)
+
+        self.rotate_heavy_mol(0, 0, theta)
+
+#        pos_mat = self.get_heavy_mol_position_matrix()
+#        pos_mat = np.dot(z_rot_mat(theta), pos_mat)
+#        self.set_heavy_mol_from_position_matrix(pos_mat)
+#        print(np.cross(self.get_heavy_direction_vector(), 
+#                            direction))
+        
+#        pos_mat = self.get_heavy_mol_position_matrix()
+        
+        #        
+
+#        translation_mat = np.matrix([[1, 0, 0], [], [], []])
+#        
+#        
+#    
+#        heavy_dir = self.get_heavy_direction_vector()
+#        
+#        numerator = np.dot(heavy_dir, direction)
+#        denominator = (np.linalg.norm(heavy_dir) * 
+#                        np.linalg.norm(direction))
+#        
+#        theta = np.arccos(numerator/denominator)
         
         
     
@@ -1000,6 +1084,17 @@ class Linker(StructUnit):
         
         return p1 - p2
         
+
+    def get_heavy_theta(self, direction):
+        heavy_vect = self.get_heavy_direction_vector()
+        
+        numerator = np.dot(heavy_vect, direction)
+        denominator = (np.linalg.norm(heavy_vect) * 
+                        np.linalg.norm(direction))
+        
+        return np.arccos(numerator/denominator)
+
+                
 
 
 @total_ordering

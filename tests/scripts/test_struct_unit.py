@@ -2,7 +2,7 @@ import os
 import rdkit
 
 from ...classes import StructUnit, FGInfo
-
+from ...convenience_functions import flatten
 
 
 
@@ -170,12 +170,32 @@ def test_aldehyde_substitution():
     print(mol.heavy_smiles)
     assert mol.heavy_smiles == exp_smiles
     
+def test_make_atoms_heavy_in_heavy():
+    """
+    This test might need more assert statements.
     
+    """
     
+    bb_file = next(x for x in get_mol_file() 
+                                    if 'test_rot_amine.mol' in x)
+    lk_file = next(x for x in get_mol_file() 
+                                    if 'aldehyde2f_3.mol' in x) 
+
+    bb = StructUnit(bb_file)
+    lk = StructUnit(lk_file)
     
+    # Test that the position of the substituted atoms remains the same.
+        
+    i = 0
+    for atom_id in flatten(bb.find_functional_group_atoms()):
+        atom = bb.prist_mol.GetAtomWithIdx(atom_id)
+        if atom.GetAtomicNum() == bb.func_grp.target_atomic_num:
+            prist_coord = bb.get_prist_atom_coords(atom_id)
+            heavy_coord = bb.get_heavy_atom_coords(bb.heavy_ids[i])
+            assert prist_coord == heavy_coord
+            i += 1
     
-    
-    
+
     
     
     
