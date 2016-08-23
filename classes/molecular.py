@@ -874,7 +874,7 @@ class StructUnit(metaclass=Cached):
         self.heavy_mol.RemoveAllConformers()
         self.heavy_mol.AddConformer(new_conf)
         
-        return self.heavy_mol        
+        return chem.Mol(self.heavy_mol)        
 
 
     def get_prist_atom_coords(self, atom_id):
@@ -1037,11 +1037,6 @@ class BuildingBlock(StructUnit):
     
     pass
 
-def z_rot_mat(gamma):
-    return np.matrix([[np.cos(gamma), -np.sin(gamma), 0],
-                      [np.sin(gamma), np.cos(gamma), 0],
-                      [0, 0, 1]])
-        
 class Linker(StructUnit):
     """
     Represents the linkers of a cage.
@@ -1092,11 +1087,11 @@ class Linker(StructUnit):
         
         rot_mat = rotation_matrix(self.heavy_direction_vector(), 
                                   direction)
-        print(np.dot(rot_mat, self.heavy_direction_vector()))
-        print(direction)
         new_pos_mat = np.dot(rot_mat, self.heavy_mol_position_matrix())
         self.set_heavy_mol_from_position_matrix(new_pos_mat)
         self.set_heavy_center(og_center)
+        
+        return chem.Mol(self.heavy_mol)
     
     def heavy_direction_vector(self):
         """

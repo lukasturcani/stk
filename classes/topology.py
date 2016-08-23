@@ -3,14 +3,44 @@ from rdkit import Chem as chem
 from rdkit.Chem import AllChem as ac
 import networkx as nx
 from functools import partial
+import numpy as np
+import itertools
 
 from .molecular import FGInfo, BuildingBlock, Linker
-from ..convenience_functions import flatten
+from ..convenience_functions import flatten, normalize_vector
+
+class Vertex:
+
+    __slots__ = ['x', 'y', 'z', 'coord']    
+    
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.coord = np.array([x,y,z])
+        
+    def place_mol(self, struct_unit):
+        return struct_unit.set_heavy_center(self.coord)
 
 class Edge:
-    def __init__(position, direction):
-        self.position = position
-        self.direction = direction
+    
+    __slots__ = ['v1', 'v2', 'coord', 'direction']    
+    
+    def __init__(self, v1, v2):
+        self.v1 = v1
+        self.v2 = v2
+        self.coord = np.divide(np.add(v1.coord, v2.coord), 2)
+        self.direction = normalize_vector(v1.coord - v2.coord)
+        
+    def place_mol(self, linker):
+        """
+        
+        """
+        
+        linker.set_heavy_center(self.coord)
+        return linker.set_heavy_mol_orientation(self.coord)
+        
+        
 
 class Topology:
     """
@@ -604,6 +634,13 @@ class FourPlusSix(Topology):
         
     """
     
+    vertices = [Vertex(0,0,0), Vertex(50,50,0), 
+                Vertex(50,0,0), Vertex(0,50,0)]
+    edges = [Edge(vertices[0], vertices[2]), 
+             Edge(vertices[0], vertices[3]),
+             Edge(vertices[1], vertices[2]),
+             Edge(vertices[1], vertices[3]),]    
+    
     def __init__(self, macro_mol):
         super().__init__(macro_mol)        
         self.pair_up = self.pair_up_diff_element_atoms
@@ -614,7 +651,7 @@ class FourPlusSix(Topology):
 
         The building block molecules are placed in their appropriate 
         positions based on the topology. This means that the 
-        building-blocks* are placed on vertices and linkers on edges. #
+        building-blocks* are placed on vertices and linkers on edges.
         This function only places the molecules, it does not join them. 
         It saves the structure a rdkit molecule instance for later use. 
         This rdkit instace is placed in the `heavy_mol` attribute of the 
@@ -628,78 +665,23 @@ class FourPlusSix(Topology):
         
         """
         
-        # Building-blocks* and linkers have different rules for 
-        # placement so each is treated by its own function.
-        bb_placement = self.place_bbs()
-        lk_placement = self.place_lks()
-        self.macro_mol.heavy_mol = chem.CombineMols(bb_placement, 
-                                                   lk_placement) 
-
-    def place_bbs(self):
-        """
-        Places all building-blocks* on their appropriate coordinates.
+        self.macro_mol.heavy_mol = chem.Mol()
         
-        This function creates a new rdkit molecule made up of 4
-        building-block* molecules. Each of the building-block* molecules
-        is placed on the vertex of a tetrahedron. The molecules are held
-        within the same rdkit molecule instance but are otherwise 
-        unconnected.
-        
-        Returns
-        -------
-        rdkit.Chem.rdchem.Mol
-            An rdkit molecule which is made up of the building-block*
-            molecules all placed on the vertices of a tetrahedron. The
-            individual molecules are unconnected.
-        
-        """
-        cage_bb = next(x for x in self.macro_mol.building_blocks if 
-                                        isinstance(x, BuildingBlock))
-
-        position1 = cage_bb.shift_heavy_mol(0,50,0)
-        position2 = cage_bb.shift_heavy_mol(0,0,25)
-        position3 = cage_bb.shift_heavy_mol(25,0,-25)
-        position4 = cage_bb.shift_heavy_mol(-25,0,-25)
-
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)
-        return chem.CombineMols(combined_mol, combined_mol2)       
-        
-    def place_lks(self):
-        """
-        Places all linkers on their appropriate coordinates.
-
-        This function creates a new rdkit molecule made up of 6 linker
-        molecules. Each of the linker molecules is placed on the edge of 
-        a tetrahedron. The molecules are held within the same rdkit 
-        molecule instance but are otherwise unconnected.
-        
-        Returns
-        -------
-        rdkit.Chem.rdchem.Mol
-            An rdkit molecule which is made up of the linker molecules 
-            all placed on the edges of a tetrahedron. The individual 
-            molecules are unconnected.
-        
-        """
-        
-        cage_lk = next(x for x in self.macro_mol.building_blocks if 
-                                                isinstance(x, Linker)) 
-                                                
-        position1 = cage_lk.shift_heavy_mol(0, 0, -25)
-        position2 = cage_lk.shift_heavy_mol(-12.5, 0, 0)
-        position3 = cage_lk.shift_heavy_mol(12.5, 0, 0)
-        
-        position4 = cage_lk.shift_heavy_mol(-12.5, 25, -12.5)
-        position5 = cage_lk.shift_heavy_mol(12.5, 25, -12.5)
-        position6 = cage_lk.shift_heavy_mol(0, 25, 25)
-
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)        
-        combined_mol3 = chem.CombineMols(position5, position6)
-        
-        combined_mol4 = chem.CombineMols(combined_mol, combined_mol2)
-        return chem.CombineMols(combined_mol3, combined_mol4)
+        lk = next(x for x in self.macro_mol.building_blocks 
+                        if isinstance(x, Linker))
+                            
+        bb = next(x for x in self.macro_mol.building_blocks 
+                        if isinstance(x, BuildingBlock))
+                            
+        for edge in self.edges:
+            self.macro_mol.heavy_mol = chem.CombineMols(
+                                        self.macro_mol.heavy_mol, 
+                                        edge.place_mol(lk))
+        chem.MolToMolFile( self.macro_mol.heavy_mol,'hi2.mol')
+#        for vertex in self.vertices:
+#            self.macro_mol.heavy_mol = chem.CombineMols(
+#                                        self.macro_mol.heavy_mol, 
+#                                        vertex.place_mol(bb))
  
 class EightPlusTwelve(FourPlusSix):
     """
@@ -766,6 +748,7 @@ class EightPlusTwelve(FourPlusSix):
         
         
         return chem.CombineMols(three, four)
+
        
 class BlockCopolymer(Topology):
     """
