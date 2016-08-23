@@ -14,7 +14,9 @@ from scipy.spatial.distance import euclidean
 from collections import namedtuple
 import types
 
-from ..convenience_functions import flatten, periodic_table
+from ..convenience_functions import (flatten, periodic_table, 
+                                     vector_theta, normalize_vector,
+                                     rotation_matrix)
 from .exception import MacroMolError
 
 class CachedMacroMol(type):
@@ -681,7 +683,7 @@ class StructUnit(metaclass=Cached):
         
         return self.heavy_mol
 
-    def get_heavy_mol_position_matrix(self):
+    def heavy_mol_position_matrix(self):
         """
         Returns position of all atoms in heavy molecule as numpy matrix. 
         
@@ -713,9 +715,6 @@ class StructUnit(metaclass=Cached):
                                       coord_mat.item(1), 
                                       coord_mat.item(2))
             conf.SetAtomPosition(i, coord)
-            
-    
-        
 
     def rotate_heavy_mol(self, x, y , z):
         """
@@ -792,7 +791,7 @@ class StructUnit(metaclass=Cached):
             new_pos = np.dot(rot_mat, pos_vector)
             conf.SetAtomPosition(atom_id, rdkit_geo.Point3D(*new_pos))
     
-    def get_heavy_centroid(self):
+    def heavy_centroid(self):
         """
         Returns the centroid of the heavy rdkit molecule.
 
@@ -815,6 +814,68 @@ class StructUnit(metaclass=Cached):
         centroid = np.array([x_sum, y_sum, z_sum]) 
 
         return np.divide(centroid, coord_num)
+
+    def heavy_center(self):
+        """
+        Returns the center point between the heavy atoms.
+
+        This is the centroid if only the heavy atoms are considered.
+
+        Returns
+        -------
+        numpy.array
+            A numpy array holding the midpoint of the heavy atoms.
+        
+        """
+        
+        coord_num = 0
+        x_sum = 0
+        y_sum = 0
+        z_sum = 0
+        for atom_id in self.heavy_ids:
+            x,y,z = self.get_heavy_atom_coords(atom_id)
+            x_sum += x
+            y_sum += y
+            z_sum += z
+            coord_num += 1
+        
+        center = np.array([x_sum, y_sum, z_sum])
+        return np.divide(center, coord_num)
+
+    def set_heavy_center(self, position):
+        """
+        Shift heavy molecule so heavy atoms center falls on `position`.         
+        
+        The entire molecule is shifted but it is the midpoint of the 
+        heavy atoms that is placed on the target `position`.        
+        
+        Parameters
+        ----------
+        np.array
+            A numpy array holding the desired the position. It holds the
+            x, y and z coordinates, respectively.
+            
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The position of the molecule in this rdkit instance is
+            changed, as described in this docstring.
+            
+        Returns
+        -------
+        None : NoneType
+            
+        """
+        
+        center = self.heavy_center()
+        shift = position - center
+        new_conf = self.shift_heavy_mol(*shift).GetConformer()
+
+        self.heavy_mol.RemoveAllConformers()
+        self.heavy_mol.AddConformer(new_conf)
+        
+        return self.heavy_mol        
+
 
     def get_prist_atom_coords(self, atom_id):
         conf = self.prist_mol.GetConformer()
@@ -1022,56 +1083,25 @@ class Linker(StructUnit):
             `direction`.
         
         """
-
         
-        og_centroid = self.get_heavy_centroid()
+        # Normalize the input direction vector.
+        direction = normalize_vector(direction)
         
-        # Shift the centroid to the origin so that rotation axis passes
-        # through the origin.
-
-        self.set_heavy_mol_position(np.array([0,0,0]))
-
-        # Get the rotation axis.
-        rot_axis = np.cross(self.get_heavy_direction_vector(), 
-                            direction)
-                            
+        og_center = self.heavy_center()
+        self.set_heavy_center(np.array([0,0,0]))        
+        
+        rot_mat = rotation_matrix(self.heavy_direction_vector(), 
+                                  direction)
+        print(np.dot(rot_mat, self.heavy_direction_vector()))
+        print(direction)
+        new_pos_mat = np.dot(rot_mat, self.heavy_mol_position_matrix())
+        self.set_heavy_mol_from_position_matrix(new_pos_mat)
+        self.set_heavy_center(og_center)
     
-        
-        # Rotate space around z axis so that rotation axis lies on the 
-        # xz plane.
-        
-        end_axis = np.array([rot_axis[0], 0 , rot_axis[2]])
-        
-        theta = self.get_heavy_theta(end_axis)
-
-        self.rotate_heavy_mol(0, 0, theta)
-
-#        pos_mat = self.get_heavy_mol_position_matrix()
-#        pos_mat = np.dot(z_rot_mat(theta), pos_mat)
-#        self.set_heavy_mol_from_position_matrix(pos_mat)
-#        print(np.cross(self.get_heavy_direction_vector(), 
-#                            direction))
-        
-#        pos_mat = self.get_heavy_mol_position_matrix()
-        
-        #        
-
-#        translation_mat = np.matrix([[1, 0, 0], [], [], []])
-#        
-#        
-#    
-#        heavy_dir = self.get_heavy_direction_vector()
-#        
-#        numerator = np.dot(heavy_dir, direction)
-#        denominator = (np.linalg.norm(heavy_dir) * 
-#                        np.linalg.norm(direction))
-#        
-#        theta = np.arccos(numerator/denominator)
-        
-        
-    
-    def get_heavy_direction_vector(self):
+    def heavy_direction_vector(self):
         """
+        
+        The returned vector is normalized.
         
         """
         
@@ -1081,21 +1111,7 @@ class Linker(StructUnit):
             pos_vects.append(np.array([x,y,z]))
         
         p1, p2 = pos_vects
-        
-        return p1 - p2
-        
-
-    def get_heavy_theta(self, direction):
-        heavy_vect = self.get_heavy_direction_vector()
-        
-        numerator = np.dot(heavy_vect, direction)
-        denominator = (np.linalg.norm(heavy_vect) * 
-                        np.linalg.norm(direction))
-        
-        return np.arccos(numerator/denominator)
-
-                
-
+        return normalize_vector(p1-p2)
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):
