@@ -57,20 +57,28 @@ def vector_theta(vector1, vector2):
     return np.arccos(numerator/denominator)    
 
 def rotation_matrix(vector1, vector2):
+    """
+    Returns a rotation matrix which transforms `vector1` to `vector2`.
+    
+    
+    """
     
     # Make sure both inputs are unit vectors.
     vector1 = normalize_vector(vector1)
     vector2 = normalize_vector(vector2)
     
     v = np.cross(vector1, vector2)
-    vx = np.array([[0, -v[2], v[1]],[v[2], 0, -v[0]], [-v[1], v[0], 0]])
+    vx = np.array([[0, -v[2], v[1]],
+                   [v[2], 0, -v[0]], 
+                   [-v[1], v[0], 0]])
+    
     s = np.linalg.norm(v)
     c = np.dot(vector1, vector2)
     I = np.identity(3)
 
     mult_factor = (1-c)/np.square(s)    
     
-    return I + vx + np.multiply(np.square(vx), mult_factor)
+    return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
 
 
 def mol_from_mol2_file(mol2_file):
