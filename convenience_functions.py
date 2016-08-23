@@ -3,6 +3,7 @@ import rdkit.Chem.AllChem as ac
 import rdkit
 from rdkit.Geometry import Point3D
 import re
+import numpy as np
 
 # This dictionary gives easy access to the rdkit bond types to the 
 # ``mol_from_mol2_file`` function.
@@ -11,6 +12,66 @@ bond = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
         '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
         '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
         'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
+
+def normalize_vector(vector):
+    """
+    Normalizes the given vector.
+    
+    Parameters
+    ----------
+    vector : np.array
+        The vector to be normalized.        
+        
+    Returns
+    -------
+    np.array
+        The normalized vector.
+    
+    """
+    
+    return np.divide(vector, np.linalg.norm(vector))
+
+def vector_theta(vector1, vector2):
+    """
+    Returns the angle difference between two vectors.
+
+    Parameters
+    ----------
+    vector1 : numpy.array
+        The first vector.
+        
+    vecotr2 : numpy.array    
+        The second vector.
+        
+    Returns
+    -------
+    float
+        The angle difference between `vector1` and `vector2`.
+    
+    """
+    
+    numerator = np.dot(vector1, vector2)
+    denominator = (np.linalg.norm(vector1) * 
+                    np.linalg.norm(vector2))
+    
+    return np.arccos(numerator/denominator)    
+
+def rotation_matrix(vector1, vector2):
+    
+    # Make sure both inputs are unit vectors.
+    vector1 = normalize_vector(vector1)
+    vector2 = normalize_vector(vector2)
+    
+    v = np.cross(vector1, vector2)
+    vx = np.array([[0, -v[2], v[1]],[v[2], 0, -v[0]], [-v[1], v[0], 0]])
+    s = np.linalg.norm(v)
+    c = np.dot(vector1, vector2)
+    I = np.identity(3)
+
+    mult_factor = (1-c)/np.square(s)    
+    
+    return I + vx + np.multiply(np.square(vx), mult_factor)
+
 
 def mol_from_mol2_file(mol2_file):
     """
