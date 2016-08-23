@@ -1,7 +1,8 @@
 import os
 import rdkit
+import numpy as np
 
-from ...classes import StructUnit, FGInfo
+from ...classes import StructUnit, Linker, FGInfo
 from ...convenience_functions import flatten
 
 
@@ -199,7 +200,66 @@ def test_make_atoms_heavy_in_heavy():
     
     
     
+def test_rotate_heavy_mol():
+    lk_file = next(x for x in get_mol_file() 
+                                    if 'test_rot_amine.mol' in x) 
     
+    lk = Linker(lk_file)
+    
+    # Rotation about the z-axis in the anti-clockwise direction.    
+    
+    lk.rotate_heavy_mol(0, 0, np.pi/4)
+
+
+    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/4
+    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/4
+    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2
+    
+    # Reverse rotation.    
+    
+    lk.rotate_heavy_mol(0, 0, -np.pi/4)    
+    
+    assert lk.get_heavy_theta(np.array([1, 0, 0])) == 0
+    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2
+    
+    # Rotation around y axis in anti-clockwise rotation.
+    
+    lk.rotate_heavy_mol(0, np.pi/2, 0)
+
+    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 0, 1])) == 0
+    
+    # Rotation around x axis in anti-clockwise rotation.
+    
+    lk.rotate_heavy_mol(np.pi/2, 0, 0)
+
+    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 1, 0])) == 0
+    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2
+    
+    # Reverse x rotation.    
+    
+    lk.rotate_heavy_mol(-np.pi/2, 0, 0)    
+    
+    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 0, 1])) == 0
+    
+    # Reverse y rotation.
+    
+    lk.rotate_heavy_mol(0, -np.pi/2, 0)
+
+    assert lk.get_heavy_theta(np.array([1, 0, 0])) == 0
+    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
+    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2    
+    
+    
+    
+    
+    
+        
     
     
     
