@@ -696,16 +696,14 @@ class StructUnit(metaclass=Cached):
         
         """
 
-        pos_mat = np.matrix([])
+        pos_array = np.array([])
 
         for atom in self.heavy_mol.GetAtoms():
             atom_id = atom.GetIdx()
             pos_vect = np.array([*self.get_heavy_atom_coords(atom_id)])
-            pos_mat = np.insert(pos_mat, [0, 0, 0], pos_vect)
+            pos_array = np.append(pos_array, pos_vect)
 
-        pos_mat = pos_mat.reshape(-1, 3)
-
-        return pos_mat.T
+        return np.matrix(pos_array.reshape(-1,3).T)
 
     def set_heavy_mol_from_position_matrix(self, pos_mat):
         
@@ -1087,10 +1085,12 @@ class Linker(StructUnit):
         
         rot_mat = rotation_matrix(self.heavy_direction_vector(), 
                                   direction)
+
         new_pos_mat = np.dot(rot_mat, self.heavy_mol_position_matrix())
+
         self.set_heavy_mol_from_position_matrix(new_pos_mat)
         self.set_heavy_center(og_center)
-        
+
         return chem.Mol(self.heavy_mol)
     
     def heavy_direction_vector(self):
@@ -1106,6 +1106,9 @@ class Linker(StructUnit):
             pos_vects.append(np.array([x,y,z]))
         
         p1, p2 = pos_vects
+        print('\npositions')
+        print(np.round(p1, decimals=2))
+        print(np.round(p2, decimals=2), '\n')
         return normalize_vector(p1-p2)
 
 @total_ordering

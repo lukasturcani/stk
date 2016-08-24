@@ -31,6 +31,10 @@ class Edge:
         self.v2 = v2
         self.coord = np.divide(np.add(v1.coord, v2.coord), 2)
         self.direction = normalize_vector(v1.coord - v2.coord)
+        print('v1',v1.coord)
+        print('v2', v2.coord)
+        print('edge coord', self.coord)
+        print('direction',self.direction)
         
     def place_mol(self, linker):
         """
@@ -38,9 +42,13 @@ class Edge:
         """
         
         linker.set_heavy_center(self.coord)
-        return linker.set_heavy_mol_orientation(self.coord)
+        mol = linker.set_heavy_mol_orientation(self.direction)
+        if not np.array_equal(self.direction, 
+                          linker.heavy_direction_vector()):
         
-        
+            raise ValueError('Wrong Direction')
+        print('hdv',linker.heavy_direction_vector())
+        return mol
 
 class Topology:
     """
@@ -634,12 +642,18 @@ class FourPlusSix(Topology):
         
     """
     
-    vertices = [Vertex(0,0,0), Vertex(50,50,0), 
-                Vertex(50,0,0), Vertex(0,50,0)]
-    edges = [Edge(vertices[0], vertices[2]), 
-             Edge(vertices[0], vertices[3]),
-             Edge(vertices[1], vertices[2]),
-             Edge(vertices[1], vertices[3]),]    
+#    vertices = [Vertex(0,0,0), Vertex(50,0,0), 
+#                Vertex(0,50,0), Vertex(25,25,50)]
+    
+    vertices = [Vertex(0,0,0), Vertex(50,0,0),
+                Vertex(0,50,0), Vertex(50,50,0)]    
+    
+#    edges = [Edge(v1,v2) for v1, v2 in 
+#                itertools.combinations(vertices, 2)]
+    edges = [Edge(vertices[0], vertices[1]), 
+             Edge(vertices[0], vertices[2]),
+             Edge(vertices[2], vertices[3]),
+             Edge(vertices[1], vertices[3])]    
     
     def __init__(self, macro_mol):
         super().__init__(macro_mol)        
@@ -677,11 +691,13 @@ class FourPlusSix(Topology):
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         edge.place_mol(lk))
-        chem.MolToMolFile( self.macro_mol.heavy_mol,'hi2.mol')
-#        for vertex in self.vertices:
-#            self.macro_mol.heavy_mol = chem.CombineMols(
-#                                        self.macro_mol.heavy_mol, 
-#                                        vertex.place_mol(bb))
+
+        for vertex in self.vertices:
+            self.macro_mol.heavy_mol = chem.CombineMols(
+                                        self.macro_mol.heavy_mol, 
+                                        vertex.place_mol(bb))
+                                        
+        chem.MolToMolFile(self.macro_mol.heavy_mol, 'hi.mol')
  
 class EightPlusTwelve(FourPlusSix):
     """
