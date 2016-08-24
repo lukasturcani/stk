@@ -29,7 +29,8 @@ def normalize_vector(vector):
     
     """
     
-    return np.divide(vector, np.linalg.norm(vector))
+    v = np.divide(vector, np.linalg.norm(vector))
+    return np.round(v, decimals=4)
 
 def vector_theta(vector1, vector2):
     """
@@ -62,12 +63,22 @@ def rotation_matrix(vector1, vector2):
     
     
     """
-    
+
     # Make sure both inputs are unit vectors.
     vector1 = normalize_vector(vector1)
     vector2 = normalize_vector(vector2)
     
-    v = np.cross(vector1, vector2)
+    # Hande the case where a == b.
+    if np.array_equal(vector1, vector2):
+        return np.identity(3)
+    
+    # Handle the case where a == -b.
+    if np.array_equal(vector1, np.multiply(vector2, -1)):
+        return np.multiply(np.identity(3), -1)
+        
+    else:
+        v = np.cross(vector1, vector2)
+      
     vx = np.array([[0, -v[2], v[1]],
                    [v[2], 0, -v[0]], 
                    [-v[1], v[0], 0]])
