@@ -700,7 +700,7 @@ class StructUnit(metaclass=Cached):
 
         for atom in self.heavy_mol.GetAtoms():
             atom_id = atom.GetIdx()
-            pos_vect = np.array([*self.get_heavy_atom_coords(atom_id)])
+            pos_vect = np.array([*self.atom_coords_in_heavy(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)
@@ -713,6 +713,58 @@ class StructUnit(metaclass=Cached):
                                       coord_mat.item(1), 
                                       coord_mat.item(2))
             conf.SetAtomPosition(i, coord)
+
+    def set_heavy_mol_orientation(self, start, end):
+        """
+        Returns a rdkit instance orientated along `direction`.
+        
+        This method rotates the heavy linker molecule about its centroid
+        until the heavy atoms are aligned with the vector described by 
+        `direction`.  In other words, the directional between the two 
+        heavy atoms in the linker is made equal to the vector in 
+        `direction`, using only rotation.
+
+        Unlike `shift_heavy_mol` this method does change the original
+        rdkit molecule found in `heav_mol`. A copy is NOT created. This
+        method does not change the ``.mol`` file however.
+        
+        Parameters
+        ----------
+        direction : numpy.array
+            This array holds the directional vector along which the 
+            heavy atoms in the linker should be placed.
+            
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed so that the
+            the vector between the 2 heavy atoms has the same direction
+            as  `direction`.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance which is rotated so that the 2 
+            heavy atoms have their directional vector aligned with
+            `direction`.
+        
+        """
+        
+        # Normalize the input direction vectors.
+        start = normalize_vector(start)
+        end = normalize_vector(end)
+        
+        og_center = self.heavy_center()
+        self.set_heavy_center(np.array([0,0,0]))        
+        
+        rot_mat = rotation_matrix(start, end)
+
+        new_pos_mat = np.dot(rot_mat, self.heavy_mol_position_matrix())
+
+        self.set_heavy_mol_from_position_matrix(new_pos_mat)
+        self.set_heavy_center(og_center)
+
+        return chem.Mol(self.heavy_mol)
 
     def rotate_heavy_mol(self, x, y , z):
         """
@@ -783,7 +835,7 @@ class StructUnit(metaclass=Cached):
         
         for atom in self.heavy_mol.GetAtoms():
             atom_id = atom.GetIdx()
-            x, y, z = self.get_heavy_atom_coords(atom_id)
+            x, y, z = self.atom_coords_in_heavy(atom_id)
             pos_vector = np.array([x,y,z])
             
             new_pos = np.dot(rot_mat, pos_vector)
@@ -804,7 +856,7 @@ class StructUnit(metaclass=Cached):
         x_sum = 0
         y_sum = 0
         z_sum = 0
-        for x, y, z in self.get_heavy_coords():
+        for x, y, z in self.all_heavy_mol_coords():
             x_sum += x
             y_sum += y
             z_sum += z
@@ -812,6 +864,20 @@ class StructUnit(metaclass=Cached):
         centroid = np.array([x_sum, y_sum, z_sum]) 
 
         return np.divide(centroid, coord_num)
+
+    def heavy_direction_vectors(self):
+        """
+        
+        The yielded vector is normalized.
+        
+        """
+        
+        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids, 
+                                                                     2):
+            p1 = self.atom_coords_in_heavy(atom1_id)
+            p2 = self.atom_coords_in_heavy(atom2_id)
+        
+            yield normalize_vector(p1-p2)
 
     def heavy_center(self):
         """
@@ -831,7 +897,7 @@ class StructUnit(metaclass=Cached):
         y_sum = 0
         z_sum = 0
         for atom_id in self.heavy_ids:
-            x,y,z = self.get_heavy_atom_coords(atom_id)
+            x,y,z = self.atom_coords_in_heavy(atom_id)
             x_sum += x
             y_sum += y
             z_sum += z
@@ -880,12 +946,12 @@ class StructUnit(metaclass=Cached):
         atom_position = conf.GetAtomPosition(atom_id)
         return tuple([*atom_position])
 
-    def get_heavy_atom_coords(self, atom_id):
+    def atom_coords_in_heavy(self, atom_id):
         conf = self.heavy_mol.GetConformer()
         atom_position = conf.GetAtomPosition(atom_id)
-        return tuple([*atom_position])
+        return np.array([*atom_position])
 
-    def get_heavy_coords(self):
+    def all_heavy_mol_coords(self):
         """
         Yields the x, y and z coordinates of atoms in `heavy_mol`.        
 
@@ -1036,9 +1102,20 @@ class BuildingBlock(StructUnit):
     Represents the building-blocks* of a cage.
     
     """
+
+    def heavy_plane_normal(self):
+        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
+        return normalize_vector(np.cross(v1, v2))
     
     def heavy_plane(self):
-        ...
+        heavy_coord = self.atom_coords_in_heavy(self.heavy_ids[0])
+        d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal, 
+                                           heavy_coord)), -1)
+        return np.append(self.heavy_plane_normal, d)
+        
+    def set_heavy_mol_orientation(self, end):
+        start = self.heavy_plane_normal
+        return StructUnit.set_heavy_mol_orientation(self, start, end)
 
 class Linker(StructUnit):
     """
@@ -1046,72 +1123,11 @@ class Linker(StructUnit):
     
     """
     
-    def set_heavy_mol_orientation(self, direction):
-        """
-        Returns a rdkit instance orientated along `direction`.
-        
-        This method rotates the heavy linker molecule about its centroid
-        until the heavy atoms are aligned with the vector described by 
-        `direction`.  In other words, the directional between the two 
-        heavy atoms in the linker is made equal to the vector in 
-        `direction`, using only rotation.
-
-        Unlike `shift_heavy_mol` this method does change the original
-        rdkit molecule found in `heav_mol`. A copy is NOT created. This
-        method does not change the ``.mol`` file however.
-        
-        Parameters
-        ----------
-        direction : numpy.array
-            This array holds the directional vector along which the 
-            heavy atoms in the linker should be placed.
-            
-        Modifies
-        --------
-        heavy_mol : rdkit.Chem.rdchem.Mol   
-            The conformer in this rdkit instance is changed so that the
-            the vector between the 2 heavy atoms has the same direction
-            as  `direction`.
-        
-        Returns
-        -------
-        rdkit.Chem.rdchem.Mol
-            An rdkit molecule instance which is rotated so that the 2 
-            heavy atoms have their directional vector aligned with
-            `direction`.
-        
-        """
-        
-        # Normalize the input direction vector.
-        direction = normalize_vector(direction)
-        
-        og_center = self.heavy_center()
-        self.set_heavy_center(np.array([0,0,0]))        
-        
-        rot_mat = rotation_matrix(self.heavy_direction_vector(), 
-                                  direction)
-
-        new_pos_mat = np.dot(rot_mat, self.heavy_mol_position_matrix())
-
-        self.set_heavy_mol_from_position_matrix(new_pos_mat)
-        self.set_heavy_center(og_center)
-
-        return chem.Mol(self.heavy_mol)
+    def set_heavy_mol_orientation(self, end):
+        start = next(self.heavy_direction_vectors())
+        return StructUnit.set_heavy_mol_orientation(self, start, end)
     
-    def heavy_direction_vector(self):
-        """
-        
-        The returned vector is normalized.
-        
-        """
-        
-        pos_vects = []
-        for atom_id in self.heavy_ids:
-            x,y,z = self.get_heavy_atom_coords(atom_id)
-            pos_vects.append(np.array([x,y,z]))
-        
-        p1, p2 = pos_vects
-        return normalize_vector(p1-p2)
+
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):
