@@ -20,6 +20,7 @@ class Vertex:
         self.coord = np.array([x,y,z])
         
     def place_mol(self, struct_unit):
+        
         return struct_unit.set_heavy_center(self.coord)
 
 class Edge:
