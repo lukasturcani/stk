@@ -28,7 +28,7 @@ def normalize_vector(vector):
         The normalized vector.
     
     """
-    
+
     v = np.divide(vector, np.linalg.norm(vector))
     return np.round(v, decimals=4)
 
