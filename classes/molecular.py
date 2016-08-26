@@ -950,7 +950,6 @@ class StructUnit(metaclass=Cached):
             atom = self.heavy_mol.GetAtomWithIdx(atom_id)
             if atom.GetAtomicNum() == self.func_grp.target_atomic_num:            
                 atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
-                self.heavy_ids.append(atom_id)
                 
                 del_ids.extend(self._delete_tag_ids(atom))
                 for n in atom.GetNeighbors():
@@ -965,6 +964,11 @@ class StructUnit(metaclass=Cached):
             editable_mol.RemoveAtom(del_id)
                
         self.heavy_mol = editable_mol.GetMol()
+        
+        # Take note of heavy atom ids.
+        for atom in self.heavy_mol.GetAtoms():
+            if atom.GetAtomicNum() == self.func_grp.heavy_atomic_num:
+                self.heavy_ids.append(atom.GetIdx())
              
     def _delete_tag_ids(self, heavy_atom):
         """
@@ -1033,7 +1037,8 @@ class BuildingBlock(StructUnit):
     
     """
     
-    pass
+    def heavy_plane(self):
+        ...
 
 class Linker(StructUnit):
     """
@@ -1106,9 +1111,6 @@ class Linker(StructUnit):
             pos_vects.append(np.array([x,y,z]))
         
         p1, p2 = pos_vects
-        print('\npositions')
-        print(np.round(p1, decimals=2))
-        print(np.round(p2, decimals=2), '\n')
         return normalize_vector(p1-p2)
 
 @total_ordering
