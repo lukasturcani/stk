@@ -22,10 +22,22 @@ class Vertex:
         
     def place_mol(self, building_block):
         building_block.set_heavy_center(self.coord)
-        return 
-        
+        return building_block.set_heavy_mol_orientation(self.edge_plane_normal())
+
+    def edge_plane_normal(self):
+        v1, v2 = itertools.islice(self.edge_direction_vectors(), 0, 2)
+        return normalize_vector(np.cross(v1, v2))
+    
     def edge_plane(self):
-        r
+        heavy_coord = self.edges[0].coord
+        d = np.multiply(np.sum(np.multiply(self.edge_plane_normal(), 
+                                           heavy_coord)), -1)
+        return np.append(self.edge_plane_normal(), d)
+        
+    def edge_direction_vectors(self):
+        for edge1, edge2 in itertools.combinations(self.edges, 2):
+            yield normalize_vector(edge1.coord-edge2.coord)
+        
 
 class Edge:
     

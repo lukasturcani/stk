@@ -1109,12 +1109,12 @@ class BuildingBlock(StructUnit):
     
     def heavy_plane(self):
         heavy_coord = self.atom_coords_in_heavy(self.heavy_ids[0])
-        d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal, 
+        d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
                                            heavy_coord)), -1)
-        return np.append(self.heavy_plane_normal, d)
+        return np.append(self.heavy_plane_normal(), d)
         
     def set_heavy_mol_orientation(self, end):
-        start = self.heavy_plane_normal
+        start = self.heavy_plane_normal()
         return StructUnit.set_heavy_mol_orientation(self, start, end)
 
 class Linker(StructUnit):
@@ -1318,6 +1318,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             dummy.prist_mol_file = prist_mol_file
             dummy.topology_args = topology_args
             MacroMolError(ex, dummy, 'During initialization.')
+            raise ex
                 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
