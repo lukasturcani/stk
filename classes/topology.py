@@ -20,9 +20,12 @@ class Vertex:
         self.coord = np.array([x,y,z])
         self.edges = []
         
-    def place_mol(self, struct_unit):
+    def place_mol(self, building_block):
+        building_block.set_heavy_center(self.coord)
+        return 
         
-        return struct_unit.set_heavy_center(self.coord)
+    def edge_plane(self):
+        r
 
 class Edge:
     
@@ -44,12 +47,12 @@ class Edge:
         linker.set_heavy_center(self.coord)
         mol = linker.set_heavy_mol_orientation(self.direction)
         if not np.allclose(self.direction, 
-                           linker.heavy_direction_vector(),
+                           next(linker.heavy_direction_vectors()),
                            rtol=0.01):
         
             raise ValueError(('Wrong direction. '
                     'Expected {0}, got {1}.').format(self.direction,  
-                                  linker.heavy_direction_vector()))
+                           next(linker.heavy_direction_vectors())))
 
         return mol
 
