@@ -650,19 +650,12 @@ class FourPlusSix(Topology):
     
     vertices = [Vertex(0,0,0), Vertex(50,0,0), 
                 Vertex(0,50,0), Vertex(25,25,50)]
-    
-#    vertices = [Vertex(0,0,0), Vertex(50,0,0)]
-#                Vertex(0,50,0), Vertex(50,50,0)]    
-    
+        
     edges = [Edge(v1,v2) for v1, v2 in 
-                itertools.combinations(vertices, 2)]
-#    edges = [Edge(vertices[0], vertices[1])]
-#             Edge(vertices[0], vertices[2]),
-#             Edge(vertices[2], vertices[3]),
-#             Edge(vertices[1], vertices[3])]    
+                itertools.combinations(vertices, 2)]  
     
     def __init__(self, macro_mol):
-        super().__init__(macro_mol)        
+        Topology.__init__(self, macro_mol)        
         self.pair_up = self.pair_up_diff_element_atoms
 
     def place_mols(self):
