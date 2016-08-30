@@ -6,6 +6,7 @@ from .molecular import MacroMolecule, Cage
 from .ga import GATools
 from ..convenience_functions import dedupe
 from ..optimization import optimize_all, optimize_all_serial
+from ..fitness import calc_fitness
 
 class Population:
     """
@@ -492,12 +493,13 @@ class Population:
         None : NoneType
         
         """
-        
+
         optimize_all_serial(self.ga_tools.optimization, self)
-    
+
+            
     def calculate_member_fitness(self):
-        pass
-    
+        calc_fitness(self.ga_tools.fitness, self)      
+      
     def __iter__(self):
         """
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.        

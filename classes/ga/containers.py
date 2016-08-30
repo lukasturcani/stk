@@ -53,11 +53,13 @@ class GATools:
     
     """
     
-    __slots__ = ['selection', 'mating', 'mutation', 'optimization']    
+    __slots__ = ['selection', 'mating', 'mutation', 
+                 'optimization', 'fitness']    
     
-    def __init__(self, selection, mating, mutation, optimization):
+    def __init__(self, selection, mating, 
+                 mutation, optimization, fitness):
         self.selection = selection
         self.mating = mating
         self.mutation = mutation
         self.optimization = optimization
-
+        self.fitness = fitness

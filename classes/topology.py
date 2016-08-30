@@ -60,7 +60,7 @@ class Edge:
         mol = linker.set_heavy_mol_orientation(self.direction)
         if not np.allclose(self.direction, 
                            next(linker.heavy_direction_vectors()),
-                           rtol=0.01):
+                           atol=0.01):
         
             raise ValueError(('Wrong direction. '
                     'Expected {0}, got {1}.').format(self.direction,  
