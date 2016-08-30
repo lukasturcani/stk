@@ -291,7 +291,17 @@ def macromodel_opt(macro_mol,
     # can be given to the console.
     opt_cmd = opt_cmd + " -WAIT " + file_root 
     # Run the optimization.
-    sp.run(opt_cmd, shell=True)
+    opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                        universal_newlines=True, shell=True)
+    
+    # If optimization fails because the license is not found, rerun the
+    # function.
+    print('stdout is here', opt_return.stdout)
+    print('Could not check out a license for mmlibs' in opt_return.stdout)
+    if 'Could not check out a license for mmlibs' in opt_return.stdout:
+        print('fatal_error')        
+        MacroMolError(Exception(), macro_mol, 'License not found.')
+        macromodel_opt(macro_mol, macromodel_path)
     
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
@@ -302,19 +312,7 @@ def macromodel_opt(macro_mol,
     except Exception as ex:
         MacroMolError(ex, macro_mol, 
         'During ``update_prist_attrs_from_mol2`` call.')
-        
-    # This command ensures that programs opened as a result of the 
-    # optimization close. If this is not done after a population is
-    # optimized, it is often the case the folders containing it cannot 
-    # be moved or deleted. This is because some SCHRODINGER programs are
-    # still running in the background and accessing them. This closes
-    # all such programs.
-    close_cmd = os.path.join(macromodel_path, "utilities", "jserver")
-    if os.name == 'nt':
-        close_cmd = '"' + close_cmd + '.exe"'
-    close_cmd += " -cleanall" 
-    sp.call(close_cmd, shell=True) 
-   
+
     macro_mol.optimized = True       
     
 def _generate_COM(macro_mol):
@@ -526,7 +524,6 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
    # Execute the file conversion.
     sp.run(convrt_cmd, shell=True)
 
-#        OPCD 1234567123456712345671234567 FFFFF.FFFF FFFFF.FFFF FFFFF.FFFF FFFFF.FFFF
 def _fix_params_in_com_file(macro_mol, main_string):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
@@ -799,6 +796,14 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     return fix_block
 
+def kill_macromodel():
+    if os.name == 'nt': 
+        kill_cmd1 = "Taskkill /IM jserver-watcher.exe /F"
+        kill_cmd2 = "Taskkill /IM jservergo.exe /F"
+        
+        sp.run(kill_cmd1, shell=True)
+        sp.run(kill_cmd2, shell=True)
+    
 def do_not_optimize(macro_mol):
     """
     Skips the optimization step.
