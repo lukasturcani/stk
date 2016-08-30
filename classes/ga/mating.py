@@ -155,7 +155,7 @@ class Mating:
             `cage1` with `cage2`.
         
         """
-        
+
         # Make a variable for each building-block* and linker of each
         # each cage. Make set consisting of topologies of the cages
         # provided as arguments - this automatically removes copies.
@@ -192,7 +192,6 @@ class Mating:
         # For each topology create a new pair of offspring using the
         # building block pairings determined earlier.
         for index, topology in enumerate(topologies):
-            
             offspring1 = Cage((build_block1, counterpart1), topology, 
                               os.path.join(os.getcwd(),
                               self.name.format(self.n_calls, index, 1)))
@@ -201,7 +200,7 @@ class Mating:
                               os.path.join(os.getcwd(),
                               self.name.format(self.n_calls, index, 2)))
             offspring_pop.add_members((offspring1, offspring2))
-            
+
         return offspring_pop
         
         

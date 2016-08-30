@@ -97,6 +97,7 @@ class Mutation:
                 num_mutations += 1
                 print('Mutation number {0}. Finish when {1}.'.format(
                                 num_mutations, self.num_mutations))
+
                 if num_mutations == self.num_mutations:
                     break
 

@@ -9,6 +9,8 @@ mutation_func random_bb database=C:\Users\lukas\Projects\MMEA\Database_prec\amin
 
 opt_func macromodel_opt
 
-pop_size 20
-num_generations 10
+fitness_func random_fitness
+
+pop_size 3
+num_generations 5
 num_mutations 5 

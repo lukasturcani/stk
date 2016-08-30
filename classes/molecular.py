@@ -1318,8 +1318,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             dummy.prist_mol_file = prist_mol_file
             dummy.topology_args = topology_args
             MacroMolError(ex, dummy, 'During initialization.')
-            raise ex
-                
+
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
             
@@ -1338,9 +1337,9 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # The topology_args attribute is saved for error handling. See
         # MacroMolError class.
         self.topology_args = topology_args
-        
+
         self.prist_mol_file = prist_mol_file
-        
+
         # This generates the name of the heavy ``.mol`` file by adding
         # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
         heavy_mol_file = list(os.path.splitext(prist_mol_file))
@@ -1365,7 +1364,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
                                              allHsExplicit=True)
                                              
         self.optimized = False
-        self.random_fitness()
+        self.fitness = False
 
     def write_mol_file(self, rdkit_mol_type):
         """
@@ -1696,9 +1695,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             return cage
 
 
-    def random_fitness(self):
-        self.fitness = np.random.randint(0,100)
-
 class Cage(MacroMolecule):
     """
     Used to represent molecular cages.
@@ -1734,7 +1730,6 @@ class Cage(MacroMolecule):
         
         return cls((bb, lk), topology, prist_mol_file)
         
-
 class Polymer(MacroMolecule):
     """
     Used to represent polymers.
