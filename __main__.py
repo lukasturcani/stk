@@ -9,6 +9,9 @@ from .classes import (Population, GATools, Selection, Mutation, Mating,
 from .optimization import kill_macromodel
 
 
+# Running MacroModel optimizations sometimes leaves applications open.
+# This closes them. If this is not done, directories may not be possible
+# to move. 
 kill_macromodel()
                       
 # Get the name of the input file and load its contents into a 
@@ -66,6 +69,7 @@ pop = pop_init(**ga_input.init_func.params,
                size=ga_input.pop_size, 
                ga_tools=ga_tools)
 pop.optimize_population()
+pop.calculate_member_fitness()
 
 # Run the GA.
 for x in range(ga_input.num_generations):
@@ -81,7 +85,6 @@ for x in range(ga_input.num_generations):
     os.chdir(str(x))
     
     print('\n\nStaring mating.\n\n')
-
     offspring = pop.gen_offspring()
 
     print('\n\nStarting mutations.\n\n')
@@ -111,5 +114,7 @@ for x in range(ga_input.num_generations):
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
      
-     
+# Running MacroModel optimizations sometimes leaves applications open.
+# This closes them. If this is not done, directories may not be possible
+# to move.     
 kill_macromodel()

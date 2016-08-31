@@ -17,6 +17,8 @@ def normalize_vector(vector):
     """
     Normalizes the given vector.
     
+    A new vector is returned, the original vector is not modified.    
+    
     Parameters
     ----------
     vector : np.array
@@ -34,20 +36,20 @@ def normalize_vector(vector):
 
 def vector_theta(vector1, vector2):
     """
-    Returns the angle difference between two vectors.
+    Returns the angle between two vectors in radians.
 
     Parameters
     ----------
     vector1 : numpy.array
         The first vector.
         
-    vecotr2 : numpy.array    
+    vector2 : numpy.array    
         The second vector.
         
     Returns
     -------
     float
-        The angle difference between `vector1` and `vector2`.
+        The angle between `vector1` and `vector2` in radians.
     
     """
     
@@ -60,7 +62,27 @@ def vector_theta(vector1, vector2):
 def rotation_matrix(vector1, vector2):
     """
     Returns a rotation matrix which transforms `vector1` to `vector2`.
+
+    Multiplying `vector1` by the rotation matrix returned by this 
+    function yields `vector2`. 
+
+    Parameters
+    ----------
+    vector1 : numpy.array
+        The vector which needs to be transformed to `vector2`.
+
+    vector2 : numpy.array
+        The vector onto which `vector1` needs to be transformed.
     
+    Returns
+    -------
+    numpy.ndarray
+        A rotation matrix which transforms `vector1` to `vector2`.
+        
+    References
+    ----------
+    http://tinyurl.com/kybj9ox
+    http://tinyurl.com/gn6e8mz
     
     """
 
@@ -68,17 +90,16 @@ def rotation_matrix(vector1, vector2):
     vector1 = normalize_vector(vector1)
     vector2 = normalize_vector(vector2)
     
-    # Hande the case where a == b.
+    # Hande the case where the input and output vectors are equal.
     if np.array_equal(vector1, vector2):
         return np.identity(3)
     
-    # Handle the case where a == -b.
+    # Handle the case where the rotation is 180 degrees.
     if np.array_equal(vector1, np.multiply(vector2, -1)):
         return np.multiply(np.identity(3), -1)
         
-    else:
-        v = np.cross(vector1, vector2)
-      
+    v = np.cross(vector1, vector2)
+    
     vx = np.array([[0, -v[2], v[1]],
                    [v[2], 0, -v[0]], 
                    [-v[1], v[0], 0]])
@@ -91,7 +112,6 @@ def rotation_matrix(vector1, vector2):
     
     return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
 
-
 def mol_from_mol2_file(mol2_file):
     """
     Creates an rdkit molecule from a ``.mol2`` file.
@@ -101,11 +121,11 @@ def mol_from_mol2_file(mol2_file):
     mol2_file : str
         The full path of the ``.mol2`` file from which an rdkit molecule
         should be instantiated.
-        
+
     Returns
     -------
     rdkit.Chem.rdchem.Mol
-        An rdkit instance of the molecule held in the `mol2_file`.
+        An rdkit instance of the molecule held in `mol2_file`.
 
     """
     
@@ -115,11 +135,14 @@ def mol_from_mol2_file(mol2_file):
     # the conformer. Finally add the conformer to the rdkit molecule and
     # return.
     
+    # Create an empty molecule and make it editable.
     mol = chem.Mol()  
     e_mol = chem.EditableMol(mol)
+    # Create a new conformer.
     conf = chem.Conformer()
+    # A regular expression which matches to elemental symbols in the 
+    # ``.mol2`` file.
     atomic_symbol = re.compile('[A-z]')    
-    
     
     take_atom = False 
     take_bond = False
@@ -132,13 +155,14 @@ def mol_from_mol2_file(mol2_file):
                 take_atom = True
                 continue
             # Indicates the following lines hold the bond block, and the
-            # atom block as ended.
+            # atom block has ended.
             if '@<TRIPOS>BOND' in line:
                 take_atom  = False
                 take_bond = True
                 continue
             # Indicates that the bond block is ended and all data has
-            # therefore been collected.
+            # therefore been collected. Stop going through the file as a
+            # result.
             if take_bond and len(line.split()) in {0,1}:
                 break
             # If in the atom block, extract atomic data.
@@ -182,7 +206,7 @@ def flatten(iterable, excluded_types={str}):
         else:
             yield x            
 
-
+# A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',
                   2: 'He',
                   3: 'Li',
