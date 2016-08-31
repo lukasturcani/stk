@@ -498,7 +498,7 @@ class Population:
 
             
     def calculate_member_fitness(self):
-        calc_fitness(self.ga_tools.fitness, self)      
+        calc_fitness(self.ga_tools.fitness, self)     
       
     def __iter__(self):
         """

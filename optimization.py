@@ -797,7 +797,21 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     return fix_block
 
 def kill_macromodel():
-    if os.name == 'nt': 
+    """
+    Kills any applications left open as a result running MacroModel.    
+    
+    Applications that are typically left open are 
+    ``jserver-watcher.exe`` and ``jservergo.exe``.    
+    
+    Returns
+    -------
+    None : NoneType    
+    
+    """
+    
+    if os.name == 'nt':
+        # In Windows, use the ``Taskkill`` command to force a close on
+        # the applications.           
         kill_cmd1 = "Taskkill /IM jserver-watcher.exe /F"
         kill_cmd2 = "Taskkill /IM jservergo.exe /F"
         
@@ -812,9 +826,18 @@ def do_not_optimize(macro_mol):
     waiting for molecules to get optimized. Use this in the input file
     in place of an optimization function when necessary.
     
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        A macromolecule which will not be optimized.
+    
+    Returns
+    -------
+    None : NoneType
+    
     """
     
-    return None
+    return
     
 from .classes import FGInfo
 from .classes.exception import MacroMolError
