@@ -7,10 +7,10 @@ mutant_select_func fittest
 mating_func bb_lk_exchange
 mutation_func random_bb database=C:\Users\lukas\Projects\MMEA\Database_prec\amines3f
 
-opt_func macromodel_opt
+opt_func do_not_optimize
 
 fitness_func random_fitness
 
-pop_size 3
-num_generations 5
+pop_size 20
+num_generations 10
 num_mutations 5 
