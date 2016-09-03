@@ -759,11 +759,12 @@ class StructUnit(metaclass=Cached):
         -------
         rdkit.Chem.rdchem.Mol
             The heavy rdkit molecule with the centroid placed at 
-            `position`.
+            `position`. This is the same instance as that in 
+            `heavy_mol`.
         
         """
         
-        centroid = self.heavy_centroid()
+        centroid = self.heavy_mol_centroid()
         shift = position - centroid
         new_conf = self.shift_heavy_mol(*shift).GetConformer()
 
@@ -859,6 +860,14 @@ class StructUnit(metaclass=Cached):
         vector. This means that in ``BuildingBlock`` molecules the
         normal to the plane will be aligned with `end` when this method
         is run.
+        
+        As the above examples demonstrate, the great thing about this 
+        method is that you as long as you can associate a gemotric 
+        feature of the molecule with a vector, then the molecule can be 
+        roatated so that this vector is aligned with `end`. The defined 
+        vector can be virtually anything. This means that any geomteric 
+        feature of the molecule can be easily aligned with any arbitrary 
+        direction.
 
         This method modifies the rdkit molecule in `heavy_mol`. It also
         returns of a copy of this rdkit molecule.
