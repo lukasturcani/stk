@@ -1,11 +1,10 @@
 import os
 import rdkit
 import numpy as np
+import copy
 
 from ...classes import StructUnit, Linker, FGInfo
-from ...convenience_functions import flatten
-
-
+from ...convenience_functions import flatten, normalize_vector
 
 def get_mol_file():
     # The following lines first create a directory tree starting from
@@ -23,6 +22,11 @@ def get_mol_file():
             for y in x[2]:
                 if '.mol' in y and 'HEAVY' not in y:
                     yield os.path.join(x[0], y)
+
+# Create a StructUnit instance which can be used by multiple tests to
+# not waste time on multiple initializations.
+struct_file = next(x for x in get_mol_file() if 'amine3f_14.mol' in x)
+struct = StructUnit(struct_file)
 
 def test_caching():
     bb_file = next(x for x in get_mol_file() 
@@ -130,7 +134,7 @@ def test_shift_heavy_mol():
         assert atom1_coords.y == og_coords.y + shift_size
         assert atom1_coords.z == og_coords.z + shift_size
         
-def test_get_heavy_coords():
+def test_heavy_all_atom_coords():
     """
     Make sure the correct output is provided.
 
@@ -138,12 +142,17 @@ def test_get_heavy_coords():
     mol_file = next(x for x in get_mol_file() 
                                         if 'amine3f_14.mol' in x)   
     mol = StructUnit(mol_file)
-    for x,y,z in mol.get_heavy_coords():
+    expected_output_type = type(np.array([1,2,3]))
+    
+    for coord in mol.heavy_all_atom_coords():
+        x,y,z = coord
+        
+        assert isinstance(coord, expected_output_type)        
         assert isinstance(x, float)
         assert isinstance(y, float)
         assert isinstance(z, float)
     
-    assert len(list(mol.get_heavy_coords())) == 32
+    assert len(list(mol.heavy_all_atom_coords())) == 32
     
 def test_amine_substitution():
     """
@@ -177,102 +186,161 @@ def test_make_atoms_heavy_in_heavy():
     
     """
     
-    bb_file = next(x for x in get_mol_file() 
-                                    if 'test_rot_amine.mol' in x)
+
     lk_file = next(x for x in get_mol_file() 
                                     if 'aldehyde2f_3.mol' in x) 
 
-    bb = StructUnit(bb_file)
     lk = StructUnit(lk_file)
     
     # Test that the position of the substituted atoms remains the same.
         
-    i = 0
-    for atom_id in flatten(bb.find_functional_group_atoms()):
-        atom = bb.prist_mol.GetAtomWithIdx(atom_id)
-        if atom.GetAtomicNum() == bb.func_grp.target_atomic_num:
-            prist_coord = bb.get_prist_atom_coords(atom_id)
-            heavy_coord = bb.get_heavy_atom_coords(bb.heavy_ids[i])
-            assert prist_coord == heavy_coord
+    i= 0
+    for atom_id in flatten(lk.find_functional_group_atoms()):
+        atom = lk.prist_mol.GetAtomWithIdx(atom_id)
+        if atom.GetAtomicNum() == lk.func_grp.target_atomic_num:
+            prist_coord = lk.prist_get_atom_coords(atom_id)
+            heavy_coord = lk.heavy_get_atom_coords(lk.heavy_ids[i])
             i += 1
+            assert np.array_equal(prist_coord, heavy_coord)        
     
+def test_set_heavy_mol_position():
 
-    
-    
-    
-def test_rotate_heavy_mol():
-    lk_file = next(x for x in get_mol_file() 
-                                    if 'test_rot_amine.mol' in x) 
-    
-    lk = Linker(lk_file)
-    
-    # Rotation about the z-axis in the anti-clockwise direction.    
-    
-    lk.rotate_heavy_mol(0, 0, np.pi/4)
-
-
-    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/4
-    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/4
-    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2
-    
-    # Reverse rotation.    
-    
-    lk.rotate_heavy_mol(0, 0, -np.pi/4)    
-    
-    assert lk.get_heavy_theta(np.array([1, 0, 0])) == 0
-    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2
-    
-    # Rotation around y axis in anti-clockwise rotation.
-    
-    lk.rotate_heavy_mol(0, np.pi/2, 0)
-
-    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 0, 1])) == 0
-    
-    # Rotation around x axis in anti-clockwise rotation.
-    
-    lk.rotate_heavy_mol(np.pi/2, 0, 0)
-
-    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 1, 0])) == 0
-    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2
-    
-    # Reverse x rotation.    
-    
-    lk.rotate_heavy_mol(-np.pi/2, 0, 0)    
-    
-    assert lk.get_heavy_theta(np.array([1, 0, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 0, 1])) == 0
-    
-    # Reverse y rotation.
-    
-    lk.rotate_heavy_mol(0, -np.pi/2, 0)
-
-    assert lk.get_heavy_theta(np.array([1, 0, 0])) == 0
-    assert lk.get_heavy_theta(np.array([0, 1, 0])) == np.pi/2
-    assert lk.get_heavy_theta(np.array([0, 0, 1])) == np.pi/2    
-    
-    
-    
-    
-    
         
+    # Place centroid at some position.
+    mol = struct.set_heavy_mol_position([3.14, 6.14, -12.14])
+    
+    # Check that the centroid of the heavy molecule is at that position.
+    assert np.allclose(struct.heavy_mol_centroid(), 
+                       np.array([3.14, 6.14, -12.14]),
+                       atol = 1e-8)
+    
+    # Ensure the returned rdkit instance is the one in `heavy_mol`.                   
+    assert mol is struct.heavy_mol
+
+def test_heavy_mol_position_matrix():
+    
+    # Go through each atom id. For each atom id get the column in the 
+    # position matrix with that id as its index. Make sure that the data
+    # is the same. 
+    pos_mat1 = struct.heavy_mol_position_matrix()
+    conf = struct.heavy_mol.GetConformer()
+       
+    for atom in struct.heavy_mol.GetAtoms():
+        atom_id = atom.GetIdx()
+        cx, cy, cz = conf.GetAtomPosition(atom_id)
+        
+        conf_coord = np.array([cx, cy, cz])   
+        mat_coord = pos_mat1.T[atom_id]
+
+        assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
+    
+    # Move the molecule, ensure that the position matrix is adjusted
+    # appropriately.
+    curr_x, curr_y, curr_z = struct.heavy_mol_centroid()
+    
+    struct.set_heavy_mol_position([curr_x+1, curr_y-1, curr_z+2])
+    pos_mat2 = struct.heavy_mol_position_matrix() 
+    conf = struct.heavy_mol.GetConformer()
+
+    for atom in struct.heavy_mol.GetAtoms():
+        atom_id = atom.GetIdx()
+        cx, cy, cz = conf.GetAtomPosition(atom_id)
+        
+        conf_coord = np.array([cx, cy, cz])   
+        mat_coord = pos_mat1.T[atom_id]
+        mat2_coord = pos_mat2.T[atom_id]
+        
+        assert not np.allclose(conf_coord, mat_coord, atol = 1e-8)    
+        assert np.allclose(conf_coord, mat2_coord, atol = 1e-8) 
+    
+def test_set_heavy_mol_from_position_matrix_AND_OTHERS():
+    """
+    Also tests heavy_mol_centroid and heavy_atom_centroid.
+    
+    """
+    
+    # Make a position matrix where each coordinate is set to [1,2,3] for
+    # every atom. Use a copy of struct in this test because it will
+    # severly mess up the structure.
+    
+    struct2 = copy.deepcopy(struct)
+    
+    pos_mat = []
+    for x in range(struct2.heavy_mol.GetNumAtoms()):
+        pos_mat.append([1,2,3])
+    
+    pos_mat = np.matrix(pos_mat).T
+
+    struct2.set_heavy_mol_from_position_matrix(pos_mat)
+    
+    for coord in struct2.heavy_all_atom_coords():
+        assert np.array_equal(coord, [1,2,3])
+    
+    # Centroids should also be in [1,2,3].
+    assert np.array_equal(struct2.heavy_atom_centroid(), [1,2,3])
+    assert np.array_equal(struct2.heavy_mol_centroid(), [1,2,3])
+
+def test_set_heavy_mol_orientation():
+    
+    struct.set_heavy_mol_orientation(
+    next(struct.heavy_direction_vectors()), [1,2,3])
+    
+    assert np.allclose(next(struct.heavy_direction_vectors()), 
+                       normalize_vector([1,2,3]),
+                       atol=1e-8)   
+    
+def test_heavy_atom_position_matrix():
+    
+    conf = struct.heavy_mol.GetConformer()
+    pos_mat = struct.heavy_atom_position_matrix()    
+    
+    for atom_id in struct.heavy_ids:
+        cx, cy, cz = conf.GetAtomPosition(atom_id)
+        coord = np.array([cx, cy, cz])        
+        
+        column_i = struct.heavy_ids.index(atom_id)
+        column = pos_mat.T[column_i]
+        
+        assert np.allclose(coord, column, atol=1e-8)
+        
+
+def test_heavy_direction_vectors():
+    
+    for vector in struct.heavy_direction_vectors():
+        assert isinstance(vector, np.ndarray)
+    
+    assert len(list(struct.heavy_direction_vectors())) == 3
     
     
+def test_set_heavy_atom_centroid():
+    struct.set_heavy_atom_centroid([1,2,3])
+    assert np.allclose(struct.heavy_atom_centroid(), [1,2,3], atol=1e-8)
     
+    struct.set_heavy_atom_centroid([2,2,2])
+    assert not np.allclose(struct.heavy_atom_centroid(), 
+                           [1,2,3], atol=1e-8)     
+
+    assert np.allclose(struct.heavy_atom_centroid(), [2,2,2], atol=1e-8)    
     
+def test_prist_get_atom_coords():
     
+    conf = struct.prist_mol.GetConformer()    
     
+    for atom in struct.prist_mol.GetAtoms():
+        atom_id = atom.GetIdx()
+        coords = struct.prist_get_atom_coords(atom_id)
+        conf_coords = conf.GetAtomPosition(atom_id)
+        assert np.allclose(coords, conf_coords, atol=1e-8)
     
+def test_heavy_get_atom_coords():
     
+    conf = struct.heavy_mol.GetConformer()    
     
-    
-    
-    
-    
+    for atom in struct.heavy_mol.GetAtoms():
+        atom_id = atom.GetIdx()
+        coords = struct.heavy_get_atom_coords(atom_id)
+        conf_coords = conf.GetAtomPosition(atom_id)
+        assert np.allclose(coords, conf_coords, atol=1e-8)
     
     
     
