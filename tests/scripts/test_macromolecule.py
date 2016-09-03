@@ -102,17 +102,27 @@ def test_get_heavy_as_graph():
         
 def test_heavy_get_atom_coords():
     
-    expected_output = (1, 52, 1)
+    expected_output = (50, 51, 0)
     output = tuple(int(x) for x in mol.heavy_get_atom_coords(21))
     assert expected_output == output
 
+def test_prist_get_atom_coords():
+    expected_output = (50, 51, 0)
+    output = tuple(int(x) for x in mol.prist_get_atom_coords(21))
+    assert expected_output == output    
+
 def test_heavy_distance():
 
-    assert int(mol.heavy_distance(22, 51)) == 62
+    assert int(mol.heavy_distance(22, 51)) == 99
     
-def test_get_atom_distances():
-    assert len(list(mol.get_heavy_atom_distances())) == 276
-    for x,y,z in mol.get_heavy_atom_distances():
+def test_prist_distance():
+
+    assert int(mol.prist_distance(22, 51)) == 99
+    
+    
+def test_heavy_all_distances():
+    assert len(list(mol.heavy_all_distances())) == 276
+    for x,y,z in mol.heavy_all_distances():
         assert isinstance(x, float)
         assert x >= 0
         assert isinstance(y, int)
