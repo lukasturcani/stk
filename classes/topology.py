@@ -5,13 +5,17 @@ import networkx as nx
 from functools import partial
 import numpy as np
 import itertools
+from collections import deque
+from scipy.spatial.distance import euclidean
 
 from .molecular import FGInfo, BuildingBlock, Linker
-from ..convenience_functions import flatten, normalize_vector
+from ..convenience_functions import (flatten, normalize_vector,
+                                     rotation_matrix, kabsch, 
+                                     matrix_centroid)
 
 class Vertex:
 
-    __slots__ = ['x', 'y', 'z', 'coord', 'edges']    
+    __slots__ = ['x', 'y', 'z', 'coord', 'edges', 'heavy_ids']    
     
     def __init__(self, x, y, z):
         self.x = x
@@ -19,9 +23,23 @@ class Vertex:
         self.z = z
         self.coord = np.array([x,y,z])
         self.edges = []
+        self.heavy_ids = []
         
     def place_mol(self, building_block):
-        building_block.set_heavy_center(self.coord)
+        
+        edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
+    
+        building_block.set_heavy_atom_centroid([0,0,0])              
+        
+        rot_mat = kabsch(building_block.heavy_atom_position_matrix().T, edge_coord_mat)
+        new_pos_mat = np.dot(rot_mat, building_block.heavy_mol_position_matrix())
+        building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
+        
+        
+        # Translate edge coord matrix to origin.
+               
+        
+        building_block.set_heavy_atom_centroid(self.coord)
         return building_block.set_heavy_mol_orientation(self.edge_plane_normal())
 
     def edge_plane_normal(self):
@@ -37,11 +55,20 @@ class Vertex:
     def edge_direction_vectors(self):
         for edge1, edge2 in itertools.combinations(self.edges, 2):
             yield normalize_vector(edge1.coord-edge2.coord)
+    
+    def edge_coord_matrix(self):
+        coords = []
+        for edge in self.edges:
+            coords.append(edge.coord)
+        return np.matrix(coords)
+        
+    def edge_centroid(self):
+        return sum(edge.coord for edge in self.edges) / len(self.edges)
         
 
 class Edge:
     
-    __slots__ = ['v1', 'v2', 'coord', 'direction']    
+    __slots__ = ['v1', 'v2', 'coord', 'direction', 'heavy_ids']    
     
     def __init__(self, v1, v2):
         self.v1 = v1
@@ -51,13 +78,15 @@ class Edge:
         v1.edges.append(self)
         v2.edges.append(self)
         
+        self.heavy_ids = []
+        
     def place_mol(self, linker):
         """
         
         """
         
-        linker.set_heavy_center(self.coord)
-        mol = linker.set_heavy_mol_orientation(self.direction)
+        linker.set_heavy_atom_centroid(self.coord)
+        linker.set_heavy_mol_orientation(self.direction)
         if not np.allclose(self.direction, 
                            next(linker.heavy_direction_vectors()),
                            atol=0.01):
@@ -66,7 +95,18 @@ class Edge:
                     'Expected {0}, got {1}.').format(self.direction,  
                            next(linker.heavy_direction_vectors())))
 
-        return mol
+        dir_vector = linker.heavy_mol_centroid() - self.coord
+        linker.set_heavy_atom_centroid([0,0,0])
+        
+
+        
+        rot_mat = rotation_matrix(dir_vector, self.coord)
+        pos_mat = linker.heavy_mol_position_matrix()
+        new_pos_mat = np.dot(rot_mat, pos_mat)
+        linker.set_heavy_mol_from_position_matrix(new_pos_mat)
+        linker.set_heavy_atom_centroid(self.coord)
+        
+        return linker.heavy_mol
 
 class Topology:
     """
@@ -320,6 +360,33 @@ class Topology:
         self.macro_mol.prist_mol.UpdatePropertyCache()
         self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol,
                                               addCoords=True)
+
+
+    def pair_up_edges_with_vertices(self, *args):
+
+
+        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
+        
+        for edge in self.edges:
+            for atom_id in edge.heavy_ids:
+                atom_coord = self.macro_mol.heavy_get_atom_coords(
+                                                                atom_id)                
+                
+                
+                distance = partial(euclidean, atom_coord)
+                vertex = min([edge.v1.coord, edge.v2.coord], 
+                             key=distance)
+                             
+                vertex = next(x for x in [edge.v1, edge.v2] if np.array_equal(vertex, x.coord))
+                partner = self.min_distance_partner(atom_id, 
+                                                    vertex.heavy_ids)
+                vertex.heavy_ids.remove(partner)
+                
+                bond_type = self.determine_bond_type(atom_id, partner)
+                # Add the bond.                
+                editable_mol.AddBond(atom_id, partner, bond_type)   
+                
+        self.macro_mol.heavy_mol = editable_mol.GetMol()
 
     def pair_up_diff_element_atoms(self, heavy_mols):
         """
@@ -634,41 +701,6 @@ class Topology:
         else:
             return rdkit.Chem.rdchem.BondType.SINGLE
 
-class FourPlusSix(Topology):
-    """
-    Defines the tetrahedral, 4+6, topology.
-
-    This is a topology of cages where 4 building-blocks* are placed on
-    vertices and 6 linkers are placed on the edges between them. This
-    class defines functions which place these molecules in the correct
-    positions within an rdkit instance. The rdkit instance is stored in 
-    the `heavy_mol` attribute of a ``Cage`` instance.
-
-    Attributes
-    ----------
-    This class also inhertis all the attributes of the ``Topology`` 
-    class. Only the attribute `pair_up` must be defined, which defines
-    which ``pair up`` inhertied from ``Topology`` should be used for
-    pairing up the linkers and building-blocks*. This attribute is
-    default initialized and cannot be set during initialization or run
-    time of MMEA. It is hard coded.
-       
-    pair_up : function (default = self.pair_up_diff_element_atoms)
-        The function used to find atoms in different building-block* and
-        linker molecules which need to have a bond created between them.
-        It also creates the bonds between them.
-        
-    """
-    
-    vertices = [Vertex(0,0,0), Vertex(50,0,0), 
-                Vertex(0,50,0), Vertex(25,25,50)]
-        
-    edges = [Edge(v1,v2) for v1, v2 in 
-                itertools.combinations(vertices, 2)]  
-    
-    def __init__(self, macro_mol):
-        Topology.__init__(self, macro_mol)        
-        self.pair_up = self.pair_up_diff_element_atoms
 
     def place_mols(self):
         """
@@ -702,11 +734,68 @@ class FourPlusSix(Topology):
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         edge.place_mol(lk))
+                                        
+            heavy_ids = deque(maxlen=2)
+            for atom in self.macro_mol.heavy_mol.GetAtoms():
+                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+                    heavy_ids.append(atom.GetIdx())
+            
+            edge.heavy_ids = list(heavy_ids)
 
         for vertex in self.vertices:
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         vertex.place_mol(bb))
+            heavy_ids = deque(maxlen=3)
+            for atom in self.macro_mol.heavy_mol.GetAtoms():
+                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+                    heavy_ids.append(atom.GetIdx())
+            
+            vertex.heavy_ids = list(heavy_ids)
+
+
+class FourPlusSix(Topology):
+    """
+    Defines the tetrahedral, 4+6, topology.
+
+    This is a topology of cages where 4 building-blocks* are placed on
+    vertices and 6 linkers are placed on the edges between them. This
+    class defines functions which place these molecules in the correct
+    positions within an rdkit instance. The rdkit instance is stored in 
+    the `heavy_mol` attribute of a ``Cage`` instance.
+
+    Attributes
+    ----------
+    This class also inhertis all the attributes of the ``Topology`` 
+    class. Only the attribute `pair_up` must be defined, which defines
+    which ``pair up`` inhertied from ``Topology`` should be used for
+    pairing up the linkers and building-blocks*. This attribute is
+    default initialized and cannot be set during initialization or run
+    time of MMEA. It is hard coded.
+       
+    pair_up : function (default = self.pair_up_diff_element_atoms)
+        The function used to find atoms in different building-block* and
+        linker molecules which need to have a bond created between them.
+        It also creates the bonds between them.
+        
+    """
+    
+    
+    # Vertices of a tetrahdron so that origin is at the origin. Source:
+    # http://tinyurl.com/lc262h8.
+    vertices = [Vertex(100,0,-100/np.sqrt(2)), 
+                Vertex(-100,0,-100/np.sqrt(2)), 
+                Vertex(0,100,100/np.sqrt(2)), 
+                Vertex(0,-100,100/np.sqrt(2))]
+        
+    edges = [Edge(v1,v2) for v1, v2 in 
+                itertools.combinations(vertices, 2)]  
+    
+    def __init__(self, macro_mol):
+        Topology.__init__(self, macro_mol)        
+        self.pair_up = self.pair_up_edges_with_vertices
+
+
  
 class EightPlusTwelve(FourPlusSix):
     """
@@ -714,65 +803,35 @@ class EightPlusTwelve(FourPlusSix):
     
     """
     
-    def place_bbs(self):
-        cage_bb = next(x for x in self.macro_mol.building_blocks if 
-                                        isinstance(x, BuildingBlock))
+    vertices = [Vertex(-50, 50, -50), 
+                Vertex(-50, -50, -50), 
+                Vertex(50, 50, -50), 
+                Vertex(50, -50, -50),
 
-        position1 = cage_bb.shift_heavy_mol(0,0,0)
-        position2 = cage_bb.shift_heavy_mol(50,0,0)
-        position3 = cage_bb.shift_heavy_mol(0,50,0)
-        position4 = cage_bb.shift_heavy_mol(50,50,0)
-
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)
-        one = chem.CombineMols(combined_mol, combined_mol2)   
+                Vertex(-50, 50, 50), 
+                Vertex(-50, -50, 50), 
+                Vertex(50, 50, 50), 
+                Vertex(50, -50, 50)]
         
-        position1 = cage_bb.shift_heavy_mol(0,0,50)
-        position2 = cage_bb.shift_heavy_mol(50,0,50)
-        position3 = cage_bb.shift_heavy_mol(0,50,50)
-        position4 = cage_bb.shift_heavy_mol(50,50,50)
+    edges = [Edge(vertices[0], vertices[2]), 
+             Edge(vertices[0], vertices[1]),
+             Edge(vertices[1], vertices[3]),
+             Edge(vertices[2], vertices[3]),
+             
+             Edge(vertices[4], vertices[6]), 
+             Edge(vertices[4], vertices[5]),
+             Edge(vertices[5], vertices[7]),
+             Edge(vertices[6], vertices[7]),
 
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)
-        two = chem.CombineMols(combined_mol, combined_mol2)          
-        
-        return chem.CombineMols(one, two)
-        
-    def place_lks(self):
-        cage_lk = next(x for x in self.macro_mol.building_blocks if 
-                                        isinstance(x, Linker))
 
-        position1 = cage_lk.shift_heavy_mol(25,0,0)
-        position2 = cage_lk.shift_heavy_mol(0,25,0)
-        position3 = cage_lk.shift_heavy_mol(25,50,0)
-        position4 = cage_lk.shift_heavy_mol(50,25,0)
-
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)
-        one = chem.CombineMols(combined_mol, combined_mol2)   
-        
-        position1 = cage_lk.shift_heavy_mol(25,0,50)
-        position2 = cage_lk.shift_heavy_mol(0,25,50)
-        position3 = cage_lk.shift_heavy_mol(25,50,50)
-        position4 = cage_lk.shift_heavy_mol(50,25,50)
-
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)
-        two = chem.CombineMols(combined_mol, combined_mol2)          
-
-        three = chem.CombineMols(one, two) 
-
-        position1 = cage_lk.shift_heavy_mol(0,0,25)
-        position2 = cage_lk.shift_heavy_mol(50,0,25)
-        position3 = cage_lk.shift_heavy_mol(0,50,25)
-        position4 = cage_lk.shift_heavy_mol(50,50,25)
-
-        combined_mol = chem.CombineMols(position1, position2)
-        combined_mol2 = chem.CombineMols(position3, position4)
-        four = chem.CombineMols(combined_mol, combined_mol2)         
-        
-        
-        return chem.CombineMols(three, four)
+             Edge(vertices[0], vertices[4]), 
+             Edge(vertices[1], vertices[5]),
+             Edge(vertices[2], vertices[6]),
+             Edge(vertices[3], vertices[7])]  
+    
+    def __init__(self, macro_mol):
+        Topology.__init__(self, macro_mol)        
+        self.pair_up = self.pair_up_edges_with_vertices    
 
        
 class BlockCopolymer(Topology):

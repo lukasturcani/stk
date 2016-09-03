@@ -5,13 +5,12 @@ from rdkit.Geometry import Point3D
 import re
 import numpy as np
 
-# This dictionary gives easy access to the rdkit bond types to the 
-# ``mol_from_mol2_file`` function.
-bond = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
-        'am' : rdkit.Chem.rdchem.BondType.SINGLE,
-        '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
-        '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
-        'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
+# This dictionary gives easy access to the rdkit bond types.
+bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
+             'am' : rdkit.Chem.rdchem.BondType.SINGLE,
+             '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
+             '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
+             'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
 
 def normalize_vector(vector):
     """
@@ -112,6 +111,73 @@ def rotation_matrix(vector1, vector2):
     
     return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
 
+def kabsch(coords1, coords2):
+    """
+    Return a rotation matrix to minimize dstance between 2 coord sets.
+    
+    This is essentially an implementation of the Kabsch algorithm. Given
+    two sets of coordinates, `coords1` and `coords2`, this function
+    returns a rotation matrix. When the rotation matrix is applied to
+    `coords1` the resulting coordinates have their rms distance to
+    `coords2` minimized.
+    
+    Parameters
+    ----------
+    coords1 : numpy.array
+        This array represents a matrix hodling coordinates which need
+        to be rotated to minimize their rms distance to coordinates in
+        `coords2`. The matrix is n x 3. Each row of the matrix holds the
+        x, y and z coordinates of one point, respectively. Here ``n`` is
+        the number of points.
+    
+    coords2 : numpy.array
+        This array represents a matrix which holds the coordinates of
+        points the distance to which should be minimized. The matrix is 
+        n x 3. Each row of the matrix holds the x, y and z coordinates 
+        of one point, respectively. Here ``n`` is the number of points.
+        
+    Returns
+    -------
+    numpy.array
+        A rotation matrix. This will be a 3 x 3 matrix.
+    
+    References
+    ----------
+    http://nghiaho.com/?page_id=671
+    https://en.wikipedia.org/wiki/Kabsch_algorithm
+    
+    """
+    
+    h = np.dot(coords1, coords2.T)
+    u,s,v = np.linalg.svd(h)
+
+    if int(np.linalg.det(v)) < 0:
+        v[:,2] = -v[:,2]
+
+    
+    return np.dot(v, u)
+
+def matrix_centroid(matrix):
+    """
+    Returns the centroid of the coordinates held in `matrix`.
+    
+    Parameters
+    ----------
+    matrix : np.array
+        A n x 3 matrix. Each row holds the x, y and z coordinate of some
+        point, respectively.
+        
+    Returns
+    -------
+    numpy.array
+        A numpy array which holds the x, y and z coordinates of the
+        centroid of the coordinates in `matrix`.
+    
+    """
+    
+    sum_ = sum( x[0] for x in matrix)
+    return sum_ / len(matrix)
+
 def mol_from_mol2_file(mol2_file):
     """
     Creates an rdkit molecule from a ``.mol2`` file.
@@ -181,7 +247,7 @@ def mol_from_mol2_file(mol2_file):
             if take_bond:
                 bond_id, atom1, atom2, bond_order, *_ = line.split()
                 e_mol.AddBond(int(atom1)-1, int(atom2)-1, 
-                              bond[bond_order])                
+                              bond_dict[bond_order])                
                 
                 continue
     
