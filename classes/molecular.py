@@ -790,7 +790,7 @@ class StructUnit(metaclass=Cached):
 
         for atom in self.heavy_mol.GetAtoms():
             atom_id = atom.GetIdx()
-            pos_vect = np.array([*self.atom_coords_in_heavy(atom_id)])
+            pos_vect = np.array([*self.heavy_get_atom_coords(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)
@@ -883,7 +883,8 @@ class StructUnit(metaclass=Cached):
         Returns
         -------
         rdkit.Chem.rdchem.Mol
-            The rdkit molecule instance of the rotated molecule.
+            An rdkit molecule instance of the rotated molecule. This is 
+            a copy of the rdkit molecule in `heavy_mol`.
         
         """
         
@@ -926,7 +927,7 @@ class StructUnit(metaclass=Cached):
         pos_array = np.array([])
 
         for atom_id in self.heavy_ids:
-            pos_vect = np.array([*self.atom_coords_in_heavy(atom_id)])
+            pos_vect = np.array([*self.heavy_get_atom_coords(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)        
@@ -942,7 +943,7 @@ class StructUnit(metaclass=Cached):
         
         """
                
-        centroid = sum(x for x in self.all_heavy_mol_coords()) 
+        centroid = sum(x for x in self.heavy_all_atom_coords()) 
         return np.divide(centroid, self.heavy_mol.GetNumAtoms())
 
     def heavy_direction_vectors(self):
@@ -960,8 +961,8 @@ class StructUnit(metaclass=Cached):
         
         for atom1_id, atom2_id in itertools.combinations(self.heavy_ids, 
                                                                      2):
-            p1 = self.atom_coords_in_heavy(atom1_id)
-            p2 = self.atom_coords_in_heavy(atom2_id)
+            p1 = self.heavy_get_atom_coords(atom1_id)
+            p2 = self.heavy_get_atom_coords(atom2_id)
         
             yield normalize_vector(p1-p2)
 
@@ -982,7 +983,7 @@ class StructUnit(metaclass=Cached):
         y_sum = 0
         z_sum = 0
         for atom_id in self.heavy_ids:
-            x,y,z = self.atom_coords_in_heavy(atom_id)
+            x,y,z = self.heavy_get_atom_coords(atom_id)
             x_sum += x
             y_sum += y
             z_sum += z
@@ -1031,17 +1032,41 @@ class StructUnit(metaclass=Cached):
         return chem.Mol(self.heavy_mol)        
 
 
-    def get_prist_atom_coords(self, atom_id):
+    def prist_get_atom_coords(self, atom_id):
         """
+        Return coordinates of atom in `prist_mol`.
+
+        Parameters
+        ----------
+        atom_id : int
+            The id of the atom whose coordinates are desired.
+            
+        Returns
+        -------
+        numpy.array
+            An array hodling the x, y and z coordinates (respectively) 
+            of atom with id of `atom_id` in `prist_mol`.
         
         """
         
         conf = self.prist_mol.GetConformer()
         atom_position = conf.GetAtomPosition(atom_id)
-        return tuple([*atom_position])
+        return np.array([*atom_position])
 
-    def atom_coords_in_heavy(self, atom_id):
+    def heavy_get_atom_coords(self, atom_id):
         """
+        Return coordinates of atom in `heavy_mol`.
+
+        Parameters
+        ----------
+        atom_id : int
+            The id of the atom whose coordinates are desired.
+            
+        Returns
+        -------
+        numpy.array
+            An array hodling the x, y and z coordinates (respectively) 
+            of atom with id of `atom_id` in `heavy_mol`.
         
         """
         
@@ -1049,11 +1074,12 @@ class StructUnit(metaclass=Cached):
         atom_position = conf.GetAtomPosition(atom_id)
         return np.array([*atom_position])
 
-    def all_heavy_mol_coords(self):
+    def heavy_all_atom_coords(self):
         """
         Yields the x, y and z coordinates of atoms in `heavy_mol`.        
 
-        This yields the coordinates of every atom.
+        This yields the coordinates of every atom in the substituted
+        molecule.
 
         The `heavy_mol` attribute holds a ``rdkit.Chem.rdchem.Mol``
         instance. This instance holds holds a 
@@ -1110,16 +1136,84 @@ class BuildingBlock(StructUnit):
     """
 
     def heavy_plane_normal(self):
+        """
+        Returns the normal vector to the plane formed by heavy atoms.
+        
+        Returns
+        -------        
+        numpy.array
+            A unit vector which describes the normal to the plane of the
+            heavy atoms.
+        
+        """
+        
         v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
         return normalize_vector(np.cross(v1, v2))
     
     def heavy_plane(self):
+        """
+        Returns the coefficients of the plane formed by heavy atoms.
+        
+        A plane is defined by the scalar plane equation,
+            
+            ax + by + cz = d.
+        
+        This method returns the a, b, c and d coefficients of this 
+        equation for the plane formed by the heavy atoms. The 
+        coefficents a, b and c decribe the normal vector to the plane.
+        The coefficent d is found by substituting these coefficients
+        along with the x, y and z variables in the scalar equation and
+        solving for d. The variables x, y and z are substituted by the
+        coordinate of some point on the plane. For example, the position
+        of one of the heavy atoms.
+        
+        Returns
+        -------
+        numpy.array
+            This array has the form [a, b, c, d] and represents the 
+            scalar equation of the plane formed by the heavy atoms.
+        
+        References
+        ----------
+        http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx                
+        
+        """
+        
         heavy_coord = self.atom_coords_in_heavy(self.heavy_ids[0])
         d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
                                            heavy_coord)), -1)
         return np.append(self.heavy_plane_normal(), d)
         
     def set_heavy_mol_orientation(self, end):
+        """
+        Rotates heavy molecule so plane normal is aligned with `end`.
+
+        Here ``plane normal`` referes to the normal of the plane formed
+        by the heavy atoms in the substituted molecule. The molecule
+        is rotated about the centroid of the heavy atoms. The rotation
+        results in the normal of their plane being aligned with `end`.
+
+        Parameters
+        ----------
+        end : numpy.array
+            The vector with which the normal of plane of heavy atoms 
+            shoould be aligned.
+        
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed due to
+            rotation of the molecule about the centroid of the heavy
+            atoms.        
+
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance of the rotated molecule. This is 
+            a copy of the rdkit molecule in `heavy_mol`.
+            
+        """
+        
         start = self.heavy_plane_normal()
         return StructUnit.set_heavy_mol_orientation(self, start, end)
 
@@ -1130,6 +1224,34 @@ class Linker(StructUnit):
     """
     
     def set_heavy_mol_orientation(self, end):
+        """
+        Rotate heavy molecule so heavy atoms lie on `end`.     
+        
+        The molecule is rotated about the centroid of the heavy atoms.
+        It is rotated so that the direction vector running between the
+        2 heavy atoms is aligned with the vector `end`.        
+        
+        Parameters
+        ----------
+        end : numpy.array
+            The vector with which the molecule's heavy atoms should be
+            aligned.
+        
+        Modifies
+        --------        
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed due to
+            rotation of the molecule about the centroid of the heavy
+            atoms.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance of the rotated molecule. This is 
+            a copy of the rdkit molecule in `heavy_mol`.        
+        
+        """
+        
         start = next(self.heavy_direction_vectors())
         return StructUnit.set_heavy_mol_orientation(self, start, end)
     
