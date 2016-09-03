@@ -1,6 +1,5 @@
 import rdkit
 from rdkit import Chem as chem
-from rdkit.Chem import AllChem as ac
 import networkx as nx
 from functools import partial
 import numpy as np
@@ -10,8 +9,7 @@ from scipy.spatial.distance import euclidean
 
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..convenience_functions import (flatten, normalize_vector,
-                                     rotation_matrix, kabsch, 
-                                     matrix_centroid)
+                                     rotation_matrix, kabsch)
 
 class Vertex:
 

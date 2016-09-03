@@ -1188,7 +1188,7 @@ class BuildingBlock(StructUnit):
         
         """
         
-        heavy_coord = self.atom_coords_in_heavy(self.heavy_ids[0])
+        heavy_coord = self.heavy_get_atom_coords(self.heavy_ids[0])
         d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
                                            heavy_coord)), -1)
         return np.append(self.heavy_plane_normal(), d)
@@ -1263,8 +1263,6 @@ class Linker(StructUnit):
         
         start = next(self.heavy_direction_vectors())
         return StructUnit.set_heavy_mol_orientation(self, start, end)
-    
-
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):
@@ -1369,12 +1367,18 @@ class MacroMolecule(metaclass=CachedMacroMol):
         join up to form the macromolecule
 
     topology : A child class of ``Topology``
-        Represents the topology of the macromolecule. Any information to 
-        do with how individual building blocks of the macromolecule are 
-        organized and joined up in space is held by this attribute. For 
-        more details about what information and functions this entails 
-        see the docstring of the ``Topology`` class and its derived 
-        classes.
+        This instance represents the topology of the macromolecule. Any 
+        information to do with how individual building blocks of the 
+        macromolecule are organized and joined up in space is held by 
+        this attribute. For more details about what information and 
+        functions this entails see the docstring of the ``Topology`` 
+        class and its derived classes.
+
+    topology_args : list (default = [])
+        This attribue holds the initializer arguments for the topology 
+        instance. This is stored so that exceptions can print all
+        values required to make an identical copy of a ``MacroMolecule``
+        instance..
 
     prist_mol_file : str
         The full path of the ``.mol`` file holding the pristine version
@@ -1403,10 +1407,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
         optimized. Optimization functions set this flag to ``True``
         after an optimization.
 
-    fitness : float
+    fitness : float (default = None)
         The fitness value of the macromolecule, as determined by the 
-        chosen fitness function. This attribute is created by fitness
-        functions.
+        chosen fitness function. This attribute is assigned by fitness
+        functions and initialized with ``None``.
     
     """
 
@@ -1437,7 +1441,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             The full path of the ``.mol`` file where the macromolecule
             will be stored.
             
-        topology_args : list
+        topology_args : list (default = None)
             Any additional arguments needed to initialize the topology
             class supplied in the `topology` argument.
             
@@ -1454,7 +1458,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             dummy.prist_mol_file = prist_mol_file
             dummy.topology_args = topology_args
             MacroMolError(ex, dummy, 'During initialization.')
-            raise ex
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
@@ -1462,10 +1465,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
         if topology_args is None:
             topology_args = []
 
-        # A numerical fitness is assigned by fitness functions evoked
-        # by a ``Population`` instance's `GATools` attribute.
-        self.fitness = None
-                
         self.building_blocks = tuple(building_blocks)
 
         # A ``Topology`` subclass instance must be initiazlied with a 
@@ -1501,7 +1500,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
                                              allHsExplicit=True)
                                              
         self.optimized = False
-        self.fitness = False
+
+        # A numerical fitness is assigned by fitness functions evoked
+        # by a ``Population`` instance's `GATools` attribute.
+        self.fitness = None
+                
 
     def write_mol_file(self, rdkit_mol_type):
         """
@@ -1513,6 +1516,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
         the structure of the rdkit molecules held in the `prist_mol` and
         `heavy_mol` attributes as the basis for what is written to the
         file.
+
+        This bypasses the need to use rdkit's writing functions, which
+        have issues with macromolecules due to poor ring finding and
+        sanitization issues.
 
         Parameters
         ----------
@@ -1734,7 +1741,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         
         return euclidean(atom1_coords, atom2_coords)
 
-    def get_heavy_atom_distances(self):
+    def heavy_all_distances(self):
         """
         Yield distances between all pairs of heavy atoms in `heavy_mol`.
         
