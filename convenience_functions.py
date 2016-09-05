@@ -206,10 +206,7 @@ def mol_from_mol2_file(mol2_file):
     e_mol = chem.EditableMol(mol)
     # Create a new conformer.
     conf = chem.Conformer()
-    # A regular expression which matches to elemental symbols in the 
-    # ``.mol2`` file.
-    atomic_symbol = re.compile('[A-z]')    
-    
+      
     take_atom = False 
     take_bond = False
     
@@ -234,8 +231,7 @@ def mol_from_mol2_file(mol2_file):
             # If in the atom block, extract atomic data.
             if take_atom:
                 _, atom_sym, x, y, z, *_ = line.split()
-                atom_sym = atomic_symbol.findall(atom_sym)[0]
-                
+                atom_sym = ''.join(x for x in atom_sym if x.isalpha())
                 atom_id = e_mol.AddAtom(chem.Atom(atom_sym))
                 atom_coord = Point3D(float(x), float(y), float(z))                
                 
