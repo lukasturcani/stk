@@ -9,12 +9,8 @@ from scipy.spatial.distance import euclidean
 
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..convenience_functions import (flatten, normalize_vector,
-<<<<<<< HEAD
                                      rotation_matrix, kabsch, 
                                      matrix_centroid, vector_theta)
-=======
-                                     rotation_matrix, kabsch)
->>>>>>> 363de5029c0a60deeaa6c0ef255f38a04c68fd36
 
 class Vertex:
 
