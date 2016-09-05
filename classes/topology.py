@@ -10,7 +10,8 @@ from scipy.spatial.distance import euclidean
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..convenience_functions import (flatten, normalize_vector,
                                      rotation_matrix, kabsch, 
-                                     matrix_centroid, vector_theta)
+                                     matrix_centroid, vector_theta,
+                                     rotation_matrix_arbitrary_axis)
 
 class Vertex:
 
@@ -26,14 +27,14 @@ class Vertex:
         
     def place_mol(self, building_block):
         
-        edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
+#        edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
         
         building_block.set_heavy_mol_orientation(self.edge_plane_normal())    
-        building_block.set_heavy_atom_centroid([0,0,0])
-        rot_mat = kabsch(building_block.heavy_atom_position_matrix().T, edge_coord_mat)
-        new_pos_mat = np.dot(rot_mat, building_block.heavy_mol_position_matrix())
-        building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
-        
+#        building_block.set_heavy_atom_centroid([0,0,0])
+#        rot_mat = kabsch(building_block.heavy_atom_position_matrix().T, edge_coord_mat)
+#        new_pos_mat = np.dot(rot_mat, building_block.heavy_mol_position_matrix())
+#        building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
+#        
         building_block.set_heavy_atom_centroid(self.coord)
         
     
@@ -110,6 +111,18 @@ class Edge:
         new_pos_mat = np.dot(rot_mat, pos_mat)
         linker.set_heavy_mol_from_position_matrix(new_pos_mat)
         linker.set_heavy_atom_centroid(self.coord)
+
+        theta = vector_theta(next(linker.heavy_direction_vectors()),
+                             self.direction)
+
+        if abs(abs(theta) - np.pi/2)  < 0.174533:        
+            linker.set_heavy_atom_centroid([0,0,0])
+            pos_mat = linker.heavy_mol_position_matrix()
+            rot_mat = rotation_matrix_arbitrary_axis(theta, self.coord)
+
+            new_pos_mat = np.dot(rot_mat, pos_mat)
+            linker.set_heavy_mol_from_position_matrix(new_pos_mat)
+            linker.set_heavy_atom_centroid(self.coord)
 
         return linker.heavy_mol
 
