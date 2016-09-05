@@ -11,7 +11,7 @@ from scipy.spatial.distance import euclidean
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..convenience_functions import (flatten, normalize_vector,
                                      rotation_matrix, kabsch, 
-                                     matrix_centroid)
+                                     matrix_centroid, vector_theta)
 
 class Vertex:
 
@@ -28,23 +28,29 @@ class Vertex:
     def place_mol(self, building_block):
         
         edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
-    
-        building_block.set_heavy_atom_centroid([0,0,0])              
         
+        building_block.set_heavy_mol_orientation(self.edge_plane_normal())    
+        building_block.set_heavy_atom_centroid([0,0,0])
         rot_mat = kabsch(building_block.heavy_atom_position_matrix().T, edge_coord_mat)
         new_pos_mat = np.dot(rot_mat, building_block.heavy_mol_position_matrix())
         building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
         
-        
-        # Translate edge coord matrix to origin.
-               
-        
         building_block.set_heavy_atom_centroid(self.coord)
-        return building_block.set_heavy_mol_orientation(self.edge_plane_normal())
+        
+    
+        return building_block.heavy_mol
 
     def edge_plane_normal(self):
         v1, v2 = itertools.islice(self.edge_direction_vectors(), 0, 2)
-        return normalize_vector(np.cross(v1, v2))
+        
+        normal = normalize_vector(np.cross(v1, v2))
+    
+        theta = vector_theta(normal, self.edges[0].coord) 
+
+        if theta > np.pi/2:
+            normal = np.multiply(normal, -1)
+        
+        return normal
     
     def edge_plane(self):
         heavy_coord = self.edges[0].coord
@@ -105,7 +111,7 @@ class Edge:
         new_pos_mat = np.dot(rot_mat, pos_mat)
         linker.set_heavy_mol_from_position_matrix(new_pos_mat)
         linker.set_heavy_atom_centroid(self.coord)
-        
+
         return linker.heavy_mol
 
 class Topology:
