@@ -27,14 +27,20 @@ class Vertex:
         
     def place_mol(self, building_block):
         
-#        edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
-        
+        edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
+        edge_coord = np.array(edge_coord_mat[0,:])[0]
+
         building_block.set_heavy_mol_orientation(self.edge_plane_normal())    
-#        building_block.set_heavy_atom_centroid([0,0,0])
-#        rot_mat = kabsch(building_block.heavy_atom_position_matrix().T, edge_coord_mat)
-#        new_pos_mat = np.dot(rot_mat, building_block.heavy_mol_position_matrix())
-#        building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
-#        
+        
+        building_block.set_heavy_atom_centroid([0,0,0])
+        atom_coord = building_block.heavy_get_atom_coords(building_block.heavy_ids[0])
+        theta = vector_theta(edge_coord, atom_coord)
+        
+        rot_mat = rotation_matrix_arbitrary_axis(theta, self.edge_plane_normal())
+        pos_mat = building_block.heavy_mol_position_matrix()
+        new_pos_mat = np.dot(rot_mat, pos_mat)
+        building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
+        
         building_block.set_heavy_atom_centroid(self.coord)
         
     
