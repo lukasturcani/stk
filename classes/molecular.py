@@ -15,7 +15,8 @@ from collections import namedtuple
 import types
 
 from ..convenience_functions import (bond_dict, flatten, periodic_table, 
-                                     normalize_vector, rotation_matrix)
+                                     normalize_vector, rotation_matrix,
+                                     vector_theta)
 from .exception import MacroMolError
 
 class CachedMacroMol(type):
@@ -1148,6 +1149,9 @@ class BuildingBlock(StructUnit):
         """
         Returns the normal vector to the plane formed by heavy atoms.
         
+        The normal of the plane is defined such that it goes in the
+        direction toward the centroid of the building-block*.        
+        
         Returns
         -------        
         numpy.array
@@ -1157,7 +1161,15 @@ class BuildingBlock(StructUnit):
         """
         
         v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
-        return normalize_vector(np.cross(v1, v2))
+        normal_v = normalize_vector(np.cross(v1, v2))
+        
+        theta = vector_theta(normal_v, 
+                             self.centroid_centroid_dir_vector())
+                             
+        if theta > np.pi/2:
+            normal_v = np.multiply(normal_v, -1)
+        
+        return normal_v
     
     def heavy_plane(self):
         """
@@ -1225,6 +1237,18 @@ class BuildingBlock(StructUnit):
         
         start = self.heavy_plane_normal()
         return StructUnit.set_heavy_mol_orientation(self, start, end)
+
+    def centroid_centroid_dir_vector(self):
+        """
+        Returns the direction vector between 2 molecular centroids.
+        
+        
+        
+        """
+    
+        return normalize_vector(self.heavy_mol_centroid() - 
+                                self.heavy_atom_centroid())
+        
 
 class Linker(StructUnit):
     """
