@@ -163,11 +163,10 @@ def rotation_matrix_arbitrary_axis(angle, axis):
     keeping the axis fixed. It return the rotated coordinates for the molecule.
     """
     # Calculation of the rotation matrix
-    
-    
     axis = normalize_vector(axis)    
     
     a = np.cos(angle/2)
+
     b,c,d = np.multiply(axis, np.sin(angle/2))
     
     e11 = np.square(a) + np.square(b) - np.square(c) - np.square(d)    
