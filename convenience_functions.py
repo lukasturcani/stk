@@ -157,6 +157,36 @@ def kabsch(coords1, coords2):
     
     return np.dot(v, u)
 
+def rotation_matrix_arbitrary_axis(angle, axis):
+    """ Applies the rotation to a molecule by using the quaternion method. 
+    The coordinates of each atom are rotated by a specific Angle is while 
+    keeping the axis fixed. It return the rotated coordinates for the molecule.
+    """
+    # Calculation of the rotation matrix
+    
+    
+    axis = normalize_vector(axis)    
+    
+    a = np.cos(angle/2)
+    b,c,d = np.multiply(axis, np.sin(angle/2))
+    
+    e11 = np.square(a) + np.square(b) - np.square(c) - np.square(d)    
+    e12 = 2*(np.multiply(b,c) - np.multiply(a,d))
+    e13 = 2*(np.multiply(b,d) + np.multiply(a,c))
+    
+    e21 = 2*(np.multiply(b,c) + np.multiply(a,d))
+    e22 = np.square(a) + np.square(c) - np.square(b) - np.square(d)
+    e23 = 2*(np.multiply(c,d) - np.multiply(a,b))
+    
+    e31 = 2*(np.multiply(b,d) - np.multiply(a,c))
+    e32 =  2*(np.multiply(c,d) + np.multiply(a,b))
+    e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
+    
+    return np.array([[e11, e12, e13],
+                     [e21, e22, e23],
+                     [e31, e32, e33]]) 
+
+    
 def matrix_centroid(matrix):
     """
     Returns the centroid of the coordinates held in `matrix`.
