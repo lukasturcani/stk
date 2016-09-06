@@ -7,7 +7,7 @@ mutant_select_func fittest
 mating_func bb_lk_exchange
 mutation_func random_bb database=C:\Users\lukas\Projects\MMEA\Database_prec\amines3f
 
-opt_func macromodel_opt
+opt_func macromodel_opt macromodel_path=C:\Program~!~Files\Schrodinger2016-3
 
 fitness_func cage target_size=4.0
 
