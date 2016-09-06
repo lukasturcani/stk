@@ -1482,7 +1482,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             dummy.prist_mol_file = prist_mol_file
             dummy.topology_args = topology_args
             MacroMolError(ex, dummy, 'During initialization.')
-            raise ex
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
@@ -1836,10 +1835,15 @@ class MacroMolecule(metaclass=CachedMacroMol):
         return self.fitness < other.fitness
     
     def __str__(self):
-        return str(self.__dict__) + "\n"
+        return str({key: value for key, value in 
+                                    self.__dict__.items() if 
+                                    key in {'prist_mol_file', 
+                                            'topology',
+                                            'fitness',
+                                            'optimized'}}) + "\n"
     
     def __repr__(self):
-        return str(self.__dict__) + "\n"
+        return str(self)
         
     def __hash__(self):
         return id(self)

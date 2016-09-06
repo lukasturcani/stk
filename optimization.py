@@ -5,7 +5,7 @@ import os
 import subprocess as sp
 from multiprocessing import Pool
 from functools import partial
-
+import time
 
 # More imports at the bottom of script.
 
@@ -27,6 +27,17 @@ def optimize_all(func_data, population):
     ``optimize_all_serial``, the ``optimize_population`` method in the
     ``Population`` class must be told to use it.
 
+    The parallel optimization creates cloned instances of the 
+    population's members. It is these that are optimized. This means 
+    that the ``.mol`` files are changed but any instance attributes 
+    are not.
+
+    To deal with this, optimization functions should return the 
+    ``MacroMolecule`` instance they optimize. The pool will return an 
+    iterator of the values returned by the optimization functions. If 
+    the returned values are the optimized macromolecules, the population 
+    in the main thread can be updated with them.
+
     Parameters
     ----------
     func_data : FunctionData
@@ -40,17 +51,21 @@ def optimize_all(func_data, population):
         
     Modifies
     --------
-    MacroMolecule
+    MacroMolecule's ``.mol`` files
         This function optimizes the structures of all the 
         ``MacroMolecule`` instances held in `population`. This means
         that their pristine ``.mol`` files are modified to their 
-        optimized structures. However, only the content of these files
-        is changed. The value of the `prist_mol_file` attributes remain 
-        the same. 
+        optimized structures. However, because all instances are cloned
+        any values in the original instance's attributes are unchanged.
+        The file's contents are changed because they are written on the
+        hard disk, which can be clones of the python interpreter.
     
     Returns
     -------
-    None : NoneType
+    iterator of MacroMolecule objects
+        This iterator yields the ``MacroMolecule`` objects that have had
+        their attributes changed as a result of the optimization. They
+        are modified clones of the original population's macromolecules.
     
     """
     
@@ -63,9 +78,8 @@ def optimize_all(func_data, population):
     
     # Apply the function to every member of the population, in parallel.
     with Pool() as pool:
-        pool.map(p_func, population)
+        return pool.map(p_func, population)
     
-
 def optimize_all_serial(func_data, population):
     """
     Apply optimization function to all population members, serially.
@@ -107,7 +121,9 @@ def optimize_all_serial(func_data, population):
     
     Returns
     -------
-    None : NoneType
+    iterator of MacroMolecule objects
+        This is meant to mirror the output of the parallel counterpart.
+        This allows the two functions to be interfaced in the same way.
     
     """
 
@@ -119,8 +135,8 @@ def optimize_all_serial(func_data, population):
     p_func = partial(func, **func_data.params)
     
     # Apply the function to every member of the population.    
-    for member in population:
-        p_func(member)
+    return iter(p_func(member) for member in population)
+    
 
 def update_prist_attrs_from_mol2(macro_mol):
     """
@@ -163,6 +179,12 @@ def update_prist_attrs_from_mol2(macro_mol):
     # directory and have the same name as the ``.mol`` file. Only a
     # different extension.
     mol2 = macro_mol.prist_mol_file.replace('.mol', '.mol2')    
+
+    # Make sure .mol2 file is present.
+    t_start = time.time()
+    while True:
+        if os.path.exists(mol2) or time.time() - t_start > 10:
+            break
     
     # Update the `prist_mol` attribute.
     macro_mol.prist_mol = mol_from_mol2_file(mol2)
@@ -197,12 +219,17 @@ def rdkit_optimization(macro_mol):
     
     Returns
     -------
-    None : NoneType   
+    macro_mol : MacroMolecule   
+        The macromolecule that was passed as an argument and modified
+        by the optimization function. Returned to accomodate 
+        parallelization. See ``optimize_all`` function documentation for
+        more details.
     
     """
     
     # If `macro_mol` is already optmized, return.
     if macro_mol.optimized:
+        print('Skipping {0}.'.format(macro_mol.prist_mol_file))   
         return None
         
     # Sanitize then optimize the rdkit molecule in `prist_mol`.
@@ -214,7 +241,8 @@ def rdkit_optimization(macro_mol):
                       includeStereo=True, kekulize=False,
                       forceV3000=True)
     
-    macro_mol.optimized = True
+    macro_mol.optimized = True   
+    return macro_mol
     
 def macromodel_opt(macro_mol, 
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2"):
@@ -253,19 +281,28 @@ def macromodel_opt(macro_mol,
     
     Returns
     -------
-    None : NoneType       
+    macro_mol : MacroMolecule
+        The macromolecule that was passed as an argument and modified
+        by the optimization function. Returned to accomodate 
+        parallelization. See ``optimize_all`` function documentation for
+        more details.               
     
     """
 
     # If the molecule is already optimized, return.
     if macro_mol.optimized:
+        print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
         return None
+    
+    print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
     
     # MacroModel requires a ``.mae`` file as input. This creates a 
     # ``.mae`` file holding the molding the pristine molecule.    
-    mae_file = _create_mae_file(macro_mol, macromodel_path)        
+    print('Creating .mae file.')
+    _create_mae_file(macro_mol, macromodel_path)        
 
     # generate the ``.com`` file for the MacroModel run.
+    print('Creating .com file.')
     _generate_COM(macro_mol)
     
     # To run MacroModel a command is issued to to the console via
@@ -291,20 +328,18 @@ def macromodel_opt(macro_mol,
     # can be given to the console.
     opt_cmd = opt_cmd + " -WAIT " + file_root 
     # Run the optimization.
+    print('Running bmin.')
     opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                         universal_newlines=True, shell=True)
     
     # If optimization fails because the license is not found, rerun the
     # function.
-    print('stdout is here', opt_return.stdout)
-    print('Could not check out a license for mmlibs' in opt_return.stdout)
     if 'Could not check out a license for mmlibs' in opt_return.stdout:
-        print('fatal_error')        
-        MacroMolError(Exception(), macro_mol, 'License not found.')
         macromodel_opt(macro_mol, macromodel_path)
     
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
+    print('Converting .maegz to .mol2.')
     _convert_mae_to_mol2(macro_mol, macromodel_path)
     
     try:
@@ -314,6 +349,7 @@ def macromodel_opt(macro_mol,
         'During ``update_prist_attrs_from_mol2`` call.')
 
     macro_mol.optimized = True       
+    return macro_mol    
     
 def _generate_COM(macro_mol):
     """
@@ -458,7 +494,8 @@ def _create_mae_file(macro_mol, macromodel_path):
     convrt_cmd += (" " + macro_mol.prist_mol_file + 
                    " -omae " + mae_file)
 
-    sp.call(convrt_cmd, shell=True)    
+    sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                        universal_newlines=True, shell=True)    
     return mae_file
 
 def _convert_mae_to_mol2(macro_mol, macromodel_path):
@@ -491,7 +528,7 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
     None : NoneType
     
     """
-    
+        
     # Replace extensions to get the names of the various files.
     mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
     # ``out`` is the full path of the optimized ``.mae`` file.
@@ -520,9 +557,16 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
     if os.name == 'nt':
         convrt_cmd = '"' + convrt_cmd + '.exe"'                
     convrt_cmd = convrt_cmd + " -imae " + out + " -omol2 " + mol2
-   
-   # Execute the file conversion.
-    sp.run(convrt_cmd, shell=True)
+ 
+    # Make sure .maegz file is present.
+    t_start = time.time()
+    while True:
+        if os.path.exists(out) or time.time() - t_start > 10:
+            break
+  
+    # Execute the file conversion.
+    sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+           universal_newlines=True, shell=True)
 
 def _fix_params_in_com_file(macro_mol, main_string):
     """

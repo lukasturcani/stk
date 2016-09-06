@@ -2,11 +2,16 @@ import os
 import shutil
 import sys
 from itertools import islice
+import warnings
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
                       FunctionData, FourPlusSix, EightPlusTwelve, 
                       GAInput)
 from .optimization import kill_macromodel
+
+
+
+
 
 
 # Running MacroModel optimizations sometimes leaves applications open.
@@ -65,16 +70,28 @@ ga_tools = GATools(selector, mator, mutator,
 
 # Generate and optimize an initial population.
 pop_init = getattr(Population, ga_input.init_func.name)
+print(('\n\nGenerating initial population.\n'
+     '------------------------------\n\n'))
 pop = pop_init(**ga_input.init_func.params, 
                size=ga_input.pop_size, 
                ga_tools=ga_tools)
-pop.optimize_population()
-pop.calculate_member_fitness()
+
+print(('\n\nOptimizing the population.\n'
+      '--------------------------\n\n'))
+pop = Population(pop.ga_tools, *pop.optimize_population())
+
+print('\n\nCalculating the fitness of population members.\n'
+    '----------------------------------------------\n\n') 
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    pop.calculate_member_fitness()
 
 # Run the GA.
 for x in range(ga_input.num_generations):
     print(('\n\nGeneration {0} started. Stop at generation {1}. '
-            'Population size is {2}.\n\n').format(x, 
+            'Population size is {2}.\n'
+            '---------------------------------------------------------'
+            '--------------\n\n').format(x, 
                                              ga_input.num_generations-1, 
                                              len(pop)))
     # At the start of each generation go into the root directory and 
@@ -84,32 +101,40 @@ for x in range(ga_input.num_generations):
     os.mkdir(str(x))
     os.chdir(str(x))
     
-    print('\n\nStaring mating.\n\n')
+    print('\n\nStarting mating.\n----------------\n\n')
     offspring = pop.gen_offspring()
 
-    print('\n\nStarting mutations.\n\n')
+    print('\n\nStarting mutations.\n-------------------\n\n')
     mutants = pop.gen_mutants()
 
-    print('\n\nAdding offsping and mutants to population.\n\n')
+    print(('\n\nAdding offsping and mutants to population.'
+          '\n------------------------------------------\n\n'))
     pop += offspring + mutants
 
-    print('\n\nRemoving duplicates, if any.\n\n')    
+    print(('\n\nRemoving duplicates, if any.\n'
+           '----------------------------\n\n')    )
     pop.remove_duplicates()    
     
-    print('\n\nOptimizing the population.\n\n')
-    pop.optimize_population()
+    print(('\n\nOptimizing the population.\n'
+          '--------------------------\n\n'))
+    pop = Population(pop.ga_tools, *pop.optimize_population())
     
-    print('\n\nCalculating the fitness of population members.\n\n')    
-    pop.calculate_member_fitness()    
+    print('\n\nCalculating the fitness of population members.\n'
+        '----------------------------------------------\n\n')    
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        pop.calculate_member_fitness()    
     
-    print('\n\nSelecting members of the next generation.\n\n')
+    print(('\n\nSelecting members of the next generation.\n'
+           '-----------------------------------------\n\n'))
     pop = Population(ga_tools, *(islice(pop.select('generational'),
                                         0, ga_input.pop_size)))
     
     # Create a folder within a generational folder for the the ``.mol``
     # files corresponding to molecules selected for the next generation.
     # Place the ``.mol`` files into that folder.
-    print('\n\nCopying .mol files to population directory.\n\n')
+    print(('\n\nCopying .mol files to population directory.\n'
+           '-------------------------------------------\n\n'))
     os.mkdir('selected')
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
