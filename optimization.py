@@ -183,7 +183,7 @@ def update_prist_attrs_from_mol2(macro_mol):
     # Make sure .mol2 file is present.
     t_start = time.time()
     while True:
-        if os.path.exists(mol2) or time.time() - t_start > 10:
+        if os.path.exists(mol2) or time.time() - t_start > 60:
             break
     
     # Update the `prist_mol` attribute.
@@ -561,7 +561,7 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
     # Make sure .maegz file is present.
     t_start = time.time()
     while True:
-        if os.path.exists(out) or time.time() - t_start > 10:
+        if os.path.exists(out) or time.time() - t_start > 60:
             break
   
     # Execute the file conversion.
