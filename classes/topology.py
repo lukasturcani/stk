@@ -815,9 +815,12 @@ class FourPlusSix(Topology):
     edges = [Edge(v1,v2) for v1, v2 in 
                 itertools.combinations(vertices, 2)]  
     
+    window_num = 4    
+    
     def __init__(self, macro_mol):
         Topology.__init__(self, macro_mol)        
         self.pair_up = self.pair_up_edges_with_vertices
+        
 
 
  
@@ -852,6 +855,8 @@ class EightPlusTwelve(FourPlusSix):
              Edge(vertices[1], vertices[5]),
              Edge(vertices[2], vertices[6]),
              Edge(vertices[3], vertices[7])]  
+    
+    window_num = 6    
     
     def __init__(self, macro_mol):
         Topology.__init__(self, macro_mol)        

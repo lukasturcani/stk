@@ -452,14 +452,13 @@ class Population:
         """
         Copies ``.mol`` files of members to a directory.
         
-        This copies both the heavy and pristine versions of the ``.mol``
-        file.        
+        This copies the pristine version of the ``.mol`` file.        
         
         Parameters
         ----------
         dir_path : str
-            The full path of the directory into which the ``.mol`` files
-            are copied.
+            The full path of the directory into which the ``.mol`` file
+            is copied.
         
         Returns
         -------
@@ -469,7 +468,6 @@ class Population:
         
         for member in self:
             shutil.copy(member.prist_mol_file, dir_path)
-            shutil.copy(member.heavy_mol_file, dir_path)
 
     def optimize_population(self):
         """
@@ -480,6 +478,12 @@ class Population:
         all members of the population in parallel. 
         ``optimize_all_serial`` does them serially. Probably best not to
         use the serial version unless debugging.
+        
+        The parallel optimization creates cloned instances of the
+        population's members. It is these that are optimized. This means
+        that the ``.mol`` files are changed but any instance attributes
+        are not. See ``optimize_all`` function documentation in 
+        ``optimization.py`` for more details.
 
         Modifies
         --------
@@ -490,12 +494,18 @@ class Population:
 
         Returns
         -------
-        None : NoneType
+        iterator of MacroMolecule objects
+            If a parallel optimization was chosen, this iterator yields 
+            the ``MacroMolecule`` objects that have had their attributes 
+            changed as a result of the optimization. They are modified 
+            clones of the original population's macromolecules.       
+            
+            If a serial optimization is done the iterator does not yield
+            clones.
         
         """
 
-        optimize_all_serial(self.ga_tools.optimization, self)
-
+        return optimize_all(self.ga_tools.optimization, self)
             
     def calculate_member_fitness(self):
         calc_fitness(self.ga_tools.fitness, self)     
