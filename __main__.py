@@ -140,8 +140,8 @@ for x in range(ga_input.num_generations):
             warnings.simplefilter("ignore")
             pop.calculate_member_fitness()    
 
-    # Keep an active reference to all cages. No need for duplicate
-    # entries here.
+    # Keep an active reference to all macromolecules. No need for 
+    # duplicate entries here.
     all_mols.add_members(pop, duplicates=False)
 
     with time_it():        
