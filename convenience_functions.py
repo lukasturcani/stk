@@ -4,6 +4,8 @@ import rdkit
 from rdkit.Geometry import Point3D
 import re
 import numpy as np
+import time
+from contextlib import contextmanager
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
@@ -296,6 +298,15 @@ def flatten(iterable, excluded_types={str}):
             yield from flatten(x)
         else:
             yield x            
+
+@contextmanager
+def time_it():
+    start = time.time()  
+    yield
+    time_taken = time.time() - start
+    m,s = divmod(time_taken, 60)
+    h,m = divmod(m, 60)
+    print('\nTime taken was {0} : {1} : {2}'.format(int(h), int(m), s))
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',

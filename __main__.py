@@ -8,7 +8,7 @@ from .classes import (Population, GATools, Selection, Mutation, Mating,
                       FunctionData, FourPlusSix, EightPlusTwelve, 
                       GAInput)
 from .optimization import kill_macromodel
-
+from .convenience_functions import time_it
 
 
 
@@ -68,23 +68,32 @@ mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations)
 ga_tools = GATools(selector, mator, mutator, 
                    ga_input.opt_func, ga_input.fitness_func)
 
+# Create a population which holds all macromolecules generated during
+# the run. This prevents any created macromolecules from being claimed
+# by garbage collection. This allows for effective caching as all
+# generated macromolecules will remain in memory for the duration of the
+# run.
+all_mols = Population()
+
 # Generate and optimize an initial population.
-pop_init = getattr(Population, ga_input.init_func.name)
-print(('\n\nGenerating initial population.\n'
-     '------------------------------\n\n'))
-pop = pop_init(**ga_input.init_func.params, 
-               size=ga_input.pop_size, 
-               ga_tools=ga_tools)
+with time_it():
+    pop_init = getattr(Population, ga_input.init_func.name)
+    print(('\n\nGenerating initial population.\n'
+         '------------------------------\n\n'))
+    pop = pop_init(**ga_input.init_func.params, 
+                   size=ga_input.pop_size, 
+                   ga_tools=ga_tools)
+with time_it():    
+    print(('\n\nOptimizing the population.\n'
+          '--------------------------\n\n'))
+    pop = Population(pop.ga_tools, *pop.optimize_population())
 
-print(('\n\nOptimizing the population.\n'
-      '--------------------------\n\n'))
-pop = Population(pop.ga_tools, *pop.optimize_population())
-
-print('\n\nCalculating the fitness of population members.\n'
-    '----------------------------------------------\n\n') 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    pop.calculate_member_fitness()
+with time_it():    
+    print('\n\nCalculating the fitness of population members.\n'
+        '----------------------------------------------\n\n') 
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        pop.calculate_member_fitness()
 
 # Run the GA.
 for x in range(ga_input.num_generations):
@@ -101,34 +110,45 @@ for x in range(ga_input.num_generations):
     os.mkdir(str(x))
     os.chdir(str(x))
     
-    print('\n\nStarting mating.\n----------------\n\n')
-    offspring = pop.gen_offspring()
+    with time_it():
+        print('\n\nStarting mating.\n----------------\n\n')
+        offspring = pop.gen_offspring()
 
-    print('\n\nStarting mutations.\n-------------------\n\n')
-    mutants = pop.gen_mutants()
+    with time_it():
+        print('\n\nStarting mutations.\n-------------------\n\n')
+        mutants = pop.gen_mutants()
+    
+    with time_it():
+        print(('\n\nAdding offsping and mutants to population.'
+              '\n------------------------------------------\n\n'))
+        pop += offspring + mutants
 
-    print(('\n\nAdding offsping and mutants to population.'
-          '\n------------------------------------------\n\n'))
-    pop += offspring + mutants
+    with time_it():
+        print(('\n\nRemoving duplicates, if any.\n'
+               '----------------------------\n\n')    )
+        pop.remove_duplicates()    
+        
+    with time_it():        
+        print(('\n\nOptimizing the population.\n'
+              '--------------------------\n\n'))
+        pop = Population(pop.ga_tools, *pop.optimize_population())
 
-    print(('\n\nRemoving duplicates, if any.\n'
-           '----------------------------\n\n')    )
-    pop.remove_duplicates()    
-    
-    print(('\n\nOptimizing the population.\n'
-          '--------------------------\n\n'))
-    pop = Population(pop.ga_tools, *pop.optimize_population())
-    
-    print('\n\nCalculating the fitness of population members.\n'
-        '----------------------------------------------\n\n')    
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        pop.calculate_member_fitness()    
-    
-    print(('\n\nSelecting members of the next generation.\n'
-           '-----------------------------------------\n\n'))
-    pop = Population(ga_tools, *(islice(pop.select('generational'),
-                                        0, ga_input.pop_size)))
+    with time_it():        
+        print('\n\nCalculating the fitness of population members.\n'
+            '----------------------------------------------\n\n')    
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            pop.calculate_member_fitness()    
+
+    # Keep an active reference to all cages. No need for duplicate
+    # entries here.
+    all_mols.add_members(pop, duplicates=False)
+
+    with time_it():        
+        print(('\n\nSelecting members of the next generation.\n'
+               '-----------------------------------------\n\n'))
+        pop = Population(ga_tools, *(islice(pop.select('generational'),
+                                            0, ga_input.pop_size)))
     
     # Create a folder within a generational folder for the the ``.mol``
     # files corresponding to molecules selected for the next generation.
