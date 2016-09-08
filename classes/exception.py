@@ -84,21 +84,8 @@ class MacroMolError(Exception):
         
         """        
         
-        cwd = os.getcwd()
-        if os.name == 'nt':
-            cwd = cwd.split('\\')
-            cwd[0] += "\\"
-        else:
-            cwd = cwd.split('/')
-
-        dir_ = []
-        for x in cwd:
-            if x == 'output' or x == 'MMEA':
-                break
-            dir_.append(x)
-
-        dir_ = os.path.join(*dir_)
-        name = os.path.join(dir_, 'failures.txt')
+        cwd = os.getcwd().split('output')[0]
+        name = os.path.join(cwd, 'failures.txt')
 
         try:
             with open(name, 'x') as f:

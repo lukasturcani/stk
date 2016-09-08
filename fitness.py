@@ -71,7 +71,6 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
         return macro_mol.fitness
     
     if macro_mol.topology.windows is None:
-        print('window eval error')
         return -np.inf
 
     if coeffs is None:

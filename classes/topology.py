@@ -796,11 +796,7 @@ class CageTopology(Topology):
     def windows(self):
         all_windows = window_sizes(self.macro_mol.prist_mol_file)
 
-        if len(all_windows) <= self.n_windows:
-            print('not enough windows found')
-
-        if all_windows is None or len(all_windows) <= self.n_windows:
-            print('all windows returned none')            
+        if all_windows is None or len(all_windows) <= self.n_windows:          
             return None
         
         return sorted(all_windows, reverse=True)[:self.n_windows]
