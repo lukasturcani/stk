@@ -30,7 +30,7 @@ class CachedMacroMol(type):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)        
-        self._cache = weakref.WeakValueDictionary()
+        self._cache = dict()
     
     def __call__(self, *args, **kwargs):
         # Sort the first argument which corresponds to an iterable of
@@ -59,7 +59,7 @@ class Cached(type):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)        
-        self.__cache = weakref.WeakValueDictionary()
+        self.__cache = dict()
     
     def __call__(self, *args, **kwargs):
         key = str(args) + str(kwargs)
