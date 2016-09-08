@@ -953,7 +953,7 @@ class StructUnit(metaclass=Cached):
         
         """
                
-        centroid = sum(x for x in self.heavy_all_atom_coords()) 
+        centroid = sum(x for _, x in self.heavy_all_atom_coords()) 
         return np.divide(centroid, self.heavy_mol.GetNumAtoms())
 
     def heavy_direction_vectors(self):
@@ -1099,7 +1099,10 @@ class StructUnit(metaclass=Cached):
         
         Yields
         ------
-        numpy.array
+        tuple of (int, numpy.array)
+            The ``int`` represents the atom id of the atom whose
+            coordinates are being yielded.
+        
             The array represents the complete position in space. Each 
             float within the array represents the value of the x, y or z 
             coordinate of an atom. The x, y and z coordinates are 
@@ -1114,11 +1117,10 @@ class StructUnit(metaclass=Cached):
         # Go through all the atoms and ask the conformer to return
         # the position of each atom. This is done by supplying the 
         # conformers `GetAtomPosition` method with the atom's id.
-        for atom in self.heavy_mol.GetAtoms():        
-            atom_position = conformer.GetAtomPosition(atom.GetIdx())
-            yield np.array([atom_position.x, 
-                            atom_position.y, 
-                            atom_position.z])  
+        for atom in self.heavy_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_position = conformer.GetAtomPosition(atom_id)
+            yield atom_id, np.array([*atom_position]) 
            
     def __eq__(self, other):
         return self.prist_mol_file == other.prist_mol_file
@@ -1431,10 +1433,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
         optimized. Optimization functions set this flag to ``True``
         after an optimization.
 
-    fitness : float (default = None)
+    fitness : float (default = False)
         The fitness value of the macromolecule, as determined by the 
         chosen fitness function. This attribute is assigned by fitness
-        functions and initialized with ``None``.
+        functions and initialized with ``False``.
     
     """
 
@@ -1527,7 +1529,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
 
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
-        self.fitness = None
+        self.fitness = False
                 
 
     def write_mol_file(self, rdkit_mol_type):
@@ -1712,6 +1714,38 @@ class MacroMolecule(metaclass=CachedMacroMol):
         position = conformer.GetAtomPosition(atom_id)
         # Unpack and return the individual coordinates.
         return position.x, position.y, position.z  
+
+    def prist_all_atom_coords(self):
+        """
+        Yields the x, y and z coordinates of atoms in `prist_mol`.        
+
+        This yields the coordinates of every atom in the pristine
+        molecule.
+        
+        Yields
+        ------
+        tuple of (int, numpy.array)
+            The ``int`` is the atom id of the atom whose coordinates
+            are yielded.
+        
+            The array represents the complete position in space. Each 
+            float within the array represents the value of the x, y or z 
+            coordinate of an atom. The x, y and z coordinates are 
+            located in the array in that order. 
+        
+        """
+        
+        # Get the conformer from the instance in the `prist_mol` 
+        # attribute. 
+        conformer = self.prist_mol.GetConformer()
+        
+        # Go through all the atoms and ask the conformer to return
+        # the position of each atom. This is done by supplying the 
+        # conformers `GetAtomPosition` method with the atom's id.
+        for atom in self.prist_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_position = conformer.GetAtomPosition(atom_id)
+            yield atom_id, np.array([*atom_position])          
         
     def heavy_distance(self, atom1_id, atom2_id):
         """
@@ -1803,6 +1837,36 @@ class MacroMolecule(metaclass=CachedMacroMol):
                 atom2_id = atom2.GetIdx()
                 yield (self.heavy_distance(atom1_id, atom2_id), 
                       atom1_id, atom2_id)
+
+    def prist_center_of_mass(self):
+        """
+        Returns the centre of mass of the pristine molecule.
+
+        Returns
+        -------
+        numpy.array
+            The array holds the x, y and z coordinates of the center of
+            mass, in that order.
+            
+        References
+        ----------
+        https://en.wikipedia.org/wiki/Center_of_mass
+        
+        """
+        
+        center = np.array([0,0,0])        
+        total_mass = 0
+        for atom_id, coord in self.prist_all_atom_coords():
+            mass = self.prist_mol.GetAtomWithIdx(atom_id).GetMass()
+            total_mass += mass
+            center = np.add(center, np.multiply(mass, coord))
+        
+        return np.divide(coord, total_mass)
+
+    def prist_atom_symbol(self, atom_id):
+        atom = self.prist_mol.GetAtomWithIdx(atom_id)
+        atomic_num = atom.GetAtomicNum()
+        return periodic_table[atomic_num]
 
     def same(self, other):
         """
