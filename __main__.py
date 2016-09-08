@@ -68,13 +68,6 @@ mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations)
 ga_tools = GATools(selector, mator, mutator, 
                    ga_input.opt_func, ga_input.fitness_func)
 
-# Create a population which holds all macromolecules generated during
-# the run. This prevents any created macromolecules from being claimed
-# by garbage collection. This allows for effective caching as all
-# generated macromolecules will remain in memory for the duration of the
-# run.
-all_mols = Population()
-
 # Generate and optimize an initial population.
 with time_it():
     pop_init = getattr(Population, ga_input.init_func.name)
@@ -139,10 +132,6 @@ for x in range(ga_input.num_generations):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             pop.calculate_member_fitness()    
-
-    # Keep an active reference to all macromolecules. No need for 
-    # duplicate entries here.
-    all_mols.add_members(pop, duplicates=False)
 
     with time_it():        
         print(('\n\nSelecting members of the next generation.\n'
