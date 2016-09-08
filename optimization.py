@@ -182,7 +182,14 @@ def update_prist_attrs_from_mol2(macro_mol):
 
     # Make sure .mol2 file is present.
     t_start = time.time()
+    tick = 0
     while True:
+        
+        time_taken = time.time() - t_start
+        if divmod(time_taken, 5)[0] == tick + 1:
+            print('Waiting for {0}.'.format(mol2))
+            tick += 1
+            
         if os.path.exists(mol2) or time.time() - t_start > 60:
             break
     
@@ -298,11 +305,11 @@ def macromodel_opt(macro_mol,
     
     # MacroModel requires a ``.mae`` file as input. This creates a 
     # ``.mae`` file holding the molding the pristine molecule.    
-    print('Creating .mae file.')
-    _create_mae_file(macro_mol, macromodel_path)        
+    print('Converting .mol to .mae - {0}.'.format(macro_mol.prist_mol_file))
+    _convert_mol_to_mae(macro_mol, macromodel_path)        
 
     # generate the ``.com`` file for the MacroModel run.
-    print('Creating .com file.')
+    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
     _generate_COM(macro_mol)
     
     # To run MacroModel a command is issued to to the console via
@@ -328,10 +335,10 @@ def macromodel_opt(macro_mol,
     # can be given to the console.
     opt_cmd = opt_cmd + " -WAIT " + file_root 
     # Run the optimization.
-    print('Running bmin.')
+    print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
     opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                         universal_newlines=True, shell=True)
-    
+    print('BMIN OUT IS ', opt_return.stdout)
     # If optimization fails because the license is not found, rerun the
     # function.
     if 'Could not check out a license for mmlibs' in opt_return.stdout:
@@ -339,14 +346,20 @@ def macromodel_opt(macro_mol,
     
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
-    print('Converting .maegz to .mol2.')
-    _convert_mae_to_mol2(macro_mol, macromodel_path)
+    print('Converting .maegz to .mol2 - {0}.'.format(
+                                            macro_mol.prist_mol_file))
+    _convert_maegz_to_mol2(macro_mol, macromodel_path) 
     
+    print('Updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
     try:
         update_prist_attrs_from_mol2(macro_mol) 
     except Exception as ex:
         MacroMolError(ex, macro_mol, 
         'During ``update_prist_attrs_from_mol2`` call.')
+
+    print('Finished updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
 
     macro_mol.optimized = True       
     return macro_mol    
@@ -432,7 +445,7 @@ def _generate_COM(macro_mol):
         com.write(main_string)
 
 
-def _create_mae_file(macro_mol, macromodel_path):
+def _convert_mol_to_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.    
     
@@ -494,11 +507,15 @@ def _create_mae_file(macro_mol, macromodel_path):
     convrt_cmd += (" " + macro_mol.prist_mol_file + 
                    " -omae " + mae_file)
 
-    sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                         universal_newlines=True, shell=True)    
+    
+    
+    print('CONVERT MOL TO MAE STD OUT IS:', convrt_return.stdout)
+
     return mae_file
 
-def _convert_mae_to_mol2(macro_mol, macromodel_path):
+def _convert_maegz_to_mol2(macro_mol, macromodel_path):
     """
     Converts a ``.mae`` file to a ``.mol2`` file.
 
@@ -560,16 +577,30 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
  
     # Make sure .maegz file is present.
     t_start = time.time()
+    tick = 0
     while True:
-        if os.path.exists(out) or time.time() - t_start > 60:
+        time_taken = time.time() - t_start
+        if divmod(time_taken, 5)[0] == tick + 1:
+            print('Waiting for {0}.'.format(out))
+            tick += 1
+        
+        if os.path.exists(out) or time_taken > 60:
             break
   
     # Execute the file conversion.
-    sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-           universal_newlines=True, shell=True)
-        
-    if not os.path.exists(out):
-        raise RuntimeError('Failed to create .mol2 file.')
+    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+           universal_newlines=True, shell=True) 
+
+    print('CONVERT STD OUT IS:', convrt_return.stdout)
+
+    if 'Could not check out a license for mmli' in convrt_return.stdout:
+        print('second call')
+        _convert_maegz_to_mol2(macro_mol, macromodel_path)    
+
+    if 'number 1' in convrt_return.stdout:
+        MacroMolError(Exception('strct error'), macro_mol, 'strct error')
+
+
 
 def _fix_params_in_com_file(macro_mol, main_string):
     """
