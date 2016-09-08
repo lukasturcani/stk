@@ -52,6 +52,13 @@ def func_line_parser(line):
         p_name, p_vals = param.split("=")
         p_vals = p_vals.split(",")
 
+        # If the parameter is a number, convert it to a float.
+        for i, val in enumerate(p_vals):
+            try:
+                p_vals[i] = eval(val)
+            except:
+                pass
+
         if len(p_vals) > 1 and p_name == 'topologies':
             # Convert the strings of names of topologies into the actual
             # topology class objects. It is the classes themselves which
@@ -59,11 +66,16 @@ def func_line_parser(line):
             # this conversion to facilitate that.            
             for i, topology in enumerate(p_vals):
                 p_vals[i] = getattr(MMEA.classes, p_vals[i])
-        if len(p_vals) == 1:
+            
+        if len(p_vals) == 1 and isinstance(p_vals[0], str):
             # Sometimes file paths may include a space. Within the
             # input file the space in a path should be changed to 
             # ``~!~``. Here it is remade into a space.
             p_vals = p_vals[0].replace('~!~', ' ')                
+
+        elif len(p_vals) == 1:
+            p_vals = p_vals[0]
+
         param_dict[p_name] = p_vals
         
     return FunctionData(name, **param_dict)

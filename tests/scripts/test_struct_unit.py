@@ -144,9 +144,10 @@ def test_heavy_all_atom_coords():
     mol = StructUnit(mol_file)
     expected_output_type = type(np.array([1,2,3]))
     
-    for coord in mol.heavy_all_atom_coords():
+    for atom_id, coord in mol.heavy_all_atom_coords():
         x,y,z = coord
         
+        assert isinstance(atom_id, int)
         assert isinstance(coord, expected_output_type)        
         assert isinstance(x, float)
         assert isinstance(y, float)
@@ -273,7 +274,7 @@ def test_set_heavy_mol_from_position_matrix_AND_OTHERS():
 
     struct2.set_heavy_mol_from_position_matrix(pos_mat)
     
-    for coord in struct2.heavy_all_atom_coords():
+    for _, coord in struct2.heavy_all_atom_coords():
         assert np.array_equal(coord, [1,2,3])
     
     # Centroids should also be in [1,2,3].
