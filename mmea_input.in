@@ -9,7 +9,7 @@ mutation_func random_bb database=C:\Users\lukas\Projects\MMEA\Database_prec\amin
 
 opt_func macromodel_opt macromodel_path=C:\Program~!~Files\Schrodinger2016-3
 
-fitness_func cage target_size=4.0
+fitness_func cage target_size=float(4.0)
 
 pop_size 4
 num_generations 4

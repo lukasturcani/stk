@@ -8,10 +8,23 @@ from collections import deque
 from scipy.spatial.distance import euclidean
 
 from .molecular import FGInfo, BuildingBlock, Linker
+from ..pyWindow import window_sizes
 from ..convenience_functions import (flatten, normalize_vector,
                                      rotation_matrix, kabsch, 
                                      matrix_centroid, vector_theta,
-                                     rotation_matrix_arbitrary_axis)
+                                     rotation_matrix_arbitrary_axis,
+                                     atom_vdw_radii)
+
+class LazyAttr:
+    def __init__(self, func):
+        self.func = func
+        
+    def __get__(self, obj, cls):
+        if obj is None:
+            return self
+        val = self.func(obj)
+        setattr(obj, self.func.__name__, val)
+        return val
 
 class Vertex:
 
@@ -777,8 +790,45 @@ class Topology:
             
             vertex.heavy_ids = list(heavy_ids)
 
+class CageTopology(Topology):
+ 
+    @LazyAttr
+    def windows(self):
+        all_windows = window_sizes(self.macro_mol.prist_mol_file)
 
-class FourPlusSix(Topology):
+        if len(all_windows) <= self.n_windows:
+            print('not enough windows found')
+
+        if all_windows is None or len(all_windows) <= self.n_windows:
+            print('all windows returned none')            
+            return None
+        
+        return sorted(all_windows, reverse=True)[:self.n_windows]
+            
+
+   
+    def cavity_size(self):
+
+        center_of_mass = self.macro_mol.prist_center_of_mass()
+        min_dist = min((euclidean(coord, center_of_mass) -
+        atom_vdw_radii[self.macro_mol.prist_atom_symbol(atom_id)]) 
+                                 for atom_id, coord in 
+                                 self.macro_mol.prist_all_atom_coords())
+        return 2 * abs(min_dist)    
+
+    def window_difference(self, default=500):
+        if self.windows is None:
+            return default
+        
+        diff_sum = sum(abs(w1 - w2) for w1, w2 in 
+            itertools.combinations(self.macro_mol.topology.windows, 2))
+
+        diff_num = sum(1 for _ in 
+            itertools.combinations(self.macro_mol.topology.windows, 2))
+            
+        return diff_sum / diff_num
+
+class FourPlusSix(CageTopology):
     """
     Defines the tetrahedral, 4+6, topology.
 
@@ -815,16 +865,16 @@ class FourPlusSix(Topology):
     edges = [Edge(v1,v2) for v1, v2 in 
                 itertools.combinations(vertices, 2)]  
     
-    window_num = 4    
+    n_windows = 4    
     
     def __init__(self, macro_mol):
-        Topology.__init__(self, macro_mol)        
+        CageTopology.__init__(self, macro_mol)        
         self.pair_up = self.pair_up_edges_with_vertices
         
 
 
  
-class EightPlusTwelve(FourPlusSix):
+class EightPlusTwelve(CageTopology):
     """
     Defines a square-like topology.    
     
@@ -856,10 +906,10 @@ class EightPlusTwelve(FourPlusSix):
              Edge(vertices[2], vertices[6]),
              Edge(vertices[3], vertices[7])]  
     
-    window_num = 6    
+    n_windows = 6    
     
     def __init__(self, macro_mol):
-        Topology.__init__(self, macro_mol)        
+        CageTopology.__init__(self, macro_mol)        
         self.pair_up = self.pair_up_edges_with_vertices    
 
        

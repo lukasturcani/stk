@@ -567,6 +567,9 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
     # Execute the file conversion.
     sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
            universal_newlines=True, shell=True)
+        
+    if not os.path.exists(out):
+        raise RuntimeError('Failed to create .mol2 file.')
 
 def _fix_params_in_com_file(macro_mol, main_string):
     """
