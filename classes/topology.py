@@ -16,6 +16,11 @@ from ..convenience_functions import (flatten, normalize_vector,
                                      atom_vdw_radii)
 
 class LazyAttr:
+    """
+    A descriptor for creating lazy attributes.
+    
+    """
+    
     def __init__(self, func):
         self.func = func
         
@@ -27,6 +32,39 @@ class LazyAttr:
         return val
 
 class Vertex:
+    """
+    Used to represent the vertices of Cage polyhedra.
+
+    This class stores information about the vertices which make up a 
+    Cage's structure.
+    
+    Attributes
+    ----------
+    x : float
+        The x position of the vertex.
+    
+    y : float
+        The y position of the vertex.    
+        
+    z : float
+        The z position of the vertex.    
+    
+    coord : numpy.array of floats
+        A numpy array which holds the x, y and z coordinates of the
+        vertex, in that order.
+    
+    edges : list of Edge instances
+        This list holds the Edge instances which represent the edges
+        connected to a partical vertex within a given cage structure.
+    
+    heavy_ids : list of ints
+        This list holds the ids of the heavy atoms which belong to the
+        building block placed on a particular vertex. The ids correspond
+        to the id of the heavy atoms in the cage molecule. This means
+        they correspond to the ids of atoms in the `heavy_mol` attribute
+        of a ``Cage`` instance.
+    
+    """
 
     __slots__ = ['x', 'y', 'z', 'coord', 'edges', 'heavy_ids']    
     
@@ -39,6 +77,18 @@ class Vertex:
         self.heavy_ids = []
         
     def place_mol(self, building_block):
+        """
+        
+        Parameters
+        ----------
+        building_block : BuildingBlock        
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            
+        
+        """
         
         edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
         edge_coord = np.array(edge_coord_mat[0,:])[0]
@@ -72,6 +122,35 @@ class Vertex:
         return normal
     
     def edge_plane(self):
+        """
+        Return coefficients of plane of edges connected to the vertex.
+        
+        A plane is defined by the scalar plane equation,
+            
+            ax + by + cz = d.
+        
+        This method returns the a, b, c and d coefficients of this 
+        equation for the plane formed by the connected edges. The 
+        coefficents a, b and c decribe the normal vector to the plane.
+        The coefficent d is found by substituting these coefficients
+        along with the x, y and z variables in the scalar equation and
+        solving for d. The variables x, y and z are substituted by the
+        coordinate of some point on the plane. For example, the position
+        of one of the heavy atoms.
+        
+        Returns
+        -------
+        numpy.array
+            This array has the form [a, b, c, d] and represents the 
+            scalar equation of the plane formed by the heavy atoms.
+        
+        References
+        ----------
+        http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx  
+
+        
+        """
+        
         heavy_coord = self.edges[0].coord
         d = np.multiply(np.sum(np.multiply(self.edge_plane_normal(), 
                                            heavy_coord)), -1)
@@ -82,16 +161,72 @@ class Vertex:
             yield normalize_vector(edge1.coord-edge2.coord)
     
     def edge_coord_matrix(self):
+        """
+        Return matrix holding coords of edges joined to the vertex.        
+
+        Returns
+        -------
+        numpy.matrix
+            The matrix is n x 3, where n is the number of edges
+            connected to the vertex.
+        
+        """
+        
         coords = []
         for edge in self.edges:
             coords.append(edge.coord)
         return np.matrix(coords)
         
     def edge_centroid(self):
+        """
+        Returns the centroid of the edges connected to the vertex.
+        
+        Returns
+        -------
+        numpy.array
+            An array which holds the x, y and z positions of the
+            centroid of the edges connected to the vertex.
+        
+        """
+        
+        # The connected edges are held in the `edges`. To get the
+        # centroid, add up all the x, y and z coordinates (separately) 
+        # and divide each sum by the number of edges. 
         return sum(edge.coord for edge in self.edges) / len(self.edges)
         
 
 class Edge:
+    """
+    Used to represent the edges of Cage polyhedra.
+
+    This class stores information about the edges which make up a Cage's 
+    structure.
+    
+    Attributes
+    ----------
+    v1 : Vertex
+        The first vertex which an edge is connected to.
+    
+    v2 : Vertex
+        The second vertex which an edge is connected to.   
+    
+    coord : numpy.array of floats
+        A numpy array which holds the x, y and z coordinates of the
+        edge, in that order. It corresponds to the midpoint of the two
+        vertices which the edge connects.
+    
+    direction : numpy.array
+        This vector represents the orientation of the edge. It is a 
+        normalized direction vector which runs from `v2` to `v1`.
+    
+    heavy_ids : list of ints
+        This list holds the ids of the heavy atoms which belong to the
+        building block placed on a particular edge. The ids correspond
+        to the id of the heavy atoms in the cage molecule. This means
+        they correspond to the ids of atoms in the `heavy_mol` attribute
+        of a ``Cage`` instance.
+    
+    """
     
     __slots__ = ['v1', 'v2', 'coord', 'direction', 'heavy_ids']    
     
@@ -134,7 +269,7 @@ class Edge:
         theta = vector_theta(next(linker.heavy_direction_vectors()),
                              self.direction)
 
-        if abs(abs(theta) - np.pi/2)  < 0.174533:        
+        if theta > np.pi/6:        
             linker.set_heavy_atom_centroid([0,0,0])
             pos_mat = linker.heavy_mol_position_matrix()
             rot_mat = rotation_matrix_arbitrary_axis(theta, self.coord)
