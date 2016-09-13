@@ -1493,7 +1493,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             
         if topology_args is None:
             topology_args = []
-        raise Exception('random exception')
+
         self.building_blocks = tuple(building_blocks)
 
         # A ``Topology`` subclass instance must be initiazlied with a 
