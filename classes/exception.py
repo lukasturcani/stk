@@ -94,10 +94,16 @@ class MacroMolError(Exception):
             pass
         
         with open(name, 'a') as f:
-            print(self.ex, file=f)
-            print('note = ', self.notes, file=f)
-            print('building blocks = ', self.macro_mol.building_blocks, file=f)
-            print('topology = ', self.macro_mol.topology, file=f) 
-            print('prist_mol_file = ', self.macro_mol.prist_mol_file, file=f) 
-            print('topology_args = ', self.macro_mol.topology_args, file=f)
-            print("\n\n\n", file=f)        
+            f.write("{0}\n".format(self.ex))
+            f.write('note = {0}\n'.format(self.notes))
+            
+            f.write('building blocks = {0}\n'.format(
+                                        self.macro_mol.building_blocks))
+
+            f.write('topology = {0}\n'.format(self.macro_mol.topology)) 
+
+            f.write('prist_mol_file = {0}\n'.format(
+                                         self.macro_mol.prist_mol_file)) 
+           
+            f.write('topology_args = {0}\n\n\n\n'.format(
+                                          self.macro_mol.topology_args))       
