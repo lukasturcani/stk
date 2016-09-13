@@ -1,13 +1,8 @@
 import numpy as np
-from functools import wraps, total_ordering
-from operator import attrgetter
+from functools import total_ordering
 import itertools
-import weakref
-import rdkit
 from rdkit import Chem as chem
-from rdkit.Chem import AllChem as ac
 import rdkit.Geometry.rdGeometry as rdkit_geo
-from copy import deepcopy
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
@@ -1242,9 +1237,17 @@ class BuildingBlock(StructUnit):
 
     def centroid_centroid_dir_vector(self):
         """
-        Returns the direction vector between 2 molecular centroids.
+        Returns the direction vector between the 2 molecular centroids.
         
+        This method uses the substituted version of the molecule. The
+        two centroids are the molecular centroid and the centroid of the
+        heavy atoms only.
         
+        Returns
+        -------
+        numpy.array
+            The normalized direction vector running from the centroid of
+            the heavy atoms to the molecular centroid.
         
         """
     
@@ -1490,7 +1493,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             
         if topology_args is None:
             topology_args = []
-
+        raise Exception('random exception')
         self.building_blocks = tuple(building_blocks)
 
         # A ``Topology`` subclass instance must be initiazlied with a 
@@ -1864,6 +1867,15 @@ class MacroMolecule(metaclass=CachedMacroMol):
         return np.divide(coord, total_mass)
 
     def prist_atom_symbol(self, atom_id):
+        """
+        Returns the symbol of the atom with id `atom_id` in `prist_mol`.
+
+        Returns
+        -------
+        str
+            The atomic symbol of the atom with id number `atom_id`.        
+        
+        """
         atom = self.prist_mol.GetAtomWithIdx(atom_id)
         atomic_num = atom.GetAtomicNum()
         return periodic_table[atomic_num]
