@@ -305,7 +305,8 @@ def macromodel_opt(macro_mol,
     
     # MacroModel requires a ``.mae`` file as input. This creates a 
     # ``.mae`` file holding the molding the pristine molecule.    
-    print('Converting .mol to .mae - {0}.'.format(macro_mol.prist_mol_file))
+    print('Converting .mol to .mae - {0}.'.format(
+                                              macro_mol.prist_mol_file))
     _convert_mol_to_mae(macro_mol, macromodel_path)        
 
     # generate the ``.com`` file for the MacroModel run.
@@ -598,7 +599,8 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
         _convert_maegz_to_mol2(macro_mol, macromodel_path)    
 
     if 'number 1' in convrt_return.stdout:
-        MacroMolError(Exception('strct error'), macro_mol, 'strct error')
+        MacroMolError(Exception('strct error'), 
+                      macro_mol, 'strct error')
 
 
 
