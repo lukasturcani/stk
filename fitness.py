@@ -45,7 +45,7 @@ def calc_fitness(func_data, population):
             macro_mol.fitness = -np.inf
             macro_mol.windows = None
 
-        print(macro_mol.fitness)            
+        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
             
 def random_fitness(macro_mol):
     """

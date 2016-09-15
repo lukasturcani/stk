@@ -9,11 +9,9 @@ from scipy.spatial.distance import euclidean
 
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..pyWindow import window_sizes
-from ..convenience_functions import (flatten, normalize_vector,
-                                     rotation_matrix, kabsch, 
-                                     matrix_centroid, vector_theta,
-                                     rotation_matrix_arbitrary_axis,
-                                     atom_vdw_radii)
+from ..convenience_functions import (flatten, normalize_vector, 
+                                     vector_theta, atom_vdw_radii,
+                                     rotation_matrix_arbitrary_axis)
 
 class LazyAttr:
     """
@@ -78,44 +76,129 @@ class Vertex:
         
     def place_mol(self, building_block):
         """
+        Places a building-block* on the coords of the vertex.
+        
+        The orientation of the building-block* is aligned with 2
+        parameters. Firstly the normal of the plane of heavy atoms of
+        the building-block* is aligned with the normal of the plane
+        formed by the edges connected to the vertex. Because the normal
+        of the plane of heavy atoms always points in the direction of
+        the building_block*'s centroid, this alignment causes the bulk
+        of the building-block* molecule to point away from the center
+        of the cage.
+        
+        Secondly, the building-block* is rotated so that a heavy atom is 
+        aligned perfectly with an edge. This reduces the rms distance
+        between the edges and heavy atoms to some extent.                
         
         Parameters
         ----------
-        building_block : BuildingBlock        
+        building_block : BuildingBlock
+            The building-block* molecule to be placed on a vertex.
         
+        Modifies
+        --------
+        building_block.heavy_mol : rdkit.Chem.rdchem.Mol
+            The conformer of the rdkit instance in this attribute is 
+            modified as per the description in the docstring.
+            
         Returns
         -------
         rdkit.Chem.rdchem.Mol
-            
+            The rdkit instance holding the building-block* molecule with
+            the coordinates placed on the vertex and orientation set as
+            described in the docstring.
         
         """
         
+        # The method first aligns the normal of the heavy atom plane to
+        # the normal of the edge plane. This means the bulk of the 
+        # building-block* is always pointed away from the center of the
+        # molecule.
+        building_block.set_heavy_mol_orientation(
+                                               self.edge_plane_normal())    
+        
+        # Next, the building-block* must be rotated so that one of the 
+        # heavy atoms is perfectly aligned with one of the edges. This
+        # is a multi-step process:
+        #   1) Place the centroid of the heavy atoms at the origin.
+        #   2) Place the centroid of the edges connected to the vertex 
+        #      at the origin.
+        #   3) Rotate the building-block* by some amount `theta`, so
+        #      so that one of the heavy atoms is perfectly aligned with
+        #      one of the edges. The axis of rotation is the normal to 
+        #      the plane of heavy atoms.
+        # 
+        # The rotation is carried out via matrices. This means a
+        # coordinate matrix of atoms in the heavy molecule is generated
+        # and modified.
+        
+        # Set the centroid of the heavy atoms at the origin.
+        building_block.set_heavy_atom_centroid([0,0,0])
+        # Get the coordinate of the atom which is to be aligned with an
+        # edge.
+        atom_coord = building_block.heavy_get_atom_coords(
+                                            building_block.heavy_ids[0])
+
+        # Get the coordinates of all the edges and translate the 
+        # centroid to the origin.
         edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
         edge_coord = np.array(edge_coord_mat[0,:])[0]
-
-        building_block.set_heavy_mol_orientation(self.edge_plane_normal())    
         
-        building_block.set_heavy_atom_centroid([0,0,0])
-        atom_coord = building_block.heavy_get_atom_coords(building_block.heavy_ids[0])
+        # Get the angle between an edge and the atom.        
         theta = vector_theta(edge_coord, atom_coord)
         
-        rot_mat = rotation_matrix_arbitrary_axis(theta, self.edge_plane_normal())
+        # Get the rotation matrix necessary to do the rotation of 
+        # `theta` about the normal to the plane.
+        rot_mat = rotation_matrix_arbitrary_axis(theta, 
+                                               self.edge_plane_normal())
+        # Apply the rotation to the positions of the atoms in the heavy
+        # molecule and get a new position matrix which holds their
+        # coordinates coordinates after the rotation.
         pos_mat = building_block.heavy_mol_position_matrix()
         new_pos_mat = np.dot(rot_mat, pos_mat)
+        # Update the positions in the rdkit instance in `heavy_mol`.
         building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
         
+        # Finally the well orientated building-block* is placed on the
+        # coords of the vertex.
         building_block.set_heavy_atom_centroid(self.coord)
-        
-    
+     
         return building_block.heavy_mol
 
     def edge_plane_normal(self):
-        v1, v2 = itertools.islice(self.edge_direction_vectors(), 0, 2)
+        """
+        Return the normal of the plane formed by the connected edges.
         
+        The normal is set such that it always points away from the 
+        origin.        
+        
+        Returns
+        -------
+        numpy.array
+            A normalized vector which defines the normal pointed away
+            from the origin.        
+        
+        """
+        # Get two of the direction vectors running between the edges.
+        v1, v2 = itertools.islice(self.edge_direction_vectors(), 2)  
+        # To get the normal to the plane get the cross product of these
+        # vectors. Normalize it.        
         normal = normalize_vector(np.cross(v1, v2))
-    
+        
+        # To check that the normal is pointing away from the center of
+        # cage, find the angle, `theta`, between it and one of the
+        # position vectors of the edges on the plane. Assuming that the
+        # center of the cage is at the origin, which it should be as 
+        # this is specified in the documentation, if the angle between
+        # the normal the position vector is less than 90 degrees they
+        # point in the same general direction. If the angle is greater
+        # than 90 degrees it means that they are pointing in opposite 
+        # directions. If this is the case make sure to multiply the 
+        # nomral by -1 in all axes so that it points in the correct 
+        # direction while still acting as the normal to the plane.
         theta = vector_theta(normal, self.edges[0].coord) 
-
+        
         if theta > np.pi/2:
             normal = np.multiply(normal, -1)
         
@@ -147,7 +230,6 @@ class Vertex:
         References
         ----------
         http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx  
-
         
         """
         
@@ -157,6 +239,17 @@ class Vertex:
         return np.append(self.edge_plane_normal(), d)
         
     def edge_direction_vectors(self):
+        """
+        Yields direction vectors between edges connected to the vertex.
+        
+        Yields
+        ------
+        numpy.array
+            A normalized direction vector running from one edge 
+            connected to the vertex to another.        
+        
+        """
+        
         for edge1, edge2 in itertools.combinations(self.edges, 2):
             yield normalize_vector(edge1.coord-edge2.coord)
     
@@ -242,11 +335,44 @@ class Edge:
         
     def place_mol(self, linker):
         """
+        Places a linker molecule on the coordinates of an edge.
+        
+        It also orientates the linker so that a the heavy atoms sit
+        exactly on the edge and bulk of the linker points away from the 
+        center of the cage.
+
+        Parameters
+        ----------
+        linker : Linker
+            The linker which is to be placed and orientated as described
+            in the docstring.
+        
+        Modifies
+        --------
+        linker.heavy_mol : rdkit.Chem.rdchem.Mol
+            The conformer of the rdkit instance in this attribute is 
+            modified as per the description in the docstring. 
+       
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            The rdkit instance holding the linker molecule with the
+            coordinates placed on the edge and orientation set as
+            described in the docstring.
+        
+        Raises
+        ------
+        ValueError
+            Raised if the orientation of the heavy atoms is incorrect.
         
         """
         
+        # First the centroid of the heavy atoms is placed on the
+        # position of the edge, then the direction of the linker is 
+        # aligned with the direction of the edge.
         linker.set_heavy_atom_centroid(self.coord)
         linker.set_heavy_mol_orientation(self.direction)
+        # Check that the linker is correctly aligned.        
         if not np.allclose(self.direction, 
                            next(linker.heavy_direction_vectors()),
                            atol=0.01):
@@ -255,20 +381,26 @@ class Edge:
                     'Expected {0}, got {1}.').format(self.direction,  
                            next(linker.heavy_direction_vectors())))
 
+        # This part ensures that the centroid of the linker is placed
+        # on the outside of the cage, rather than on the inside. To do
+        # this find the direction in which the centroid is pointing.
+        # This is done by getting the direction vector running from the
+        # midpoint of the two heavy atoms to the centroid of the 
+        # molecule. Next this direction vector is aligned with the 
+        # position vector running between the midpoint of the cage to
+        # the midpoint of the heavy atoms. This assumes that the center
+        # of the cage is at the origin.
         dir_vector = linker.heavy_mol_centroid() - self.coord
-        linker.set_heavy_atom_centroid([0,0,0])
-        
+        linker._set_heavy_mol_orientation(dir_vector, self.coord)
 
-        
-        rot_mat = rotation_matrix(dir_vector, self.coord)
-        pos_mat = linker.heavy_mol_position_matrix()
-        new_pos_mat = np.dot(rot_mat, pos_mat)
-        linker.set_heavy_mol_from_position_matrix(new_pos_mat)
-        linker.set_heavy_atom_centroid(self.coord)
-
+        # In some cases this ruins the alignmen of the heavy atoms with
+        # the edge direction. This can be corrected by the finding the
+        # angle between the edge direction and the heavy atom direction
+        # vector and rotating about the centroid - cage center axis by
+        # that angle.
         theta = vector_theta(next(linker.heavy_direction_vectors()),
                              self.direction)
-
+        # Only do the corrective rotation if angle offset is big.
         if theta > np.pi/6:        
             linker.set_heavy_atom_centroid([0,0,0])
             pos_mat = linker.heavy_mol_position_matrix()

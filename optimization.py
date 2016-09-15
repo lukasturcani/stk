@@ -9,6 +9,10 @@ import time
 
 # More imports at the bottom of script.
 
+class ConversionError(Exception):
+    def __init__(self, message):
+        self.message = message
+
 def optimize_all(func_data, population):
     """
     Apply optimization function to all population members in parallel.
@@ -190,7 +194,7 @@ def update_prist_attrs_from_mol2(macro_mol):
             print('Waiting for {0}.'.format(mol2))
             tick += 1
             
-        if os.path.exists(mol2) or time.time() - t_start > 60:
+        if os.path.exists(mol2) or time.time() - t_start > 20:
             break
     
     # Update the `prist_mol` attribute.
@@ -251,7 +255,7 @@ def rdkit_optimization(macro_mol):
     macro_mol.optimized = True   
     return macro_mol
     
-def macromodel_opt(macro_mol, 
+def macromodel_opt(macro_mol, force_field='16',
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2"):
     """
     Optimizes the molecule using MacroModel.
@@ -270,6 +274,10 @@ def macromodel_opt(macro_mol,
         machine. For example, in a default Microsoft installation the 
         folder will probably be something like
         ``C:\Program Files\Schrodinger2016-2``.
+
+    force_field : str (default = '16')
+        The number of the force field to be used in the optimization, 
+        as a string. The string should be 2 characters long.
     
     Modifies
     --------
@@ -299,7 +307,7 @@ def macromodel_opt(macro_mol,
     # If the molecule is already optimized, return.
     if macro_mol.optimized:
         print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
-        return None
+        return
     
     print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
     
@@ -311,7 +319,7 @@ def macromodel_opt(macro_mol,
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    _generate_COM(macro_mol)
+    _generate_COM(macro_mol, force_field)
     
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.run``. The command is the full path of the ``bmin``
@@ -339,17 +347,25 @@ def macromodel_opt(macro_mol,
     print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
     opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                         universal_newlines=True, shell=True)
-    print('BMIN OUT IS ', opt_return.stdout)
+
     # If optimization fails because the license is not found, rerun the
     # function.
-    if 'Could not check out a license for mmlibs' in opt_return.stdout:
-        macromodel_opt(macro_mol, macromodel_path)
-    
+    print("BMIN STDOUT IS", macro_mol.prist_mol_file, opt_return.stdout)
+    if not _license_found(macro_mol, opt_return.stdout):
+        return macromodel_opt(macro_mol, 
+                              macromodel_path=macromodel_path)
+
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
     print('Converting .maegz to .mol2 - {0}.'.format(
                                             macro_mol.prist_mol_file))
-    _convert_maegz_to_mol2(macro_mol, macromodel_path) 
+    try:
+        _convert_maegz_to_mol2(macro_mol, macromodel_path)
+    except ConversionError as ex:
+        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
+               '- {0}'.format(macro_mol.prist_mol_file)))
+        return macromodel_opt(macro_mol, force_field='14', 
+                              macromodel_path=macromodel_path)
     
     print('Updating attributes from .mol2 - {0}.'.format(
                                              macro_mol.prist_mol_file))
@@ -364,8 +380,49 @@ def macromodel_opt(macro_mol,
 
     macro_mol.optimized = True       
     return macro_mol    
+
+def _license_found(macro_mol, bmin_output):
+    """
+    Checks to see if minimization failed due to a missing license.
+
+    The user can be notified of this in one of two ways. Sometimes the
+    output of the submission contains the message informing that the 
+    license was not found and in other cases it will be the log file.
+    This function checks both of these sources for this message.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule being optimized
     
-def _generate_COM(macro_mol):
+    bmin_output : str
+        The outout from submitting the minimization of the structure
+        to the ``bmin`` program via the shell.
+        
+    Returns
+    -------
+    bool
+        ``True`` if the license was found. ``False`` if the minimization
+        did not occur due to a missing license.
+    
+    """
+
+    if 'Could not check out a license for mmlibs' in bmin_output:
+        return False
+    
+    # To check if the log file mentions a missing license file open the
+    # the log file and scan for the apporpriate string.
+    log_file_path = macro_mol.prist_mol_file.replace('mol', 'log')
+    with open(log_file_path, 'r') as log_file:
+        log_file_content = log_file.read()
+        
+    if 'Could not check out a license for mmlibs' in log_file_content:
+        return False
+        
+    
+    return True
+ 
+def _generate_COM(macro_mol, force_field='16'):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -384,6 +441,10 @@ def _generate_COM(macro_mol):
     ----------
     macro_mol : MacroMolecule
         The macromolecule which is to be optimized.
+        
+    force_field : str (default = '16')
+        The number of the force field to be used in the optimization, 
+        as a string. The string should be 2 characters long.
 
     Modifies
     --------
@@ -403,7 +464,7 @@ def _generate_COM(macro_mol):
     "0.0000     0.0000     0.0000\n"
 " DEBG      55      0      0      0     0.0000     0.0000     "
 "0.0000     0.0000\n"
-" FFLD      16      1      0      0     1.0000     0.0000     "
+" FFLD      {0}      1      0      0     1.0000     0.0000     "
 "0.0000     0.0000\n"
 " BDCO       0      0      0      0    41.5692 99999.0000     "
 "0.0000     0.0000\n"
@@ -420,7 +481,7 @@ def _generate_COM(macro_mol):
 "0.0000     0.0000\n"
 " END        0      0      0      0     0.0000     0.0000     "
 "0.0000     0.0000\n"
-" ")
+" ").format(force_field)
 
     # Create a path for the ``.com`` file. It is the same as that of the
     # ``.mol`` file but with a ``.com`` extension. Get the path of the
@@ -509,10 +570,13 @@ def _convert_mol_to_mae(macro_mol, macromodel_path):
                    " -omae " + mae_file)
 
     convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                        universal_newlines=True, shell=True)    
-    
-    
-    print('CONVERT MOL TO MAE STD OUT IS:', convrt_return.stdout)
+                        universal_newlines=True, shell=True)
+
+    # If no license if found, keep re-running the function until it is.
+    if 'Could not check out a license for mmli' in convrt_return.stdout:
+        return _convert_mol_to_mae(macro_mol, macromodel_path) 
+
+    print("CONVERT OUTPUT IS:", convrt_return.stdout)
 
     return mae_file
 
@@ -544,6 +608,14 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
     Returns
     -------
     None : NoneType
+
+    Raises
+    ------
+    ConversionError
+        If the OPLS3 force field failed to optimize the molecule. If
+        this happens the conversion function is unable to convert the 
+        output of the optimization function and as a result this error
+        is raised.
     
     """
         
@@ -585,22 +657,21 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
             print('Waiting for {0}.'.format(out))
             tick += 1
         
-        if os.path.exists(out) or time_taken > 60:
+        if os.path.exists(out) or time_taken > 20:
             break
   
     # Execute the file conversion.
     convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
            universal_newlines=True, shell=True) 
 
-    print('CONVERT STD OUT IS:', convrt_return.stdout)
-
+    # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
-        print('second call')
-        _convert_maegz_to_mol2(macro_mol, macromodel_path)    
+        return _convert_maegz_to_mol2(macro_mol, macromodel_path)    
 
+    # If OPLS3 failed, re-run the optimization with the OPLS_2005 force 
+    # field.
     if 'number 1' in convrt_return.stdout:
-        MacroMolError(Exception('strct error'), 
-                      macro_mol, 'strct error')
+        raise ConversionError(convrt_return.stdout)
 
 
 
