@@ -830,7 +830,7 @@ class StructUnit(metaclass=Cached):
                                       coord_mat.item(2))
             conf.SetAtomPosition(i, coord)
 
-    def set_heavy_mol_orientation(self, start, end):
+    def _set_heavy_mol_orientation(self, start, end):
         """
         Rotates heavy molecule by rotation of `start` to `end`.
         
@@ -843,18 +843,20 @@ class StructUnit(metaclass=Cached):
         are 45 degrees apart, a 45 degree rotation will be applied to
         heavy molecule. The rotation will be along the appropriate axis.
         
-        This method will likely be overwritten in derived classes of 
-        ``StructUnit``. The derived class will probably use a default
-        `start` vector. For example, the ``Linker`` class will have the
+        This method will likely have counterparts in derived classes of 
+        ``StructUnit``. The counterparts will probably use a default
+        `start` vector and will not be private.  This prevents 
+        overwriting and means both versions of the function will be 
+        available. For example, the ``Linker`` class will have the
         default `start` vector as the direction vector between the 2
-        heavy atoms. This means that running this function on a 
+        heavy atoms. This means that running the function on a 
         ``Linker`` instance will align the heavy atoms with the vector
-        `end`. 
+        `end`.
 
         On the other hand, the ``BuildingBlock`` class will use the 
         normal to the plane formed by the heavy atoms as the `start`
         vector. This means that in ``BuildingBlock`` molecules the
-        normal to the plane will be aligned with `end` when this method
+        normal to the plane will be aligned with `end` when the method
         is run.
         
         As the above examples demonstrate, the great thing about this 
@@ -1233,7 +1235,7 @@ class BuildingBlock(StructUnit):
         """
         
         start = self.heavy_plane_normal()
-        return StructUnit.set_heavy_mol_orientation(self, start, end)
+        return StructUnit._set_heavy_mol_orientation(self, start, end)
 
     def centroid_centroid_dir_vector(self):
         """
@@ -1291,7 +1293,7 @@ class Linker(StructUnit):
         """
         
         start = next(self.heavy_direction_vectors())
-        return StructUnit.set_heavy_mol_orientation(self, start, end)
+        return StructUnit._set_heavy_mol_orientation(self, start, end)
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):

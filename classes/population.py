@@ -139,7 +139,8 @@ class Population:
                                     
 
     @classmethod
-    def init_random_cages(cls, bb_db, lk_db, topologies, size, ga_tools):
+    def init_random_cages(cls, bb_db, lk_db, 
+                          topologies, size, ga_tools):
         """
         Creates a population of cages built from provided databases.        
         

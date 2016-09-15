@@ -72,7 +72,9 @@ class Selection:
     Selection algorithms added as methods to this class only need to be 
     within the class but do not need access to the instance of the 
     class, the `self` parameter of methods is not needed. This means the 
-    selection methods can be decorated with ``staticmethod``.
+    selection methods can be decorated with ``staticmethod``. In the 
+    cases where access to the class or instance is necessary, 
+    ``classmethod`` or no decorator should be used as appropriate.
     
     Selection algorithms are to be implemented as generators. Selection 
     algorithms which produce parents pools must yield a tuple of
@@ -165,16 +167,9 @@ class Selection:
             The next fittest ``MacroMolecule`` instance held by the
             population.
         
-        """
-        
-        # Make a list of all the indiviudals in the the population and
-        # sort that list using the `fitness` attribute as the key.
-        # Reverse the sort so that highest fitness is at index 0. Yield
-        # from the sorted list.
-        
-        ordered_pop = list(population.all_members())
-        ordered_pop.sort(key=attrgetter('fitness'), reverse=True)    
-        for ind in ordered_pop:
+        """        
+          
+        for ind in sorted(Population, reverse=True):
             yield ind
     
     @staticmethod    
@@ -212,6 +207,29 @@ class Selection:
         # Get all combinations of size 2.        
         for mol1, mol2 in itertools.combinations(population, 2):
             yield mol1, mol2 
+    
+    @classmethod
+    def all_combinations_n_fittest(cls, population, n):
+        """
+        Yields all pairings of the `n` fittest individuals.
+
+        Parameters
+        ----------
+        population : Population
+            The population from which parents should be selected.
+            
+        Yields
+        ------
+        tuple of 2 MacroMolecule instances
+            The ``MacroMolecule`` instances which together form a parent
+            pair.
+        
+        """
+        
+        n_fittest = itertools.islice(cls.fittest(population), n)
+        for ind1, ind2 in itertools.combinations(n_fittest, 2):
+            yield ind1, ind2
+    
     
     """
     The following methods are inteded for convenience while 
