@@ -241,7 +241,7 @@ def rdkit_optimization(macro_mol):
     # If `macro_mol` is already optmized, return.
     if macro_mol.optimized:
         print('Skipping {0}.'.format(macro_mol.prist_mol_file))   
-        return None
+        return macro_mol
         
     # Sanitize then optimize the rdkit molecule in `prist_mol`.
     chem.SanitizeMol(macro_mol.prist_mol)
@@ -307,7 +307,7 @@ def macromodel_opt(macro_mol, force_field='16',
     # If the molecule is already optimized, return.
     if macro_mol.optimized:
         print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
-        return
+        return macro_mol
     
     print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
     
@@ -984,11 +984,12 @@ def do_not_optimize(macro_mol):
     
     Returns
     -------
-    None : NoneType
+    MacroMolecule
+        The macromolecule not getting optimized.
     
     """
     
-    return
+    return macro_mol
     
 from .classes import FGInfo
 from .classes.exception import MacroMolError

@@ -1,7 +1,7 @@
 init_func init_random_cages bb_db=C:\Users\lukas\Projects\MMEA\Database_prec\amines3f lk_db=C:\Users\lukas\Projects\MMEA\Database_prec\aldehydes2f topologies=EightPlusTwelve,FourPlusSix
 
 generational_select_func fittest
-parent_select_func all_combinations_n_fittest n=4
+parent_select_func all_combinations_n_fittest n=2
 mutant_select_func fittest
 
 mating_func bb_lk_exchange

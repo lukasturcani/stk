@@ -168,8 +168,8 @@ class Selection:
             population.
         
         """        
-          
-        for ind in sorted(Population, reverse=True):
+
+        for ind in sorted(population, reverse=True):
             yield ind
     
     @staticmethod    
