@@ -120,7 +120,7 @@ for x in range(ga_input.num_generations):
         print(('\n\nRemoving duplicates, if any.\n'
                '----------------------------\n\n')    )
         pop.remove_duplicates()    
-        
+
     with time_it():        
         print(('\n\nOptimizing the population.\n'
               '--------------------------\n\n'))
