@@ -98,7 +98,7 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
     fitness_value = np.power(fitness_value, exponents)
     fitness_value = np.multiply(fitness_value, coeffs)    
 
-    return -np.sum(fitness_value)
+    return 1/np.sum(fitness_value)
 
     
     
