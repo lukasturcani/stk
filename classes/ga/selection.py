@@ -1,5 +1,6 @@
 from operator import attrgetter
 import itertools
+import numpy as np
  
 # Note that import of the Population class occurs at the end of the
 # file. There is a good reason for this.
@@ -173,8 +174,172 @@ class Selection:
             yield ind
     
     @staticmethod    
-    def roulette(population):
-        pass
+    def roulette(population, elitism=False, 
+                 truncation=False, duplicates=False):
+        """
+        Yields individuals using roulette selection.
+        
+        In roulette selection the chance an individual is selected is
+        given by its fitness. If the total fitness is the sum of all the
+        fitness values in a population, the chance an individuals is 
+        selected is given by
+        
+        p = individual fitness / total fitness,
+        
+        where p is the probability of selection [1].
+        
+        This method also supports the application of elitism and
+        truncation. Elitism means that the n fittest individuals are 
+        guaranteed to be selected at least once.        
+        
+        Truncation means that only the n fittest individuals
+        are subject to selection by the algorithm, the rest are not
+        going to be selected.          
+        
+        Parameters
+        ----------
+        population : Population
+            The population from which individuals are to be selected.
+            
+        elitism : bool (default = False) or int
+            If ``False`` elitism does not take place. If an ``int`` then
+            that number of individuals is subject to elitism.
+            
+        truncation : bool (default = False) or int           
+            If ``False`` truncation does not take place. If an ``int``
+            then that number of individuals is kept and the rest are
+            truncated.
+            
+        duplicates : bool (default = False)
+            If ``True`` the same individual can be selected more than
+            once with the selection mechanism. This option is
+            appropriate when selecting for mutation. If ``False`` a
+            selected individual cannot be selected again. This option is
+            suitable for generational selecitons.
+            
+        Yields
+        ------
+        MacroMolecule
+            The next selected invidual.
+                
+        References
+        ----------
+        [1] http://tinyurl.com/csc3djm 
+        
+        """
+                
+        pop_list = sorted(population, 
+                          key=attrgetter('fitness'), reverse=True)
+
+        # Apply truncation if desired.
+        if truncation:
+            pop_list = pop_list[:truncation]
+ 
+        total_fitness = sum(ind.fitness for ind in pop_list if 
+                               isinstance(ind.fitness, float) or 
+                               isinstance(ind.fitness, int))
+                              
+        weights = []
+        for ind in pop_list:
+            if not ind.fitness:
+                weights.append(0)
+            else:
+                weights.append(ind.fitness / total_fitness)
+               
+        if duplicates:            
+            
+            # If elitism applies yield the required individuals first.
+            if elitism:
+                for ind in itertools.islice(pop_list, elitism):
+                    yield ind
+        
+            while True:
+                yield np.random.choice(pop_list, 
+                                       p=weights, replace=True)
+        
+        else:
+
+            # if elitism applies yield the required individuals first
+            # and remove them from the population list so they cannot be
+            # selected more than once.
+            if elitism:
+                for ind in list(itertools.islice(pop_list, elitism)):
+                    yield ind
+                    pop_list.remove(ind)
+            
+                # Recalculate probabilities as some weights were 
+                # removed.
+                total_fitness = sum(ind.fitness for ind in pop_list if 
+                                       isinstance(ind.fitness, float) or 
+                                       isinstance(ind.fitness, int))    
+                weights = []
+                for ind in pop_list:
+                    if not ind.fitness:
+                        weights.append(0)
+                    else:
+                        weights.append(ind.fitness / total_fitness)            
+
+            for ind in np.random.choice(pop_list, size=len(pop_list), 
+                                        p=weights, replace=False):
+                yield ind
+
+    @staticmethod
+    def deterministic_sampling(population, elitism=False, 
+                               truncation=False, duplicates=False):
+        """
+        Yields individuals using deterministic sampling.
+
+        In determnistic sampling the mean fitness value of the
+        population is calculated, <f>. For each individual a
+        normalized fitness value is then calculated via
+        
+            fn = f / <f>
+            
+        where fn is the normalized fitness value and f is the original
+        fitness value. If f is greater than 1 then the individual is
+        guaranteed to be selected. If duplicates are allowed the
+        individuals is guaranteed to be selected n times where n is the
+        integer part of fn.
+        
+        Once all the guarnteed individuals have been yielded, the
+        remaining individuals are yielded with a probability of p. Here
+        p is the decimal part of fn for that individual.
+        
+        This method supports the application of elitism and truncation
+        Elitism means that the n fittest individuals are guaranteed to 
+        be selected at least once. Truncation means that only the n 
+        fittest individuals are subject to selection by the algorithm, 
+        the rest are not going to be selected.
+        
+        Parameters
+        ----------
+        population : Population
+            The population from which individuals are to be selected.
+            
+        elitism : bool (default = False) or int
+            If ``False`` elitism does not take place. If an ``int`` then
+            that number of individuals is subject to elitism.
+            
+        truncation : bool (default = False) or int           
+            If ``False`` truncation does not take place. If an ``int``
+            then that number of individuals is kept and the rest are
+            truncated.
+            
+        duplicates : bool (default = False)
+            If ``True`` the same individual can be selected more than
+            once with the selection mechanism. This option is
+            appropriate when selecting for mutation. If ``False`` a
+            selected individual cannot be selected again. This option is
+            suitable for generational selecitons.
+            
+        Yields
+        ------
+        MacroMolecule
+            The next selected invidual.
+        
+        """
+        
+
 
     """
     The following selection algorithms can be used for the selection of
@@ -229,6 +394,58 @@ class Selection:
         n_fittest = itertools.islice(cls.fittest(population), n)
         for ind1, ind2 in itertools.combinations(n_fittest, 2):
             yield ind1, ind2
+    
+    @staticmethod
+    def mating_roulette(population, truncation=False):
+        """
+        Yields parents using roulette selection.
+
+        The probability of selection here is the same as in `roulette`.
+        
+        This method supports the application of truncation. Truncation 
+        means that only the n fittest individuals are subject to 
+        selection by the algorithm, the rest are not going to be 
+        selected.   
+
+        Parameters
+        ----------        
+        population : Population
+            The population from which parents are selected.
+        
+        truncation : bool (default = False) or int           
+            If ``False`` truncation does not take place. If an ``int``
+            then that number of individuals is kept and the rest are
+            truncated.
+            
+        Yields
+        ------
+        tuple of MacroMolecule instances
+            The selected parent pair.
+        
+        """
+        
+        pop_list = sorted(population, 
+                          key=attrgetter('fitness'), reverse=True)
+
+        # Apply truncation if desired.
+        if truncation:
+            pop_list = pop_list[:truncation]
+
+        total_fitness = sum(ind.fitness for ind in pop_list if 
+                               isinstance(ind.fitness, float) or 
+                               isinstance(ind.fitness, int))
+     
+        weights = []
+        for ind in pop_list:
+            if not ind.fitness:
+                weights.append(0)
+            else:
+                weights.append(ind.fitness / total_fitness)
+        
+        while True:
+            ind1, ind2 = np.random.choice(pop_list, size=2, 
+                                          p=weights, replace=False)
+            yield ind1, ind2       
     
     
     """
