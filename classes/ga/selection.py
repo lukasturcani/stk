@@ -359,12 +359,7 @@ class Selection:
             while True:
                 yield np.random.choice(pop, p=weights, replace=True)
             
-        else:
-            if elitism:
-                for x in list(itertools.islice(pop, elitism)):
-                    yield x
-                    pop.remove(x)
-                    
+        else:                    
             for x in list(pop):
                 if fns[x] < 1:
                     break
