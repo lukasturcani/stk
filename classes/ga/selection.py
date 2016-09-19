@@ -1,6 +1,8 @@
 from operator import attrgetter
 import itertools
 import numpy as np
+from inspect import signature
+from functools import wraps
  
 # Note that import of the Population class occurs at the end of the
 # file. There is a good reason for this.
@@ -150,6 +152,12 @@ class Selection:
     """
 
     @staticmethod
+    def elites(population, n):
+        pop = sorted(population, 
+                     key=attrgetter('fitness'), reverse=True)[:n]
+        return pop
+
+    @staticmethod
     def fittest(population):        
         """
         Yields members of the population, fittest first.
@@ -173,8 +181,8 @@ class Selection:
         for ind in sorted(population, reverse=True):
             yield ind
     
-    @staticmethod    
-    def roulette(population, elitism=False, 
+    @classmethod    
+    def roulette(cls, population, elitism=False, 
                  truncation=False, duplicates=False):
         """
         Yields individuals using roulette selection.
@@ -192,9 +200,8 @@ class Selection:
         truncation. Elitism means that the n fittest individuals are 
         guaranteed to be selected at least once.        
         
-        Truncation means that only the n fittest individuals
-        are subject to selection by the algorithm, the rest are not
-        going to be selected.          
+        Truncation means that the n least fit individuals are not
+        subject to selection by the algorithm.          
         
         Parameters
         ----------
@@ -207,8 +214,7 @@ class Selection:
             
         truncation : bool (default = False) or int           
             If ``False`` truncation does not take place. If an ``int``
-            then that number of individuals is kept and the rest are
-            truncated.
+            then it corresponds to number of individuals discarded.
             
         duplicates : bool (default = False)
             If ``True`` the same individual can be selected more than
@@ -228,63 +234,42 @@ class Selection:
         
         """
                 
-        pop_list = sorted(population, 
-                          key=attrgetter('fitness'), reverse=True)
+        pop = sorted(population, 
+                     key=attrgetter('fitness'), reverse=True)
 
         # Apply truncation if desired.
         if truncation:
-            pop_list = pop_list[:truncation]
+            pop = pop[:-truncation]  
+               
+        if elitism:
+            elite_pop = cls.elites(pop, elitism)
+            for ind in elite_pop:
+                yield ind
+                if not duplicates:
+                    pop.remove(ind)
  
-        total_fitness = sum(ind.fitness for ind in pop_list if 
+        total_fitness = sum(ind.fitness for ind in pop if 
                                isinstance(ind.fitness, float) or 
                                isinstance(ind.fitness, int))
                               
         weights = []
-        for ind in pop_list:
+        for ind in pop:
             if not ind.fitness:
                 weights.append(0)
             else:
                 weights.append(ind.fitness / total_fitness)
                
-        if duplicates:            
-            
-            # If elitism applies yield the required individuals first.
-            if elitism:
-                for ind in itertools.islice(pop_list, elitism):
-                    yield ind
-        
+        if duplicates:                    
             while True:
-                yield np.random.choice(pop_list, 
-                                       p=weights, replace=True)
+                yield np.random.choice(pop, p=weights, replace=True)
         
         else:
-
-            # if elitism applies yield the required individuals first
-            # and remove them from the population list so they cannot be
-            # selected more than once.
-            if elitism:
-                for ind in list(itertools.islice(pop_list, elitism)):
-                    yield ind
-                    pop_list.remove(ind)
-            
-                # Recalculate probabilities as some weights were 
-                # removed.
-                total_fitness = sum(ind.fitness for ind in pop_list if 
-                                       isinstance(ind.fitness, float) or 
-                                       isinstance(ind.fitness, int))    
-                weights = []
-                for ind in pop_list:
-                    if not ind.fitness:
-                        weights.append(0)
-                    else:
-                        weights.append(ind.fitness / total_fitness)            
-
-            for ind in np.random.choice(pop_list, size=len(pop_list), 
+            for ind in np.random.choice(pop, size=len(pop), 
                                         p=weights, replace=False):
                 yield ind
 
-    @staticmethod
-    def deterministic_sampling(population, elitism=False, 
+    @classmethod
+    def deterministic_sampling(cls, population, elitism=False, 
                                truncation=False, duplicates=False):
         """
         Yields individuals using deterministic sampling.
@@ -341,25 +326,26 @@ class Selection:
 
         pop = sorted(population, 
                      key=attrgetter('fitness'), reverse=True)
-                     
+
+        # Apply truncation if desired.
         if truncation:
-            pop = pop[:truncation]
+            pop = pop[:-truncation]  
+               
+        if elitism:
+            elite_pop = cls.elites(pop, elitism)
+            for ind in elite_pop:
+                yield ind
+                if not duplicates:
+                    pop.remove(ind)
 
         mean_fitness = population.mean('fitness')
         fns = {ind : ind.fitness/mean_fitness for ind in pop}
 
-        if duplicates:
-            if elitism:
-                elites = []
-                for ind in list(itertools.islice(pop, elitism)):
-                    yield ind
-                    elites.append(ind)
-            
+        if duplicates:            
             for ind in pop:
                 if fns[ind] < 1:
                     break
-                
-                if ind in elites:
+                if ind in elite_pop:
                     n_yields = int(fns[ind] - 1)
                 else:
                     n_yields = int(fns[ind])
@@ -455,9 +441,8 @@ class Selection:
         The probability of selection here is the same as in `roulette`.
         
         This method supports the application of truncation. Truncation 
-        means that only the n fittest individuals are subject to 
-        selection by the algorithm, the rest are not going to be 
-        selected.   
+        means that the n least fit individuals are not subject to 
+        selection by the algorithm.
 
         Parameters
         ----------        
@@ -466,8 +451,7 @@ class Selection:
         
         truncation : bool (default = False) or int           
             If ``False`` truncation does not take place. If an ``int``
-            then that number of individuals is kept and the rest are
-            truncated.
+            then it corresponds to the number of individuals truncated.
             
         Yields
         ------
@@ -481,7 +465,7 @@ class Selection:
 
         # Apply truncation if desired.
         if truncation:
-            pop_list = pop_list[:truncation]
+            pop_list = pop_list[:-truncation]
 
         total_fitness = sum(ind.fitness for ind in pop_list if 
                                isinstance(ind.fitness, float) or 
@@ -564,6 +548,10 @@ class Selection:
     def default(cls):
         func_data = FunctionData('fittest', size=5)
         return cls(*[func_data for x in range(0,3)])
-        
-        
+
+    
+    
+
+
+       
 from ..population import Population
