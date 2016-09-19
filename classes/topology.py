@@ -261,7 +261,8 @@ class Vertex:
         -------
         numpy.matrix
             The matrix is n x 3, where n is the number of edges
-            connected to the vertex.
+            connected to the vertex. The row holds the x, y and z
+            coordinates, respectively.
         
         """
         
@@ -437,7 +438,44 @@ class Topology:
     blocks in the correct positions, such as chosen edges or vertices.
 
     Instances of this class should not be created directly. Only via a
-    derived class.
+    derived class. Multiple inheritance can be useful when creating 
+    derived classes. For example, all topologies describing cages will
+    share some characteristics. This means a class ``CageTopology`` can
+    be created which holds all information required by all cage 
+    topologies. This class, ``CageTopology``, will inherit ``Topology``. 
+    A specific cage topology such as ``FourPlusSix`` or 
+    ``EightPlusTwelve`` will then inherit ``CageTopology`` and add any 
+    information specific to that one topology.
+    
+    Extending MMEA: Adding new topologies
+    -------------------------------------
+    > Cages
+    To add a new cage topology a new class should be created, named
+    after the topology. This class should inhertic the ``CageTopology``
+    class. This will give access to various methods which are necessary
+    for dealing with any cage molecule. See the documenation of 
+    ``CageTopology`` for more details.
+    
+    The new class will only need to have three class attributes added.
+    A list called `vertices`, a list called `edges` and an attribute
+    called `n_windows` which holds the number of windows the cage
+    topology has.
+    
+    The `vertices` list holds instances of the class ``Vertex``. Each
+    instance represents a vertex of a cage and needs to be initialized
+    with the coordinates of that vertex. Vertices of a cage are where
+    building-blocks* of cages are placed.
+    
+    The `edges` list holds instances of the class ``Edge``. Each
+    instance represents an edge of a cage and needs to be initialized
+    with two instnaces of the ``Vertex`` class. The ``Vertex`` instances
+    should be held in the `vertices` list mentioned above. These are 
+    the two vertices which the edge connects. Linkers of cages are 
+    placed on edges. The edge instances automatically derive their 
+    positions from the vertices supplied during initialization.
+
+    The vertices need to be positioned such that the center of the
+    topology is at the origin.
     
     Attributes
     ----------
@@ -448,14 +486,16 @@ class Topology:
         
     paired : set of ints
         This attribute is created and used during assembly by some pair
-        up functions. Not all topolgies will need to do this. It is a
-        set of atom ids which have already had a bond added to them
-        during assembly.
+        up functions. Not all topolgies will need to do this and as a 
+        result not all instances will have this attribute. It is a set
+        of atom ids which have already had a bond added to them during
+        assembly.
         
     paired_mols : set of tuples of ints
         This attribute is created and used during assembly by some pair
-        up functions. Not all topologies will need to do this. It is a 
-        set of tuples. The tuples are sorted so that (1,2) and (2,1) are
+        up functions. Not all topologies will need to do this and as a 
+        result not all instnaces will have this attribute. It is a set 
+        of tuples. The tuples are sorted so that (1,2) and (2,1) are
         added as the same pairing. Note that using ``sorted`` on tuples
         returns a list, so it must be reconverted to a tuple before
         being added to the set. This is because lists are not hashable
@@ -1058,9 +1098,45 @@ class Topology:
             vertex.heavy_ids = list(heavy_ids)
 
 class CageTopology(Topology):
- 
+    """
+    A topology class which cage topologies should inherit.
+        
+    Attributes
+    ----------
+    In addition to all the attributes defined within ``Topology`` this
+    class has the following attributes:
+
+    pair_up : function object (default = pair_up_edges_with_vertices)
+        This is the function which pairs up molecules placed using the
+        ``Vertex`` and ``Edge`` classes. This should be how cage
+        topologies should be defined.
+    
+    """
+    
+    def __init__(self, macro_mol):
+        Topology.__init__(self, macro_mol)        
+        self.pair_up = self.pair_up_edges_with_vertices
+        
+
     @LazyAttr
     def windows(self):
+        """
+        
+        Returns
+        -------
+        None : NoneType
+            If the function for finding windows and their sizes
+            found fewer than the required number of windows or
+            if it failed for some other reason.
+            
+        list of floats
+            Each float in the list represents the size of a window in
+            the cage. If the window finding function found more than
+            the expected number of windows, only the largest n windows
+            are returned. Where n is the number of expected windows.
+        
+        """
+        
         all_windows = window_sizes(self.macro_mol.prist_mol_file)
 
         if all_windows is None or len(all_windows) <= self.n_windows:          
@@ -1071,7 +1147,15 @@ class CageTopology(Topology):
 
    
     def cavity_size(self):
+        """
+        Returns the size of the cage cavity.
 
+        Returns
+        -------
+        float
+            The size of the cage cavity.        
+        
+        """
         center_of_mass = self.macro_mol.prist_center_of_mass()
         min_dist = min((euclidean(coord, center_of_mass) -
         atom_vdw_radii[self.macro_mol.prist_atom_symbol(atom_id)]) 
@@ -1080,6 +1164,30 @@ class CageTopology(Topology):
         return 2 * abs(min_dist)    
 
     def window_difference(self, default=500):
+        """
+        The total difference between all cage size.
+        
+        Every combination of windows is considered and all the size
+        differences are summed and returned.
+
+        Parameters
+        ----------
+        default : float or int (default = 500)
+            The number returned if no windows were found in the cage.
+        
+        Returns
+        -------
+        default : float or int
+            If the `windows` attribute is ``None``. This happens when
+            the window finidning algorithm fails. In these cases the
+            `default` value is returned.
+            
+        float
+            The total difference of window size when considering every
+            combination of windows.
+                           
+        """
+        
         if self.windows is None:
             return default
         
@@ -1100,20 +1208,6 @@ class FourPlusSix(CageTopology):
     class defines functions which place these molecules in the correct
     positions within an rdkit instance. The rdkit instance is stored in 
     the `heavy_mol` attribute of a ``Cage`` instance.
-
-    Attributes
-    ----------
-    This class also inhertis all the attributes of the ``Topology`` 
-    class. Only the attribute `pair_up` must be defined, which defines
-    which ``pair up`` inhertied from ``Topology`` should be used for
-    pairing up the linkers and building-blocks*. This attribute is
-    default initialized and cannot be set during initialization or run
-    time of MMEA. It is hard coded.
-       
-    pair_up : function (default = self.pair_up_diff_element_atoms)
-        The function used to find atoms in different building-block* and
-        linker molecules which need to have a bond created between them.
-        It also creates the bonds between them.
         
     """
     
@@ -1128,14 +1222,7 @@ class FourPlusSix(CageTopology):
     edges = [Edge(v1,v2) for v1, v2 in 
                 itertools.combinations(vertices, 2)]  
     
-    n_windows = 4    
-    
-    def __init__(self, macro_mol):
-        CageTopology.__init__(self, macro_mol)        
-        self.pair_up = self.pair_up_edges_with_vertices
-        
-
-
+    n_windows = 4
  
 class EightPlusTwelve(CageTopology):
     """
@@ -1169,11 +1256,7 @@ class EightPlusTwelve(CageTopology):
              Edge(vertices[2], vertices[6]),
              Edge(vertices[3], vertices[7])]  
     
-    n_windows = 6    
-    
-    def __init__(self, macro_mol):
-        CageTopology.__init__(self, macro_mol)        
-        self.pair_up = self.pair_up_edges_with_vertices    
+    n_windows = 6  
 
        
 class BlockCopolymer(Topology):
