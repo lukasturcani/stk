@@ -1,6 +1,7 @@
 import itertools
 import shutil
 import os
+from statistics import mean
 
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
@@ -510,7 +511,42 @@ class Population:
             
     def calculate_member_fitness(self):
         calc_fitness(self.ga_tools.fitness, self)     
-      
+     
+    def mean(self, attr_name, delegate=False):
+        """
+        Calculates the mean value of some attribute of the members.
+        
+        Parameters
+        ----------
+        attr_name : str
+            The name of the attribute whose mean value should be
+            calculated.
+            
+        delegate : False or string (default = False)
+            If ``False`` the attr_name is assumed to correspond to an
+            attribute held by the members directly. If a string is
+            provided it should hold the name of the attribute which
+            holds the desired attribute. For example, if `cavity_size`
+            is requested: attr_name=`cavity_size`, delegate=`topology`.
+            This is because `cavity_size` is not held by members
+            directly. It is held in the `topology` attribute of the 
+            members.
+
+        Returns
+        -------
+        float
+            The mean of a given attribute held by members of the 
+            population.
+
+        """
+        
+        if delegate:
+            return mean(getattr(getattr(x, delegate), attr_name) 
+                                                          for x in self)    
+        else:
+            return mean(getattr(x, attr_name) for x in self)
+            
+     
     def __iter__(self):
         """
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.        

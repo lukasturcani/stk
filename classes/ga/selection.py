@@ -305,7 +305,7 @@ class Selection:
         remaining individuals are yielded with a probability of p. Here
         p is the decimal part of fn for that individual.
         
-        This method supports the application of elitism and truncation
+        This method supports the application of elitism and truncation.
         Elitism means that the n fittest individuals are guaranteed to 
         be selected at least once. Truncation means that only the n 
         fittest individuals are subject to selection by the algorithm, 
@@ -338,8 +338,60 @@ class Selection:
             The next selected invidual.
         
         """
-        
 
+        pop = sorted(population, 
+                     key=attrgetter('fitness'), reverse=True)
+                     
+        if truncation:
+            pop = pop[:truncation]
+
+        mean_fitness = population.mean('fitness')
+        fns = {ind : ind.fitness/mean_fitness for ind in pop}
+
+        if duplicates:
+            if elitism:
+                elites = []
+                for ind in list(itertools.islice(pop, elitism)):
+                    yield ind
+                    elites.append(ind)
+            
+            for ind in pop:
+                if fns[ind] < 1:
+                    break
+                
+                if ind in elites:
+                    n_yields = int(fns[ind] - 1)
+                else:
+                    n_yields = int(fns[ind])
+                    
+                for x in range(n_yields):
+                    yield ind
+            
+            total_decimal = sum(fns[x] - int(fns[x]) for x in pop)
+            weights = [(fns[x] - int(fns[x]))/total_decimal for x
+                                                                in pop]            
+            while True:
+                yield np.random.choice(pop, p=weights, replace=True)
+            
+        else:
+            if elitism:
+                for x in list(itertools.islice(pop, elitism)):
+                    yield x
+                    pop.remove(x)
+                    
+            for x in list(pop):
+                if fns[x] < 1:
+                    break
+                yield x
+                pop.remove(x)
+            
+            total_decimal = sum(fns[x] - int(fns[x]) for x in pop)
+            weights = [(fns[x] - int(fns[x]))/total_decimal for x
+                                                                in pop]
+            
+            for x in np.random.choice(pop, p=weights, 
+                                      size=len(pop), replace=False):
+                yield x
 
     """
     The following selection algorithms can be used for the selection of
@@ -447,7 +499,60 @@ class Selection:
                                           p=weights, replace=False)
             yield ind1, ind2       
     
-    
+    @staticmethod
+    def mating_deterministic_sampling(population, truncation=False):
+        """
+        Yields parents according to determnistic sampling.
+
+        In determnistic sampling the mean fitness value of the
+        population is calculated, <f>. For each individual a
+        normalized fitness value is then calculated via
+        
+            fn = f / <f>
+            
+        where fn is the normalized fitness value and f is the original
+        fitness value. 
+        
+        Deterministic sampling then creates a temporary, mating 
+        population of the same size as the original population. An 
+        individual is guaranteed to be placed into the mating population 
+        n times, where n is the integer part of fn. Any remaining slots
+        are assigned stochastically with the probability of selection
+        being the decimal part of fn.
+        
+        Parents are then randomly selected from the mating population.
+
+        This method supports the application of truncation. Truncation 
+        means that only the n fittest individuals are subject to 
+        selection by the algorithm, the rest are not going to be 
+        selected.  
+        
+        Parameters
+        ----------        
+        population : Population
+            The population from which parents are selected.
+        
+        truncation : bool (default = False) or int           
+            If ``False`` truncation does not take place. If an ``int``
+            then that number of individuals is kept and the rest are
+            truncated.
+            
+        Yields
+        ------
+        tuple of MacroMolecule instances
+            The selected parent pair.            
+        
+        """
+        
+        pop = sorted(population, 
+                          key=attrgetter('fitness'), reverse=True)
+
+        # Apply truncation if desired.
+        if truncation:
+            pop = pop[:truncation]
+        
+        
+  
     """
     The following methods are inteded for convenience while 
     debugging or testing and should not be used during typical 
