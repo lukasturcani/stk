@@ -136,16 +136,16 @@ def test_roulette():
     
     pop2 = []
     for i, x in enumerate(pop1.select()):
-        if i > 500:
+        if i > 1000:
             break
         pop2.append(x)
-            
-    for ind in pop1:
-        assert ind in pop2
+
+    count = Counter(pop2)
+    assert max(count.values()) > 1
 
     # Conditions 3: elitism = False, truncation = True,
     #               duplicates = False
-    roulette = FunctionData('roulette', truncation=5)
+    roulette = FunctionData('roulette', truncation=17)
     selector = Selection(roulette, 'a', 'b')
     ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
     pop1.ga_tools = ga_tools
@@ -173,12 +173,12 @@ def test_roulette():
     
     pop2 = []
     for i, x in enumerate(pop1.select()):
-        if i > 500:
+        if i > 1000:
             break
         pop2.append(x)
-    
-    for ind in fittest:
-        assert ind in pop2
+
+    count = Counter(pop2)
+    assert list(count.values())[0] > 1
 
     # Conditions 5: elitism = True, truncation = False, 
     #               duplicates = False
@@ -209,27 +209,24 @@ def test_roulette():
  
     pop2 = []
     for i, x in enumerate(pop1.select()):
-        if i > 500:
-            break
         if i == 4:
             for ind in fittest:
                 assert ind in pop2
+            break
         pop2.append(x)
-            
-    for ind in pop1:
-        assert ind in pop2
+
     
     # Conditions  7: elitism = True, truncation = True,
     #               duplicates = False
-    roulette = FunctionData('roulette', elitism=3, truncation=18)
+    roulette = FunctionData('roulette', elitism=3, truncation=17)
     selector = Selection(roulette, 'a', 'b')
     ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
     pop1.ga_tools = ga_tools
     
     pop2 = list(pop1.select())
     pop2_dedupe = set(pop2)
-    fittest = sorted(pop1, reverse=True, key=attrgetter('fitness'))[:3]
-    assert len(pop2) == 18
+    fittest = sorted(pop1, reverse=True, key=attrgetter('fitness'))[:5]
+    assert len(pop2) == 5
     assert len(pop2) == len(pop2_dedupe)
     for ind in pop2[:3]:
         assert ind in fittest        
@@ -242,7 +239,7 @@ def test_roulette():
     for mol in pop1:
         mol.p = mol.fitness / total_fitness
 
-    roulette = FunctionData('roulette', duplicates=True, truncation=10,
+    roulette = FunctionData('roulette', duplicates=True, truncation=12,
                             elitism=3)
     selector = Selection(roulette, 'a', 'b')
     ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
@@ -250,16 +247,11 @@ def test_roulette():
     
     pop2 = []
     for i, x in enumerate(pop1.select()):
-        if i > 500:
-            break
-        if i == 3:
+        if i == 2:
             for ind in pop2:
                 assert ind in fittest[:3]
+            break
         pop2.append(x)
-           
-    for ind in fittest:
-        assert ind in pop2
-
     
 def test_mating_roulette():
     # Set fitnesses. 
@@ -279,13 +271,13 @@ def test_mating_roulette():
     
     pop2 = []
     for i, parents in enumerate(pop1.select()):
-        if i == 500:
+        if i == 50:
             assert len(parents) == 2
             break
         pop2.extend(parents)
         
-    for ind in pop1:
-        assert ind in pop2
+    count = Counter(pop2)
+    assert max(count.values()) > 1
 
     
 
@@ -303,13 +295,13 @@ def test_mating_roulette():
     
     pop2 = []
     for i, parents in enumerate(pop1.select()):
-        if i == 500:
+        if i == 50:
             assert len(parents) == 2
             break
         pop2.extend(parents)
         
-    for ind in fittest:
-        assert ind in pop2
+    count = Counter(pop2)
+    assert max(count.values()) > 1
         
         
         
