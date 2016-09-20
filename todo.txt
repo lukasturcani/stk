@@ -12,7 +12,7 @@
 -add more selection functions
 -attributes added to topology as a result of fitness function need to be documented
 -create ga test runs
-
+-tests for stochastic sampling and mating determinstic sampling
 
 DONE!
 ------------
