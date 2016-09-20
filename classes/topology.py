@@ -1258,6 +1258,28 @@ class EightPlusTwelve(CageTopology):
     
     n_windows = 6  
 
+class SixPlusNine(CageTopology):
+    
+    # source: http://eusebeia.dyndns.org/4d/prism3
+    vertices = [Vertex(-50,-50/np.sqrt(3),-50), 
+                Vertex(-50,-50/np.sqrt(3),50),
+                Vertex(50,-50/np.sqrt(3),-50),
+                Vertex(50,-50/np.sqrt(3),50),
+                Vertex(0, 100/np.sqrt(3),-50),
+                Vertex(0, 100/np.sqrt(3), 50)]
+                
+    edges = [Edge(vertices[0], vertices[1]),
+             Edge(vertices[0], vertices[2]),
+             Edge(vertices[2], vertices[3]),
+             Edge(vertices[1], vertices[3]),
+             Edge(vertices[0], vertices[4]),
+             Edge(vertices[2], vertices[4]),
+             Edge(vertices[1], vertices[5]),
+             Edge(vertices[3], vertices[5]),
+             Edge(vertices[4], vertices[5])]
+    
+    n_windows = 5
+
        
 class BlockCopolymer(Topology):
     """

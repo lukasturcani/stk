@@ -246,10 +246,16 @@ class GAInput:
                 kw = line[0]
                 
                 if '_func' in kw:
-                    setattr(self, kw, func_line_parser(raw_line))
+                    func_data = func_line_parser(raw_line)
+                    if 'mutation' in kw:
+                        mutation_funcs = getattr(self, kw, default=[])
+                        mutation_funcs.append(func_data)
+                        func_data = mutation_funcs
+                    setattr(self, kw, func_data)
                                         
                 elif kw in {'pop_size', 'num_generations', 
-                            'num_mutations', 'num_matings'}:
+                            'num_mutations', 'num_matings', 
+                            'mutation_weights'}:
                     setattr(self, kw, int(line[1]))
                 
                 else:

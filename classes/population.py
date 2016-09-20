@@ -178,6 +178,15 @@ class Population:
         
         return cls(*cage_gen, ga_tools)
 
+    @classmethod
+    def init_fixed_bb_cages(cls, bb_file, lk_db, 
+                            topologies, size, ga_tools):
+        
+        cage_gen = iter(Cage.init_fixed_bb(bb_file, lk_db, topologies,
+                    os.path.join(os.getcwd(),"init_{}.mol".format(x))) 
+                        for x in range(size))
+        return cls(*cage_gen, ga_tools)
+
     def all_members(self):
         """
         Yields all members in the population and its subpopulations.
