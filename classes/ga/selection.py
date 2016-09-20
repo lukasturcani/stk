@@ -287,8 +287,11 @@ class Selection:
         integer part of fn.
         
         Once all the guarnteed individuals have been yielded, the
-        remaining individuals are yielded with a probability of p. Here
-        p is the decimal part of fn for that individual.
+        remaining individuals are yielded according to their decimal
+        values, largest first.
+        
+        Note that this algorithm is the same as `fittest` when no
+        duplicates are allowed.
         
         This method supports the application of elitism and truncation.
         Elitism means that the n fittest individuals are guaranteed to 
@@ -330,6 +333,104 @@ class Selection:
         # Apply truncation if desired.
         if truncation:
             pop = pop[:-truncation]  
+        
+        elite_pop = []
+        if elitism:
+            elite_pop = cls.elites(pop, elitism)
+            for ind in elite_pop:
+                yield ind
+                if not duplicates:
+                    pop.remove(ind)
+
+        mean_fitness = population.mean('fitness')
+        fns = {ind : ind.fitness/mean_fitness for ind in pop}
+
+        if duplicates:            
+            for ind in pop:
+                # Yield decimal fitnesses once. If they were elite they
+                # have already been yielded.                
+                if fns[ind] < 1 and ind not in elite_pop:
+                    yield ind
+                    continue
+                
+                # If the inidividual was elite it has already been
+                # yielded once. Account for this.
+                if ind in elite_pop:
+                    n_yields = int(fns[ind] - 1)
+                else:
+                    n_yields = int(fns[ind])
+                    
+                for x in range(n_yields):
+                    yield ind
+         
+        else:                    
+            for x in pop:   
+                yield x
+
+    @classmethod
+    def stochastic_sampling(cls, population, elitism=False, 
+                            truncation=False, duplicates=False):
+        """
+        Yields individuals via stochastic sampling.
+        
+        This selection algorithm combines deterministic sampling and the
+        roulette method. In stochastic sampling the mean fitness value 
+        of the population is calculated, <f>. For each individual a
+        normalized fitness value is then calculated via
+        
+            fn = f / <f>
+            
+        where fn is the normalized fitness value and f is the original
+        fitness value. If f is greater than 1 then the individual is
+        guaranteed to be selected. If duplicates are allowed the
+        individuals is guaranteed to be selected n times where n is the
+        integer part of fn.
+        
+        Once all the guarnteed individuals have been yielded, the
+        remaining individuals are yielded via the roulette method. The
+        weights in the roulette method are based on the decimal part of
+        fn.
+        
+        This method supports the application of elitism and truncation.
+        Elitism means that the n fittest individuals are guaranteed to 
+        be selected at least once. Truncation means that only the n 
+        fittest individuals are subject to selection by the algorithm, 
+        the rest are not going to be selected.
+        
+        Parameters
+        ----------
+        population : Population
+            The population from which individuals are to be selected.
+            
+        elitism : bool (default = False) or int
+            If ``False`` elitism does not take place. If an ``int`` then
+            that number of individuals is subject to elitism.
+            
+        truncation : bool (default = False) or int           
+            If ``False`` truncation does not take place. If an ``int``
+            then that number of individuals is kept and the rest are
+            truncated.
+            
+        duplicates : bool (default = False)
+            If ``True`` the same individual can be selected more than
+            once with the selection mechanism. This option is
+            appropriate when selecting for mutation. If ``False`` a
+            selected individual cannot be selected again. This option is
+            suitable for generational selecitons.
+            
+        Yields
+        ------
+        MacroMolecule
+            The next selected invidual.        
+        
+        """
+
+        pop = sorted(population, 
+                     key=attrgetter('fitness'), reverse=True)
+
+        # Apply truncation if desired.
+        if truncation:
+            pop = pop[:-truncation]  
                
         if elitism:
             elite_pop = cls.elites(pop, elitism)
@@ -343,8 +444,13 @@ class Selection:
 
         if duplicates:            
             for ind in pop:
+                # Stop yielding deterministically when normalized
+                # fitness values < 1 are encountered.
                 if fns[ind] < 1:
                     break
+                
+                # If the inidividual was elite it has already been
+                # yielded once. Account for this.
                 if ind in elite_pop:
                     n_yields = int(fns[ind] - 1)
                 else:
@@ -353,26 +459,31 @@ class Selection:
                 for x in range(n_yields):
                     yield ind
             
-            total_decimal = sum(fns[x] - int(fns[x]) for x in pop)
-            weights = [(fns[x] - int(fns[x]))/total_decimal for x
-                                                                in pop]            
+            # Start using roulette.
+            total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
+                                                               in pop)
+            weights = [(ind.fitness - int(ind.fitness)) / total_decimal
+                        for ind in pop]
             while True:
-                yield np.random.choice(pop, p=weights, replace=True)
-            
+                yield np.random.choice(pop, replace=True, p=weights)
+         
         else:                    
-            for x in list(pop):
-                if fns[x] < 1:
+            for ind in list(pop):   
+                # Stop yielding deterministically when normalized
+                # fitness values < 1 are encountered.
+                if fns[ind] < 1:
                     break
-                yield x
-                pop.remove(x)
-            
-            total_decimal = sum(fns[x] - int(fns[x]) for x in pop)
-            weights = [(fns[x] - int(fns[x]))/total_decimal for x
-                                                                in pop]
-            
-            for x in np.random.choice(pop, p=weights, 
-                                      size=len(pop), replace=False):
-                yield x
+                yield ind
+                pop.remove(ind)
+
+            # Start using roulette.
+            total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
+                                                               in pop)
+            weights = [(ind.fitness - int(ind.fitness)) / total_decimal
+                        for ind in pop]
+            for ind in np.random.choice(pop, replace=False, p=weights,
+                                        size=len(pop)):
+                yield ind
 
     """
     The following selection algorithms can be used for the selection of
@@ -479,7 +590,8 @@ class Selection:
             yield ind1, ind2       
     
     @staticmethod
-    def mating_deterministic_sampling(population, truncation=False):
+    def mating_deterministic_sampling(population, truncation=False,
+                                      debug=False):
         """
         Yields parents according to determnistic sampling.
 
@@ -496,8 +608,7 @@ class Selection:
         population of the same size as the original population. An 
         individual is guaranteed to be placed into the mating population 
         n times, where n is the integer part of fn. Any remaining slots
-        are assigned stochastically with the probability of selection
-        being the decimal part of fn.
+        are to individuals with the largest decimal values.
         
         Parents are then randomly selected from the mating population.
 
@@ -516,6 +627,12 @@ class Selection:
             then that number of individuals is kept and the rest are
             truncated.
             
+        debug : bool (default = False)
+            Used for debugging. When ``True`` the mating population and
+            other internal data of the function is used which can be
+            used to ensure that the selection algorithm is working as
+            intended.
+            
         Yields
         ------
         tuple of MacroMolecule instances
@@ -529,7 +646,25 @@ class Selection:
         # Apply truncation if desired.
         if truncation:
             pop = pop[:truncation]
+
+        mean_fitness = population.mean('fitness')            
+        fns = [(ind, ind.fitness/mean_fitness) for ind in pop]
         
+        mating_pop = []
+        for ind, fn in fns:
+            if int(fn) < 1 and len(mating_pop) >= len(population):
+                break
+            
+            if int(fn) < 1:
+                mating_pop.append(ind)
+            
+            for x in range(int(fn)):
+                mating_pop.append(ind)
+        
+        while True:
+            ind1, ind2 = np.random.choice(mating_pop, 
+                                          size=2, replace=False)
+            yield ind1, ind2
         
   
     """
