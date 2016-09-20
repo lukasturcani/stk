@@ -1980,6 +1980,18 @@ class Cage(MacroMolecule):
         topology = np.random.choice(topologies)
         
         return cls((bb, lk), topology, prist_mol_file)
+
+    @classmethod
+    def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
+        bb = BuildingBlock(bb_file)        
+        
+        lk_file = np.random.choice(os.listdir(lk_db))
+        lk_file = os.path.join(lk_db, lk_file)
+        lk = Linker(lk_file)
+        
+        topology = np.random.choice(topologies)        
+        
+        return cls((bb, lk), topology, prist_mol_file)
         
 class Polymer(MacroMolecule):
     """
