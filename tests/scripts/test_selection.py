@@ -107,7 +107,7 @@ def test_roulette():
     
     # Set fitnesses. 
     for mol in pop1:
-        mol.fitness = np.random.randint(1, 100)
+        mol.fitness = np.random.randint(1, 25)
 
     # Calculate probabilities of roulette selection
     total_fitness = sum(x.fitness for x in pop1)
@@ -121,11 +121,23 @@ def test_roulette():
     ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
     pop1.ga_tools = ga_tools
     
+    # Select members of the population
     pop2 = list(pop1.select())    
     pop2_dedupe = set(pop2)    
     
+    # No duplicates are allowed so lengths of each population should be
+    # the same.
     assert len(pop2) == len(pop1)
     assert len(pop2) == len(pop2_dedupe)
+    
+    # Uncomment the following lines to check distribution.
+#    count1 = Counter(pop1)
+#    count2 = Counter(pop2)
+#    print(count1, len(count1))
+#    print(count2, len(count2))
+#    print(pop2)
+#    assert False
+    
     
     # Conditions 2: elitism = False, truncation = False, 
     #               duplicates = True
@@ -136,12 +148,24 @@ def test_roulette():
     
     pop2 = []
     for i, x in enumerate(pop1.select()):
-        if i > 1000:
+        if i > 2000:
             break
         pop2.append(x)
 
     count = Counter(pop2)
+    # The biggest count should be more than 1 as duplicates are allowed.
     assert max(count.values()) > 1
+    # No truncation means that every population members should be
+    # present at least once.
+    pop2_dedupe = set(pop2)
+    assert len(pop2_dedupe) == len(pop1)
+
+    # Uncomment the following lines to check distribution.
+#    count1 = Counter(pop1)
+#    count2 = Counter(pop2)
+#    print(count1, len(count1))
+#    print(count2, len(count2))
+#    assert False
 
     # Conditions 3: elitism = False, truncation = True,
     #               duplicates = False
@@ -157,7 +181,13 @@ def test_roulette():
     assert len(pop2) == len(pop2_dedupe)
     for ind in pop2:
         assert ind in fittest
-        
+    # Uncomment the following lines to check distribution.
+#    count1 = Counter(pop1)
+#    count2 = Counter(pop2)
+#    print(count1, len(count1))
+#    print(count2, len(count2))
+#    print(pop2)
+#    assert False        
     # Conditions 4: elitism = False, truncation = True, 
     #               duplicates = True
     
@@ -179,6 +209,14 @@ def test_roulette():
 
     count = Counter(pop2)
     assert list(count.values())[0] > 1
+    pop2_dedupe = set(pop2)
+    assert len(pop2_dedupe) == 17
+    # Uncomment the following lines to check distribution.
+#    count1 = Counter(pop1)
+#    count2 = Counter(pop2)
+#    print(count1, len(count1))
+#    print(count2, len(count2))
+#    assert False
 
     # Conditions 5: elitism = True, truncation = False, 
     #               duplicates = False
@@ -279,8 +317,6 @@ def test_mating_roulette():
     count = Counter(pop2)
     assert max(count.values()) > 1
 
-    
-
     # With truncation.
     # Calculate probabilities of roulette selection
     fittest = sorted(pop1, key=attrgetter('fitness'), reverse=True)[:10]
@@ -303,6 +339,190 @@ def test_mating_roulette():
     count = Counter(pop2)
     assert max(count.values()) > 1
         
+def test_deterministic_sampling():
+    # Set fitnesses. 
+    for mol in pop1:
+        mol.fitness = np.random.randint(1, 25)
+
+    # Conditions 1: elitism = False, truncation = False, 
+    #               duplicates = False
+    deterministic = FunctionData('deterministic_sampling')
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
         
+    
+    pop2 = list(pop1.select())
+    for i, ind in enumerate(pop2):
+        if i > 0:
+            assert ind.fitness <= pop2[i-1].fitness
+            
+    for ind in pop1:
+        assert ind in pop2
         
+    # Conditions 2: elitism = False, truncation = False, 
+    #               duplicates = True
+    deterministic = FunctionData('deterministic_sampling', 
+                                 duplicates=True)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
         
+    # Make one of the fitness higher than average to verify that
+    # multiple yields are taking place.
+        
+    pop1[0].fitness = 100
+    pop2 = list(pop1.select())
+    for i, ind in enumerate(pop2):
+        if i > 0:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) > 1
+    # Check for no truncation.   
+    for ind in pop1:
+        assert ind in pop2    
+   
+   # Conditions 3: elitism = False, truncation = True, 
+    #               duplicates = False
+    deterministic = FunctionData('deterministic_sampling', 
+                                 truncation=3)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
+        
+    # Make one of the fitness higher than average         
+    pop1[0].fitness = 100
+    pop2 = list(pop1.select())
+    for i, ind in enumerate(pop2):
+        if i > 0:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) == 1
+    # Check for truncation.   
+    assert len(pop2) == len(pop1) - 3   
+
+   # Conditions 4: elitism = False, truncation = True, 
+    #               duplicates = True
+    deterministic = FunctionData('deterministic_sampling', 
+                                 truncation=3, duplicates=True)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
+        
+    # Make one of the fitness higher than average         
+    pop1[0].fitness = 100
+    pop2 = list(pop1.select())
+    for i, ind in enumerate(pop2):
+        if i > 0:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) > 1
+    # Check for truncation.   
+    assert min(x.fitness for x in pop1) < min(x.fitness for x in pop2)    
+    
+   # Conditions 5: elitism = True, truncation = False, 
+    #               duplicates = False
+    deterministic = FunctionData('deterministic_sampling', 
+                                 elitism=3)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
+        
+    # Make one of the fitness higher than average         
+    pop1[0].fitness = 100
+    pop2 = []
+    gen = pop1.select()
+    for x in range(4):
+        pop2.append(next(gen))
+    
+    for i, ind in enumerate(pop2):
+        if i > 0:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) == 1
+    
+    fittest = sorted(pop1, reverse=True, key=attrgetter('fitness'))[:3]
+    for x in fittest:
+        assert x in pop2
+
+   # Conditions 6: elitism = True, truncation = False, 
+    #               duplicates = True
+    deterministic = FunctionData('deterministic_sampling', 
+                                 elitism=3,duplicates=True)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
+        
+    # Make one of the fitness higher than average         
+    pop1[0].fitness = 100
+    pop2 = []
+    gen = pop1.select()
+    for x in range(4):
+        pop2.append(next(gen))
+    
+    for i, ind in enumerate(pop2):
+        if i > 0 and i < 3:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) == 2
+    
+    fittest = sorted(pop1, reverse=True, key=attrgetter('fitness'))[:3]
+    for x in fittest:
+        assert x in pop2
+
+   # Conditions 7: elitism = True, truncation = True, 
+    #               duplicates = False
+    deterministic = FunctionData('deterministic_sampling', 
+                                 truncation=3, elitism=3, duplicates=False)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
+        
+    # Make one of the fitness higher than average         
+    pop1[0].fitness = 100
+    pop2 = list(pop1.select())
+    
+    for i, ind in enumerate(pop2):
+        if i > 0:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) == 1
+    
+    fittest = sorted(pop1, reverse=True, key=attrgetter('fitness'))[:3]
+    for x in fittest:
+        assert x in pop2
+    assert len(pop2) == len(pop1) -3
+
+   # Conditions 8: elitism = True, truncation = True, 
+    #               duplicates = True
+    deterministic = FunctionData('deterministic_sampling', 
+                                 elitism=3, duplicates=True, 
+                                 truncation=3)
+    selector = Selection(deterministic, 'a', 'b')
+    ga_tools = GATools(selector, 'a', 'b', 'do_not_optimize', 'cage')
+    pop1.ga_tools = ga_tools   
+        
+    # Make one of the fitness higher than average         
+    pop1[0].fitness = 100
+    pop2 = list(pop1.select())
+    for i, ind in enumerate(pop2):
+        if i > 0 and i != 3:
+            assert ind.fitness <= pop2[i-1].fitness
+    count = Counter(pop2)
+    assert max(count.values()) > 1
+    
+    fittest = sorted(pop1, reverse=True, key=attrgetter('fitness'))[:3]
+    for x in fittest:
+        assert x in pop2
+
+
+
+
+
+
+
+
+
+
+
+
