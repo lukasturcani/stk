@@ -122,7 +122,7 @@ class Vertex:
         building_block.set_heavy_atom_centroid([0,0,0])
         # Get the coordinate of the atom which is to be aligned with an
         # edge.
-        atom_coord = building_block.heavy_get_atom_coords(
+        atom_coord = building_block.atom_coords('heavy',
                                             building_block.heavy_ids[0])
 
         # Get the coordinates of all the edges and translate the 
@@ -140,10 +140,10 @@ class Vertex:
         # Apply the rotation to the positions of the atoms in the heavy
         # molecule and get a new position matrix which holds their
         # coordinates coordinates after the rotation.
-        pos_mat = building_block.heavy_mol_position_matrix()
+        pos_mat = building_block.position_matrix('heavy')
         new_pos_mat = np.dot(rot_mat, pos_mat)
         # Update the positions in the rdkit instance in `heavy_mol`.
-        building_block.set_heavy_mol_from_position_matrix(new_pos_mat)
+        building_block.set_position_from_matrix('heavy', new_pos_mat)
         
         # Finally the well orientated building-block* is placed on the
         # coords of the vertex.
@@ -376,7 +376,7 @@ class Edge:
         # position vector running between the midpoint of the cage to
         # the midpoint of the heavy atoms. This assumes that the center
         # of the cage is at the origin.
-        dir_vector = linker.heavy_mol_centroid() - self.coord
+        dir_vector = linker.centroid('heavy') - self.coord
         linker._set_heavy_mol_orientation(dir_vector, self.coord)
 
         # In some cases this ruins the alignmen of the heavy atoms with
@@ -389,11 +389,11 @@ class Edge:
         # Only do the corrective rotation if angle offset is big.
         if theta > np.pi/6:        
             linker.set_heavy_atom_centroid([0,0,0])
-            pos_mat = linker.heavy_mol_position_matrix()
+            pos_mat = linker.position_matrix('heavy')
             rot_mat = rotation_matrix_arbitrary_axis(theta, self.coord)
 
             new_pos_mat = np.dot(rot_mat, pos_mat)
-            linker.set_heavy_mol_from_position_matrix(new_pos_mat)
+            linker.set_position_from_matrix('heavy', new_pos_mat)
             linker.set_heavy_atom_centroid(self.coord)
 
         return linker.heavy_mol
@@ -566,7 +566,7 @@ class Topology:
         
         # Get a mathematical graph representing the disconnected 
         # heavy molecule.
-        heavy_graph = self.macro_mol.get_heavy_as_graph()
+        heavy_graph = self.macro_mol.graph('heavy')
         
         # Use the graph to generate a list of lists. Each sublist is
         # a collection of atom ids all belonging to the same molecule.
@@ -698,8 +698,8 @@ class Topology:
         
         for edge in self.edges:
             for atom_id in edge.heavy_ids:
-                atom_coord = self.macro_mol.heavy_get_atom_coords(
-                                                                atom_id)                
+                atom_coord = self.macro_mol.atom_coords('heavy', 
+                                                        atom_id)                
                 
                 
                 distance = partial(euclidean, atom_coord)
@@ -968,7 +968,8 @@ class Topology:
         # argument of `self.macro_mol.heavy_distance` with `atom_id`
         # which means that the output of the min function is the atom id
         # of the atom which is the closest to `atom_id`.
-        distance_func = partial(self.macro_mol.heavy_distance, atom_id)
+        distance_func = partial(self.macro_mol.atom_distance, 
+                                'heavy', atom_id)
         return min(partner_pool, key=distance_func)
 
     def determine_bond_type(self, atom1_id, atom2_id):
