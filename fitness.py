@@ -2,7 +2,7 @@ import numpy as np
 import rdkit.Chem as chem
 
 from .classes.exception import MacroMolError
-from .classes.molecule import MacroMolecule, StructUnit
+from .classes.molecular import MacroMolecule, StructUnit
 from .optimization import macromodel_opt
 
 def calc_fitness(func_data, population):
