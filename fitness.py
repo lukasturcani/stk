@@ -101,12 +101,69 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
     return 1/np.sum(fitness_value)
         
 class MolInCage:
+    """
+
+    Attributes
+    ----------
+    target_mol : StructUnit
+        An instance representing the molecule being placed within the 
+        cage. It is created the first time the fitness function is run
+        and returned from this attribute afterwards.
+        
+
+    """    
+    
     
     def __call__(self, cage, target_mol_file, rotate=False):
+        """
+        Calculates the fitness of a cage / target complex.
+        
+        Depending of `rotate` a different number of cage / target 
+        complexes will be generated. When `rotate` is ``True``, the 
+        target molecule is rotated along the x, y and z axes and each
+        rotation forms a new complex. The lowest energy complex is used
+        for the fitness calculation. When `rotate` is ``False`` not 
+        rotation takes place.
+        
+        To see which rotations take place see the documentation of the
+        `generate_complexes` method.
+        
+        Parameters
+        ----------
+        cage : Cage
+            The cage which is to have its fitness calculated,
+
+        target_mol_file : str
+            The full path of the .mol file hodling the target molecule
+            placed inside the cage.
+
+        rotate : bool (default = False)
+            When ``True`` the target molecule will be rotated inside the
+            cavity of the cage. When ``False`` only the orientation
+            within the .mol file is used.
+            
+        Returns
+        -------
+        float
+            The fitness value of `cage`.
+        
+        """
+        
+        # If the cage already has a fitness value, don't run the
+        # calculation again.
         if cage.fitness:
             print('Skipping {0}'.format(cage.prist_mol_file))
             return cage.fitness            
         
+        # The first time running the fitness function create an instance
+        # of the target molecule as a ``StructUnit``. Save it to
+        # `target_mol`. Normally ``StructUnit`` instances do not have
+        # the attribute `optimized`, as these structures do not need to
+        # be optimized. However, in this case it is necessary to know
+        # the energy of the target molecule as part of the fitness 
+        # calculation. Giving ``StructUnit`` the `optimized` attribute
+        # fools the optimization function into running on ``StructUnit``
+        # despite it being designed for ``MacroMolecule`` instances.
         if not hasattr(self, 'target_mol'):
             target_mol = StructUnit(target_mol_file)
             target_mol.optimized = False
@@ -124,7 +181,7 @@ class MolInCage:
         # rotation.        
         rdkit_complexes = list(self.generate_complexes(cage, rotate))
         
-        # Place the rdkit instance(s) into a new .mol file and use that 
+        # Place the rdkit complexes into a new .mol file and use that 
         # to make a new ``StructUnit`` instance of the complex.
         # ``StructUnit`` is the class of choice here because it can be
         # initialized from a .mol file. ``MacroMolecule`` requires
@@ -133,14 +190,20 @@ class MolInCage:
         for i, complex_ in enumerate(rdkit_complexes):
             # First the data is loaded into a ``MacroMolecule`` instance
             # as this is the class which is able to write rdkit
-            # instances to .mol files.
+            # instances to .mol files. Note that this ``MacroMolecule``
+            # instance is just a dummy and only holds the bare minimum
+            # information required to write the complex to a .mol file.
             mm_complex = MacroMolecule.__new__(MacroMolecule)
             mm_complex.prist_mol = complex_
             mm_complex.prist_mol_file = cage.prist_mol_file.replace(
                                 '.mol', '_COMPLEX_{0}.mol'.format(i))
             mm_complex.write_mol_file('prist')
             
+            # Once the .mol file is written load it into a 
+            # ``StructUnit`` instance.
             macromol_complex = StructUnit(mm_complex.prist_mol_file)
+            # In order to optimize a ``StructUnit`` instance the
+            # `optimized` attribute needs to be added.
             macromol_complex.optimized = False
             macromodel_opt(macromol_complex, no_fix=True)
             macromol_complexes.append(macromol_complex)
@@ -149,7 +212,6 @@ class MolInCage:
         # individual energies. If more than complex was made, use the
         # most stable version.
         energy_separate = cage.energy + self.target_mol.energy
-
         energy_diff =  min(energy_separate - macromol_complex.energy for 
                                 macromol_complex in macromol_complexes)
                                 
