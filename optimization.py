@@ -279,6 +279,10 @@ def macromodel_opt(macro_mol, force_field='16',
     force_field : str (default = '16')
         The number of the force field to be used in the optimization, 
         as a string. The string should be 2 characters long.
+        
+    no_fix : bool (default = False)
+        When ``True`` the molecular parameters will not be fixed during
+        the optimization.
     
     Modifies
     --------
@@ -445,6 +449,10 @@ def _generate_COM(macro_mol, force_field='16', no_fix=False):
     force_field : str (default = '16')
         The number of the force field to be used in the optimization, 
         as a string. The string should be 2 characters long.
+        
+    no_fix : bool (default = False)
+        When ``True`` the generated .com file will not contain commands
+        which fix the molecular parameters during optimization.
 
     Modifies
     --------
@@ -695,6 +703,10 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     main_string : str
         The body of the ``.com`` file which is to have fix commands
         added.
+    
+    no_fix : bool (default = False)
+        When ``True`` the block containing instructions to fix molecular
+        parameters is not added to the .com file.
         
     Returns
     -------
@@ -708,6 +720,7 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     # Make a string to hold all of the ``FX`` lines.
     fix_block = "" 
 
+    # If no_fix is ``True`` do not add a fix block.
     if no_fix:
         return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                     "COMES_HERE!!!\n"), fix_block)
