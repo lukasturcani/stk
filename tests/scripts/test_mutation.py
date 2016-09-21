@@ -1,5 +1,6 @@
 from collections import Counter
 import os
+import numpy as np
 
 from .test_population import generate_population
 from .test_struct_unit import get_mol_file
@@ -57,7 +58,8 @@ def test_random_mutation_function_selection():
     
     # No weights first.    
     
-    mutator = Mutation([rand_bb, rand_topology], 20)
+    mutator = Mutation([rand_bb, rand_topology], 100,
+                       weights=[1,0])
     ga_tools = GATools(selector, 'a', mutator, 
                        'rdkit_optimization', 'cage')
 
@@ -65,7 +67,10 @@ def test_random_mutation_function_selection():
     lk_db = os.path.join(os.getcwd(), 'Database_prec', 'aldehydes2f')
 
     pop1 = Population.init_fixed_bb_cages(bb_file, lk_db, [FourPlusSix],
-                                          20, ga_tools)    
+                                          100, ga_tools)
+    pop1.remove_duplicates()
+    for ind in pop1:
+        ind.fitness = np.random.randint(1,25)
 
     pop2 = pop1.gen_mutants()
     new_top = 0
@@ -78,11 +83,29 @@ def test_random_mutation_function_selection():
         if bb != bb_file:
             new_bb +=1
             
-    assert new_top + new_bb == 20
-    
+    assert new_top == 0
+    assert new_bb != 0
 
+    mutator = Mutation([rand_bb, rand_topology], 100,
+                       weights=[0,1])
+    ga_tools = GATools(selector, 'a', mutator, 
+                       'rdkit_optimization', 'cage')    
     
-
+    pop1.ga_tools = ga_tools
+    pop2 = pop1.gen_mutants()
+    new_top = 0
+    new_bb = 0
+    for mutant in pop2:
+        if type(mutant.topology) != FourPlusSix:
+            new_top += 1
+        bb = next(x.prist_mol_file for x in mutant.building_blocks if 
+                    isinstance(x, BuildingBlock))
+        if bb != bb_file:
+            new_bb +=1
+            
+    assert new_top != 0
+    assert new_bb == 0   
+    
 def test_random_bb():
     
     mol.fitness = 1

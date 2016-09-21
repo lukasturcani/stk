@@ -350,7 +350,6 @@ def macromodel_opt(macro_mol, force_field='16',
 
     # If optimization fails because the license is not found, rerun the
     # function.
-    print("BMIN STDOUT IS", macro_mol.prist_mol_file, opt_return.stdout)
     if not _license_found(macro_mol, opt_return.stdout):
         return macromodel_opt(macro_mol, 
                               macromodel_path=macromodel_path)
@@ -575,8 +574,6 @@ def _convert_mol_to_mae(macro_mol, macromodel_path):
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
         return _convert_mol_to_mae(macro_mol, macromodel_path) 
-
-    print("CONVERT OUTPUT IS:", convrt_return.stdout)
 
     return mae_file
 

@@ -1,12 +1,9 @@
 import numpy as np
-from functools import partial
-from multiprocessing import Pool
-import itertools
 import rdkit.Chem as chem
-from scipy.spatial.distance import euclidean
 
-from .pyWindow import window_sizes
 from .classes.exception import MacroMolError
+from .classes.molecule import MacroMolecule, StructUnit
+from .optimization import macromodel_opt
 
 def calc_fitness(func_data, population):
     """
@@ -99,6 +96,119 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
     fitness_value = np.multiply(fitness_value, coeffs)    
 
     return 1/np.sum(fitness_value)
+        
+class MolInCage:
+    
+    def __call__(self, cage, target_mol_file, rotate=False):
+        if cage.fitness:
+            print('Skipping {0}'.format(cage.prist_mol_file))
+            return cage.fitness            
+        
+        if not hasattr(self, 'target_mol'):
+            target_mol = StructUnit(target_mol_file)
+            macromodel_opt(target_mol)
+            setattr(self, 'target_mol', target_mol)
+        
+        
+        # This function creates a new molecule holding both the target
+        # and the cage centered at the origin. It then calculates the 
+        # energy of this complex and compares it to the energies of the
+        # molecules when separate. The more stable the complex relative
+        # to the individuals the higher the fitness.
+        
+        # Create rdkit instances of the target in the cage for each
+        # rotation.        
+        rdkit_complexes = self.generate_complexes(cage, rotate)
+        
+        # Place the rdkit instance(s) into a new .mol file and use that 
+        # to make a new ``StructUnit`` instance of the complex.
+        # ``StructUnit`` is the class of choice here because it can be
+        # initialized from a .mol file. ``MacroMolecule`` requires
+        # things like topology and building blocks for initialization.
+        macromol_complexes = []        
+        for i, complex_ in enumerate(rdkit_complexes):
+            # First the data is loaded into a ``MacroMolecule`` instance
+            # as this is the class which is able to write rdkit
+            # instances to .mol files.
+            mm_complex = MacroMolecule.__new__(MacroMolecule)
+            mm_complex.prist_mol = complex_
+            mm_complex.prist_mol_file = target_mol_file.replace('.mol', 
+                                           '_COMPLEX_{0}.mol'.format(i))
+            mm_complex.write_mol_file('prist')
+            
+            macromol_complex = StructUnit(mm_complex.prist_mol_file)
+            macromodel_opt(macromol_complex)
+            macromol_complexes.append(macromol_complex)
+        
+        # Calculate the energy of the complex and compare to the
+        # individual energies. If more than complex was made, use the
+        # most stable version.
+        energy_separate = cage.energy + self.target_mol.energy
+        
+        energy_diff =  min(energy_separate - macromol_complex.energy for 
+                                macromol_complex in macromol_complexes)
+                                
+        return np.exp(energy_diff)
+   
+    def generate_complexes(self, cage, rotate):
+        
+        # Define the rotations which are to be used on the target.
+        rotations = [0, np.pi/2, np.pi, 3*np.pi/2]
 
+
+        # First place both the target and cage at the origin.
+        cage.set_prist_centroid([0,0,0])
+        self.target_mol.set_prist_centroid([0,0,0])
+        
+        
+
+        
+molecule_in_cage = MolInCage()
+
+
+class molecule_in_cage:
+    """
+    Fitness function for finding cages for holding `target_mol`.
+    
+    Parameters
+    ----------
+    cage : Cage
+        The cage whose fitness must be calculated.
+        
+    target_mol_file : str
+        The full path of the .mol file holding the target molecule which 
+        is to be placed inside the cage.
+    
+    Returns
+    -------
+    float
+        The fitness value of the cage.
+    
+    """
+    
+    # This function is implemented a closure. The idea is that the user
+    # will only input the .mol file location into the MMEA input script.
+    # From this .mol file a ``MacroMolecule`` instance will be generated 
+    # of the target molecule. However it is obviously a complete waste 
+    # of resources if the target ``MacroMolecule`` is generated each
+    # time the fitness function is called. A closure allows the creation
+    # of it only once - the first time it is called.
+
+    
+    
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     

@@ -14,6 +14,7 @@
 -create ga test runs
 -tests for stochastic sampling and mating determinstic sampling
 -tests for init of fixed bb cage/ pop
+-change mutation test so that first test initiates from saved population - should lead to a speedup
 
 DONE!
 ------------
