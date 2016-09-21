@@ -637,22 +637,196 @@ class StructUnit(metaclass=Cached):
         # atom ids of those atoms.
         return self.prist_mol.GetSubstructMatches(func_grp_mol)        
 
-    def shift_heavy_mol(self, x, y, z):
+    def atom_coords(self, mol_type, atom_id):
         """
-        Shifts the coordinates of all atoms in `heavy_mol`.
+        Return coordinates of an atom in `heavy_mol` or `prist_mol`.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule conformer is to be shifted.             
         
-        The `heavy_mol` attribute holds a ``rdkit.Chem.rdchem.Mol``
-        instance. This instance holds holds a 
+        atom_id : int
+            The id of the atom whose coordinates are desired.
+            
+        Returns
+        -------
+        numpy.array
+            An array hodling the x, y and z coordinates (respectively) 
+            of atom with id of `atom_id` in `heavy_mol`.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        conf = rdkit_mol.GetConformer()
+        atom_position = conf.GetAtomPosition(atom_id)
+        return np.array([*atom_position])
+
+    def all_atom_coords(self, mol_type):
+        """
+        Yields the coordinates of atoms in `heavy_mol` or `prist_mol`.        
+
+        This yields the coordinates of every atom in the pristine or
+        heavy molecule, depending on `mol_type`.
+
+        The `heavy_mol` and `prist_mol` attributes hold a 
+        ``rdkit.Chem.rdchem.Mol`` instance. This instance holds a 
         ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
         holds the positions of the atoms within that conformer. This
-        function creates a new conformer with all the coordinates
-        shifted by `x`, `y` and `z` as appropriate. This function does
-        not change the existing conformer.
+        generator yields those coordinates.
+        
+        Yields
+        ------
+        tuple of (int, numpy.array)
+            The ``int`` represents the atom id of the atom whose
+            coordinates are being yielded.
+        
+            The array represents the complete position in space. Each 
+            float within the array represents the value of the x, y or z 
+            coordinate of an atom. The x, y and z coordinates are 
+            located in the array in that order. 
+            
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        # Get the conformer from the rdkit instance. 
+        conformer = rdkit_mol.GetConformer()
+        
+        # Go through all the atoms and ask the conformer to return
+        # the position of each atom. This is done by supplying the 
+        # conformers `GetAtomPosition` method with the atom's id.
+        for atom in rdkit_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_position = conformer.GetAtomPosition(atom_id)
+            yield atom_id, np.array([*atom_position]) 
+
+    def position_matrix(self, mol_type):
+        """
+        Return position of all atoms in the building block as a matrix. 
+        
+        Positions of the atoms in the heavy or pristine rdkit instance
+        will be returned based on `mol_type`.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule conformer is to be shifted.            
+        
+        Returns
+        -------
+        numpy.matrix
+            The matrix is 3 x n. Each column holds the x, y and z
+            coordinates of an atom. The index of the column corresponds
+            to the id of the atom in the rdkit molecule whose 
+            coordinates it holds.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))       
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+
+        pos_array = np.array([])
+        for atom in rdkit_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            pos_vect = np.array([*self.atom_coords(mol_type, atom_id)])
+            pos_array = np.append(pos_array, pos_vect)
+
+        return np.matrix(pos_array.reshape(-1,3).T)
+
+    def centroid(self, mol_type):
+        """
+        Returns the centroid of the heavy or pristine rdkit molecule.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule conformer is to be shifted.
+
+        Returns
+        -------
+        numpy.array
+            A numpy array holding the position of the centroid.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+            
+        centroid = sum(x for _, x in self.all_atom_coords(mol_type)) 
+        return np.divide(centroid, rdkit_mol.GetNumAtoms())
+
+    def shift(self, mol_type, shift):
+        """
+        Shifts the coordinates of all atoms.
+        
+        This method will shift the rdkit instance of either the pristine 
+        or heavy molecule depending on `mol_type`.
+        
+        The `heavy_mol` and `prist_mol` attributes hold a 
+        ``rdkit.Chem.rdchem.Mol`` instance. This instance holds holds a 
+        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
+        holds the positions of the atoms in the molecule. This function 
+        creates a new conformer with all the coordinates shifted by the
+        values supplied in `shift`. This function does not change the 
+        existing conformer.
         
         To be clear, consider the following code:
         
-            >>> b = a.shift_heavy_mol(10,10,10)
-            >>> c = a.shift_heavy_mol(10,10,10)
+            >>> b = a.shift('heavy', [10,10,10])
+            >>> c = a.shift('heavy', [10,10,10])
         
         In the preceeding code where ``a`` is a ``StructUnit`` instance, 
         ``b`` and ``c`` are two new ``rdkit.Chem.rdchem.Mol`` instances. 
@@ -668,29 +842,50 @@ class StructUnit(metaclass=Cached):
         again with the same arguments leads to the same result. This is 
         why the conformers in ``b`` and ``c`` are the same.
 
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule conformer is to be shifted.
+            
+        shift : numpy.array
+            A numpy array holding the value of the shift along the
+            x, y and z axes in that order.
+        
         Returns
         -------
         rdkit.Chem.rdchem.Mol
             An rdkit molecule instance which has a modified version of 
-            the conformer found in `heavy_mol`. Note that the conformer 
-            instance is stored by `heavy_mol` indirectly. The
-            modification is that all atoms in the conformer are shifted 
-            by amount given in the `x`, `y` and `z` arguments.
+            the conformer found in either `heavy_mol` or `prist_mol`.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
         
         """
         
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
         # The function does not modify the existing conformer, as a 
         # result a new instance is created and used for modification.
-        conformer = chem.Conformer(self.heavy_mol.GetConformer())
+        conformer = chem.Conformer(rdkit_mol.GetConformer())
         
         # For each atom, get the atomic positions from the conformer 
-        # and add `x`, `y` and `z` to them, as appropriate. This induces 
-        # the shift. Create a new geometry instance from these new
+        # and shift them. Create a new geometry instance from these new
         # coordinate values. The geometry instance is used by rdkit to
         # store the coordinates of atoms. Finally, set the conformers
         # atomic position to the values stored in this newly generated
         # geometry instance.
-        for atom in self.heavy_mol.GetAtoms():
+        for atom in rdkit_mol.GetAtoms():
             
             # Remember the id of the atom you are currently using. It 
             # is used to change the position of the correct atom at the
@@ -699,57 +894,65 @@ class StructUnit(metaclass=Cached):
             
             # `atom_position` in an instance holding in the x, y and z 
             # coordinates of an atom in its 'x', 'y' and 'z' attributes.
-            atom_position = conformer.GetAtomPosition(atom_id)
+            atom_position = np.array(conformer.GetAtomPosition(atom_id))
             
             # Inducing the shift.
-            new_x = atom_position.x + x
-            new_y = atom_position.y + y
-            new_z = atom_position.z + z
+            new_atom_position = atom_position + shift
             
             # Creating a new geometry instance.
-            new_coords = rdkit_geo.Point3D(new_x, new_y, new_z)            
+            new_coords = rdkit_geo.Point3D(*new_atom_position)            
             
             # Changes the position of the atom in the conformer to the
             # values stored in the new geometry instance.
             conformer.SetAtomPosition(atom_id, new_coords)
         
         # Create a new copy of the rdkit molecule instance representing
-        # the substituted molecule - the original instance is not to be
-        # modified.
-        new_heavy = chem.Mol(self.heavy_mol)
+        # the molecule - the original instance is not to be modified.
+        new_mol = chem.Mol(rdkit_mol)
         
         # The new rdkit molecule was copied from the one held in the
-        # `heavy_mol` attribute, as result it has a copy of its
-        # conformer. To prevent the rdkit molecule from holding multiple
-        # conformers the `RemoveAllConformers` method is run first. The
-        # shifted conformer is then given to the rdkit molecule, which 
-        # is returned.
-        new_heavy.RemoveAllConformers()
-        new_heavy.AddConformer(conformer)
-        return new_heavy        
+        # `heavy_mol` or `prist_mol` attribute, as result it has a copy 
+        # of its conformer. To prevent the rdkit molecule from holding 
+        # multiple conformers the `RemoveAllConformers` method is run 
+        # first. The shifted conformer is then given to the rdkit 
+        # molecule, which is returned.
+        new_mol.RemoveAllConformers()
+        new_mol.AddConformer(conformer)
+        return new_mol        
 
-    def set_heavy_mol_position(self, position):
+    def set_position(self, mol_type, position):
         """
-        Changes the position of the rdkit molecule in `heavy_mol`. 
+        Changes the position of the rdkit molecule. 
         
-        This method translates the heavy building block molecule so that
-        its centroid is on the point `position`.
+        This method translates the heavy or pristine building block 
+        molecule so that its centroid is on the point `position`. Which
+        one is set depends on `mol_type`.
         
-        Unlike `shift_heavy_mol` this method does change the original
-        rdkit molecule found in `heav_mol`. A copy is NOT created. This
-        method does not change the ``.mol`` file however.
+        Unlike `shift_mol` this method does change the original
+        rdkit molecule found in `prist_mol` or `heav_mol`. A copy is NOT 
+        created. This method does not change the ``.mol`` files however.
         
         Parameters
         ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule conformer is to be shifted.        
+        
         position : numpy.array
             This array holds the position on which the centroid of the 
-            heavy building block should be placed.
+            building block should be placed.
             
         Modifies
         --------
+        prist_mol : rdkit.Chem.rdchem.Mol       
+            If `mol_type` is 'prist',  the conformer in this rdkit 
+            instance is changed so that its centroid falls on 
+            `position`.         
+        
         heavy_mol : rdkit.Chem.rdchem.Mol   
-            The conformer in this rdkit instance is changed so that its
-            centroid falls on `position`.
+            If `mol_type` is 'heavy', the conformer in this rdkit 
+            instance is changed so that its centroid falls on 
+            `position`.
         
         Returns
         -------
@@ -758,43 +961,35 @@ class StructUnit(metaclass=Cached):
             `position`. This is the same instance as that in 
             `heavy_mol`.
         
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
         """
         
-        centroid = self.heavy_mol_centroid()
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        centroid = self.centroid(mol_type)
         shift = position - centroid
-        new_conf = self.shift_heavy_mol(*shift).GetConformer()
+        new_conf = self.shift(shift).GetConformer()
 
-        self.heavy_mol.RemoveAllConformers()
-        self.heavy_mol.AddConformer(new_conf)
+        rdkit_mol.RemoveAllConformers()
+        rdkit_mol.AddConformer(new_conf)
         
-        return self.heavy_mol
+        return rdkit_mol
 
-    def heavy_mol_position_matrix(self):
+    def set_position_from_matrix(self, mol_type, pos_mat):
         """
-        Returns position of all atoms in heavy molecule as a matrix. 
-        
-        Returns
-        -------
-        numpy.matrix
-            The matrix is 3 x n. Each column holds the x, y and z
-            coordinates of an atom. The index of the column corresponds
-            to the id of the atom in the heavy molecule whose 
-            coordinates it holds.
-        
-        """
-
-        pos_array = np.array([])
-
-        for atom in self.heavy_mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            pos_vect = np.array([*self.heavy_get_atom_coords(atom_id)])
-            pos_array = np.append(pos_array, pos_vect)
-
-        return np.matrix(pos_array.reshape(-1,3).T)
-
-    def set_heavy_mol_from_position_matrix(self, pos_mat):
-        """
-        Set atomic positions in heavy molecule to those in `pos_mat`.
+        Set atomic positions of rdkit molecule to those in `pos_mat`.
         
         The form of the `pos_mat` is 3 x n. The column of `pos_mat` 
         represents the x, y and z coordinates to which an atom
@@ -805,6 +1000,10 @@ class StructUnit(metaclass=Cached):
         
         Parameters
         ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule conformer is to be shifted.        
+        
         pos_mat : numpy.array
             The matrix holds the coordinates to which atoms of the heavy 
             molecule should be set. The index of the column in
@@ -821,9 +1020,24 @@ class StructUnit(metaclass=Cached):
         -------
         None : NoneType
         
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
         """
         
-        conf = self.heavy_mol.GetConformer()
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        conf = rdkit_mol.GetConformer()
         for i, coord_mat in enumerate(pos_mat.T):
             coord = rdkit_geo.Point3D(coord_mat.item(0), 
                                       coord_mat.item(1), 
@@ -937,21 +1151,7 @@ class StructUnit(metaclass=Cached):
             pos_vect = np.array([*self.heavy_get_atom_coords(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
-        return np.matrix(pos_array.reshape(-1,3).T)        
-
-    def heavy_mol_centroid(self):
-        """
-        Returns the centroid of the heavy rdkit molecule.
-
-        Returns
-        -------
-        numpy.array
-            A numpy array holding the position of the centroid.
-        
-        """
-               
-        centroid = sum(x for _, x in self.heavy_all_atom_coords()) 
-        return np.divide(centroid, self.heavy_mol.GetNumAtoms())
+        return np.matrix(pos_array.reshape(-1,3).T)
 
     def heavy_direction_vectors(self):
         """
@@ -1036,88 +1236,7 @@ class StructUnit(metaclass=Cached):
         self.heavy_mol.RemoveAllConformers()
         self.heavy_mol.AddConformer(new_conf)
         
-        return chem.Mol(self.heavy_mol)        
-
-
-    def prist_get_atom_coords(self, atom_id):
-        """
-        Return coordinates of atom in `prist_mol`.
-
-        Parameters
-        ----------
-        atom_id : int
-            The id of the atom whose coordinates are desired.
-            
-        Returns
-        -------
-        numpy.array
-            An array hodling the x, y and z coordinates (respectively) 
-            of atom with id of `atom_id` in `prist_mol`.
-        
-        """
-        
-        conf = self.prist_mol.GetConformer()
-        atom_position = conf.GetAtomPosition(atom_id)
-        return np.array([*atom_position])
-
-    def heavy_get_atom_coords(self, atom_id):
-        """
-        Return coordinates of atom in `heavy_mol`.
-
-        Parameters
-        ----------
-        atom_id : int
-            The id of the atom whose coordinates are desired.
-            
-        Returns
-        -------
-        numpy.array
-            An array hodling the x, y and z coordinates (respectively) 
-            of atom with id of `atom_id` in `heavy_mol`.
-        
-        """
-        
-        conf = self.heavy_mol.GetConformer()
-        atom_position = conf.GetAtomPosition(atom_id)
-        return np.array([*atom_position])
-
-    def heavy_all_atom_coords(self):
-        """
-        Yields the x, y and z coordinates of atoms in `heavy_mol`.        
-
-        This yields the coordinates of every atom in the substituted
-        molecule.
-
-        The `heavy_mol` attribute holds a ``rdkit.Chem.rdchem.Mol``
-        instance. This instance holds holds a 
-        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
-        holds the positions of the atoms within that conformer. This
-        generator yields those coordinates.
-        
-        Yields
-        ------
-        tuple of (int, numpy.array)
-            The ``int`` represents the atom id of the atom whose
-            coordinates are being yielded.
-        
-            The array represents the complete position in space. Each 
-            float within the array represents the value of the x, y or z 
-            coordinate of an atom. The x, y and z coordinates are 
-            located in the array in that order. 
-        
-        """
-        
-        # Get the conformer from the instance in the `heavy_mol` 
-        # attribute. 
-        conformer = self.heavy_mol.GetConformer()
-        
-        # Go through all the atoms and ask the conformer to return
-        # the position of each atom. This is done by supplying the 
-        # conformers `GetAtomPosition` method with the atom's id.
-        for atom in self.heavy_mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            atom_position = conformer.GetAtomPosition(atom_id)
-            yield atom_id, np.array([*atom_position]) 
+        return chem.Mol(self.heavy_mol)
            
     def __eq__(self, other):
         return self.prist_mol_file == other.prist_mol_file
