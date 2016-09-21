@@ -11,23 +11,8 @@ from .molecular import FGInfo, BuildingBlock, Linker
 from ..pyWindow import window_sizes
 from ..convenience_functions import (flatten, normalize_vector, 
                                      vector_theta, atom_vdw_radii,
-                                     rotation_matrix_arbitrary_axis)
-
-class LazyAttr:
-    """
-    A descriptor for creating lazy attributes.
-    
-    """
-    
-    def __init__(self, func):
-        self.func = func
-        
-    def __get__(self, obj, cls):
-        if obj is None:
-            return self
-        val = self.func(obj)
-        setattr(obj, self.func.__name__, val)
-        return val
+                                     rotation_matrix_arbitrary_axis,
+                                     LazyAttr)
 
 class Vertex:
     """

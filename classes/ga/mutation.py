@@ -102,11 +102,12 @@ class Mutation:
         
         parent_pool = population.select('mutation')
         mutant_pop = Population(population.ga_tools)
-        func_data = np.random.choice(self.funcs, p=self.weights)
-        func = getattr(self, func_data.name)
         
         num_mutations = 0
         for parent in parent_pool:
+            func_data = np.random.choice(self.funcs, p=self.weights)
+            func = getattr(self, func_data.name)            
+           
             try:
                 self.n_calls += 1
                 mutant = func(parent, **func_data.params)

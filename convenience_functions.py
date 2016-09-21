@@ -308,6 +308,24 @@ def time_it():
     h,m = divmod(m, 60)
     print('\nTime taken was {0} : {1} : {2}'.format(int(h), int(m), s))
 
+
+class LazyAttr:
+    """
+    A descriptor for creating lazy attributes.
+    
+    """
+    
+    def __init__(self, func):
+        self.func = func
+        
+    def __get__(self, obj, cls):
+        if obj is None:
+            return self
+        val = self.func(obj)
+        setattr(obj, self.func.__name__, val)
+        return val
+        
+        
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',
                   2: 'He',
