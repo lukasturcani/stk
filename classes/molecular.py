@@ -380,7 +380,7 @@ class StructUnit(metaclass=Cached):
     
     """
     
-    def __init__(self, prist_mol_file):
+    def __init__(self, prist_mol_file, minimal=False):
         """
         Initializes a ``StructUnit`` instance.
         
@@ -389,6 +389,10 @@ class StructUnit(metaclass=Cached):
         prist_mol_file : str
             The full path of the ``.mol`` file holding the building
             block structure.
+            
+        minimal : bool (default = False)
+            If ``True`` the full initialization is not carried out. This
+            is used in the `cage_target` fitness function.
             
         """
         
@@ -429,6 +433,10 @@ class StructUnit(metaclass=Cached):
         # functional group which appears first in 
         # `FGInfo.functional_group_list`.
         
+        # Check for minimal initialization.
+        if minimal:
+            return
+        
         # Calling the ``next`` function on this generator causes it to
         # yield the first (and what should be the only) result. The
         # generator will return ``None`` if it does not find the name of
@@ -436,7 +444,6 @@ class StructUnit(metaclass=Cached):
         self.func_grp = next((x for x in 
                                 FGInfo.functional_group_list if 
                                 x.name in prist_mol_file), None)
-        
         self.heavy_ids = []        
         
         # Calling this function generates all the attributes assciated
