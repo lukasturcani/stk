@@ -256,7 +256,8 @@ def rdkit_optimization(macro_mol):
     return macro_mol
     
 def macromodel_opt(macro_mol, force_field='16',
-                 macromodel_path=r"C:\Program Files\Schrodinger2016-2"):
+                 macromodel_path=r"C:\Program Files\Schrodinger2016-2",
+                 no_fix=False):
     """
     Optimizes the molecule using MacroModel.
 
@@ -319,7 +320,7 @@ def macromodel_opt(macro_mol, force_field='16',
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    _generate_COM(macro_mol, force_field)
+    _generate_COM(macro_mol, force_field, no_fix)
     
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.run``. The command is the full path of the ``bmin``
@@ -421,7 +422,7 @@ def _license_found(macro_mol, bmin_output):
     
     return True
  
-def _generate_COM(macro_mol, force_field='16'):
+def _generate_COM(macro_mol, force_field='16', no_fix=False):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -491,7 +492,8 @@ def _generate_COM(macro_mol, force_field='16'):
     
     # This function adds all the lines which fix bond distances and 
     # angles into ``main_string``.
-    main_string = _fix_params_in_com_file(macro_mol, main_string)
+    main_string = _fix_params_in_com_file(macro_mol, 
+                                          main_string, no_fix)
     
     # Writes the ``.com`` file.
     with open(com_file, "w") as com:
@@ -672,7 +674,7 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
 
 
 
-def _fix_params_in_com_file(macro_mol, main_string):
+def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
     
@@ -704,7 +706,11 @@ def _fix_params_in_com_file(macro_mol, main_string):
     """
     
     # Make a string to hold all of the ``FX`` lines.
-    fix_block = ""      
+    fix_block = "" 
+
+    if no_fix:
+        return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
+                                    "COMES_HERE!!!\n"), fix_block)
     # Add lines that fix the bond distance.
     fix_block = _fix_distance_in_com_file(macro_mol, fix_block)  
     # Add lines that fix the bond angles.                          
@@ -767,7 +773,7 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
         atom1_id = atom1.GetIdx() 
         atom2_id = atom2.GetIdx() 
         
-        bond_len = macro_mol.prist_distance(atom1_id, atom2_id)
+        bond_len = macro_mol.atom_distance('prist', atom1_id, atom2_id)
         
         # Make sure that the indices are increased by 1 in the ``.mae``
         # file from their rdkit value.
