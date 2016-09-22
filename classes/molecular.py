@@ -1753,7 +1753,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
                 if 'Total Energy =    ' in line:
                     return float(line.split()[3])
 
-    def write_mol_file(self, rdkit_mol_type):
+    def write_mol_file(self, rdkit_mol_type, path=None):
         """
         Writes a V3000 ``.mol`` file of the macromolecule.
 
@@ -1772,6 +1772,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
         ----------
         rdkit_mol_type : str
             Allowed values for this parameter 'prist' and 'heavy'.
+            
+        path : str (default = None)
+            If the .mol file is to be written to a direcotry other than
+            the one in `prist_mol_file` or `heavy_mol_file`, it should
+            be written here.
         
         Modifies
         --------
@@ -1856,6 +1861,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
                                           atom_block)
         main_string = main_string.replace("!!!BOND!!!BLOCK!!!HERE!!!\n",
                                           bond_block)
+        
+        if path:
+            base_name = os.path.basename(file_name)
+            file_name = os.path.join(path, base_name)
         
         with open(file_name, 'w') as f:
             f.write(main_string)
