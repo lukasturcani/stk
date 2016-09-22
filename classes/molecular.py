@@ -496,7 +496,7 @@ class StructUnit(metaclass=Cached):
         # Subtitutes the relevant functional group atoms in `heavy_mol`
         # for heavy atoms and deletes Hydrogen atoms of the functional
         # group as well as any other atoms tagged for deletion.
-        self._make_atoms_heavy_in_heavy()
+        self._make_atoms_heavy()
 
         # Change the pristine ``.mol`` file name to include the word
         # ``HEAVY_`` at the end. This generates the name of the 
@@ -517,7 +517,7 @@ class StructUnit(metaclass=Cached):
                                              isomericSmiles=True,
                                              allHsExplicit=True)        
 
-    def _make_atoms_heavy_in_heavy(self):
+    def _make_atoms_heavy(self):
         """
         Converts functional group in `heavy_mol` to substituted version.
 
@@ -1208,7 +1208,7 @@ class StructUnit(metaclass=Cached):
         pos_array = np.array([])
 
         for atom_id in self.heavy_ids:
-            pos_vect = np.array([*self.heavy_get_atom_coords(atom_id)])
+            pos_vect = np.array([*self.atom_coords('heavy', atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)
