@@ -643,7 +643,7 @@ class StructUnit(metaclass=Cached):
         # Go thorugh the log file line by line and find the line which
         # says ``Total Energy = ``. This line holds the energy value in
         # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('mol', 'log')
+        log_file = self.prist_mol_file.replace('.mol', '.log')
         with open(log_file, 'r') as log:
             for line in log:
                 if 'Total Energy =    ' in line:
@@ -1747,7 +1747,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # Go thorugh the log file line by line and find the line which
         # says ``Total Energy = ``. This line holds the energy value in
         # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('mol', 'log')
+        log_file = self.prist_mol_file.replace('.mol', '.log')
         with open(log_file, 'r') as log:
             for line in log:
                 if 'Total Energy =    ' in line:
@@ -2030,7 +2030,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
                 # and yield the resulting data.
                 atom1_id = atom1.GetIdx()
                 atom2_id = atom2.GetIdx()
-                yield (self.heavy_distance(atom1_id, atom2_id), 
+                yield (self.atom_distance('heavy', atom1_id, atom2_id), 
                       atom1_id, atom2_id)
 
     def centroid(self, mol_type):
