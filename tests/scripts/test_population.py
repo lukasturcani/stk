@@ -2,10 +2,11 @@ import pytest
 from collections import Counter
 import shutil
 import os
-import pickle
+
 
 from ...classes import (Population, Cage, GATools, FourPlusSix, Linker,
-                        EightPlusTwelve, SixPlusNine, BuildingBlock)
+                        EightPlusTwelve, SixPlusNine, BuildingBlock,
+                        MacroMolecule)
 
 def generate_population(offset=False):
     """
@@ -88,7 +89,7 @@ def test_init_fixed_bb_cages():
     bb_file = os.path.join('data', 'population', 'bb_amine.mol')
     lk_db = os.path.join('data', 'population', 'lk_db')
     topologies = [FourPlusSix, EightPlusTwelve, SixPlusNine]
-    size = 20
+    size = 10
     
     pop = Population.init_fixed_bb_cages(bb_file, lk_db, topologies,
                                          size, None)    
@@ -350,8 +351,8 @@ def test_getitem():
     assert all(cage in flat_pop.members for cage in pop)
     # Verify lack of subpopulations.
     assert not flat_pop.populations
-    # An integer index should return a ``Cage`` instance.
-    assert isinstance(pop[5], Cage)
+    # An integer index should return a ``MacroMolecule`` instance.
+    assert isinstance(pop[5], MacroMolecule)
     # Non integer/slice indices are not supported
     with pytest.raises(TypeError):
         pop[5.5]
