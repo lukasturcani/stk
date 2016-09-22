@@ -1377,7 +1377,7 @@ class BuildingBlock(StructUnit):
         
         """
         
-        heavy_coord = self.heavy_get_atom_coords(self.heavy_ids[0])
+        heavy_coord = self.atom_coords('heavy', self.heavy_ids[0])
         d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
                                            heavy_coord)), -1)
         return np.append(self.heavy_plane_normal(), d)
