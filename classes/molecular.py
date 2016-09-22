@@ -2219,7 +2219,8 @@ class Cage(MacroMolecule):
         topology = np.random.choice(topologies)        
         
         return cls((bb, lk), topology, prist_mol_file)
-        
+
+
 class Polymer(MacroMolecule):
     """
     Used to represent polymers.
