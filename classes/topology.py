@@ -234,7 +234,7 @@ class Vertex:
             connected to the vertex to another.        
         
         """
-        
+
         for edge1, edge2 in itertools.combinations(self.edges, 2):
             yield normalize_vector(edge1.coord-edge2.coord)
     
@@ -441,10 +441,14 @@ class Topology:
     for dealing with any cage molecule. See the documenation of 
     ``CageTopology`` for more details.
     
-    The new class will only need to have three class attributes added.
-    A list called `vertices`, a list called `edges` and an attribute
-    called `n_windows` which holds the number of windows the cage
-    topology has.
+    The new class will only need to have four class attributes added. A
+    list called `vertices`, a list called `edges`, an attribute called
+    `n_windows` which holds the number of windows the cage topology has
+    and `n_window_types` which holds the number of different window
+    types. For example, if `n_window_types` is 2 then the topology will
+    have two kinds of windows, each with a different expected size even
+    in a perfectly symmetrical case. Windows of the same type are
+    expected to be of the same size.
     
     The `vertices` list holds instances of the class ``Vertex``. Each
     instance represents a vertex of a cage and needs to be initialized
@@ -1142,11 +1146,11 @@ class CageTopology(Topology):
             The size of the cage cavity.        
         
         """
-        center_of_mass = self.macro_mol.prist_center_of_mass()
+        center_of_mass = self.macro_mol.center_of_mass('prist')
         min_dist = min((euclidean(coord, center_of_mass) -
-        atom_vdw_radii[self.macro_mol.prist_atom_symbol(atom_id)]) 
+        atom_vdw_radii[self.macro_mol.atom_symbol('prist', atom_id)]) 
                                  for atom_id, coord in 
-                                 self.macro_mol.prist_all_atom_coords())
+                                 self.macro_mol.all_atom_coords('prist'))
         return 2 * abs(min_dist)    
 
     def window_difference(self, default=500):
@@ -1177,13 +1181,45 @@ class CageTopology(Topology):
         if self.windows is None:
             return default
         
-        diff_sum = sum(abs(w1 - w2) for w1, w2 in 
-            itertools.combinations(self.macro_mol.topology.windows, 2))
+    
+        # Cluster the windows into groups so that only size differences
+        # between windows of the same type are taken into account. To do
+        # this, first sort the windows by size. If two windows types are
+        # present split the windows at the two groups at the point where
+        # the window sizes have the biggest difference. If there are
+        # three types split it at the two biggest differences and so on.
+                
+        windows = np.array(self.windows)
+        
+        diffs = list(abs(np.ediff1d(windows)))
+        sorted_diffs = sorted(diffs, reverse=True)
+        
+        # Get indices of where the list should be split.
+        split = []
+        for x in range(self.n_window_types-1):
+            i = diffs.index(sorted_diffs[x]) + 1
+            split.append(i)
+    
+        # Get the sub-lists.
+        og = list(windows)
+        clusters = []
+        for i in sorted(split, reverse=True):
+            clusters.append(og[i:])            
+            og = og[:i]
+    
+        # After this sum the differences in each group and then sum the
+        # group totals.
+        diff_sums = []
+        for cluster in clusters:
+            diff_sum = sum(abs(w1 - w2) for w1, w2 in 
+                                    itertools.combinations(cluster, 2))
 
-        diff_num = sum(1 for _ in 
-            itertools.combinations(self.macro_mol.topology.windows, 2))
+            diff_num = sum(1 for _ in 
+                itertools.combinations(cluster, 2))
             
-        return diff_sum / diff_num
+            diff_sums.append(diff_sum / diff_num)
+            
+        return sum(diff_sums)
 
 class FourPlusSix(CageTopology):
     """
@@ -1209,7 +1245,8 @@ class FourPlusSix(CageTopology):
                 itertools.combinations(vertices, 2)]  
     
     n_windows = 4
- 
+    n_window_types = 1
+    
 class EightPlusTwelve(CageTopology):
     """
     Defines a square-like topology.    
@@ -1243,7 +1280,8 @@ class EightPlusTwelve(CageTopology):
              Edge(vertices[3], vertices[7])]  
     
     n_windows = 6  
-
+    n_window_types = 1
+    
 class SixPlusNine(CageTopology):
     
     # source: http://eusebeia.dyndns.org/4d/prism3
@@ -1265,8 +1303,47 @@ class SixPlusNine(CageTopology):
              Edge(vertices[4], vertices[5])]
     
     n_windows = 5
+    n_window_types = 1
 
-       
+class Dodecahedron(CageTopology):
+    
+    # Source: http://tinyurl.com/h2dl949
+    phi = (1 + np.sqrt(5))/2
+    x = 50
+    vertices = [Vertex(x* phi, 0.0, x/phi), 
+                Vertex(x*-phi, 0.0, x/phi), 
+                Vertex(x*-phi, 0.0, x/-phi),
+                Vertex(x* phi, 0.0, x/-phi), 
+                
+                Vertex(x/ phi, x* phi, 0.0), 
+                Vertex(x/ phi, x*-phi, 0.0),
+                Vertex(x/-phi, x*-phi, 0.0), 
+                Vertex(x/-phi, x* phi, 0.0), 
+                Vertex(0.0, x/ phi, x* phi),
+                Vertex(0.0, x/ phi, x*-phi), 
+                Vertex(0.0, x/-phi, x*-phi), 
+                Vertex(0.0, x/-phi, x* phi),
+  
+                Vertex( x, x, x), 
+                Vertex( x,-x, x), 
+                Vertex(-x,-x, x), 
+                Vertex(-x, x, x), 
+                Vertex(-x, x,-x), 
+                Vertex( x, x,-x),
+                Vertex( x,-x,-x), 
+                Vertex(-x,-x,-x)]
+
+    A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T = vertices
+    edges = [Edge(A,N), Edge(A,M), Edge(A,D), Edge(B,O), Edge(B,P),
+             Edge(B,C), Edge(C,T), Edge(C,Q), Edge(D,S), Edge(D,R),
+             Edge(E,M), Edge(E,H), Edge(E,R), Edge(F,G), Edge(F,S),
+             Edge(F,N), Edge(G,O), Edge(G,T), Edge(H,P), Edge(H,Q),
+             Edge(I,L), Edge(I,M), Edge(I,P), Edge(J,K), Edge(J,R),
+             Edge(J,Q), Edge(K,S), Edge(K,T), Edge(L,O), Edge(L,N)]    
+    
+    n_windows = 12
+    n_window_types = 1
+    
 class BlockCopolymer(Topology):
     """
     A class for describing the repeating units of polymers.    
