@@ -481,9 +481,9 @@ class Population:
         
     def write_population_to_dir(self, dir_path):
         """
-        Copies ``.mol`` files of members to a directory.
+        Writes the ``.mol`` files of members to a directory.
         
-        This copies the pristine version of the ``.mol`` file.        
+        This writes the pristine version of the ``.mol`` file.        
         
         Parameters
         ----------
@@ -497,8 +497,12 @@ class Population:
         
         """
         
+        # If the directory does not exist, create it.        
+        if not os.path.exists(dir_path):
+            os.mkdir(dir_path)
+        
         for member in self:
-            shutil.copy(member.prist_mol_file, dir_path)
+            member.write_mol_file('prist', dir_path)
 
     def optimize_population(self):
         """
