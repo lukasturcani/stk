@@ -590,8 +590,7 @@ class Selection:
             yield ind1, ind2       
     
     @staticmethod
-    def mating_deterministic_sampling(population, truncation=False,
-                                      debug=False):
+    def mating_deterministic_sampling(population, truncation=False):
         """
         Yields parents according to determnistic sampling.
 
@@ -626,12 +625,6 @@ class Selection:
             If ``False`` truncation does not take place. If an ``int``
             then that number of individuals is kept and the rest are
             truncated.
-            
-        debug : bool (default = False)
-            Used for debugging. When ``True`` the mating population and
-            other internal data of the function is used which can be
-            used to ensure that the selection algorithm is working as
-            intended.
             
         Yields
         ------
