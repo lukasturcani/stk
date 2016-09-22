@@ -6,7 +6,7 @@ import pytest
 import itertools as it
 from scipy.spatial.distance import euclidean
 
-from ...classes import StructUnit, Linker, FGInfo
+from ...classes import StructUnit, FGInfo
 from ...convenience_functions import flatten, normalize_vector
 
 obj_file_name = os.path.join('data', 'struct_unit',
