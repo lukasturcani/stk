@@ -1,21 +1,15 @@
 -add missing tests (including : failure capture of macromolecules)
 -fix them
--implement parallelisation
--implement orientation
--implement fitness function
+-implement parallelisation of fitness functions
+-parametrize fitness function
 -implement limited mutation
--implement population storage and initialization from stored populations
 -implement chirality check
 -write developer's guide
 -write user's guide
 -make mating and mutation parallel
--add more selection functions
--attributes added to topology as a result of fitness function need to be documented
 -create ga test runs
 -tests for stochastic sampling and mating determinstic sampling
 -tests for init of fixed bb cage/ pop
 -change mutation test so that first test initiates from saved population - should lead to a speedup
-
-DONE!
-------------
--implement storage of failed initializations/optimizations etc.
+-implement tools for chekcing progress of the GA 
+-add tests for substitutions in structunit
