@@ -2,6 +2,7 @@ import itertools
 import shutil
 import os
 from statistics import mean
+import pickle
 
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
@@ -137,8 +138,7 @@ class Population:
                              " initialized with 'Population',"
                              " 'MacroMolecule' and 1 'GATools' type."), 
                                                                     arg)
-                                    
-
+                    
     @classmethod
     def init_random_cages(cls, bb_db, lk_db, 
                           topologies, size, ga_tools):
@@ -186,6 +186,26 @@ class Population:
                     os.path.join(os.getcwd(),"init_{}.mol".format(x))) 
                         for x in range(size))
         return cls(*cage_gen, ga_tools)
+
+    @classmethod
+    def load(cls, file_name):
+        """
+        Initializes a Population from one dumped to a file with pickle.
+        
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file holding the dumped population.
+            
+        Returns
+        -------
+        Population
+            The population stored in the dump file.
+            
+        """
+        
+        with open(file_name, 'rb') as dump_file:
+            return pickle.load(dump_file)
 
     def all_members(self):
         """
@@ -461,9 +481,9 @@ class Population:
         
     def write_population_to_dir(self, dir_path):
         """
-        Copies ``.mol`` files of members to a directory.
+        Writes the ``.mol`` files of members to a directory.
         
-        This copies the pristine version of the ``.mol`` file.        
+        This writes the pristine version of the ``.mol`` file.        
         
         Parameters
         ----------
@@ -477,8 +497,12 @@ class Population:
         
         """
         
+        # If the directory does not exist, create it.        
+        if not os.path.exists(dir_path):
+            os.mkdir(dir_path)
+        
         for member in self:
-            shutil.copy(member.prist_mol_file, dir_path)
+            member.write_mol_file('prist', dir_path)
 
     def optimize_population(self):
         """
@@ -554,7 +578,26 @@ class Population:
                                                           for x in self)    
         else:
             return mean(getattr(x, attr_name) for x in self)
+
+    def dump(self, file_name):
+        """
+        Write the population object to a file.
+        
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file to which the population should
+            be written.
             
+        Returns
+        -------
+        None : NoneType
+
+        """
+        
+        with open(file_name, 'wb') as dump_file:    
+            pickle.dump(self, dump_file)        
+        
      
     def __iter__(self):
         """

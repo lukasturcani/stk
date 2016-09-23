@@ -1,0 +1,306 @@
+ 
+ JobID: DESKTOP-J23D4B7-0-57e33404
+ BatchMin V11.3    Build  113014  Starting Time 22-Sep-2016 02:29:42
+ MacroModel. Copyright Schrodinger, LLC.
+ All rights reserved.
+
+ Input filename:  1.mae
+ Output filename: 1-out.maegz
+ Turning on debug switch          55
+ Atom-type file: C:\Program Files\Schrodinger2016-3\mmshare-v3.5\bin\Windows-x64\..\..\data\atom.typ
+ No FFLD_OPLS2008_PRINT license found. 
+ Forcefield parameters will not be revealed.
+ Force field: C:\Program Files\Schrodinger2016-3\macromodel-v11.3\bin\Windows-x64\..\..\data\f16.fld
+ Read   840 atoms. Structure name, if any, appears on next line: 
+ 
+ Quality of Force Field Parameters in Use:
+   Numbers of high, medium and low quality stretch parameters =  900    0    0
+   Numbers of high, medium and low quality bend parameters    = 1680    0    0
+   Numbers of high, medium and low quality torsion parameters = 2640    0    0
+   Interactions examined:       5220 of       5220 total, including unused params.
+      Stretch total=     1680   constrained=      780
+         Bend total=     2080   constrained=      400        linear=      400
+      Torsion total=     3188   constrained=      368  out-of-plane=      180
+    Nonbonded total=     4350      H-bonded=        0      ordinary=     4350
+  Nonbonded cutoffs: CutVdw=   7.00    ;  CutEs=   12.0    
+ Starting conjugate gradient minimization.
+         Constraint E (included in E shown)=           0.00kJ/mol
+                   Total Energy = 83350016.0000 kJ/mol
+                        Stretch = 83335344.0000 kJ/mol
+                           Bend =     6583.7876 kJ/mol
+                        Torsion =     2355.9741 kJ/mol
+               Improper Torsion =        0.0004 kJ/mol
+                            VDW =     1416.9866 kJ/mol
+                  Electrostatic =     4315.4199 kJ/mol
+        Explicit Hydrogen Bonds =        0.0000 kJ/mol
+                    Cross Terms =        0.0000 kJ/mol
+  
+ T.E. for cross-checking:  83350016.0000 kJ/mol
+Iter=    10  Move(A)= 56.955978 E(kJ/mol)=   796176.9     Grad=   661.6733    
+Iter=    20  Move(A)= 11.462604 E(kJ/mol)=   664710.5     Grad=   215.0596    
+Iter=    30  Move(A)=  9.497944 E(kJ/mol)=   619072.6     Grad=   168.8413    
+Iter=    40  Move(A)=  7.941904 E(kJ/mol)=   585069.3     Grad=   159.4084    
+Iter=    50  Move(A)=  5.355437 E(kJ/mol)=   564180.8     Grad=   128.7513    
+Iter=    60  Move(A)=  7.421520 E(kJ/mol)=   544146.2     Grad=   150.3004    
+Iter=    70  Move(A)= 20.236383 E(kJ/mol)=   501418.5     Grad=   196.0748    
+Iter=    80  Move(A)= 29.933121 E(kJ/mol)=   439385.1     Grad=   246.4259    
+Iter=    90  Move(A)= 19.358660 E(kJ/mol)=   389402.2     Grad=   243.8759    
+Iter=   100  Move(A)= 16.153400 E(kJ/mol)=   339620.3     Grad=   225.9494    
+Iter=   110  Move(A)= 15.411226 E(kJ/mol)=   298384.3     Grad=   193.0862    
+Iter=   120  Move(A)= 12.028037 E(kJ/mol)=   270811.7     Grad=   138.3886    
+Iter=   130  Move(A)=  7.895513 E(kJ/mol)=   255298.9     Grad=   122.7884    
+Iter=   140  Move(A)= 14.527781 E(kJ/mol)=   229395.4     Grad=   185.0445    
+Iter=   150  Move(A)= 29.009237 E(kJ/mol)=   182896.1     Grad=   214.6539    
+Iter=   160  Move(A)= 32.345417 E(kJ/mol)=   134518.1     Grad=   204.8808    
+Iter=   170  Move(A)= 16.414892 E(kJ/mol)=   106536.1     Grad=   139.4895    
+Iter=   180  Move(A)=  8.154545 E(kJ/mol)=   93667.41     Grad=   97.62901    
+Iter=   190  Move(A)=  7.452927 E(kJ/mol)=   84275.84     Grad=   79.60161    
+Iter=   200  Move(A)=  8.833604 E(kJ/mol)=   74664.81     Grad=   88.35200    
+Iter=   210  Move(A)=  9.089550 E(kJ/mol)=   65936.43     Grad=   86.69352    
+Iter=   220  Move(A)= 10.823730 E(kJ/mol)=   55965.23     Grad=   109.9648    
+Iter=   230  Move(A)= 19.756041 E(kJ/mol)=   40823.20     Grad=   122.4502    
+Iter=   240  Move(A)= 22.453678 E(kJ/mol)=   25154.17     Grad=   98.35764    
+Iter=   250  Move(A)= 10.995014 E(kJ/mol)=   17667.97     Grad=   65.24612    
+Iter=   260  Move(A)=  4.839156 E(kJ/mol)=   14742.26     Grad=   40.73410    
+Iter=   270  Move(A)=  2.682690 E(kJ/mol)=   13281.08     Grad=   30.75962    
+Iter=   280  Move(A)=  2.961932 E(kJ/mol)=   11846.98     Grad=   34.49373    
+Iter=   290  Move(A)=  3.806609 E(kJ/mol)=   10309.96     Grad=   35.79578    
+Iter=   300  Move(A)=  4.298086 E(kJ/mol)=   8780.960     Grad=   37.40775    
+Iter=   310  Move(A)=  4.381920 E(kJ/mol)=   7369.000     Grad=   35.07309    
+Iter=   320  Move(A)=  4.015897 E(kJ/mol)=   6241.622     Grad=   26.44134    
+Iter=   330  Move(A)=  2.930446 E(kJ/mol)=   5438.618     Grad=   24.26693    
+Iter=   340  Move(A)=  2.684599 E(kJ/mol)=   4777.947     Grad=   22.47496    
+Iter=   350  Move(A)=  2.033327 E(kJ/mol)=   4339.969     Grad=   18.51027    
+Iter=   360  Move(A)=  1.347792 E(kJ/mol)=   4084.230     Grad=   14.63092    
+Iter=   370  Move(A)=  1.236435 E(kJ/mol)=   3884.187     Grad=   12.63722    
+Iter=   380  Move(A)=  1.299515 E(kJ/mol)=   3704.348     Grad=   12.63820    
+Iter=   390  Move(A)=  1.521601 E(kJ/mol)=   3507.229     Grad=   12.19555    
+Iter=   400  Move(A)=  1.443485 E(kJ/mol)=   3334.214     Grad=   11.08887    
+Iter=   410  Move(A)=  1.110336 E(kJ/mol)=   3214.958     Grad=   9.851277    
+Iter=   420  Move(A)=  0.947590 E(kJ/mol)=   3126.820     Grad=   8.679802    
+Iter=   430  Move(A)=  0.804308 E(kJ/mol)=   3057.169     Grad=   7.366223    
+Iter=   440  Move(A)=  0.618947 E(kJ/mol)=   3012.466     Grad=   5.830298    
+Iter=   450  Move(A)=  0.470666 E(kJ/mol)=   2982.052     Grad=   4.634152    
+Iter=   460  Move(A)=  0.430071 E(kJ/mol)=   2959.049     Grad=   3.952722    
+Iter=   470  Move(A)=  0.369942 E(kJ/mol)=   2941.222     Grad=   3.968600    
+Iter=   480  Move(A)=  0.390053 E(kJ/mol)=   2924.689     Grad=   4.034334    
+Iter=   490  Move(A)=  0.466457 E(kJ/mol)=   2907.983     Grad=   4.023685    
+Iter=   500  Move(A)=  0.542943 E(kJ/mol)=   2888.855     Grad=   4.022251    
+Iter=   510  Move(A)=  0.599186 E(kJ/mol)=   2869.832     Grad=   3.777601    
+Iter=   520  Move(A)=  0.499310 E(kJ/mol)=   2853.209     Grad=   3.293338    
+Iter=   530  Move(A)=  0.363294 E(kJ/mol)=   2843.383     Grad=   2.846486    
+Iter=   540  Move(A)=  0.302388 E(kJ/mol)=   2834.564     Grad=   2.817682    
+Iter=   550  Move(A)=  0.421122 E(kJ/mol)=   2823.816     Grad=   3.450855    
+Iter=   560  Move(A)=  0.878091 E(kJ/mol)=   2801.601     Grad=   4.622656    
+Iter=   570  Move(A)=  0.743201 E(kJ/mol)=   2781.166     Grad=   3.836188    
+Iter=   580  Move(A)=  0.739835 E(kJ/mol)=   2762.942     Grad=   4.141536    
+Iter=   590  Move(A)=  0.803901 E(kJ/mol)=   2742.487     Grad=   4.374986    
+Iter=   600  Move(A)=  1.229333 E(kJ/mol)=   2710.848     Grad=   5.158202    
+Iter=   610  Move(A)=  1.140319 E(kJ/mol)=   2683.218     Grad=   5.170615    
+Iter=   620  Move(A)=  1.148417 E(kJ/mol)=   2656.001     Grad=   4.649453    
+Iter=   630  Move(A)=  1.321262 E(kJ/mol)=   2624.178     Grad=   5.163235    
+Iter=   640  Move(A)=  1.394104 E(kJ/mol)=   2592.843     Grad=   5.221610    
+Iter=   650  Move(A)=  1.229685 E(kJ/mol)=   2564.021     Grad=   4.761224    
+Iter=   660  Move(A)=  1.120319 E(kJ/mol)=   2538.849     Grad=   4.211225    
+Iter=   670  Move(A)=  0.935605 E(kJ/mol)=   2518.758     Grad=   4.240378    
+Iter=   680  Move(A)=  0.884602 E(kJ/mol)=   2500.701     Grad=   3.573171    
+Iter=   690  Move(A)=  0.806498 E(kJ/mol)=   2483.355     Grad=   3.887486    
+Iter=   700  Move(A)=  0.752538 E(kJ/mol)=   2468.484     Grad=   3.575308    
+Iter=   710  Move(A)=  0.683478 E(kJ/mol)=   2454.744     Grad=   3.277183    
+Iter=   720  Move(A)=  0.713955 E(kJ/mol)=   2441.294     Grad=   3.631020    
+Iter=   730  Move(A)=  0.716628 E(kJ/mol)=   2428.180     Grad=   3.279127    
+Iter=   740  Move(A)=  0.740318 E(kJ/mol)=   2412.364     Grad=   3.347190    
+Iter=   750  Move(A)=  0.742519 E(kJ/mol)=   2398.732     Grad=   3.387590    
+Iter=   760  Move(A)=  0.650940 E(kJ/mol)=   2386.510     Grad=   2.999043    
+Iter=   770  Move(A)=  0.660928 E(kJ/mol)=   2374.312     Grad=   3.066422    
+Iter=   780  Move(A)=  0.752603 E(kJ/mol)=   2359.614     Grad=   3.294185    
+Iter=   790  Move(A)=  0.714557 E(kJ/mol)=   2346.691     Grad=   3.249558    
+Iter=   800  Move(A)=  0.700693 E(kJ/mol)=   2334.164     Grad=   3.041643    
+Iter=   810  Move(A)=  0.696795 E(kJ/mol)=   2321.239     Grad=   3.344129    
+Iter=   820  Move(A)=  0.747144 E(kJ/mol)=   2308.544     Grad=   3.298444    
+Iter=   830  Move(A)=  0.709971 E(kJ/mol)=   2297.196     Grad=   3.028013    
+Iter=   840  Move(A)=  0.699176 E(kJ/mol)=   2285.635     Grad=   3.110594    
+Iter=   850  Move(A)=  0.709461 E(kJ/mol)=   2273.706     Grad=   3.199622    
+Iter=   860  Move(A)=  0.685829 E(kJ/mol)=   2262.877     Grad=   2.883120    
+Iter=   870  Move(A)=  0.655467 E(kJ/mol)=   2251.897     Grad=   2.719212    
+Iter=   880  Move(A)=  0.583117 E(kJ/mol)=   2243.281     Grad=   2.708689    
+Iter=   890  Move(A)=  0.532635 E(kJ/mol)=   2234.778     Grad=   2.473216    
+Iter=   900  Move(A)=  0.483503 E(kJ/mol)=   2228.041     Grad=   2.198126    
+Iter=   910  Move(A)=  0.446371 E(kJ/mol)=   2220.811     Grad=   2.369637    
+Iter=   920  Move(A)=  0.537176 E(kJ/mol)=   2213.512     Grad=   2.576878    
+Iter=   930  Move(A)=  0.624640 E(kJ/mol)=   2204.479     Grad=   2.471608    
+Iter=   940  Move(A)=  0.602273 E(kJ/mol)=   2196.821     Grad=   2.388353    
+Iter=   950  Move(A)=  0.577540 E(kJ/mol)=   2189.486     Grad=   2.440853    
+Iter=   960  Move(A)=  0.635780 E(kJ/mol)=   2181.630     Grad=   2.574498    
+Iter=   970  Move(A)=  0.720118 E(kJ/mol)=   2173.125     Grad=   2.550405    
+Iter=   980  Move(A)=  0.620237 E(kJ/mol)=   2165.979     Grad=   2.455794    
+Iter=   990  Move(A)=  0.570690 E(kJ/mol)=   2158.621     Grad=   2.395716    
+Iter=  1000  Move(A)=  0.615328 E(kJ/mol)=   2151.605     Grad=   2.368516    
+Iter=  1010  Move(A)=  0.688673 E(kJ/mol)=   2143.513     Grad=   2.455988    
+Iter=  1020  Move(A)=  0.662995 E(kJ/mol)=   2136.447     Grad=   2.417276    
+Iter=  1030  Move(A)=  0.618239 E(kJ/mol)=   2129.096     Grad=   2.216297    
+Iter=  1040  Move(A)=  0.563072 E(kJ/mol)=   2123.263     Grad=   2.054985    
+Iter=  1050  Move(A)=  0.513719 E(kJ/mol)=   2117.423     Grad=   2.079410    
+Iter=  1060  Move(A)=  0.469374 E(kJ/mol)=   2112.644     Grad=   2.033861    
+Iter=  1070  Move(A)=  0.456357 E(kJ/mol)=   2108.312     Grad=   1.885011    
+Iter=  1080  Move(A)=  0.441135 E(kJ/mol)=   2103.935     Grad=   1.880316    
+Iter=  1090  Move(A)=  0.460039 E(kJ/mol)=   2099.488     Grad=   1.958874    
+Iter=  1100  Move(A)=  0.489495 E(kJ/mol)=   2094.483     Grad=   1.975967    
+Iter=  1110  Move(A)=  0.521143 E(kJ/mol)=   2089.760     Grad=   1.826997    
+Iter=  1120  Move(A)=  0.476860 E(kJ/mol)=   2084.325     Grad=   1.864653    
+Iter=  1130  Move(A)=  0.425745 E(kJ/mol)=   2080.630     Grad=   1.705003    
+Iter=  1140  Move(A)=  0.371574 E(kJ/mol)=   2077.391     Grad=   1.650560    
+Iter=  1150  Move(A)=  0.418296 E(kJ/mol)=   2072.830     Grad=   1.683109    
+Iter=  1160  Move(A)=  0.440818 E(kJ/mol)=   2069.195     Grad=   1.696634    
+Iter=  1170  Move(A)=  0.372773 E(kJ/mol)=   2066.241     Grad=   1.495884    
+Iter=  1180  Move(A)=  0.345174 E(kJ/mol)=   2061.880     Grad=   1.458038    
+Iter=  1190  Move(A)=  0.375564 E(kJ/mol)=   2059.029     Grad=   1.488579    
+Iter=  1200  Move(A)=  0.355495 E(kJ/mol)=   2056.410     Grad=   1.435839    
+Iter=  1210  Move(A)=  0.307889 E(kJ/mol)=   2053.537     Grad=   1.354269    
+Iter=  1220  Move(A)=  0.296137 E(kJ/mol)=   2051.472     Grad=   1.286693    
+Iter=  1230  Move(A)=  0.260650 E(kJ/mol)=   2049.718     Grad=   1.120344    
+Iter=  1240  Move(A)=  0.260445 E(kJ/mol)=   2047.940     Grad=   1.254487    
+Iter=  1250  Move(A)=  0.302444 E(kJ/mol)=   2046.507     Grad=   1.234968    
+Iter=  1260  Move(A)=  0.259949 E(kJ/mol)=   2044.904     Grad=   1.105256    
+Iter=  1270  Move(A)=  0.249411 E(kJ/mol)=   2043.330     Grad=   1.147797    
+Iter=  1280  Move(A)=  0.285606 E(kJ/mol)=   2041.594     Grad=   1.205834    
+Iter=  1290  Move(A)=  0.290709 E(kJ/mol)=   2039.917     Grad=   1.202578    
+Iter=  1300  Move(A)=  0.285403 E(kJ/mol)=   2038.017     Grad=   1.157472    
+Iter=  1310  Move(A)=  0.276617 E(kJ/mol)=   2036.511     Grad=   1.068423    
+Iter=  1320  Move(A)=  0.241625 E(kJ/mol)=   2035.225     Grad=   1.034446    
+Iter=  1330  Move(A)=  0.217573 E(kJ/mol)=   2035.059     Grad=  0.9564003    
+Iter=  1340  Move(A)=  0.207775 E(kJ/mol)=   2034.004     Grad=  0.9178680    
+Iter=  1350  Move(A)=  0.180243 E(kJ/mol)=   2033.134     Grad=  0.7956452    
+Iter=  1360  Move(A)=  0.162038 E(kJ/mol)=   2032.345     Grad=  0.8320850    
+Iter=  1370  Move(A)=  0.180400 E(kJ/mol)=   2031.512     Grad=  0.8538116    
+Iter=  1380  Move(A)=  0.179049 E(kJ/mol)=   2030.721     Grad=  0.7855461    
+Iter=  1390  Move(A)=  0.172680 E(kJ/mol)=   2029.993     Grad=  0.7453350    
+Iter=  1400  Move(A)=  0.173099 E(kJ/mol)=   2029.276     Grad=  0.7547076    
+Iter=  1410  Move(A)=  0.182154 E(kJ/mol)=   2029.712     Grad=  0.7537286    
+Iter=  1420  Move(A)=  0.174684 E(kJ/mol)=   2029.040     Grad=  0.7067151    
+Iter=  1430  Move(A)=  0.159430 E(kJ/mol)=   2028.439     Grad=  0.6580856    
+Iter=  1440  Move(A)=  0.144525 E(kJ/mol)=   2027.911     Grad=  0.6457323    
+Iter=  1450  Move(A)=  0.141149 E(kJ/mol)=   2027.406     Grad=  0.6487652    
+Iter=  1460  Move(A)=  0.142027 E(kJ/mol)=   2026.913     Grad=  0.6273427    
+Iter=  1470  Move(A)=  0.149474 E(kJ/mol)=   2026.411     Grad=  0.6516855    
+Iter=  1480  Move(A)=  0.144990 E(kJ/mol)=   2025.940     Grad=  0.6206872    
+Iter=  1490  Move(A)=  0.134979 E(kJ/mol)=   2023.839     Grad=  0.5795650    
+Iter=  1500  Move(A)=  0.119397 E(kJ/mol)=   2023.464     Grad=  0.5352542    
+Iter=  1510  Move(A)=  0.126539 E(kJ/mol)=   2023.075     Grad=  0.5512964    
+Iter=  1520  Move(A)=  0.130364 E(kJ/mol)=   2022.690     Grad=  0.5435709    
+Iter=  1530  Move(A)=  0.134027 E(kJ/mol)=   2022.302     Grad=  0.5535191    
+Iter=  1540  Move(A)=  0.135892 E(kJ/mol)=   2021.917     Grad=  0.5580601    
+Iter=  1550  Move(A)=  0.130940 E(kJ/mol)=   2021.758     Grad=  0.5354645    
+Iter=  1560  Move(A)=  0.124482 E(kJ/mol)=   2021.432     Grad=  0.5151266    
+Iter=  1570  Move(A)=  0.110415 E(kJ/mol)=   2021.150     Grad=  0.4636968    
+Iter=  1580  Move(A)=  0.108682 E(kJ/mol)=   2020.872     Grad=  0.4620661    
+Iter=  1590  Move(A)=  0.117160 E(kJ/mol)=   2020.581     Grad=  0.4872501    
+Iter=  1600  Move(A)=  0.125848 E(kJ/mol)=   2020.277     Grad=  0.4936190    
+Iter=  1610  Move(A)=  0.126958 E(kJ/mol)=   2019.973     Grad=  0.4818453    
+Iter=  1620  Move(A)=  0.128913 E(kJ/mol)=   2019.666     Grad=  0.4844586    
+Iter=  1630  Move(A)=  0.129718 E(kJ/mol)=   2020.448     Grad=  0.5094635    
+Iter=  1640  Move(A)=  0.134449 E(kJ/mol)=   2020.146     Grad=  0.5032675    
+Iter=  1650  Move(A)=  0.144940 E(kJ/mol)=   2019.824     Grad=  0.4913657    
+Iter=  1660  Move(A)=  0.148110 E(kJ/mol)=   2019.505     Grad=  0.5167840    
+Iter=  1670  Move(A)=  0.131827 E(kJ/mol)=   2019.236     Grad=  0.4414030    
+Iter=  1680  Move(A)=  0.119436 E(kJ/mol)=   2018.583     Grad=  0.4577712    
+Iter=  1690  Move(A)=  0.135210 E(kJ/mol)=   2018.299     Grad=  0.4780979    
+Iter=  1700  Move(A)=  0.136244 E(kJ/mol)=   2018.022     Grad=  0.4800077    
+Iter=  1710  Move(A)=  0.143994 E(kJ/mol)=   2017.730     Grad=  0.4863042    
+Iter=  1720  Move(A)=  0.152436 E(kJ/mol)=   2017.427     Grad=  0.4955488    
+Iter=  1730  Move(A)=  0.169806 E(kJ/mol)=   2016.552     Grad=  0.5723022    
+Iter=  1740  Move(A)=  0.187846 E(kJ/mol)=   2016.196     Grad=  0.5391622    
+Iter=  1750  Move(A)=  0.162914 E(kJ/mol)=   2015.886     Grad=  0.4662561    
+Iter=  1760  Move(A)=  0.158272 E(kJ/mol)=   2015.572     Grad=  0.5214536    
+Iter=  1770  Move(A)=  0.183258 E(kJ/mol)=   2015.320     Grad=  0.5364714    
+Iter=  1780  Move(A)=  0.191321 E(kJ/mol)=   2014.954     Grad=  0.5288590    
+Iter=  1790  Move(A)=  0.198559 E(kJ/mol)=   2014.581     Grad=  0.5636558    
+Iter=  1800  Move(A)=  0.191721 E(kJ/mol)=   2014.234     Grad=  0.5457913    
+Iter=  1810  Move(A)=  0.178808 E(kJ/mol)=   2014.297     Grad=  0.4792376    
+Iter=  1820  Move(A)=  0.142465 E(kJ/mol)=   2014.039     Grad=  0.4398207    
+Iter=  1830  Move(A)=  0.147527 E(kJ/mol)=   2013.763     Grad=  0.5027633    
+Iter=  1840  Move(A)=  0.167205 E(kJ/mol)=   2013.464     Grad=  0.5065988    
+Iter=  1850  Move(A)=  0.168704 E(kJ/mol)=   2013.158     Grad=  0.4979756    
+Iter=  1860  Move(A)=  0.184130 E(kJ/mol)=   2012.803     Grad=  0.5283548    
+Iter=  1870  Move(A)=  0.187559 E(kJ/mol)=   2012.481     Grad=  0.5208488    
+Iter=  1880  Move(A)=  0.175724 E(kJ/mol)=   2012.184     Grad=  0.4827280    
+Iter=  1890  Move(A)=  0.167231 E(kJ/mol)=   2011.894     Grad=  0.4806756    
+Iter=  1900  Move(A)=  0.192929 E(kJ/mol)=   2011.557     Grad=  0.5777698    
+Iter=  1910  Move(A)=  0.247220 E(kJ/mol)=   2011.109     Grad=  0.6065297    
+Iter=  1920  Move(A)=  0.290319 E(kJ/mol)=   2010.603     Grad=  0.6460915    
+Iter=  1930  Move(A)=  0.362947 E(kJ/mol)=   2009.976     Grad=  0.7894734    
+Iter=  1940  Move(A)=  0.452606 E(kJ/mol)=   2008.836     Grad=  0.8994094    
+Iter=  1950  Move(A)=  0.558216 E(kJ/mol)=   2007.871     Grad=  0.8775145    
+Iter=  1960  Move(A)=  0.529249 E(kJ/mol)=   2006.835     Grad=  0.9286786    
+Iter=  1970  Move(A)=  0.516832 E(kJ/mol)=   2005.837     Grad=  0.9400397    
+Iter=  1980  Move(A)=  0.515915 E(kJ/mol)=   2004.778     Grad=  0.9029253    
+Iter=  1990  Move(A)=  0.470410 E(kJ/mol)=   2003.813     Grad=  0.9268994    
+Iter=  2000  Move(A)=  0.559242 E(kJ/mol)=   2003.347     Grad=   1.052803    
+Iter=  2010  Move(A)=  0.660244 E(kJ/mol)=   2001.980     Grad=   1.046894    
+Iter=  2020  Move(A)=  0.579962 E(kJ/mol)=   1998.944     Grad=  0.9409220    
+Iter=  2030  Move(A)=  0.422653 E(kJ/mol)=   1997.876     Grad=  0.9334736    
+Iter=  2040  Move(A)=  0.432991 E(kJ/mol)=   1997.032     Grad=  0.9920538    
+Iter=  2050  Move(A)=  0.426381 E(kJ/mol)=   1995.959     Grad=  0.8882304    
+Iter=  2060  Move(A)=  0.429340 E(kJ/mol)=   1993.925     Grad=  0.9665763    
+Iter=  2070  Move(A)=  0.536838 E(kJ/mol)=   1992.609     Grad=   1.009014    
+Iter=  2080  Move(A)=  0.452530 E(kJ/mol)=   1991.828     Grad=  0.8897439    
+Iter=  2090  Move(A)=  0.390338 E(kJ/mol)=   1990.779     Grad=  0.9123261    
+Iter=  2100  Move(A)=  0.420924 E(kJ/mol)=   1989.129     Grad=  0.9808652    
+Iter=  2110  Move(A)=  0.450211 E(kJ/mol)=   1987.921     Grad=   1.003275    
+Iter=  2120  Move(A)=  0.487386 E(kJ/mol)=   1984.373     Grad=  0.9933100    
+Iter=  2130  Move(A)=  0.460410 E(kJ/mol)=   1983.014     Grad=   1.061448    
+Iter=  2140  Move(A)=  0.456817 E(kJ/mol)=   1980.880     Grad=   1.123678    
+Iter=  2150  Move(A)=  0.554566 E(kJ/mol)=   1979.149     Grad=   1.246254    
+Iter=  2160  Move(A)=  0.615383 E(kJ/mol)=   1976.266     Grad=   1.291797    
+Iter=  2170  Move(A)=  0.437094 E(kJ/mol)=   1973.488     Grad=   1.209569    
+Iter=  2180  Move(A)=  0.341259 E(kJ/mol)=   1971.836     Grad=   1.204659    
+Iter=  2190  Move(A)=  0.357336 E(kJ/mol)=   1968.650     Grad=   1.017187    
+Iter=  2200  Move(A)=  0.328550 E(kJ/mol)=   1967.101     Grad=   1.199572    
+Iter=  2210  Move(A)=  0.422514 E(kJ/mol)=   1965.226     Grad=   1.245499    
+Iter=  2220  Move(A)=  0.459004 E(kJ/mol)=   1962.276     Grad=   1.178544    
+Iter=  2230  Move(A)=  0.488683 E(kJ/mol)=   1960.123     Grad=   1.321897    
+Iter=  2240  Move(A)=  0.513241 E(kJ/mol)=   1958.602     Grad=   1.387948    
+Iter=  2250  Move(A)=  0.488545 E(kJ/mol)=   1956.320     Grad=   1.377016    
+Iter=  2260  Move(A)=  0.560084 E(kJ/mol)=   1953.619     Grad=   1.526283    
+Iter=  2270  Move(A)=  0.618592 E(kJ/mol)=   1950.783     Grad=   1.504588    
+Iter=  2280  Move(A)=  0.605348 E(kJ/mol)=   1947.160     Grad=   1.561144    
+Iter=  2290  Move(A)=  0.547753 E(kJ/mol)=   1944.585     Grad=   1.391659    
+Iter=  2300  Move(A)=  0.487581 E(kJ/mol)=   1941.224     Grad=   1.200240    
+Iter=  2310  Move(A)=  0.455323 E(kJ/mol)=   1939.095     Grad=   1.309067    
+Iter=  2320  Move(A)=  0.475574 E(kJ/mol)=   1935.369     Grad=   1.355759    
+Iter=  2330  Move(A)=  0.428274 E(kJ/mol)=   1933.311     Grad=   1.337250    
+Iter=  2340  Move(A)=  0.465540 E(kJ/mol)=   1929.696     Grad=   1.348622    
+Iter=  2350  Move(A)=  0.481343 E(kJ/mol)=   1927.354     Grad=   1.303415    
+Iter=  2360  Move(A)=  0.448043 E(kJ/mol)=   1924.034     Grad=   1.381110    
+Iter=  2370  Move(A)=  0.518615 E(kJ/mol)=   1921.178     Grad=   1.613251    
+Iter=  2380  Move(A)=  0.612902 E(kJ/mol)=   1915.390     Grad=   1.641955    
+Iter=  2390  Move(A)=  0.531992 E(kJ/mol)=   1912.349     Grad=   1.540090    
+Iter=  2400  Move(A)=  0.528872 E(kJ/mol)=   1906.247     Grad=   1.676758    
+Iter=  2410  Move(A)=  0.507791 E(kJ/mol)=   1903.067     Grad=   1.529648    
+Iter=  2420  Move(A)=  0.511815 E(kJ/mol)=   1897.972     Grad=   1.660821    
+Iter=  2430  Move(A)=  0.486943 E(kJ/mol)=   1894.892     Grad=   1.616463    
+Iter=  2440  Move(A)=  0.487377 E(kJ/mol)=   1890.041     Grad=   1.399976    
+Iter=  2450  Move(A)=  0.463260 E(kJ/mol)=   1887.160     Grad=   1.426807    
+Iter=  2460  Move(A)=  0.426647 E(kJ/mol)=   1883.035     Grad=   1.512687    
+Iter=  2470  Move(A)=  0.395532 E(kJ/mol)=   1880.629     Grad=   1.257167    
+Iter=  2480  Move(A)=  0.326548 E(kJ/mol)=   1878.643     Grad=   1.220948    
+Iter=  2490  Move(A)=  0.316258 E(kJ/mol)=   1878.293     Grad=   1.267020    
+Iter=  2500  Move(A)=  0.318793 E(kJ/mol)=   1876.489     Grad=   1.159663    
+         Constraint E (included in E shown)=         790.84kJ/mol
+                   Total Energy =     1876.4573 kJ/mol
+                        Stretch =        4.3428 kJ/mol
+                           Bend =      397.0836 kJ/mol
+                        Torsion =     -713.9836 kJ/mol
+               Improper Torsion =        5.8331 kJ/mol
+                            VDW =     -191.7964 kJ/mol
+                  Electrostatic =     1584.1335 kJ/mol
+        Explicit Hydrogen Bonds =        0.0000 kJ/mol
+                    Cross Terms =        0.0000 kJ/mol
+  
+ T.E. for cross-checking:      1876.4573 kJ/mol
+ Iterations =        2500  out of         2500
+ Conf    1 E =    1876.457 (  1.160) kJ/mol
+ Total number of structures processed =           1
+ 
+BatchMin: normal termination                           22-Sep-2016 02:29:51
+C:\Program Files\Schrodinger2016-3/run  < "1.com"  0.00s user 0.00s system 0% cpu 9.843 total
