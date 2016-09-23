@@ -126,7 +126,6 @@ class Mutation:
             
         return mutant_pop
 
-
     def random_bb(self, cage, database):
         """
         Substitutes a building-block* with a random one from a database.
