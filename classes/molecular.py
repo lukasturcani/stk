@@ -380,7 +380,7 @@ class StructUnit(metaclass=Cached):
     
     """
     
-    def __init__(self, prist_mol_file):
+    def __init__(self, prist_mol_file, minimal=False):
         """
         Initializes a ``StructUnit`` instance.
         
@@ -389,6 +389,10 @@ class StructUnit(metaclass=Cached):
         prist_mol_file : str
             The full path of the ``.mol`` file holding the building
             block structure.
+            
+        minimal : bool (default = False)
+            If ``True`` the full initialization is not carried out. This
+            is used in the `cage_target` fitness function.
             
         """
         
@@ -429,6 +433,10 @@ class StructUnit(metaclass=Cached):
         # functional group which appears first in 
         # `FGInfo.functional_group_list`.
         
+        # Check for minimal initialization.
+        if minimal:
+            return
+        
         # Calling the ``next`` function on this generator causes it to
         # yield the first (and what should be the only) result. The
         # generator will return ``None`` if it does not find the name of
@@ -436,7 +444,6 @@ class StructUnit(metaclass=Cached):
         self.func_grp = next((x for x in 
                                 FGInfo.functional_group_list if 
                                 x.name in prist_mol_file), None)
-        
         self.heavy_ids = []        
         
         # Calling this function generates all the attributes assciated
@@ -489,7 +496,7 @@ class StructUnit(metaclass=Cached):
         # Subtitutes the relevant functional group atoms in `heavy_mol`
         # for heavy atoms and deletes Hydrogen atoms of the functional
         # group as well as any other atoms tagged for deletion.
-        self._make_atoms_heavy_in_heavy()
+        self._make_atoms_heavy()
 
         # Change the pristine ``.mol`` file name to include the word
         # ``HEAVY_`` at the end. This generates the name of the 
@@ -510,7 +517,7 @@ class StructUnit(metaclass=Cached):
                                              isomericSmiles=True,
                                              allHsExplicit=True)        
 
-    def _make_atoms_heavy_in_heavy(self):
+    def _make_atoms_heavy(self):
         """
         Converts functional group in `heavy_mol` to substituted version.
 
@@ -636,7 +643,7 @@ class StructUnit(metaclass=Cached):
         # Go thorugh the log file line by line and find the line which
         # says ``Total Energy = ``. This line holds the energy value in
         # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('mol', 'log')
+        log_file = self.prist_mol_file.replace('.mol', '.log')
         with open(log_file, 'r') as log:
             for line in log:
                 if 'Total Energy =    ' in line:
@@ -1201,7 +1208,7 @@ class StructUnit(metaclass=Cached):
         pos_array = np.array([])
 
         for atom_id in self.heavy_ids:
-            pos_vect = np.array([*self.heavy_get_atom_coords(atom_id)])
+            pos_vect = np.array([*self.atom_coords('heavy', atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)
@@ -1370,7 +1377,7 @@ class BuildingBlock(StructUnit):
         
         """
         
-        heavy_coord = self.heavy_get_atom_coords(self.heavy_ids[0])
+        heavy_coord = self.atom_coords('heavy', self.heavy_ids[0])
         d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
                                            heavy_coord)), -1)
         return np.append(self.heavy_plane_normal(), d)
@@ -1740,13 +1747,13 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # Go thorugh the log file line by line and find the line which
         # says ``Total Energy = ``. This line holds the energy value in
         # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('mol', 'log')
+        log_file = self.prist_mol_file.replace('.mol', '.log')
         with open(log_file, 'r') as log:
             for line in log:
                 if 'Total Energy =    ' in line:
                     return float(line.split()[3])
 
-    def write_mol_file(self, rdkit_mol_type):
+    def write_mol_file(self, rdkit_mol_type, path=None):
         """
         Writes a V3000 ``.mol`` file of the macromolecule.
 
@@ -1765,6 +1772,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
         ----------
         rdkit_mol_type : str
             Allowed values for this parameter 'prist' and 'heavy'.
+            
+        path : str (default = None)
+            If the .mol file is to be written to a direcotry other than
+            the one in `prist_mol_file` or `heavy_mol_file`, it should
+            be written here.
         
         Modifies
         --------
@@ -1849,6 +1861,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
                                           atom_block)
         main_string = main_string.replace("!!!BOND!!!BLOCK!!!HERE!!!\n",
                                           bond_block)
+        
+        if path:
+            base_name = os.path.basename(file_name)
+            file_name = os.path.join(path, base_name)
         
         with open(file_name, 'w') as f:
             f.write(main_string)
@@ -2023,7 +2039,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
                 # and yield the resulting data.
                 atom1_id = atom1.GetIdx()
                 atom2_id = atom2.GetIdx()
-                yield (self.heavy_distance(atom1_id, atom2_id), 
+                yield (self.atom_distance('heavy', atom1_id, atom2_id), 
                       atom1_id, atom2_id)
 
     def centroid(self, mol_type):
@@ -2203,7 +2219,8 @@ class Cage(MacroMolecule):
         topology = np.random.choice(topologies)        
         
         return cls((bb, lk), topology, prist_mol_file)
-        
+
+
 class Polymer(MacroMolecule):
     """
     Used to represent polymers.

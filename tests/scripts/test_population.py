@@ -1,12 +1,12 @@
 import pytest
-import itertools as it
 from collections import Counter
 import shutil
 import os
 
-from ...classes import (Population, Cage, GATools, FourPlusSix,  
-                       BuildingBlock, Linker)
-from .test_struct_unit import get_mol_file
+
+from ...classes import (Population, Cage, GATools, FourPlusSix, Linker,
+                        EightPlusTwelve, SixPlusNine, BuildingBlock,
+                        MacroMolecule)
 
 def generate_population(offset=False):
     """
@@ -37,7 +37,10 @@ def generate_population(offset=False):
     # Initialize final population of subpopulations and cages.
     return Population(sub1, sub2, *cages[-3:])
     
-       
+pop_file = os.path.join('data', 'population',
+                        'population_test_obj')
+                        
+pop = Population.load(pop_file)
 
 def test_init():
     """
@@ -77,9 +80,49 @@ def test_init():
     # ``None`` type arguments can be supplied. Valid, should pass.
     Population(*[None for x in range(0,10)])
 
-def test_init_random_cages():
-    pass
-        
+def test_init_fixed_bb_cages():
+    """
+    Tests `init_fixed_bb_cages.
+    
+    """
+    
+    bb_file = os.path.join('data', 'population', 'bb_amine.mol')
+    lk_db = os.path.join('data', 'population', 'lk_db')
+    topologies = [FourPlusSix, EightPlusTwelve, SixPlusNine]
+    size = 10
+    
+    pop = Population.init_fixed_bb_cages(bb_file, lk_db, topologies,
+                                         size, None)    
+    
+    # Count the topologies, there should be more than one as they are
+    # selected randomly.
+    tops = [type(x.topology) for x in pop]
+    count = Counter(tops)
+    assert len(count.values()) > 1
+    
+    # Check that all the BuildingBlock molecules are the same.
+    bb_check = next(b for b in pop[0].building_blocks if 
+                                        isinstance(b, BuildingBlock))
+    lks = [] 
+    bbs = []                                   
+    for x in pop:
+        x_bb = next(b for b in x.building_blocks if 
+                                        isinstance(b, BuildingBlock))
+        x_lk = next(b for b in x.building_blocks if 
+                                        isinstance(b, Linker))
+        lks.append(x_lk)
+        bbs.append(x_bb)
+        assert x_bb is bb_check
+
+    count = Counter(bbs)
+    assert len(count.values()) == 1
+    
+    # Check that there are multiple Linker molecules.
+    count = Counter(lks)
+    assert len(count.values()) > 1
+    
+      
+     
 def test_all_members():
     """
     Check that all members, direct and in subpopulations, are returned.
@@ -193,7 +236,7 @@ def test_add_members_no_duplicates():
     receiver.add_members(supplier_different)
     assert receiver_size + len(supplier_different) == len(receiver)
     
-def test_add_subpopulations():
+def test_add_subpopulation():
     """
     Add a population as a subpopulation to another.
     
@@ -286,6 +329,8 @@ def test_remove_duplicates_not_between_subpops():
     assert subpop1.populations[0].populations[0].members
     assert not subpop1.populations[0].populations[0].populations
 
+def test_mean():
+    pass
     
 def test_getitem():
     """
@@ -306,8 +351,8 @@ def test_getitem():
     assert all(cage in flat_pop.members for cage in pop)
     # Verify lack of subpopulations.
     assert not flat_pop.populations
-    # An integer index should return a ``Cage`` instance.
-    assert isinstance(pop[5], Cage)
+    # An integer index should return a ``MacroMolecule`` instance.
+    assert isinstance(pop[5], MacroMolecule)
     # Non integer/slice indices are not supported
     with pytest.raises(TypeError):
         pop[5.5]
@@ -390,22 +435,9 @@ def test_write_population_to_dir():
         shutil.rmtree('write_pop_test')
     except:
         pass
-    
-    os.mkdir('write_pop_test')
-    bb_file = next(x for x in get_mol_file() 
-                                        if 'amine3f_14.mol' in x)
-    lk_file = next(x for x in get_mol_file() 
-                                        if 'aldehyde2f_3.mol' in x) 
-    
-    bb = BuildingBlock(bb_file)
-    lk = Linker(lk_file)    
-    building_blocks = (bb, lk)
-    mol = Cage(building_blocks, FourPlusSix, 
-               'you_can_delete_this3.mol')    
-    pop = Population(mol)
-    pop.write_population_to_dir(os.path.join(os.getcwd(), 
-                                             'write_pop_test'))
-    assert len(os.listdir('write_pop_test')) == len(pop)*2
+
+    pop.write_population_to_dir('write_pop_test')
+    assert len(os.listdir('write_pop_test')) == len(pop)
     try:
         shutil.rmtree('write_pop_test')
     except:
