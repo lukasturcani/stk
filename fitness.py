@@ -42,7 +42,7 @@ def calc_fitness(func_data, population):
             
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
-            macro_mol.fitness = -np.inf
+            macro_mol.fitness = 0
             macro_mol.topology.windows = None
 
         print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
@@ -71,7 +71,7 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
         return macro_mol.fitness
     
     if macro_mol.topology.windows is None:
-        return -np.inf
+        return 0
 
     if coeffs is None:
         coeffs = np.array([50,1,1])
@@ -206,8 +206,9 @@ def cage_target(cage, target_mol_file, *,
     energy_separate = cage.energy + target.energy
     energy_diff =  min(energy_separate - macromol_complex.energy for 
                             macromol_complex in macromol_complexes)
-                            
-    return np.exp(energy_diff)
+    
+                       
+    return np.exp(energy_diff) + 1
    
 def _generate_complexes(cage, target, rotate):
     """
