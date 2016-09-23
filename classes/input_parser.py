@@ -259,7 +259,7 @@ class GAInput:
                 elif kw in {'pop_size', 'num_generations', 
                             'num_mutations', 'num_matings', 
                             'mutation_weights'}:
-                    setattr(self, kw, int(line[1]))
+                    setattr(self, kw, eval(line[1]))
                 
                 else:
                     raise NameError(("Line does not define a valid"
