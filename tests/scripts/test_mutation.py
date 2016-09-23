@@ -1,37 +1,19 @@
-from collections import Counter
 import os
-import numpy as np
+import pickle
 
-from .test_population import generate_population
-from .test_struct_unit import get_mol_file
 from ...classes import (GATools, Selection, 
                         FunctionData, BuildingBlock, Mutation)
-from ...classes import  (Linker, Cage, FourPlusSix, 
-                         EightPlusTwelve, SixPlusNine, Population)
-from ...convenience_functions import flatten
+from ...classes import  (Linker, FourPlusSix, EightPlusTwelve, 
+                         SixPlusNine, Population)
 
-bb_file = next(x for x in get_mol_file() 
-                                    if 'amine3f_14.mol' in x)
-lk_file = next(x for x in get_mol_file() 
-                                    if 'aldehyde2f_3.mol' in x) 
+mol_file = os.path.join('data', 'mutation', 'cage1')
+mol2_file = os.path.join('data', 'mutation', 'cage2')
 
-bb = BuildingBlock(bb_file)
-lk = Linker(lk_file)    
-building_blocks = (bb, lk)
-mol = Cage(building_blocks, FourPlusSix, 
-           'you_can_delete_this3.mol')
-
-bb2_file = next(x for x in get_mol_file() 
-                                    if 'amine3f_5.mol' in x)
-lk2_file = next(x for x in get_mol_file() 
-                                    if 'aldehyde2f_28.mol' in x) 
-
-bb2 = BuildingBlock(bb2_file)
-lk2 = Linker(lk2_file)    
-building_blocks2 = (bb2, lk2)
-mol2 = Cage(building_blocks2, EightPlusTwelve, 
-             'you_can_delete_this4.mol')
-
+with open(mol_file, 'rb') as dump_file:
+    mol = pickle.load(dump_file)
+    
+with open(mol2_file, 'rb') as dump_file:
+    mol2 = pickle.load(dump_file)
 
 def test_random_mutation_function_selection():
     # This tests if the selection of a mutation function by the Mutation
@@ -43,36 +25,17 @@ def test_random_mutation_function_selection():
     # a new bb. When no weights are used. With weights the ratio should
     # be different
 
+    # Load the original population
+    pop_file = os.path.join('data', 'mutation', 'single_bb_pop')
+    pop1 = Population.load(pop_file)
+    bb_file = next(x.prist_mol_file for x in pop1[0].building_blocks 
+                                        if isinstance(x, BuildingBlock))
 
-    # Make a ``GATools`` attribute and give it to the population.
-    database = os.path.join(os.getcwd(), 
-                            'Database_prec', 'amines3f')
-    rand_bb = FunctionData('random_bb', database=database)
-            
-    rand_topology = FunctionData('random_cage_topology', 
-            topologies=[FourPlusSix, EightPlusTwelve, SixPlusNine])
-    
-    sel = FunctionData('roulette', duplicates=True)
-    
-    selector = Selection('a', 'a', sel)
-    
-    # No weights first.    
-    
-    mutator = Mutation([rand_bb, rand_topology], 100,
-                       weights=[1,0])
-    ga_tools = GATools(selector, 'a', mutator, 
-                       'rdkit_optimization', 'cage')
-
-    # Generate the original population
-    lk_db = os.path.join(os.getcwd(), 'Database_prec', 'aldehydes2f')
-
-    pop1 = Population.init_fixed_bb_cages(bb_file, lk_db, [FourPlusSix],
-                                          100, ga_tools)
-    pop1.remove_duplicates()
-    for ind in pop1:
-        ind.fitness = np.random.randint(1,25)
-
+    # Create the mutants.
     pop2 = pop1.gen_mutants()
+    
+    # The original weights dicatate the only the mutation of bbs will
+    # take place.
     new_top = 0
     new_bb = 0
     for mutant in pop2:
@@ -84,14 +47,10 @@ def test_random_mutation_function_selection():
             new_bb +=1
             
     assert new_top == 0
-    assert new_bb != 0
-
-    mutator = Mutation([rand_bb, rand_topology], 100,
-                       weights=[0,1])
-    ga_tools = GATools(selector, 'a', mutator, 
-                       'rdkit_optimization', 'cage')    
+    assert new_bb != 0  
     
-    pop1.ga_tools = ga_tools
+    # Reverse the weights.
+    pop1.ga_tools.mutation.weights = [0,1]
     pop2 = pop1.gen_mutants()
     new_top = 0
     new_bb = 0
@@ -104,15 +63,30 @@ def test_random_mutation_function_selection():
             new_bb +=1
             
     assert new_top != 0
-    assert new_bb == 0   
+    assert new_bb == 0
     
+    # Split the weights.
+    pop1.ga_tools.mutation.weights = [0.5,0.5]
+    pop2 = pop1.gen_mutants()
+    new_top = 0
+    new_bb = 0
+    for mutant in pop2:
+        if type(mutant.topology) != FourPlusSix:
+            new_top += 1
+        bb = next(x.prist_mol_file for x in mutant.building_blocks if 
+                    isinstance(x, BuildingBlock))
+        if bb != bb_file:
+            new_bb +=1
+            
+    assert new_top != 0
+    assert new_bb != 0    
+   
 def test_random_bb():
     
     mol.fitness = 1
     mol2.fitness = 2
     # Make a ``GATools`` attribute and give it to the population.
-    database = os.path.join(os.getcwd(), 
-                            'Database_prec', 'amines3f')
+    database = os.path.join('data', 'mutation', 'bb_db')
     rand_bb = FunctionData('random_bb', database=database)
     sel = FunctionData('fittest')
     

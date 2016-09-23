@@ -100,7 +100,8 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
 
     return 1/np.sum(fitness_value)   
     
-def cage_target(self, cage, target_mol_file, rotate=False):
+def cage_target(cage, target_mol_file, *, 
+                macromodel_path, rotate=False):
     """
     Calculates the fitness of a cage / target complex.
     
@@ -128,6 +129,9 @@ def cage_target(self, cage, target_mol_file, rotate=False):
         cavity of the cage. When ``False`` only the orientation
         within the .mol file is used.
         
+    macromodel_path : str (keyword-only)
+        The Schrodinger directory path.
+        
     Returns
     -------
     float
@@ -151,13 +155,12 @@ def cage_target(self, cage, target_mol_file, rotate=False):
     # calculation. Giving ``StructUnit`` the `optimized` attribute
     # fools the optimization function into running on ``StructUnit``
     # despite it being designed for ``MacroMolecule`` instances.
-    target = StructUnit(target_mol_file)
+    target = StructUnit(target_mol_file, minimal=True)
     if not hasattr(target, 'optimized'):
         target.optimized = False
-        macromodel_opt(target, no_fix=True)
-    else:
-        print('hahahahaha')
-    
+        macromodel_opt(target, no_fix=True, 
+                       macromodel_path=macromodel_path)
+
     # This function creates a new molecule holding both the target
     # and the cage centered at the origin. It then calculates the 
     # energy of this complex and compares it to the energies of the
@@ -188,11 +191,13 @@ def cage_target(self, cage, target_mol_file, rotate=False):
         
         # Once the .mol file is written load it into a 
         # ``StructUnit`` instance.
-        macromol_complex = StructUnit(mm_complex.prist_mol_file)
+        macromol_complex = StructUnit(mm_complex.prist_mol_file, 
+                                      minimal=True)
         # In order to optimize a ``StructUnit`` instance the
         # `optimized` attribute needs to be added.
         macromol_complex.optimized = False
-        macromodel_opt(macromol_complex, no_fix=True)
+        macromodel_opt(macromol_complex, no_fix=True,
+                       macromodel_path=macromodel_path)
         macromol_complexes.append(macromol_complex)
     
     # Calculate the energy of the complex and compare to the

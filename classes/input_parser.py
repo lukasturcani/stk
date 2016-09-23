@@ -27,7 +27,7 @@ def func_line_parser(line):
     
     # Split the line into components. Each component is text separated
     # by whitespace. Compenents = ``words``.
-    words = line.split()   
+    words = line.split()
     # The first 2 words are the keyword defining the ``GAInput`` 
     # attribute name and the name of the function/method to be used,
     # respectively. Any remaining words are the parameters and their
@@ -208,6 +208,9 @@ class GAInput:
         
         if not hasattr(self, 'num_mutations'):
             self.num_mutations = 0
+            
+        if not hasattr(self, 'mutation_weights'):
+            self.mutation_weights = [1]
         
     def _extract_data(self):
         """
@@ -248,7 +251,7 @@ class GAInput:
                 if '_func' in kw:
                     func_data = func_line_parser(raw_line)
                     if 'mutation' in kw:
-                        mutation_funcs = getattr(self, kw, default=[])
+                        mutation_funcs = getattr(self, kw, [])
                         mutation_funcs.append(func_data)
                         func_data = mutation_funcs
                     setattr(self, kw, func_data)
