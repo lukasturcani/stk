@@ -1233,6 +1233,25 @@ class StructUnit(metaclass=Cached):
         
             yield normalize_vector(p1-p2)
 
+    def centroid_centroid_dir_vector(self):
+        """
+        Returns the direction vector between the 2 molecular centroids.
+        
+        This method uses the substituted version of the molecule. The
+        two centroids are the molecular centroid and the centroid of the
+        heavy atoms only.
+        
+        Returns
+        -------
+        numpy.array
+            The normalized direction vector running from the centroid of
+            the heavy atoms to the molecular centroid.
+        
+        """
+    
+        return normalize_vector(self.centroid('heavy') - 
+                                self.heavy_atom_centroid())
+
     def heavy_atom_centroid(self):
         """
         Returns the centroid of the heavy atoms.
@@ -1413,27 +1432,7 @@ class BuildingBlock(StructUnit):
         """
         
         start = self.heavy_plane_normal()
-        return StructUnit._set_heavy_mol_orientation(self, start, end)
-
-    def centroid_centroid_dir_vector(self):
-        """
-        Returns the direction vector between the 2 molecular centroids.
-        
-        This method uses the substituted version of the molecule. The
-        two centroids are the molecular centroid and the centroid of the
-        heavy atoms only.
-        
-        Returns
-        -------
-        numpy.array
-            The normalized direction vector running from the centroid of
-            the heavy atoms to the molecular centroid.
-        
-        """
-    
-        return normalize_vector(self.centroid('heavy') - 
-                                self.heavy_atom_centroid())
-        
+        return StructUnit._set_heavy_mol_orientation(self, start, end)        
 
 class Linker(StructUnit):
     """
@@ -1670,6 +1669,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             dummy.prist_mol_file = prist_mol_file
             dummy.topology_args = topology_args
             MacroMolError(ex, dummy, 'During initialization.')
+            raise ex
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
