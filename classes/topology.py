@@ -352,12 +352,13 @@ class Edge:
             Raised if the orientation of the heavy atoms is incorrect.
         
         """
-        
+
         # First the centroid of the heavy atoms is placed on the
         # position of the edge, then the direction of the linker is 
         # aligned with the direction of the edge.
         linker.set_heavy_atom_centroid(self.coord)
         linker.set_heavy_mol_orientation(self.direction)
+
         # Check that the linker is correctly aligned.        
         if not np.allclose(self.direction, 
                            next(linker.heavy_direction_vectors()),
@@ -369,32 +370,10 @@ class Edge:
 
         # This part ensures that the centroid of the linker is placed
         # on the outside of the cage, rather than on the inside. To do
-        # this find the direction in which the centroid is pointing.
-        # This is done by getting the direction vector running from the
-        # midpoint of the two heavy atoms to the centroid of the 
-        # molecule. Next this direction vector is aligned with the 
-        # position vector running between the midpoint of the cage to
-        # the midpoint of the heavy atoms. This assumes that the center
-        # of the cage is at the origin.
-        dir_vector = linker.centroid('heavy') - self.coord
-        linker._set_heavy_mol_orientation(dir_vector, self.coord)
+        # this rotate around the edge direction until the
+        # centroid-centroid vector is aligned with `self.coord`.
+        theta = vector_theta()
 
-        # In some cases this ruins the alignmen of the heavy atoms with
-        # the edge direction. This can be corrected by the finding the
-        # angle between the edge direction and the heavy atom direction
-        # vector and rotating about the centroid - cage center axis by
-        # that angle.
-        theta = vector_theta(next(linker.heavy_direction_vectors()),
-                             self.direction)
-        # Only do the corrective rotation if angle offset is big.
-        if theta > np.pi/6:        
-            linker.set_heavy_atom_centroid([0,0,0])
-            pos_mat = linker.position_matrix('heavy')
-            rot_mat = rotation_matrix_arbitrary_axis(theta, self.coord)
-
-            new_pos_mat = np.dot(rot_mat, pos_mat)
-            linker.set_position_from_matrix('heavy', new_pos_mat)
-            linker.set_heavy_atom_centroid(self.coord)
 
         return linker.heavy_mol
 
