@@ -69,8 +69,6 @@ mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
 ga_tools = GATools(selector, mator, mutator, 
                    ga_input.opt_func, ga_input.fitness_func)
 
-print(ga_tools.fitness.params)
-
 # Generate and optimize an initial population.
 with time_it():
     pop_init = getattr(Population, ga_input.init_func.name)
