@@ -240,7 +240,8 @@ class Selection:
         # Apply truncation if desired.
         if truncation:
             pop = pop[:-truncation]  
-               
+              
+        elite_pop = []
         if elitism:
             elite_pop = cls.elites(pop, elitism)
             for ind in elite_pop:
@@ -431,7 +432,8 @@ class Selection:
         # Apply truncation if desired.
         if truncation:
             pop = pop[:-truncation]  
-               
+            
+        elite_pop = []
         if elitism:
             elite_pop = cls.elites(pop, elitism)
             for ind in elite_pop:
