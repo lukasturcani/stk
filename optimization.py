@@ -357,7 +357,8 @@ def macromodel_opt(macro_mol, force_field='16',
     # function.
     if not _license_found(macro_mol, opt_return.stdout):
         return macromodel_opt(macro_mol, 
-                              macromodel_path=macromodel_path)
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix)
 
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
@@ -375,7 +376,8 @@ def macromodel_opt(macro_mol, force_field='16',
                                 'Both force fields failed.')
         # If OPLSE_2005 has not been tried - try it.
         return macromodel_opt(macro_mol, force_field='14', 
-                              macromodel_path=macromodel_path)
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix)
     
     print('Updating attributes from .mol2 - {0}.'.format(
                                              macro_mol.prist_mol_file))
@@ -780,7 +782,7 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
     # the bond distance and atomic indices to the ``fix_block``. If the
     # bond does invovle two heavy atoms go to the next bond. This is
     # because a bond between 2 heavy atoms was added during assembly and
-    # should therefore not be fixed.   
+    # should therefore not be fixed.  
     for bond in macro_mol.heavy_mol.GetBonds():
         atom1 = bond.GetBeginAtom() 
         atom2 = bond.GetEndAtom()
