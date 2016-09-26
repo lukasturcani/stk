@@ -82,6 +82,10 @@ with time_it():
           '--------------------------\n\n'))
     pop = Population(pop.ga_tools, *pop.optimize_population())
 
+for mem in pop:
+    if not mem.optimized:
+        raise Exception('should be optimized', mem)
+
 with time_it():    
     print('\n\nCalculating the fitness of population members.\n'
         '----------------------------------------------\n\n') 
@@ -103,6 +107,12 @@ for x in range(ga_input.num_generations):
     os.chdir(root_dir)
     os.mkdir(str(x))
     os.chdir(str(x))
+
+    for mem in pop:
+        if not mem.optimized:
+            raise Exception('should be optimized', mem)
+    
+    
     
     with time_it():
         print('\n\nStarting mating.\n----------------\n\n')
@@ -126,6 +136,10 @@ for x in range(ga_input.num_generations):
         print(('\n\nOptimizing the population.\n'
               '--------------------------\n\n'))
         pop = Population(pop.ga_tools, *pop.optimize_population())
+
+    for mem in pop:
+        if not mem.optimized:
+            raise Exception('should be optimized', mem)
 
     with time_it():        
         print('\n\nCalculating the fitness of population members.\n'

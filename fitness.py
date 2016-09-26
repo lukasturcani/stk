@@ -49,7 +49,7 @@ def calc_fitness(func_data, population):
             
 def random_fitness(macro_mol):
     """
-    Returns a random fitness value between 0 and 100.
+    Returns a random fitness value between 1 and 10.
 
     Parameters
     ----------
@@ -63,7 +63,7 @@ def random_fitness(macro_mol):
 
     """
 
-    return np.random.randint(0,100)
+    return np.random.randint(1,10)
 
 def cage(macro_mol, target_size, coeffs=None, exponents=None):
     if macro_mol.fitness:

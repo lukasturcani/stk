@@ -483,6 +483,7 @@ class Selection:
                                                                in pop)
             weights = [(ind.fitness - int(ind.fitness)) / total_decimal
                         for ind in pop]
+            print(weights)
             for ind in np.random.choice(pop, replace=False, p=weights,
                                         size=len(pop)):
                 yield ind
@@ -647,6 +648,9 @@ class Selection:
         
         mating_pop = []
         for ind, fn in fns:
+            print('fn',fn)
+            print('fitness',ind.fitness)
+            print('mean_fitenss', mean_fitness)
             if int(fn) < 1 and len(mating_pop) >= len(population):
                 break
             
