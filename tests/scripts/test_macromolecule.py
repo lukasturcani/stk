@@ -357,10 +357,10 @@ def test_center_of_mass():
     
     assert np.allclose(mol.center_of_mass('prist'), 
                     [ 0.00033407, -0.00164896,  0.03560446],
-                    atol=1e-8)
+                    atol=1e-5)
     assert np.allclose(mol.center_of_mass('heavy'), 
                 [ -6.00447081e-05,  -2.57375917e-02,   1.74293007e-02],
-                atol=1e-8)
+                atol=1e-5)
 
 def test_shift():
     """
