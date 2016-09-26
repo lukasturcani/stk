@@ -22,6 +22,12 @@ class CachedMacroMol(type):
     This class is tailored to the needs of createding cached
     ``MacroMolecule`` instances.
     
+    Extending MMEA
+    --------------
+    If a MacroMolecule class is added such that one of its initializer
+    args of kwargs should not be used for caching, the `__call__` method
+    in this class will need to be modified.    
+    
     """    
     
     def __init__(self, *args, **kwargs):
@@ -44,8 +50,34 @@ class CachedMacroMol(type):
             return self._cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
-            self._cache[key] = obj
+            obj.key = key
+            self._cache[key] = obj            
             return obj
+
+    def _update_cache(self, macro_mol):
+        """
+        Updates the cache of stored molecule.
+
+        Parallel processes, such as optimization, return a copy of the
+        optimized molecule. The original molecule, stored in `_cache`,
+        does not have its attributes updated. In order to replace the 
+        molecule with the optimized copy within the cache this function 
+        should be used.
+        
+        Parameters
+        ----------
+        population : iterable of MacroMolecule instances
+            A population holding molecules which should replace the
+            ones held in `_cache` which share the same key.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+           
+        self._cache[macro_mol.key] = macro_mol
+
 
 class Cached(type):
     """
@@ -1711,6 +1743,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
         The fitness value of the macromolecule, as determined by the 
         chosen fitness function. This attribute is assigned by fitness
         functions and initialized with ``False``.
+        
+    key : str
+        The key used for caching the molecule. Necessary for 
+        `update_cache` to work. This attribute is assigned by in the 
+        `__call__` method of the ``CachedMacroMol`` class.
     
     """
 
@@ -1805,6 +1842,10 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
         self.fitness = False
+
+    def update_cache(self):
+        cls = type(self)
+        cls._update_cache(self)
                 
     @LazyAttr
     def energy(self):
