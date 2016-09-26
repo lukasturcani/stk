@@ -7,7 +7,8 @@ import itertools as it
 from scipy.spatial.distance import euclidean
 
 from ...classes import StructUnit, FGInfo
-from ...convenience_functions import flatten, normalize_vector
+from ...convenience_functions import (flatten, normalize_vector,
+                                     vector_theta)
 
 obj_file_name = os.path.join('data', 'struct_unit',
                              'struct_unit_test_obj')
@@ -461,6 +462,20 @@ def test_set_heavy_mol_orientation():
     # Check that pristine molecule was not modified.
     assert np.array_equal(prist_pos_mat, 
                           struct_unit.position_matrix('prist'))
+
+def test_rotate():
+    """
+    Tests `rotate`.
+    
+    """
+    
+    og_vector = next(struct_unit.heavy_direction_vectors())
+    axis = np.cross(og_vector, [1,1,1])   
+    struct_unit.rotate(np.pi/2, axis)
+    new_vector = next(struct_unit.heavy_direction_vectors()) 
+    theta = vector_theta(og_vector, new_vector)
+    assert abs(theta - np.pi/2) < 0.001 
+    
     
 def test_heavy_atom_position_matrix():
     """
@@ -497,6 +512,19 @@ def test_heavy_direction_vectors():
     for vector in struct_unit.heavy_direction_vectors():
         assert isinstance(vector, np.ndarray)
     assert sum(1 for _ in struct_unit.heavy_direction_vectors()) == 3
+
+def test_centroid_centroid_dir_vector():
+    """
+    Tests `centroid_centroid_dir_vector`.
+    
+    """
+    
+    mol_centroid = struct_unit.centroid('heavy')
+    h_atom_centroid =struct_unit.heavy_atom_centroid()
+    
+    assert np.array_equal(
+        normalize_vector(mol_centroid - h_atom_centroid),
+                          struct_unit.centroid_centroid_dir_vector())
 
 def test_heavy_atom_centroid_functions():
     """
