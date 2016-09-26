@@ -11,3 +11,4 @@
 -add tests for substitutions in structunit
 -topology tests
 -topology to cope with odd topologies
+-make sure update_cache function in CachedMacroMol metaclass does not need to be updated when extending MMEA.

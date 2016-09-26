@@ -101,6 +101,7 @@ class Mating:
                 # Apply the mating function and supply any additional
                 # arguments to it.
                 offspring = func(*parents, **self.func_data.params)
+                
                 # Add the new offspring to the offspring population.                
                 offspring_pop.add_members(offspring)
                 num_matings += 1

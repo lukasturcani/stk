@@ -82,7 +82,11 @@ def optimize_all(func_data, population):
     
     # Apply the function to every member of the population, in parallel.
     with Pool() as pool:
-        return pool.map(p_func, population)
+        optimized = pool.map(p_func, population)
+        # Make sure the cache is updated with the optimized versions.
+        for member in optimized:
+            member.update_cache()
+        return optimized
     
 def optimize_all_serial(func_data, population):
     """
@@ -1005,6 +1009,11 @@ def do_not_optimize(macro_mol):
     ----------
     macro_mol : MacroMolecule
         A macromolecule which will not be optimized.
+        
+    Modifies
+    --------
+    macro_mol.optimized
+        Set to ``True``.
     
     Returns
     -------
@@ -1013,6 +1022,12 @@ def do_not_optimize(macro_mol):
     
     """
     
+    if macro_mol.optimized:
+        print('Skipping', macro_mol.prist_mol_file)
+        return macro_mol
+    
+    print('Optimizing', macro_mol.prist_mol_file)
+    macro_mol.optimized = True   
     return macro_mol
     
 from .classes import FGInfo
