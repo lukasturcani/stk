@@ -63,17 +63,4 @@ def test_heavy_plane():
     # The first 3 members of the plane array should be equal to the 
     # heavy plane normal.
     assert np.allclose(bb.heavy_plane()[:3], bb.heavy_plane_normal(), 
-                       atol=1e-8)     
-
-def test_centroid_centroid_dir_vector():
-    """
-    Tests `centroid_centroid_dir_vector`.
-    
-    """
-    
-    mol_centroid = bb.centroid('heavy')
-    h_atom_centroid = bb.heavy_atom_centroid()
-    
-    assert np.array_equal(
-        normalize_vector(mol_centroid - h_atom_centroid),
-                          bb.centroid_centroid_dir_vector())
+                       atol=1e-8)
