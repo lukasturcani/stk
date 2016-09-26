@@ -6,13 +6,14 @@ import numpy as np
 import itertools
 from collections import deque
 from scipy.spatial.distance import euclidean
+import copy
 
 from .molecular import FGInfo, BuildingBlock, Linker
 from ..pyWindow import window_sizes
 from ..convenience_functions import (flatten, normalize_vector, 
                                      vector_theta, atom_vdw_radii,
                                      rotation_matrix_arbitrary_axis,
-                                     LazyAttr)
+                                     LazyAttr, rotation_matrix)
 
 class Vertex:
     """
@@ -368,13 +369,10 @@ class Edge:
                     'Expected {0}, got {1}.').format(self.direction,  
                            next(linker.heavy_direction_vectors())))
 
-        # This part ensures that the centroid of the linker is placed
-        # on the outside of the cage, rather than on the inside. To do
-        # this rotate around the edge direction until the
-        # centroid-centroid vector is aligned with `self.coord`.
-        theta = vector_theta()
-
-
+        # Ensure the centroid of the linker is placed on the outside of 
+        # the cage.
+        linker.minimize_theta(self.coord, self.direction)
+        
         return linker.heavy_mol
 
 class Topology:
