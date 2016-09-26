@@ -464,6 +464,9 @@ class Selection:
             # Start using roulette.
             total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
                                                                in pop)
+            if total_decimal == 0:
+                return
+                
             weights = [(ind.fitness - int(ind.fitness)) / total_decimal
                         for ind in pop]
             while True:
@@ -481,9 +484,12 @@ class Selection:
             # Start using roulette.
             total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
                                                                in pop)
+            if total_decimal == 0:
+                return
+                
             weights = [(ind.fitness - int(ind.fitness)) / total_decimal
                         for ind in pop]
-            print(weights)
+
             for ind in np.random.choice(pop, replace=False, p=weights,
                                         size=len(pop)):
                 yield ind
@@ -648,9 +654,6 @@ class Selection:
         
         mating_pop = []
         for ind, fn in fns:
-            print('fn',fn)
-            print('fitness',ind.fitness)
-            print('mean_fitenss', mean_fitness)
             if int(fn) < 1 and len(mating_pop) >= len(population):
                 break
             

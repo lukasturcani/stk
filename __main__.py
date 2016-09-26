@@ -5,7 +5,6 @@ from itertools import islice
 import warnings
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
-                      FunctionData, FourPlusSix, EightPlusTwelve, 
                       GAInput)
 from .optimization import kill_macromodel
 from .convenience_functions import time_it
