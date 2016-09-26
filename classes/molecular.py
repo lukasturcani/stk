@@ -11,7 +11,8 @@ import types
 
 from ..convenience_functions import (bond_dict, flatten, periodic_table, 
                                      normalize_vector, rotation_matrix,
-                                     vector_theta, LazyAttr)
+                                     vector_theta, LazyAttr,
+                                     rotation_matrix_arbitrary_axis)
 from .exception import MacroMolError
 
 class CachedMacroMol(type):
@@ -1073,8 +1074,12 @@ class StructUnit(metaclass=Cached):
         Modifies
         --------
         heavy_mol : rdkit.Chem.rdchem.Mol
-            The coordinates of atoms in this molecule are set to the 
-            coordinates in `pos_mat`.
+            If `mol_type` is 'heavy', the coordinates of atoms in this 
+            molecule are set to the coordinates in `pos_mat`.
+    
+        prist_mol : rdkit.Chem.rdchem.Mol   
+            if `mol_type` is 'prist', the coordinates of atoms in this 
+            molecule are set to the coordinates in `pos_mat`.
     
         Returns
         -------
@@ -1177,11 +1182,11 @@ class StructUnit(metaclass=Cached):
         # atom centroid to the origin. This is so that the rotation
         # occurs about this point.
         og_center = self.heavy_atom_centroid()
-        self.set_heavy_atom_centroid(np.array([0,0,0]))        
+        self.set_heavy_atom_centroid(np.array([0,0,0])) 
         
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
-
+        
         # Apply the rotation matrix to the atomic positions to yield the
         # new atomic positions.
         new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
@@ -1191,6 +1196,38 @@ class StructUnit(metaclass=Cached):
         self.set_heavy_atom_centroid(og_center)
 
         return chem.Mol(self.heavy_mol)
+
+    def rotate(self, theta, axis):
+        """
+        Rotates the heavy linker by `theta` about `axis`.
+        
+        The rotation occurs about the heavy atom centroid.        
+        
+        Parameters
+        ----------        
+        theta : float
+            The size of the rotation in radians.
+        
+        axis : numpy.array
+            The axis about which rotation happens.
+        
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated.
+    
+        Returns
+        -------
+        None : NoneType
+            
+        """
+        
+        og_position = self.heavy_atom_centroid()
+        self.set_heavy_atom_centroid([0,0,0])
+        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
+        self.set_position_from_matrix('heavy', new_pos_mat)
+        self.set_heavy_atom_centroid(og_position)                
 
     def heavy_atom_position_matrix(self):
         """
@@ -1471,6 +1508,58 @@ class Linker(StructUnit):
         
         start = next(self.heavy_direction_vectors())
         return StructUnit._set_heavy_mol_orientation(self, start, end)
+        
+    def minimize_theta(self, vector, axis):
+        """
+        Rotates linker about `axis` to minimze theta with `vector`.
+        
+        The linker is iteratively rotated so that its heavy atom vector
+        is as close as possible to `vector`.        
+        
+        Parameters
+        ----------
+        vector : numpy.array
+            The vector to which the distance should be minimized.
+            
+        axis : numpy.array
+            The direction vector along which the rotation happens.
+        
+        Returns
+        -------
+        None : NoneType        
+        
+        """
+        
+        vector = normalize_vector(vector)
+        axis = normalize_vector(axis)
+        
+        # Size of iterative step in radians.
+        step = 0.17
+        
+        theta = vector_theta(self.centroid_centroid_dir_vector(),
+                             vector)
+                             
+        # First determine the direction in which iteration should occur.
+        self.rotate(step, axis)
+        theta2 = vector_theta(self.centroid_centroid_dir_vector(),
+                             vector)       
+        if theta2 > theta:
+            axis = np.multiply(axis, -1)
+            
+        prev_theta = theta2
+        while True:
+            self.rotate(step, axis)
+            theta = vector_theta(self.centroid_centroid_dir_vector(),
+                             vector)
+            
+            if theta > prev_theta:
+                axis = np.multiply(axis, -1)
+                self.rotate(step, axis)
+                break
+            
+            prev_theta = theta
+        
+        
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):
