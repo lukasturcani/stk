@@ -11,3 +11,4 @@
 -add tests for substitutions in structunit
 -topology tests
 -topology to cope with odd topologies
+-consider dealing with charged building blocks
