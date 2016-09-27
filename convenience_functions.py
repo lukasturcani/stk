@@ -1,8 +1,6 @@
 import rdkit.Chem as chem
-import rdkit.Chem.AllChem as ac
 import rdkit
 from rdkit.Geometry import Point3D
-import re
 import numpy as np
 import time
 from contextlib import contextmanager
@@ -209,9 +207,70 @@ def matrix_centroid(matrix):
     sum_ = sum( x[0] for x in matrix)
     return sum_ / len(matrix)
 
+def mol_from_mol_file(mol_file):
+    """
+    Creates a rdkit molecule from a ``.mol`` (V3000) file.
+    
+    Parameters
+    ----------
+    mol_file : str
+        The full of the .mol file from which an rdkit molecule should
+        be instantiated.
+        
+    Returns
+    -------
+    rdkit.Chem.rdchem.Mol
+        An rdkit instance of the molecule held in `mol2_file`.
+    
+    """
+    
+    mol = chem.Mol()  
+    e_mol = chem.EditableMol(mol)
+    conf = chem.Conformer()
+    
+    with open(mol_file, 'r') as f:
+        take_atom = False
+        take_bond = False
+        
+        for line in f:
+            if 'M  V30 BEGIN ATOM' in line:
+                take_atom = True
+                continue
+            
+            if 'M  V30 END ATOM' in line:
+                take_atom = False
+                continue
+
+            if 'M  V30 BEGIN BOND' in line:
+                take_bond = True
+                continue
+            
+            if 'M  V30 END BOND' in line:
+                take_bond = False
+                continue
+            
+            if take_atom:
+                _, _, _, atom_sym, *coords, _ = line.split()
+                coords = [float(x) for x in coords]
+                atom_coord = Point3D(*coords)   
+                atom_id = e_mol.AddAtom(chem.Atom(atom_sym))              
+                conf.SetAtomPosition(atom_id, atom_coord)                
+                continue
+            
+            if take_bond:
+                *_, bond_id,  bond_order, atom1, atom2 = line.split()
+                e_mol.AddBond(int(atom1)-1, int(atom2)-1, 
+                              bond_dict[bond_order])                   
+                continue
+
+    mol = e_mol.GetMol()
+    mol.AddConformer(conf)
+    return mol
+    
+
 def mol_from_mol2_file(mol2_file):
     """
-    Creates an rdkit molecule from a ``.mol2`` file.
+    Creates a rdkit molecule from a ``.mol2`` file.
     
     Parameters
     ----------
