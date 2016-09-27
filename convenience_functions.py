@@ -4,6 +4,7 @@ from rdkit.Geometry import Point3D
 import numpy as np
 import time
 from contextlib import contextmanager
+import matplotlib.pyplot as plt
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
@@ -342,7 +343,32 @@ def mol_from_mol2_file(mol2_file):
     mol.AddConformer(conf)
     return mol
     
-            
+def plot_counter(counter, plot_name):
+    """
+    Saves a .png file holding a plot of `counter`.
+    
+    The counter should hold the number of times a certain population
+    member was selected.
+    
+    Parameters
+    ----------
+    counter : Counter
+        A counter of which members of a population were picked.
+    
+    plot_name : str
+        The full path of the .png where the plot is to be saved.
+        
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    fig = plt.figure()
+    x_vals = [x.fitness for x in counter.keys()]
+    y_vals = list(counter.values())
+    plt.bar(x_vals, y_vals)
+    fig.savefig(plot_name, dpi=fig.dpi)
+
 def dedupe(iterable, seen=None):
     if seen is None:
         seen = set()        
