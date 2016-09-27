@@ -485,6 +485,7 @@ class Selection:
             total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
                                                                in pop)
             if total_decimal == 0:
+                print('tot decimal was 0')                
                 return
                 
             weights = [(ind.fitness - int(ind.fitness)) / total_decimal
