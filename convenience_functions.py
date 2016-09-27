@@ -5,6 +5,7 @@ import numpy as np
 import time
 from contextlib import contextmanager
 import matplotlib.pyplot as plt
+import os 
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
@@ -208,6 +209,12 @@ def matrix_centroid(matrix):
     sum_ = sum( x[0] for x in matrix)
     return sum_ / len(matrix)
 
+class ChargedMolError(Exception):
+    def __init__(self, mol_file, msg):
+        self.mol_file = mol_file
+        self.msg = msg
+    
+
 def mol_from_mol_file(mol_file):
     """
     Creates a rdkit molecule from a ``.mol`` (V3000) file.
@@ -222,6 +229,13 @@ def mol_from_mol_file(mol_file):
     -------
     rdkit.Chem.rdchem.Mol
         An rdkit instance of the molecule held in `mol2_file`.
+        
+    Raises
+    ------
+    ChargedMolError
+        If an atom row has more than 8 coloumns it is usually because
+        there is a 9th coloumn indicating atomic charge. Such molecules
+        are not currently supported, so an error is raised.
     
     """
     
@@ -251,11 +265,15 @@ def mol_from_mol_file(mol_file):
                 continue
             
             if take_atom:
-                _, _, _, atom_sym, *coords, _ = line.split()
+                words = line.split()
+                if len(words) > 8:
+                    raise ChargedMolError(mol_file, ('Atom row has more'
+                    ' than 8 coloumns. Likely due to a charged atom.'))
+                _, _, _, atom_sym, *coords, _ = words
                 coords = [float(x) for x in coords]
                 atom_coord = Point3D(*coords)   
                 atom_id = e_mol.AddAtom(chem.Atom(atom_sym))              
-                conf.SetAtomPosition(atom_id, atom_coord)                
+                conf.SetAtomPosition(atom_id, atom_coord)
                 continue
             
             if take_bond:
@@ -267,7 +285,6 @@ def mol_from_mol_file(mol_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
-    
 
 def mol_from_mol2_file(mol2_file):
     """
@@ -342,6 +359,29 @@ def mol_from_mol2_file(mol2_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
+
+def del_charged_mols(database):
+    """
+    Removes charged .mol files from a folder of .mol files.
+    
+    Parameters
+    ----------
+    database : str
+        The full path of the folder containing the .mol files.
+    
+    Returns
+    -------
+    None : NoneType    
+    
+    """
+    
+    for mol_file in os.listdir(database):
+        full_path = os.path.join(database, mol_file)
+        with open(full_path, 'r') as f:
+            content = f.read()
+        if 'CHG=' in content:
+            print('Deleting', mol_file)
+            os.remove(full_path)
     
 def plot_counter(counter, plot_name):
     """
