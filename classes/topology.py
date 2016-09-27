@@ -358,7 +358,8 @@ class Edge:
         # position of the edge, then the direction of the linker is 
         # aligned with the direction of the edge.
         linker.set_heavy_atom_centroid(self.coord)
-        linker.set_heavy_mol_orientation(self.direction)
+        linker.set_heavy_mol_orientation(np.multiply(self.direction,
+                                         np.random.choice([1,-1])))
 
         # Check that the linker is correctly aligned.        
         if not np.allclose(self.direction, 
