@@ -68,6 +68,7 @@ mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
                    weights=ga_input.mutation_weights)
 ga_tools = GATools(selector, mator, mutator, 
                    ga_input.opt_func, ga_input.fitness_func)
+ga_tools.ga_input = ga_input
 
 # Generate and optimize an initial population.
 with time_it():
