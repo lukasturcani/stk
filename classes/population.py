@@ -1,12 +1,12 @@
 import itertools
-import shutil
 import os
 from statistics import mean
 import pickle
+from collections import Counter
 
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
-from ..convenience_functions import dedupe
+from ..convenience_functions import dedupe, plot_counter
 from ..optimization import optimize_all, optimize_all_serial
 from ..fitness import calc_fitness
 
@@ -478,6 +478,41 @@ class Population:
         """
 
         return self.ga_tools.mutation(self)
+
+    def gen_next_gen(self, pop_size):
+        """
+        Returns a population hodling the next generation of structures.
+        
+        This function also creates a .png plot of the selection
+        distribution.
+        
+        Parameters
+        ----------
+        pop_size : int
+            The size of the next generation.
+        
+        Returns
+        -------
+        Population
+            A population holding the next generation of individuals.
+        
+        """
+        
+        new_gen = Population(self.ga_tools)
+        counter = Counter()
+        for i, member in enumerate(self.select('generational'), 1):
+            counter.update([member])
+            new_gen.add_members([member])
+            if i == pop_size:
+                break
+        for member in self:
+            if member not in counter.keys():
+                counter.update({member : 0})
+        
+        plot_counter(counter, os.path.join(os.getcwd(), 
+                                           'gen_select.png'))
+        return new_gen
+        
         
     def write_population_to_dir(self, dir_path):
         """

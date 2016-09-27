@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from collections import Counter
 
 # More imports at the bottom of module.
 
@@ -102,9 +103,11 @@ class Mutation:
         
         parent_pool = population.select('mutation')
         mutant_pop = Population(population.ga_tools)
+        counter = Counter()        
         
         num_mutations = 0
         for parent in parent_pool:
+            counter.update([parent])
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)            
            
@@ -123,7 +126,13 @@ class Mutation:
                 MacroMolError(ex, parent, 'Error during mutation.') 
 
         mutant_pop -= population
-            
+        
+        # Update counter with unselected members.
+        for member in population:
+            if member not in counter.keys():
+                counter.update({member : 0})
+        plot_counter(counter, os.path.join(os.getcwd(), 
+                              'mutation_counter.png'))
         return mutant_pop
 
     def random_bb(self, cage, database):
@@ -192,3 +201,4 @@ class Mutation:
 from ..population import Population
 from ..molecular import BuildingBlock, Linker, Cage, Polymer
 from ..exception import MacroMolError
+from ...convenience_functions import plot_counter

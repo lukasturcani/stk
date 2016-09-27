@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 
 # More imports at the bottom of module.
 
@@ -87,6 +88,7 @@ class Mating:
         # Create the parent pool by using `select('mating')`.
         parent_pool = population.select('mating')
         offspring_pop = Population(population.ga_tools)
+        counter = Counter()
         
         # Get the mating function object using the name of the mating
         # function supplied during initialization of the ``Mating`` 
@@ -95,7 +97,8 @@ class Mating:
         
         # Keep a count of the number of successful matings.
         num_matings = 0
-        for parents in parent_pool:         
+        for parents in parent_pool:
+            counter.update(parents)
             try:
                 self.n_calls += 1
                 # Apply the mating function and supply any additional
@@ -117,6 +120,12 @@ class Mating:
         # Make sure that only original molecules are left in the 
         # offspring population.
         offspring_pop -= population
+        # Update counter with unselected members and plot counter.
+        for member in population:
+            if member not in counter.keys():
+                counter.update({member : 0})
+        plot_counter(counter, os.path.join(os.getcwd(), 
+                              'mating_counter.png'))
         return offspring_pop
 
     """
@@ -208,3 +217,4 @@ class Mating:
 from ..population import Population
 from ..molecular import BuildingBlock, Linker, Cage, Polymer
 from ..exception import MacroMolError
+from ...convenience_functions import plot_counter

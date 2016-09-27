@@ -3,11 +3,12 @@ import shutil
 import sys
 from itertools import islice
 import warnings
+from collections import Counter
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
                       GAInput)
 from .optimization import kill_macromodel
-from .convenience_functions import time_it
+from .convenience_functions import time_it, plot_counter
 
 
 
@@ -136,9 +137,8 @@ for x in range(ga_input.num_generations):
 
     with time_it():        
         print(('\n\nSelecting members of the next generation.\n'
-               '-----------------------------------------\n\n'))
-        pop = Population(ga_tools, *(islice(pop.select('generational'),
-                                            0, ga_input.pop_size)))
+               '-----------------------------------------\n\n'))             
+        pop = pop.gen_next_gen(ga_input.pop_size)
     
     # Create a folder within a generational folder for the the ``.mol``
     # files corresponding to molecules selected for the next generation.
