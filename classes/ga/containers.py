@@ -51,10 +51,14 @@ class GATools:
         calculating the fitness of ``MacroMolecule`` instances. It also
         holds any additional paramters the function may require.
     
+    ga_input : GAInput
+        The GAInput object holding data gathered from the input file.
+        This attribute is added in the ``__main__.py`` script.
+    
     """
     
     __slots__ = ['selection', 'mating', 'mutation', 
-                 'optimization', 'fitness']    
+                 'optimization', 'fitness', 'ga_input']    
     
     def __init__(self, selection, mating, 
                  mutation, optimization, fitness):
