@@ -12,7 +12,8 @@ import types
 from ..convenience_functions import (bond_dict, flatten, periodic_table, 
                                      normalize_vector, rotation_matrix,
                                      vector_theta, LazyAttr,
-                                     rotation_matrix_arbitrary_axis)
+                                     rotation_matrix_arbitrary_axis,
+                                     mol_from_mol_file)
 from .exception import MacroMolError
 
 class CachedMacroMol(type):
@@ -250,9 +251,9 @@ class StructUnit(metaclass=Cached):
     The goal of this class is to conveniently store information about, 
     and perform operations on, single instances of the building blocks 
     used to form macromolecules. The class stores information regarding
-    the rdkit instance of the building block, its ``SMILES`` string and
-    the location of its ``.mol`` file. See the attributes section of 
-    this docstring for a full list of information stored.
+    the rdkit instance of the building block and the location of its 
+    ``.mol`` file. See the attributes section of this docstring for a 
+    full list of information stored.
     
     This class also takes care of perfoming substitutions of the 
     functional groups in the building blocks via the 
@@ -375,10 +376,6 @@ class StructUnit(metaclass=Cached):
         This is an ``rdkit molecule type``. It is the rdkit instance
         of the molecule held in `prist_mol_file`.
         
-    prist_smiles : str
-        This string holds the ``SMILES`` code of the unsubstituted form
-        of the molecule.
-        
     heavy_mol_file : str
         The full path of the ``.mol`` file (V3000) holding the 
         substituted molecule. This attribute is initialized by the 
@@ -390,10 +387,6 @@ class StructUnit(metaclass=Cached):
         the initializer when it calls the `_generate_heavy_attrs` 
         method.
         
-    heavy_smiles : str
-        A string holding the ``SMILES`` code of the substituted version
-        of the molecule.
-    
     func_grp : FGInfo
         This attribute holds an instance of ``FGInfo``. The ``FGInfo``
         instance holds the information regarding which functional group
@@ -441,13 +434,7 @@ class StructUnit(metaclass=Cached):
             os.mkdir("HEAVY")
         
         self.prist_mol_file = prist_mol_file
-        self.prist_mol = chem.MolFromMolFile(prist_mol_file, 
-                                             sanitize=False, 
-                                             removeHs=False)
-                                             
-        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
-                                             isomericSmiles=True,
-                                             allHsExplicit=True)
+        self.prist_mol = mol_from_mol_file(prist_mol_file)
         
         # Define a generator which yields an ``FGInfo`` instance from
         # the `FGInfo.functional_group_list`. The yielded ``FGInfo``
@@ -541,14 +528,7 @@ class StructUnit(metaclass=Cached):
         self.heavy_mol_file = os.path.split(self.heavy_mol_file)[1]
         self.heavy_mol_file = os.path.join(os.getcwd(), "HEAVY", 
                                            self.heavy_mol_file)
-        
-        chem.MolToMolFile(self.heavy_mol, self.heavy_mol_file,
-                          includeStereo=True, kekulize=False,
-                          forceV3000=True) 
-
-        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol, 
-                                             isomericSmiles=True,
-                                             allHsExplicit=True)        
+        self.write_mol_file('heavy')      
 
     def _make_atoms_heavy(self):
         """
@@ -1715,9 +1695,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
 
     prist_mol : rdkit.Chem.rdchem.Mol
         An rdkit molecule instance representing the macromolecule.
-
-    prist_smiles : str
-        A ``SMILES`` string which represents the pristine macromolecule.
         
     heavy_mol_file : str
         The full path of the ``.mol`` file holding the substituted
@@ -1725,10 +1702,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
 
     heavy_mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance holding the substituted version of the
-        macromolecule.
-
-    heavy_smiles : str
-        A ``SMILES`` string representing the substitued version of the 
         macromolecule.
 
     optimized : bool (default = False)
@@ -1795,7 +1768,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             dummy.prist_mol_file = prist_mol_file
             dummy.topology_args = topology_args
             MacroMolError(ex, dummy, 'During initialization.')
-            raise ex
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
@@ -1811,7 +1783,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # The topology_args attribute is saved for error handling. See
         # MacroMolError class.
         self.topology_args = topology_args
-
         self.prist_mol_file = prist_mol_file
 
         # This generates the name of the heavy ``.mol`` file by adding
@@ -1826,16 +1797,9 @@ class MacroMolecule(metaclass=CachedMacroMol):
         self.topology.build()
     
 
-        # Write the ``.mol`` files and create the ``SMILES`` strings.
+        # Write the ``.mol`` files.
         self.write_mol_file('prist')
         self.write_mol_file('heavy')
-        
-        self.prist_smiles = chem.MolToSmiles(self.prist_mol, 
-                                             isomericSmiles=True, 
-                                             allHsExplicit=True)                                               
-        self.heavy_smiles = chem.MolToSmiles(self.heavy_mol,
-                                             isomericSmiles=True,
-                                             allHsExplicit=True)
                                              
         self.optimized = False
 

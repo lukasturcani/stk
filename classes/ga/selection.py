@@ -651,7 +651,7 @@ class Selection:
 
         mean_fitness = population.mean('fitness')            
         fns = [(ind, ind.fitness/mean_fitness) for ind in pop]
-        
+
         mating_pop = []
         for ind, fn in fns:
             if int(fn) < 1 and len(mating_pop) >= len(population):
