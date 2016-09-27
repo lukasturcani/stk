@@ -106,4 +106,8 @@ class MacroMolError(Exception):
                                          self.macro_mol.prist_mol_file)) 
            
             f.write('topology_args = {0}\n\n\n\n'.format(
-                                          self.macro_mol.topology_args))       
+                                          self.macro_mol.topology_args))    
+                                          
+class PopulationSizeError(Exception):
+    def __init__(self, msg):
+        self.msg = msg

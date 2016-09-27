@@ -7,6 +7,7 @@ from collections import Counter
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
                       GAInput)
+from .classes.exception import PopulationSizeError
 from .optimization import kill_macromodel
 from .convenience_functions import time_it, plot_counter
 
@@ -93,6 +94,8 @@ with time_it():
 
 # Run the GA.
 for x in range(ga_input.num_generations):
+    if len(pop) != ga_input.pop_size:
+        raise PopulationSizeError('Population has the wrong size.')
     print(('\n\nGeneration {0} started. Stop at generation {1}. '
             'Population size is {2}.\n'
             '---------------------------------------------------------'
@@ -117,13 +120,16 @@ for x in range(ga_input.num_generations):
     with time_it():
         print(('\n\nAdding offsping and mutants to population.'
               '\n------------------------------------------\n\n'))
+        print('before addition', len(pop))
         pop += offspring + mutants
-
+        print('after additin', len(pop))
+    
     with time_it():
         print(('\n\nRemoving duplicates, if any.\n'
                '----------------------------\n\n')    )
+        
         pop.remove_duplicates()    
-
+        print('after duplicate remove', len(pop))
     with time_it():        
         print(('\n\nOptimizing the population.\n'
               '--------------------------\n\n'))
@@ -139,8 +145,9 @@ for x in range(ga_input.num_generations):
     with time_it():        
         print(('\n\nSelecting members of the next generation.\n'
                '-----------------------------------------\n\n'))             
+        print(len(pop))
         pop = pop.gen_next_gen(ga_input.pop_size)
-    
+        print('after selection of next gen', len(pop), ga_input.pop_size)
     # Create a folder within a generational folder for the the ``.mol``
     # files corresponding to molecules selected for the next generation.
     # Place the ``.mol`` files into that folder.
