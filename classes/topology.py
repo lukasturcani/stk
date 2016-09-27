@@ -346,12 +346,7 @@ class Edge:
             The rdkit instance holding the linker molecule with the
             coordinates placed on the edge and orientation set as
             described in the docstring.
-        
-        Raises
-        ------
-        ValueError
-            Raised if the orientation of the heavy atoms is incorrect.
-        
+
         """
 
         # First the centroid of the heavy atoms is placed on the
@@ -360,15 +355,6 @@ class Edge:
         linker.set_heavy_atom_centroid(self.coord)
         linker.set_heavy_mol_orientation(np.multiply(self.direction,
                                          np.random.choice([1,-1])))
-
-        # Check that the linker is correctly aligned.        
-        if not np.allclose(self.direction, 
-                           next(linker.heavy_direction_vectors()),
-                           atol=0.01):
-        
-            raise ValueError(('Wrong direction. '
-                    'Expected {0}, got {1}.').format(self.direction,  
-                           next(linker.heavy_direction_vectors())))
 
         # Ensure the centroid of the linker is placed on the outside of 
         # the cage.
@@ -1321,6 +1307,8 @@ class Dodecahedron(CageTopology):
     
     n_windows = 12
     n_window_types = 1
+
+
     
 class BlockCopolymer(Topology):
     """
