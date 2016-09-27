@@ -408,6 +408,7 @@ def plot_counter(counter, plot_name):
     y_vals = list(counter.values())
     plt.bar(x_vals, y_vals)
     fig.savefig(plot_name, dpi=fig.dpi)
+    plt.close('all')
 
 def dedupe(iterable, seen=None):
     if seen is None:
