@@ -60,8 +60,6 @@ def test_init():
     assert isinstance(struct_unit.func_grp, FGInfo)
     assert isinstance(struct_unit.prist_mol, rdkit.Chem.rdchem.Mol)
     assert isinstance(struct_unit.heavy_mol, rdkit.Chem.rdchem.Mol)
-    assert isinstance(struct_unit.prist_smiles, str)
-    assert isinstance(struct_unit.heavy_smiles, str)
     assert isinstance(struct_unit.prist_mol_file, str)
     assert isinstance(struct_unit.heavy_mol_file, str)
     assert isinstance(struct_unit.heavy_ids, list)
