@@ -148,7 +148,7 @@ for x in range(ga_input.num_generations):
     os.mkdir('selected')
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
-     
+    pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible
 # to move.     
