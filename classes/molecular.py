@@ -1570,8 +1570,6 @@ class Linker(StructUnit):
                 break
             
             prev_theta = theta
-        
-        
 
 @total_ordering
 class MacroMolecule(metaclass=CachedMacroMol):

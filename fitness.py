@@ -208,7 +208,9 @@ def cage_target(cage, target_mol_file, *,
                             macromol_complex in macromol_complexes)
     
                        
-    return np.exp(energy_diff) + 1
+    raw_fitness = np.exp(energy_diff*1e-5) + 1
+    if raw_fitness > 1e10:
+        raw_fitness = 1e10        
    
 def _generate_complexes(cage, target, rotate):
     """
