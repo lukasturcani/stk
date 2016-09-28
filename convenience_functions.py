@@ -213,7 +213,6 @@ class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
         self.msg = msg
-    
 
 def mol_from_mol_file(mol_file):
     """
