@@ -422,7 +422,13 @@ class Selection:
         Yields
         ------
         MacroMolecule
-            The next selected invidual.        
+            The next selected invidual.
+        
+        Raises
+        ------
+        RuntimeError
+            If a normalized weight is 0. This should not happen as all
+            fitness values should be non-zero.
         
         """
 
@@ -462,13 +468,17 @@ class Selection:
                     yield ind
             
             # Start using roulette.
-            total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
-                                                               in pop)
+            total_decimal = sum(fns[ind] - int(fns[ind]) for ind in pop)
             if total_decimal == 0:
                 return
                 
-            weights = [(ind.fitness - int(ind.fitness)) / total_decimal
-                        for ind in pop]
+            weights = [(fns[ind] - int(fns[ind])) / total_decimal for 
+                                                             ind in pop]
+                                                             
+            if 0 in weights:
+                raise RuntimeError(('0 found in normalized weights. '
+                'Likely due to a 0 in the normalized fitness values.'))             
+                
             while True:
                 yield np.random.choice(pop, replace=True, p=weights)
          
@@ -482,14 +492,16 @@ class Selection:
                 pop.remove(ind)
 
             # Start using roulette.
-            total_decimal = sum(ind.fitness - int(ind.fitness) for ind 
-                                                               in pop)
+            total_decimal = sum(fns[ind] - int(fns[ind]) for ind in pop)
             if total_decimal == 0:
-                print('tot decimal was 0')                
                 return
                 
-            weights = [(ind.fitness - int(ind.fitness)) / total_decimal
-                        for ind in pop]
+            weights = [(fns[ind] - int(fns[ind])) / total_decimal for 
+                                                             ind in pop]
+
+            if 0 in weights:
+                raise RuntimeError(('0 found in normalized weights. '
+                'Likely due to a 0 in the normalized fitness values.')) 
 
             for ind in np.random.choice(pop, replace=False, p=weights,
                                         size=len(pop)):
@@ -669,7 +681,6 @@ class Selection:
                                           size=2, replace=False)
             yield ind1, ind2
         
-  
     """
     The following methods are inteded for convenience while 
     debugging or testing and should not be used during typical 
