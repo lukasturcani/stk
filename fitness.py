@@ -42,7 +42,7 @@ def calc_fitness(func_data, population):
             
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
-            macro_mol.fitness = 0
+            macro_mol.fitness = 1
             macro_mol.topology.windows = None
 
         print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
@@ -71,7 +71,7 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
         return macro_mol.fitness
     
     if macro_mol.topology.windows is None:
-        return 0
+        return 1
 
     if coeffs is None:
         coeffs = np.array([50,1,1])
@@ -100,8 +100,8 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
 
     return 1/np.sum(fitness_value)   
     
-def cage_target(cage, target_mol_file, *, 
-                macromodel_path, rotate=False):
+def cage_target(cage, target_mol_file, *, macromodel_path, 
+                rotate=False, min_window_size=0):
     """
     Calculates the fitness of a cage / target complex.
     
@@ -123,6 +123,11 @@ def cage_target(cage, target_mol_file, *,
     target_mol_file : str
         The full path of the .mol file hodling the target molecule
         placed inside the cage.
+        
+    min_window_size : float (default = 0)
+        The smallest windows size allowing the target to enter the cage.
+        Default is 0, which implies that there is no minimum. This can
+        occur when the target acts a template for cage assembly.
 
     rotate : bool (default = False)
         When ``True`` the target molecule will be rotated inside the
@@ -143,7 +148,12 @@ def cage_target(cage, target_mol_file, *,
     # calculation again.
     if cage.fitness:
         print('Skipping {0}'.format(cage.prist_mol_file))
-        return cage.fitness            
+        return cage.fitness
+            
+    # If the size of the window is too small for the target molecule to
+    # enter the cage return the minimum fitness value.
+    if max(cage.windows) < min_window_size:
+        return 1
     
     # The first time running the fitness function create an instance
     # of the target molecule as a ``StructUnit``. Due to caching,

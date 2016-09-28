@@ -90,6 +90,9 @@ with time_it():
 
 # Run the GA.
 for x in range(ga_input.num_generations):
+    # Save the min, max and mean values of the population.    
+    pop.progress_update()
+    
     # Check that the population has the correct size.
     if len(pop) != ga_input.pop_size:
         raise PopulationSizeError('Population has the wrong size.')
@@ -97,9 +100,8 @@ for x in range(ga_input.num_generations):
     print(('\n\nGeneration {0} started. Stop at generation {1}. '
             'Population size is {2}.\n'
             '---------------------------------------------------------'
-            '--------------\n\n').format(x, 
-                                             ga_input.num_generations-1, 
-                                             len(pop)))
+            '--------------\n\n').format(x, ga_input.num_generations-1, 
+                                            len(pop)))
     # At the start of each generation go into the root directory and 
     # create a folder to hold the next generation's ``.mol`` files.
     # Change into the newly created directory.
@@ -155,3 +157,10 @@ for x in range(ga_input.num_generations):
 # This closes them. If this is not done, directories may not be possible
 # to move.     
 kill_macromodel()
+
+# Update a final time and plot the results of the GA run.
+pop.progress_update()
+pop.plot_epp(os.path.join(root_dir, 'epp.png'))
+
+
+
