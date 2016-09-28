@@ -13,7 +13,7 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
                                      normalize_vector, rotation_matrix,
                                      vector_theta, LazyAttr,
                                      rotation_matrix_arbitrary_axis,
-                                     mol_from_mol_file)
+                                     mol_from_mol_file, ChargedMolError)
 from .exception import MacroMolError
 
 class CachedMacroMol(type):
@@ -434,7 +434,17 @@ class StructUnit(metaclass=Cached):
             os.mkdir("HEAVY")
         
         self.prist_mol_file = prist_mol_file
-        self.prist_mol = mol_from_mol_file(prist_mol_file)
+        
+        # First try to load the molecule using the MMEA .mol reading
+        # function. If it excepts due to a ChargedMolError, try the
+        # rdkit function. This one may however cause cages to crash due
+        # poor ring finding.
+        try:
+            self.prist_mol = mol_from_mol_file(prist_mol_file)
+        except ChargedMolError:
+            self.prist_mol = chem.MolFromMolFile(prist_mol_file,
+                                                 sanitize=False,
+                                                 removeHs=False)
         
         # Define a generator which yields an ``FGInfo`` instance from
         # the `FGInfo.functional_group_list`. The yielded ``FGInfo``
@@ -1357,13 +1367,13 @@ class StructUnit(metaclass=Cached):
         
         return chem.Mol(self.heavy_mol)
            
-    def write_mol_file(self, mol_type):
+    def write_mol_file(self, mol_type, path=None):
         """
         See `write_mol_file` documentation in ``MacroMolecule``.
         
         """
         
-        return MacroMolecule.write_mol_file(self, mol_type)
+        return MacroMolecule.write_mol_file(self, mol_type, path=path)
 
     def __eq__(self, other):
         return self.prist_mol_file == other.prist_mol_file
