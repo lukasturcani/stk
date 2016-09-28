@@ -86,12 +86,6 @@ class MacroMolError(Exception):
         
         cwd = os.getcwd().split('output')[0]
         name = os.path.join(cwd, 'failures.txt')
-
-        try:
-            with open(name, 'x') as f:
-                pass
-        except Exception as ex2:
-            pass
         
         with open(name, 'a') as f:
             f.write("{0}\n".format(self.ex))

@@ -1102,7 +1102,7 @@ class CageTopology(Topology):
         
         all_windows = window_sizes(self.macro_mol.prist_mol_file)
 
-        if all_windows is None or len(all_windows) <= self.n_windows:          
+        if all_windows is None:          
             return None
         
         return sorted(all_windows, reverse=True)[:self.n_windows]
