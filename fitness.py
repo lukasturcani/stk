@@ -2,6 +2,7 @@ import numpy as np
 import rdkit.Chem as chem
 import itertools as it
 import copy
+from scipy.stats import logistic
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
@@ -88,7 +89,11 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
     target_window_area = np.square(target_size)
     window_area = np.square(max(macro_mol.topology.windows))
     window_area_diff = abs(target_window_area - window_area)
-            
+    
+    energy_per_bond = macro_mol.energy / macro_mol.topology.bonds_made
+    energy_per_bond = logistic.cdf(0.05*energy_per_bond)        
+        
+        
     fitness_value = np.array([
                              cavity_diff, 
                              window_area_diff,                                                          
@@ -152,7 +157,7 @@ def cage_target(cage, target_mol_file, *, macromodel_path,
             
     # If the size of the window is too small for the target molecule to
     # enter the cage return the minimum fitness value.
-    if max(cage.windows) < min_window_size:
+    if max(cage.topology.windows) < min_window_size:
         return 1
     
     # The first time running the fitness function create an instance
