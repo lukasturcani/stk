@@ -3,6 +3,7 @@ import rdkit.Chem as chem
 import itertools as it
 import copy
 from scipy.stats import logistic
+import os
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
@@ -67,6 +68,106 @@ def random_fitness(macro_mol):
     return np.random.randint(1,10)
 
 def cage(macro_mol, target_size, coeffs=None, exponents=None):
+    """
+    Calculates the fitness of a cage.
+    
+    The fitness function has the form
+        
+        (1) fitness = A*(var1^a) + B(var2^b) + C(var3^c) + D(var4^d).
+        
+    Where var1 to var4 signify parameters of the cage which factor into
+    fitness. These parameters are calculated by the fitness function and
+    placed in variables, for example:
+        
+        1) `cavity_diff` - the difference between the cage's cavity and
+           the desired cavity size
+        2) `window_area_diff` - the difference between the size of the 
+           window of the cage and the size required to allow the target
+           to enter the cavity
+        3) `asymmetry` - sum of the difference between the size of of
+           windows of the same type
+        4) `energy_per_bond` - the energy of the cage divided by the 
+           number of bonds for during assembly. This is a measure of the
+           stability or strain of a cage.
+    
+    The `coeffs` parameter has the form
+    
+        np.array([1,2,3,4]),
+
+    where 1, 2, 3 and 4 correspond to the desired values of A, B, C and 
+    D in equation (1). Equally the `exponents` parameter also has the
+    form
+
+        np.array([5,6,7,8]),
+    
+    where 5, 6, 7 and 8 correspond to the values of a, b, c and d in
+    equation (1).
+    
+    Assume that for a given GA run, it is not worthwhile factoring in 
+    the `window_area_diff` parameter. This may be because cages which 
+    form around the target (templating) are also to be considered. In
+    this case the `coeffs` parameter passed to the function would be:
+
+        np.array([1,0,1,1])
+        
+    In this way the contribution of that parameter to the fitness will
+    always be 0. Note that you may also want to set the corresponding 
+    exponent to 0 as well. This may lead to a faster calculation.
+    
+    The parameters (var1 to var4) do not correspond to the values of the 
+    variables 1-4 (`cavity_diff` etc.) directly. The variables are 
+    first passed through a function to keep the values of var1 to var4 
+    between 0 and 1. Consider that `cavity_diff` due to being measured 
+    in unit ``alpha`` has an average value of 9000 while the average
+    value of `energy_per_bond` in unit ``beta`` will have an average of
+    0.0005. The contributions of these two variables to the fitness 
+    function would not be the same unless some form normalization is 
+    used. The goal is to manipulate the relative contributions with the
+    coeffs A, B, C and D and exponents a, b, c and d. Not to play play 
+    around with units.
+    
+    Because of this the variables are passed through the sigmoid 
+    function. In cases where the variable is guaranteed to be positive
+    1 is subtracted from the returned value followed by multiplication
+    by 2. This keeps the possible values of the variable between 0 and 
+    1.
+    
+    The values of the variables are also saved to a file. This is allows
+    the user to see what kinds of values they are getting and allows
+    parametrizing the sigmoid function so that its spread is ``good``.
+    For example if `cavity_diff` hold values such as 9000 almost all
+    values after scaling by the sigmoid function will be 1. To prevent
+    this `cavity_diff` would be multiplied by some small constant before
+    being passed to the sigmoid function.
+    
+    Parameters
+    ----------
+    macro_mol : Cage
+        The cage whose fitness is to be calculated.
+        
+    target_size : float
+        The desried size of the cage's pore.
+        
+    coeffs : numpy.array (default = None)
+    
+    exponents : numpy.array (default = None)
+        
+    Modfies
+    -------
+    fitness_measures.txt
+        The function creates a this file in the ``output`` folder. The
+        file holds the values of the variables `cavity_diff`, 
+        `window_area_diff`, `asymmetry`, `energy_per_bond` for all cages
+        generated during the GA run. It also holds the values after
+        scaling by the sigmoid function.
+    
+    Returns
+    -------
+    float
+        The fitness of `macro_mol`.
+
+    """
+    
     if macro_mol.fitness:
         print('Skipping {0}'.format(macro_mol.prist_mol_file))
         return macro_mol.fitness
@@ -81,30 +182,46 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
         exponents = np.array([1,1,1,1])
 
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
-    cavity_diff = logistic.cdf(cavity_diff) - 0.5
+    s_cavity_diff = 2*(logistic.cdf(cavity_diff) - 0.5)
 
     target_window_area = np.square(target_size)
     window_area = np.square(max(macro_mol.topology.windows))
     window_area_diff = abs(target_window_area - window_area)
-    window_area_diff = logistic.cdf(window_area_diff) - 0.5     
-        
-    asymmetry  = (logistic.cdf(
-                       macro_mol.topology.window_difference(500)) - 0.5)
+    s_window_area_diff = 2*(logistic.cdf(window_area_diff) - 0.5)     
+      
+    asymmetry = macro_mol.topology.window_difference(500)
+    s_asymmetry  = 2*(logistic.cdf(asymmetry) - 0.5)
     
     energy_per_bond = macro_mol.energy / macro_mol.topology.bonds_made
-    energy_per_bond = logistic.cdf(0.05*energy_per_bond)
+    s_energy_per_bond = logistic.cdf(0.05*energy_per_bond)
+
+
+    file_name = os.path.join(os.getcwd().split('output')[0], 
+                             'output', 'fitness_measures.txt')
+    with open(file_name, 'a') as f: 
+        f.write('\n')
+        f.write('unscaled {0} {1} {2} {3}\n'.format(cavity_diff, 
+                                                    window_area_diff,
+                                                    asymmetry,
+                                                    energy_per_bond))
+        f.write('scaled {0} {1} {2} {3}\n'.format(s_cavity_diff, 
+                                                  s_window_area_diff,
+                                                  s_asymmetry,
+                                                  s_energy_per_bond))
+
 
     fitness_value = np.array([
-                             cavity_diff, 
-                             window_area_diff,                                                          
-                             asymmetry,
-                             energy_per_bond
+                             s_cavity_diff, 
+                             s_window_area_diff,                                                          
+                             s_asymmetry,
+                             s_energy_per_bond
                              ])
     
     fitness_value = np.power(fitness_value, exponents)
     fitness_value = np.multiply(fitness_value, coeffs)    
 
-    return 1/np.sum(fitness_value)   
+    sigmoid_sum = np.sum(fitness_value) + 1
+    return 1/sigmoid_sum + 1
     
 def cage_target(cage, target_mol_file, *, macromodel_path, 
                 rotate=False, min_window_size=0):
