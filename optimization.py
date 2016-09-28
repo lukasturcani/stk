@@ -426,6 +426,8 @@ def _license_found(macro_mol, bmin_output):
     if 'Could not check out a license for mmlibs' in bmin_output:
         return False
     
+    print(bmin_output)    
+    
     # To check if the log file mentions a missing license file open the
     # the log file and scan for the apporpriate string.
     log_file_path = macro_mol.prist_mol_file.replace('mol', 'log')
