@@ -405,15 +405,17 @@ class Topology:
     for dealing with any cage molecule. See the documenation of 
     ``CageTopology`` for more details.
     
-    The new class will only need to have four class attributes added. A
-    list called `vertices`, a list called `edges`, an attribute called
-    `n_windows` which holds the number of windows the cage topology has
-    and `n_window_types` which holds the number of different window
-    types. For example, if `n_window_types` is 2 then the topology will
-    have two kinds of windows, each with a different expected size even
-    in a perfectly symmetrical case. Windows of the same type are
-    expected to be of the same size.
-    
+    The new class will only need to have five class attributes added:
+        1) a list called `vertices` 
+        2) a list called `edges`
+        3) `n_windows` which holds the number of windows the cage 
+           topology has
+        4) `n_window_types` which holds the number of different window
+           types. For example, if `n_window_types` is 2 then the 
+           topology will have two kinds of windows, each with a 
+           different expected size even in a perfectly symmetrical case. 
+           Windows of the same type are expected to be of the same size.
+        
     The `vertices` list holds instances of the class ``Vertex``. Each
     instance represents a vertex of a cage and needs to be initialized
     with the coordinates of that vertex. Vertices of a cage are where
@@ -437,6 +439,11 @@ class Topology:
         gives easy access to the macromolecule's attributes to the 
         ``Topology``instance.
         
+    bonds_made : int
+        The number of bonds created during assembly. This should be
+        incremened for each new bond made during assembly. Used in some
+        fitness functions.
+    
     paired : set of ints
         This attribute is created and used during assembly by some pair
         up functions. Not all topolgies will need to do this and as a 
@@ -458,6 +465,7 @@ class Topology:
     
     def __init__(self, macro_mol):
         self.macro_mol = macro_mol
+        self.bonds_made = 0         
         
     def build(self):
         """
@@ -681,7 +689,8 @@ class Topology:
                 
                 bond_type = self.determine_bond_type(atom_id, partner)
                 # Add the bond.                
-                editable_mol.AddBond(atom_id, partner, bond_type)   
+                editable_mol.AddBond(atom_id, partner, bond_type)
+                self.bonds_made += 1
                 
         self.macro_mol.heavy_mol = editable_mol.GetMol()
 
@@ -1063,7 +1072,7 @@ class CageTopology(Topology):
     pair_up : function object (default = pair_up_edges_with_vertices)
         This is the function which pairs up molecules placed using the
         ``Vertex`` and ``Edge`` classes. This should be how cage
-        topologies should be defined.
+        topologies should be defined.    
     
     """
     
@@ -1209,7 +1218,7 @@ class FourPlusSix(CageTopology):
                 itertools.combinations(vertices, 2)]  
     
     n_windows = 4
-    n_window_types = 1
+    n_window_types = 1    
     
 class EightPlusTwelve(CageTopology):
     """
