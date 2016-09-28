@@ -500,13 +500,10 @@ class Population:
         
         new_gen = Population(self.ga_tools)
         counter = Counter()
-        print('in gen next gen -1', len(self))
-        print('in gen next gen 0', len(list(self.select('generational'))))
         for member in self.select('generational'):
             counter.update([member])
             new_gen.add_members([member])
             if len(new_gen) == pop_size:
-                print('in gen next gen',len(new_gen), pop_size)
                 break
         for member in self:
             if member not in counter.keys():
