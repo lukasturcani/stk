@@ -75,29 +75,30 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
         return 1
 
     if coeffs is None:
-        coeffs = np.array([50,1,1])
+        coeffs = np.array([1,1,1,1])
         
     if exponents is None:
-        exponents = np.array([1,1,1])
-
-    if target_size <= 10:
-        coeffs[0] = 5
-        exponents[0] = 2        
+        exponents = np.array([1,1,1,1])
 
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
+    cavity_diff = logistic.cdf(cavity_diff) - 0.5
 
     target_window_area = np.square(target_size)
     window_area = np.square(max(macro_mol.topology.windows))
     window_area_diff = abs(target_window_area - window_area)
+    window_area_diff = logistic.cdf(window_area_diff) - 0.5     
+        
+    asymmetry  = (logistic.cdf(
+                       macro_mol.topology.window_difference(500)) - 0.5)
     
     energy_per_bond = macro_mol.energy / macro_mol.topology.bonds_made
-    energy_per_bond = logistic.cdf(0.05*energy_per_bond)        
-        
-        
+    energy_per_bond = logistic.cdf(0.05*energy_per_bond)
+
     fitness_value = np.array([
                              cavity_diff, 
                              window_area_diff,                                                          
-                             macro_mol.topology.window_difference(500)
+                             asymmetry,
+                             energy_per_bond
                              ])
     
     fitness_value = np.power(fitness_value, exponents)
