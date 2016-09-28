@@ -632,8 +632,39 @@ class Population:
         
         with open(file_name, 'wb') as dump_file:    
             pickle.dump(self, dump_file)        
+
+    def progress_update(self):
+        """
+        Updates the values in the ``GAProgress`` instance.
         
+        The ``GAProgress`` instance is held by the attribute
+        `ga_tools.ga_progress`. It keeps track of historical fitness
+        values of the population. This is necessary when plotting the
+        evolutionary progress plot.
+        
+        This function just delegates the call to the `update` method in
+        the ``GAProgress`` class.
+        
+        Modifies
+        --------
+        ga_tools.ga_progress : GAProgress
+            See documentation of `update` in GAProgess class.
+        
+        """
+        
+        self.ga_tools.ga_progress.update(self)
+
+    def plot_epp(self, plot_name):
+        """
+        Plots the evolutionary progress plot of the population.
+
+        This function delegates the call to `epp` in ``GAProgress``.
+        See documentation there for more details.        
+        
+        """
      
+        self.ga_tools.ga_progress.epp(plot_name)
+         
     def __iter__(self):
         """
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.        

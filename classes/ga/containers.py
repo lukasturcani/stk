@@ -1,3 +1,5 @@
+from .ga_progress import GAProgress
+
 class FunctionData:
     """
     Stores information about functions and their parameters.
@@ -58,7 +60,7 @@ class GATools:
     """
     
     __slots__ = ['selection', 'mating', 'mutation', 
-                 'optimization', 'fitness', 'ga_input']    
+                 'optimization', 'fitness', 'ga_input', 'ga_progress']    
     
     def __init__(self, selection, mating, 
                  mutation, optimization, fitness):
@@ -67,3 +69,4 @@ class GATools:
         self.mutation = mutation
         self.optimization = optimization
         self.fitness = fitness
+        self.ga_progress = GAProgress()
