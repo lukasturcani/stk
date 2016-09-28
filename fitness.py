@@ -223,7 +223,7 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
     sigmoid_sum = np.sum(fitness_value) + 1
     return 1/sigmoid_sum + 1
     
-def cage_target(cage, target_mol_file, *, macromodel_path, 
+def cage_target(cage, target_mol_file, target_size, *, macromodel_path, 
                 rotate=False, min_window_size=0):
     """
     Calculates the fitness of a cage / target complex.
@@ -246,6 +246,10 @@ def cage_target(cage, target_mol_file, *, macromodel_path,
     target_mol_file : str
         The full path of the .mol file hodling the target molecule
         placed inside the cage.
+        
+    target_size : float
+        The minimum size which the cage cavity needs to be in order to
+        encapsulate the target.
         
     min_window_size : float (default = 0)
         The smallest windows size allowing the target to enter the cage.
@@ -276,6 +280,11 @@ def cage_target(cage, target_mol_file, *, macromodel_path,
     # If the size of the window is too small for the target molecule to
     # enter the cage return the minimum fitness value.
     if max(cage.topology.windows) < min_window_size:
+        return 1
+        
+    # If the size of the cage cavity is too small for the target, return
+    # the minimum fitness value.
+    if cage.topology.cavity_size() < target_size:
         return 1
     
     # The first time running the fitness function create an instance
