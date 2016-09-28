@@ -1119,6 +1119,7 @@ class CageTopology(Topology):
             The size of the cage cavity.        
         
         """
+        
         center_of_mass = self.macro_mol.center_of_mass('prist')
         min_dist = min((euclidean(coord, center_of_mass) -
         atom_vdw_radii[self.macro_mol.atom_symbol('prist', atom_id)]) 
