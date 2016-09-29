@@ -2234,8 +2234,8 @@ class MacroMolecule(metaclass=CachedMacroMol):
             mass = rdkit_mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
             center = np.add(center, np.multiply(mass, coord))
-        
-        return np.divide(coord, total_mass)
+
+        return np.divide(center, total_mass)
 
     def shift(self, mol_type, shift):
         """
