@@ -162,5 +162,3 @@ kill_macromodel()
 pop.progress_update()
 pop.plot_epp(os.path.join(root_dir, 'epp.png'))
 
-
-
