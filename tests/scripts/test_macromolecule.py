@@ -355,12 +355,28 @@ def test_center_of_mass():
     
     """
     
-    assert np.allclose(mol.center_of_mass('prist'), 
-                    [ 0.00033407, -0.00164896,  0.03560446],
-                    atol=1e-3)
-    assert np.allclose(mol.center_of_mass('heavy'), 
-                [ -6.00447081e-05,  -2.57375917e-02,   1.74293007e-02],
-                atol=1e-3)
+    # Calculate the center of mass.
+    coord_sum = 0
+    total_mass = 0
+    for atom_id, coord in mol.all_atom_coords('prist'):
+        atom_mass = mol.prist_mol.GetAtomWithIdx(atom_id).GetMass()
+        total_mass += atom_mass
+        scaled_coord = np.multiply(atom_mass, coord)
+        coord_sum = np.add(scaled_coord, coord_sum)
+
+    com = np.divide(coord_sum, total_mass)
+    assert np.allclose(mol.center_of_mass('prist'), com, atol=1e-6)
+
+    coord_sum = 0
+    total_mass = 0
+    for atom_id, coord in mol.all_atom_coords('heavy'):
+        atom_mass = mol.heavy_mol.GetAtomWithIdx(atom_id).GetMass()
+        total_mass += atom_mass
+        scaled_coord = np.multiply(atom_mass, coord)
+        coord_sum = np.add(scaled_coord, coord_sum)
+
+    com = np.divide(coord_sum, total_mass)
+    assert np.allclose(mol.center_of_mass('heavy'), com, atol=1e-6)
 
 def test_shift():
     """
