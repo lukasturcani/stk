@@ -20,6 +20,49 @@ def calc_fitness(func_data, population):
     `fitness` attribute of a population member happens here, not by the
     fitness function.    
     
+    Extending MMEA: Adding fitness functions
+    ----------------------------------------
+    To add a new fitness function simply write it as a function in this
+    module. It will need to take the ``MacroMolecule`` instance as its
+    first argument. 
+    
+    Some fitness functions will need to have certain internal values 
+    normalized. In this section, the ``cage`` fitness function is used
+    as an example.
+    
+    The cage fitness function has the form
+    
+        (1) fitness = A*(var1^a) + B(var2^b) + C(var3^c) + D(var4^d).
+        
+    Here var1 to var4 represent the parameters of a cage which factor
+    into its fitness. If raw values of these parameters are used, due
+    to different units and naturally different orders of magnitude one
+    parameter may have an undue influence on the fitness only because
+    of its units. The goal is for fitness function contributions to be
+    determined soley by the coeffiecients A to D and exponents a to d.
+    
+    In order to do this the average value of var1 throughout the entire
+    population is calculated first and then used as a scaling factor.
+    The variables in the fitness function therefore have the form
+    
+        (2) var = var_ind / <var>,
+        
+    where var can be any of var1 to var4 in equation (1), var_ind is the
+    variable of for that individual and <var> is the average of that 
+    variable throughout the population.
+    
+    In order to calculate the fitness in this way the fitness function
+    needs to be applied twice to each member of the population. The
+    first loop calculates var_ind and <var> and the second loop 
+    calculates var. See the implementation.
+    
+    Fitness functions which require this scaling procedure will need to
+    have a keyword argument called `means` which is default initialized
+    to ``None``. In order to make use of this they will also have to
+    have the general form of equation (1). Nothing else is reqiured
+    but they should allow the user to supply array holding the c
+    oefficients and exponents. See the implementation of ``cage``.
+    
     Parameters
     ----------
     func_data : FunctionData
@@ -39,8 +82,15 @@ def calc_fitness(func_data, population):
     func = globals()[func_data.name]
     
     if 'means' in signature(func).parameters.keys():
-        var_sum = np.sum(func(ind, **func_data.params) for ind in 
-                                                        population)
+
+        var_sum = 0
+        for ind in population:
+            try:
+                unscaled = func(ind, **func_data.params)
+            except:
+                unscaled = 0
+            var_sum = np.add(unscaled, var_sum)
+
         var_avg = np.divide(var_sum, len(population))
 
     # Apply the function to every member of the population.
@@ -112,41 +162,15 @@ def cage(macro_mol, target_size,
     
     Assume that for a given GA run, it is not worthwhile factoring in 
     the `window_area_diff` parameter. This may be because cages which 
-    form around the target (templating) are also to be considered. In
-    this case the `coeffs` parameter passed to the function would be:
+    form via templating are also to be considered. In this case the 
+    `coeffs` parameter passed to the function would be:
 
         np.array([1,0,1,1])
         
     In this way the contribution of that parameter to the fitness will
     always be 0. Note that you may also want to set the corresponding 
     exponent to 0 as well. This may lead to a faster calculation.
-    
-    The parameters (var1 to var4) do not correspond to the values of the 
-    variables 1-4 (`cavity_diff` etc.) directly. The variables are 
-    first passed through a function to keep the values of var1 to var4 
-    between 0 and 1. Consider that `cavity_diff` due to being measured 
-    in unit ``alpha`` has an average value of 9000 while the average
-    value of `energy_per_bond` in unit ``beta`` will have an average of
-    0.0005. The contributions of these two variables to the fitness 
-    function would not be the same unless some form normalization is 
-    used. The goal is to manipulate the relative contributions with the
-    coeffs A, B, C and D and exponents a, b, c and d. Not to play play 
-    around with units.
-    
-    Because of this the variables are passed through the sigmoid 
-    function. In cases where the variable is guaranteed to be positive
-    1 is subtracted from the returned value followed by multiplication
-    by 2. This keeps the possible values of the variable between 0 and 
-    1.
-    
-    The values of the variables are also saved to a file. This is allows
-    the user to see what kinds of values they are getting and allows
-    parametrizing the sigmoid function so that its spread is ``good``.
-    For example if `cavity_diff` hold values such as 9000 almost all
-    values after scaling by the sigmoid function will be 1. To prevent
-    this `cavity_diff` would be multiplied by some small constant before
-    being passed to the sigmoid function.
-    
+  
     Parameters
     ----------
     macro_mol : Cage
@@ -156,22 +180,24 @@ def cage(macro_mol, target_size,
         The desried size of the cage's pore.
         
     coeffs : numpy.array (default = None)
-    
-    exponents : numpy.array (default = None)
+        An array holding the coeffients A to N in equation (1).
         
-    Modfies
-    -------
-    fitness_measures.txt
-        The function creates a this file in the ``output`` folder. The
-        file holds the values of the variables `cavity_diff`, 
-        `window_area_diff`, `asymmetry`, `energy_per_bond` for all cages
-        generated during the GA run. It also holds the values after
-        scaling by the sigmoid function.
+    exponents : numpy.array (default = None)
+        An array holding the exponents a to n in equation (1).
+        
+    means : numpy.array (default = None)
+        A numpy array holding the mean values of var1 to varx over the
+        populatoin. Used in the scaling procedure decribed in 
+        ``calc_fitnes``.
     
     Returns
     -------
     float
         The fitness of `macro_mol`.
+        
+    numpy.array
+        A numpy array holding values of var1 to varx. This is returned
+        during the scaling procedure described in ``calc_fitness``.
 
     """
     
@@ -182,7 +208,7 @@ def cage(macro_mol, target_size,
     if macro_mol.topology.windows is None:
         return 1
 
-    if means:
+    if means is not None:
         if coeffs is None:
             coeffs = np.array([1,1,1,1])
             
