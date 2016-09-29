@@ -187,8 +187,8 @@ class Population:
                         for x in range(size))
         return cls(*cage_gen, ga_tools)
 
-    @classmethod
-    def load(cls, file_name):
+    @staticmethod
+    def load(file_name):
         """
         Initializes a Population from one dumped to a file with pickle.
         

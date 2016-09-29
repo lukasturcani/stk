@@ -7,7 +7,7 @@ import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
 from collections import namedtuple
-import types
+import pickle
 
 from ..convenience_functions import (bond_dict, flatten, periodic_table, 
                                      normalize_vector, rotation_matrix,
@@ -1813,6 +1813,49 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
         self.fitness = False
+        
+        # Dump the molecule in case it causes an issue later on.
+        self.dump(self.prist_mol_file.replace('.mol', '.dmp'))
+
+    @staticmethod
+    def load(file_name):
+        """
+        Initializes a MacroMolecule from one dumped to a file.
+        
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file holding the dumped molecule.
+            
+        Returns
+        -------
+        MacroMolecule
+            The macromolecule stored in the dump file.
+            
+        """
+        
+        with open(file_name, 'rb') as dump_file:
+            return pickle.load(dump_file)
+        
+    def dump(self, file_name):
+        """
+        Write the MacroMolecule object to a file.
+        
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file to which the macromolecule should
+            be written.
+            
+        Returns
+        -------
+        None : NoneType
+
+        """
+        
+        with open(file_name, 'wb') as dump_file:    
+            pickle.dump(self, dump_file)          
+
 
     def update_cache(self):
         cls = type(self)
