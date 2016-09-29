@@ -4,6 +4,7 @@ import itertools as it
 import copy
 from scipy.stats import logistic
 import os
+from inspect import signature
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
@@ -36,11 +37,17 @@ def calc_fitness(func_data, population):
 
     # Get the fitness function object.
     func = globals()[func_data.name]
+    
+    if 'means' in signature(func).parameters.keys():
+        var_sum = np.sum(func(ind, **func_data.params) for ind in 
+                                                        population)
+        var_avg = np.divide(var_sum, len(population))
 
     # Apply the function to every member of the population.
     for macro_mol in population:
         try: 
-            macro_mol.fitness = func(macro_mol, **func_data.params)
+            macro_mol.fitness = func(macro_mol, means=var_avg,
+                                     **func_data.params)
             
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
@@ -66,7 +73,8 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
-def cage(macro_mol, target_size, coeffs=None, exponents=None):
+def cage(macro_mol, target_size, 
+         coeffs=None, exponents=None, means=None):
     """
     Calculates the fitness of a cage.
     
@@ -174,53 +182,38 @@ def cage(macro_mol, target_size, coeffs=None, exponents=None):
     if macro_mol.topology.windows is None:
         return 1
 
-    if coeffs is None:
-        coeffs = np.array([1,1,1,1])
+    if means:
+        if coeffs is None:
+            coeffs = np.array([1,1,1,1])
+            
+        if exponents is None:
+            exponents = np.array([1,1,1,1])  
         
-    if exponents is None:
-        exponents = np.array([1,1,1,1])
+        scaled = np.divide(macro_mol.unscaled_fitness_vars, means)
+        delattr(macro_mol, 'unscaled_fitness_vars')      
+        fitness_value = np.power(scaled, exponents)
+        fitness_value = np.multiply(fitness_value, coeffs)    
+        fitness_value = np.sum(fitness_value) + 1
+        return 1/fitness_value + 1
 
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
-    s_cavity_diff = 2*(logistic.cdf(cavity_diff) - 0.5)
 
     target_window_area = np.square(target_size)
     window_area = np.square(max(macro_mol.topology.windows))
-    window_area_diff = abs(target_window_area - window_area)
-    s_window_area_diff = 2*(logistic.cdf(window_area_diff) - 0.5)     
+    window_area_diff = abs(target_window_area - window_area)    
       
     asymmetry = macro_mol.topology.window_difference(500)
-    s_asymmetry  = 2*(logistic.cdf(asymmetry) - 0.5)
     
     energy_per_bond = macro_mol.energy / macro_mol.topology.bonds_made
-    s_energy_per_bond = logistic.cdf(0.05*energy_per_bond)
 
-
-    file_name = os.path.join(os.getcwd().split('output')[0], 
-                             'output', 'fitness_measures.txt')
-    with open(file_name, 'a') as f: 
-        f.write('\n')
-        f.write('unscaled {0} {1} {2} {3}\n'.format(cavity_diff, 
-                                                    window_area_diff,
-                                                    asymmetry,
-                                                    energy_per_bond))
-        f.write('scaled {0} {1} {2} {3}\n'.format(s_cavity_diff, 
-                                                  s_window_area_diff,
-                                                  s_asymmetry,
-                                                  s_energy_per_bond))
-
-
-    fitness_value = np.array([
-                             s_cavity_diff, 
-                             s_window_area_diff,                                                          
-                             s_asymmetry,
-                             s_energy_per_bond
-                             ])
-    
-    fitness_value = np.power(fitness_value, exponents)
-    fitness_value = np.multiply(fitness_value, coeffs)    
-
-    sigmoid_sum = np.sum(fitness_value) + 1
-    return 1/sigmoid_sum + 1
+    unscaled =  np.array([
+                     cavity_diff, 
+                     window_area_diff,                                                          
+                     asymmetry,
+                     energy_per_bond
+                     ])
+    macro_mol.unscaled_fitness_vars = unscaled
+    return unscaled
     
 def cage_target(cage, target_mol_file, target_size, *, macromodel_path, 
                 rotate=False, min_window_size=0):
