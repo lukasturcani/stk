@@ -68,6 +68,12 @@ class MacroMolError(Exception):
     """
     
     def __init__(self, ex, macro_mol, notes):
+        # If a macro_mol caused a ``MacroMolError`` it should not be
+        # used by the GA. To ensure it is skipped by the optimization
+        # and fitness functions, set these attributes of `macro_mol`.
+        macro_mol.optimized = True
+        macro_mol.fitness = 1
+        
         self.ex = ex
         self.macro_mol = macro_mol
         self.notes = notes

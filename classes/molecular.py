@@ -1770,12 +1770,11 @@ class MacroMolecule(metaclass=CachedMacroMol):
                                  topology_args)
             
         except Exception as ex:
-            dummy = types.SimpleNamespace()
-            dummy.building_blocks = building_blocks
-            dummy.topology = topology
-            dummy.prist_mol_file = prist_mol_file
-            dummy.topology_args = topology_args
-            MacroMolError(ex, dummy, 'During initialization.')
+            self.building_blocks = building_blocks
+            self.topology = topology
+            self.prist_mol_file = prist_mol_file
+            self.topology_args = topology_args
+            MacroMolError(ex, self, 'During initialization.')
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
