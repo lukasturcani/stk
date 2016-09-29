@@ -374,10 +374,12 @@ def macromodel_opt(macro_mol, force_field='16',
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
                '- {0}'.format(macro_mol.prist_mol_file)))
         
-        # If OPLS_2005 has been tried already - raise an exception.
+        # If OPLS_2005 has been tried already - record an exception.
         if force_field=='14':
-            raise MacroMolError(Exception(), macro_mol, 
-                                'Both force fields failed.')
+            MacroMolError(Exception(), macro_mol, 
+                          'Both force fields failed.')
+            return macro_mol
+            
         # If OPLSE_2005 has not been tried - try it.
         return macromodel_opt(macro_mol, force_field='14', 
                               macromodel_path=macromodel_path,
