@@ -216,10 +216,15 @@ def cage(macro_mol, target_size,
             exponents = np.array([1,1,1,1])  
         
         scaled = np.divide(macro_mol.unscaled_fitness_vars, means)
+        # Energy per bond can be anything from -inf to inf. Use
+        # exponential function to set its values between 0 and inf.
+        scaled[3] = np.exp(scaled[3])
+        print(scaled)
         delattr(macro_mol, 'unscaled_fitness_vars')      
         fitness_value = np.power(scaled, exponents)
         fitness_value = np.multiply(fitness_value, coeffs)    
         fitness_value = np.sum(fitness_value) + 1
+        print(fitness_value)
         return 1/fitness_value + 1
 
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())

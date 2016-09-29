@@ -1180,7 +1180,10 @@ class CageTopology(Topology):
         for i in sorted(split, reverse=True):
             clusters.append(og[i:])            
             og = og[:i]
-    
+
+        if self.n_window_types == 1:
+            clusters.append(og)
+
         # After this sum the differences in each group and then sum the
         # group totals.
         diff_sums = []
