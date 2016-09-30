@@ -4,6 +4,8 @@ from rdkit.Geometry import Point3D
 import numpy as np
 import time
 from contextlib import contextmanager
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os 
 

@@ -1,15 +1,13 @@
 import os
 import shutil
 import sys
-from itertools import islice
 import warnings
-from collections import Counter
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
                       GAInput)
 from .classes.exception import PopulationSizeError
 from .optimization import kill_macromodel
-from .convenience_functions import time_it, plot_counter
+from .convenience_functions import time_it
 
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible
