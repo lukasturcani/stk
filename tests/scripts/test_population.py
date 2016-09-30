@@ -39,7 +39,7 @@ def generate_population(offset=False):
     
 pop_file = os.path.join('data', 'population',
                         'population_test_obj')
-                        
+
 pop = Population.load(pop_file)
 
 def test_init():
