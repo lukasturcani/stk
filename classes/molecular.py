@@ -1791,6 +1791,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
+            raise ex
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
@@ -1816,7 +1817,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         
         # Ask the ``Topology`` instance to assemble/build the cage. This
         # creates the cage's ``.mol`` file all  the building blocks and
-        # linkers joined up. Both the substituted and pristine versions.
+        # linkers joined up. Both the substituted and pristine versions.      
         self.topology.build()
     
 
