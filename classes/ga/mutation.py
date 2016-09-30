@@ -161,9 +161,9 @@ class Mutation:
         
         bb_file = np.random.choice(os.listdir(database))
         bb_file = os.path.join(database, bb_file)
-        bb = BuildingBlock(bb_file)
+        bb = StructUnit3(bb_file)
         lk = next(x for x in cage.building_blocks if 
-                                                isinstance(x, Linker))        
+                                             isinstance(x, StructUnit2))        
         return Cage((bb, lk), type(cage.topology),
             os.path.join(os.getcwd(), self.name.format(self.n_calls)))
 
@@ -199,6 +199,6 @@ class Mutation:
              os.path.join(os.getcwd(), self.name.format(self.n_calls)))
         
 from ..population import Population
-from ..molecular import BuildingBlock, Linker, Cage, Polymer
+from ..molecular import StructUnit3, StructUnit2, Cage, Polymer
 from ..exception import MacroMolError
 from ...convenience_functions import plot_counter

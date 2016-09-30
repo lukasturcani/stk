@@ -1,8 +1,6 @@
 from operator import attrgetter
 import itertools
 import numpy as np
-from inspect import signature
-from functools import wraps
  
 # Note that import of the Population class occurs at the end of the
 # file. There is a good reason for this.

@@ -5,8 +5,8 @@ import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 
-from ...classes import (MacroMolecule, FourPlusSix, BuildingBlock, 
-                        Linker, EightPlusTwelve)
+from ...classes import (MacroMolecule, FourPlusSix, StructUnit3, 
+                        StructUnit2, EightPlusTwelve)
 
 from ...convenience_functions import periodic_table
 
@@ -18,8 +18,8 @@ bb_file = os.path.join('data', 'macromolecule',
 lk_file = os.path.join('data', 'macromolecule', 
                        'macromolecule_lk_aldehyde_1.mol')
 
-bb = BuildingBlock(bb_file)
-lk = Linker(lk_file)    
+bb = StructUnit3(bb_file)
+lk = StructUnit2(lk_file)    
 building_blocks = (bb, lk)
 mol = MacroMolecule(building_blocks, FourPlusSix,
                     'delete_this_1.mol')
@@ -54,7 +54,7 @@ def test_caching():
     lk2_file = os.path.join('data', 'macromolecule',
                             'macromolecule_lk_aldehyde_2.mol')
                                         
-    lk2 = Linker(lk2_file)
+    lk2 = StructUnit2(lk2_file)
     building_blocks2 = (bb, lk2)
     mol2 = MacroMolecule(building_blocks2, FourPlusSix, 
                           'delete_this_5.mol')
