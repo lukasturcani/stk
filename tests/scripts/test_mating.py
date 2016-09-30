@@ -14,11 +14,12 @@ def test_bb_lk_exchange():
         mator = Mating(bb_lk_exchange, 1)
         pop1.ga_tools.mating = mator
 
+        
         pop2 = pop1.gen_offspring()
 
         for mol3 in pop2:
             assert mol3 not in pop1
-        print(pop2)
+
         all_topologies = {type(x.topology) for x in pop2}
         assert EightPlusTwelve in all_topologies and FourPlusSix in all_topologies
         
