@@ -210,22 +210,31 @@ def cage(macro_mol, target_size,
 
     if means is not None:
         if coeffs is None:
-            coeffs = np.array([1,1,1,1])
+            coeffs = np.array([1,1,1,1,0.2])
             
         if exponents is None:
-            exponents = np.array([1,1,1,1])  
+            exponents = np.array([1,1,1,1,1])  
+        
+        # Make sure you are not dividing by 0.
+        for i, x in enumerate(means):
+            if x == 0:
+                means[i] = 1
         
         scaled = np.divide(macro_mol.unscaled_fitness_vars, means)
-        # Energy per bond can be anything from -inf to inf. Use
-        # exponential function to set its values between 0 and inf.
-        scaled[3] = np.exp(scaled[3])
-        print(scaled)
+        # Delete the attribute once is no longer necessary.
         delattr(macro_mol, 'unscaled_fitness_vars')      
-        fitness_value = np.power(scaled, exponents)
-        fitness_value = np.multiply(fitness_value, coeffs)    
-        fitness_value = np.sum(fitness_value) + 1
-        print(fitness_value)
-        return 1/fitness_value + 1
+        fitness_vars = np.power(scaled, exponents)
+        fitness_vars = np.multiply(fitness_vars, coeffs)    
+        penalty_term = np.sum(fitness_vars[:-1])
+        penalty_term =  np.divide(1,penalty_term)
+        if penalty_term > 1e101:
+            penalty_term = 1e101
+        
+        # Carrots and sticks, where the previous fitness parameters were
+        # the sticks.
+        carrot_term = fitness_vars[-1]
+        
+        return penalty_term + carrot_term
 
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
 
@@ -236,12 +245,19 @@ def cage(macro_mol, target_size,
     asymmetry = macro_mol.topology.window_difference(500)
     
     energy_per_bond = macro_mol.energy / macro_mol.topology.bonds_made
+    if energy_per_bond < 0:
+        neg_eng_per_bond = energy_per_bond
+        pos_eng_per_bond = 0
+    else:
+        neg_eng_per_bond = 0
+        pos_eng_per_bond = energy_per_bond
 
     unscaled =  np.array([
                      cavity_diff, 
                      window_area_diff,                                                          
                      asymmetry,
-                     energy_per_bond
+                     pos_eng_per_bond,
+                     neg_eng_per_bond
                      ])
     macro_mol.unscaled_fitness_vars = unscaled
     return unscaled
