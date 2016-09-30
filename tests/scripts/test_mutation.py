@@ -14,6 +14,7 @@ with open(mol_file, 'rb') as dump_file:
 with open(mol2_file, 'rb') as dump_file:
     mol2 = pickle.load(dump_file)
 
+
 def test_random_mutation_function_selection():
     # This tests if the selection of a mutation function by the Mutation
     # object is working properly.
@@ -26,6 +27,7 @@ def test_random_mutation_function_selection():
 
     # Load the original population
     pop_file = os.path.join('data', 'mutation', 'single_bb_pop')
+
     pop1 = Population.load(pop_file)
     bb_file = next(x.prist_mol_file for x in pop1[0].building_blocks 
                                         if isinstance(x, StructUnit3))
@@ -39,6 +41,8 @@ def test_random_mutation_function_selection():
     new_bb = 0
     for mutant in pop2:
         if type(mutant.topology) != FourPlusSix:
+            print(mutant)
+            print(mutant.topology)
             new_top += 1
         bb = next(x.prist_mol_file for x in mutant.building_blocks if 
                     isinstance(x, StructUnit3))

@@ -113,7 +113,15 @@ def test_write_mol_file():
                               'write_test_prist.mol')
     heavy_name = os.path.join('data','macromolecule', 
                               'write_test_heavy.mol')  
-    
+                
+    from itertools import zip_longest
+    with open(prist_name, 'r') as prist_file:
+        
+        with open(struct_unit.prist_mol_file, 'r') as out_file:
+            for l1, l2 in zip_longest(prist_file, out_file):
+                assert l1 == l2
+   
+   
     with open(prist_name, 'r') as prist_file:
         exp_output_prist = prist_file.read()
     
