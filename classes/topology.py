@@ -511,6 +511,7 @@ class Topology:
         # replaces the heavy atoms with their pristine counterparts / 
         # functional groups.
         self.place_mols()
+#        chem.MolToMolFile(self.macro_mol.heavy_mol, '1heavy.mol')
         self.join_mols()
         self.final_sub()
 
@@ -1196,6 +1197,24 @@ class CageTopology(Topology):
             diff_sums.append(diff_sum / diff_num)
             
         return sum(diff_sums)
+
+class TwoPlusThree(CageTopology):
+    vertices = [Vertex(0,0,50), Vertex(0,0,-50)]
+    edges = [Edge(vertices[0], vertices[1]),
+             Edge(vertices[0], vertices[1]),
+             Edge(vertices[0], vertices[1])]
+             
+    edges[0].coord = np.array([-50,
+                              -10*np.sqrt(3),
+                                0])
+
+    edges[1].coord = np.array([50,
+                              -10*np.sqrt(3),
+                                0])
+
+    edges[2].coord = np.array([0,
+                              10*np.sqrt(3),
+                                0])
 
 class FourPlusSix(CageTopology):
     """
