@@ -81,7 +81,9 @@ def calc_fitness(func_data, population):
     # Get the fitness function object.
     func = globals()[func_data.name]
     
-    if 'means' in signature(func).parameters.keys():
+    use_means = 'means' in signature(func).parameters.keys() 
+    
+    if use_means:
 
         var_sum = 0
         for ind in population:
@@ -95,10 +97,13 @@ def calc_fitness(func_data, population):
 
     # Apply the function to every member of the population.
     for macro_mol in population:
-        try: 
-            macro_mol.fitness = func(macro_mol, means=var_avg,
-                                     **func_data.params)
-            
+        try:
+            if use_means:
+                macro_mol.fitness = func(macro_mol, means=var_avg,
+                                         **func_data.params)
+            else:
+                macro_mol.fitness = func(macro_mol, **func_data.params)
+                
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
             macro_mol.topology.windows = None
