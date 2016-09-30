@@ -138,7 +138,10 @@ def test_random_cage_topology():
     # I have two cages, each cage can make two mutants. This is
     # because there are 2 topologies for each cage available to make
     # a new mutant.        
-    
+    # This assert may sometimes fail because roulette is selected it is
+    # is possible that the same mutant will be created over and over.
+    # This is unlikely so retry and check if its failing consistnently
+    # or not.
     assert len(pop2) == 4
     
     # Check that the correct topologies were substituted.
