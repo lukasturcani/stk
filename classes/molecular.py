@@ -1394,9 +1394,9 @@ class StructUnit(metaclass=Cached):
         repr_ = repr_.replace("class ", "class=")
         return repr_
         
-class BuildingBlock(StructUnit):
+class StructUnit3(StructUnit):
     """
-    Represents the building-blocks* of a cage.
+    Represents building blocks with 3 functional groups.
     
     """
 
@@ -1493,9 +1493,9 @@ class BuildingBlock(StructUnit):
         start = self.heavy_plane_normal()
         return StructUnit._set_heavy_mol_orientation(self, start, end)        
 
-class Linker(StructUnit):
+class StructUnit2(StructUnit):
     """
-    Represents the linkers of a cage.
+    Represents building blocks with 2 functional groups.
     
     """
     

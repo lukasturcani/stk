@@ -1,10 +1,9 @@
 import os
 import pickle
 
-from ...classes import (GATools, Selection, 
-                        FunctionData, BuildingBlock, Mutation)
-from ...classes import  (Linker, FourPlusSix, EightPlusTwelve, 
-                         SixPlusNine, Population)
+from ...classes import (GATools, Selection, FunctionData, StructUnit3, 
+                        Mutation, StructUnit2, FourPlusSix, 
+                        EightPlusTwelve, SixPlusNine, Population)
 
 mol_file = os.path.join('data', 'mutation', 'cage1')
 mol2_file = os.path.join('data', 'mutation', 'cage2')
@@ -29,7 +28,7 @@ def test_random_mutation_function_selection():
     pop_file = os.path.join('data', 'mutation', 'single_bb_pop')
     pop1 = Population.load(pop_file)
     bb_file = next(x.prist_mol_file for x in pop1[0].building_blocks 
-                                        if isinstance(x, BuildingBlock))
+                                        if isinstance(x, StructUnit3))
 
     # Create the mutants.
     pop2 = pop1.gen_mutants()
@@ -42,7 +41,7 @@ def test_random_mutation_function_selection():
         if type(mutant.topology) != FourPlusSix:
             new_top += 1
         bb = next(x.prist_mol_file for x in mutant.building_blocks if 
-                    isinstance(x, BuildingBlock))
+                    isinstance(x, StructUnit3))
         if bb != bb_file:
             new_bb +=1
             
@@ -58,7 +57,7 @@ def test_random_mutation_function_selection():
         if type(mutant.topology) != FourPlusSix:
             new_top += 1
         bb = next(x.prist_mol_file for x in mutant.building_blocks if 
-                    isinstance(x, BuildingBlock))
+                    isinstance(x, StructUnit3))
         if bb != bb_file:
             new_bb +=1
             
@@ -74,7 +73,7 @@ def test_random_mutation_function_selection():
         if type(mutant.topology) != FourPlusSix:
             new_top += 1
         bb = next(x.prist_mol_file for x in mutant.building_blocks if 
-                    isinstance(x, BuildingBlock))
+                    isinstance(x, StructUnit3))
         if bb != bb_file:
             new_bb +=1
             
@@ -103,8 +102,10 @@ def test_random_bb():
         assert mol3 not in pop1
     
     assert len(pop2) == 1
-    bb = next(x for x in pop2[0].building_blocks if isinstance(x, BuildingBlock))
-    lk = next(x for x in pop2[0].building_blocks if isinstance(x, Linker))
+    bb = next(x for x in pop2[0].building_blocks if isinstance(x, 
+                                                          StructUnit3))
+    lk = next(x for x in pop2[0].building_blocks if isinstance(x, 
+                                                          StructUnit2))
     assert bb not in mol2.building_blocks
     assert lk in mol2.building_blocks
 
