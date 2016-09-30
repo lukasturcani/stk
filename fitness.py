@@ -129,10 +129,19 @@ def cage(macro_mol, target_size,
     Calculates the fitness of a cage.
     
     The fitness function has the form
+    
+        (1) fitness = penalty_term + carrot_term
         
-        (1) fitness = A*(var1^a) + B(var2^b) + C(var3^c) + D(var4^d).
+    where
         
-    Where var1 to var4 signify parameters of the cage which factor into
+        (2) penalty_term = 1 / [ A*(var1^a) + B*(var2^b) + C*(var3^c) + 
+                                 D*(var4^d) ],
+                                 
+    and 
+    
+        (3) carrot_term = E*(var5^e).
+        
+    Here var1 to var5 signify parameters of the cage which factor into
     fitness. These parameters are calculated by the fitness function and
     placed in variables, for example:
         
@@ -143,33 +152,51 @@ def cage(macro_mol, target_size,
            to enter the cavity
         3) `asymmetry` - sum of the difference between the size of of
            windows of the same type
-        4) `energy_per_bond` - the energy of the cage divided by the 
-           number of bonds for during assembly. This is a measure of the
-           stability or strain of a cage.
+        4) `neg_eng_per_bond` - the energy of the cage divided by the 
+           number of bonds for during assembly, when the total energy
+           of the cage is < 0. This is a measure of the stability or 
+           strain of a cage.
+        5) Same as 4) but used when total energy of the cage is > 0.
+        
+    The design of the fitness function is as follows. Consider two
+    cages, ``CageA`` and ``CageB``. If the parameters, 1) to 4), in
+    CageA, which signify poor fitness are 10 times that of CageB and the
+    parameter which signifies good fitness, 5), is 10 times less than 
+    CageB, then CageA should have a fitness value 10 times less than 
+    CageB.
+    
+    This is assuming all coefficients and powers are 1. Note that a cage
+    will always have either 4) or 5) at 0. This is because its total 
+    energy will always be either positive or negative.
     
     The `coeffs` parameter has the form
     
-        np.array([1,2,3,4]),
+        np.array([1,2,3,4,5]),
 
-    where 1, 2, 3 and 4 correspond to the desired values of A, B, C and 
-    D in equation (1). Equally the `exponents` parameter also has the
-    form
+    where 1, 2, 3, 4 and 5 correspond to the desired values of A, B, C,  
+    D and E in equation (2). Equally the `exponents` parameter also has 
+    the form
 
-        np.array([5,6,7,8]),
+        np.array([5,6,7,8,9]),
     
-    where 5, 6, 7 and 8 correspond to the values of a, b, c and d in
-    equation (1).
+    where 5, 6, 7, 8 and 9 correspond to the values of a, b, c, d and e
+    in equation (2).
     
     Assume that for a given GA run, it is not worthwhile factoring in 
     the `window_area_diff` parameter. This may be because cages which 
     form via templating are also to be considered. In this case the 
     `coeffs` parameter passed to the function would be:
 
-        np.array([1,0,1,1])
+        np.array([1,0,1,1, 0.25])
         
     In this way the contribution of that parameter to the fitness will
     always be 0. Note that you may also want to set the corresponding 
-    exponent to 0 as well. This may lead to a faster calculation.
+    exponent to 0 as well. This may lead to a faster calculation. Notice
+    that the carrot term has the coeffiecient set to 0.25. This gives
+    it the same weighing as the other terms in the penalty term. The 
+    difference is due to the fact that the penality term's exponents are
+    summed first and then used in 1/x, while the carrot term is not 
+    summed or passed through an inverse function.
   
     Parameters
     ----------
@@ -180,10 +207,10 @@ def cage(macro_mol, target_size,
         The desried size of the cage's pore.
         
     coeffs : numpy.array (default = None)
-        An array holding the coeffients A to N in equation (1).
+        An array holding the coeffients A to N in equation (2).
         
     exponents : numpy.array (default = None)
-        An array holding the exponents a to n in equation (1).
+        An array holding the exponents a to n in equation (2).
         
     means : numpy.array (default = None)
         A numpy array holding the mean values of var1 to varx over the
