@@ -180,14 +180,14 @@ class Mating:
         # building-block*.
         build_block1 = cage1.building_blocks[0]
         # The counterpart to this ``build_block1`` is the 
-        # ``BuildingBlock`` or ``Linker`` of the other cage which can be 
-        # used together with build_block1 to make a new cage. For 
-        # example if build_block1 is a ``BuildingBlock`` instance then
-        # its counter part is the ``Linker`` instance in `cage2`. The
-        # generator below returns the building block instance from cage2
-        # which is not the same type as ``build_block1``. This means
-        # that a ``BuildingBlock`` is paired up with a ``Linker`` and
-        # vice versa.
+        # ``StructUnit3`` or ``StructUnit2`` of the other cage which can 
+        # be used together with build_block1 to make a new cage. For 
+        # example if build_block1 is a ``StructUnit3`` instance then
+        # its counter part is the ``StructUnit2`` instance in `cage2`. 
+        # The generator below returns the building block instance from 
+        # cage2 which is not the same type as ``build_block1``. This 
+        # means that a ``StructUnit3`` is paired up with a 
+        # ``StructUnit2`` and vice versa.
         counterpart1 = next(x for x in cage2.building_blocks if 
                             type(build_block1) != type(x))
         # Same as above but for the other building block.
@@ -215,6 +215,6 @@ class Mating:
         
         
 from ..population import Population
-from ..molecular import BuildingBlock, Linker, Cage, Polymer
+from ..molecular import Cage
 from ..exception import MacroMolError
 from ...convenience_functions import plot_counter

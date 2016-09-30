@@ -6,14 +6,13 @@ import numpy as np
 import itertools
 from collections import deque
 from scipy.spatial.distance import euclidean
-import copy
 
-from .molecular import FGInfo, BuildingBlock, Linker
+from .molecular import FGInfo, StructUnit3, StructUnit2
 from ..pyWindow import window_sizes
 from ..convenience_functions import (flatten, normalize_vector, 
                                      vector_theta, atom_vdw_radii,
                                      rotation_matrix_arbitrary_axis,
-                                     LazyAttr, rotation_matrix)
+                                     LazyAttr)
 
 class Vertex:
     """
@@ -79,7 +78,7 @@ class Vertex:
         
         Parameters
         ----------
-        building_block : BuildingBlock
+        building_block : StructUnit3
             The building-block* molecule to be placed on a vertex.
         
         Modifies
@@ -330,7 +329,7 @@ class Edge:
 
         Parameters
         ----------
-        linker : Linker
+        linker : StructUnit2
             The linker which is to be placed and orientated as described
             in the docstring.
         
@@ -1032,10 +1031,10 @@ class Topology:
         self.macro_mol.heavy_mol = chem.Mol()
         
         lk = next(x for x in self.macro_mol.building_blocks 
-                        if isinstance(x, Linker))
+                        if isinstance(x, StructUnit2))
                             
         bb = next(x for x in self.macro_mol.building_blocks 
-                        if isinstance(x, BuildingBlock))
+                        if isinstance(x, StructUnit3))
                             
         for edge in self.edges:
             self.macro_mol.heavy_mol = chem.CombineMols(
