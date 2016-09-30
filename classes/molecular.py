@@ -1375,6 +1375,22 @@ class StructUnit(metaclass=Cached):
         
         return MacroMolecule.write_mol_file(self, mol_type, path=path)
 
+    @staticmethod
+    def load(file_name):
+        """
+        See `load` documentation in ``MacroMolecule``.
+        
+        """        
+        return MacroMolecule.load(file_name)
+        
+    def dump(self, file_name):
+        """
+        See `write` documentation in ``MacroMolecule``.
+        
+        """
+        
+        return MacroMolecule.dump(self, file_name)
+
     def __eq__(self, other):
         return self.prist_mol_file == other.prist_mol_file
         
@@ -1394,9 +1410,9 @@ class StructUnit(metaclass=Cached):
         repr_ = repr_.replace("class ", "class=")
         return repr_
         
-class BuildingBlock(StructUnit):
+class StructUnit3(StructUnit):
     """
-    Represents the building-blocks* of a cage.
+    Represents building blocks with 3 functional groups.
     
     """
 
@@ -1493,9 +1509,9 @@ class BuildingBlock(StructUnit):
         start = self.heavy_plane_normal()
         return StructUnit._set_heavy_mol_orientation(self, start, end)        
 
-class Linker(StructUnit):
+class StructUnit2(StructUnit):
     """
-    Represents the linkers of a cage.
+    Represents building blocks with 2 functional groups.
     
     """
     
@@ -2234,8 +2250,8 @@ class MacroMolecule(metaclass=CachedMacroMol):
             mass = rdkit_mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
             center = np.add(center, np.multiply(mass, coord))
-        
-        return np.divide(coord, total_mass)
+
+        return np.divide(center, total_mass)
 
     def shift(self, mol_type, shift):
         """
@@ -2341,11 +2357,11 @@ class Cage(MacroMolecule):
         
         bb_file = np.random.choice(os.listdir(bb_db))
         bb_file = os.path.join(bb_db, bb_file)
-        bb = BuildingBlock(bb_file)
+        bb = StructUnit3(bb_file)
         
         lk_file = np.random.choice(os.listdir(lk_db))
         lk_file = os.path.join(lk_db, lk_file)
-        lk = Linker(lk_file)
+        lk = StructUnit2(lk_file)
         
         topology = np.random.choice(topologies)
         
@@ -2353,11 +2369,11 @@ class Cage(MacroMolecule):
 
     @classmethod
     def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
-        bb = BuildingBlock(bb_file)        
+        bb = StructUnit3(bb_file)        
         
         lk_file = np.random.choice(os.listdir(lk_db))
         lk_file = os.path.join(lk_db, lk_file)
-        lk = Linker(lk_file)
+        lk = StructUnit2(lk_file)
         
         topology = np.random.choice(topologies)        
         

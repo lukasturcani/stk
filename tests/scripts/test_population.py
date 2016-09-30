@@ -4,9 +4,9 @@ import shutil
 import os
 
 
-from ...classes import (Population, Cage, GATools, FourPlusSix, Linker,
-                        EightPlusTwelve, SixPlusNine, BuildingBlock,
-                        MacroMolecule)
+from ...classes import (Population, Cage, GATools, FourPlusSix, 
+                        StructUnit2, EightPlusTwelve, SixPlusNine, 
+                        StructUnit3, MacroMolecule)
 
 def generate_population(offset=False):
     """
@@ -39,7 +39,7 @@ def generate_population(offset=False):
     
 pop_file = os.path.join('data', 'population',
                         'population_test_obj')
-                        
+
 pop = Population.load(pop_file)
 
 def test_init():
@@ -102,14 +102,14 @@ def test_init_fixed_bb_cages():
     
     # Check that all the BuildingBlock molecules are the same.
     bb_check = next(b for b in pop[0].building_blocks if 
-                                        isinstance(b, BuildingBlock))
+                                        isinstance(b, StructUnit3))
     lks = [] 
     bbs = []                                   
     for x in pop:
         x_bb = next(b for b in x.building_blocks if 
-                                        isinstance(b, BuildingBlock))
+                                        isinstance(b, StructUnit3))
         x_lk = next(b for b in x.building_blocks if 
-                                        isinstance(b, Linker))
+                                        isinstance(b, StructUnit2))
         lks.append(x_lk)
         bbs.append(x_bb)
         assert x_bb is bb_check
