@@ -5,8 +5,8 @@ import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 
-from ...classes import (MacroMolecule, FourPlusSix, BuildingBlock, 
-                        Linker, EightPlusTwelve)
+from ...classes import (MacroMolecule, FourPlusSix, StructUnit3, 
+                        StructUnit2, EightPlusTwelve)
 
 from ...convenience_functions import periodic_table
 
@@ -18,8 +18,8 @@ bb_file = os.path.join('data', 'macromolecule',
 lk_file = os.path.join('data', 'macromolecule', 
                        'macromolecule_lk_aldehyde_1.mol')
 
-bb = BuildingBlock(bb_file)
-lk = Linker(lk_file)    
+bb = StructUnit3(bb_file)
+lk = StructUnit2(lk_file)    
 building_blocks = (bb, lk)
 mol = MacroMolecule(building_blocks, FourPlusSix,
                     'delete_this_1.mol')
@@ -54,7 +54,7 @@ def test_caching():
     lk2_file = os.path.join('data', 'macromolecule',
                             'macromolecule_lk_aldehyde_2.mol')
                                         
-    lk2 = Linker(lk2_file)
+    lk2 = StructUnit2(lk2_file)
     building_blocks2 = (bb, lk2)
     mol2 = MacroMolecule(building_blocks2, FourPlusSix, 
                           'delete_this_5.mol')
@@ -113,7 +113,15 @@ def test_write_mol_file():
                               'write_test_prist.mol')
     heavy_name = os.path.join('data','macromolecule', 
                               'write_test_heavy.mol')  
-    
+                
+    from itertools import zip_longest
+    with open(prist_name, 'r') as prist_file:
+        
+        with open(struct_unit.prist_mol_file, 'r') as out_file:
+            for l1, l2 in zip_longest(prist_file, out_file):
+                assert l1 == l2
+   
+   
     with open(prist_name, 'r') as prist_file:
         exp_output_prist = prist_file.read()
     
@@ -355,12 +363,28 @@ def test_center_of_mass():
     
     """
     
-    assert np.allclose(mol.center_of_mass('prist'), 
-                    [ 0.00033407, -0.00164896,  0.03560446],
-                    atol=1e-3)
-    assert np.allclose(mol.center_of_mass('heavy'), 
-                [ -6.00447081e-05,  -2.57375917e-02,   1.74293007e-02],
-                atol=1e-3)
+    # Calculate the center of mass.
+    coord_sum = 0
+    total_mass = 0
+    for atom_id, coord in mol.all_atom_coords('prist'):
+        atom_mass = mol.prist_mol.GetAtomWithIdx(atom_id).GetMass()
+        total_mass += atom_mass
+        scaled_coord = np.multiply(atom_mass, coord)
+        coord_sum = np.add(scaled_coord, coord_sum)
+
+    com = np.divide(coord_sum, total_mass)
+    assert np.allclose(mol.center_of_mass('prist'), com, atol=1e-6)
+
+    coord_sum = 0
+    total_mass = 0
+    for atom_id, coord in mol.all_atom_coords('heavy'):
+        atom_mass = mol.heavy_mol.GetAtomWithIdx(atom_id).GetMass()
+        total_mass += atom_mass
+        scaled_coord = np.multiply(atom_mass, coord)
+        coord_sum = np.add(scaled_coord, coord_sum)
+
+    com = np.divide(coord_sum, total_mass)
+    assert np.allclose(mol.center_of_mass('heavy'), com, atol=1e-6)
 
 def test_shift():
     """
