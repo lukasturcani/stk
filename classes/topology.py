@@ -1068,6 +1068,46 @@ class TwoPlusThree(CageTopology):
                               10*np.sqrt(3),
                                 0])
 
+class TenPlusTwenty(CageTopology):
+    vertices = [Vertex(-50, 50, -50), 
+                Vertex(-50, -50, -50), 
+                Vertex(50, 50, -50), 
+                Vertex(50, -50, -50),
+
+                Vertex(-50, 50, 50), 
+                Vertex(-50, -50, 50), 
+                Vertex(50, 50, 50), 
+                Vertex(50, -50, 50),
+
+                Vertex(0,0,75),
+                Vertex(0,0,-75)]
+        
+    edges = [Edge(vertices[0], vertices[2]), 
+             Edge(vertices[0], vertices[1]),
+             Edge(vertices[1], vertices[3]),
+             Edge(vertices[2], vertices[3]),
+             
+             Edge(vertices[4], vertices[6]), 
+             Edge(vertices[4], vertices[5]),
+             Edge(vertices[5], vertices[7]),
+             Edge(vertices[6], vertices[7]),
+
+
+             Edge(vertices[0], vertices[4]), 
+             Edge(vertices[1], vertices[5]),
+             Edge(vertices[2], vertices[6]),
+             Edge(vertices[3], vertices[7]),
+
+            Edge(vertices[8], vertices[4]),
+            Edge(vertices[8], vertices[5]),
+            Edge(vertices[8], vertices[6]),
+            Edge(vertices[8], vertices[7]),
+
+            Edge(vertices[9], vertices[0]),
+            Edge(vertices[9], vertices[1]),
+            Edge(vertices[9], vertices[2]),
+            Edge(vertices[9], vertices[3])]      
+
 class FourPlusSix(CageTopology):
     """
     Defines the tetrahedral, 4+6, topology.
