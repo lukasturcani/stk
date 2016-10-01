@@ -74,6 +74,10 @@ with time_it():
                    size=ga_input.pop_size, 
                    ga_tools=ga_tools)
 
+# Assign generation tag.
+for mem in pop:
+    mem.init_gen = -1
+
 with time_it():    
     print(('\n\nOptimizing the population.\n'
           '--------------------------\n\n'))
@@ -111,9 +115,33 @@ for x in range(ga_input.num_generations):
         print('\n\nStarting mating.\n----------------\n\n')
         offspring = pop.gen_offspring()
 
+
+
+
+
+
+    for mem in offspring:
+        mem.init_gen = x
+
+
+
+
+
+
     with time_it():
         print('\n\nStarting mutations.\n-------------------\n\n')
         mutants = pop.gen_mutants()
+
+
+
+
+
+
+    for mem in mutants:
+        mem.init_gen = x
+
+
+
     
     with time_it():
         print(('\n\nAdding offsping and mutants to population.'
@@ -123,8 +151,16 @@ for x in range(ga_input.num_generations):
     with time_it():
         print(('\n\nRemoving duplicates, if any.\n'
                '----------------------------\n\n')    )
-        
         pop.remove_duplicates()    
+
+    for mem in pop:
+        if mem.init_gen != x and not mem.optimized:
+            print(mem, 'should be optimizied')
+            
+        if mem.init_gen != x and not mem.fitness:
+            print(mem, 'should have fitness')
+    
+    
     with time_it():        
         print(('\n\nOptimizing the population.\n'
               '--------------------------\n\n'))
