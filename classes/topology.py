@@ -46,10 +46,18 @@ class Vertex:
         to the id of the heavy atoms in the cage molecule. This means
         they correspond to the ids of atoms in the `heavy_mol` attribute
         of a ``Cage`` instance.
+        
+    distances : list of tuples of form (float, int, int)
+        Every vertex will be paired to an atom of a paired edge. That
+        atom will have its distances to all the atoms on the vertex
+        calculated. That information is stored here. The float is the
+        distance, the first int is the id of the paired edge and the 
+        second int is the atom on the vertex.
     
     """
 
-    __slots__ = ['x', 'y', 'z', 'coord', 'edges', 'heavy_ids']    
+    __slots__ = ['x', 'y', 'z', 'coord', 
+                 'edges', 'heavy_ids', 'distances']    
     
     def __init__(self, x, y, z):
         self.x = x
@@ -58,6 +66,7 @@ class Vertex:
         self.coord = np.array([x,y,z])
         self.edges = []
         self.heavy_ids = []
+        self.distances = []
         
     def place_mol(self, building_block):
         """
@@ -304,10 +313,15 @@ class Edge:
         to the id of the heavy atoms in the cage molecule. This means
         they correspond to the ids of atoms in the `heavy_mol` attribute
         of a ``Cage`` instance.
-    
+        
+    atom_vertex_pairs : list of tuples of form (int, Vertex)
+        Each tuple holds the id of a heavy atom and the Vertex to which
+        that atom should be joined.
+        
     """
     
-    __slots__ = ['v1', 'v2', 'coord', 'direction', 'heavy_ids']    
+    __slots__ = ['v1', 'v2', 'coord', 'direction', 
+                 'heavy_ids', 'atom_vertex_pairs']    
     
     def __init__(self, v1, v2):
         self.v1 = v1
@@ -318,6 +332,7 @@ class Edge:
         v2.edges.append(self)
         
         self.heavy_ids = []
+        self.atom_vertex_pairs = []
         
     def place_mol(self, linker):
         """
@@ -352,8 +367,23 @@ class Edge:
         # position of the edge, then the direction of the linker is 
         # aligned with the direction of the edge.
         linker.set_heavy_atom_centroid(self.coord)
+        
+        flip = np.random.choice([1,-1])                
         linker.set_heavy_mol_orientation(np.multiply(self.direction,
-                                         np.random.choice([1,-1])))
+                                                     flip))
+
+        start_atom, end_atom = next(
+                                linker.heavy_direction_vector_atoms())
+
+        # These are the atom ids when the atoms are not in the
+        # macromolecule. As a result for these to be useful to 
+        # `join_mols` they are updated in `place_mols` of ``Topology``.
+        if flip == 1:
+            self.atom_vertex_pairs.extend([(start_atom, self.v2), 
+                                           (end_atom, self.v1)])            
+        else:
+            self.atom_vertex_pairs.extend([(start_atom, self.v1), 
+                                           (end_atom, self.v2)])
 
         # Ensure the centroid of the linker is placed on the outside of 
         # the cage.
@@ -511,8 +541,8 @@ class Topology:
         # replaces the heavy atoms with their pristine counterparts / 
         # functional groups.
         self.place_mols()
-#        chem.MolToMolFile(self.macro_mol.heavy_mol, '1heavy.mol')
         self.join_mols()
+#        chem.MolToMolFile(self.macro_mol.heavy_mol, '1heavy.mol')
         self.final_sub()
 
     def join_mols(self):
@@ -673,246 +703,32 @@ class Topology:
         editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
         
         for edge in self.edges:
-            for atom_id in edge.heavy_ids:
-                atom_coord = self.macro_mol.atom_coords('heavy', 
-                                                        atom_id)                
-                
-                
-                distance = partial(euclidean, atom_coord)
-                vertex = min([edge.v1.coord, edge.v2.coord], 
-                             key=distance)
-                             
-                vertex = next(x for x in [edge.v1, edge.v2] if np.array_equal(vertex, x.coord))
-                partner = self.min_distance_partner(atom_id, 
-                                                    vertex.heavy_ids)
-                vertex.heavy_ids.remove(partner)
-                
-                bond_type = self.determine_bond_type(atom_id, partner)
+            for atom_id, vertex in edge.atom_vertex_pairs:
+                # Get all the distances between the atom and the heavy
+                # atoms on the vertex. Store this information on the 
+                # vertex.
+                for atom2_id in vertex.heavy_ids:
+                    distance = self.macro_mol.atom_distance('heavy', 
+                                                            atom_id, 
+                                                            atom2_id)
+                    vertex.distances.append((distance, 
+                                             atom_id, atom2_id))
+
+
+        for vertex in self.vertices:
+            paired = set()
+            for _, atom1_id, atom2_id in sorted(vertex.distances):
+                if atom1_id in paired or atom2_id in paired:
+                    continue            
+
+                bond_type = self.determine_bond_type(atom1_id, atom2_id)
                 # Add the bond.                
-                editable_mol.AddBond(atom_id, partner, bond_type)
+                editable_mol.AddBond(atom1_id, atom2_id, bond_type)
                 self.bonds_made += 1
+                paired.add(atom1_id)
+                paired.add(atom2_id)
                 
         self.macro_mol.heavy_mol = editable_mol.GetMol()
-
-    def pair_up_diff_element_atoms(self, heavy_mols):
-        """
-        Pairs up atoms of different elements in different molecules.
-        
-        For each atom this function finds the closest heavy atom which
-        statisfies the following criteria:
-            > it has not had a bond added to it yet
-            > it has a different element
-            > it is on a different molecule
-            > the molecules of the two atoms are not bonded together
-        
-        Parameters
-        ----------
-        heavy_mols : iterable of iterables of ints
-            This is list of the form [[1,2], [3,4,5], [9,8,10], [7,6]].
-            Each sublist represents the atom ids of heavy atoms 
-            belonging to the same building block molecule.
-        
-        Modifies
-        --------
-        self.macro_mol.heavy_mol
-            Adds bonds between atoms in the rdkit molecule instance held
-            by this attribute.
-        
-        Returns
-        -------
-        None : NoneType
-        
-        """
-        
-        # Create a ``EditableMol`` which allows for the adding of bonds.
-        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
-        
-        # Keep track of which atoms and molecules have been joined.
-        self.paired = set()
-        self.paired_mols = set()
-        
-        # Go through all the atom ids of heavy atoms and if that id 
-        # belongs to an atom that has not yet been paired, generate a 
-        # pool of atom ids of possible partners for pairing. The pool
-        # consists of atom ids that fulfil the 4 criteria outlined in
-        # the docstring. From these the atom closest to the atom being
-        # iteratred through is chosen and a bond between the two is 
-        # made. The sets tracking pairings are updated.
-        for atom_id in flatten(heavy_mols):
-            
-            # Atom is not yet paired.
-            if atom_id not in self.paired:
-                
-                # Generate the potential partner ids.
-                partner_pool = self.unpaired_diff_element_atoms(atom_id, 
-                                                         heavy_mols)
-                
-                # Find the closest atom from the partner pool.                                       
-                partner = self.min_distance_partner(atom_id, 
-                                                    partner_pool)
-                
-                # Check if the bond created should be double or single.
-                bond_type = self.determine_bond_type(atom_id, partner)
-                # Add the bond.                
-                editable_mol.AddBond(atom_id, partner, bond_type)
-                
-                # Find that molecule number of the molecule that atom
-                # and its partner belong to. The molecule number is just
-                # the index of the sublist containing the id within 
-                # `heavy_mols`.
-                atom_mol_num = next(heavy_mols.index(x) for x in 
-                                            heavy_mols if atom_id in x)
-                
-                partner_mol_num = next(heavy_mols.index(x) for x in 
-                                            heavy_mols if partner in x)                 
-                
-                # Update the pair tracking sets.
-                self.paired.add(atom_id)
-                self.paired.add(partner)
-                self.paired_mols.add(str(sorted((atom_mol_num, 
-                                                 partner_mol_num))))
-        
-        # Turn the ``EditableMol`` into an rdkit molecule instance and
-        # place that into the ``MacroMolecule``'s attribute.        
-        self.macro_mol.heavy_mol = editable_mol.GetMol()
-
-    def pair_up_polymer(self, heavy_mols):
-        """
-        Pairs up monomer units of a polymer.
-
-        The monomer units should be placed in a straight line. This
-        functions creates bonds between heavy atoms of any kind as long
-        they are in separate molecules and the two molecules are not
-        already joined. This function creates the shortest possible 
-        bonds which satisfy this criteria first. It only creates N-1 
-        bonds where N is number of monomers joined up in a repeating 
-        unit of the polymer. For example if the repeating unit is
-        ``AAA`` or ``ABC`` then N = 3 in both cases, and 2 bonds will be
-        formed.
-        
-        Parameters
-        ----------
-        heavy_mols : iterable of iterables of ints
-            This is list of the form [[1,2], [3,4,5], [9,8,10], [7,6]].
-            Each sublist represents the atom ids of heavy atoms 
-            belonging to the same building block molecule.
-
-        Modifies
-        --------    
-        self.macro_mol.heavy_mol
-            Adds bonds between atoms in the rdkit molecule instance held
-            by this attribute.
-        
-        """
-        
-        # Create a ``EditableMol`` which allows for the adding of bonds.        
-        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
-        
-        # Keep track of which atoms and molecules have been joined.
-        self.paired = set()
-        self.paired_mols = set()
-        
-        # Get the distances between all heavy atoms. Starting with the 
-        # shortest distance, check if the atoms are on the same molecule
-        # is yes move on to the next shortest distance and try again. If
-        # not, create a bond between the two atoms. If the number of
-        # bonds created is greater than or equal to N - 1 stop.        
-        distances = sorted(self.macro_mol.get_heavy_atom_distances())
-        num_bonds_made= 0
-        for _, atom1_id, atom2_id in distances:
-            
-            # The molecule number is just the index of the sublist 
-            # holding the atom id in `heavy_mols`.           
-            atom1_mol =  next(heavy_mols.index(x) for x in 
-                                            heavy_mols if atom1_id in x)           
-            
-            atom2_mol =  next(heavy_mols.index(x) for x in 
-                                            heavy_mols if atom2_id in x)
-            mol_pair = str(sorted((atom1_mol, atom2_mol)))
-            
-            # Make sure the atoms or molecules are not already paired.            
-            atom1_not_paired = atom1_id not in self.paired
-            atom2_not_paired = atom2_id not in self.paired
-            mols_not_paired = mol_pair not in self.paired_mols       
-            # Check that you're not dealing with the same atom.            
-            not_same_atom = atom1_mol != atom2_mol
-            if (atom1_not_paired and atom2_not_paired and 
-                 mols_not_paired and not_same_atom):
-                    
-                    # Check if double or single bond should be added.
-                    bond_type= self.determine_bond_type(atom1_id, 
-                                                        atom2_id)
-                    # Add the bond.                    
-                    editable_mol.AddBond(atom1_id, atom2_id, bond_type)
-                    
-                    # Update the tracking sets.                    
-                    self.paired.add(atom1_id)
-                    self.paired.add(atom2_id)
-                    self.paired_mols.add(mol_pair)
-                    
-                    # Increment the bond count.
-                    num_bonds_made += 1           
-                    # Break if enough bonds have been made.
-                    if num_bonds_made >= len(self.repeating_unit)-1:
-                        break
-
-        # Turn the ``EditableMol`` into an rdkit molecule instance and
-        # place that into the ``MacroMolecule``'s attribute.        
-        self.macro_mol.heavy_mol = editable_mol.GetMol()
-
-
-
-    def unpaired_diff_element_atoms(self, atom1_id, heavy_mols):
-        """
-        Yield atoms forming the partner pool of another atom.        
-        
-        The atom ids yielded from `heavy_mols` belong to atoms which 
-        satisfy the following criteria:
-            > have a different element to the atom with `atom1_id`
-            > are in a different molecule to the atom with `atom1_id`
-            > have not yet been bonded to another heavy atom
-            > belong to a molecule which has not been bonded to the 
-              molecule containing the atom with `atom1_id`
-                
-        Parameters
-        ----------
-        atom1_id : int
-            The id of the atom whose partner pool should be generated.
-            
-        heavy_mols : iterable of iterables of ints
-            This is list of the form [[1,2], [3,4,5], [9,8,10], [7,6]].
-            Each sublist represents the atom ids of heavy atoms 
-            belonging to the same building block molecule.
-        
-        Yields
-        ------
-        int
-            The id of the next atom within the partner pool.
-        
-        """
-        
-        for atom2_id in flatten(heavy_mols):
-            # Get the rdkit atom instance with the given atom ids.
-            atom1 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom1_id)
-            atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
-
-            # Get the molecule numbers of the molecules holding atoms
-            # with those ids. The molecule number is just the index of 
-            # the sublist holding the atom id in `heavy_mols`.             
-            atom1_mol =  next(heavy_mols.index(x) for x in heavy_mols 
-                                                       if atom1_id in x)           
-            atom2_mol =  next(heavy_mols.index(x) for x in heavy_mols 
-                                                       if atom2_id in x)
-            mol_pair = str(sorted((atom1_mol, atom2_mol)))
-            
-            # Check if the conditions described in the docstring are
-            # satisfied. If yes, yield the atom.
-            if (atom1.GetAtomicNum() != atom2.GetAtomicNum() and 
-                atom2_id not in self.paired and 
-                mol_pair not in self.paired_mols and 
-                atom1_id != atom2_id):
-                
-                yield atom2_id
               
     def min_distance_partner(self, atom_id, partner_pool):
         """
@@ -1047,7 +863,14 @@ class Topology:
                 if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
                     heavy_ids.append(atom.GetIdx())
             
-            edge.heavy_ids = list(heavy_ids)
+            edge.heavy_ids = sorted(heavy_ids)
+            atom_vertex_pairs = sorted(edge.atom_vertex_pairs)
+            updated_pairs = []
+            for new_id, (old_id, vertex) in zip(edge.heavy_ids, 
+                                                atom_vertex_pairs):
+                updated_pairs.append((new_id, vertex))
+            
+            edge.atom_vertex_pairs = updated_pairs
 
         for vertex in self.vertices:
             self.macro_mol.heavy_mol = chem.CombineMols(
@@ -1199,16 +1022,16 @@ class CageTopology(Topology):
         return sum(diff_sums)
 
 class TwoPlusThree(CageTopology):
-    vertices = [Vertex(0,0,50), Vertex(0,0,-50)]
+    vertices = [Vertex(0,0,20), Vertex(0,0,-20)]
     edges = [Edge(vertices[0], vertices[1]),
              Edge(vertices[0], vertices[1]),
              Edge(vertices[0], vertices[1])]
              
-    edges[0].coord = np.array([-50,
+    edges[0].coord = np.array([-10,
                               -10*np.sqrt(3),
                                 0])
 
-    edges[1].coord = np.array([50,
+    edges[1].coord = np.array([10,
                               -10*np.sqrt(3),
                                 0])
 
