@@ -360,9 +360,27 @@ class Edge(Vertex):
             described in the docstring.
 
         """
+        
         if len(self.vs) > 2:
-            return Vertex.place_mol(self, linker)
-
+            Vertex.place_mol(self, linker)
+            
+            distances = []
+            for atom_id in linker.heavy_ids:
+                atom_coord = linker.atom_coords('heavy', atom_id)
+                for v in self.vs:
+                    distance = euclidean(atom_coord, v.coord)
+                    distances.append((distance, atom_id, v))
+                    
+            paired_as = set()
+            paired_vs = set()
+            for _, atom_id, v in sorted(distances):
+                if atom_id in paired_as or v in paired_vs:
+                    continue
+                self.atom_vertex_pairs.append((atom_id, v))
+                paired_as.add(atom_id)
+                paired_vs.add(v)
+                
+            return linker.heavy_mol
 
         # First the centroid of the heavy atoms is placed on the
         # position of the edge, then the direction of the linker is 
@@ -848,18 +866,28 @@ class Topology:
         
         self.macro_mol.heavy_mol = chem.Mol()
         
-        lk = next(x for x in self.macro_mol.building_blocks 
-                        if isinstance(x, StructUnit2))
-                            
-        bb = next(x for x in self.macro_mol.building_blocks 
-                        if isinstance(x, StructUnit3))
-                            
+        bb1 = self.macro_mol.building_blocks[0]
+        bb2 = self.macro_mol.building_blocks[1] 
+        n_fg1 = len(bb1.find_functional_group_atoms())
+        n_fg2 = len(bb2.find_functional_group_atoms())
+        
+        if n_fg1 < n_fg2:
+            lk = bb1
+            n_lk = n_fg1
+            bb = bb2
+            n_bb = n_fg2
+        else:
+            lk = bb2
+            n_lk = n_fg2
+            bb = bb1
+            n_bb = n_fg1
+        
         for edge in self.edges:
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         edge.place_mol(lk))
                                         
-            heavy_ids = deque(maxlen=2)
+            heavy_ids = deque(maxlen=n_lk)
             for atom in self.macro_mol.heavy_mol.GetAtoms():
                 if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
                     heavy_ids.append(atom.GetIdx())
@@ -877,7 +905,7 @@ class Topology:
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         vertex.place_mol(bb))
-            heavy_ids = deque(maxlen=3)
+            heavy_ids = deque(maxlen=n_bb)
             for atom in self.macro_mol.heavy_mol.GetAtoms():
                 if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
                     heavy_ids.append(atom.GetIdx())
