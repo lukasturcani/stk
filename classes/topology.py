@@ -9,7 +9,7 @@ from scipy.spatial.distance import euclidean
 
 from .molecular import FGInfo, StructUnit3, StructUnit2
 from ..pyWindow import window_sizes
-from ..convenience_functions import (flatten, normalize_vector, 
+from ..convenience_functions import (centroid, normalize_vector, 
                                      vector_theta, atom_vdw_radii,
                                      rotation_matrix_arbitrary_axis,
                                      LazyAttr)
@@ -54,10 +54,7 @@ class Vertex:
         distance, the first int is the id of the paired edge and the 
         second int is the atom on the vertex.
     
-    """
-
-    __slots__ = ['x', 'y', 'z', 'coord', 
-                 'edges', 'heavy_ids', 'distances']    
+    """ 
     
     def __init__(self, x, y, z):
         self.x = x
@@ -283,7 +280,7 @@ class Vertex:
         return sum(edge.coord for edge in self.edges) / len(self.edges)
         
 
-class Edge:
+class Edge(Vertex):
     """
     Used to represent the edges of Cage polyhedra.
 
@@ -318,21 +315,22 @@ class Edge:
         Each tuple holds the id of a heavy atom and the Vertex to which
         that atom should be joined.
         
-    """
+    """  
     
-    __slots__ = ['v1', 'v2', 'coord', 'direction', 
-                 'heavy_ids', 'atom_vertex_pairs']    
+    def __init__(self, *vertices):
+        self.vs = vertices
+        self.coord = centroid(*(v.coord for v in vertices))
+        self.direction = normalize_vector(self.vs[0].coord - 
+                                          self.vs[1].coord)
+
+        for v in vertices:
+            v.edges.append(self)
     
-    def __init__(self, v1, v2):
-        self.v1 = v1
-        self.v2 = v2
-        self.coord = np.divide(np.add(v1.coord, v2.coord), 2)
-        self.direction = normalize_vector(v1.coord - v2.coord)
-        v1.edges.append(self)
-        v2.edges.append(self)
-        
         self.heavy_ids = []
         self.atom_vertex_pairs = []
+        
+        if len(vertices) > 2:
+            self.edges = vertices
         
     def place_mol(self, linker):
         """
@@ -362,6 +360,9 @@ class Edge:
             described in the docstring.
 
         """
+        if len(self.vs) > 2:
+            return Vertex.place_mol(self, linker)
+
 
         # First the centroid of the heavy atoms is placed on the
         # position of the edge, then the direction of the linker is 
@@ -379,11 +380,11 @@ class Edge:
         # macromolecule. As a result for these to be useful to 
         # `join_mols` they are updated in `place_mols` of ``Topology``.
         if flip == 1:
-            self.atom_vertex_pairs.extend([(start_atom, self.v2), 
-                                           (end_atom, self.v1)])            
+            self.atom_vertex_pairs.extend([(start_atom, self.vs[1]), 
+                                           (end_atom, self.vs[0])])            
         else:
-            self.atom_vertex_pairs.extend([(start_atom, self.v1), 
-                                           (end_atom, self.v2)])
+            self.atom_vertex_pairs.extend([(start_atom, self.vs[0]), 
+                                           (end_atom, self.vs[1])])
 
         # Ensure the centroid of the linker is placed on the outside of 
         # the cage.
