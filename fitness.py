@@ -95,6 +95,8 @@ def calc_fitness(func_data, population):
 
         var_avg = np.divide(var_sum, len(population))
 
+    print(var_avg)
+
     # Apply the function to every member of the population.
     for macro_mol in population:
         try:
