@@ -107,8 +107,8 @@ class Vertex:
         # building-block* is always pointed away from the center of the
         # molecule.
         building_block.set_heavy_mol_orientation(
-                                               self.edge_plane_normal())    
-        
+                                               self.edge_plane_normal())            
+
         # Next, the building-block* must be rotated so that one of the 
         # heavy atoms is perfectly aligned with one of the edges. This
         # is a multi-step process:
@@ -1050,17 +1050,69 @@ class CageTopology(Topology):
             
         return sum(diff_sums)
 
+class FourPlusEight(CageTopology):
+    vertices = [Vertex(-10,-10,0), 
+                Vertex(-10,10,0),
+                Vertex(10,-10,0),
+                Vertex(10,10,0)]     
+        
+    a,b,c,d=vertices    
+    
+    edges = [Edge(a,b),
+             Edge(a,b),
+             Edge(b,d),
+             Edge(b,d),
+             Edge(a,c),
+             Edge(a,c),
+             Edge(c,d),
+             Edge(c,d)]
+             
+    e1,e2,e3,e4,e5,e6,e7,e8 = edges
+    for e in [e1,e3,e5,e7]:
+        e.coord = np.add(e.coord, [0,0,10])
+
+    for e in [e2,e4,e6,e8]:
+        e.coord = np.add(e.coord, [0,0,-10])
+        
+
+class SixPlusTwelve(CageTopology):
+    vertices = [Vertex(-50,-50,0), 
+                Vertex(-50,50,0),
+                Vertex(50,-50,0),
+                Vertex(50,50,0),
+                Vertex(0,0,50),
+                Vertex(0,0,-50)]
+                
+    a,b,c,d,e,f = vertices
+    
+    edges = [Edge(a,b),
+             Edge(b,d),
+             Edge(d,c),
+             Edge(a,c),
+             Edge(e,a),
+             Edge(e,b),
+             Edge(e,c),
+             Edge(e,d),
+             Edge(f,a),
+             Edge(f,b),
+             Edge(f,c),
+             Edge(f,d)] 
+
 class TwoPlusThree(CageTopology):
     vertices = [Vertex(0,0,20), Vertex(0,0,-20)]
     edges = [Edge(vertices[0], vertices[1]),
              Edge(vertices[0], vertices[1]),
              Edge(vertices[0], vertices[1])]
-             
-    edges[0].coord = np.array([-10,
+    
+    a,b = vertices
+    b.edge_plane_normal = lambda a=a: np.multiply(a.edge_plane_normal(), 
+                                                  -1)
+         
+    edges[0].coord = np.array([-20,
                               -10*np.sqrt(3),
                                 0])
 
-    edges[1].coord = np.array([10,
+    edges[1].coord = np.array([20,
                               -10*np.sqrt(3),
                                 0])
 
@@ -1107,6 +1159,83 @@ class TenPlusTwenty(CageTopology):
             Edge(vertices[9], vertices[1]),
             Edge(vertices[9], vertices[2]),
             Edge(vertices[9], vertices[3])]      
+
+class TwoPlusFour(CageTopology):
+    vertices = [Vertex(0,0,-10), Vertex(0,0,10)]
+    alpha, beta = vertices
+    beta.edge_plane_normal = lambda alpha=alpha: np.multiply(
+                                        alpha.edge_plane_normal(), -1)
+    
+    edges = [Edge(vertices[0], vertices[1]),
+             Edge(vertices[0], vertices[1]),
+            Edge(vertices[0], vertices[1]),
+            Edge(vertices[0], vertices[1])]
+            
+    a,b,c,d = edges
+    
+    a.coord = np.array([10,0,0])
+    b.coord = np.array([-10,0,0])
+    c.coord = np.array([0,10,0])
+    d.coord = np.array([0,-10,0])
+
+class ThreePlusSix(CageTopology):
+
+    vertices = [Vertex(-20,-10*np.sqrt(3),0), 
+                Vertex(20,-10*np.sqrt(3),0),
+                Vertex(0,10*np.sqrt(3),0)]
+
+    a,b,c=vertices    
+    
+    edges = [Edge(a,b),
+             Edge(a,b),
+             Edge(b,c),
+             Edge(b,c),
+             Edge(a,c),
+             Edge(a,c)]
+             
+    e1,e2,e3,e4,e5,e6 = edges
+    for e in [e1,e3,e5]:
+        e.coord = np.add(e.coord, [0,0,10])
+
+    for e in [e2,e4,e6]:
+        e.coord = np.add(e.coord, [0,0,-10])
+    
+class FourPlusFour(CageTopology):
+    vertices = [Vertex(100,0,-100/np.sqrt(2)), 
+                Vertex(-100,0,-100/np.sqrt(2)), 
+                Vertex(0,100,100/np.sqrt(2)), 
+                Vertex(0,-100,100/np.sqrt(2))]
+                
+    a,b,c,d = vertices
+
+    
+
+    edges = [    Edge(a,b,c),
+    Edge(b,c,d),
+    Edge(d,a,b),
+    Edge(a,c,d)]
+
+class SixPlusEight(CageTopology):
+    
+    vertices =    [Vertex(-50, 50, 0), 
+                Vertex(-50, -50, 0), 
+                Vertex(50, 50, 0), 
+                Vertex(50, -50, 0),
+
+                Vertex(0, 0, 50), 
+                Vertex(0, 0, -50)]
+
+    a,b,c,d,e,f = vertices
+
+    edges = [Edge(a,e,b),
+             Edge(b,e,d),
+            Edge(e,d,c),
+            Edge(e,c,a),
+
+            Edge(a,f,b),
+            Edge(f,b,d),
+            Edge(d,f,c),
+            Edge(c,f,a)]
 
 class FourPlusSix(CageTopology):
     """
