@@ -1825,7 +1825,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
 
         self.building_blocks = tuple(building_blocks)
 
-        # A ``Topology`` subclass instance must be initiazlied with a 
+        # A ``Topology`` subclass instance must be initialized with a 
         # copy of the cage it is describing.     
         self.topology = topology(self, *topology_args)
         # The topology_args attribute is saved for error handling. See
