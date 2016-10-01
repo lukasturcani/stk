@@ -115,6 +115,28 @@ def rotation_matrix(vector1, vector2):
     
     return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
 
+def centroid(*coords):
+    """
+    Calculates the centroid of a group of coordinates.
+    
+    Parameters
+    ----------
+    *coords : numpy.array
+        Any number of numpy arrays holding x, y and z positions.
+        
+    Returns
+    -------
+    numpy.array
+        The centroid of the coordinates `coords`.
+    
+    """
+    
+    total = 0
+    for coord in coords:
+        total = np.add(total, coord)
+    return np.divide(total, len(coords))
+    
+
 def kabsch(coords1, coords2):
     """
     Return a rotation matrix to minimize dstance between 2 coord sets.
