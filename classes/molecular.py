@@ -1292,6 +1292,30 @@ class StructUnit(metaclass=Cached):
         
             yield normalize_vector(p1-p2)
 
+    def heavy_direction_vector_atoms(self):
+        """
+        Yields the atoms which form `heavy_direction_vectors`.
+
+        The method `heavy_direction_vectors` yields direction vectors.
+        This method yields the atom ids of atoms which form those 
+        direction vectors. The atoms ids are yielded in the same order
+        as the vectors.
+
+        Yield
+        -------
+        tuple of ints
+            The tuple holds the start and end atom ids of a
+            `heavy_direction_vector`. The first tuple will correspond 
+            to the atoms forming the first `heavy_direction_vector` and
+            so on. The atom id at index 0 is the start atom and the atom
+            id at index 1 is the end atom.
+        
+        """
+
+        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids,
+                                                                     2):
+            yield atom2_id, atom1_id                                                                 
+
     def centroid_centroid_dir_vector(self):
         """
         Returns the direction vector between the 2 molecular centroids.
