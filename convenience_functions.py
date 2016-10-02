@@ -427,9 +427,22 @@ def plot_counter(counter, plot_name):
     
     """
     fig = plt.figure()
-    x_vals = [x.fitness for x in counter.keys()]
-    y_vals = list(counter.values())
-    plt.bar(x_vals, y_vals)
+    x_vals_b = []
+    y_vals_b = []
+    
+    x_vals_r = []
+    y_vals_r = []    
+    
+    for ind, value in counter.items():
+        if value == 0:
+            x_vals_r.append(ind.fitness)
+            y_vals_r.append(0.5)
+        else:
+            x_vals_b.append(ind.fitness)
+            y_vals_b.append(value)
+    
+    plt.bar(x_vals_b, y_vals_b, color='blue')
+    plt.bar(x_vals_r, y_vals_r, color='red')
     fig.savefig(plot_name, dpi=fig.dpi)
     plt.close('all')
 
