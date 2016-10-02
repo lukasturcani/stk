@@ -101,7 +101,12 @@ class Vertex:
             described in the docstring.
         
         """
-        
+
+        # Flush the lists from data of previous molecules.
+        self.heavy_ids = []
+        self.distances = []
+
+      
         # The method first aligns the normal of the heavy atom plane to
         # the normal of the edge plane. This means the bulk of the 
         # building-block* is always pointed away from the center of the
@@ -361,6 +366,10 @@ class Edge(Vertex):
 
         """
         
+        # Flush the lists from data of previous molecules.
+        self.heavy_ids = []
+        self.atom_vertex_pairs = []
+        
         if len(self.vs) > 2:
             Vertex.place_mol(self, linker)
             
@@ -561,7 +570,6 @@ class Topology:
         # functional groups.
         self.place_mols()
         self.join_mols()
-#        chem.MolToMolFile(self.macro_mol.heavy_mol, '1heavy.mol')
         self.final_sub()
 
     def join_mols(self):
