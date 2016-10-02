@@ -72,7 +72,7 @@ class MacroMolError(Exception):
         # used by the GA. To ensure it is skipped by the optimization
         # and fitness functions, set these attributes of `macro_mol`.
         macro_mol.optimized = True
-        macro_mol.fitness = 1
+        macro_mol.fitness = 1e-4
         
         self.ex = ex
         self.macro_mol = macro_mol

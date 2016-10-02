@@ -86,16 +86,20 @@ def calc_fitness(func_data, population):
     if use_means:
 
         var_sum = 0
+        valid_params = 0
         for ind in population:
             try:
                 unscaled = func(ind, **func_data.params)
             except:
-                unscaled = 0
-            var_sum = np.add(unscaled, var_sum)
+                unscaled = None
+            
+            if unscaled is not None:
+                valid_params += 1    
+                var_sum = np.add(unscaled, var_sum)
 
-        var_avg = np.divide(var_sum, len(population))
+        var_avg = np.divide(var_sum, valid_params)
 
-    print(var_avg)
+    print('var_avg', var_avg)
 
     # Apply the function to every member of the population.
     for macro_mol in population:
@@ -233,16 +237,22 @@ def cage(macro_mol, target_size,
         A numpy array holding values of var1 to varx. This is returned
         during the scaling procedure described in ``calc_fitness``.
 
+    Raises
+    ------
+    ValueError
+        When the average of the negavite bond formation energy is 
+        positive.
+
     """
-    
-    if macro_mol.fitness:
-        print('Skipping {0}'.format(macro_mol.prist_mol_file))
-        return macro_mol.fitness
-    
-    if macro_mol.topology.windows is None:
-        return 1
 
     if means is not None:
+        if means[-1] > 0:
+            raise ValueError(('The negative bond formation energy is'
+                              ' not negative.'), means)
+        
+        if macro_mol.unscaled_fitness_vars is None:
+            return 1e-4
+        
         if coeffs is None:
             coeffs = np.array([1,1,1,1,0.2])
             
@@ -255,8 +265,7 @@ def cage(macro_mol, target_size,
                 means[i] = 1
         
         scaled = np.divide(macro_mol.unscaled_fitness_vars, means)
-        # Delete the attribute once is no longer necessary.
-        delattr(macro_mol, 'unscaled_fitness_vars')      
+        
         fitness_vars = np.power(scaled, exponents)
         fitness_vars = np.multiply(fitness_vars, coeffs)    
         penalty_term = np.sum(fitness_vars[:-1])
@@ -269,6 +278,16 @@ def cage(macro_mol, target_size,
         carrot_term = fitness_vars[-1]
         
         return penalty_term + carrot_term
+
+
+    if macro_mol.topology.windows is None:
+        # If the windows algorithm failed create an array that indicates
+        # this failure.
+        macro_mol.unscaled_fitness_vars = None
+        return
+        
+    if hasattr(macro_mol, 'unscaled_fitness_vars'):
+        return macro_mol.unscaled_fitness_vars
 
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
 
