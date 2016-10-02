@@ -537,8 +537,14 @@ class Population:
             os.mkdir(dir_path)
         
         for member in self:
-            member.write_mol_file('prist', dir_path)
-            member.dump(member.prist_mol_file.replace('.mol', '.dmp'))
+            member.write_mol_file('prist', dir_path)            
+            
+            
+            base_name = os.path.split(member.prist_mol_file)[1]
+            base_name = base_name.replace('.mol', '.dmp')
+            dump_file = os.path.join(dir_path, base_name)            
+            
+            member.dump(dump_file)
 
     def optimize_population(self):
         """

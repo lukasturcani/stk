@@ -1957,7 +1957,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             Allowed values for this parameter 'prist' and 'heavy'.
             
         path : str (default = None)
-            If the .mol file is to be written to a direcotry other than
+            If the .mol file is to be written to a directory other than
             the one in `prist_mol_file` or `heavy_mol_file`, it should
             be written here.
         
