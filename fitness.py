@@ -91,6 +91,7 @@ def calc_fitness(func_data, population):
             try:
                 unscaled = func(ind, **func_data.params)
             except:
+                ind.unscaled_fitness_vars = None
                 unscaled = None
             
             if unscaled is not None:
@@ -98,8 +99,6 @@ def calc_fitness(func_data, population):
                 var_sum = np.add(unscaled, var_sum)
 
         var_avg = np.divide(var_sum, valid_params)
-
-    print('var_avg', var_avg)
 
     # Apply the function to every member of the population.
     for macro_mol in population:
