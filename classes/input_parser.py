@@ -59,7 +59,7 @@ def func_line_parser(line):
             except:
                 pass
 
-        if len(p_vals) > 1 and p_name == 'topologies':
+        if p_name == 'topologies':
             # Convert the strings of names of topologies into the actual
             # topology class objects. It is the classes themselves which
             # are used by MMEA not the class names as strings. So make
@@ -73,7 +73,7 @@ def func_line_parser(line):
             # ``~!~``. Here it is remade into a space.
             p_vals = p_vals[0].replace('~!~', ' ')                
 
-        elif len(p_vals) == 1:
+        elif len(p_vals) == 1 and p_name != 'topologies':
             p_vals = p_vals[0]
 
         param_dict[p_name] = p_vals
