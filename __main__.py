@@ -123,15 +123,7 @@ for x in range(ga_input.num_generations):
     with time_it():
         print(('\n\nRemoving duplicates, if any.\n'
                '----------------------------\n\n')    )
-        pop.remove_duplicates()    
-
-    for mem in pop:
-        if mem.init_gen != x and not mem.optimized:
-            print(mem, 'should be optimizied')
-            
-        if mem.init_gen != x and not mem.fitness:
-            print(mem, 'should have fitness')
-    
+        pop.remove_duplicates()        
     
     with time_it():        
         print(('\n\nOptimizing the population.\n'
