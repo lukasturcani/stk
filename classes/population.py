@@ -538,6 +538,7 @@ class Population:
         
         for member in self:
             member.write_mol_file('prist', dir_path)
+            member.dump(member.prist_mol_file.replace('.mol', '.dmp'))
 
     def optimize_population(self):
         """
