@@ -1815,7 +1815,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
-            raise ex
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
@@ -2360,6 +2359,18 @@ class MacroMolecule(metaclass=CachedMacroMol):
 class Cage(MacroMolecule):
     """
     Used to represent molecular cages.
+    
+    Attributes
+    ----------
+    In addtion to those described in MacroMolecule, this class the
+    following attributes.
+    
+    unscaled_fitness_vars : numpy.array
+        An array holding the values of various contributions to the
+        fitness of a cage, before they are scaled by the population
+        averages. This attribute is created and modified the by the
+        ``cage`` fitness function. See its documentation for more
+        details.
     
     """
     
