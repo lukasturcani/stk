@@ -569,8 +569,9 @@ class Topology:
         # replaces the heavy atoms with their pristine counterparts / 
         # functional groups.
         self.place_mols()
-        self.join_mols()
-        self.final_sub()
+        chem.MolToMolFile(self.macro_mol.heavy_mol, self.macro_mol.heavy_mol_file)
+#        self.join_mols()
+#        self.final_sub()
 
     def join_mols(self):
         """
@@ -756,6 +757,9 @@ class Topology:
                 paired.add(atom2_id)
                 
         self.macro_mol.heavy_mol = editable_mol.GetMol()
+
+    def pair_up_vertices(self, *args):
+        pass
               
     def min_distance_partner(self, atom_id, partner_pool):
         """
@@ -1058,6 +1062,70 @@ class CageTopology(Topology):
             
         return sum(diff_sums)
 
+class VertexOnlyCageToplogy(CageTopology):
+    def __init__(self, macro_mol, random_placement=False):
+        Topology.__init__(self, macro_mol)
+        self.pair_up = self.pair_up_vertices
+        self.random_placement = random_placement
+        
+    def place_mols(self):
+        
+        self.macro_mol.heavy_mol = chem.Mol()        
+        
+        if self.random_placement:
+            return self.place_mols_random()
+        return self.place_mols_assigned()
+        
+    def place_mols_random(self):
+        for v in self.vertices:
+            bb = np.random.choice(self.macro_mol.building_blocks)
+            self.macro_mol.heavy_mol = chem.CombineMols(
+                                        self.macro_mol.heavy_mol,
+                                        v.place_mol(bb))
+                                        
+
+
+#    def place_mols(self):
+#        
+#        for edge in self.edges:
+#            self.macro_mol.heavy_mol = chem.CombineMols(
+#                                        self.macro_mol.heavy_mol, 
+#                                        edge.place_mol(lk))
+#                                        
+#            heavy_ids = deque(maxlen=n_lk)
+#            for atom in self.macro_mol.heavy_mol.GetAtoms():
+#                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+#                    heavy_ids.append(atom.GetIdx())
+#            
+#            edge.heavy_ids = sorted(heavy_ids)
+#            atom_vertex_pairs = sorted(edge.atom_vertex_pairs)
+#            updated_pairs = []
+#            for new_id, (old_id, vertex) in zip(edge.heavy_ids, 
+#                                                atom_vertex_pairs):
+#                updated_pairs.append((new_id, vertex))
+#            
+#            edge.atom_vertex_pairs = updated_pairs
+#
+#        for vertex in self.vertices:
+#            self.macro_mol.heavy_mol = chem.CombineMols(
+#                                        self.macro_mol.heavy_mol, 
+#                                        vertex.place_mol(bb))
+#            heavy_ids = deque(maxlen=n_bb)
+#            for atom in self.macro_mol.heavy_mol.GetAtoms():
+#                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+#                    heavy_ids.append(atom.GetIdx())
+#            
+#            vertex.heavy_ids = list(heavy_ids)
+
+
+
+
+
+
+
+    def place_mols_assigned(self):
+        pass
+
 class FourPlusEight(CageTopology):
     vertices = [Vertex(-10,-10,0), 
                 Vertex(-10,10,0),
@@ -1208,20 +1276,19 @@ class ThreePlusSix(CageTopology):
     for e in [e2,e4,e6]:
         e.coord = np.add(e.coord, [0,0,-10])
     
-class FourPlusFour(CageTopology):
+class TwoPlusTwo(VertexOnlyCageToplogy):
     vertices = [Vertex(100,0,-100/np.sqrt(2)), 
                 Vertex(-100,0,-100/np.sqrt(2)), 
                 Vertex(0,100,100/np.sqrt(2)), 
                 Vertex(0,-100,100/np.sqrt(2))]
                 
     a,b,c,d = vertices
-
     
+    connections = [(a,b), (a,c), (a,d),
+                   (b,c), (b,d),
+                   (c,d)]
+                
 
-    edges = [    Edge(a,b,c),
-    Edge(b,c,d),
-    Edge(d,a,b),
-    Edge(a,c,d)]
 
 class SixPlusEight(CageTopology):
     
