@@ -1068,6 +1068,7 @@ class VertexOnlyCageToplogy(CageTopology):
         self.pair_up = self.pair_up_vertices
         self.random_placement = random_placement
         
+        
     def place_mols(self):
         
         self.macro_mol.heavy_mol = chem.Mol()        
@@ -1082,7 +1083,11 @@ class VertexOnlyCageToplogy(CageTopology):
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol,
                                         v.place_mol(bb))
-                                        
+
+    def connect(self):
+        for v1, v2 in self.connections:
+            v1.edges.append(v2)
+            v2.edges.append(v1)                                    
 
 
 #    def place_mols(self):
