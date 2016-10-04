@@ -22,23 +22,14 @@ class Vertex:
     Cage's structure.
     
     Attributes
-    ----------
-    x : float
-        The x position of the vertex.
-    
-    y : float
-        The y position of the vertex.    
-        
-    z : float
-        The z position of the vertex.    
-    
+    ----------     
     coord : numpy.array of floats
         A numpy array which holds the x, y and z coordinates of the
         vertex, in that order.
     
-    edges : list of Edge instances
-        This list holds the Edge instances which represent the edges
-        connected to a partical vertex within a given cage structure.
+    connected : list of Edge or Vertex instances
+        This list holds the Edge or Vertex instances which represent the 
+        edges or vertices connected to the `self` vertex.
     
     heavy_ids : list of ints
         This list holds the ids of the heavy atoms which belong to the
@@ -46,24 +37,38 @@ class Vertex:
         to the id of the heavy atoms in the cage molecule. This means
         they correspond to the ids of atoms in the `heavy_mol` attribute
         of a ``Cage`` instance.
+    
+    atom_position_pairs : list of tuples of form (int, Edge/Vertex)
+        Each heavy atom on a vertex is paired to a specific vertex or 
+        edge first. Only after this is the atom - atom pairing 
+        performed. The atom - edge/vertex pairing is stored here. The
+        int represents the id of the heavy atom.
         
     distances : list of tuples of form (float, int, int)
-        Every vertex will be paired to an atom of a paired edge. That
-        atom will have its distances to all the atoms on the vertex
-        calculated. That information is stored here. The float is the
-        distance, the first int is the id of the paired edge and the 
-        second int is the atom on the vertex.
+        After a heavy atoms have been associated with vertices to which
+        they join, the idividual atoms are paired up. To do this the 
+        distance between every heavy atom on the paired vertex and the
+        heavy atom which is paired to the vertex is found. This
+        information is stored here where float is the distance, the
+        first int is the heavy atom and the second int is the heavy
+        atom on the vertex paired to the first atom.
     
     """ 
     
     def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
         self.coord = np.array([x,y,z])
-        self.edges = []
+        self.connected = []
         self.heavy_ids = []
+        self.atom_position_pairs = []
         self.distances = []
+        
+    @classmethod
+    def vertex_init(cls, *vertices):
+        obj = cls(*centroid(*(v.coord for v in vertices)))
+        obj.connected.extend(vertices)
+        for v in vertices:
+            v.connected.append(obj)
+        return obj
         
     def place_mol(self, building_block):
         """
@@ -101,11 +106,8 @@ class Vertex:
             described in the docstring.
         
         """
-
-        # Flush the lists from data of previous molecules.
-        self.heavy_ids = []
+        # Flush the list of data from previous molecules.
         self.distances = []
-
       
         # The method first aligns the normal of the heavy atom plane to
         # the normal of the edge plane. This means the bulk of the 
@@ -161,7 +163,7 @@ class Vertex:
         building_block.set_heavy_atom_centroid(self.coord)
      
         return building_block.heavy_mol
-
+            
     def edge_plane_normal(self):
         """
         Return the normal of the plane formed by the connected edges.
@@ -193,7 +195,7 @@ class Vertex:
         # directions. If this is the case make sure to multiply the 
         # nomral by -1 in all axes so that it points in the correct 
         # direction while still acting as the normal to the plane.
-        theta = vector_theta(normal, self.edges[0].coord) 
+        theta = vector_theta(normal, self.connected[0].coord) 
         
         if theta > np.pi/2:
             normal = np.multiply(normal, -1)
@@ -246,7 +248,7 @@ class Vertex:
         
         """
 
-        for edge1, edge2 in itertools.combinations(self.edges, 2):
+        for edge1, edge2 in itertools.combinations(self.connected, 2):
             yield normalize_vector(edge1.coord-edge2.coord)
     
     def edge_coord_matrix(self):
@@ -263,7 +265,7 @@ class Vertex:
         """
         
         coords = []
-        for edge in self.edges:
+        for edge in self.connected:
             coords.append(edge.coord)
         return np.matrix(coords)
         
@@ -282,7 +284,7 @@ class Vertex:
         # The connected edges are held in the `edges`. To get the
         # centroid, add up all the x, y and z coordinates (separately) 
         # and divide each sum by the number of edges. 
-        return sum(edge.coord for edge in self.edges) / len(self.edges)
+        return sum(edge.coord for edge in self.connected) / len(self.connected)
         
 
 class Edge(Vertex):
@@ -294,48 +296,22 @@ class Edge(Vertex):
     
     Attributes
     ----------
-    v1 : Vertex
-        The first vertex which an edge is connected to.
-    
-    v2 : Vertex
-        The second vertex which an edge is connected to.   
-    
-    coord : numpy.array of floats
-        A numpy array which holds the x, y and z coordinates of the
-        edge, in that order. It corresponds to the midpoint of the two
-        vertices which the edge connects.
-    
+
     direction : numpy.array
         This vector represents the orientation of the edge. It is a 
         normalized direction vector which runs from `v2` to `v1`.
-    
-    heavy_ids : list of ints
-        This list holds the ids of the heavy atoms which belong to the
-        building block placed on a particular edge. The ids correspond
-        to the id of the heavy atoms in the cage molecule. This means
-        they correspond to the ids of atoms in the `heavy_mol` attribute
-        of a ``Cage`` instance.
+
         
-    atom_vertex_pairs : list of tuples of form (int, Vertex)
-        Each tuple holds the id of a heavy atom and the Vertex to which
-        that atom should be joined.
         
     """  
     
-    def __init__(self, *vertices):
-        self.vs = vertices
-        self.coord = centroid(*(v.coord for v in vertices))
-        self.direction = normalize_vector(self.vs[0].coord - 
-                                          self.vs[1].coord)
-
-        for v in vertices:
-            v.edges.append(self)
-    
-        self.heavy_ids = []
-        self.atom_vertex_pairs = []
+    def __init__(self, v1, v2):
+        Vertex.__init__(self, *centroid(v1.coord, v2.coord))
+        self.direction = normalize_vector(v1.coord - v2.coord)
+        self.connected.extend([v1, v2])
+        v1.connected.append(self)
+        v2.connected.append(self)
         
-        if len(vertices) > 2:
-            self.edges = vertices
         
     def place_mol(self, linker):
         """
@@ -367,30 +343,8 @@ class Edge(Vertex):
         """
         
         # Flush the lists from data of previous molecules.
-        self.heavy_ids = []
-        self.atom_vertex_pairs = []
+        self.distances = []
         
-        if len(self.vs) > 2:
-            Vertex.place_mol(self, linker)
-            
-            distances = []
-            for atom_id in linker.heavy_ids:
-                atom_coord = linker.atom_coords('heavy', atom_id)
-                for v in self.vs:
-                    distance = euclidean(atom_coord, v.coord)
-                    distances.append((distance, atom_id, v))
-                    
-            paired_as = set()
-            paired_vs = set()
-            for _, atom_id, v in sorted(distances):
-                if atom_id in paired_as or v in paired_vs:
-                    continue
-                self.atom_vertex_pairs.append((atom_id, v))
-                paired_as.add(atom_id)
-                paired_vs.add(v)
-                
-            return linker.heavy_mol
-
         # First the centroid of the heavy atoms is placed on the
         # position of the edge, then the direction of the linker is 
         # aligned with the direction of the edge.
@@ -399,19 +353,6 @@ class Edge(Vertex):
         flip = np.random.choice([1,-1])                
         linker.set_heavy_mol_orientation(np.multiply(self.direction,
                                                      flip))
-
-        start_atom, end_atom = next(
-                                linker.heavy_direction_vector_atoms())
-
-        # These are the atom ids when the atoms are not in the
-        # macromolecule. As a result for these to be useful to 
-        # `join_mols` they are updated in `place_mols` of ``Topology``.
-        if flip == 1:
-            self.atom_vertex_pairs.extend([(start_atom, self.vs[1]), 
-                                           (end_atom, self.vs[0])])            
-        else:
-            self.atom_vertex_pairs.extend([(start_atom, self.vs[0]), 
-                                           (end_atom, self.vs[1])])
 
         # Ensure the centroid of the linker is placed on the outside of 
         # the cage.
@@ -569,123 +510,102 @@ class Topology:
         # replaces the heavy atoms with their pristine counterparts / 
         # functional groups.
         self.place_mols()
-        self.join_mols()
+        self.join_mols()      
         self.final_sub()
 
-    def join_mols(self):
+    def place_mols(self):
         """
-        Joins the disconnected building blocks of a macromolecule.
-        
-        Before this function is called the ``MacroMolecule`` instance 
-        which holds a given topology, `self`, should have an rdkit 
-        molecule instance in its `heavy_mol` attribute. At this point,
-        the macromocule in this rdkit instance will consist of various
-        building blocks on the edges and vertices of the defined 
-        topology. This function joins them up into a single molecule.
-        
-        This function should not be altered when extending MMEA. It is
-        designed so that it automatically calls the functions 
-        appropriate for a given topology. See `build` method 
-        documentation for more details on how this works.
+        Places all building block molecules on correct coordinates.
+
+        The building block molecules are placed in their appropriate 
+        positions based on the topology. This means that the 
+        building-blocks* are placed on vertices and linkers on edges.
+        This function only places the molecules, it does not join them. 
+        It saves the structure a rdkit molecule instance for later use. 
+        This rdkit instace is placed in the `heavy_mol` attribute of the 
+        ``Cage`` instance the topology is describing.
         
         Modifies
         --------
-        self.macro_molecule.heavy_mol
-            The ``MacroMolecule`` instance which holds `self` has the 
-            joined up rdkit version of the heavy macromolecule added to 
-            its `heavy_mol` attribute.
+        self.macro_mol.heavy_mol
+            Places an rdkit instance with disconnected building blocks
+            placed on edges and vertices in this attribute.    
         
         """
         
-        # Get a mathematical graph representing the disconnected 
-        # heavy molecule.
-        heavy_graph = self.macro_mol.graph('heavy')
+        self.macro_mol.heavy_mol = chem.Mol()
         
-        # Use the graph to generate a list of lists. Each sublist is
-        # a collection of atom ids all belonging to the same molecule.
-        # x.nodes() generates the atom ids for each of the sublists. The
-        # function ``connected_component_subgraphs`` generates the 
-        # subgraphs representing the disconnected molecules.           
-        molecules = [x.nodes() for x in 
-                    nx.connected_component_subgraphs(heavy_graph)]
+        bb1 = self.macro_mol.building_blocks[0]
+        bb2 = self.macro_mol.building_blocks[1] 
+        n_fg1 = len(bb1.find_functional_group_atoms())
+        n_fg2 = len(bb2.find_functional_group_atoms())
         
-        # Get rid of all the atom ids which do not belong to heavy 
-        # molecules, but keep data organised into sublists representing
-        # molecules.
-        heavy_mols = self.extract_heavy_atoms(molecules)
+        if n_fg1 < n_fg2:
+            lk = bb1
+            n_lk = n_fg1
+            bb = bb2
+            n_bb = n_fg2
+        else:
+            lk = bb2
+            n_lk = n_fg2
+            bb = bb1
+            n_bb = n_fg1
         
-        # Run the pair up function chosen for the given topology. This
-        # is set in the derived classes initializer. Only the atom ids
-        # of heavy atoms are provided as bonds are only made between 
-        # these. Keeping the data organised into sublists representing
-        # molecules prevents bonds from being created between heavy
-        # atoms on the same molecule by the pair up functions.
-        self.pair_up(heavy_mols)            
-
-
-    def extract_heavy_atoms(self, molecules):
-        """
-        Returns atom ids of heavy atoms, grouped by molecule.
-        
-        This function is only usable during assembly. After assembly
-        all heavy atoms will be on the same molecule. This makes
-        grouping the heavy atoms by molecule somewhat nonsensical.
-        
-        Parameters
-        ----------
-        molecules : iterable of iterables of ints
-            This is list of the form [[1,2], [3,4,5], [9,8,10], [7,6]].
-            Each sublist represents the atom ids belonging to the same
-            building block molecule.
-        
-        Returns
-        -------
-        list of lists of ints
-            The returned list has the form [[1,2], [3,5,7], [9,13]]. 
-            Each sublist represents the atom ids belonging to the same
-            building block molecule. Only heavy atom ids are present in
-            the returned list.
-        
-        """
-        
-        # In essence, create a new sublist for each original sublist in 
-        # in `molecules`. Copy atom ids from the original sublists into
-        # the new subslists only if the atom ids belong to heavy
-        # molecules.        
-        
-        
-        # Create a new list which will holds the sublists holding heavy
-        # atom ids. 
-        heavy_mols = []
-        
-        # Iterate through each sublist in `molecules`. For each such 
-        # sublist, ``molecule``, create a list, ``heavy_mol``, which 
-        # will hold the atom ids found in ``molecule`` if the atom ids
-        # belong to a heavy atom. 
-        
-        # Once all the atom ids in ``molecule`` have been checked, add
-        # the created ``heavy_mol`` variable to ``heavy_mols``. Once
-        # all sublists in ``molecules`` have been checked, return 
-        # ``heavy_mols``.            
-        for molecule in molecules:
-            heavy_mol = []
-            for atom_id in molecule:
-                # Get the corresponding rdkit atom instance.
-                atom = self.macro_mol.heavy_mol.GetAtomWithIdx(atom_id)              
-                atom_n = atom.GetAtomicNum()  
-                
-                # Checks that the atom is heavy.
-                if atom_n in FGInfo.heavy_atomic_nums:
-                    # Heavy ids get added to the new sublist.
-                    heavy_mol.append(atom_id)
+        for position in self.positions_A:
+            self.macro_mol.heavy_mol = chem.CombineMols(
+                                        self.macro_mol.heavy_mol, 
+                                        position.place_mol(bb))
+                                        
+            heavy_ids = deque(maxlen=n_bb)
+            for atom in self.macro_mol.heavy_mol.GetAtoms():
+                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+                    heavy_ids.append(atom.GetIdx())
             
-            # After going through all the atom ids in the original 
-            # sublist, add the new sublist to the collection of heavy
-            # id sublists.
-            heavy_mols.append(heavy_mol) 
+            position.heavy_ids = sorted(heavy_ids)
+            self.pair_heavy_ids_with_connected(position)
+
+        for position in self.positions_B:
+            self.macro_mol.heavy_mol = chem.CombineMols(
+                                        self.macro_mol.heavy_mol, 
+                                        position.place_mol(lk))
+            heavy_ids = deque(maxlen=n_lk)
+            for atom in self.macro_mol.heavy_mol.GetAtoms():
+                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+                    heavy_ids.append(atom.GetIdx())
+            
+            position.heavy_ids = list(heavy_ids)
+
+    def join_mols(self):
         
-        return heavy_mols
+        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
         
+        for position in self.positions_A:
+            for atom_id, vertex in position.atom_position_pairs:
+                # Get all the distances between the atom and the heavy
+                # atoms on the vertex. Store this information on the 
+                # vertex.
+                for atom2_id in vertex.heavy_ids:
+                    distance = self.macro_mol.atom_distance('heavy', 
+                                                            atom_id, 
+                                                            atom2_id)
+                    position.distances.append((distance, 
+                                             atom_id, atom2_id))
+
+        paired = set()        
+        for position in self.positions_A:
+            for _, atom1_id, atom2_id in sorted(position.distances):
+                if atom1_id in paired or atom2_id in paired:
+                    continue            
+
+                bond_type = self.determine_bond_type(atom1_id, atom2_id)
+                # Add the bond.                
+                editable_mol.AddBond(atom1_id, atom2_id, bond_type)
+                self.bonds_made += 1
+                paired.add(atom1_id)
+                paired.add(atom2_id)
+                
+        self.macro_mol.heavy_mol = editable_mol.GetMol()           
+
     def final_sub(self):
         """
         Replaces heavy atoms with functional group atoms they represent.        
@@ -721,76 +641,28 @@ class Topology:
         # Hydrogen atoms are added in places where they are missing.
         self.macro_mol.prist_mol.UpdatePropertyCache()
         self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol,
-                                              addCoords=True)
+                                              addCoords=True)        
 
-
-    def pair_up_edges_with_vertices(self, *args):
-
-
-        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
-        
-        for edge in self.edges:
-            for atom_id, vertex in edge.atom_vertex_pairs:
-                # Get all the distances between the atom and the heavy
-                # atoms on the vertex. Store this information on the 
-                # vertex.
-                for atom2_id in vertex.heavy_ids:
-                    distance = self.macro_mol.atom_distance('heavy', 
-                                                            atom_id, 
-                                                            atom2_id)
-                    vertex.distances.append((distance, 
-                                             atom_id, atom2_id))
-
-
-        for vertex in self.vertices:
-            paired = set()
-            for _, atom1_id, atom2_id in sorted(vertex.distances):
-                if atom1_id in paired or atom2_id in paired:
-                    continue            
-
-                bond_type = self.determine_bond_type(atom1_id, atom2_id)
-                # Add the bond.                
-                editable_mol.AddBond(atom1_id, atom2_id, bond_type)
-                self.bonds_made += 1
-                paired.add(atom1_id)
-                paired.add(atom2_id)
+    def pair_heavy_ids_with_connected(self, vertex):
+        vertex.atom_position_pairs = []        
+        distances = []
+        for heavy_id in vertex.heavy_ids:
+            for position in vertex.connected:
+                atom_coord = self.macro_mol.atom_coords('heavy', 
+                                                        heavy_id)
                 
-        self.macro_mol.heavy_mol = editable_mol.GetMol()
-              
-    def min_distance_partner(self, atom_id, partner_pool):
-        """
-        Return the closest atom from `partner_pool`.
+                distance = euclidean(atom_coord, position.coord)
+                distances.append((distance, heavy_id, position))
         
-        A number of atom ids is supplied and this function finds the
-        atom id of the atom closest to the atom who's id is supplied in 
-        `atom_id`.
-
-        Parameters
-        ----------
-        atom_id : int
-            The id of an atom whose minimum distance partner needs to be
-            found.
-            
-        partner_pool : iterable of iterables of ints
-        
-        Returns
-        -------
-        int
-            An id from `partner_pool`. It belongs to the atom which is  
-            shortest distance away from the atom, whose id was
-            supplied in `atom_id`.
-        
-        """
-        
-        # ``partial`` creates a function which can be used as a key by
-        # the ``min`` function. A function can only be used as a key if 
-        # it takes a single argument. ``partial`` fill the first 
-        # argument of `self.macro_mol.heavy_distance` with `atom_id`
-        # which means that the output of the min function is the atom id
-        # of the atom which is the closest to `atom_id`.
-        distance_func = partial(self.macro_mol.atom_distance, 
-                                'heavy', atom_id)
-        return min(partner_pool, key=distance_func)
+        distances.sort()
+        paired_pos = set()
+        paired_ids = set()
+        for _, heavy_id, pos in distances:
+            if heavy_id in paired_ids or pos in paired_pos:
+                continue
+            vertex.atom_position_pairs.append((heavy_id, pos))
+            paired_ids.add(heavy_id)
+            paired_pos.add(pos)
 
     def determine_bond_type(self, atom1_id, atom2_id):
         """
@@ -851,95 +723,11 @@ class Topology:
         else:
             return rdkit.Chem.rdchem.BondType.SINGLE
 
-
-    def place_mols(self):
-        """
-        Places all building block molecules on correct coordinates.
-
-        The building block molecules are placed in their appropriate 
-        positions based on the topology. This means that the 
-        building-blocks* are placed on vertices and linkers on edges.
-        This function only places the molecules, it does not join them. 
-        It saves the structure a rdkit molecule instance for later use. 
-        This rdkit instace is placed in the `heavy_mol` attribute of the 
-        ``Cage`` instance the topology is describing.
-        
-        Modifies
-        --------
-        self.macro_mol.heavy_mol
-            Places an rdkit instance with disconnected building blocks
-            placed on edges and vertices in this attribute.    
-        
-        """
-        
-        self.macro_mol.heavy_mol = chem.Mol()
-        
-        bb1 = self.macro_mol.building_blocks[0]
-        bb2 = self.macro_mol.building_blocks[1] 
-        n_fg1 = len(bb1.find_functional_group_atoms())
-        n_fg2 = len(bb2.find_functional_group_atoms())
-        
-        if n_fg1 < n_fg2:
-            lk = bb1
-            n_lk = n_fg1
-            bb = bb2
-            n_bb = n_fg2
-        else:
-            lk = bb2
-            n_lk = n_fg2
-            bb = bb1
-            n_bb = n_fg1
-        
-        for edge in self.edges:
-            self.macro_mol.heavy_mol = chem.CombineMols(
-                                        self.macro_mol.heavy_mol, 
-                                        edge.place_mol(lk))
-                                        
-            heavy_ids = deque(maxlen=n_lk)
-            for atom in self.macro_mol.heavy_mol.GetAtoms():
-                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
-                    heavy_ids.append(atom.GetIdx())
-            
-            edge.heavy_ids = sorted(heavy_ids)
-            atom_vertex_pairs = sorted(edge.atom_vertex_pairs)
-            updated_pairs = []
-            for new_id, (old_id, vertex) in zip(edge.heavy_ids, 
-                                                atom_vertex_pairs):
-                updated_pairs.append((new_id, vertex))
-            
-            edge.atom_vertex_pairs = updated_pairs
-
-        for vertex in self.vertices:
-            self.macro_mol.heavy_mol = chem.CombineMols(
-                                        self.macro_mol.heavy_mol, 
-                                        vertex.place_mol(bb))
-            heavy_ids = deque(maxlen=n_bb)
-            for atom in self.macro_mol.heavy_mol.GetAtoms():
-                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
-                    heavy_ids.append(atom.GetIdx())
-            
-            vertex.heavy_ids = list(heavy_ids)
-
 class CageTopology(Topology):
     """
     A topology class which cage topologies should inherit.
         
-    Attributes
-    ----------
-    In addition to all the attributes defined within ``Topology`` this
-    class has the following attributes:
-
-    pair_up : function object (default = pair_up_edges_with_vertices)
-        This is the function which pairs up molecules placed using the
-        ``Vertex`` and ``Edge`` classes. This should be how cage
-        topologies should be defined.    
-    
-    """
-    
-    def __init__(self, macro_mol):
-        Topology.__init__(self, macro_mol)        
-        self.pair_up = self.pair_up_edges_with_vertices
-        
+    """        
 
     @LazyAttr
     def windows(self):
@@ -1058,15 +846,61 @@ class CageTopology(Topology):
             
         return sum(diff_sums)
 
+class VertexOnlyCageToplogy(CageTopology): 
+    
+    def __init__(self, macro_mol, random_placement=False):
+        Topology.__init__(self, macro_mol)
+        self.random_placement = random_placement
+        self.connect()
+        
+    def place_mols(self):
+        
+        self.macro_mol.heavy_mol = chem.Mol()        
+        
+        if self.random_placement:
+            return self.place_mols_random()
+        return self.place_mols_assigned()
+        
+    def place_mols_random(self):
+        for position in self.positions_A:
+            bb = np.random.choice(self.macro_mol.building_blocks)
+            n_bb = len(bb.find_functional_group_atoms())
+            
+            self.macro_mol.heavy_mol = chem.CombineMols(
+                                        self.macro_mol.heavy_mol,
+                                        position.place_mol(bb))
+
+            heavy_ids = deque(maxlen=n_bb)
+            for atom in self.macro_mol.heavy_mol.GetAtoms():
+                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
+                    heavy_ids.append(atom.GetIdx())
+            
+            position.heavy_ids = sorted(heavy_ids)
+            self.pair_heavy_ids_with_connected(position)
+
+
+    @classmethod
+    def connect(cls):
+        if getattr(cls, 'connected', False):
+            return
+        
+        for v1, v2 in cls.connections:
+            v1.connected.append(v2)
+            v2.connected.append(v1)                                    
+        cls.connected = True
+        
+    def place_mols_assigned(self):
+        pass
+
 class FourPlusEight(CageTopology):
-    vertices = [Vertex(-10,-10,0), 
+    positions_A = [Vertex(-10,-10,0), 
                 Vertex(-10,10,0),
                 Vertex(10,-10,0),
                 Vertex(10,10,0)]     
         
-    a,b,c,d=vertices    
+    a,b,c,d=positions_A    
     
-    edges = [Edge(a,b),
+    positions_B = [Edge(a,b),
              Edge(a,b),
              Edge(b,d),
              Edge(b,d),
@@ -1075,7 +909,7 @@ class FourPlusEight(CageTopology):
              Edge(c,d),
              Edge(c,d)]
              
-    e1,e2,e3,e4,e5,e6,e7,e8 = edges
+    e1,e2,e3,e4,e5,e6,e7,e8 = positions_B
     for e in [e1,e3,e5,e7]:
         e.coord = np.add(e.coord, [0,0,10])
 
@@ -1084,16 +918,16 @@ class FourPlusEight(CageTopology):
         
 
 class SixPlusTwelve(CageTopology):
-    vertices = [Vertex(-50,-50,0), 
+    positions_A = [Vertex(-50,-50,0), 
                 Vertex(-50,50,0),
                 Vertex(50,-50,0),
                 Vertex(50,50,0),
                 Vertex(0,0,50),
                 Vertex(0,0,-50)]
                 
-    a,b,c,d,e,f = vertices
+    a,b,c,d,e,f = positions_A
     
-    edges = [Edge(a,b),
+    positions_B = [Edge(a,b),
              Edge(b,d),
              Edge(d,c),
              Edge(a,c),
@@ -1107,29 +941,32 @@ class SixPlusTwelve(CageTopology):
              Edge(f,d)] 
 
 class TwoPlusThree(CageTopology):
-    vertices = [Vertex(0,0,20), Vertex(0,0,-20)]
-    edges = [Edge(vertices[0], vertices[1]),
-             Edge(vertices[0], vertices[1]),
-             Edge(vertices[0], vertices[1])]
+    positions_A = [Vertex(0,0,20), Vertex(0,0,-20)]
+    a,b = positions_A
     
-    a,b = vertices
+    positions_B = [Edge(a, b),
+                  Edge(a, b),
+                  Edge(a,b)]
+    
+    alpha, beta, gamma = positions_B
+  
     b.edge_plane_normal = lambda a=a: np.multiply(a.edge_plane_normal(), 
                                                   -1)
          
-    edges[0].coord = np.array([-20,
+    alpha.coord = np.array([-20,
                               -10*np.sqrt(3),
                                 0])
 
-    edges[1].coord = np.array([20,
+    beta.coord = np.array([20,
                               -10*np.sqrt(3),
                                 0])
 
-    edges[2].coord = np.array([0,
+    gamma.coord = np.array([0,
                               10*np.sqrt(3),
                                 0])
 
 class TenPlusTwenty(CageTopology):
-    vertices = [Vertex(-50, 50, -50), 
+    positions_A = [Vertex(-50, 50, -50), 
                 Vertex(-50, -50, -50), 
                 Vertex(50, 50, -50), 
                 Vertex(50, -50, -50),
@@ -1142,44 +979,46 @@ class TenPlusTwenty(CageTopology):
                 Vertex(0,0,75),
                 Vertex(0,0,-75)]
         
-    edges = [Edge(vertices[0], vertices[2]), 
-             Edge(vertices[0], vertices[1]),
-             Edge(vertices[1], vertices[3]),
-             Edge(vertices[2], vertices[3]),
+    a,b,c,d, e,f,g,h, i,j = positions_A
+        
+    positions_B = [Edge(a, c), 
+             Edge(a, b),
+             Edge(b, d),
+             Edge(c, d),
              
-             Edge(vertices[4], vertices[6]), 
-             Edge(vertices[4], vertices[5]),
-             Edge(vertices[5], vertices[7]),
-             Edge(vertices[6], vertices[7]),
+             Edge(e, g), 
+             Edge(e, f),
+             Edge(f, h),
+             Edge(g, h),
 
 
-             Edge(vertices[0], vertices[4]), 
-             Edge(vertices[1], vertices[5]),
-             Edge(vertices[2], vertices[6]),
-             Edge(vertices[3], vertices[7]),
+             Edge(a, e), 
+             Edge(b, f),
+             Edge(c, g),
+             Edge(d, h),
 
-            Edge(vertices[8], vertices[4]),
-            Edge(vertices[8], vertices[5]),
-            Edge(vertices[8], vertices[6]),
-            Edge(vertices[8], vertices[7]),
+            Edge(i, e),
+            Edge(i, f),
+            Edge(i, g),
+            Edge(i, h),
 
-            Edge(vertices[9], vertices[0]),
-            Edge(vertices[9], vertices[1]),
-            Edge(vertices[9], vertices[2]),
-            Edge(vertices[9], vertices[3])]      
+            Edge(j, a),
+            Edge(j, b),
+            Edge(j, c),
+            Edge(j, d)]      
 
 class TwoPlusFour(CageTopology):
-    vertices = [Vertex(0,0,-10), Vertex(0,0,10)]
-    alpha, beta = vertices
+    positions_A = [Vertex(0,0,-10), Vertex(0,0,10)]
+    alpha, beta = positions_A
     beta.edge_plane_normal = lambda alpha=alpha: np.multiply(
                                         alpha.edge_plane_normal(), -1)
     
-    edges = [Edge(vertices[0], vertices[1]),
-             Edge(vertices[0], vertices[1]),
-            Edge(vertices[0], vertices[1]),
-            Edge(vertices[0], vertices[1])]
+    positions_B = [Edge(alpha, beta),
+             Edge(alpha, beta),
+            Edge(alpha, beta),
+            Edge(alpha, beta)]
             
-    a,b,c,d = edges
+    a,b,c,d = positions_B
     
     a.coord = np.array([10,0,0])
     b.coord = np.array([-10,0,0])
@@ -1188,62 +1027,68 @@ class TwoPlusFour(CageTopology):
 
 class ThreePlusSix(CageTopology):
 
-    vertices = [Vertex(-20,-10*np.sqrt(3),0), 
+    positions_A = [Vertex(-20,-10*np.sqrt(3),0), 
                 Vertex(20,-10*np.sqrt(3),0),
                 Vertex(0,10*np.sqrt(3),0)]
 
-    a,b,c=vertices    
+    a,b,c=positions_A    
     
-    edges = [Edge(a,b),
+    positions_B = [Edge(a,b),
              Edge(a,b),
              Edge(b,c),
              Edge(b,c),
              Edge(a,c),
              Edge(a,c)]
              
-    e1,e2,e3,e4,e5,e6 = edges
+    e1,e2,e3,e4,e5,e6 = positions_B
     for e in [e1,e3,e5]:
         e.coord = np.add(e.coord, [0,0,10])
 
     for e in [e2,e4,e6]:
         e.coord = np.add(e.coord, [0,0,-10])
     
-class FourPlusFour(CageTopology):
-    vertices = [Vertex(100,0,-100/np.sqrt(2)), 
-                Vertex(-100,0,-100/np.sqrt(2)), 
-                Vertex(0,100,100/np.sqrt(2)), 
-                Vertex(0,-100,100/np.sqrt(2))]
+class TwoPlusTwo(VertexOnlyCageToplogy):
+    positions_A = [Vertex(50,0,-50/np.sqrt(2)), 
+                Vertex(-50,0,-50/np.sqrt(2)), 
+                Vertex(0,50,50/np.sqrt(2)), 
+                Vertex(0,-50,50/np.sqrt(2))]
                 
-    a,b,c,d = vertices
+
+
+    a,b,c,d = positions_A
+
+    for x in positions_A:
+        old_normal = x.edge_plane_normal
+        x.edge_plane_normal = lambda a=old_normal: np.multiply(a(), -1)
 
     
+    connections = [(a,b), (a,c), (a,d),
+                   (b,c), (b,d),
+                   (c,d)]
+                
 
-    edges = [    Edge(a,b,c),
-    Edge(b,c,d),
-    Edge(d,a,b),
-    Edge(a,c,d)]
 
 class SixPlusEight(CageTopology):
     
-    vertices =    [Vertex(-50, 50, 0), 
-                Vertex(-50, -50, 0), 
-                Vertex(50, 50, 0), 
-                Vertex(50, -50, 0),
+    positions_A = [Vertex(-50, 50, 0), 
+                    Vertex(-50, -50, 0), 
+                    Vertex(50, 50, 0), 
+                    Vertex(50, -50, 0),
+    
+                    Vertex(0, 0, 50), 
+                    Vertex(0, 0, -50)]
 
-                Vertex(0, 0, 50), 
-                Vertex(0, 0, -50)]
+    a,b,c,d,e,f = positions_A
 
-    a,b,c,d,e,f = vertices
-
-    edges = [Edge(a,e,b),
-             Edge(b,e,d),
-            Edge(e,d,c),
-            Edge(e,c,a),
-
-            Edge(a,f,b),
-            Edge(f,b,d),
-            Edge(d,f,c),
-            Edge(c,f,a)]
+    positions_B = [Vertex.vertex_init(a,e,b),
+                 Vertex.vertex_init(b,e,d),
+                Vertex.vertex_init(e,d,c),
+                Vertex.vertex_init(e,c,a),
+    
+                Vertex.vertex_init(a,f,b),
+                Vertex.vertex_init(f,b,d),
+                Vertex.vertex_init(d,f,c),
+                Vertex.vertex_init(c,f,a)]
 
 class FourPlusSix(CageTopology):
     """
@@ -1260,13 +1105,13 @@ class FourPlusSix(CageTopology):
     
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    vertices = [Vertex(100,0,-100/np.sqrt(2)), 
+    positions_A = [Vertex(100,0,-100/np.sqrt(2)), 
                 Vertex(-100,0,-100/np.sqrt(2)), 
                 Vertex(0,100,100/np.sqrt(2)), 
                 Vertex(0,-100,100/np.sqrt(2))]
         
-    edges = [Edge(v1,v2) for v1, v2 in 
-                itertools.combinations(vertices, 2)]  
+    positions_B = [Edge(v1,v2) for v1, v2 in 
+                itertools.combinations(positions_A, 2)]  
     
     n_windows = 4
     n_window_types = 1    
@@ -1277,7 +1122,7 @@ class EightPlusTwelve(CageTopology):
     
     """
     
-    vertices = [Vertex(-50, 50, -50), 
+    positions_A = [Vertex(-50, 50, -50), 
                 Vertex(-50, -50, -50), 
                 Vertex(50, 50, -50), 
                 Vertex(50, -50, -50),
@@ -1286,22 +1131,24 @@ class EightPlusTwelve(CageTopology):
                 Vertex(-50, -50, 50), 
                 Vertex(50, 50, 50), 
                 Vertex(50, -50, 50)]
-        
-    edges = [Edge(vertices[0], vertices[2]), 
-             Edge(vertices[0], vertices[1]),
-             Edge(vertices[1], vertices[3]),
-             Edge(vertices[2], vertices[3]),
+    
+    a,b,c,d, e,f,g,h = positions_A
+    
+    positions_B = [Edge(a, c), 
+             Edge(a, b),
+             Edge(b, d),
+             Edge(c, d),
              
-             Edge(vertices[4], vertices[6]), 
-             Edge(vertices[4], vertices[5]),
-             Edge(vertices[5], vertices[7]),
-             Edge(vertices[6], vertices[7]),
+             Edge(e, g), 
+             Edge(e, f),
+             Edge(f, h),
+             Edge(g, h),
 
 
-             Edge(vertices[0], vertices[4]), 
-             Edge(vertices[1], vertices[5]),
-             Edge(vertices[2], vertices[6]),
-             Edge(vertices[3], vertices[7])]  
+             Edge(a, e), 
+             Edge(b, f),
+             Edge(c, g),
+             Edge(d, h)]  
     
     n_windows = 6  
     n_window_types = 1
@@ -1309,22 +1156,24 @@ class EightPlusTwelve(CageTopology):
 class SixPlusNine(CageTopology):
     
     # source: http://eusebeia.dyndns.org/4d/prism3
-    vertices = [Vertex(-50,-50/np.sqrt(3),-50), 
+    positions_A = [Vertex(-50,-50/np.sqrt(3),-50), 
                 Vertex(-50,-50/np.sqrt(3),50),
                 Vertex(50,-50/np.sqrt(3),-50),
                 Vertex(50,-50/np.sqrt(3),50),
                 Vertex(0, 100/np.sqrt(3),-50),
                 Vertex(0, 100/np.sqrt(3), 50)]
-                
-    edges = [Edge(vertices[0], vertices[1]),
-             Edge(vertices[0], vertices[2]),
-             Edge(vertices[2], vertices[3]),
-             Edge(vertices[1], vertices[3]),
-             Edge(vertices[0], vertices[4]),
-             Edge(vertices[2], vertices[4]),
-             Edge(vertices[1], vertices[5]),
-             Edge(vertices[3], vertices[5]),
-             Edge(vertices[4], vertices[5])]
+           
+    a,b,c, d,e,f = positions_A          
+           
+    positions_B = [Edge(a, b),
+             Edge(a, c),
+             Edge(c, d),
+             Edge(b, d),
+             Edge(a, e),
+             Edge(c, e),
+             Edge(b, f),
+             Edge(d, f),
+             Edge(e, f)]
     
     n_windows = 5
     n_window_types = 1
@@ -1334,7 +1183,7 @@ class Dodecahedron(CageTopology):
     # Source: http://tinyurl.com/h2dl949
     phi = (1 + np.sqrt(5))/2
     x = 50
-    vertices = [Vertex(x* phi, 0.0, x/phi), 
+    positions_A = [Vertex(x* phi, 0.0, x/phi), 
                 Vertex(x*-phi, 0.0, x/phi), 
                 Vertex(x*-phi, 0.0, x/-phi),
                 Vertex(x* phi, 0.0, x/-phi), 
@@ -1357,8 +1206,8 @@ class Dodecahedron(CageTopology):
                 Vertex( x,-x,-x), 
                 Vertex(-x,-x,-x)]
 
-    A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T = vertices
-    edges = [Edge(A,N), Edge(A,M), Edge(A,D), Edge(B,O), Edge(B,P),
+    A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T = positions_A
+    positions_B = [Edge(A,N), Edge(A,M), Edge(A,D), Edge(B,O), Edge(B,P),
              Edge(B,C), Edge(C,T), Edge(C,Q), Edge(D,S), Edge(D,R),
              Edge(E,M), Edge(E,H), Edge(E,R), Edge(F,G), Edge(F,S),
              Edge(F,N), Edge(G,O), Edge(G,T), Edge(H,P), Edge(H,Q),
