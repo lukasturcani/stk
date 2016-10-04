@@ -20,6 +20,9 @@ class TwoPlusFour(CageTopology):
     b.coord = np.array([-10,0,0])
     c.coord = np.array([0,10,0])
     d.coord = np.array([0,-10,0])
+    
+    n_windows = 4
+    n_window_types = 1
 
 class ThreePlusSix(CageTopology):
 
@@ -42,6 +45,9 @@ class ThreePlusSix(CageTopology):
 
     for e in [e2,e4,e6]:
         e.coord = np.add(e.coord, [0,0,-10])
+        
+    n_windows = 5
+    n_window_types = 2
 
 class FourPlusEight(CageTopology):
     positions_A = [Vertex(-10,-10,0), 
@@ -66,6 +72,9 @@ class FourPlusEight(CageTopology):
 
     for e in [e2,e4,e6,e8]:
         e.coord = np.add(e.coord, [0,0,-10])
+        
+    n_windows = 6
+    n_window_types = 2
 
 class SixPlusTwelve(CageTopology):
     positions_A = [Vertex(-50,-50,0), 
@@ -89,6 +98,9 @@ class SixPlusTwelve(CageTopology):
              Edge(f,b),
              Edge(f,c),
              Edge(f,d)] 
+    
+    n_windows = 8
+    n_window_types = 1   
     
 class TenPlusTwenty(CageTopology):
     positions_A = [Vertex(-50, 50, -50), 
@@ -131,3 +143,6 @@ class TenPlusTwenty(CageTopology):
             Edge(j, b),
             Edge(j, c),
             Edge(j, d)]      
+
+    n_windows = 12
+    n_window_types = 2

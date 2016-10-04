@@ -28,6 +28,9 @@ class TwoPlusThree(CageTopology):
     gamma.coord = np.array([0,
                               10*np.sqrt(3),
                                 0])
+                                
+    n_windows = 3
+    n_window_types = 1
 
 class FourPlusSix(CageTopology):
     """

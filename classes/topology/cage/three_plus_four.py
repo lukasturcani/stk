@@ -22,3 +22,6 @@ class SixPlusEight(CageTopology):
                 Vertex.vertex_init(f,b,d),
                 Vertex.vertex_init(d,f,c),
                 Vertex.vertex_init(c,f,a)]
+                
+    n_windows = 12
+    n_window_types = 1
