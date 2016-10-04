@@ -166,7 +166,6 @@ class VertexOnlyCageTopology(CageTopology):
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol,
                                         position.place_mol(bb))
-
             heavy_ids = deque(maxlen=n_bb)
             for atom in self.macro_mol.heavy_mol.GetAtoms():
                 if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:

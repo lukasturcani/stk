@@ -1,4 +1,4 @@
-from .cage import (TwoPlusThree, FourPlusSix, SixPlusNine, 
+from .cage import (TwoPlusThree, FourPlusSix, SixPlusNine, FourPlusFour,
                    EightPlusTwelve, Dodecahedron, TwoPlusFour, 
                    ThreePlusSix, FourPlusEight, SixPlusTwelve,
-                   TenPlusTwenty, TwoPlusTwo, SixPlusEight)
+                   TenPlusTwenty, TwoPlusTwo, SixPlusEight, OnePlusOne)

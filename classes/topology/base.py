@@ -157,7 +157,6 @@ class Vertex:
         # Finally the well orientated building-block* is placed on the
         # coords of the vertex.
         building_block.set_heavy_atom_centroid(self.coord)
-     
         return building_block.heavy_mol
             
     def edge_plane_normal(self):
