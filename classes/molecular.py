@@ -1815,18 +1815,19 @@ class MacroMolecule(metaclass=CachedMacroMol):
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
+            raise ex
             
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
             
         if topology_args is None:
-            topology_args = []
+            topology_args = {}
 
         self.building_blocks = tuple(building_blocks)
 
         # A ``Topology`` subclass instance must be initialized with a 
-        # copy of the cage it is describing.     
-        self.topology = topology(self, *topology_args)
+        # copy of the cage it is describing.
+        self.topology = topology(self, **topology_args)
         # The topology_args attribute is saved for error handling. See
         # MacroMolError class.
         self.topology_args = topology_args
@@ -1957,7 +1958,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
             Allowed values for this parameter 'prist' and 'heavy'.
             
         path : str (default = None)
-            If the .mol file is to be written to a direcotry other than
+            If the .mol file is to be written to a directory other than
             the one in `prist_mol_file` or `heavy_mol_file`, it should
             be written here.
         
