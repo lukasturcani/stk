@@ -2147,6 +2147,23 @@ class MacroMolecule(metaclass=CachedMacroMol):
         """
         
         return StructUnit.all_atom_coords(self, mol_type)         
+
+    def position_matrix(self, mol_type):
+        """
+        See `position_matrix` documentation in ``StructUnit``.        
+        
+        """
+        
+        return StructUnit.position_matrix(self, mol_type)
+
+    def set_position_from_matrix(self, mol_type, pos_mat):
+        """
+        See `set_position_from_matrix` documentation in ``StructUnit``.        
+        
+        """
+
+        return StructUnit.set_position_from_matrix(self, 
+                                                   mol_type, pos_mat)        
         
     def atom_distance(self, mol_type, atom1_id, atom2_id):
         """

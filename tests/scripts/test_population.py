@@ -4,9 +4,10 @@ import shutil
 import os
 
 
-from ...classes import (Population, Cage, GATools, FourPlusSix, 
-                        StructUnit2, EightPlusTwelve, SixPlusNine, 
+from ...classes import (Population, Cage, GATools, StructUnit2,
                         StructUnit3, MacroMolecule)
+                        
+from ...classes.topology import FourPlusSix, EightPlusTwelve, SixPlusNine
 
 def generate_population(offset=False):
     """
@@ -36,11 +37,8 @@ def generate_population(offset=False):
     
     # Initialize final population of subpopulations and cages.
     return Population(sub1, sub2, *cages[-3:])
-    
-pop_file = os.path.join('data', 'population',
-                        'population_test_obj')
 
-pop = Population.load(pop_file)
+pop = generate_population()
 
 def test_init():
     """
@@ -430,20 +428,7 @@ def test_contains():
     pop.add_subpopulation(Population(*subpop_cages))
     assert subpop_cages[2] in pop
                       
-def test_write_population_to_dir():
-    try:    
-        shutil.rmtree('write_pop_test')
-    except:
-        pass
 
-    pop.write_population_to_dir('write_pop_test')
-    assert len(os.listdir('write_pop_test')) == len(pop)
-    try:
-        shutil.rmtree('write_pop_test')
-    except:
-        pass
-    
- 
     
                       
                       
