@@ -85,10 +85,7 @@ def macromodel_opt(macro_mol, force_field='16',
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    if md:
-        _generate_md_com(macro_mol)
-    else:
-        _generate_com(macro_mol, force_field, no_fix)
+    _generate_com(macro_mol, force_field, no_fix)
     
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.run``. The command is the full path of the ``bmin``
@@ -156,8 +153,64 @@ def macromodel_opt(macro_mol, force_field='16',
     print('Finished updating attributes from .mol2 - {0}.'.format(
                                              macro_mol.prist_mol_file))
 
+    if md:
+        macromodel_md_opt(macro_mol, macromodel_path)
+
     macro_mol.optimized = True       
     return macro_mol    
+
+def macromodel_md_opt(macro_mol, macromodel_path):  
+    print('\nRunning MD on {0}.'.format(macro_mol.prist_mol_file))    
+    
+    # MacroModel requires a ``.mae`` file as input. This creates a 
+    # ``.mae`` file holding the molding the pristine molecule.    
+    print('Converting .mol to .mae - {0}.'.format(
+                                              macro_mol.prist_mol_file))
+    _convert_mol_to_mae(macro_mol, macromodel_path)        
+
+    # generate the ``.com`` file for the MacroModel run.
+    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
+    _generate_md_com(macro_mol)
+    # To run MacroModel a command is issued to to the console via
+    # ``subprocess.run``. The command is the full path of the ``bmin``
+    # program. ``bmin`` is located in the Schrodinger installation
+    # folder. On Windows, to run the software the ``.exe`` extension
+    # must be added to the command and the entire path must be enclosed
+    # in quotes. The path of the ``.mae`` file to be optimized is then
+    # added to the command. On Windows and Unix machines the command
+    # should look something like:
+    #   "C:\\Program Files\\Schrodinger2016-2\\bmin.exe" mae_file_path
+    # and
+    #   $SCHRODINGER/bmin mae_file_path
+    # respectively. Where ``mae_file_path`` does not include the 
+    # ``.mae`` extension.
+    file_root = macro_mol.prist_mol_file.replace(".mol", "")
+    opt_cmd = os.path.join(macromodel_path, "bmin")
+    if os.name == 'nt':
+        opt_cmd = '"' + opt_cmd + '.exe"' 
+
+    # Add the -WAIT option to the optimization command. This prevents
+    # this means the optimization must finish before the next command
+    # can be given to the console.
+    opt_cmd = opt_cmd + " -WAIT " + file_root 
+    # Run the optimization.
+    print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
+    opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                        universal_newlines=True, shell=True)
+    # If optimization fails because the license is not found, rerun the
+    # function.
+    if not _license_found(macro_mol, opt_return.stdout):
+        return macromodel_opt(macro_mol, 
+                              macromodel_path=macromodel_path)
+
+    log_file = macro_mol.prist_mol_file.replace('.mol', '.log')
+    wait_for_file(log_file)
+    conf_num = _low_energy_conf(macro_mol)
+    print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file))
+    _extract_conformer(macro_mol, conf_num, macromodel_path)
+    _convert_mae_to_mol2(macro_mol, macromodel_path)
+    update_prist_attrs_from_mol2(macro_mol)
+    
 
 def _license_found(macro_mol, bmin_output):
     """
@@ -296,8 +349,39 @@ def _generate_com(macro_mol, force_field='16', no_fix=False):
         com.write(main_string)
 
 def _generate_md_com(macro_mol):
+    # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
+    # run a 5000 ns MD, at 300K and optimize 500 random conformations generated during the trajectory
     
+    main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
+ FFLD      16      1      0      0     1.0000     0.0000     0.0000     0.0000
+ BDCO       0      0      0      0    41.5692 99999.0000     0.0000     0.0000
+ READ       0      0      0      0     0.0000     0.0000     0.0000     0.0000
+ CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
+ MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
+ MDIT       0      0      0      0   300.0000     0.0000     0.0000     0.0000
+ MDYN       0      0      0      0     1.5000   500.0000   300.0000     0.0000
+ MDSA     200      0      0      0     0.0000     0.0000     1.0000     0.0000
+ MDYN       1      0      0      0     1.5000  2000.0000   500.0000     0.0000
+ WRIT       0      0      0      0     0.0000     0.0000     0.0000     0.0000
+ RWND       0      1      0      0     0.0000     0.0000     0.0000     0.0000
+ BGIN       0      0      0      0     0.0000     0.0000     0.0000     0.0000
+ READ      -2      0      0      0     0.0000     0.0000     0.0000     0.0000
+ CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
+ MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
+ END        0      0      0      0     0.0000     0.0000     0.0000     0.0000"""
 
+    com_file = macro_mol.prist_mol_file.replace(".mol", ".com")
+    mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
+    output = macro_mol.prist_mol_file.replace(".mol", "-out.maegz")
+
+    # Generate the com file containing the info for the run
+    with open(com_file, "w") as com:
+        # name of the macromodel file
+        com.write(str(mae + "\n"))
+        # name of the output file
+        com.write(str(output + "\n"))
+        # details of the macromodel run
+        com.write(main_string)
 
 def _convert_mol_to_mae(macro_mol, macromodel_path):
     """
@@ -439,16 +523,7 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
     convrt_cmd = convrt_cmd + " -imae " + out + " -omol2 " + mol2
  
     # Make sure .maegz file is present.
-    t_start = time.time()
-    tick = 0
-    while True:
-        time_taken = time.time() - t_start
-        if divmod(time_taken, 5)[0] == tick + 1:
-            print('Waiting for {0}.'.format(out))
-            tick += 1
-        
-        if os.path.exists(out) or time_taken > 20:
-            break
+    wait_for_file(out)
   
     # Execute the file conversion.
     convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
@@ -463,7 +538,83 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
     if 'number 1' in convrt_return.stdout:
         raise ConversionError(convrt_return.stdout)
 
+def _convert_mae_to_mol2(macro_mol, macromodel_path):
+    """
+    Converts a ``.mae`` file to a ``.mol2`` file.
 
+    This function is called by ``macromodel_opt``. It is private because
+    it should probably not be used outside of this context.
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule being optimized. The ``.mae`` file holding its
+        optimized structure is converted to a ``.mol2`` file. Both
+        versions are kept.
+        
+    macromodel_path : str
+        The full path of the installation directory of the Schrodinger 
+        suite. By default on a Windows machine it should be something
+        like: "C:\Program Files\Schrodinger2016-2".   
+    
+    Modifies
+    --------    
+    This function creates a new ``.mol2`` file from the optimized 
+    ``.mae`` file. This new file is placed in the same folder as the 
+    ``.mae`` file.
+    
+    Returns
+    -------
+    None : NoneType
+
+    Raises
+    ------
+    ConversionError
+        If the OPLS3 force field failed to optimize the molecule. If
+        this happens the conversion function is unable to convert the 
+        output of the optimization function and as a result this error
+        is raised.
+    
+    """
+        
+    # Replace extensions to get the names of the various files.
+    mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
+    # ``out`` is the full path of the optimized ``.mae`` file.
+    out = macro_mol.prist_mol_file.replace(".mol", ".mae")
+    
+    # ``convrt_cmd`` is the command entered into the console for turning
+    # a ``.mae`` file to ``.mol2``. It consists of the path to the 
+    # program ``structconvert`` followed by the option ``-imae`` and 
+    # then the full path of the optimized ``.mae`` file. The option 
+    # ``-omol2`` specifies that the output should be a ``.mol2`` file. 
+    # This option is followed by the name of the ``.mol2`` file. On a 
+    # Windows machine the path must be placed in quotes and include the 
+    # ``.exe`` extension. Overall on a Windows and Unix machine the line 
+    # should look something like:
+    #   C:\\Program Files\\Schrodinger2016-2\\utilities\\...
+    #  ...structconvert.exe" -imae mol_file.mae -omol2 mol_file.mol2
+    # and
+    #   $SCHRODINGER/utilities/structconvert -imae mol_file.mae... 
+    # ... -mol2 mol_file.mol2
+    # respectively.    
+    convrt_cmd = os.path.join(macromodel_path, 'utilities', 
+                                                     'structconvert')
+    # For Windows systems add the ``.exe`` extension and encapsulate
+    # path in quotes.
+    if os.name == 'nt':
+        convrt_cmd = '"' + convrt_cmd + '.exe"'                
+    convrt_cmd = convrt_cmd + " -imae " + out + " -omol2 " + mol2
+ 
+    # Make sure .maegz file is present.
+    wait_for_file(out)
+  
+    # Execute the file conversion.
+    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+           universal_newlines=True, shell=True) 
+
+    # If no license if found, keep re-running the function until it is.
+    if 'Could not check out a license for mmli' in convrt_return.stdout:
+        return _convert_maegz_to_mol2(macro_mol, macromodel_path)    
 
 def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
@@ -745,6 +896,72 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
                                 atom3_id+1, atom4_id+1, ta) + "\n")
 
     return fix_block
+
+def _low_energy_conf(macro_mol):
+    """
+    Opens the .log file from the MD and gathers the info about the conformers
+    """
+
+    log_name = macro_mol.prist_mol_file.replace('.mol', '.log')    
+    
+    with open(log_name, 'r') as log:
+        conformers = []
+        for line in log:
+            if "Conf" in line and "****" not in line:
+                conf_num = int(line.split()[1])
+                conf_en = float(line.split()[4])
+                conformers.append((conf_num, conf_en))
+    
+        # Delete the first 2 structures
+        conformers.pop(0)
+        conformers.pop(0)
+        # Sort the conformers depending on their energy and select the lowest in energy
+        conf_sorted = sorted(conformers, key=lambda x: x[1])
+        print("  structure {} \n{} \n\n".format(log_name.split(".")[0],conf_sorted))
+        min_conf_en = float(conf_sorted[0][1])
+        min_conf_num = int(conf_sorted[0][0]) - 1
+        print("  Conf with lowest energy {0} kJ/mol is {1}".format(min_conf_en, min_conf_num))
+        print("  LOW Energy conf calculated\n\n")
+        
+    return min_conf_num
+
+def _extract_conformer(macro_mol, conf_num, macromodel_path):
+    maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
+    mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
+    
+    extract_cmd = os.path.join(macromodel_path, 
+                               'utilities', 'maesubset')
+
+    # For Windows systems add the ``.exe`` extension and encapsulate
+    # path in quotes.
+    if os.name == 'nt':
+        extract_cmd = '"' + extract_cmd + '.exe"'                
+    extract_cmd = "{0} {1} -n {2} -o {3}".format(extract_cmd, maegz, 
+                                                 conf_num, mae)
+ 
+    # Make sure .maegz file is present.
+    wait_for_file(maegz)
+  
+    # Execute the file conversion.
+    convrt_return = sp.run(extract_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+           universal_newlines=True, shell=True) 
+
+    # If no license if found, keep re-running the function until it is.
+    if 'Could not check out a license for mmli' in convrt_return.stdout:
+        return _extract_conformer(macro_mol, conf_num, macromodel_path)        
+
+def wait_for_file(file_name):
+    # Make sure .maegz file is present.
+    t_start = time.time()
+    tick = 0
+    while True:
+        time_taken = time.time() - t_start
+        if divmod(time_taken, 5)[0] == tick + 1:
+            print('Waiting for {0}.'.format(file_name))
+            tick += 1
+        
+        if os.path.exists(file_name) or time_taken > 20:
+            break 
 
 def kill_macromodel():
     """
