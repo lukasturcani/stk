@@ -14,7 +14,7 @@ class ConversionError(Exception):
 
 def macromodel_opt(macro_mol, force_field='16',
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2",
-                 no_fix=False):
+                 no_fix=False, md=False):
     """
     Optimizes the molecule using MacroModel.
 
@@ -40,6 +40,10 @@ def macromodel_opt(macro_mol, force_field='16',
     no_fix : bool (default = False)
         When ``True`` the molecular parameters will not be fixed during
         the optimization.
+        
+    md : bool (default = False)
+        If ``True`` then a macromodel optimization using MD is carried
+        out to sample different conformtions.
     
     Modifies
     --------
@@ -81,7 +85,10 @@ def macromodel_opt(macro_mol, force_field='16',
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    _generate_COM(macro_mol, force_field, no_fix)
+    if md:
+        _generate_md_com(macro_mol)
+    else:
+        _generate_com(macro_mol, force_field, no_fix)
     
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.run``. The command is the full path of the ``bmin``
@@ -199,7 +206,7 @@ def _license_found(macro_mol, bmin_output):
     
     return True
  
-def _generate_COM(macro_mol, force_field='16', no_fix=False):
+def _generate_com(macro_mol, force_field='16', no_fix=False):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -287,6 +294,9 @@ def _generate_COM(macro_mol, force_field='16', no_fix=False):
         # Next is the body of the ``.com`` file, held in
         # ``main_string``.
         com.write(main_string)
+
+def _generate_md_com(macro_mol):
+    
 
 
 def _convert_mol_to_mae(macro_mol, macromodel_path):
