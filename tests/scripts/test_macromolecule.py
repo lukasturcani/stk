@@ -1,12 +1,13 @@
 import os
-import pickle
 import pytest
 import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 
-from ...classes import (MacroMolecule, FourPlusSix, StructUnit3, 
-                        StructUnit2, EightPlusTwelve)
+from ...classes import (MacroMolecule, StructUnit3, 
+                        StructUnit2, )
+
+from ...classes.topology import FourPlusSix, EightPlusTwelve
 
 from ...convenience_functions import periodic_table
 
@@ -66,77 +67,27 @@ def test_energy():
     `energy` attribute must lazy and read the log file correctly.
     
     """
- 
-    # Load the StructUnit instance from the dump file.
-    with open(obj_file_name, 'rb') as dump_file:
-        macro_mol = pickle.load(dump_file)
 
-    macro_mol.prist_mol_file = obj_file_name + '.mol'
+
+    mol.prist_mol_file = obj_file_name + '.mol'
 
     # `energy` should fail on unoptimized molecules as these will not 
     # have a .log file.
     with pytest.raises(AttributeError):
-        macro_mol.energy
+        mol.energy
 
     # Check that the .log file is being read correctly.
-    macro_mol.optimized = True
-    assert macro_mol.energy == 1876.4573
+    mol.optimized = True
+    assert mol.energy == 1876.4573
     # Use another log file with a different energy to check that the
     # energy attribute is lazy. The log file getting changed but the
     # energy remaining the same proves this.
-    macro_mol.prist_mol_file = obj_file_name + '2.mol'
-    assert macro_mol.energy != -1876.4573
+    mol.prist_mol_file = obj_file_name + '2.mol'
+    assert mol.energy != -1876.4573
     # Delete the attribute so that the log file is reread and ensure
     # negative energies are gettting read correctly.
-    delattr(macro_mol, 'energy')
-    assert macro_mol.energy == -1876.4573  
-
-def test_write_mol_file():
-    """
-    Tests `write_mol_file`.
-    
-    """
-    
-    # Load the StructUnit instance from the dump file.
-    with open(obj_file_name, 'rb') as dump_file:
-        struct_unit = pickle.load(dump_file)    
-    
-    struct_unit.prist_mol_file = 'delete_this.mol'
-    struct_unit.heavy_mol_file = 'delete_this_heavy.mol' 
-    
-    struct_unit.write_mol_file('prist')
-    struct_unit.write_mol_file('heavy')
-    
-    
-    # Get the expected output as a string.
-    prist_name = os.path.join('data','macromolecule', 
-                              'write_test_prist.mol')
-    heavy_name = os.path.join('data','macromolecule', 
-                              'write_test_heavy.mol')  
-                
-    from itertools import zip_longest
-    with open(prist_name, 'r') as prist_file:
-        
-        with open(struct_unit.prist_mol_file, 'r') as out_file:
-            for l1, l2 in zip_longest(prist_file, out_file):
-                assert l1 == l2
-   
-   
-    with open(prist_name, 'r') as prist_file:
-        exp_output_prist = prist_file.read()
-    
-    with open(heavy_name, 'r') as heavy_file:
-        exp_output_heavy = heavy_file.read() 
-    
-    # Get the written output as a string.
-    with open('delete_this.mol', 'r') as out_file:
-        output_prist = out_file.read()
-        
-    with open('delete_this_heavy.mol', 'r') as out_file:
-        output_heavy = out_file.read()
-        
-    assert exp_output_prist == output_prist
-    assert exp_output_heavy == output_heavy
+    delattr(mol, 'energy')
+    assert mol.energy == -1876.4573  
 
 def test_graph():
     """
@@ -300,17 +251,13 @@ def test_centroid_functions_prist():
         > set_position
     
     """
-
-    # Load the StructUnit instance from the dump file.
-    with open(obj_file_name, 'rb') as dump_file:
-        mol = pickle.load(dump_file)
         
     # Get the centroid.
     prist_centroid = mol.centroid('prist')
     # Get the heavy centroid to make sure its not changed in this test.    
     heavy_centroid = mol.centroid('heavy')
     # Position the centroid.
-    new_pos = np.array([10,15,25])
+    new_pos = np.array([25,15,10])
     mol.set_position('prist', new_pos)
     # Check that the centroid is at the desired position and that it's
     # different to the original position.
@@ -333,17 +280,13 @@ def test_centroid_functions_heavy():
         > set_position
     
     """
-
-    # Load the StructUnit instance from the dump file.
-    with open(obj_file_name, 'rb') as dump_file:
-        mol = pickle.load(dump_file)
         
     # Get the centroid.
     heavy_centroid = mol.centroid('heavy')
     # Get the prist centroid to make sure its not changed in this test.    
     prist_centroid = mol.centroid('prist')
     # Position the centroid.
-    new_pos = np.array([10,15,25])
+    new_pos = np.array([10.,15.,25.])
     mol.set_position('heavy', new_pos)
     # Check that the centroid is at the desired position and that it's
     # different to the original position.
@@ -353,9 +296,8 @@ def test_centroid_functions_heavy():
                        atol = 1e-8)
 
     # Check that the prist centroid is unmoved.
-    assert np.array_equal(prist_centroid, mol.centroid('prist'))
-    assert not np.allclose(new_pos, mol.centroid('prist'), 
-                       atol = 1e-8) 
+    assert np.allclose(prist_centroid, mol.centroid('prist'), atol=1e-8)
+    assert not np.allclose(new_pos, mol.centroid('prist'), atol = 1e-8) 
 
 def test_center_of_mass():
     """
@@ -391,22 +333,18 @@ def test_shift():
     Test `shift`.      
     
     """
-    
-    # Load the StructUnit instance from the dump file.
-    with open(obj_file_name, 'rb') as dump_file:
-        macro_mol = pickle.load(dump_file)
 
     # Shifting the same StructUnit twice should return two 
     # ``rdkit.Chem.rdchem.Mol`` instances with conformers describing the
     # same atomic positions. Furthermore, the original conformer in the
     # ``StructUnit`` instance should be unchanged.
-    og_conformer = macro_mol.prist_mol.GetConformer()
+    og_conformer = mol.prist_mol.GetConformer()
 
     shift = [10,10,10]    
-    a = macro_mol.shift('prist', shift)
+    a = mol.shift('prist', shift)
     a_conformer = a.GetConformer()
     
-    b = macro_mol.shift('prist', shift)
+    b = mol.shift('prist', shift)
     b_conformer = b.GetConformer()
     
     # Check that the same atom coords are present in `a` and `b`. Also
