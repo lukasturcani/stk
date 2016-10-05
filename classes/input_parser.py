@@ -65,7 +65,7 @@ def func_line_parser(line):
             # are used by MMEA not the class names as strings. So make
             # this conversion to facilitate that.            
             for i, topology in enumerate(p_vals):
-                p_vals[i] = getattr(MMEA.classes, p_vals[i])
+                p_vals[i] = getattr(MMEA.classes.topology, p_vals[i])
             
         if len(p_vals) == 1 and isinstance(p_vals[0], str):
             # Sometimes file paths may include a space. Within the
