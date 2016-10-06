@@ -1,6 +1,5 @@
 import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
-
 import os
 from multiprocessing import Pool
 from functools import partial
@@ -70,7 +69,8 @@ def optimize_all(func_data, population):
     
     # Using the name of the function stored in `func_data` get the
     # function object from one of the functions defined within the 
-    # module.    
+    # module.
+    print(globals())
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may require.
     p_func = partial(func, **func_data.params)
@@ -138,8 +138,7 @@ def optimize_all_serial(func_data, population):
     p_func = partial(func, **func_data.params)
     
     # Apply the function to every member of the population.    
-    return iter(p_func(member) for member in population)
-    
+    return iter(p_func(member) for member in population)    
 
 def update_prist_attrs_from_mol2(macro_mol):
     """
@@ -286,7 +285,6 @@ def do_not_optimize(macro_mol):
     print('Optimizing', macro_mol.prist_mol_file)
     macro_mol.optimized = True   
     return macro_mol
-    
-from ..classes import FGInfo
-from ..classes.exception import MacroMolError
+
+from .macromodel import macromodel_opt    
 from ..convenience_functions import mol_from_mol2_file
