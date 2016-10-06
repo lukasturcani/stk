@@ -81,11 +81,11 @@ def macromodel_opt(macro_mol, force_field='16',
     # ``.mae`` file holding the molding the pristine molecule.    
     print('Converting .mol to .mae - {0}.'.format(
                                               macro_mol.prist_mol_file))
-    _convert_mol_to_mae(macro_mol, macromodel_path)        
+    convert_mol_to_mae(macro_mol, macromodel_path)        
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    _generate_com(macro_mol, force_field, no_fix)
+    generate_com(macro_mol, force_field, no_fix)
     
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.run``. The command is the full path of the ``bmin``
@@ -116,7 +116,7 @@ def macromodel_opt(macro_mol, force_field='16',
 
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not _license_found(macro_mol, opt_return.stdout):
+    if not license_found(macro_mol, opt_return.stdout):
         return macromodel_opt(macro_mol, 
                               macromodel_path=macromodel_path,
                               no_fix=no_fix)
@@ -126,7 +126,7 @@ def macromodel_opt(macro_mol, force_field='16',
     print('Converting .maegz to .mol2 - {0}.'.format(
                                             macro_mol.prist_mol_file))
     try:
-        _convert_maegz_to_mol2(macro_mol, macromodel_path)
+        convert_maegz_to_mol2(macro_mol, macromodel_path)
     except ConversionError as ex:
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
                '- {0}'.format(macro_mol.prist_mol_file)))
@@ -166,11 +166,11 @@ def macromodel_md_opt(macro_mol, macromodel_path):
     # ``.mae`` file holding the molding the pristine molecule.    
     print('Converting .mol to .mae - {0}.'.format(
                                               macro_mol.prist_mol_file))
-    _convert_mol_to_mae(macro_mol, macromodel_path)        
+    convert_mol_to_mae(macro_mol, macromodel_path)        
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    _generate_md_com(macro_mol)
+    generate_md_com(macro_mol)
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.run``. The command is the full path of the ``bmin``
     # program. ``bmin`` is located in the Schrodinger installation
@@ -199,20 +199,20 @@ def macromodel_md_opt(macro_mol, macromodel_path):
                         universal_newlines=True, shell=True)
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not _license_found(macro_mol, opt_return.stdout):
+    if not license_found(macro_mol, opt_return.stdout):
         return macromodel_opt(macro_mol, 
                               macromodel_path=macromodel_path)
 
     log_file = macro_mol.prist_mol_file.replace('.mol', '.log')
     wait_for_file(log_file)
-    conf_num = _low_energy_conf(macro_mol)
+    conf_num = low_energy_conf(macro_mol)
     print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file))
-    _extract_conformer(macro_mol, conf_num, macromodel_path)
-    _convert_mae_to_mol2(macro_mol, macromodel_path)
+    extract_conformer(macro_mol, conf_num, macromodel_path)
+    convert_mae_to_mol2(macro_mol, macromodel_path)
     update_prist_attrs_from_mol2(macro_mol)
     
 
-def _license_found(macro_mol, bmin_output):
+def license_found(macro_mol, bmin_output):
     """
     Checks to see if minimization failed due to a missing license.
 
@@ -259,7 +259,7 @@ def _license_found(macro_mol, bmin_output):
     
     return True
  
-def _generate_com(macro_mol, force_field='16', no_fix=False):
+def generate_com(macro_mol, force_field='16', no_fix=False):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -333,7 +333,7 @@ def _generate_com(macro_mol, force_field='16', no_fix=False):
     
     # This function adds all the lines which fix bond distances and 
     # angles into ``main_string``.
-    main_string = _fix_params_in_com_file(macro_mol, 
+    main_string = fix_params_in_com_file(macro_mol, 
                                           main_string, no_fix)
     
     # Writes the ``.com`` file.
@@ -348,7 +348,7 @@ def _generate_com(macro_mol, force_field='16', no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def _generate_md_com(macro_mol):
+def generate_md_com(macro_mol):
     # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
     # run a 5000 ns MD, at 300K and optimize 500 random conformations generated during the trajectory
     
@@ -383,7 +383,7 @@ def _generate_md_com(macro_mol):
         # details of the macromodel run
         com.write(main_string)
 
-def _convert_mol_to_mae(macro_mol, macromodel_path):
+def convert_mol_to_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.    
     
@@ -450,11 +450,11 @@ def _convert_mol_to_mae(macro_mol, macromodel_path):
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return _convert_mol_to_mae(macro_mol, macromodel_path) 
+        return convert_mol_to_mae(macro_mol, macromodel_path) 
 
     return mae_file
 
-def _convert_maegz_to_mol2(macro_mol, macromodel_path):
+def convert_maegz_to_mol2(macro_mol, macromodel_path):
     """
     Converts a ``.mae`` file to a ``.mol2`` file.
 
@@ -531,14 +531,14 @@ def _convert_maegz_to_mol2(macro_mol, macromodel_path):
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return _convert_maegz_to_mol2(macro_mol, macromodel_path)    
+        return convert_maegz_to_mol2(macro_mol, macromodel_path)    
 
     # If OPLS3 failed, re-run the optimization with the OPLS_2005 force 
     # field.
     if 'number 1' in convrt_return.stdout:
         raise ConversionError(convrt_return.stdout)
 
-def _convert_mae_to_mol2(macro_mol, macromodel_path):
+def convert_mae_to_mol2(macro_mol, macromodel_path):
     """
     Converts a ``.mae`` file to a ``.mol2`` file.
 
@@ -614,9 +614,9 @@ def _convert_mae_to_mol2(macro_mol, macromodel_path):
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return _convert_maegz_to_mol2(macro_mol, macromodel_path)    
+        return convert_maegz_to_mol2(macro_mol, macromodel_path)    
 
-def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
+def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
     
@@ -659,16 +659,16 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
         return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                     "COMES_HERE!!!\n"), fix_block)
     # Add lines that fix the bond distance.
-    fix_block = _fix_distance_in_com_file(macro_mol, fix_block)  
+    fix_block = fix_distance_in_com_file(macro_mol, fix_block)  
     # Add lines that fix the bond angles.                          
-    fix_block = _fix_bond_angle_in_com_file(macro_mol, fix_block)
+    fix_block = fix_bond_angle_in_com_file(macro_mol, fix_block)
     # Add lines that fix the torsional angles.
-    fix_block = _fix_torsional_angle_in_com_file(macro_mol, fix_block)
+    fix_block = fix_torsional_angle_in_com_file(macro_mol, fix_block)
     
     return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                 "COMES_HERE!!!\n"), fix_block)
 
-def _fix_distance_in_com_file(macro_mol, fix_block):
+def fix_distance_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond distances to ``.com`` body string.
     
@@ -729,7 +729,7 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
 
     return fix_block
     
-def _fix_bond_angle_in_com_file(macro_mol, fix_block):
+def fix_bond_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond angles to ``.com`` body string.
     
@@ -811,7 +811,7 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     
     return fix_block
     
-def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
+def fix_torsional_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing torsional bond angles to ``.com`` body string.
     
@@ -897,7 +897,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     return fix_block
 
-def _low_energy_conf(macro_mol):
+def low_energy_conf(macro_mol):
     """
     Opens the .log file from the MD and gathers the info about the conformers
     """
@@ -917,15 +917,11 @@ def _low_energy_conf(macro_mol):
         conformers.pop(0)
         # Sort the conformers depending on their energy and select the lowest in energy
         conf_sorted = sorted(conformers, key=lambda x: x[1])
-        print("  structure {} \n{} \n\n".format(log_name.split(".")[0],conf_sorted))
-        min_conf_en = float(conf_sorted[0][1])
         min_conf_num = int(conf_sorted[0][0]) - 1
-        print("  Conf with lowest energy {0} kJ/mol is {1}".format(min_conf_en, min_conf_num))
-        print("  LOW Energy conf calculated\n\n")
         
     return min_conf_num
 
-def _extract_conformer(macro_mol, conf_num, macromodel_path):
+def extract_conformer(macro_mol, conf_num, macromodel_path):
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
     
@@ -948,7 +944,7 @@ def _extract_conformer(macro_mol, conf_num, macromodel_path):
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return _extract_conformer(macro_mol, conf_num, macromodel_path)        
+        return extract_conformer(macro_mol, conf_num, macromodel_path)        
 
 def wait_for_file(file_name):
     # Make sure .maegz file is present.
