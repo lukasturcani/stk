@@ -5,7 +5,6 @@ import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 
 # More imports at bottom.
-from ...classes.exception import MacroMolError
 
 class ConversionError(Exception):
     def __init__(self, message):
@@ -1138,6 +1137,6 @@ def kill_macromodel():
         
         
         
-        
+from ...classes.exception import MacroMolError       
 from ...classes.molecular import FGInfo        
 from ..optimization import update_prist_attrs_from_mol2        

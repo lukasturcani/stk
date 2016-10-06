@@ -2476,4 +2476,4 @@ class Polymer(MacroMolecule):
     pass
 
 
-from ..optimization import macromodel_opt
+from ..optimization.macromodel.macromodel_opt_funcs import macromodel_opt
