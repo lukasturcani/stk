@@ -2431,11 +2431,19 @@ class Cage(MacroMolecule):
         
         """
         
-        bb_file = np.random.choice(os.listdir(bb_db))
+        while True:
+            bb_file = np.random.choice(os.listdir(bb_db))
+            if bb_file.endswith(".mol"):
+                break
+            
         bb_file = os.path.join(bb_db, bb_file)
         bb = StructUnit3(bb_file)
         
-        lk_file = np.random.choice(os.listdir(lk_db))
+        while True:
+            lk_file = np.random.choice(os.listdir(lk_db))
+            if lk_file.endswith(".mol"):
+                break
+            
         lk_file = os.path.join(lk_db, lk_file)
         lk = StructUnit2(lk_file)
         
@@ -2447,7 +2455,11 @@ class Cage(MacroMolecule):
     def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
         bb = StructUnit3(bb_file)        
         
-        lk_file = np.random.choice(os.listdir(lk_db))
+        while True:
+            lk_file = np.random.choice(os.listdir(lk_db))
+            if lk_file.endswith(".mol"):
+                break
+            
         lk_file = os.path.join(lk_db, lk_file)
         lk = StructUnit2(lk_file)
         
