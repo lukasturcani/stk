@@ -1,7 +1,7 @@
 import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
 import os
-from multiprocessing import Pool
+import multiprocessing as mp
 from functools import partial
 import time
 
@@ -70,13 +70,12 @@ def optimize_all(func_data, population):
     # Using the name of the function stored in `func_data` get the
     # function object from one of the functions defined within the 
     # module.
-    print(globals())
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may require.
     p_func = partial(func, **func_data.params)
     
     # Apply the function to every member of the population, in parallel.
-    with Pool() as pool:
+    with mp.get_context('spawn').Pool() as pool:
         optimized = pool.map(p_func, population)
         # Make sure the cache is updated with the optimized versions.
         for member in optimized:
