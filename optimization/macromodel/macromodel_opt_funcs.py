@@ -4,7 +4,7 @@ import time
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 
-from ..optimization import update_prist_attrs_from_mol2
+# More imports at bottom.
 from ...classes.exception import MacroMolError
 from ...classes.molecular import FGInfo
 
@@ -980,3 +980,11 @@ def kill_macromodel():
         
         sp.run(kill_cmd1, shell=True)
         sp.run(kill_cmd2, shell=True)
+        
+        
+        
+        
+        
+        
+        
+from ..optimization import update_prist_attrs_from_mol2        
