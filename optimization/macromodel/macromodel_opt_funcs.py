@@ -69,7 +69,7 @@ def macromodel_opt(macro_mol, force_field='16',
         more details.               
     
     """
-
+    
     # If the molecule is already optimized, return.
     if macro_mol.optimized:
         print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
@@ -105,15 +105,20 @@ def macromodel_opt(macro_mol, force_field='16',
     if os.name == 'nt':
         opt_cmd = '"' + opt_cmd + '.exe"' 
 
-    # Add the -WAIT option to the optimization command. This prevents
-    # this means the optimization must finish before the next command
-    # can be given to the console.
-    opt_cmd = opt_cmd + " -WAIT " + file_root 
+    # Add the -WAIT option to the optimization command. This means the 
+    # optimization must finish before the next command can be given to 
+    # the console.
+    opt_cmd = opt_cmd + " -WAIT " + file_root  
     # Run the optimization.
     print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
     opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                         universal_newlines=True, shell=True)
-
+    # If optimization fails because a wrong Schrodinger path was given,
+    # raise.
+    if 'The system cannot find the path specified' in opt_return.stdout:
+        print(opt_return.stdout)        
+        raise ValueError(('Wrong Schrodinger path supplied to'
+                          ' `macromodel_opt` function.'))
     # If optimization fails because the license is not found, rerun the
     # function.
     if not license_found(macro_mol, opt_return.stdout):
@@ -359,9 +364,9 @@ def generate_md_com(macro_mol):
  CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
  MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
  MDIT       0      0      0      0   300.0000     0.0000     0.0000     0.0000
- MDYN       0      0      0      0     1.5000   500.0000   300.0000     0.0000
- MDSA     200      0      0      0     0.0000     0.0000     1.0000     0.0000
- MDYN       1      0      0      0     1.5000  2000.0000   500.0000     0.0000
+ MDYN       0      0      0      0     1.5000    10.0000   300.0000     0.0000
+ MDSA      50      0      0      0     0.0000     0.0000     1.0000     0.0000
+ MDYN       1      0      0      0     1.5000   200.0000   300.0000     0.0000
  WRIT       0      0      0      0     0.0000     0.0000     0.0000     0.0000
  RWND       0      1      0      0     0.0000     0.0000     0.0000     0.0000
  BGIN       0      0      0      0     0.0000     0.0000     0.0000     0.0000

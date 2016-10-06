@@ -8,7 +8,7 @@ from inspect import signature
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
-from .optimization import macromodel_opt
+from . import optimization
 from .convenience_functions import rotation_matrix_arbitrary_axis
 
 def calc_fitness(func_data, population):
@@ -391,7 +391,7 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     target = StructUnit(target_mol_file, minimal=True)
     if not hasattr(target, 'optimized'):
         target.optimized = False
-        macromodel_opt(target, no_fix=True, 
+        optimization.macromodel_opt(target, no_fix=True, 
                        macromodel_path=macromodel_path)
 
     # This function creates a new molecule holding both the target
@@ -429,7 +429,7 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
         # In order to optimize a ``StructUnit`` instance the
         # `optimized` attribute needs to be added.
         macromol_complex.optimized = False
-        macromodel_opt(macromol_complex, no_fix=True,
+        optimization.macromodel_opt(macromol_complex, no_fix=True,
                        macromodel_path=macromodel_path)
         macromol_complexes.append(macromol_complex)
     
