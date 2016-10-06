@@ -1,6 +1,6 @@
 import numpy as np
 import itertools
-from collections import deque
+from collections import deque, Counter
 import rdkit
 import rdkit.Chem as chem
 from scipy.spatial.distance import euclidean
@@ -437,28 +437,18 @@ class Topology:
         incremened for each new bond made during assembly. Used in some
         fitness functions.
     
-    paired : set of ints
-        This attribute is created and used during assembly by some pair
-        up functions. Not all topolgies will need to do this and as a 
-        result not all instances will have this attribute. It is a set
-        of atom ids which have already had a bond added to them during
-        assembly.
+    bb_counter : Counter
+        A counter keeping track of how much of each building block was
+        used during assembly. The ``StructUnit`` instance acts as the
+        counter key.
         
-    paired_mols : set of tuples of ints
-        This attribute is created and used during assembly by some pair
-        up functions. Not all topologies will need to do this and as a 
-        result not all instnaces will have this attribute. It is a set 
-        of tuples. The tuples are sorted so that (1,2) and (2,1) are
-        added as the same pairing. Note that using ``sorted`` on tuples
-        returns a list, so it must be reconverted to a tuple before
-        being added to the set. This is because lists are not hashable
-        and cannot be added to sets a result.
         
     """
     
     def __init__(self, macro_mol):
         self.macro_mol = macro_mol
-        self.bonds_made = 0         
+        self.bonds_made = 0
+        self.bb_counter = Counter()         
         
     def build(self):
         """
@@ -487,6 +477,13 @@ class Topology:
         self.macro_molecule.prist_mol
             Adds an rdkit instance of the pristine assembled molecule to
             this attribute.
+            
+        self.bonds_made : int
+            This counter is updated with each bond made during assembly.            
+            
+        self.bb_counter : Counter
+            The counter is updated with each building block molecule
+            placed.                        
             
         Returns
         -------
@@ -550,7 +547,8 @@ class Topology:
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         position.place_mol(bb))
-                                        
+            self.bb_counter.update([bb])                            
+            
             heavy_ids = deque(maxlen=n_bb)
             for atom in self.macro_mol.heavy_mol.GetAtoms():
                 if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
@@ -563,6 +561,8 @@ class Topology:
             self.macro_mol.heavy_mol = chem.CombineMols(
                                         self.macro_mol.heavy_mol, 
                                         position.place_mol(lk))
+            self.bb_counter.update([lk])
+            
             heavy_ids = deque(maxlen=n_lk)
             for atom in self.macro_mol.heavy_mol.GetAtoms():
                 if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
