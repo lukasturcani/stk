@@ -285,5 +285,5 @@ def do_not_optimize(macro_mol):
     macro_mol.optimized = True   
     return macro_mol
 
-from .macromodel import macromodel_opt    
+from .macromodel import macromodel_opt, macromodel_cage_opt, macromodel_md_opt    
 from ..convenience_functions import mol_from_mol2_file
