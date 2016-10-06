@@ -660,8 +660,8 @@ class StructUnit(metaclass=Cached):
         """
         
         if not self.optimized:
-            raise AttributeError(('A molecule must be optimized for'
-                                  ' its energy to be taken.'))
+            macromodel_opt(self, no_fix=True,
+                           macromodel_path=macromodel_path)
         
         # Go thorugh the log file line by line and find the line which
         # says ``Total Energy = ``. This line holds the energy value in
@@ -2442,5 +2442,4 @@ class Polymer(MacroMolecule):
     pass
 
 
-
-
+from ..optimization import macromodel_opt
