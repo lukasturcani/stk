@@ -133,7 +133,7 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
-def cage(macro_mol, target_size, 
+def cage(macro_mol, target_size, macromodel_path,
          coeffs=None, exponents=None, means=None):
     """
     Calculates the fitness of a cage.
@@ -162,11 +162,11 @@ def cage(macro_mol, target_size,
            to enter the cavity
         3) `asymmetry` - sum of the difference between the size of of
            windows of the same type
-        4) `neg_eng_per_bond` - the energy of the cage divided by the 
-           number of bonds for during assembly, when the total energy
-           of the cage is < 0. This is a measure of the stability or 
-           strain of a cage.
-        5) Same as 4) but used when total energy of the cage is > 0.
+        4) `neg_eng_per_bond` - the formation energy of the cage divided 
+           by the number of bonds for during assembly, when the energy
+           is < 0. This is a measure of the stability or strain of a 
+           cage.
+        5) Same as 4) but used when the energy is > 0.
         
     The design of the fitness function is as follows. Consider two
     cages, ``CageA`` and ``CageB``. If the parameters, 1) to 4), in
@@ -215,6 +215,9 @@ def cage(macro_mol, target_size,
         
     target_size : float
         The desried size of the cage's pore.
+        
+    macromodel_path : str
+        The Schrodinger directory path.
         
     coeffs : numpy.array (default = None)
         An array holding the coeffients A to N in equation (2).
@@ -296,7 +299,7 @@ def cage(macro_mol, target_size,
       
     asymmetry = macro_mol.topology.window_difference(500)
     
-    energy_per_bond = macro_mol.energy / macro_mol.topology.bonds_made
+    energy_per_bond = macro_mol.formation_energy()
     if energy_per_bond < 0:
         neg_eng_per_bond = energy_per_bond
         pos_eng_per_bond = 0
@@ -381,18 +384,11 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     # The first time running the fitness function create an instance
     # of the target molecule as a ``StructUnit``. Due to caching,
     # running the initialization again on later attempts will not 
-    # re-initialize. Normally ``StructUnit`` instances do not have
-    # the attribute `optimized`, as these structures do not need to
-    # be optimized. However, in this case it is necessary to know
-    # the energy of the target molecule as part of the fitness 
-    # calculation. Giving ``StructUnit`` the `optimized` attribute
-    # fools the optimization function into running on ``StructUnit``
-    # despite it being designed for ``MacroMolecule`` instances.
+    # re-initialize.
     target = StructUnit(target_mol_file, minimal=True)
-    if not hasattr(target, 'optimized'):
-        target.optimized = False
-        optimization.macromodel_opt(target, no_fix=True, 
-                       macromodel_path=macromodel_path)
+
+    optimization.macromodel_opt(target, no_fix=True, 
+                                macromodel_path=macromodel_path)
 
     # This function creates a new molecule holding both the target
     # and the cage centered at the origin. It then calculates the 
@@ -426,9 +422,6 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
         # ``StructUnit`` instance.
         macromol_complex = StructUnit(mm_complex.prist_mol_file, 
                                       minimal=True)
-        # In order to optimize a ``StructUnit`` instance the
-        # `optimized` attribute needs to be added.
-        macromol_complex.optimized = False
         optimization.macromodel_opt(macromol_complex, no_fix=True,
                        macromodel_path=macromodel_path)
         macromol_complexes.append(macromol_complex)
