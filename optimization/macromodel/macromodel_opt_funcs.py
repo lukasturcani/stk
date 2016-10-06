@@ -3,6 +3,7 @@ import subprocess as sp
 import time
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
+import warnings
 
 # More imports at bottom.
 
@@ -360,9 +361,11 @@ def macromodel_cage_opt(macro_mol, force_field='16',
     print('Finished updating attributes from .mol2 - {0}.'.format(
                                              macro_mol.prist_mol_file))
 
-    if (md and 
-       len(macro_mol.topology.windows) == macro_mol.topology.n_windows):
-        macromodel_md_opt(macro_mol, macromodel_path)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        if (md and 
+           len(macro_mol.topology.windows) == macro_mol.topology.n_windows):
+            macromodel_md_opt(macro_mol, macromodel_path)
 
     macro_mol.optimized = True       
     return macro_mol
