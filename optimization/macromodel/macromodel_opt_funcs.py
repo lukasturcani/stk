@@ -216,6 +216,158 @@ def macromodel_md_opt(macro_mol, macromodel_path):
     convert_mae_to_mol2(macro_mol, macromodel_path)
     update_prist_attrs_from_mol2(macro_mol)
     
+def macromodel_cage_opt(macro_mol, force_field='16',
+                 macromodel_path=r"C:\Program Files\Schrodinger2016-2",
+                 no_fix=False, md=False):
+    """
+    Optimizes the molecule using MacroModel.
+
+    This function runs a restricted optimization. The structures of the
+    building blocks are frozen and only the new bonds formed between
+    building blocks during assembly are optimized.    
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure must be optimized.
+        
+    macromodel_path : str
+        The full path of the ``Schrodinger`` suite within the user's 
+        machine. For example, in a default Microsoft installation the 
+        folder will probably be something like
+        ``C:\Program Files\Schrodinger2016-2``.
+
+    force_field : str (default = '16')
+        The number of the force field to be used in the optimization, 
+        as a string. The string should be 2 characters long.
+        
+    no_fix : bool (default = False)
+        When ``True`` the molecular parameters will not be fixed during
+        the optimization.
+        
+    md : bool (default = False)
+        If ``True`` then a macromodel optimization using MD is carried
+        out to sample different conformtions.
+    
+    Modifies
+    --------
+    macro_mol.prist_mol
+        The rdkit molecule held in this attribute is replaced by an 
+        rdkit molecule with an optimized structure.
+    
+    macro_mol.prist_mol_file's content
+        The content of the ``.mol`` file located at 
+        `macro_mol.prist_mol_file`, is changed so that it holds the
+        structure of the optimized rdkit molecule.
+    
+    macro_mol.optimized
+        After a successful optimization, this attribute is set to 
+        ``True``.
+    
+    Returns
+    -------
+    macro_mol : MacroMolecule
+        The macromolecule that was passed as an argument and modified
+        by the optimization function. Returned to accomodate 
+        parallelization. See ``optimize_all`` function documentation for
+        more details.               
+    
+    """
+    
+    # If the molecule is already optimized, return.
+    if macro_mol.optimized:
+        print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
+        return macro_mol
+    
+    print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
+    
+    # MacroModel requires a ``.mae`` file as input. This creates a 
+    # ``.mae`` file holding the molding the pristine molecule.    
+    print('Converting .mol to .mae - {0}.'.format(
+                                              macro_mol.prist_mol_file))
+    convert_mol_to_mae(macro_mol, macromodel_path)        
+
+    # generate the ``.com`` file for the MacroModel run.
+    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
+    generate_com(macro_mol, force_field, no_fix)
+    
+    # To run MacroModel a command is issued to to the console via
+    # ``subprocess.run``. The command is the full path of the ``bmin``
+    # program. ``bmin`` is located in the Schrodinger installation
+    # folder. On Windows, to run the software the ``.exe`` extension
+    # must be added to the command and the entire path must be enclosed
+    # in quotes. The path of the ``.mae`` file to be optimized is then
+    # added to the command. On Windows and Unix machines the command
+    # should look something like:
+    #   "C:\\Program Files\\Schrodinger2016-2\\bmin.exe" mae_file_path
+    # and
+    #   $SCHRODINGER/bmin mae_file_path
+    # respectively. Where ``mae_file_path`` does not include the 
+    # ``.mae`` extension.
+    file_root = macro_mol.prist_mol_file.replace(".mol", "")
+    opt_cmd = os.path.join(macromodel_path, "bmin")
+    if os.name == 'nt':
+        opt_cmd = '"' + opt_cmd + '.exe"' 
+
+    # Add the -WAIT option to the optimization command. This means the 
+    # optimization must finish before the next command can be given to 
+    # the console.
+    opt_cmd = opt_cmd + " -WAIT " + file_root  
+    # Run the optimization.
+    print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
+    opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                        universal_newlines=True, shell=True)
+    # If optimization fails because a wrong Schrodinger path was given,
+    # raise.
+    if 'The system cannot find the path specified' in opt_return.stdout:
+        print(opt_return.stdout)        
+        raise ValueError(('Wrong Schrodinger path supplied to'
+                          ' `macromodel_opt` function.'))
+    # If optimization fails because the license is not found, rerun the
+    # function.
+    if not license_found(macro_mol, opt_return.stdout):
+        return macromodel_opt(macro_mol, 
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix)
+
+    # Get the ``.mae`` file output from the optimization and convert it
+    # to a ``.mol2`` file.
+    print('Converting .maegz to .mol2 - {0}.'.format(
+                                            macro_mol.prist_mol_file))
+    try:
+        convert_maegz_to_mol2(macro_mol, macromodel_path)
+    except ConversionError as ex:
+        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
+               '- {0}'.format(macro_mol.prist_mol_file)))
+        
+        # If OPLS_2005 has been tried already - record an exception.
+        if force_field=='14':
+            MacroMolError(Exception(), macro_mol, 
+                          'Both force fields failed.')
+            return macro_mol
+            
+        # If OPLSE_2005 has not been tried - try it.
+        return macromodel_opt(macro_mol, force_field='14', 
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix)
+    
+    print('Updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
+    try:
+        update_prist_attrs_from_mol2(macro_mol) 
+    except Exception as ex:
+        MacroMolError(ex, macro_mol, 
+        'During ``update_prist_attrs_from_mol2`` call.')
+
+    print('Finished updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
+
+    if (md and 
+       len(macro_mol.topology.windows) == macro_mol.topology.n_windows):
+        macromodel_md_opt(macro_mol, macromodel_path)
+
+    macro_mol.optimized = True       
+    return macro_mol
 
 def license_found(macro_mol, bmin_output):
     """
@@ -355,7 +507,7 @@ def generate_com(macro_mol, force_field='16', no_fix=False):
 
 def generate_md_com(macro_mol):
     # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
-    # run a 5000 ns MD, at 300K and optimize 500 random conformations generated during the trajectory
+    # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
     
     main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
  FFLD      16      1      0      0     1.0000     0.0000     0.0000     0.0000
@@ -916,10 +1068,7 @@ def low_energy_conf(macro_mol):
                 conf_num = int(line.split()[1])
                 conf_en = float(line.split()[4])
                 conformers.append((conf_num, conf_en))
-    
-        # Delete the first 2 structures
-        conformers.pop(0)
-        conformers.pop(0)
+
         # Sort the conformers depending on their energy and select the lowest in energy
         conf_sorted = sorted(conformers, key=lambda x: x[1])
         min_conf_num = int(conf_sorted[0][0]) - 1
