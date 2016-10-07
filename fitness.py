@@ -84,18 +84,21 @@ def calc_fitness(func_data, population):
     use_means = 'means' in signature(func).parameters.keys() 
     
     if use_means:
-
         var_sum = 0
         valid_params = 0
         for ind in population:
             try:
                 unscaled = func(ind, **func_data.params)
-            except:
+                print('unscaled try', unscaled)
+            except Exception as ex:
+                raise ex
                 ind.unscaled_fitness_vars = None
                 unscaled = None
+                print('unscaled except', unscaled)
             
             if unscaled is not None:
-                valid_params += 1    
+                valid_params += 1
+                print('unscaled not none', unscaled)
                 var_sum = np.add(unscaled, var_sum)
 
         var_avg = np.divide(var_sum, valid_params)
@@ -113,6 +116,7 @@ def calc_fitness(func_data, population):
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
             macro_mol.topology.windows = None
+            raise ex
 
         print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
             
@@ -249,6 +253,7 @@ def cage(macro_mol, target_size, macromodel_path,
     """
 
     if means is not None:
+        print(means)
         if means[-1] > 0:
             raise ValueError(('The negative bond formation energy is'
                               ' not negative.'), means)
@@ -300,7 +305,7 @@ def cage(macro_mol, target_size, macromodel_path,
       
     asymmetry = macro_mol.topology.window_difference(500)
     
-    energy_per_bond = macro_mol.formation_energy()
+    energy_per_bond = macro_mol.formation_energy(macromodel_path)
     if energy_per_bond < 0:
         neg_eng_per_bond = energy_per_bond
         pos_eng_per_bond = 0
