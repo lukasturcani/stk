@@ -582,7 +582,7 @@ class Population:
         
         """
 
-        return optimize_all(self.ga_tools.optimization, self)
+        return optimize_all_serial(self.ga_tools.optimization, self)
             
     def calculate_member_fitness(self):
         calc_fitness(self.ga_tools.fitness, self)     

@@ -363,9 +363,16 @@ def macromodel_cage_opt(macro_mol, force_field='16',
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        if (md and 
-           len(macro_mol.topology.windows) == macro_mol.topology.n_windows):
-            macromodel_md_opt(macro_mol, macromodel_path)
+
+        try:
+            if macro_mol.topology.windows is not None:
+                if (md and 
+                           len(macro_mol.topology.windows) == 
+                                           macro_mol.topology.n_windows):
+                    macromodel_md_opt(macro_mol, macromodel_path)
+
+        except:
+            pass
 
     macro_mol.optimized = True       
     return macro_mol
@@ -1065,7 +1072,7 @@ def low_energy_conf(macro_mol):
     with open(log_name, 'r') as log:
         conformers = []
         for line in log:
-            if "Conf" in line and "****" not in line:
+            if "Conf" in line and "kJ/mol" in line and "****" not in line:
                 conf_num = int(line.split()[1])
                 conf_en = float(line.split()[4])
                 conformers.append((conf_num, conf_en))
