@@ -89,16 +89,13 @@ def calc_fitness(func_data, population):
         for ind in population:
             try:
                 unscaled = func(ind, **func_data.params)
-                print('unscaled try', unscaled)
+
             except Exception as ex:
-                raise ex
                 ind.unscaled_fitness_vars = None
                 unscaled = None
-                print('unscaled except', unscaled)
             
             if unscaled is not None:
                 valid_params += 1
-                print('unscaled not none', unscaled)
                 var_sum = np.add(unscaled, var_sum)
 
         var_avg = np.divide(var_sum, valid_params)
@@ -116,7 +113,6 @@ def calc_fitness(func_data, population):
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
             macro_mol.topology.windows = None
-            raise ex
 
         print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
             
@@ -253,8 +249,10 @@ def cage(macro_mol, target_size, macromodel_path,
     """
 
     if means is not None:
-        print(means)
-        if means[-1] > 0:
+        # A mean value of 0 is converted to 1 to prevent divisions by
+        # zero. Really the condition should be > 0 but > 1 accounts for
+        # this consideration.
+        if means[-1] > 1:
             raise ValueError(('The negative bond formation energy is'
                               ' not negative.'), means)
         
