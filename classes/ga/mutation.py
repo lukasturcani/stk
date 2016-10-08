@@ -123,7 +123,8 @@ class Mutation:
                     break
 
             except Exception as ex:
-                MacroMolError(ex, parent, 'Error during mutation.') 
+                MacroMolError(ex, parent, ('Error during mutation'
+                    ' with {}.').format(func.__name__)) 
 
         mutant_pop -= population
         
@@ -159,7 +160,10 @@ class Mutation:
         
         """
         
-        bb_file = np.random.choice(os.listdir(database))
+        while True:
+            bb_file = np.random.choice(os.listdir(database))
+            if bb_file.endswith(".mol"):
+                break
         bb_file = os.path.join(database, bb_file)
         bb = StructUnit3(bb_file)
         lk = next(x for x in cage.building_blocks if 

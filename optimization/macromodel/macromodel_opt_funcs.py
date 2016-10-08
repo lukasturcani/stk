@@ -114,10 +114,12 @@ def macromodel_opt(macro_mol, force_field='16',
                         universal_newlines=True, shell=True)
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
-    if 'The system cannot find the path specified' in opt_return.stdout:
-        print(opt_return.stdout)        
-        raise ValueError(('Wrong Schrodinger path supplied to'
+    if 'The system cannot find the path specified' in opt_return.stdout:   
+        path_error = ValueError(('Wrong Schrodinger path supplied to'
                           ' `macromodel_opt` function.'))
+        MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
+        return macro_mol        
+        
     # If optimization fails because the license is not found, rerun the
     # function.
     if not license_found(macro_mol, opt_return.stdout):
@@ -317,11 +319,12 @@ def macromodel_cage_opt(macro_mol, force_field='16',
     opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                         universal_newlines=True, shell=True)
     # If optimization fails because a wrong Schrodinger path was given,
-    # raise.
-    if 'The system cannot find the path specified' in opt_return.stdout:
-        print(opt_return.stdout)        
-        raise ValueError(('Wrong Schrodinger path supplied to'
+    # make a MacroMolError.
+    if 'The system cannot find the path specified' in opt_return.stdout:       
+        path_error = ValueError(('Wrong Schrodinger path supplied to'
                           ' `macromodel_opt` function.'))
+        MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
+        return macro_mol  
     # If optimization fails because the license is not found, rerun the
     # function.
     if not license_found(macro_mol, opt_return.stdout):
@@ -1106,6 +1109,7 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
+        print('extract_conformer - License not found. ')        
         return extract_conformer(macro_mol, conf_num, macromodel_path)        
 
 def wait_for_file(file_name):

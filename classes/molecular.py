@@ -674,7 +674,7 @@ class StructUnit(metaclass=Cached):
         # index 3 after ``split()`` has been applied.
         log_file = self.prist_mol_file.replace('.mol', '.log')
         with open(log_file, 'r') as log:
-            for line in log:
+            for line in reversed(log.readlines()):
                 if 'Total Energy =    ' in line:
                     return float(line.split()[3])
 
