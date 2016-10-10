@@ -195,7 +195,10 @@ class Mutation:
         
         """        
 
-        lk_file = np.random.choice(os.listdir(database))
+        while True:
+            lk_file = np.random.choice(os.listdir(database))
+            if lk_file.endswith(".mol"):
+                break
         lk_file = os.path.join(database, lk_file)
         lk = StructUnit2(lk_file)
         bb = next(x for x in cage.building_blocks if 
