@@ -99,7 +99,7 @@ def calc_fitness(func_data, population):
                 var_sum = np.add(unscaled, var_sum)
 
         var_avg = np.divide(var_sum, valid_params)
-        population.var_avg = var_avg
+        population.ga_tools.ga_progress.means.append(var_avg.tolist())
 
     # Apply the function to every member of the population.
     for macro_mol in population:
