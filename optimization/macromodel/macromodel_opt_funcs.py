@@ -214,8 +214,20 @@ def macromodel_md_opt(macro_mol, macromodel_path):
     conf_num = low_energy_conf(macro_mol)
     print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file))
     extract_conformer(macro_mol, conf_num, macromodel_path)
+    print('Converting .mae to .mol2 - {}.'.format(
+                                            macro_mol.prist_mol_file))
     convert_mae_to_mol2(macro_mol, macromodel_path)
-    update_prist_attrs_from_mol2(macro_mol)
+
+    print('Updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
+    try:
+        update_prist_attrs_from_mol2(macro_mol) 
+    except Exception as ex:
+        MacroMolError(ex, macro_mol, 
+        'During ``update_prist_attrs_from_mol2`` call.')
+
+    print('Finished updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
     
 def macromodel_cage_opt(macro_mol, force_field='16',
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2",
