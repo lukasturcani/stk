@@ -87,34 +87,33 @@ def macromodel_opt(macro_mol, force_field='16',
     generate_com(macro_mol, force_field, no_fix)
     
     # To run MacroModel a command is issued to to the console via
-    # ``subprocess.run``. The command is the full path of the ``bmin``
+    # ``subprocess.Popen``. The command is the full path of the ``bmin``
     # program. ``bmin`` is located in the Schrodinger installation
-    # folder. On Windows, to run the software the ``.exe`` extension
-    # must be added to the command and the entire path must be enclosed
-    # in quotes. The path of the ``.mae`` file to be optimized is then
-    # added to the command. On Windows and Unix machines the command
-    # should look something like:
-    #   "C:\\Program Files\\Schrodinger2016-2\\bmin.exe" mae_file_path
-    # and
-    #   $SCHRODINGER/bmin mae_file_path
-    # respectively. Where ``mae_file_path`` does not include the 
-    # ``.mae`` extension.
+    # folder.
     file_root = macro_mol.prist_mol_file.replace(".mol", "")
-    opt_cmd = os.path.join(macromodel_path, "bmin")
-    if os.name == 'nt':
-        opt_cmd = '"' + opt_cmd + '.exe"' 
-
-    # Add the -WAIT option to the optimization command. This means the 
-    # optimization must finish before the next command can be given to 
-    # the console.
-    opt_cmd = opt_cmd + " -WAIT " + file_root  
+    opt_app = os.path.join(macromodel_path, "bmin")
+    # The first member of the list is the command, the following ones
+    # are any additional arguments.
+    opt_cmd = [opt_app, file_root] 
+    
     # Run the optimization.
-    print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
-    opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                        universal_newlines=True, shell=True)
+    print(time.ctime(time.time()),
+    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
+    try:
+        opt_proc = sp.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                            universal_newlines=True)
+        proc_out, _ = opt_proc.communicate(timeout=600)
+        opt_proc.wait()
+        
+    except sp.TimeoutExpired as ex:
+        print(('\nMinimization took too long and was terminated '
+               'by force - {}\n').format(macro_mol.prist_mol_file))
+        opt_proc.kill()
+        proc_out = ""
+
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
-    if 'The system cannot find the path specified' in opt_return.stdout:   
+    if 'The system cannot find the path specified' in proc_out:   
         path_error = ValueError(('Wrong Schrodinger path supplied to'
                           ' `macromodel_opt` function.'))
         MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
@@ -122,10 +121,10 @@ def macromodel_opt(macro_mol, force_field='16',
         
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not license_found(macro_mol, opt_return.stdout):
-        return macromodel_opt(macro_mol, 
+    if not license_found(macro_mol, proc_out):
+        return macromodel_opt(macro_mol, force_field=force_field,
                               macromodel_path=macromodel_path,
-                              no_fix=no_fix)
+                              no_fix=no_fix, md=md)
 
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
@@ -146,7 +145,7 @@ def macromodel_opt(macro_mol, force_field='16',
         # If OPLSE_2005 has not been tried - try it.
         return macromodel_opt(macro_mol, force_field='14', 
                               macromodel_path=macromodel_path,
-                              no_fix=no_fix)
+                              no_fix=no_fix, md=md)
     
     print('Updating attributes from .mol2 - {0}.'.format(
                                              macro_mol.prist_mol_file))
@@ -178,36 +177,43 @@ def macromodel_md_opt(macro_mol, macromodel_path):
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
     generate_md_com(macro_mol)
     # To run MacroModel a command is issued to to the console via
-    # ``subprocess.run``. The command is the full path of the ``bmin``
-    # program. ``bmin`` is located in the Schrodinger installation
-    # folder. On Windows, to run the software the ``.exe`` extension
-    # must be added to the command and the entire path must be enclosed
-    # in quotes. The path of the ``.mae`` file to be optimized is then
-    # added to the command. On Windows and Unix machines the command
-    # should look something like:
-    #   "C:\\Program Files\\Schrodinger2016-2\\bmin.exe" mae_file_path
-    # and
-    #   $SCHRODINGER/bmin mae_file_path
-    # respectively. Where ``mae_file_path`` does not include the 
-    # ``.mae`` extension.
+    # ``subprocess.Popen``.
     file_root = macro_mol.prist_mol_file.replace(".mol", "")
-    opt_cmd = os.path.join(macromodel_path, "bmin")
-    if os.name == 'nt':
-        opt_cmd = '"' + opt_cmd + '.exe"' 
-
-    # Add the -WAIT option to the optimization command. This prevents
-    # this means the optimization must finish before the next command
-    # can be given to the console.
-    opt_cmd = opt_cmd + " -WAIT " + file_root 
+    opt_app = os.path.join(macromodel_path, "bmin")
+    # The first member of the list is the command, the following ones
+    # are any additional arguments.
+    opt_cmd = [opt_app, file_root]
+    
     # Run the optimization.
-    print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
-    opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                        universal_newlines=True, shell=True)
+    print(time.ctime(time.time()),
+    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
+    try:
+        opt_proc = sp.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                            universal_newlines=True)
+        print(opt_proc.pid)
+        proc_out, _ = opt_proc.communicate(timeout=600)
+        opt_proc.wait()
+        print('done waiting', opt_proc.pid)
+
+    except sp.TimeoutExpired as ex:
+        print(('\nMinimization took too long and was terminated '
+               'by force - {}\n').format(macro_mol.prist_mol_file))
+        opt_proc.kill()
+        proc_out = ""
+
+    # If optimization fails because a wrong Schrodinger path was given,
+    # make a MacroMolError.
+    if 'The system cannot find the path specified' in proc_out:       
+        path_error = ValueError(('Wrong Schrodinger path supplied to'
+                          ' `macromodel_opt` function.'))
+        MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
+        return macro_mol
+       
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not license_found(macro_mol, opt_return.stdout):
-        return macromodel_opt(macro_mol, 
-                              macromodel_path=macromodel_path)
+    if not license_found(macro_mol, proc_out):
+        return macromodel_md_opt(macro_mol,
+                                 macromodel_path=macromodel_path)
 
     log_file = macro_mol.prist_mol_file.replace('.mol', '.log')
     wait_for_file(log_file)
@@ -305,44 +311,46 @@ def macromodel_cage_opt(macro_mol, force_field='16',
     generate_com(macro_mol, force_field, no_fix)
     
     # To run MacroModel a command is issued to to the console via
-    # ``subprocess.run``. The command is the full path of the ``bmin``
+    # ``subprocess.Popen``. The command is the full path of the ``bmin``
     # program. ``bmin`` is located in the Schrodinger installation
-    # folder. On Windows, to run the software the ``.exe`` extension
-    # must be added to the command and the entire path must be enclosed
-    # in quotes. The path of the ``.mae`` file to be optimized is then
-    # added to the command. On Windows and Unix machines the command
-    # should look something like:
-    #   "C:\\Program Files\\Schrodinger2016-2\\bmin.exe" mae_file_path
-    # and
-    #   $SCHRODINGER/bmin mae_file_path
-    # respectively. Where ``mae_file_path`` does not include the 
-    # ``.mae`` extension.
+    # folder.
     file_root = macro_mol.prist_mol_file.replace(".mol", "")
-    opt_cmd = os.path.join(macromodel_path, "bmin")
-    if os.name == 'nt':
-        opt_cmd = '"' + opt_cmd + '.exe"' 
-
-    # Add the -WAIT option to the optimization command. This means the 
-    # optimization must finish before the next command can be given to 
-    # the console.
-    opt_cmd = opt_cmd + " -WAIT " + file_root  
+    opt_app = os.path.join(macromodel_path, "bmin")
+    # The first member of the list is the command, the following ones
+    # are any additional arguments.
+    opt_cmd = [opt_app, file_root]
+    
     # Run the optimization.
-    print('Running bmin - {0}.'.format(macro_mol.prist_mol_file))
-    opt_return = sp.run(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                        universal_newlines=True, shell=True)
+    print(time.ctime(time.time()),
+    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
+    try:
+        opt_proc = sp.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+                            universal_newlines=True)
+        proc_out, _ = opt_proc.communicate(timeout=600)
+        
+        opt_proc.wait()
+        
+    except sp.TimeoutExpired as ex:
+        print(('\nMinimization took too long and was terminated '
+               'by force - {}\n').format(macro_mol.prist_mol_file))
+        opt_proc.kill()
+        proc_out = ""     
+        
     # If optimization fails because a wrong Schrodinger path was given,
     # make a MacroMolError.
-    if 'The system cannot find the path specified' in opt_return.stdout:       
+
+    if 'The system cannot find the path specified' in proc_out:       
         path_error = ValueError(('Wrong Schrodinger path supplied to'
                           ' `macromodel_opt` function.'))
         MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
-        return macro_mol  
+        return macro_mol
+        
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not license_found(macro_mol, opt_return.stdout):
-        return macromodel_opt(macro_mol, 
+    if not license_found(macro_mol, proc_out):
+        return macromodel_cage_opt(macro_mol, force_field=force_field,
                               macromodel_path=macromodel_path,
-                              no_fix=no_fix)
+                              no_fix=no_fix, md=md)
 
     # Get the ``.mae`` file output from the optimization and convert it
     # to a ``.mol2`` file.
@@ -361,9 +369,9 @@ def macromodel_cage_opt(macro_mol, force_field='16',
             return macro_mol
             
         # If OPLSE_2005 has not been tried - try it.
-        return macromodel_opt(macro_mol, force_field='14', 
+        return macromodel_cage_opt(macro_mol, force_field='14', 
                               macromodel_path=macromodel_path,
-                              no_fix=no_fix)
+                              no_fix=no_fix, md=md)
     
     print('Updating attributes from .mol2 - {0}.'.format(
                                              macro_mol.prist_mol_file))
@@ -408,7 +416,7 @@ def license_found(macro_mol, bmin_output):
     
     bmin_output : str
         The outout from submitting the minimization of the structure
-        to the ``bmin`` program via the shell.
+        to the ``bmin`` program.
         
     Returns
     -------
@@ -566,9 +574,6 @@ def generate_md_com(macro_mol):
 def convert_mol_to_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.    
-    
-    This function is called by ``macromodel_opt``. It is private because
-    it should probably not be used outside of this context.
 
     Parameters
     ----------
@@ -602,44 +607,12 @@ def convert_mol_to_mae(macro_mol, macromodel_path):
     mae_file = macro_mol.prist_mol_file.replace('.mol', 
                                                      '.mae')
     
-    # ``convrt_cmd`` is the command entered into the console for turning
-    # a ``.mol`` file to ``.mae``. It consists of the path to the 
-    # program ``structconvert`` followed by the name of ``.mol`` file.
-    # The option ``-omae`` specifies that the output should be a 
-    # ``.mae`` file. This option is followed by the name of the ``.mae``
-    # file. On a Windows machine the path must be placed in quotes and
-    # include the ``.exe`` extension. Overall on a Windows and Unix
-    # machine the line should look something like:
-    #   C:\\Program Files\\Schrodinger2016-2\\utilities\\...
-    #  ...structconvert.exe" mol_file.mol -omae mol_file.mae
-    # and
-    #   $SCHRODINGER/utilities/structconvert mol_file.mol -omae ...
-    # ...mol_file.mae
-    # respectively.
-    convrt_cmd = os.path.join(macromodel_path, 'utilities',
-                              'structconvert')  
-    # For Windows systems add the ``.exe`` extension and encapsulate
-    # path in quotes.                              
-    if os.name == 'nt':
-        convrt_cmd = '"' + convrt_cmd + '.exe"'    
-    convrt_cmd += (" " + macro_mol.prist_mol_file + 
-                   " -omae " + mae_file)
-
-    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                        universal_newlines=True, shell=True)
-
-    # If no license if found, keep re-running the function until it is.
-    if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return convert_mol_to_mae(macro_mol, macromodel_path) 
-
+    structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
     return mae_file
 
 def convert_maegz_to_mol2(macro_mol, macromodel_path):
     """
     Converts a ``.mae`` file to a ``.mol2`` file.
-
-    This function is called by ``macromodel_opt``. It is private because
-    it should probably not be used outside of this context.
     
     Parameters
     ----------
@@ -679,51 +652,11 @@ def convert_maegz_to_mol2(macro_mol, macromodel_path):
     out = macro_mol.prist_mol_file.replace(".mol", 
                                                 "-out.maegz")
     
-    # ``convrt_cmd`` is the command entered into the console for turning
-    # a ``.mae`` file to ``.mol2``. It consists of the path to the 
-    # program ``structconvert`` followed by the option ``-imae`` and 
-    # then the full path of the optimized ``.mae`` file. The option 
-    # ``-omol2`` specifies that the output should be a ``.mol2`` file. 
-    # This option is followed by the name of the ``.mol2`` file. On a 
-    # Windows machine the path must be placed in quotes and include the 
-    # ``.exe`` extension. Overall on a Windows and Unix machine the line 
-    # should look something like:
-    #   C:\\Program Files\\Schrodinger2016-2\\utilities\\...
-    #  ...structconvert.exe" -imae mol_file.mae -omol2 mol_file.mol2
-    # and
-    #   $SCHRODINGER/utilities/structconvert -imae mol_file.mae... 
-    # ... -mol2 mol_file.mol2
-    # respectively.    
-    convrt_cmd = os.path.join(macromodel_path, 'utilities', 
-                                                     'structconvert')
-    # For Windows systems add the ``.exe`` extension and encapsulate
-    # path in quotes.
-    if os.name == 'nt':
-        convrt_cmd = '"' + convrt_cmd + '.exe"'                
-    convrt_cmd = convrt_cmd + " -imae " + out + " -omol2 " + mol2
- 
-    # Make sure .maegz file is present.
-    wait_for_file(out)
-  
-    # Execute the file conversion.
-    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-           universal_newlines=True, shell=True) 
-
-    # If no license if found, keep re-running the function until it is.
-    if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return convert_maegz_to_mol2(macro_mol, macromodel_path)    
-
-    # If OPLS3 failed, re-run the optimization with the OPLS_2005 force 
-    # field.
-    if 'number 1' in convrt_return.stdout:
-        raise ConversionError(convrt_return.stdout)
+    return structconvert(out, mol2, macromodel_path)
 
 def convert_mae_to_mol2(macro_mol, macromodel_path):
     """
     Converts a ``.mae`` file to a ``.mol2`` file.
-
-    This function is called by ``macromodel_opt``. It is private because
-    it should probably not be used outside of this context.
     
     Parameters
     ----------
@@ -762,39 +695,31 @@ def convert_mae_to_mol2(macro_mol, macromodel_path):
     # ``out`` is the full path of the optimized ``.mae`` file.
     out = macro_mol.prist_mol_file.replace(".mol", ".mae")
     
-    # ``convrt_cmd`` is the command entered into the console for turning
-    # a ``.mae`` file to ``.mol2``. It consists of the path to the 
-    # program ``structconvert`` followed by the option ``-imae`` and 
-    # then the full path of the optimized ``.mae`` file. The option 
-    # ``-omol2`` specifies that the output should be a ``.mol2`` file. 
-    # This option is followed by the name of the ``.mol2`` file. On a 
-    # Windows machine the path must be placed in quotes and include the 
-    # ``.exe`` extension. Overall on a Windows and Unix machine the line 
-    # should look something like:
-    #   C:\\Program Files\\Schrodinger2016-2\\utilities\\...
-    #  ...structconvert.exe" -imae mol_file.mae -omol2 mol_file.mol2
-    # and
-    #   $SCHRODINGER/utilities/structconvert -imae mol_file.mae... 
-    # ... -mol2 mol_file.mol2
-    # respectively.    
-    convrt_cmd = os.path.join(macromodel_path, 'utilities', 
+    return structconvert(out, mol2, macromodel_path)    
+
+
+def structconvert(iname, oname, macromodel_path):
+  
+    convrt_app = os.path.join(macromodel_path, 'utilities', 
                                                      'structconvert')
-    # For Windows systems add the ``.exe`` extension and encapsulate
-    # path in quotes.
-    if os.name == 'nt':
-        convrt_cmd = '"' + convrt_cmd + '.exe"'                
-    convrt_cmd = convrt_cmd + " -imae " + out + " -omol2 " + mol2
- 
-    # Make sure .maegz file is present.
-    wait_for_file(out)
+    convrt_cmd = [convrt_app, iname, oname]
+
+    # Make sure input file is present.
+    wait_for_file(iname)
   
     # Execute the file conversion.
     convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-           universal_newlines=True, shell=True) 
+           universal_newlines=True) 
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
-        return convert_maegz_to_mol2(macro_mol, macromodel_path)    
+        return structconvert(iname, oname, macromodel_path)    
+
+    # If OPLS3 failed, re-run the optimization with the OPLS_2005 force 
+    # field.
+    if 'number 1' in convrt_return.stdout:
+        raise ConversionError(convrt_return.stdout)    
+
 
 def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
@@ -1102,22 +1027,18 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
     
-    extract_cmd = os.path.join(macromodel_path, 
+    extract_app = os.path.join(macromodel_path, 
                                'utilities', 'maesubset')
 
-    # For Windows systems add the ``.exe`` extension and encapsulate
-    # path in quotes.
-    if os.name == 'nt':
-        extract_cmd = '"' + extract_cmd + '.exe"'                
-    extract_cmd = "{0} {1} -n {2} -o {3}".format(extract_cmd, maegz, 
-                                                 conf_num, mae)
+               
+    extract_cmd = [extract_app, maegz, "-n", conf_num, "-o", mae]
  
     # Make sure .maegz file is present.
     wait_for_file(maegz)
   
     # Execute the file conversion.
     convrt_return = sp.run(extract_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-           universal_newlines=True, shell=True) 
+           universal_newlines=True) 
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
@@ -1153,11 +1074,8 @@ def kill_macromodel():
     if os.name == 'nt':
         # In Windows, use the ``Taskkill`` command to force a close on
         # the applications.           
-        kill_cmd1 = "Taskkill /IM jserver-watcher.exe /F"
-        kill_cmd2 = "Taskkill /IM jservergo.exe /F"
-        
-        sp.run(kill_cmd1, shell=True)
-        sp.run(kill_cmd2, shell=True)
+        sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"])
+        sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
         
         
         
