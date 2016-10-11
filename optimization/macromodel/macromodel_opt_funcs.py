@@ -414,7 +414,7 @@ def kill_bmin():
         try:
             x[-1].kill()
             break
-        except Exception as ex:
+        except:
             print('excepted')
             continue
 
