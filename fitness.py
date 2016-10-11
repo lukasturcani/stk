@@ -2,8 +2,6 @@ import numpy as np
 import rdkit.Chem as chem
 import itertools as it
 import copy
-from scipy.stats import logistic
-import os
 from inspect import signature
 
 from .classes.exception import MacroMolError
@@ -299,8 +297,7 @@ def cage(macro_mol, target_size, macromodel_path,
 
     target_window_area = np.square(target_size)
     window_area = np.square(max(macro_mol.topology.windows))
-    window_area_diff = abs(target_window_area - window_area)    
-      
+    window_area_diff = abs(target_window_area - window_area) 
     asymmetry = macro_mol.topology.window_difference(500)
     
     energy_per_bond = macro_mol.formation_energy(macromodel_path)
