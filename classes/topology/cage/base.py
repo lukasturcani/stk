@@ -24,7 +24,6 @@ class CageTopology(Topology):
         topologies should be defined.    
     
     """
-        
 
     @LazyAttr
     def windows(self):
@@ -50,9 +49,12 @@ class CageTopology(Topology):
         if all_windows is None:          
             return None
         
-        return sorted(all_windows, reverse=True)[:self.n_windows]
-            
-
+        all_windows = sorted(all_windows, reverse=True)[:self.n_windows]
+        for i, x in enumerate(all_windows):
+            if x > 500:
+                all_windows[i] = 500
+                
+        return all_windows
    
     def cavity_size(self):
         """
@@ -99,7 +101,10 @@ class CageTopology(Topology):
         
         if self.windows is None:
             return default
-        
+        if len(self.windows) < self.n_windows:
+            return default
+        if 500 in self.windows:
+            return default
     
         # Cluster the windows into groups so that only size differences
         # between windows of the same type are taken into account. To do
