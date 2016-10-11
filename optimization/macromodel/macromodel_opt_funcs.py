@@ -4,6 +4,7 @@ import time
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 import warnings
+import psutil
 
 # More imports at bottom.
 
@@ -100,15 +101,16 @@ def macromodel_opt(macro_mol, force_field='16',
     print(time.ctime(time.time()),
     'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
     try:
-        opt_proc = sp.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                            universal_newlines=True)
+        opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
+                                stderr=sp.STDOUT, 
+                                universal_newlines=True)
         proc_out, _ = opt_proc.communicate(timeout=600)
         opt_proc.wait()
         
     except sp.TimeoutExpired as ex:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
-        opt_proc.kill()
+        kill_bmin()
         proc_out = ""
 
     # If optimization fails because a wrong Schrodinger path was given,
@@ -163,7 +165,7 @@ def macromodel_opt(macro_mol, force_field='16',
 
     macro_mol.optimized = True       
     return macro_mol    
-
+       
 def macromodel_md_opt(macro_mol, macromodel_path):  
     print('\nRunning MD on {0}.'.format(macro_mol.prist_mol_file))    
     
@@ -188,17 +190,16 @@ def macromodel_md_opt(macro_mol, macromodel_path):
     print(time.ctime(time.time()),
     'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
     try:
-        opt_proc = sp.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                            universal_newlines=True)
-        print(opt_proc.pid)
+        opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
+                                stderr=sp.STDOUT, 
+                                universal_newlines=True)
         proc_out, _ = opt_proc.communicate(timeout=600)
         opt_proc.wait()
-        print('done waiting', opt_proc.pid)
 
     except sp.TimeoutExpired as ex:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
-        opt_proc.kill()
+        kill_bmin()
         proc_out = ""
 
     # If optimization fails because a wrong Schrodinger path was given,
@@ -324,16 +325,15 @@ def macromodel_cage_opt(macro_mol, force_field='16',
     print(time.ctime(time.time()),
     'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
     try:
-        opt_proc = sp.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
+        opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
                             universal_newlines=True)
-        proc_out, _ = opt_proc.communicate(timeout=600)
-        
+        proc_out, _ = opt_proc.communicate(timeout=600)    
         opt_proc.wait()
         
     except sp.TimeoutExpired as ex:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
-        opt_proc.kill()
+        kill_bmin()
         proc_out = ""     
         
     # If optimization fails because a wrong Schrodinger path was given,
@@ -399,6 +399,24 @@ def macromodel_cage_opt(macro_mol, force_field='16',
 
     macro_mol.optimized = True       
     return macro_mol
+
+def kill_bmin():
+    bmins = []
+    for i, process in enumerate(psutil.process_iter()):
+        if process.name() == 'bmin.exe':
+            process_time = (process.cpu_times().user + 
+                            process.cpu_times().system)
+    
+            bmins.append((process_time, i, process))
+
+    bmins.sort(reverse=True)
+    for x in bmins:
+        try:
+            x[-1].kill()
+            break
+        except Exception as ex:
+            print('excepted')
+            continue
 
 def license_found(macro_mol, bmin_output):
     """
