@@ -35,7 +35,6 @@ class GAProgress:
             plt.close('all')
             
         else:
-            print(self.means[0])
             for x in range(len(self.means[0])):
                 fig = plt.figure()
                 y_mean = [v[x] for v in self.means]
