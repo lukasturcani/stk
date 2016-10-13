@@ -1022,7 +1022,22 @@ def fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
 def low_energy_conf(macro_mol):
     """
-    Opens the .log file from the MD and gathers the info about the conformers
+    Return the lowest energy conformer's number.
+    
+    An MD conformer seach will produce a .log file which holds the
+    energies of the various conformers found. This function extracts
+    the number of the lowest energy conformer from the .log file.
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macro_mol which had an MD conformer search run on it.
+        
+    Returns
+    -------
+    int
+        The number of the lowest energy conformer.
+
     """
 
     log_name = macro_mol.prist_mol_file.replace('.mol', '.log')    
@@ -1035,26 +1050,62 @@ def low_energy_conf(macro_mol):
                 conf_en = float(line.split()[4])
                 conformers.append((conf_num, conf_en))
 
-        # Sort the conformers depending on their energy and select the lowest in energy
         conf_sorted = sorted(conformers, key=lambda x: x[1])
         min_conf_num = int(conf_sorted[0][0]) - 1
         
     return min_conf_num
 
 def extract_conformer(macro_mol, conf_num, macromodel_path):
+    """
+    Creates an individual .mae file for a conformer in a .maegz file.
+    
+    An MD conformer search produces a .maegz file holding the all the
+    found conformers together. This function places the conformer with
+    the number `conf_num` in its own .mae file. The .mae file reflects
+    the name of `macro_mol`.
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The mocromolecule which had an MD conformer search run on it.
+        
+    conf_num : int
+        The number of the conformer to be extracted. Likely the lowest
+        energy conformer.
+        
+    macromodel_path : str
+        The full path of the Schrodinger directory.
+        
+    Modifies
+    --------
+    This function creates a .mae file which has the name of 
+    `macro_mol.prist_mol_file` except with .mae instead of .mol at the
+    end. The .mae file holds the conformer of macro_mol held in a
+    .maegz file. The .maegz file was likely produced during an MD
+    conformer search.
+
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
+    # The names of the input and output files.
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
     
+    # The full path of the application doing the extraction.
     extract_app = os.path.join(macromodel_path, 
                                'utilities', 'maesubset')
 
-               
+    # The command needed to run the application and extract the
+    # conformer via bash or whatever.             
     extract_cmd = [extract_app, maegz, "-n", conf_num, "-o", mae]
  
     # Make sure .maegz file is present.
     wait_for_file(maegz)
   
-    # Execute the file conversion.
+    # Execute the extraction.
     convrt_return = sp.run(extract_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
            universal_newlines=True) 
 
@@ -1063,8 +1114,25 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
         print('extract_conformer - License not found. ')        
         return extract_conformer(macro_mol, conf_num, macromodel_path)        
 
-def wait_for_file(file_name):
-    # Make sure .maegz file is present.
+def wait_for_file(file_name, timeout=20):
+    """
+    Stalls until a given file exists or `timeout` expires.
+    
+    Parameters
+    ----------
+    file_name : str
+        The full path of the file which should be waited for.
+        
+    timeout : int or float
+        The number of seconds before the function stops waiting and
+        returns.
+        
+    Returns
+    --------
+    None : NoneType
+    
+    """
+    
     t_start = time.time()
     tick = 0
     while True:
@@ -1073,7 +1141,7 @@ def wait_for_file(file_name):
             print('Waiting for {0}.'.format(file_name))
             tick += 1
         
-        if os.path.exists(file_name) or time_taken > 20:
+        if os.path.exists(file_name) or time_taken > timeout:
             break 
 
 def kill_macromodel():
