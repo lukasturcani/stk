@@ -79,12 +79,42 @@ def calc_fitness(func_data, population):
     # Get the fitness function object.
     func = globals()[func_data.name]
     
+    # Some fitness functions will normalize various fitness parameters
+    # across the population. If this is to be done a ``means`` parameter
+    # should be found in the signature of the function.
     use_means = 'means' in signature(func).parameters.keys() 
     
+    # This carries out the first part normalization procedure, if 
+    # needed. This is the calculation of the mean value of a each
+    # fitness parameter in the population. For example, if the ``cage``
+    # fitness function is being used the mean values of `asymmetry`,
+    # `cavity_diff` (and so on) are found. These average values are then
+    # stored with the population in its `ga_tools` attribute.
     if use_means:
+        # In order to calculate the mean, first you calculate the sum
+        # and then divide by the number of things summed. `var_sum` is
+        # an array where each element is the sum of a particular fitness
+        # parameter across the population. It is initialized to 0 but 
+        # turns into an array later.
         var_sum = 0
+        # `valid_params` is the count of how many sets of fitness 
+        # parameter arrays were added together. The fitness function may 
+        # fail on a particlar molecule and as a result its unscaled 
+        # fitness parameters are not added to `var_sum`. This means that
+        # the individual will not contribute to the number of things
+        # summed either.
         valid_params = 0
         for ind in population:
+            # Try running the fitness function on the individual. If it
+            # excepts just set the `unscaled_fitness_vars` attribute to 
+            # ``None`` and the `unscaled` variable to ``None``. If the
+            # function does not except it means two things. The
+            # individual will have an attribute `unscaled_fitness_vars`
+            # holding an array contaninig the fitness paramters. This
+            # will also be what is returned by the function and placed
+            # into the `unscaled` variable. If this happens the
+            # `unscaled` variable is added to `var_sum` and 
+            # `valid_params` is incremented by 1.
             try:
                 unscaled = func(ind, **func_data.params)
 
@@ -96,15 +126,25 @@ def calc_fitness(func_data, population):
                 valid_params += 1
                 var_sum = np.add(unscaled, var_sum)
 
+        # To get the average divide the sum by the number of things 
+        # summed.
         var_avg = np.divide(var_sum, valid_params)
+        # Save the average to the population.
         population.ga_tools.ga_progress.means.append(var_avg.tolist())
 
     # Apply the function to every member of the population.
     for macro_mol in population:
         try:
+            # If `use_means` is ``True``, the fitness function should
+            # have a `means` parameter. This parameter should be set to
+            # the variable `var_avg` calculated above. This normalizes
+            # all of the fitness paramters.
             if use_means:
                 macro_mol.fitness = func(macro_mol, means=var_avg,
                                          **func_data.params)
+            
+            # If `use_means` is not ``True`` no need to provide the
+            # `means` argument.            
             else:
                 macro_mol.fitness = func(macro_mol, **func_data.params)
                 
@@ -246,20 +286,21 @@ def cage(macro_mol, target_size, macromodel_path,
 
     """
 
-    if means is not None:
-        # A mean value of 0 is converted to 1 to prevent divisions by
-        # zero. Really the condition should be > 0 but > 1 accounts for
-        # this consideration.
-        if means[-1] > 1:
-            raise ValueError(('The negative bond formation energy is'
-                              ' not negative.'), means)
-        
+    # Go into this ``if`` block if the `means` paramter is provided.
+    # This means that the unnormalized fitness paramters have already 
+    # been found and their mean taken. Now the scaled fitness paramters
+    # must be found and combined into a single final, fitness value.
+    if means is not None:        
+        # If there was some issue with calculating the unscaled fitness
+        # parameters give a low fitness.        
         if macro_mol.unscaled_fitness_vars is None:
             return 1e-4
         
+        # Set the default coeffient values.
         if coeffs is None:
             coeffs = np.array([1,1,1,1,0.2])
             
+        # Set the default exponent values.
         if exponents is None:
             exponents = np.array([1,1,1,1,1])  
         
@@ -268,6 +309,9 @@ def cage(macro_mol, target_size, macromodel_path,
             if x == 0:
                 means[i] = 1
         
+        # The normalized fitness paramter is found by dividing the value
+        # of that parameter in that individual by the mean value within
+        # the population.
         scaled = np.divide(macro_mol.unscaled_fitness_vars, means)
         
         fitness_vars = np.power(scaled, exponents)
@@ -283,23 +327,36 @@ def cage(macro_mol, target_size, macromodel_path,
         
         return penalty_term + carrot_term
 
+    # If unscaled fitness paramters need to be calculated, the following
+    # code is executed.
 
+    # If pyWindow returned ``None`` some error occured. Set the various
+    # attributes and return value to ``None`` as a result. 
     if macro_mol.topology.windows is None:
-        # If the windows algorithm failed create an array that indicates
-        # this failure.
         macro_mol.unscaled_fitness_vars = None
         return
-        
+    
+    # If the unsacled fitness paramters have already be calculted,
+    # return them. They're unscaled so they will not have changed.
     if hasattr(macro_mol, 'unscaled_fitness_vars'):
         return macro_mol.unscaled_fitness_vars
 
+    # Calculate the difference between the cavity size of the cage and
+    # the desired cavity size.
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
-
+    # Calcualte  the window area required to a molecule of the target
+    # size through.
     target_window_area = np.square(target_size)
+    # The point is to allow only molecules of the target size to
+    # diffuse through the cage, no bigger molecules. To do this the
+    # biggest window of the cage must be found. The difference between
+    # this window and the target window size is then found.
     window_area = np.square(max(macro_mol.topology.windows))
     window_area_diff = abs(target_window_area - window_area) 
+    # Check the assymetry of the cage.
     asymmetry = macro_mol.topology.window_difference(500)
-    
+    # Check the formation energy of the cage. Treat the positive and
+    # negative cases separately.
     energy_per_bond = macro_mol.formation_energy(macromodel_path)
     if energy_per_bond < 0:
         neg_eng_per_bond = energy_per_bond
