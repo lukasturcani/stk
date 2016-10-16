@@ -5,6 +5,8 @@ import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 import warnings
 import psutil
+from multiprocessing import Pool
+from functools import partial
 
 # More imports at bottom.
 
@@ -166,7 +168,9 @@ def macromodel_opt(macro_mol, force_field='16',
     macro_mol.optimized = True       
     return macro_mol    
        
-def macromodel_md_opt(macro_mol, macromodel_path):  
+def macromodel_md_opt(macro_mol, macromodel_path, timeout=True,
+                      temp=300, confs=50, eq_time=10, sim_time=200):  
+
     print('\nRunning MD on {0}.'.format(macro_mol.prist_mol_file))    
     
     # MacroModel requires a ``.mae`` file as input. This creates a 
@@ -177,7 +181,8 @@ def macromodel_md_opt(macro_mol, macromodel_path):
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    generate_md_com(macro_mol)
+    generate_md_com(macro_mol, temp=300, 
+                    confs=50, eq_time=10, sim_time=200)
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.Popen``.
     file_root = macro_mol.prist_mol_file.replace(".mol", "")
@@ -193,7 +198,10 @@ def macromodel_md_opt(macro_mol, macromodel_path):
         opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
                                 stderr=sp.STDOUT, 
                                 universal_newlines=True)
-        proc_out, _ = opt_proc.communicate(timeout=600)
+        if timeout:
+            proc_out, _ = opt_proc.communicate(timeout=600)
+        else:
+            proc_out, _ = opt_proc.communicate()
         opt_proc.wait()
 
     except sp.TimeoutExpired as ex:
@@ -554,7 +562,7 @@ def generate_com(macro_mol, force_field='16', no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def generate_md_com(macro_mol):
+def generate_md_com(macro_mol, temp=300, confs=50, eq_time=10, sim_time=200):
     # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
     # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
     
@@ -565,9 +573,9 @@ def generate_md_com(macro_mol):
  CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
  MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
  MDIT       0      0      0      0   300.0000     0.0000     0.0000     0.0000
- MDYN       0      0      0      0     1.5000    10.0000   300.0000     0.0000
- MDSA      50      0      0      0     0.0000     0.0000     1.0000     0.0000
- MDYN       1      0      0      0     1.5000   200.0000   300.0000     0.0000
+ MDYN       0      0      0      0     1.5000{eq_time:6}.0000{temp:6}.0000     0.0000
+ MDSA{confs:8}      0      0      0     0.0000     0.0000     1.0000     0.0000
+ MDYN       1      0      0      0     1.5000{sim_time:6}.0000{temp:6}.0000     0.0000
  WRIT       0      0      0      0     0.0000     0.0000     0.0000     0.0000
  RWND       0      1      0      0     0.0000     0.0000     0.0000     0.0000
  BGIN       0      0      0      0     0.0000     0.0000     0.0000     0.0000
@@ -575,6 +583,9 @@ def generate_md_com(macro_mol):
  CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
  MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
  END        0      0      0      0     0.0000     0.0000     0.0000     0.0000"""
+
+    main_string = main_string.format(temp=temp, confs=confs,
+                                     eq_time=eq_time, sim_time=sim_time)
 
     com_file = macro_mol.prist_mol_file.replace(".mol", ".com")
     mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
@@ -1100,14 +1111,14 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
 
     # The command needed to run the application and extract the
     # conformer via bash or whatever.             
-    extract_cmd = [extract_app, maegz, "-n", conf_num, "-o", mae]
+    extract_cmd = [extract_app, maegz, "-n", str(conf_num), "-o", mae]
  
     # Make sure .maegz file is present.
     wait_for_file(maegz)
   
     # Execute the extraction.
-    convrt_return = sp.run(extract_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-           universal_newlines=True) 
+    convrt_return = sp.run(extract_cmd, stdout=sp.PIPE, 
+                           stderr=sp.STDOUT, universal_newlines=True) 
 
     # If no license if found, keep re-running the function until it is.
     if 'Could not check out a license for mmli' in convrt_return.stdout:
@@ -1162,11 +1173,28 @@ def kill_macromodel():
         # the applications.           
         sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"])
         sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
-        
-        
-        
-        
-        
+
+def optimize_folder(path, macromodel_path):
+    
+    # First make a list holding all macromolecule objects to be 
+    # optimzied. Because the objects need to be initialized from a .mol
+    # file a StructUnit instance not a MacroMolecule instance is used.
+    # minimal = True, because it is all that is needed to run 
+    # optimziations, plus you want to avoid doing functional group
+    # substitutions.
+    names = [os.path.join(path, file_name) for file_name in 
+             os.listdir(path) if file_name.endswith(".mol")]    
+    macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
+                                                                  names]
+
+    md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
+        timeout=False, temp=1000, confs=500, eq_time=100, sim_time=5000)    
+    
+    with Pool() as p:
+        p.map(md_opt, macro_mols)
+    
+    
+
 from ...classes.exception import MacroMolError       
-from ...classes.molecular import FGInfo        
+from ...classes.molecular import FGInfo, StructUnit        
 from ..optimization import update_prist_attrs_from_mol2        
