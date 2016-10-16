@@ -1,2 +1,2 @@
 from .optimization import optimize_all, optimize_all_serial, rdkit_optimization, do_not_optimize, update_prist_attrs_from_mol2
-from .macromodel import macromodel_opt, kill_macromodel, macromodel_md_opt, macromodel_cage_opt
+from .macromodel import macromodel_opt, kill_macromodel, macromodel_md_opt, macromodel_cage_opt, optimize_folder
