@@ -13,8 +13,194 @@ from functools import partial
 class ConversionError(Exception):
     def __init__(self, message):
         self.message = message
+class PathError(Exception):
+    def __init__(self, message):
+        self.message = message
+class LicenseError(Exception):
+    def __init__(self, message):
+        self.message = message
+class ForceFieldError(Exception):
+    def __init__(self, message):
+        self.message = message
+class OptimizationError(Exception):
+    def __init__(self, message):
+        self.message = message
+class ConformerExtractionError(Exception):
+    def __init__(self, message):
+        self.message = message
 
-def macromodel_opt(macro_mol, force_field='16',
+def macromodel_opt(macro_mol, force_field=16,
+                 macromodel_path=r"C:\Program Files\Schrodinger2016-2",
+                 no_fix=False, md=False):
+    """
+    Optimizes the molecule using MacroModel.
+
+    This function runs a restricted optimization. The structures of the
+    building blocks are frozen and only the new bonds formed between
+    building blocks during assembly are optimized.    
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure must be optimized.
+        
+    macromodel_path : str
+        The full path of the ``Schrodinger`` suite within the user's 
+        machine. For example, in a default Microsoft installation the 
+        folder will probably be something like
+        ``C:\Program Files\Schrodinger2016-2``.
+
+    force_field : int (default = 16)
+        The number of the force field to be used in the optimization.
+        
+    no_fix : bool (default = False)
+        When ``True`` the molecular parameters will not be fixed during
+        the optimization.
+        
+    md : bool (default = False)
+        If ``True`` then a macromodel optimization using MD is carried
+        out to sample different conformtions.
+    
+    Modifies
+    --------
+    macro_mol.prist_mol
+        The rdkit molecule held in this attribute is replaced by an 
+        rdkit molecule with an optimized structure.
+    
+    macro_mol.prist_mol_file's content
+        The content of the ``.mol`` file located at 
+        `macro_mol.prist_mol_file`, is changed so that it holds the
+        structure of the optimized rdkit molecule.
+    
+    macro_mol.optimized
+        After the optimization, this attribute is set to ``True``.
+    
+    Returns
+    -------
+    macro_mol : MacroMolecule
+        The macromolecule that was passed as an argument and modified
+        by the optimization function. Returned to accomodate 
+        parallelization. See ``optimize_all`` function documentation for
+        more details.               
+    
+    """
+    
+    # If the molecule is already optimized, return.
+    if macro_mol.optimized:
+        print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
+        return macro_mol
+    
+    print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
+    try:
+        # MacroModel requires a ``.mae`` file as input. This creates a 
+        # ``.mae`` file holding the molding the pristine molecule.    
+        convert_mol_to_mae(macro_mol, macromodel_path)        
+        # generate the ``.com`` file for the MacroModel run.
+        generate_com(macro_mol, force_field, no_fix)        
+        # Run the optimization.
+        run_bmin(macro_mol, macromodel_path)
+        # Get the ``.mae`` file output from the optimization and convert it
+        # to a ``.mol2`` file.
+        convert_maegz_to_mol2(macro_mol, macromodel_path)
+        update_prist_attrs_from_mol2(macro_mol) 
+
+        if md:
+            macromodel_md_opt(macro_mol, macromodel_path)
+            
+        macro_mol.optimized = True       
+        return macro_mol 
+
+    except ConversionError as ex:
+        MacroMolError(ex, macro_mol, '`structconvert` failed.')
+        return macro_mol        
+
+    except PathError as ex:
+        MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
+        return macro_mol
+
+    except OptimizationError as ex:
+        MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
+        return macro_mol
+
+    except ForceFieldError as ex:        
+        # If OPLS_2005 has been tried already - record an exception.
+        if force_field == 14:
+            MacroMolError(Exception(), macro_mol, 
+                          'Both force fields failed.')
+            return macro_mol
+            
+        # If OPLSE_2005 has not been tried - try it.
+        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
+               '- {0}'.format(macro_mol.prist_mol_file)))
+        return macromodel_opt(macro_mol, force_field=14, 
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix, md=md)   
+
+    except Exception as ex:
+        MacroMolError((ex, macro_mol, 'Uncategorized '
+                      'exception during `macromodel_opt`.'))
+        return macro_mol
+       
+def macromodel_md_opt(macro_mol, macromodel_path, 
+                      timeout=True, force_field=16, 
+                      temp=300, confs=50, eq_time=10, sim_time=200):  
+
+    print('\nRunning MD on {0}.'.format(macro_mol.prist_mol_file))    
+    try:
+        # MacroModel requires a ``.mae`` file as input. This creates a 
+        # ``.mae`` file holding the molding the pristine molecule.    
+        convert_mol_to_mae(macro_mol, macromodel_path)        
+        # Generate the ``.com`` file for the MacroModel MD run.
+        generate_md_com(macro_mol, force_field=force_field, temp=temp, 
+                        confs=confs, eq_time=eq_time, sim_time=sim_time)
+        # Run the optimization.
+        run_bmin(macro_mol, macromodel_path, timeout)        
+        # Find the number of the lowest energy conformer.
+        conf_num = low_energy_conf(macro_mol)
+        # Extract the lowest energy conformer into its own .mae file.
+        extract_conformer(macro_mol, conf_num, macromodel_path)
+        # Convert the .mae file of the lowest energy conformer to a .mol
+        # file.
+        convert_mae_to_mol2(macro_mol, macromodel_path)
+        update_prist_attrs_from_mol2(macro_mol) 
+
+    except ConversionError as ex:
+        MacroMolError(ex, macro_mol, '`structconvert` failed.')
+        return macro_mol
+
+    except PathError as ex:
+        MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
+        return macro_mol
+
+    except OptimizationError as ex:
+        MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
+        return macro_mol
+
+    except ConformerExtractionError as ex:
+        MacroMolError(ex, macro_mol, 'Conformer extraction failed.')
+        return macro_mol
+
+    except ForceFieldError as ex:        
+        # If OPLS_2005 has been tried already - record an exception.
+        if force_field == 14:
+            MacroMolError(Exception(), macro_mol, 
+                          'Both force fields failed.')
+            return macro_mol
+            
+        # If OPLSE_2005 has not been tried - try it.
+        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
+               '- {0}'.format(macro_mol.prist_mol_file)))
+        return macromodel_md_opt(macro_mol, macromodel_path, 
+                                 timeout=timeout, force_field=14, 
+                                 temp=temp, confs=confs, 
+                                 eq_time=eq_time, sim_time=sim_time) 
+        
+    except Exception as ex:
+        MacroMolError((ex, macro_mol, 'Uncategorized'
+                       ' exception during `macromodel_md_opt`.'))
+        return macro_mol
+    
+def macromodel_cage_opt(macro_mol, force_field=16,
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2",
                  no_fix=False, md=False):
     """
@@ -78,16 +264,67 @@ def macromodel_opt(macro_mol, force_field='16',
         return macro_mol
     
     print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
-    
-    # MacroModel requires a ``.mae`` file as input. This creates a 
-    # ``.mae`` file holding the molding the pristine molecule.    
-    print('Converting .mol to .mae - {0}.'.format(
-                                              macro_mol.prist_mol_file))
-    convert_mol_to_mae(macro_mol, macromodel_path)        
+    try:    
+        # MacroModel requires a ``.mae`` file as input. This creates a 
+        # ``.mae`` file holding the molding the pristine molecule.    
+        convert_mol_to_mae(macro_mol, macromodel_path)        
+        # generate the ``.com`` file for the MacroModel run.
+        generate_com(macro_mol, force_field, no_fix)
+        # Run the optimization.
+        run_bmin(macro_mol, macromodel_path)
+        convert_maegz_to_mol2(macro_mol, macromodel_path)
+        # Get the ``.mae`` file output from the optimization and convert it
+        # to a ``.mol2`` file.
+        update_prist_attrs_from_mol2(macro_mol) 
 
-    # generate the ``.com`` file for the MacroModel run.
-    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    generate_com(macro_mol, force_field, no_fix)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+
+            any_windows = macro_mol.topology.windows is not None
+            all_windows = (len(macro_mol.topology.windows) == 
+                                       macro_mol.topology.n_windows)
+
+            if md and any_windows and all_windows:
+                macromodel_md_opt(macro_mol, macromodel_path)
+
+        macro_mol.optimized = True       
+        return macro_mol
+
+    except ConversionError as ex:
+        MacroMolError(ex, macro_mol, '`structconvert` failed.')
+        return macro_mol        
+
+    except PathError as ex:
+        MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
+        return macro_mol
+
+    except OptimizationError as ex:
+        MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
+        return macro_mol
+
+    except ForceFieldError as ex:        
+        # If OPLS_2005 has been tried already - record an exception.
+        if force_field==14:
+            MacroMolError(Exception(), macro_mol, 
+                          'Both force fields failed.')
+            return macro_mol
+            
+        # If OPLSE_2005 has not been tried - try it.
+        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
+       '- {0}'.format(macro_mol.prist_mol_file)))
+        return macromodel_cage_opt(macro_mol, force_field=14, 
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix, md=md)    
+
+    except Exception as ex:
+        MacroMolError((ex, macro_mol, 'Uncategorized '
+                      'exception during `macromodel_opt`.'))
+        return macro_mol
+
+def run_bmin(macro_mol, macromodel_path, timeout=True):
+
+    print(time.ctime(time.time()),
+    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
     
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.Popen``. The command is the full path of the ``bmin``
@@ -98,315 +335,41 @@ def macromodel_opt(macro_mol, force_field='16',
     # The first member of the list is the command, the following ones
     # are any additional arguments.
     opt_cmd = [opt_app, file_root] 
-    
-    # Run the optimization.
-    print(time.ctime(time.time()),
-    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
+
+    opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
+                            stderr=sp.STDOUT, 
+                            universal_newlines=True)
     try:
-        opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
-                                stderr=sp.STDOUT, 
-                                universal_newlines=True)
-        proc_out, _ = opt_proc.communicate(timeout=600)
-        opt_proc.wait()
-        
-    except sp.TimeoutExpired as ex:
-        print(('\nMinimization took too long and was terminated '
-               'by force - {}\n').format(macro_mol.prist_mol_file))
-        kill_bmin()
-        proc_out = ""
-
-    # If optimization fails because a wrong Schrodinger path was given,
-    # raise.
-    if 'The system cannot find the path specified' in proc_out:   
-        path_error = ValueError(('Wrong Schrodinger path supplied to'
-                          ' `macromodel_opt` function.'))
-        MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
-        return macro_mol        
-        
-    # If optimization fails because the license is not found, rerun the
-    # function.
-    if not license_found(macro_mol, proc_out):
-        return macromodel_opt(macro_mol, force_field=force_field,
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
-
-    # Get the ``.mae`` file output from the optimization and convert it
-    # to a ``.mol2`` file.
-    print('Converting .maegz to .mol2 - {0}.'.format(
-                                            macro_mol.prist_mol_file))
-    try:
-        convert_maegz_to_mol2(macro_mol, macromodel_path)
-    except ConversionError as ex:
-        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {0}'.format(macro_mol.prist_mol_file)))
-        
-        # If OPLS_2005 has been tried already - record an exception.
-        if force_field=='14':
-            MacroMolError(Exception(), macro_mol, 
-                          'Both force fields failed.')
-            return macro_mol
-            
-        # If OPLSE_2005 has not been tried - try it.
-        return macromodel_opt(macro_mol, force_field='14', 
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
-    
-    print('Updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
-    try:
-        update_prist_attrs_from_mol2(macro_mol) 
-    except Exception as ex:
-        MacroMolError(ex, macro_mol, 
-        'During ``update_prist_attrs_from_mol2`` call.')
-
-    print('Finished updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
-
-    if md:
-        macromodel_md_opt(macro_mol, macromodel_path)
-
-    macro_mol.optimized = True       
-    return macro_mol    
-       
-def macromodel_md_opt(macro_mol, macromodel_path, timeout=True,
-                      temp=300, confs=50, eq_time=10, sim_time=200):  
-
-    print('\nRunning MD on {0}.'.format(macro_mol.prist_mol_file))    
-    
-    # MacroModel requires a ``.mae`` file as input. This creates a 
-    # ``.mae`` file holding the molding the pristine molecule.    
-    print('Converting .mol to .mae - {0}.'.format(
-                                              macro_mol.prist_mol_file))
-    convert_mol_to_mae(macro_mol, macromodel_path)        
-
-    # generate the ``.com`` file for the MacroModel run.
-    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    generate_md_com(macro_mol, temp=temp, 
-                    confs=confs, eq_time=eq_time, sim_time=sim_time)
-    # To run MacroModel a command is issued to to the console via
-    # ``subprocess.Popen``.
-    file_root = macro_mol.prist_mol_file.replace(".mol", "")
-    opt_app = os.path.join(macromodel_path, "bmin")
-    # The first member of the list is the command, the following ones
-    # are any additional arguments.
-    opt_cmd = [opt_app, file_root]
-    
-    # Run the optimization.
-    print(time.ctime(time.time()),
-    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
-    try:
-        opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
-                                stderr=sp.STDOUT, 
-                                universal_newlines=True)
         if timeout:
             proc_out, _ = opt_proc.communicate(timeout=600)
         else:
-            proc_out, _ = opt_proc.communicate()
+            proc_out, _ = opt_proc.communicate()   
         opt_proc.wait()
-
-    except sp.TimeoutExpired as ex:
+    except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
         kill_bmin()
-        proc_out = ""
 
     # If optimization fails because a wrong Schrodinger path was given,
-    # make a MacroMolError.
-    if 'The system cannot find the path specified' in proc_out:       
-        path_error = ValueError(('Wrong Schrodinger path supplied to'
-                          ' `macromodel_opt` function.'))
-        MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
-        return macro_mol
-       
+    # raise.
+    if 'The system cannot find the path specified' in proc_out:
+        raise PathError('Wrong Schrodinger path supplied to'
+                              ' `macromodel_opt` function.')
+
     # If optimization fails because the license is not found, rerun the
     # function.
     if not license_found(macro_mol, proc_out):
-        return macromodel_md_opt(macro_mol,
-                                 macromodel_path=macromodel_path)
+        return run_bmin(macro_mol, macromodel_path)
 
+    # Make sure the .log and .maegz files which should be created by
+    # the optimization are present.
     log_file = macro_mol.prist_mol_file.replace('.mol', '.log')
     wait_for_file(log_file)
-    conf_num = low_energy_conf(macro_mol)
-    print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file))
-    extract_conformer(macro_mol, conf_num, macromodel_path)
-    print('Converting .mae to .mol2 - {}.'.format(
-                                            macro_mol.prist_mol_file))
-    convert_mae_to_mol2(macro_mol, macromodel_path)
-
-    print('Updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
-    try:
-        update_prist_attrs_from_mol2(macro_mol) 
-    except Exception as ex:
-        MacroMolError(ex, macro_mol, 
-        'During ``update_prist_attrs_from_mol2`` call.')
-
-    print('Finished updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
-    
-def macromodel_cage_opt(macro_mol, force_field='16',
-                 macromodel_path=r"C:\Program Files\Schrodinger2016-2",
-                 no_fix=False, md=False):
-    """
-    Optimizes the molecule using MacroModel.
-
-    This function runs a restricted optimization. The structures of the
-    building blocks are frozen and only the new bonds formed between
-    building blocks during assembly are optimized.    
-    
-    Parameters
-    ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure must be optimized.
-        
-    macromodel_path : str
-        The full path of the ``Schrodinger`` suite within the user's 
-        machine. For example, in a default Microsoft installation the 
-        folder will probably be something like
-        ``C:\Program Files\Schrodinger2016-2``.
-
-    force_field : str (default = '16')
-        The number of the force field to be used in the optimization, 
-        as a string. The string should be 2 characters long.
-        
-    no_fix : bool (default = False)
-        When ``True`` the molecular parameters will not be fixed during
-        the optimization.
-        
-    md : bool (default = False)
-        If ``True`` then a macromodel optimization using MD is carried
-        out to sample different conformtions.
-    
-    Modifies
-    --------
-    macro_mol.prist_mol
-        The rdkit molecule held in this attribute is replaced by an 
-        rdkit molecule with an optimized structure.
-    
-    macro_mol.prist_mol_file's content
-        The content of the ``.mol`` file located at 
-        `macro_mol.prist_mol_file`, is changed so that it holds the
-        structure of the optimized rdkit molecule.
-    
-    macro_mol.optimized
-        After a successful optimization, this attribute is set to 
-        ``True``.
-    
-    Returns
-    -------
-    macro_mol : MacroMolecule
-        The macromolecule that was passed as an argument and modified
-        by the optimization function. Returned to accomodate 
-        parallelization. See ``optimize_all`` function documentation for
-        more details.               
-    
-    """
-    
-    # If the molecule is already optimized, return.
-    if macro_mol.optimized:
-        print('Skipping {0}.'.format(macro_mol.prist_mol_file))       
-        return macro_mol
-    
-    print('\nOptimizing {0}.'.format(macro_mol.prist_mol_file))    
-    
-    # MacroModel requires a ``.mae`` file as input. This creates a 
-    # ``.mae`` file holding the molding the pristine molecule.    
-    print('Converting .mol to .mae - {0}.'.format(
-                                              macro_mol.prist_mol_file))
-    convert_mol_to_mae(macro_mol, macromodel_path)        
-
-    # generate the ``.com`` file for the MacroModel run.
-    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    generate_com(macro_mol, force_field, no_fix)
-    
-    # To run MacroModel a command is issued to to the console via
-    # ``subprocess.Popen``. The command is the full path of the ``bmin``
-    # program. ``bmin`` is located in the Schrodinger installation
-    # folder.
-    file_root = macro_mol.prist_mol_file.replace(".mol", "")
-    opt_app = os.path.join(macromodel_path, "bmin")
-    # The first member of the list is the command, the following ones
-    # are any additional arguments.
-    opt_cmd = [opt_app, file_root]
-    
-    # Run the optimization.
-    print(time.ctime(time.time()),
-    'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
-    try:
-        opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-                            universal_newlines=True)
-        proc_out, _ = opt_proc.communicate(timeout=600)    
-        opt_proc.wait()
-        
-    except sp.TimeoutExpired as ex:
-        print(('\nMinimization took too long and was terminated '
-               'by force - {}\n').format(macro_mol.prist_mol_file))
-        kill_bmin()
-        proc_out = ""     
-        
-    # If optimization fails because a wrong Schrodinger path was given,
-    # make a MacroMolError.
-
-    if 'The system cannot find the path specified' in proc_out:       
-        path_error = ValueError(('Wrong Schrodinger path supplied to'
-                          ' `macromodel_opt` function.'))
-        MacroMolError(path_error, macro_mol, 'Wrong MacroModel path.')
-        return macro_mol
-        
-    # If optimization fails because the license is not found, rerun the
-    # function.
-    if not license_found(macro_mol, proc_out):
-        return macromodel_cage_opt(macro_mol, force_field=force_field,
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
-
-    # Get the ``.mae`` file output from the optimization and convert it
-    # to a ``.mol2`` file.
-    print('Converting .maegz to .mol2 - {0}.'.format(
-                                            macro_mol.prist_mol_file))
-    try:
-        convert_maegz_to_mol2(macro_mol, macromodel_path)
-    except ConversionError as ex:
-        print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {0}'.format(macro_mol.prist_mol_file)))
-        
-        # If OPLS_2005 has been tried already - record an exception.
-        if force_field=='14':
-            MacroMolError(Exception(), macro_mol, 
-                          'Both force fields failed.')
-            return macro_mol
-            
-        # If OPLSE_2005 has not been tried - try it.
-        return macromodel_cage_opt(macro_mol, force_field='14', 
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
-    
-    print('Updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
-    try:
-        update_prist_attrs_from_mol2(macro_mol) 
-    except Exception as ex:
-        MacroMolError(ex, macro_mol, 
-        'During ``update_prist_attrs_from_mol2`` call.')
-
-    print('Finished updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-
-        try:
-            if macro_mol.topology.windows is not None:
-                if (md and 
-                           len(macro_mol.topology.windows) == 
-                                           macro_mol.topology.n_windows):
-                    macromodel_md_opt(macro_mol, macromodel_path)
-
-        except:
-            pass
-
-    macro_mol.optimized = True       
-    return macro_mol
+    maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
+    wait_for_file(maegz)
+    if not os.path.exists(log_file) or not os.path.exists(maegz):
+        raise OptimizationError(('The .log and/or .maegz '
+                     'files were not created by the optimization.'))   
 
 def kill_bmin():
     bmins = []
@@ -426,7 +389,7 @@ def kill_bmin():
             print('excepted')
             continue
 
-def license_found(macro_mol, bmin_output):
+def license_found(macro_mol, output):
     """
     Checks to see if minimization failed due to a missing license.
 
@@ -440,7 +403,7 @@ def license_found(macro_mol, bmin_output):
     macro_mol : MacroMolecule
         The macromolecule being optimized
     
-    bmin_output : str
+    output : str
         The outout from submitting the minimization of the structure
         to the ``bmin`` program.
         
@@ -452,15 +415,16 @@ def license_found(macro_mol, bmin_output):
     
     """
 
-    if 'Could not check out a license for mmlibs' in bmin_output:
+    if 'Could not check out a license for mmlibs' in output:
         return False
-    
-    
+    if not isinstance(macro_mol, MacroMolecule):
+        return True
+
     # To check if the log file mentions a missing license file open the
     # the log file and scan for the apporpriate string.
     
     # Check if the file exists first. If not, this is often means the
-    # calculation must be redone so return False anway.
+    # calculation must be redone so return False anyway.
     log_file_path = macro_mol.prist_mol_file.replace('mol', 'log')
     if not os.path.exists(log_file_path):    
         return False
@@ -469,11 +433,10 @@ def license_found(macro_mol, bmin_output):
         
     if 'Could not check out a license for mmlibs' in log_file_content:
         return False
-        
-    
+
     return True
  
-def generate_com(macro_mol, force_field='16', no_fix=False):
+def generate_com(macro_mol, force_field=16, no_fix=False):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -511,6 +474,8 @@ def generate_com(macro_mol, force_field='16', no_fix=False):
     None : NoneType    
     
     """
+
+    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
     
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
@@ -519,7 +484,7 @@ def generate_com(macro_mol, force_field='16', no_fix=False):
     "0.0000     0.0000     0.0000\n"
 " DEBG      55      0      0      0     0.0000     0.0000     "
 "0.0000     0.0000\n"
-" FFLD      {0}      1      0      0     1.0000     0.0000     "
+" FFLD{0:8}      1      0      0     1.0000     0.0000     "
 "0.0000     0.0000\n"
 " BDCO       0      0      0      0    41.5692 99999.0000     "
 "0.0000     0.0000\n"
@@ -562,12 +527,15 @@ def generate_com(macro_mol, force_field='16', no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def generate_md_com(macro_mol, temp=300, confs=50, eq_time=10, sim_time=200):
+def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
+
+    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
+
     # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
     # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
     
     main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
- FFLD      16      1      0      0     1.0000     0.0000     0.0000     0.0000
+ FFLD{force_field:8}      1      0      0     1.0000     0.0000     0.0000     0.0000
  BDCO       0      0      0      0    41.5692 99999.0000     0.0000     0.0000
  READ       0      0      0      0     0.0000     0.0000     0.0000     0.0000
  CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
@@ -584,8 +552,8 @@ def generate_md_com(macro_mol, temp=300, confs=50, eq_time=10, sim_time=200):
  MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
  END        0      0      0      0     0.0000     0.0000     0.0000     0.0000"""
 
-    main_string = main_string.format(temp=temp, confs=confs,
-                                     eq_time=eq_time, sim_time=sim_time)
+    main_string = main_string.format(force_field=force_field, temp=temp, 
+                        confs=confs, eq_time=eq_time, sim_time=sim_time)
 
     com_file = macro_mol.prist_mol_file.replace(".mol", ".com")
     mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
@@ -629,13 +597,14 @@ def convert_mol_to_mae(macro_mol, macromodel_path):
         The full path of the newly created ``.mae`` file.     
     
     """
-    
+ 
+    print('Converting .mol to .mae - {}.'.format(
+                                              macro_mol.prist_mol_file))
+   
     # Create the name of the new ``.mae`` file. It is the same as the
     # ``.mol`` file, including the same path. Only the extensions are
     # different.
-    mae_file = macro_mol.prist_mol_file.replace('.mol', 
-                                                     '.mae')
-    
+    mae_file = macro_mol.prist_mol_file.replace('.mol', '.mae')  
     structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
     return mae_file
 
@@ -667,21 +636,22 @@ def convert_maegz_to_mol2(macro_mol, macromodel_path):
 
     Raises
     ------
-    ConversionError
+    ForceFieldError
         If the OPLS3 force field failed to optimize the molecule. If
         this happens the conversion function is unable to convert the 
         output of the optimization function and as a result this error
         is raised.
     
     """
-        
+
+    print('Converting .maegz to .mol2 - {}.'.format(
+                                            macro_mol.prist_mol_file))
+
+    # ``out`` is the full path of the optimized ``.mae`` file.
+    maegz = macro_mol.prist_mol_file.replace(".mol", "-out.maegz")      
     # Replace extensions to get the names of the various files.
     mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
-    # ``out`` is the full path of the optimized ``.mae`` file.
-    out = macro_mol.prist_mol_file.replace(".mol", 
-                                                "-out.maegz")
-    
-    return structconvert(out, mol2, macromodel_path)
+    structconvert(maegz, mol2, macromodel_path)
 
 def convert_mae_to_mol2(macro_mol, macromodel_path):
     """
@@ -711,44 +681,53 @@ def convert_mae_to_mol2(macro_mol, macromodel_path):
 
     Raises
     ------
-    ConversionError
+    ForceFieldError
         If the OPLS3 force field failed to optimize the molecule. If
         this happens the conversion function is unable to convert the 
         output of the optimization function and as a result this error
         is raised.
     
     """
-        
+
+    print('Converting .mae to .mol2 - {}.'.format(
+                                            macro_mol.prist_mol_file))
+    
+    # ``mae`` is the full path of the optimized ``.mae`` file.
+    mae = macro_mol.prist_mol_file.replace(".mol", ".mae")        
     # Replace extensions to get the names of the various files.
     mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
-    # ``out`` is the full path of the optimized ``.mae`` file.
-    out = macro_mol.prist_mol_file.replace(".mol", ".mae")
+    structconvert(mae, mol2, macromodel_path)    
     
-    return structconvert(out, mol2, macromodel_path)    
-
-
 def structconvert(iname, oname, macromodel_path):
   
     convrt_app = os.path.join(macromodel_path, 'utilities', 
                                                      'structconvert')
     convrt_cmd = [convrt_app, iname, oname]
 
-    # Make sure input file is present.
-    wait_for_file(iname)
-  
     # Execute the file conversion.
-    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, stderr=sp.STDOUT, 
-           universal_newlines=True) 
+    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, 
+                           stderr=sp.STDOUT, universal_newlines=True) 
+
+    # If conversion fails because a wrong Schrodinger path was given,
+    # raise.
+    if 'The system cannot find the path specif' in convrt_return.stdout:
+        raise PathError('Wrong Schrodinger path supplied to'
+                              ' `structconvert` function.')
 
     # If no license if found, keep re-running the function until it is.
-    if 'Could not check out a license for mmli' in convrt_return.stdout:
+    if not license_found('', convrt_return.stdout):
         return structconvert(iname, oname, macromodel_path)    
 
-    # If OPLS3 failed, re-run the optimization with the OPLS_2005 force 
-    # field.
+    # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:
-        raise ConversionError(convrt_return.stdout)    
+        raise ForceFieldError(convrt_return.stdout)    
 
+    wait_for_file(oname)
+    if not os.path.exists(oname):
+        raise ConversionError(('Conversion output file {} was not found.'
+                ' Console output was {}.').format(oname, convrt_return))
+
+    return convrt_return
 
 def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
@@ -1101,29 +1080,32 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
     
     """
     
+    print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file)) 
+    
     # The names of the input and output files.
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
     
     # The full path of the application doing the extraction.
-    extract_app = os.path.join(macromodel_path, 
-                               'utilities', 'maesubset')
+    extract_app = os.path.join(macromodel_path, 'utilities', 'maesubset')
 
     # The command needed to run the application and extract the
     # conformer via bash or whatever.             
     extract_cmd = [extract_app, maegz, "-n", str(conf_num), "-o", mae]
- 
-    # Make sure .maegz file is present.
-    wait_for_file(maegz)
   
     # Execute the extraction.
-    convrt_return = sp.run(extract_cmd, stdout=sp.PIPE, 
+    extract_return = sp.run(extract_cmd, stdout=sp.PIPE, 
                            stderr=sp.STDOUT, universal_newlines=True) 
 
     # If no license if found, keep re-running the function until it is.
-    if 'Could not check out a license for mmli' in convrt_return.stdout:
-        print('extract_conformer - License not found. ')        
+    if not license_found('', extract_return.stdout):   
         return extract_conformer(macro_mol, conf_num, macromodel_path)        
+
+    # Make sure the .mae file is in fact created.
+    wait_for_file(mae)
+    if not os.path.exists(mae):
+        raise ConformerExtractionError(('Conformer extraction failed.'
+        ' Console output was {}.'.format(extract_return)))
 
 def wait_for_file(file_name, timeout=20):
     """
@@ -1196,5 +1178,5 @@ def optimize_folder(path, macromodel_path):
     
 
 from ...classes.exception import MacroMolError       
-from ...classes.molecular import FGInfo, StructUnit        
+from ...classes.molecular import FGInfo, StructUnit, MacroMolecule        
 from ..optimization import update_prist_attrs_from_mol2        
