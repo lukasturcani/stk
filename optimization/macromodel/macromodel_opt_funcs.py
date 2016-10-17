@@ -181,8 +181,8 @@ def macromodel_md_opt(macro_mol, macromodel_path, timeout=True,
 
     # generate the ``.com`` file for the MacroModel run.
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
-    generate_md_com(macro_mol, temp=300, 
-                    confs=50, eq_time=10, sim_time=200)
+    generate_md_com(macro_mol, temp=temp, 
+                    confs=confs, eq_time=eq_time, sim_time=sim_time)
     # To run MacroModel a command is issued to to the console via
     # ``subprocess.Popen``.
     file_root = macro_mol.prist_mol_file.replace(".mol", "")
