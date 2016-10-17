@@ -181,24 +181,14 @@ def update_prist_attrs_from_mol2(macro_mol):
     # different extension.
     mol2 = macro_mol.prist_mol_file.replace('.mol', '.mol2')    
 
-    # Make sure .mol2 file is present.
-    t_start = time.time()
-    tick = 0
-    while True:
-        
-        time_taken = time.time() - t_start
-        if divmod(time_taken, 5)[0] == tick + 1:
-            print('Waiting for {0}.'.format(mol2))
-            tick += 1
-            
-        if os.path.exists(mol2) or time.time() - t_start > 20:
-            break
-    
     # Update the `prist_mol` attribute.
     macro_mol.prist_mol = mol_from_mol2_file(mol2)
     
     # Update content in ``prist_mol_file``.
     macro_mol.write_mol_file('prist')
+
+    print('Finished updating attributes from .mol2 - {0}.'.format(
+                                             macro_mol.prist_mol_file))
     
 def rdkit_optimization(macro_mol):
     """
