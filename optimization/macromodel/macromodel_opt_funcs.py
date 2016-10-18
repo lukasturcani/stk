@@ -18,6 +18,7 @@ class PathError(Exception):
         self.message = message
 class LicenseError(Exception):
     def __init__(self, message):
+        print('License not found.')
         self.message = message
 class ForceFieldError(Exception):
     def __init__(self, message):
