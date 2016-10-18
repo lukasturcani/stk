@@ -365,8 +365,8 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
     if 'The system cannot find the path specified' in proc_out:
-        raise PathError('Wrong Schrodinger path supplied to'
-                              ' `macromodel_opt` function.')
+        raise PathError(('Wrong Schrodinger path supplied to'
+                              ' `macromodel_opt` function.'))
 
     # If optimization fails because the license is not found, rerun the
     # function.
@@ -398,7 +398,7 @@ def kill_bmin():
             x[-1].kill()
             break
         except:
-            print('excepted')
+            print('``kill_bmin`` excepted.')
             continue
 
 def license_found(macro_mol, output):
@@ -725,8 +725,8 @@ def structconvert(iname, oname, macromodel_path):
     # If conversion fails because a wrong Schrodinger path was given,
     # raise.
     if 'The system cannot find the path specif' in convrt_return.stdout:
-        raise PathError('Wrong Schrodinger path supplied to'
-                              ' `structconvert` function.')
+        raise PathError(('Wrong Schrodinger path supplied to'
+                              ' `structconvert` function.'))
 
     # If no license if found, keep re-running the function until it is.
     if not license_found('', convrt_return.stdout):
@@ -739,7 +739,8 @@ def structconvert(iname, oname, macromodel_path):
     wait_for_file(oname)
     if not os.path.exists(oname):
         raise ConversionError(('Conversion output file {} was not found.'
-                ' Console output was {}.').format(oname, convrt_return))
+                ' Console output was {}.').format(oname, 
+                                                  convrt_return.stdout))
 
     return convrt_return
 
@@ -1122,7 +1123,7 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
     wait_for_file(mae)
     if not os.path.exists(mae):
         raise ConformerExtractionError(('Conformer extraction failed.'
-        ' Console output was {}.'.format(extract_return)))
+        ' Console output was {}.').format(extract_return))
 
 def wait_for_file(file_name, timeout=20):
     """
