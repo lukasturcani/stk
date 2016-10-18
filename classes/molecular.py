@@ -1820,7 +1820,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
-            raise ex
             
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
