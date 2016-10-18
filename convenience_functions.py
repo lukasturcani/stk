@@ -4,9 +4,6 @@ from rdkit.Geometry import Point3D
 import numpy as np
 import time
 from contextlib import contextmanager
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import os 
 
 # This dictionary gives easy access to the rdkit bond types.
@@ -426,25 +423,32 @@ def plot_counter(counter, plot_name):
     None : NoneType
     
     """
-    fig = plt.figure()
-    x_vals_b = []
-    y_vals_b = []
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        fig = plt.figure()
+        x_vals_b = []
+        y_vals_b = []
+        
+        x_vals_r = []
+        y_vals_r = []    
+        
+        for ind, value in counter.items():
+            if value == 0:
+                x_vals_r.append(ind.fitness)
+                y_vals_r.append(0.5)
+            else:
+                x_vals_b.append(ind.fitness)
+                y_vals_b.append(value)
+        
+        plt.bar(x_vals_b, y_vals_b, color='blue')
+        plt.bar(x_vals_r, y_vals_r, color='red')
+        fig.savefig(plot_name, dpi=fig.dpi)
+        plt.close('all')
+    except:
+        pass
     
-    x_vals_r = []
-    y_vals_r = []    
-    
-    for ind, value in counter.items():
-        if value == 0:
-            x_vals_r.append(ind.fitness)
-            y_vals_r.append(0.5)
-        else:
-            x_vals_b.append(ind.fitness)
-            y_vals_b.append(value)
-    
-    plt.bar(x_vals_b, y_vals_b, color='blue')
-    plt.bar(x_vals_r, y_vals_r, color='red')
-    fig.savefig(plot_name, dpi=fig.dpi)
-    plt.close('all')
 
 def dedupe(iterable, seen=None):
     if seen is None:
