@@ -135,7 +135,7 @@ def macromodel_opt(macro_mol, force_field=16,
             
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {0}'.format(macro_mol.prist_mol_file)))
+               '- {0}').format(macro_mol.prist_mol_file))
         return macromodel_opt(macro_mol, force_field=14, 
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md)   
@@ -197,7 +197,7 @@ def macromodel_md_opt(macro_mol, macromodel_path,
             
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {0}'.format(macro_mol.prist_mol_file)))
+               '- {0}').format(macro_mol.prist_mol_file))
         return macromodel_md_opt(macro_mol, macromodel_path, 
                                  timeout=timeout, force_field=14, 
                                  temp=temp, confs=confs, 
@@ -322,7 +322,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
             
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-       '- {0}'.format(macro_mol.prist_mol_file)))
+       '- {0}').format(macro_mol.prist_mol_file))
         return macromodel_cage_opt(macro_mol, force_field=14, 
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md)    
