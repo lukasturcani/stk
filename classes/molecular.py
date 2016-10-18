@@ -14,7 +14,6 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
                                      vector_theta, LazyAttr,
                                      rotation_matrix_arbitrary_axis,
                                      mol_from_mol_file, ChargedMolError)
-from .exception import MacroMolError
 
 class CachedMacroMol(type):
     """
@@ -2477,3 +2476,4 @@ class Polymer(MacroMolecule):
 
 
 from ..optimization.macromodel.macromodel_opt_funcs import macromodel_opt
+from .exception import MacroMolError
