@@ -114,4 +114,4 @@ class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
         
-from .classes.molecular import MacroMolecule
+from .molecular import MacroMolecule
