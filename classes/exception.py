@@ -101,15 +101,17 @@ class MacroMolError(Exception):
             
             if isinstance(macro_mol, MacroMolecule):
                 f.write('building blocks = {0}\n'.format(
-                                                macro_mol.building_blocks))
+                                             macro_mol.building_blocks))
     
                 f.write('topology = {0}\n'.format(macro_mol.topology)) 
     
      
                
-                f.write('topology_args = {0}\n\n\n\n'.format(
-                                                   macro_mol.topology_args))    
-                                          
+                f.write('topology_args = {0}\n'.format(
+                                              macro_mol.topology_args))    
+                             
+            f.write('\n\n\n')                             
+                             
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg

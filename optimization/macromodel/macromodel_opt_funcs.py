@@ -1054,15 +1054,13 @@ def low_energy_conf(macro_mol):
             if "Conf" in line and "kJ/mol" in line and "****" not in line:
                 conf_num = int(line.split()[1])
                 conf_en = float(line.split()[4])
-                conformers.append((conf_num, conf_en))
+                conformers.append((conf_en, conf_num))
 
-        conf_sorted = sorted(conformers, key=lambda x: x[1])
-        if not conf_sorted:
-            raise ConformerIdentificationError(('No conformers'
-                                                ' found in .log file.'))
-        min_conf_num = int(conf_sorted[0][0]) - 1
-        
-    return min_conf_num
+    if not conformers:
+        raise ConformerIdentificationError(('No conformers'
+                                            ' found in .log file.'))
+                                            
+    return min(conformers)[1] - 1
 
 def extract_conformer(macro_mol, conf_num, macromodel_path):
     """
@@ -1101,6 +1099,11 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
     
     print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file)) 
     
+    # If the conformer number is 0, the original structure had the
+    # lowest energy and no extraction needs to take place.
+    if conf_num == 0:
+        return
+    
     # The names of the input and output files.
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
@@ -1114,7 +1117,7 @@ def extract_conformer(macro_mol, conf_num, macromodel_path):
   
     # Execute the extraction.
     extract_return = sp.run(extract_cmd, stdout=sp.PIPE, 
-                           stderr=sp.STDOUT, universal_newlines=True) 
+                           stderr=sp.STDOUT, universal_newlines=True)
 
     # If no license if found, keep re-running the function until it is.
     if not license_found('', extract_return.stdout):   
