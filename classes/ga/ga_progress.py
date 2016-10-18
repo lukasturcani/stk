@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 
@@ -25,30 +24,32 @@ class GAProgress:
             self.mins.append(min(x.fitness for x in population))
         
     def epp(self, plot_name):
-        
-        if isinstance(self.maxs[0], float):
-            fig = plt.figure()
-            plt.plot(self.gens, self.means, color='green')
-            plt.plot(self.gens, self.mins, color='blue')
-            plt.plot(self.gens, self.maxs, color='red')
-            fig.savefig(plot_name, dpi=fig.dpi)
-            plt.close('all')
-            
-        else:
-            for x in range(len(self.means[0])):
+        try:
+            import matplotlib.pyplot as plt
+            if isinstance(self.maxs[0], float):
                 fig = plt.figure()
-                y_mean = [v[x] for v in self.means]
-                y_max = [v[x] for v in self.maxs]
-                y_min = [v[x] for v in self.mins]
-
-                plt.plot(self.gens, y_mean, color='green')
-                plt.plot(self.gens, y_min, color='blue')
-                plt.plot(self.gens, y_max, color='red')
-                
-                new_plot_name = str(x).join(os.path.splitext(plot_name))                
-                
-                fig.savefig(new_plot_name, dpi=fig.dpi)
+                plt.plot(self.gens, self.means, color='green')
+                plt.plot(self.gens, self.mins, color='blue')
+                plt.plot(self.gens, self.maxs, color='red')
+                fig.savefig(plot_name, dpi=fig.dpi)
                 plt.close('all')
-
+                
+            else:
+                for x in range(len(self.means[0])):
+                    fig = plt.figure()
+                    y_mean = [v[x] for v in self.means]
+                    y_max = [v[x] for v in self.maxs]
+                    y_min = [v[x] for v in self.mins]
+    
+                    plt.plot(self.gens, y_mean, color='green')
+                    plt.plot(self.gens, y_min, color='blue')
+                    plt.plot(self.gens, y_max, color='red')
+                    
+                    new_plot_name = str(x).join(os.path.splitext(plot_name))                
+                    
+                    fig.savefig(new_plot_name, dpi=fig.dpi)
+                    plt.close('all')
+        except:
+            pass
             
         
