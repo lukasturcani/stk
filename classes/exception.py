@@ -75,12 +75,11 @@ class MacroMolError(Exception):
         macro_mol.fitness = 1e-4
         
         self.ex = ex
-        self.macro_mol = macro_mol
         self.notes = notes
-        self.write_to_file()
+        self.write_to_file(macro_mol)
         print('\n\nMacroMolError written to ``failures.txt``.\n\n')
         
-    def write_to_file(self):
+    def write_to_file(self, macro_mol):
         """
         Writes the exception and macromolecule to ``failures.txt``.
         
@@ -96,18 +95,23 @@ class MacroMolError(Exception):
         with open(name, 'a') as f:
             f.write("{0}\n".format(self.ex))
             f.write('note = {0}\n'.format(self.notes))
-            
-            f.write('building blocks = {0}\n'.format(
-                                        self.macro_mol.building_blocks))
-
-            f.write('topology = {0}\n'.format(self.macro_mol.topology)) 
 
             f.write('prist_mol_file = {0}\n'.format(
-                                         self.macro_mol.prist_mol_file)) 
-           
-            f.write('topology_args = {0}\n\n\n\n'.format(
-                                          self.macro_mol.topology_args))    
+                                              macro_mol.prist_mol_file))
+            
+            if isinstance(macro_mol, MacroMolecule):
+                f.write('building blocks = {0}\n'.format(
+                                                macro_mol.building_blocks))
+    
+                f.write('topology = {0}\n'.format(macro_mol.topology)) 
+    
+     
+               
+                f.write('topology_args = {0}\n\n\n\n'.format(
+                                                   macro_mol.topology_args))    
                                           
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
+        
+from .classes.molecular import MacroMolecule
