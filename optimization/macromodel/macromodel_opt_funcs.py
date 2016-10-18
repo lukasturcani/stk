@@ -103,8 +103,8 @@ def macromodel_opt(macro_mol, force_field=16,
         generate_com(macro_mol, force_field, no_fix)        
         # Run the optimization.
         run_bmin(macro_mol, macromodel_path)
-        # Get the ``.mae`` file output from the optimization and convert it
-        # to a ``.mol2`` file.
+        # Get the ``.maegz`` file output from the optimization and 
+        # convert it to a ``.mol2`` file.
         convert_maegz_to_mol2(macro_mol, macromodel_path)
         update_prist_attrs_from_mol2(macro_mol) 
 
@@ -284,9 +284,9 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         generate_com(macro_mol, force_field, no_fix)
         # Run the optimization.
         run_bmin(macro_mol, macromodel_path)
+        # Get the ``.maegz`` file output from the optimization and 
+        # convert it to a ``.mol2`` file.
         convert_maegz_to_mol2(macro_mol, macromodel_path)
-        # Get the ``.mae`` file output from the optimization and convert it
-        # to a ``.mol2`` file.
         update_prist_attrs_from_mol2(macro_mol) 
 
         with warnings.catch_warnings():
