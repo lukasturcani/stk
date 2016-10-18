@@ -25,6 +25,9 @@ class ForceFieldError(Exception):
 class OptimizationError(Exception):
     def __init__(self, message):
         self.message = message
+class ConformerIdentificationError(Exception):
+    def __init__(self, message):
+        self.message = message
 class ConformerExtractionError(Exception):
     def __init__(self, message):
         self.message = message
@@ -51,7 +54,8 @@ def macromodel_opt(macro_mol, force_field=16,
         ``C:\Program Files\Schrodinger2016-2``.
 
     force_field : int (default = 16)
-        The number of the force field to be used in the optimization.
+        The number of the force field, within MacroModel, to be used in 
+        the optimization.
         
     no_fix : bool (default = False)
         When ``True`` the molecular parameters will not be fixed during
@@ -137,7 +141,7 @@ def macromodel_opt(macro_mol, force_field=16,
                               no_fix=no_fix, md=md)   
 
     except Exception as ex:
-        MacroMolError((ex, macro_mol, 'Uncategorized '
+        MacroMolError(ex, macro_mol, ('Uncategorized '
                       'exception during `macromodel_opt`.'))
         return macro_mol
        
@@ -176,6 +180,10 @@ def macromodel_md_opt(macro_mol, macromodel_path,
         MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
+    except ConformerIdentificationError as ex:
+        MacroMolError(ex, macro_mol, 'Lowest energy conformer not found.')
+        return macro_mol
+
     except ConformerExtractionError as ex:
         MacroMolError(ex, macro_mol, 'Conformer extraction failed.')
         return macro_mol
@@ -196,7 +204,7 @@ def macromodel_md_opt(macro_mol, macromodel_path,
                                  eq_time=eq_time, sim_time=sim_time) 
         
     except Exception as ex:
-        MacroMolError((ex, macro_mol, 'Uncategorized'
+        MacroMolError(ex, macro_mol, ('Uncategorized'
                        ' exception during `macromodel_md_opt`.'))
         return macro_mol
     
@@ -210,6 +218,10 @@ def macromodel_cage_opt(macro_mol, force_field=16,
     building blocks are frozen and only the new bonds formed between
     building blocks during assembly are optimized.    
     
+    This function differes from `macromodel_opt` in that it checks the
+    number of windows the `macro_mol` has before running the MD. The MD
+    is only run all windows are found  (i.e. the cage is not collapsed).    
+    
     Parameters
     ----------
     macro_mol : MacroMolecule
@@ -221,9 +233,9 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         folder will probably be something like
         ``C:\Program Files\Schrodinger2016-2``.
 
-    force_field : str (default = '16')
-        The number of the force field to be used in the optimization, 
-        as a string. The string should be 2 characters long.
+    force_field : int (default = 16)
+        The number of the force field, within MacroModel, to be used in 
+        the optimization.
         
     no_fix : bool (default = False)
         When ``True`` the molecular parameters will not be fixed during
@@ -279,13 +291,12 @@ def macromodel_cage_opt(macro_mol, force_field=16,
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-
-            any_windows = macro_mol.topology.windows is not None
-            all_windows = (len(macro_mol.topology.windows) == 
+            if macro_mol.topology.windows is not None:
+                all_windows = (len(macro_mol.topology.windows) == 
                                        macro_mol.topology.n_windows)
 
-            if md and any_windows and all_windows:
-                macromodel_md_opt(macro_mol, macromodel_path)
+                if md and all_windows:
+                    macromodel_md_opt(macro_mol, macromodel_path)
 
         macro_mol.optimized = True       
         return macro_mol
@@ -317,13 +328,13 @@ def macromodel_cage_opt(macro_mol, force_field=16,
                               no_fix=no_fix, md=md)    
 
     except Exception as ex:
-        MacroMolError((ex, macro_mol, 'Uncategorized '
-                      'exception during `macromodel_opt`.'))
+        MacroMolError(ex, macro_mol, ('Uncategorized '
+                      'exception during `macromodel_cage_opt`.'))
         return macro_mol
 
 def run_bmin(macro_mol, macromodel_path, timeout=True):
 
-    print(time.ctime(time.time()),
+    print("", time.ctime(time.time()),
     'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
     
     # To run MacroModel a command is issued to to the console via
@@ -349,6 +360,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
         kill_bmin()
+        proc_out = ""
 
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
@@ -400,8 +412,10 @@ def license_found(macro_mol, output):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule being optimized
+    macro_mol : MacroMolecule or any other type
+        The macromolecule being optimized. If the .log file is not to
+        be checked, a non MacroMolecule object should be placed here
+        instead. An empty string would do nicely.
     
     output : str
         The outout from submitting the minimization of the structure
@@ -456,9 +470,9 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
     macro_mol : MacroMolecule
         The macromolecule which is to be optimized.
         
-    force_field : str (default = '16')
-        The number of the force field to be used in the optimization, 
-        as a string. The string should be 2 characters long.
+    force_field : int (default = 16)
+        The number of the force field, within MacroModel, to be used in 
+        the optimization.
         
     no_fix : bool (default = False)
         When ``True`` the generated .com file will not contain commands
@@ -1041,6 +1055,9 @@ def low_energy_conf(macro_mol):
                 conformers.append((conf_num, conf_en))
 
         conf_sorted = sorted(conformers, key=lambda x: x[1])
+        if not conf_sorted:
+            raise ConformerIdentificationError(('No conformers'
+                                                ' found in .log file.'))
         min_conf_num = int(conf_sorted[0][0]) - 1
         
     return min_conf_num
