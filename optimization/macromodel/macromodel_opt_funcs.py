@@ -346,7 +346,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     opt_app = os.path.join(macromodel_path, "bmin")
     # The first member of the list is the command, the following ones
     # are any additional arguments.
-    opt_cmd = [opt_app, file_root] 
+    opt_cmd = [opt_app, file_root, "-WAIT"] 
 
     opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
                             stderr=sp.STDOUT, 
@@ -356,14 +356,12 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
             proc_out, _ = opt_proc.communicate(timeout=600)
         else:
             proc_out, _ = opt_proc.communicate()   
-        opt_proc.wait()
+
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
         kill_bmin()
         proc_out = ""
-
-    print('did it wait?')
 
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
@@ -1158,13 +1156,7 @@ def wait_for_file(file_name, timeout=20):
             print('Waiting for {0}.'.format(file_name))
             tick += 1
         
-        if os.path.exists(file_name):
-            with open(file_name, 'r') as f:
-                size = len(f.read())
-            if size > 10:
-                break
-            
-        if time_taken > timeout:
+        if os.path.exists(file_name) or time_taken > timeout:
             break 
 
 def kill_macromodel():
