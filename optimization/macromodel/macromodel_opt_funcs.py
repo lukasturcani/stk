@@ -363,6 +363,8 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
         kill_bmin()
         proc_out = ""
 
+    print('did it wait?')
+
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
     if 'The system cannot find the path specified' in proc_out:
