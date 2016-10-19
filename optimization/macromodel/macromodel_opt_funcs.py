@@ -348,7 +348,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     # The first member of the list is the command, the following ones
     # are any additional arguments.
 
-    opt_cmd = [opt_app, file_root, "-NOJOBID",  "-WAIT", ">", log_file] 
+    opt_cmd = [opt_app, file_root, "-NOJOBID", "-WAIT"] 
 
     opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
                             stderr=sp.STDOUT, 
@@ -357,13 +357,16 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
         if timeout:
             proc_out, _ = opt_proc.communicate(timeout=600)
         else:
-            proc_out, _ = opt_proc.communicate()   
-
+            proc_out, _ = opt_proc.communicate()    
+    
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
         kill_bmin()
         proc_out = ""
+
+    with open(log_file, 'w') as log:
+        log.write(proc_out)
 
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
@@ -376,9 +379,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     if not license_found(macro_mol, proc_out):
         return run_bmin(macro_mol, macromodel_path)
 
-    # Make sure the .log and .maegz files which should be created by
-    # the optimization are present.
-    wait_for_file(log_file)
+    # Make sure the .maegz file created by the optimization is present.
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     wait_for_file(maegz)
     if not os.path.exists(log_file) or not os.path.exists(maegz):
@@ -442,8 +443,6 @@ def license_found(macro_mol, output):
     # Check if the file exists first. If not, this is often means the
     # calculation must be redone so return False anyway.
     log_file_path = macro_mol.prist_mol_file.replace('mol', 'log')
-    if not os.path.exists(log_file_path):    
-        return False
     with open(log_file_path, 'r') as log_file:
         log_file_content = log_file.read()
         
