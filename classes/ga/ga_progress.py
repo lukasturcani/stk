@@ -25,6 +25,8 @@ class GAProgress:
             self.mins.append(min(x.fitness for x in population))
         
     def epp(self, plot_name):
+        print(self.maxs[0], type(self.maxs[0]))
+        print(self.maxs)
         if isinstance(self.maxs[0], float):
             fig = plt.figure()
             plt.plot(self.gens, self.means, color='green')
