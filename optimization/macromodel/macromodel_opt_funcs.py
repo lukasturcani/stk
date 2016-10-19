@@ -1156,7 +1156,13 @@ def wait_for_file(file_name, timeout=20):
             print('Waiting for {0}.'.format(file_name))
             tick += 1
         
-        if os.path.exists(file_name) or time_taken > timeout:
+        if os.path.exists(file_name):
+            with open(file_name, 'r') as f:
+                size = len(f.read())
+            if size > 10:
+                break
+            
+        if time_taken > timeout:
             break 
 
 def kill_macromodel():
