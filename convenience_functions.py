@@ -5,6 +5,9 @@ import numpy as np
 import time
 from contextlib import contextmanager
 import os 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
@@ -423,31 +426,27 @@ def plot_counter(counter, plot_name):
     None : NoneType
     
     """
-    try:
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        fig = plt.figure()
-        x_vals_b = []
-        y_vals_b = []
-        
-        x_vals_r = []
-        y_vals_r = []    
-        
-        for ind, value in counter.items():
-            if value == 0:
-                x_vals_r.append(ind.fitness)
-                y_vals_r.append(0.5)
-            else:
-                x_vals_b.append(ind.fitness)
-                y_vals_b.append(value)
-        
-        plt.bar(x_vals_b, y_vals_b, color='blue')
-        plt.bar(x_vals_r, y_vals_r, color='red')
-        fig.savefig(plot_name, dpi=fig.dpi)
-        plt.close('all')
-    except:
-        pass
+
+    fig = plt.figure()
+    x_vals_b = []
+    y_vals_b = []
+    
+    x_vals_r = []
+    y_vals_r = []    
+    
+    for ind, value in counter.items():
+        if value == 0:
+            x_vals_r.append(ind.fitness)
+            y_vals_r.append(0.5)
+        else:
+            x_vals_b.append(ind.fitness)
+            y_vals_b.append(value)
+    
+    plt.bar(x_vals_b, y_vals_b, color='blue')
+    plt.bar(x_vals_r, y_vals_r, color='red')
+    fig.savefig(plot_name, dpi=fig.dpi)
+    plt.close('all')
+
     
 
 def dedupe(iterable, seen=None):
