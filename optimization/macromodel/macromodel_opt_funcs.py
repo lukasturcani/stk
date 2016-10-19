@@ -343,10 +343,12 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     # program. ``bmin`` is located in the Schrodinger installation
     # folder.
     file_root = macro_mol.prist_mol_file.replace(".mol", "")
+    log_file = macro_mol.prist_mol_file.replace(".mol", ".log")
     opt_app = os.path.join(macromodel_path, "bmin")
     # The first member of the list is the command, the following ones
     # are any additional arguments.
-    opt_cmd = [opt_app, file_root, "-WAIT"] 
+
+    opt_cmd = [opt_app, file_root, "-NOJOBID",  "-WAIT", ">", log_file] 
 
     opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
                             stderr=sp.STDOUT, 
@@ -376,7 +378,6 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
 
     # Make sure the .log and .maegz files which should be created by
     # the optimization are present.
-    log_file = macro_mol.prist_mol_file.replace('.mol', '.log')
     wait_for_file(log_file)
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
     wait_for_file(maegz)
@@ -1177,6 +1178,9 @@ def kill_macromodel():
         # the applications.           
         sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"])
         sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
+    if os.name == 'posix':
+        sp.run(["pkill", "jservergo"])
+        sp.run(["pkill", "jserver-watcher"])
 
 def optimize_folder(path, macromodel_path):
     
