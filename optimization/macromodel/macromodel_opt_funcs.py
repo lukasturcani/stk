@@ -1194,8 +1194,13 @@ def optimize_folder(path, macromodel_path):
     macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
                                                                   names]
 
+    # .mol files often get moved around. Make sure the `prist_mol_file`
+    # attribute is updated to account for this.
+    for name, macro_mol in zip(names, macro_mols):
+        macro_mol.prist_mol_file = name
+
     md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
-        timeout=False, temp=1000, confs=500, eq_time=100, sim_time=5000)    
+        timeout=False, temp=1000, confs=1000, eq_time=100, sim_time=10000)    
     
     with Pool() as p:
         p.map(md_opt, macro_mols)
