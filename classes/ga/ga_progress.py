@@ -18,6 +18,7 @@ class GAProgress:
             
             self.maxs.append(np.max(unscaled_var_mat, axis=0).tolist()[0])
             self.mins.append(np.min(unscaled_var_mat, axis=0).tolist()[0])
+            print(self.means)
             
         else:
             self.means.append(population.mean('fitness'))
