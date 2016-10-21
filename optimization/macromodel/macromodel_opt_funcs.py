@@ -160,13 +160,13 @@ def macromodel_md_opt(macro_mol, macromodel_path,
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
         # Run the optimization.
         run_bmin(macro_mol, macromodel_path, timeout)        
-        # Find the number of the lowest energy conformer.
-        conf_num = low_energy_conf(macro_mol)
-        # Extract the lowest energy conformer into its own .mae file.
-        extract_conformer(macro_mol, conf_num, macromodel_path)
+        # Extract the lowest energy conformer into its own .mae file.        
+        extractor = MAEExtractor(macro_mol)
         # Convert the .mae file of the lowest energy conformer to a .mol
         # file.
-        convert_mae_to_mol2(macro_mol, macromodel_path)
+        structconvert(extractor.path, 
+                      macro_mol.prist_mol_file.replace('.mol', '.mol2'),
+                      macromodel_path)
         update_prist_attrs_from_mol2(macro_mol) 
 
     except ConversionError as ex:
@@ -1059,7 +1059,7 @@ def low_energy_conf(macro_mol):
     if not conformers:
         raise ConformerIdentificationError(('No conformers'
                                             ' found in .log file.'))
-                                            
+    print(conformers)                                   
     return min(conformers)[1] - 1
 
 def extract_conformer(macro_mol, conf_num, macromodel_path):
@@ -1209,4 +1209,5 @@ def optimize_folder(path, macromodel_path):
 
 from ...classes.exception import MacroMolError       
 from ...classes.molecular import FGInfo, StructUnit, MacroMolecule        
-from ..optimization import update_prist_attrs_from_mol2        
+from ..optimization import update_prist_attrs_from_mol2
+from ...convenience_functions import MAEExtractor        
