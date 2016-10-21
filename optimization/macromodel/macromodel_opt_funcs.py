@@ -175,14 +175,6 @@ def macromodel_md_opt(macro_mol, macromodel_path,
         MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
-    except ConformerIdentificationError as ex:
-        MacroMolError(ex, macro_mol, 'Lowest energy conformer not found.')
-        return macro_mol
-
-    except ConformerExtractionError as ex:
-        MacroMolError(ex, macro_mol, 'Conformer extraction failed.')
-        return macro_mol
-
     except ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field == 14:
