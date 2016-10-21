@@ -26,12 +26,6 @@ class ForceFieldError(Exception):
 class OptimizationError(Exception):
     def __init__(self, message):
         self.message = message
-class ConformerIdentificationError(Exception):
-    def __init__(self, message):
-        self.message = message
-class ConformerExtractionError(Exception):
-    def __init__(self, message):
-        self.message = message
 
 def macromodel_opt(macro_mol, force_field=16,
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2",
@@ -1025,109 +1019,6 @@ def fix_torsional_angle_in_com_file(macro_mol, fix_block):
                                 atom3_id+1, atom4_id+1, ta) + "\n")
 
     return fix_block
-
-def low_energy_conf(macro_mol):
-    """
-    Return the lowest energy conformer's number.
-    
-    An MD conformer seach will produce a .log file which holds the
-    energies of the various conformers found. This function extracts
-    the number of the lowest energy conformer from the .log file.
-    
-    Parameters
-    ----------
-    macro_mol : MacroMolecule
-        The macro_mol which had an MD conformer search run on it.
-        
-    Returns
-    -------
-    int
-        The number of the lowest energy conformer.
-
-    """
-
-    log_name = macro_mol.prist_mol_file.replace('.mol', '.log')    
-    
-    with open(log_name, 'r') as log:
-        conformers = []
-        for line in log:
-            if "Conf" in line and "kJ/mol" in line and "****" not in line:
-                conf_num = int(line.split()[1])
-                conf_en = float(line.split()[4])
-                conformers.append((conf_en, conf_num))
-
-    if not conformers:
-        raise ConformerIdentificationError(('No conformers'
-                                            ' found in .log file.'))
-    print(conformers)                                   
-    return min(conformers)[1] - 1
-
-def extract_conformer(macro_mol, conf_num, macromodel_path):
-    """
-    Creates an individual .mae file for a conformer in a .maegz file.
-    
-    An MD conformer search produces a .maegz file holding the all the
-    found conformers together. This function places the conformer with
-    the number `conf_num` in its own .mae file. The .mae file reflects
-    the name of `macro_mol`.
-    
-    Parameters
-    ----------
-    macro_mol : MacroMolecule
-        The mocromolecule which had an MD conformer search run on it.
-        
-    conf_num : int
-        The number of the conformer to be extracted. Likely the lowest
-        energy conformer.
-        
-    macromodel_path : str
-        The full path of the Schrodinger directory.
-        
-    Modifies
-    --------
-    This function creates a .mae file which has the name of 
-    `macro_mol.prist_mol_file` except with .mae instead of .mol at the
-    end. The .mae file holds the conformer of macro_mol held in a
-    .maegz file. The .maegz file was likely produced during an MD
-    conformer search.
-
-    Returns
-    -------
-    None : NoneType
-    
-    """
-    
-    print('Extracting conformer - {}.'.format(macro_mol.prist_mol_file)) 
-    
-    # If the conformer number is 0, the original structure had the
-    # lowest energy and no extraction needs to take place.
-    if conf_num == 0:
-        return
-    
-    # The names of the input and output files.
-    maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
-    mae =  macro_mol.prist_mol_file.replace('.mol', '.mae' )  
-    
-    # The full path of the application doing the extraction.
-    extract_app = os.path.join(macromodel_path, 'utilities', 'maesubset')
-
-    # The command needed to run the application and extract the
-    # conformer via bash or whatever.             
-    extract_cmd = [extract_app, maegz, "-n", str(conf_num), "-o", mae]
-  
-    # Execute the extraction.
-    extract_return = sp.run(extract_cmd, stdout=sp.PIPE, 
-                           stderr=sp.STDOUT, universal_newlines=True)
-
-    # If no license if found, keep re-running the function until it is.
-    if not license_found('', extract_return.stdout):   
-        return extract_conformer(macro_mol, conf_num, macromodel_path)        
-
-    # Make sure the .mae file is in fact created.
-    wait_for_file(mae)
-    if not os.path.exists(mae):
-        raise ConformerExtractionError(('Conformer extraction failed.'
-        ' Console output was {}.').format(extract_return))
 
 def wait_for_file(file_name, timeout=20):
     """
