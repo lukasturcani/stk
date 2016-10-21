@@ -8,6 +8,11 @@ import os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import gzip
+import re
+from collections import deque
+from itertools import zip_longest
+
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
@@ -489,7 +494,60 @@ class LazyAttr:
         val = self.func(obj)
         setattr(obj, self.func.__name__, val)
         return val
+       
+class MAEExtractor:
+    def __init__(self, macro_mol):
+        self.path = macro_mol.prist_mol_file.replace('.mol', "-out.maegz")
+        self.macro_mol = macro_mol
+        self.maegz_to_mae()
+        self.extract_conformer()
+
+    def extract_conformer(self):
+        print("Extracting conformer - {}.".format(
+                                        self.macro_mol.prist_mol_file))        
+                
         
+        num = self.lowest_energy_conformer()        
+        
+        content = self.content.split("f_m_ct")
+        new_mae = "f_m_ct".join([content[0], content[num]])
+        new_name = self.path.replace('.mae', '_EXTRACTED_{}.mae'.format(num))
+        with open(new_name, 'w') as mae_file:
+            mae_file.write(new_mae)
+        self.path = new_name
+            
+    def extract_energy(self, block):
+        block = block.split(":::")
+        for name, value in zip(block[0].split('\n'), block[1].split('\n')):
+            if 'r_mmod_Potential_Energy' in name:
+                return float(value)            
+        
+    def lowest_energy_conformer(self):
+        with open(self.path, 'r') as mae_file:
+            self.content = mae_file.read()
+            self.content_split = re.split(r"[{}]", self.content)
+
+        energies = []
+
+        prev_block = deque([""], maxlen=1)
+        index = 1        
+        for block in self.content_split:
+            if ("f_m_ct" in prev_block[0] and
+                                "r_mmod_Potential_Energy" in block):              
+                energy = self.extract_energy(block)
+                energies.append((energy, index))
+                index += 1
+                
+            prev_block.append(block)
+        return min(energies)[1]
+  
+    def maegz_to_mae(self):
+        mae_path = self.path.replace('.maegz', '.mae')            
+        with gzip.open(self.path, 'r') as maegz_file:
+            with open(mae_path, 'wb') as mae_file:
+                mae_file.write(maegz_file.read())       
+        self.path = mae_path  
+
         
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',
