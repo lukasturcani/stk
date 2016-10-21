@@ -496,8 +496,18 @@ class LazyAttr:
         return val
        
 class MAEExtractor:
+    """
+    Extracts the lowest energy conformer from a .maegz file.
+
+    Attributes
+    ----------
+    macro_mol : MacroMolecule 
+            
+    """
+    
     def __init__(self, macro_mol):
-        self.path = macro_mol.prist_mol_file.replace('.mol', "-out.maegz")
+        self.maegz_path = macro_mol.prist_mol_file.replace('.mol', 
+                                                           "-out.maegz")
         self.macro_mol = macro_mol
         self.maegz_to_mae()
         self.extract_conformer()
@@ -523,7 +533,7 @@ class MAEExtractor:
                 return float(value)            
         
     def lowest_energy_conformer(self):
-        with open(self.path, 'r') as mae_file:
+        with open(self.mae_path, 'r') as mae_file:
             self.content = mae_file.read()
             self.content_split = re.split(r"[{}]", self.content)
 
@@ -542,12 +552,10 @@ class MAEExtractor:
         return min(energies)[1]
   
     def maegz_to_mae(self):
-        mae_path = self.path.replace('.maegz', '.mae')            
-        with gzip.open(self.path, 'r') as maegz_file:
-            with open(mae_path, 'wb') as mae_file:
+        self.mae_path = self.path.replace('.maegz', '.mae')            
+        with gzip.open(self.maegz_path, 'r') as maegz_file:
+            with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())       
-        self.path = mae_path  
-
         
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',
