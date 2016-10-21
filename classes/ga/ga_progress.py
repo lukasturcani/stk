@@ -15,10 +15,10 @@ class GAProgress:
             unscaled_var_mat = np.matrix(
             [x.unscaled_fitness_vars.tolist() for 
              x in population if x.unscaled_fitness_vars is not None])
-            
+
             self.maxs.append(np.max(unscaled_var_mat, axis=0).tolist()[0])
             self.mins.append(np.min(unscaled_var_mat, axis=0).tolist()[0])
-            print(self.means)
+            self.means.append(np.mean(unscaled_var_mat, axis=0).tolist()[0])
             
         else:
             self.means.append(population.mean('fitness'))

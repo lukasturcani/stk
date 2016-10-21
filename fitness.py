@@ -125,12 +125,11 @@ def calc_fitness(func_data, population):
             if unscaled is not None:
                 valid_params += 1
                 var_sum = np.add(unscaled, var_sum)
+                print(unscaled[0])
 
         # To get the average divide the sum by the number of things 
         # summed.
         var_avg = np.divide(var_sum, valid_params)
-        # Save the average to the population.
-        population.ga_tools.ga_progress.means.append(var_avg.tolist())
 
     # Apply the function to every member of the population.
     for macro_mol in population:
