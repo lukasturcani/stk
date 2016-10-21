@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import gzip
 import re
 from collections import deque
-from itertools import zip_longest
 
 
 # This dictionary gives easy access to the rdkit bond types.
@@ -521,7 +520,7 @@ class MAEExtractor:
         
         content = self.content.split("f_m_ct")
         new_mae = "f_m_ct".join([content[0], content[num]])
-        new_name = self.path.replace('.mae', '_EXTRACTED_{}.mae'.format(num))
+        new_name = self.mae_path.replace('.mae', '_EXTRACTED_{}.mae'.format(num))
         with open(new_name, 'w') as mae_file:
             mae_file.write(new_mae)
         self.path = new_name
@@ -552,7 +551,7 @@ class MAEExtractor:
         return min(energies)[1]
   
     def maegz_to_mae(self):
-        self.mae_path = self.path.replace('.maegz', '.mae')            
+        self.mae_path = self.maegz_path.replace('.maegz', '.mae')            
         with gzip.open(self.maegz_path, 'r') as maegz_file:
             with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())       
