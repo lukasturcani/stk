@@ -368,7 +368,8 @@ class Selection:
 
     @classmethod
     def stochastic_sampling(cls, population, elitism=False, 
-                            truncation=False, duplicates=False):
+                            truncation=False, duplicates=False,
+                            use_rank=False):
         """
         Yields individuals via stochastic sampling.
         
@@ -417,6 +418,15 @@ class Selection:
             selected individual cannot be selected again. This option is
             suitable for generational selecitons.
             
+        use_rank : bool (default = False)
+            When ``True`` the rank is used instead of fitness when
+            selecting. More accurately a provisional fitness value, f,
+            calculated from the rank is used for selection. The formula
+            is
+                
+                f = 1/rank.
+                
+            
         Yields
         ------
         MacroMolecule
@@ -445,8 +455,13 @@ class Selection:
                 if not duplicates:
                     pop.remove(ind)
 
-        mean_fitness = population.mean('fitness')
-        fns = {ind : ind.fitness/mean_fitness for ind in pop}
+        if use_rank:
+            mean_fitness = np.mean([1/r for r, _ in enumerate(pop, 1)])
+            fns = {ind : 1/(r * mean_fitness) for r, ind in 
+                                                    enumerate(pop, 1)}
+        else:
+            mean_fitness = population.mean('fitness')
+            fns = {ind : ind.fitness/mean_fitness for ind in pop}
 
         if duplicates:            
             for ind in pop:
