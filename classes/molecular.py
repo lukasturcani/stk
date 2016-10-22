@@ -1396,6 +1396,14 @@ class StructUnit(metaclass=Cached):
         self.heavy_mol.AddConformer(new_conf)
         
         return chem.Mol(self.heavy_mol)
+
+    def update_from_mae(self, mae_path=None):
+        """
+        See `update_from_mae` documentation in ``MacroMolecule``.
+        
+        """
+
+        return MacroMolecule.update_from_mae(self, mae_path)
            
     def write_mol_file(self, mol_type, path=None):
         """
