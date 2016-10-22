@@ -266,8 +266,7 @@ def mol_from_mol_file(mol_file):
     
     """
     
-    mol = chem.Mol()  
-    e_mol = chem.EditableMol(mol)
+    e_mol = chem.EditableMol(chem.Mol())
     conf = chem.Conformer()
     
     with open(mol_file, 'r') as f:
@@ -313,77 +312,84 @@ def mol_from_mol_file(mol_file):
     mol.AddConformer(conf)
     return mol
 
-def mol_from_mol2_file(mol2_file):
+def mol_from_mae_file(mae_path):
     """
-    Creates a rdkit molecule from a ``.mol2`` file.
+    Creates a rdkit molecule from a ``.mae`` file.
     
     Parameters
     ----------
     mol2_file : str
-        The full path of the ``.mol2`` file from which an rdkit molecule
+        The full path of the ``.mae`` file from which an rdkit molecule
         should be instantiated.
 
     Returns
     -------
     rdkit.Chem.rdchem.Mol
-        An rdkit instance of the molecule held in `mol2_file`.
+        An rdkit instance of the molecule held in `mae_file`.
 
     """
     
-    # Read the ``.mol2`` file line by line. Checks for the lines
-    # holding flags indicating the start of the atomic or bond block.
-    # When going through a block use its data in the rdkit molecule or
-    # the conformer. Finally add the conformer to the rdkit molecule and
-    # return.
-    
-    # Create an empty molecule and make it editable.
-    mol = chem.Mol()  
-    e_mol = chem.EditableMol(mol)
-    # Create a new conformer.
+    mol = chem.EditableMol(chem.Mol())
     conf = chem.Conformer()
-      
-    take_atom = False 
-    take_bond = False
+
+    with open(mae_path, 'r') as mae:
+        content = re.split(r'[{}]', mae.read())
     
-    with open(mol2_file, 'r') as f:
-        for line in f:
-            
-            # Indicates the following lines hold the atom block.
-            if '@<TRIPOS>ATOM' in line:
-                take_atom = True
-                continue
-            # Indicates the following lines hold the bond block, and the
-            # atom block has ended.
-            if '@<TRIPOS>BOND' in line:
-                take_atom  = False
-                take_bond = True
-                continue
-            # Indicates that the bond block is ended and all data has
-            # therefore been collected. Stop going through the file as a
-            # result.
-            if take_bond and len(line.split()) in {0,1}:
-                break
-            # If in the atom block, extract atomic data.
-            if take_atom:
-                _, atom_sym, x, y, z, *_ = line.split()
-                atom_sym = ''.join(x for x in atom_sym if x.isalpha())
-                atom_id = e_mol.AddAtom(chem.Atom(atom_sym))
-                atom_coord = Point3D(float(x), float(y), float(z))                
-                
-                conf.SetAtomPosition(atom_id, atom_coord)
-                
-                continue
-            
-            # If in the bond block, extract bond data.
-            if take_bond:
-                bond_id, atom1, atom2, bond_order, *_ = line.split()
-                e_mol.AddBond(int(atom1)-1, int(atom2)-1, 
-                              bond_dict[bond_order])                
-                
-                continue
+    prev_block = deque([''], maxlen=1)
+    for block in content:
+        if 'm_atom[' in prev_block[0]:
+            atom_block = block
+        if 'm_bond[' in prev_block[0]:
+            bond_block = block
+        prev_block.append(block)
     
-    # Get the rdkit molecule and give it the conformer.
-    mol = e_mol.GetMol()
+
+
+    labels, data_block, *_ = atom_block.split(':::')
+    labels = [l for l in labels.split('\n') if not l.isspace() and l != '']
+    data_block = [a.split() for a in data_block.split('\n') if not a.isspace() and a != '']
+    
+    for line in data_block:
+        if len(labels) != len(line):
+            raise RuntimeError(('Number of labels does'
+                      ' not match number of columns in .mae file.'))
+            
+        for label, data in zip(labels, line):
+            if 'x_coord' in label:
+                x = float(data)
+            if 'y_coord' in label:
+                y = float(data)
+            if 'z_coord' in label:
+                z = float(data)
+            if 'atomic_number' in label:
+                atom_num = int(data)
+        
+        atom_sym = periodic_table[atom_num]        
+        atom_coord = Point3D(x,y,z)
+        atom_id = mol.AddAtom(chem.Atom(atom_sym))              
+        conf.SetAtomPosition(atom_id, atom_coord)        
+
+
+    
+    labels, data_block, *_ = bond_block.split(':::')
+    labels = [l for l in labels.split('\n') if not l.isspace() and l != '']
+    data_block = [a.split() for a in data_block.split('\n') if not a.isspace() and a != '']
+    
+    for line in data_block:
+        if len(labels) != len(line):
+            raise RuntimeError(('Number of labels does'
+                      ' not match number of columns in .mae file.'))
+            
+        for label, data in zip(labels, line):
+            if 'from' in label:
+                atom1 = int(data) - 1
+            if 'to' in label:
+                atom2 = int(data) - 1
+            if 'order' in label:
+                bond_order = str(int(data))
+        mol.AddBond(atom1, atom2, bond_dict[bond_order])  
+        
+    mol = mol.GetMol()
     mol.AddConformer(conf)
     return mol
 
