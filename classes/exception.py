@@ -93,21 +93,21 @@ class MacroMolError(Exception):
         name = os.path.join(cwd, 'failures.txt')
         
         with open(name, 'a') as f:
-            f.write("{0}\n".format(self.ex))
-            f.write('note = {0}\n'.format(self.notes))
+            f.write("{} - {}\n".format(type(self.ex).__name__, self.ex))
+            f.write('note = {}\n'.format(self.notes))
 
-            f.write('prist_mol_file = {0}\n'.format(
+            f.write('prist_mol_file = {}\n'.format(
                                               macro_mol.prist_mol_file))
             
             if isinstance(macro_mol, MacroMolecule):
-                f.write('building blocks = {0}\n'.format(
+                f.write('building blocks = {}\n'.format(
                                              macro_mol.building_blocks))
     
-                f.write('topology = {0}\n'.format(macro_mol.topology)) 
+                f.write('topology = {}\n'.format(macro_mol.topology)) 
     
      
                
-                f.write('topology_args = {0}\n'.format(
+                f.write('topology_args = {}\n'.format(
                                               macro_mol.topology_args))    
                              
             f.write('\n\n\n')                             
