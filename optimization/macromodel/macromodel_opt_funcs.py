@@ -27,10 +27,13 @@ class ForceFieldError(Exception):
 class OptimizationError(Exception):
     def __init__(self, message):
         self.message = message
+class LewisStructureError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 def macromodel_opt(macro_mol, force_field=16,
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2",
-                 no_fix=False, md=False):
+                 no_fix=False, md=False, lewis_fixed=False):
     """
     Optimizes the molecule using MacroModel.
 
@@ -132,16 +135,29 @@ def macromodel_opt(macro_mol, force_field=16,
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
                '- {0}').format(macro_mol.prist_mol_file))
-        return macromodel_opt(macro_mol, force_field=14, 
+        return macromodel_opt(macro_mol, force_field=14,
+                              lewis_fixed=lewis_fixed,
                               macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)   
+                              no_fix=no_fix, md=md)
+
+    except LewisStructureError as ex:
+        if not lewis_fixed:
+            run_applyhtreat(macro_mol, macromodel_path)
+            return macromodel_opt(macro_mol, force_field=force_field,
+                              lewis_fixed=True,
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix, md=md) 
+        else:
+            MacroMolError(ex, macro_mol, ('A viable Lewis'
+                                       ' structure was not generated.'))
+            return macro_mol
 
     except Exception as ex:
         MacroMolError(ex, macro_mol, ('Uncategorized '
                       'exception during `macromodel_opt`.'))
         return macro_mol
        
-def macromodel_md_opt(macro_mol, macromodel_path, 
+def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
                       timeout=True, force_field=16, 
                       temp=300, confs=50, eq_time=10, sim_time=200):  
 
@@ -182,19 +198,32 @@ def macromodel_md_opt(macro_mol, macromodel_path,
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
                '- {0}').format(macro_mol.prist_mol_file))
         return macromodel_md_opt(macro_mol, macromodel_path, 
-                                 timeout=timeout, force_field=14, 
+                                 timeout=timeout, force_field=14,
+                                 lewis_fixed=lewis_fixed,
                                  temp=temp, confs=confs, 
                                  eq_time=eq_time, sim_time=sim_time) 
+
+    except LewisStructureError as ex:
+        if not lewis_fixed:
+            run_applyhtreat(macro_mol, macromodel_path)
+            return macromodel_md_opt(macro_mol, macromodel_path, 
+                                 timeout=timeout, force_field=force_field,
+                                 lewis_fixed=True,
+                                 temp=temp, confs=confs, 
+                                 eq_time=eq_time, sim_time=sim_time) 
+        else:
+            MacroMolError(ex, macro_mol, ('A viable Lewis'
+                                       ' structure was not generated.'))
+            return macro_mol
         
     except Exception as ex:
         MacroMolError(ex, macro_mol, ('Uncategorized'
                        ' exception during `macromodel_md_opt`.'))
-        raise ex
         return macro_mol
     
 def macromodel_cage_opt(macro_mol, force_field=16,
                  macromodel_path=r"C:\Program Files\Schrodinger2016-2",
-                 no_fix=False, md=False):
+                 no_fix=False, md=False, lewis_fixed=False):
     """
     Optimizes the molecule using MacroModel.
 
@@ -309,7 +338,20 @@ def macromodel_cage_opt(macro_mol, force_field=16,
        '- {0}').format(macro_mol.prist_mol_file))
         return macromodel_cage_opt(macro_mol, force_field=14, 
                               macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)    
+                              no_fix=no_fix, md=md, 
+                              lewis_fixed=lewis_fixed)    
+
+    except LewisStructureError as ex:
+        if not lewis_fixed:
+            run_applyhtreat(macro_mol, macromodel_path)
+            return macromodel_cage_opt(macro_mol, force_field=force_field,
+                              lewis_fixed=True,
+                              macromodel_path=macromodel_path,
+                              no_fix=no_fix, md=md) 
+        else:
+            MacroMolError(ex, macro_mol, ('A viable Lewis'
+                                       ' structure was not generated.'))
+            return macro_mol
 
     except Exception as ex:
         MacroMolError(ex, macro_mol, ('Uncategorized '
@@ -357,6 +399,12 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
                                 " an error condition. See .log file."))
     if "FATAL do_nosort_typing: NO MATCH found for atom " in proc_out:
         raise ForceFieldError('The log implies the force field failed.')
+    if (("FATAL gen_lewis_structure(): could not find best Lewis"
+         " structure") in proc_out and ("skipping input structure  "
+         "due to forcefield interaction errors") in proc_out):
+        raise LewisStructureError(
+                '`bmin` failed due to poor Lewis structure.')
+        
 
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
@@ -394,6 +442,22 @@ def kill_bmin():
             print('``kill_bmin`` excepted.')
             continue
 
+def run_applyhtreat(macro_mol, macromodel_path):
+    mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
+    mae_out = mae.replace('.mae', '_htreated.mae')
+    convert_mol_to_mae(macro_mol, macromodel_path)
+    
+    app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
+    cmd = [app, mae, mae_out]
+    out = sp.run(cmd, stdout=sp.PIPE, 
+                 stderr=sp.STDOUT, universal_newlines=True)
+
+    # If no license if found, keep re-running the function until it is.
+    if not license_found('', out.stdout):
+        return run_applyhtreat(macro_mol, macromodel_path)     
+    
+    macro_mol.update_from_mae(mae_out)    
+    
 def license_found(macro_mol, output):
     """
     Checks to see if minimization failed due to a missing license.
