@@ -1,10 +1,7 @@
 import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
-import os
 import multiprocessing as mp
 from functools import partial
-import time
-
 # More imports at the bottom of script.
 
 def optimize_all(func_data, population):
@@ -138,57 +135,6 @@ def optimize_all_serial(func_data, population):
     
     # Apply the function to every member of the population.    
     return iter(p_func(member) for member in population)    
-
-def update_prist_attrs_from_mol2(macro_mol):
-    """
-    Replaces instance in `prist_mol` from the optimized ``.mol2`` file.
-    
-    This function uses a ``.mol2`` file's structure to form a new rdkit 
-    molecule instance. This new rdkit molecule instance is placed in the 
-    `prist_mol` attribute of `macro_mol`.
-    
-    The ``.mol2`` file should be in the same location that the ``.mol``
-    file is. It is converted to a ``.mol`` file so that the ``.mol``
-    file in `prist_mol_file` holds the optimized structure.
-        
-    
-    Parameters
-    ----------
-    macro_mol : MacroMolecule
-        The macro_molecule who's `prist_mol` and `prist_mol_file` 
-        attributes are to be updated. Note that the `prist_mol_file`
-        attribute itself is not changed. Only the data in the file it
-        points to.
-        
-    Modifies
-    --------
-    macro_mol.prist_mol
-        A new rdkit instance is placed in this attribute. The rdkit
-        instances holds the molecule described by the ``.mol2`` file.
-        
-    macro_mol.prist_mol_file's content
-        The content in this ``.mol`` file is replaced with the structure
-        of the optimized molecule held in a ``.mol2`` file.
-        
-    Returns
-    -------
-    None : NoneType
-    
-    """
-    
-    # Get the name of the ``.mol2`` file. It should be in the same
-    # directory and have the same name as the ``.mol`` file. Only a
-    # different extension.
-    mol2 = macro_mol.prist_mol_file.replace('.mol', '.mol2')    
-
-    # Update the `prist_mol` attribute.
-    macro_mol.prist_mol = mol_from_mol2_file(mol2)
-    
-    # Update content in ``prist_mol_file``.
-    macro_mol.write_mol_file('prist')
-
-    print('Finished updating attributes from .mol2 - {0}.'.format(
-                                             macro_mol.prist_mol_file))
     
 def rdkit_optimization(macro_mol):
     """
@@ -276,4 +222,3 @@ def do_not_optimize(macro_mol):
     return macro_mol
 
 from .macromodel import macromodel_opt, macromodel_cage_opt, macromodel_md_opt    
-from ..convenience_functions import mol_from_mol2_file

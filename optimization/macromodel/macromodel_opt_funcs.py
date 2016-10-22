@@ -7,6 +7,7 @@ import warnings
 import psutil
 from multiprocessing import Pool
 from functools import partial
+import gzip
 
 # More imports at bottom.
 
@@ -100,8 +101,8 @@ def macromodel_opt(macro_mol, force_field=16,
         run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and 
         # convert it to a ``.mol2`` file.
-        convert_maegz_to_mol2(macro_mol, macromodel_path)
-        update_prist_attrs_from_mol2(macro_mol) 
+        convert_maegz_to_mae(macro_mol, macromodel_path)
+        macro_mol.update_from_mae() 
 
         if md:
             macromodel_md_opt(macro_mol, macromodel_path)
@@ -155,13 +156,8 @@ def macromodel_md_opt(macro_mol, macromodel_path,
         # Run the optimization.
         run_bmin(macro_mol, macromodel_path, timeout)        
         # Extract the lowest energy conformer into its own .mae file.        
-        extractor = MAEExtractor(macro_mol)
-        # Convert the .mae file of the lowest energy conformer to a .mol
-        # file.
-        structconvert(extractor.path, 
-                      macro_mol.prist_mol_file.replace('.mol', '.mol2'),
-                      macromodel_path)
-        update_prist_attrs_from_mol2(macro_mol) 
+        conformer_mae = MAEExtractor(macro_mol).path
+        macro_mol.update_from_mae(conformer_mae) 
 
     except ConversionError as ex:
         MacroMolError(ex, macro_mol, '`structconvert` failed.')
@@ -193,6 +189,7 @@ def macromodel_md_opt(macro_mol, macromodel_path,
     except Exception as ex:
         MacroMolError(ex, macro_mol, ('Uncategorized'
                        ' exception during `macromodel_md_opt`.'))
+        raise ex
         return macro_mol
     
 def macromodel_cage_opt(macro_mol, force_field=16,
@@ -273,8 +270,8 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and 
         # convert it to a ``.mol2`` file.
-        convert_maegz_to_mol2(macro_mol, macromodel_path)
-        update_prist_attrs_from_mol2(macro_mol) 
+        convert_maegz_to_mae(macro_mol, macromodel_path)
+        macro_mol.update_from_mae() 
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -354,6 +351,13 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     with open(log_file, 'w') as log:
         log.write(proc_out)
 
+    # Check the log for error reports.
+    if "termination due to error condition           21-" in proc_out:
+        raise OptimizationError(("`bmin` crashed due to"
+                                " an error condition. See .log file."))
+    if "FATAL do_nosort_typing: NO MATCH found for atom " in proc_out:
+        raise ForceFieldError('The log implies the force field failed.')
+
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
     if 'The system cannot find the path specified' in proc_out:
@@ -370,8 +374,8 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     wait_for_file(maegz)
     if not os.path.exists(log_file) or not os.path.exists(maegz):
         raise OptimizationError(('The .log and/or .maegz '
-                     'files were not created by the optimization.'))   
-
+                     'files were not created by the optimization.'))
+        
 def kill_bmin():
     bmins = []
     for i, process in enumerate(psutil.process_iter()):
@@ -609,15 +613,15 @@ def convert_mol_to_mae(macro_mol, macromodel_path):
     structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
     return mae_file
 
-def convert_maegz_to_mol2(macro_mol, macromodel_path):
+def convert_maegz_to_mae(macro_mol, macromodel_path):
     """
-    Converts a ``.mae`` file to a ``.mol2`` file.
+    Converts a ``.maegz`` file to a ``.mae`` file.
     
     Parameters
     ----------
     macro_mol : MacroMolecule
-        The macromolecule being optimized. The ``.mae`` file holding its
-        optimized structure is converted to a ``.mol2`` file. Both
+        The macromolecule being optimized. The ``.maegz`` file holding 
+        its optimized structure is converted to a ``.mae`` file. Both
         versions are kept.
         
     macromodel_path : str
@@ -645,59 +649,14 @@ def convert_maegz_to_mol2(macro_mol, macromodel_path):
     
     """
 
-    print('Converting .maegz to .mol2 - {}.'.format(
+    print('Converting .maegz to .mae - {}.'.format(
                                             macro_mol.prist_mol_file))
 
     # ``out`` is the full path of the optimized ``.mae`` file.
     maegz = macro_mol.prist_mol_file.replace(".mol", "-out.maegz")      
     # Replace extensions to get the names of the various files.
-    mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
-    structconvert(maegz, mol2, macromodel_path)
-
-def convert_mae_to_mol2(macro_mol, macromodel_path):
-    """
-    Converts a ``.mae`` file to a ``.mol2`` file.
-    
-    Parameters
-    ----------
-    macro_mol : MacroMolecule
-        The macromolecule being optimized. The ``.mae`` file holding its
-        optimized structure is converted to a ``.mol2`` file. Both
-        versions are kept.
-        
-    macromodel_path : str
-        The full path of the installation directory of the Schrodinger 
-        suite. By default on a Windows machine it should be something
-        like: "C:\Program Files\Schrodinger2016-2".   
-    
-    Modifies
-    --------    
-    This function creates a new ``.mol2`` file from the optimized 
-    ``.mae`` file. This new file is placed in the same folder as the 
-    ``.mae`` file.
-    
-    Returns
-    -------
-    None : NoneType
-
-    Raises
-    ------
-    ForceFieldError
-        If the OPLS3 force field failed to optimize the molecule. If
-        this happens the conversion function is unable to convert the 
-        output of the optimization function and as a result this error
-        is raised.
-    
-    """
-
-    print('Converting .mae to .mol2 - {}.'.format(
-                                            macro_mol.prist_mol_file))
-    
-    # ``mae`` is the full path of the optimized ``.mae`` file.
-    mae = macro_mol.prist_mol_file.replace(".mol", ".mae")        
-    # Replace extensions to get the names of the various files.
-    mol2 = macro_mol.prist_mol_file.replace(".mol", ".mol2")
-    structconvert(mae, mol2, macromodel_path)    
+    mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
+    return structconvert(maegz, mae, macromodel_path)
     
 def structconvert(iname, oname, macromodel_path):
   
@@ -1091,6 +1050,5 @@ def optimize_folder(path, macromodel_path):
     
 
 from ...classes.exception import MacroMolError       
-from ...classes.molecular import FGInfo, StructUnit, MacroMolecule        
-from ..optimization import update_prist_attrs_from_mol2
+from ...classes.molecular import FGInfo, StructUnit, MacroMolecule
 from ...convenience_functions import MAEExtractor        

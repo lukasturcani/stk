@@ -13,7 +13,8 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
                                      normalize_vector, rotation_matrix,
                                      vector_theta, LazyAttr,
                                      rotation_matrix_arbitrary_axis,
-                                     mol_from_mol_file, ChargedMolError)
+                                     mol_from_mol_file, 
+                                     mol_from_mae_file, ChargedMolError)
 
 class CachedMacroMol(type):
     """
@@ -1905,6 +1906,14 @@ class MacroMolecule(metaclass=CachedMacroMol):
     def update_cache(self):
         cls = type(self)
         cls._update_cache(self)
+
+    def update_from_mae(self, mae_path=None):
+        if mae_path is None:
+            mae_path = self.prist_mol_file.replace('.mol', '.mae')
+        
+        self.prist_mol = mol_from_mae_file(mae_path)
+        self.write_mol_file('prist')
+        
                 
     @LazyAttr
     def energy(self):
