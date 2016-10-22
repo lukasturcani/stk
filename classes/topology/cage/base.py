@@ -25,7 +25,7 @@ class CageTopology(Topology):
     
     """
 
-    @LazyAttr
+    @property
     def windows(self):
         """
         

@@ -125,7 +125,6 @@ def calc_fitness(func_data, population):
             if unscaled is not None:
                 valid_params += 1
                 var_sum = np.add(unscaled, var_sum)
-                print(unscaled[0])
 
         # To get the average divide the sum by the number of things 
         # summed.
