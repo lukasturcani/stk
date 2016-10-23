@@ -373,8 +373,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     # The first member of the list is the command, the following ones
     # are any additional arguments.
 
-    opt_cmd = [opt_app, file_root, "-NOJOBID", "-WAIT"] 
-
+    opt_cmd = [opt_app, file_root, "-WAIT", "-LOCAL"]
     opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
                             stderr=sp.STDOUT, 
                             universal_newlines=True)
@@ -388,8 +387,8 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
         kill_bmin()
-        proc_out = ""
-
+        proc_out, _ = opt_proc.communicate() 
+        
     with open(log_file, 'w') as log:
         log.write(proc_out)
 
@@ -553,6 +552,8 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
     "0.0000     0.0000     0.0000\n"
 " DEBG      55      0      0      0     0.0000     0.0000     "
 "0.0000     0.0000\n"
+" DEBG     931      0      0      0     0.0000     0.0000     "
+"0.0000     0.0000\n"
 " FFLD{0:8}      1      0      0     1.0000     0.0000     "
 "0.0000     0.0000\n"
 " BDCO       0      0      0      0    41.5692 99999.0000     "
@@ -604,6 +605,7 @@ def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, s
     # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
     
     main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
+ DEBG     931      0      0      0     0.0000     0.0000     0.0000     0.0000
  FFLD{force_field:8}      1      0      0     1.0000     0.0000     0.0000     0.0000
  BDCO       0      0      0      0    41.5692 99999.0000     0.0000     0.0000
  READ       0      0      0      0     0.0000     0.0000     0.0000     0.0000
