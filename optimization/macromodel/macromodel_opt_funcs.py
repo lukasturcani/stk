@@ -7,7 +7,7 @@ import warnings
 import psutil
 from multiprocessing import Pool
 from functools import partial
-import gzip
+import re
 
 # More imports at bottom.
 
@@ -379,28 +379,28 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
                             universal_newlines=True)
     try:
         if timeout:
-            proc_out, _ = opt_proc.communicate(timeout=600)
+            proc_out, _ = opt_proc.communicate(timeout=200)
         else:
             proc_out, _ = opt_proc.communicate()    
     
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
-        kill_bmin()
-        proc_out, _ = opt_proc.communicate() 
-        
-    with open(log_file, 'w') as log:
-        log.write(proc_out)
+        kill_bmin(macro_mol, macromodel_path)
+        proc_out = ""
+
+    with open(log_file, 'r') as log: 
+        log_content = log.read()
 
     # Check the log for error reports.
-    if "termination due to error condition           21-" in proc_out:
+    if "termination due to error condition           21-" in log_content:
         raise OptimizationError(("`bmin` crashed due to"
                                 " an error condition. See .log file."))
-    if "FATAL do_nosort_typing: NO MATCH found for atom " in proc_out:
+    if "FATAL do_nosort_typing: NO MATCH found for atom " in log_content:
         raise ForceFieldError('The log implies the force field failed.')
     if (("FATAL gen_lewis_structure(): could not find best Lewis"
-         " structure") in proc_out and ("skipping input structure  "
-         "due to forcefield interaction errors") in proc_out):
+         " structure") in log_content and ("skipping input structure  "
+         "due to forcefield interaction errors") in log_content):
         raise LewisStructureError(
                 '`bmin` failed due to poor Lewis structure.')
         
@@ -423,23 +423,26 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
         raise OptimizationError(('The .log and/or .maegz '
                      'files were not created by the optimization.'))
         
-def kill_bmin():
-    bmins = []
-    for i, process in enumerate(psutil.process_iter()):
-        if process.name() == 'bmin.exe':
-            process_time = (process.cpu_times().user + 
-                            process.cpu_times().system)
-    
-            bmins.append((process_time, i, process))
+def kill_bmin(macro_mol, macromodel_path):
+    name = macro_mol.prist_mol_file.replace('.mol', '')
+    name = re.split(r'\\|/', name)[-1]
+    app = os.path.join(macromodel_path, 'jobcontrol')
+    cmd = [app, '-stop', name]
+    out = sp.run(cmd, stdout=sp.PIPE, 
+                 stderr=sp.STDOUT, universal_newlines=True)
+ 
+    # If no license if found, keep re-running the function until it is.
+    if not license_found('', out.stdout):
+        return kill_bmin(macro_mol, macromodel_path)  
+   
+    cmd = [app, '-list']
+    output = name
+    while name in output:
+        output = sp.run(cmd, stdout=sp.PIPE, 
+                 stderr=sp.STDOUT, universal_newlines=True).stdout
 
-    bmins.sort(reverse=True)
-    for x in bmins:
-        try:
-            x[-1].kill()
-            break
-        except:
-            print('``kill_bmin`` excepted.')
-            continue
+
+  
 
 def run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
@@ -552,8 +555,6 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
     "0.0000     0.0000     0.0000\n"
 " DEBG      55      0      0      0     0.0000     0.0000     "
 "0.0000     0.0000\n"
-" DEBG     931      0      0      0     0.0000     0.0000     "
-"0.0000     0.0000\n"
 " FFLD{0:8}      1      0      0     1.0000     0.0000     "
 "0.0000     0.0000\n"
 " BDCO       0      0      0      0    41.5692 99999.0000     "
@@ -605,7 +606,6 @@ def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, s
     # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
     
     main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
- DEBG     931      0      0      0     0.0000     0.0000     0.0000     0.0000
  FFLD{force_field:8}      1      0      0     1.0000     0.0000     0.0000     0.0000
  BDCO       0      0      0      0    41.5692 99999.0000     0.0000     0.0000
  READ       0      0      0      0     0.0000     0.0000     0.0000     0.0000
