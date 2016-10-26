@@ -7,3 +7,5 @@ from .two_plus_four import (TwoPlusFour, ThreePlusSix, FourPlusEight,
 from .three_plus_three import OnePlusOne, TwoPlusTwo, FourPlusFour
 
 from .three_plus_four import SixPlusEight
+
+from .base import CageTopology
