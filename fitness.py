@@ -170,7 +170,8 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
-def cage(macro_mol, target_size, macromodel_path,
+def cage(macro_mol, target_size, macromodel_path, 
+         target_window_area=None, 
          coeffs=None, exponents=None, means=None):
     """
     Calculates the fitness of a cage.
@@ -255,6 +256,10 @@ def cage(macro_mol, target_size, macromodel_path,
         
     macromodel_path : str
         The Schrodinger directory path.
+
+    target_window_area : float (default = None)
+        The desired size of the largest window of the cage. If ``None``
+        the square of `target_size` is used.
         
     coeffs : numpy.array (default = None)
         An array holding the coeffients A to N in equation (2).
@@ -264,7 +269,7 @@ def cage(macro_mol, target_size, macromodel_path,
         
     means : numpy.array (default = None)
         A numpy array holding the mean values of var1 to varx over the
-        populatoin. Used in the scaling procedure decribed in 
+        population. Used in the scaling procedure decribed in 
         ``calc_fitnes``.
     
     Returns
@@ -342,9 +347,10 @@ def cage(macro_mol, target_size, macromodel_path,
     # Calculate the difference between the cavity size of the cage and
     # the desired cavity size.
     cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
-    # Calcualte  the window area required to a molecule of the target
+    # Calculate the window area required to fit a molecule of the target
     # size through.
-    target_window_area = np.square(target_size)
+    if target_window_area is None:
+        target_window_area = np.square(target_size)
     # The point is to allow only molecules of the target size to
     # diffuse through the cage, no bigger molecules. To do this the
     # biggest window of the cage must be found. The difference between
