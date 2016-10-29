@@ -434,16 +434,7 @@ def kill_bmin(macro_mol, macromodel_path):
     # If no license if found, keep re-running the function until it is.
     if not license_found('', out.stdout):
         return kill_bmin(macro_mol, macromodel_path)  
-   
-    cmd = [app, '-list']
-    output = name
-    while name in output:
-        output = sp.run(cmd, stdout=sp.PIPE, 
-                 stderr=sp.STDOUT, universal_newlines=True).stdout
-
-
   
-
 def run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
     mae_out = mae.replace('.mae', '_htreated.mae')
