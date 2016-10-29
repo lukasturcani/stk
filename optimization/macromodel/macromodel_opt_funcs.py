@@ -379,7 +379,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
                             universal_newlines=True)
     try:
         if timeout:
-            proc_out, _ = opt_proc.communicate(timeout=200)
+            proc_out, _ = opt_proc.communicate(timeout=600)
         else:
             proc_out, _ = opt_proc.communicate()    
     
