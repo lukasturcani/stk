@@ -381,7 +381,8 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
             proc_out, _ = opt_proc.communicate(timeout=600)
         else:
             proc_out, _ = opt_proc.communicate()    
-    
+        opt_proc.wait()
+        
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
