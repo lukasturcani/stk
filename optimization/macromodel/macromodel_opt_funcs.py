@@ -372,14 +372,13 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     opt_app = os.path.join(macromodel_path, "bmin")
     # The first member of the list is the command, the following ones
     # are any additional arguments.
-
-    opt_cmd = [opt_app, file_root, "-WAIT", "-LOCAL"]
+    opt_cmd = [opt_app, file_root, "-LOCAL"]
     opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE, 
                             stderr=sp.STDOUT, 
                             universal_newlines=True)
     try:
         if timeout:
-            proc_out, _ = opt_proc.communicate(timeout=200)
+            proc_out, _ = opt_proc.communicate(timeout=600)
         else:
             proc_out, _ = opt_proc.communicate()    
     
@@ -424,25 +423,22 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
                      'files were not created by the optimization.'))
         
 def kill_bmin(macro_mol, macromodel_path):
-    name = macro_mol.prist_mol_file.replace('.mol', '')
-    name = re.split(r'\\|/', name)[-1]
-    app = os.path.join(macromodel_path, 'jobcontrol')
-    cmd = [app, '-stop', name]
-    out = sp.run(cmd, stdout=sp.PIPE, 
-                 stderr=sp.STDOUT, universal_newlines=True)
- 
-    # If no license if found, keep re-running the function until it is.
-    if not license_found('', out.stdout):
-        return kill_bmin(macro_mol, macromodel_path)  
-   
-    cmd = [app, '-list']
-    output = name
-    while name in output:
-        output = sp.run(cmd, stdout=sp.PIPE, 
-                 stderr=sp.STDOUT, universal_newlines=True).stdout
+    bmins = []
+    for i, process in enumerate(psutil.process_iter()):
+        if process.name() == 'bmin.exe':
+            process_time = (process.cpu_times().user + 
+                            process.cpu_times().system)
+    
+            bmins.append((process_time, i, process))
 
-
-  
+    bmins.sort(reverse=True)
+    for x in bmins:
+        try:
+            x[-1].kill()
+            break
+        except:
+            print('``kill_bmin`` excepted.')
+            continue
 
 def run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
