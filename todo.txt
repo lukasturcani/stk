@@ -1,14 +1,7 @@
+-write developer's guide
+-write user's guide
 -implement parallelisation of fitness functions
 -parametrize fitness function
 -implement limited mutation
--implement chirality check
--write developer's guide
--write user's guide
--make mating and mutation parallel
--create ga test runs
--tests for stochastic sampling and mating determinstic sampling
--implement tools for chekcing progress of the GA 
--add tests for substitutions in structunit
--topology tests
--topology to cope with odd topologies
--consider dealing with charged building blocks
+-make timeout in bmin settable by user
+-keep track of which mutation function was used
