@@ -434,7 +434,21 @@ def kill_bmin(macro_mol, macromodel_path):
     # If no license if found, keep re-running the function until it is.
     if not license_found('', out.stdout):
         return kill_bmin(macro_mol, macromodel_path)  
-  
+   
+   
+   # This loop causes the function to wait until the job has been killed
+   # via job control. This means the output files will have been written
+   # by the time the function exits. Essentially the loop continues
+   # until the job is no longer found by "./jobcontrol -list"
+    cmd = [app, '-list']
+    output = name
+    start = time.time()
+    while name in output:
+        output = sp.run(cmd, stdout=sp.PIPE, 
+                 stderr=sp.STDOUT, universal_newlines=True).stdout
+        if time.time() - start > 600:
+            break
+                 
 def run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
     mae_out = mae.replace('.mae', '_htreated.mae')
