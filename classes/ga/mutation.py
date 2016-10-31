@@ -236,6 +236,116 @@ class Mutation:
         
         return Cage(cage.building_blocks, topology, 
              os.path.join(os.getcwd(), self.name.format(self.n_calls)))
+
+    def similar_bb(self, cage, database):
+        """
+        Substitute the building-block* with similar one from `database`.
+        
+        All of the molecules in `database` are checked for similarity to
+        the building-block* of `cage`. The first time this mutation
+        function is run on a cage, the most similar molecule in
+        `database` is used to substitute the building-block*. The next
+        time this mutation function is run on the same cage, the second 
+        most similar molecule from `database` is used and so on.
+        
+        Parameters
+        ----------
+        cage : Cage
+            The cage which is to have its building-block* substituted.
+            
+        database : str
+            The full path of the database from which molecules are used
+            to substitute the building-block* of `cage`.
+
+        Modifies
+        --------
+        cage._similar_bb_mols : generator
+            Creates this attribute on the `cage` instance. This allows
+            the function to keep track of which molecule from `database`
+            should be used in the substitution.
+            
+        Returns
+        -------
+        Cage
+            A new cage with the same linker as `cage` but a different
+            building-block*. The building-block* is selected according
+            to the description in this docstring.
+        
+        """
+        
+        # The first time this function is run it creates a generator
+        # which returns molecules from `database`, most similar first.
+        # This generator is placed in the `_similar_bb_mols` attribute
+        # of `cage`. When this function is run again on the same cage,
+        # to get the next molecule from `database` all one needs to do
+        # is run ``next()`` on `_similar_bb_mols`. This will return the
+        # next most similar molecule in `database`.
+        
+        if not hasattr(cage, '_similar_bb_mols'):
+            bb = next(x for x in cage.building_blocks if 
+                                             isinstance(x, StructUnit3))
+            cage._similar_bb_mols = bb.similar_molecules(database)
+        
+        new_bb = StructUnit3(next(cage._similar_bb_mols))
+        lk = next(x for x in cage.building_blocks if 
+                                             isinstance(x, StructUnit2))
+        return Cage((new_bb, lk), type(cage.topology),
+              os.path.join(os.getcwd(), self.name.format(self.n_calls)))
+        
+    def similar_lk(self, cage, database):
+        """
+        Substitute the linker with a similar one from `database`.
+        
+        All of the molecules in `database` are checked for similarity to
+        the linker of `cage`. The first time this mutation function is 
+        run on a cage, the most similar molecule in `database` is used 
+        to substitute the linker. The next time this mutation function 
+        is run on the same cage, the second most similar molecule from 
+        `database` is used and so on.
+        
+        Parameters
+        ----------
+        cage : Cage
+            The cage which is to have its linker substituted.
+            
+        database : str
+            The full path of the database from which molecules are used
+            to substitute the linker of `cage`.
+
+        Modifies
+        --------
+        cage._similar_lk_mols : generator
+            Creates this attribute on the `cage` instance. This allows
+            the function to keep track of which molecule from `database`
+            should be used in the substitution.
+            
+        Returns
+        -------
+        Cage
+            A new cage with the same building-block* as `cage` but a 
+            different linker. The linker is selected according to the 
+            description in this docstring.
+        
+        """
+
+        # The first time this function is run it creates a generator
+        # which returns molecules from `database`, most similar first.
+        # This generator is placed in the `_similar_lk_mols` attribute
+        # of `cage`. When this function is run again on the same cage,
+        # to get the next molecule from `database` all one needs to do
+        # is run ``next()`` on `_similar_lk_mols`. This will return the
+        # next most similar molecule in `database`.
+        
+        if not hasattr(cage, '_similar_lk_mols'):
+            lk = next(x for x in cage.building_blocks if 
+                                             isinstance(x, StructUnit2))
+            cage._similar_lk_mols = lk.similar_molecules(database)
+        
+        new_lk = StructUnit2(next(cage._similar_lk_mols))
+        bb = next(x for x in cage.building_blocks if 
+                                             isinstance(x, StructUnit3))
+        return Cage((new_lk, bb), type(cage.topology),
+              os.path.join(os.getcwd(), self.name.format(self.n_calls)))
         
 from ..population import Population
 from ..molecular import StructUnit3, StructUnit2, Cage, Polymer
