@@ -2,7 +2,9 @@ import numpy as np
 from functools import total_ordering
 import itertools
 from rdkit import Chem as chem
+from rdkit.Chem import AllChem as ac
 import rdkit.Geometry.rdGeometry as rdkit_geo
+from rdkit import DataStructs
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
@@ -711,6 +713,52 @@ class StructUnit(metaclass=Cached):
         # atom ids of those atoms.
         return self.prist_mol.GetSubstructMatches(func_grp_mol)        
 
+    def similar_molecules(self, database):
+        """
+        Yields molecules from `database`, most similar first.
+        
+        This method uses the Morgan fingerprints of length 4 to evaluate 
+        how similar the molecules in `database` are to `self`. It then 
+        yields the molecules from the database, most similar first.
+        
+        Parameters
+        ----------
+        database : str
+            The full path of the database from which the molecules are
+            yielded.
+            
+        Yields
+        ------
+        str
+            The full path of the .mol file holding the similar molecule.
+        
+        """
+        # First get the fingerprint of `self`.
+        chem.GetSSSR(self.prist_mol)
+        self.prist_mol.UpdatePropertyCache(strict=False)
+        fp = ac.GetMorganFingerprint(self.prist_mol, 4)
+        
+        # For every .mol file in the database create an rdkit molecule.
+        # Place these in a list.
+        mols = []
+        for file in os.listdir(database):
+            path = os.path.join(database, file)
+            # Ignore files which are not .mol and the .mol file of the
+            # molecule itself.
+            if not path.endswith('.mol') or path == self.prist_mol_file:
+                continue
+            mol = chem.MolFromMolFile(path, 
+                                      sanitize=False, 
+                                      removeHs=False)
+            chem.GetSSSR(mol)
+            mol.UpdatePropertyCache(strict=False)
+            mol_fp = ac.GetMorganFingerprint(mol, 4)
+            similarity = DataStructs.DiceSimilarity(fp, mol_fp)
+            mols.append((similarity, path))
+        
+        mols.sort(reverse=True)
+        yield from (x[-1] for x in mols)
+        
     def atom_coords(self, mol_type, atom_id):
         """
         Return coordinates of an atom in `heavy_mol` or `prist_mol`.
