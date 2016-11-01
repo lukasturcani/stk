@@ -124,7 +124,9 @@ class Mutation:
 
             except Exception as ex:
                 MacroMolError(ex, parent, ('Error during mutation'
-                    ' with {}.').format(func.__name__)) 
+                    ' with {}.').format(func.__name__))
+                
+                raise ex
 
         mutant_pop -= population
         
@@ -284,9 +286,12 @@ class Mutation:
         if not hasattr(cage, '_similar_bb_mols'):
             bb = next(x for x in cage.building_blocks if 
                                              isinstance(x, StructUnit3))
-            cage._similar_bb_mols = bb.similar_molecules(database)
+            cage._similar_bb_mols = bb.similar_molecules(database), 0
         
-        new_bb = StructUnit3(next(cage._similar_bb_mols))
+        sim_mols, cur_index = cage._similar_bb_mols
+        new_bb = StructUnit3(sim_mols[cur_index][-1])
+        cage._similar_bb_mols = sim_mols, cur_index + 1
+        
         lk = next(x for x in cage.building_blocks if 
                                              isinstance(x, StructUnit2))
         return Cage((new_bb, lk), type(cage.topology),
@@ -339,9 +344,12 @@ class Mutation:
         if not hasattr(cage, '_similar_lk_mols'):
             lk = next(x for x in cage.building_blocks if 
                                              isinstance(x, StructUnit2))
-            cage._similar_lk_mols = lk.similar_molecules(database)
+            cage._similar_lk_mols = lk.similar_molecules(database), 0
+
+        sim_mols, cur_index = cage._similar_lk_mols
+        new_lk = StructUnit2(sim_mols[cur_index][-1])
+        cage._similar_lk_mols = sim_mols, cur_index + 1
         
-        new_lk = StructUnit2(next(cage._similar_lk_mols))
         bb = next(x for x in cage.building_blocks if 
                                              isinstance(x, StructUnit3))
         return Cage((new_lk, bb), type(cage.topology),
