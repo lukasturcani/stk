@@ -715,22 +715,23 @@ class StructUnit(metaclass=Cached):
 
     def similar_molecules(self, database):
         """
-        Yields molecules from `database`, most similar first.
+        Returns molecules from `database` ordered by similarity.
         
         This method uses the Morgan fingerprints of length 4 to evaluate 
-        how similar the molecules in `database` are to `self`. It then 
-        yields the molecules from the database, most similar first.
+        how similar the molecules in `database` are to `self`.
         
         Parameters
         ----------
         database : str
             The full path of the database from which the molecules are
-            yielded.
+            checked for similarity.
             
-        Yields
-        ------
-        str
-            The full path of the .mol file holding the similar molecule.
+        Returns
+        -------
+        list of tuples of form (float, str)
+            The float is the similarity of a given molecule in the
+            database to `self` while the str is the full path of the 
+            .mol file of that molecule.
         
         """
         # First get the fingerprint of `self`.
@@ -756,8 +757,7 @@ class StructUnit(metaclass=Cached):
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
             mols.append((similarity, path))
         
-        mols.sort(reverse=True)
-        yield from (x[-1] for x in mols)
+        return sorted(mols, reverse=True)
         
     def atom_coords(self, mol_type, atom_id):
         """
