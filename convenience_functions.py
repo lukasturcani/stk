@@ -241,7 +241,11 @@ class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
         self.msg = msg
-
+class MolFileError(Exception):
+    def __init__(self, mol_file, msg):
+        self.mol_file = mol_file
+        self.msg = msg
+        
 def mol_from_mol_file(mol_file):
     """
     Creates a rdkit molecule from a ``.mol`` (V3000) file.
@@ -263,6 +267,8 @@ def mol_from_mol_file(mol_file):
         If an atom row has more than 8 coloumns it is usually because
         there is a 9th coloumn indicating atomic charge. Such molecules
         are not currently supported, so an error is raised.
+    MolFileError
+        If the file is not a V3000 .mol file.
     
     """
     
@@ -272,8 +278,12 @@ def mol_from_mol_file(mol_file):
     with open(mol_file, 'r') as f:
         take_atom = False
         take_bond = False
+        v3000 = False
         
         for line in f:
+            if 'V3000' in line:
+                v3000 = True
+                
             if 'M  V30 BEGIN ATOM' in line:
                 take_atom = True
                 continue
@@ -307,7 +317,9 @@ def mol_from_mol_file(mol_file):
                 e_mol.AddBond(int(atom1)-1, int(atom2)-1, 
                               bond_dict[bond_order])                   
                 continue
-
+    if not v3000:
+        raise MolFileError(mol_file, 'Not a V3000 .mol file.')
+            
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
