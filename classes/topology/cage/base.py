@@ -5,7 +5,7 @@ import numpy as np
 import rdkit.Chem as chem 
 
 from ..base import Topology
-from ....convenience_functions import LazyAttr, atom_vdw_radii
+from ....convenience_functions import atom_vdw_radii
 from ....pyWindow import window_sizes
 from ...molecular import FGInfo
 
