@@ -71,10 +71,6 @@ ga_tools = GATools(selector, mator, mutator,
                    ga_input.opt_func, ga_input.fitness_func)
 ga_tools.ga_input = ga_input
 
-cc3_bb = StructUnit3('/home/lukas/Dropbox/GA/17_11_2015_update_OPLS3opt/aldehydes_3f/aldehyde3f_25.mol')
-cc3_lk = StructUnit2('/home/lukas/Dropbox/GA/17_11_2015_update_OPLS3opt/amines_2f/amine2f_89.mol')
-cc3 = Cage((cc3_bb, cc3_lk), FourPlusSix, 'cc3.mol')
-
 # Generate and optimize an initial population.
 with time_it():
     pop_init = getattr(Population, ga_input.init_func.name)
@@ -162,9 +158,6 @@ for x in range(ga_input.num_generations):
     os.mkdir('selected')
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
-    
-    if cc3 in pop:
-        break
     
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible
