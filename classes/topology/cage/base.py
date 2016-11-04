@@ -62,7 +62,7 @@ class CageTopology(Topology):
                 return None
                 
         return all_windows
-   
+        
     def cavity_size(self):
         """
         Returns the size of the cage cavity.
