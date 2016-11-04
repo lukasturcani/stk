@@ -29,6 +29,8 @@ class GAProgress:
         if (isinstance(self.maxs[0], float) or 
                                         isinstance(self.maxs[0], int)):
             fig = plt.figure()
+            plt.xlabel('Generation number')
+            plt.ylabel('Fitness')
             plt.plot(self.gens, self.means, color='green')
             plt.plot(self.gens, self.mins, color='blue')
             plt.plot(self.gens, self.maxs, color='red')
@@ -38,6 +40,7 @@ class GAProgress:
         else:
             for x in range(len(self.means[0])):
                 fig = plt.figure()
+                plt.xlabel('Generation number')
                 y_mean = [v[x] for v in self.means]
                 y_max = [v[x] for v in self.maxs]
                 y_min = [v[x] for v in self.mins]
