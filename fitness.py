@@ -148,7 +148,6 @@ def calc_fitness(func_data, population):
                 
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
-            macro_mol.topology.windows = None
 
         print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
             
