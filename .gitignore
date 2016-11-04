@@ -1,0 +1,5 @@
+**/__pycache__/
+
+tests/HEAVY/
+tests/*.mol
+tests/*.dmp
