@@ -9,6 +9,10 @@ from ....convenience_functions import LazyAttr, atom_vdw_radii
 from ....pyWindow import window_sizes
 from ...molecular import FGInfo
 
+class WindowError(Exception):
+    def __init__(self, message):
+        self.message = message
+
 class CageTopology(Topology):
     """
     A topology class which cage topologies should inherit.
@@ -46,13 +50,16 @@ class CageTopology(Topology):
         
         all_windows = window_sizes(self.macro_mol.prist_mol_file)
 
+        # If pyWindow failed, return ``None``.
         if all_windows is None:          
             return None
         
         all_windows = sorted(all_windows, reverse=True)[:self.n_windows]
         for i, x in enumerate(all_windows):
+            # Return ``None`` when pyWindow fucks up and outputs a
+            # mistakenly large window size.
             if x > 500:
-                all_windows[i] = 500
+                return None
                 
         return all_windows
    
@@ -70,49 +77,48 @@ class CageTopology(Topology):
         center_of_mass = self.macro_mol.center_of_mass('prist')
         min_dist = min((euclidean(coord, center_of_mass) -
         atom_vdw_radii[self.macro_mol.atom_symbol('prist', atom_id)]) 
-                                 for atom_id, coord in 
-                                 self.macro_mol.all_atom_coords('prist'))
+                           for atom_id, coord in 
+                               self.macro_mol.all_atom_coords('prist'))
         return 2 * abs(min_dist)    
 
-    def window_difference(self, default=500):
+    def window_difference(self):
         """
-        The total difference between all cage size.
+        The total difference in all window sizes.
         
         Every combination of windows is considered and all the size
-        differences are summed and returned.
-
-        Parameters
-        ----------
-        default : float or int (default = 500)
-            The number returned if no windows were found in the cage.
+        differences are summed and returned. Only differences between
+        windows of the same type are considered.
+        
+        Consider a triangular-based prism cage topology. Such a cage 
+        will have triangular windows and square windows. You only want 
+        to compare the triangulars with other triangular windows and 
+        squares only with other squares.
         
         Returns
         -------
-        default : float or int
-            If the `windows` attribute is ``None``. This happens when
-            the window finidning algorithm fails. In these cases the
-            `default` value is returned.
-            
         float
             The total difference of window size when considering every
-            combination of windows.
-                           
+            combination of windows of the same type.
+                       
+        Raises
+        ------
+        WindowError
+            When the number of found windows is less than the number of 
+            expected windows. Likely due to a collapsed cage.
+            
         """
         
-        if self.windows is None:
-            return default
+
         if len(self.windows) < self.n_windows:
-            return default
-        if 500 in self.windows:
-            return default
-    
+            raise WindowError(('Number of windows found is less than'
+                               ' the number of expected windows.'))
+
         # Cluster the windows into groups so that only size differences
         # between windows of the same type are taken into account. To do
         # this, first sort the windows by size. If two windows types are
         # present split the windows at the two groups at the point where
         # the window sizes have the biggest difference. If there are
         # three types split it at the two biggest differences and so on.
-                
         windows = np.array(self.windows)
         
         diffs = list(abs(np.ediff1d(windows)))
