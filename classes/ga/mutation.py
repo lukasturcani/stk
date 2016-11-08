@@ -125,8 +125,6 @@ class Mutation:
             except Exception as ex:
                 MacroMolError(ex, parent, ('Error during mutation'
                     ' with {}.').format(func.__name__))
-                
-                raise ex
 
         mutant_pop -= population
         
@@ -275,13 +273,18 @@ class Mutation:
         
         """
         
-        # The first time this function is run it creates a generator
-        # which returns molecules from `database`, most similar first.
-        # This generator is placed in the `_similar_bb_mols` attribute
-        # of `cage`. When this function is run again on the same cage,
-        # to get the next molecule from `database` all one needs to do
-        # is run ``next()`` on `_similar_bb_mols`. This will return the
-        # next most similar molecule in `database`.
+        # The idea here is to create a list of molecules from `database`
+        # order by similarity to the building-block* of `cage`. Each
+        # time this function is called on `cage` the next molecule from
+        # this list is used to substitute the building-block* of the
+        # cage and create a new mutant. The most elegant way to do this
+        # would be with a generator. However, because generators can't be
+        # dumped with ``pickle`` this is not possible. The idea would be
+        # to save the generator into an attribute of `cage` and yield
+        # the next building-block* from it each time this function is
+        # used on that cage. Instead of the generator the list is saved
+        # to the attribute alongside the index which is to be accessed
+        # the next time this function is run on the same `cage`.
         
         if not hasattr(cage, '_similar_bb_mols'):
             bb = next(x for x in cage.building_blocks if 
@@ -333,13 +336,18 @@ class Mutation:
         
         """
 
-        # The first time this function is run it creates a generator
-        # which returns molecules from `database`, most similar first.
-        # This generator is placed in the `_similar_lk_mols` attribute
-        # of `cage`. When this function is run again on the same cage,
-        # to get the next molecule from `database` all one needs to do
-        # is run ``next()`` on `_similar_lk_mols`. This will return the
-        # next most similar molecule in `database`.
+        # The idea here is to create a list of molecules from `database`
+        # order by similarity to the linker of `cage`. Each time this 
+        # function is called on `cage` the next molecule from this list 
+        # is used to substitute the linker of the cage and create a new 
+        # mutant. The most elegant way to do this would be with a 
+        # generator. However, because generators can't be dumped with 
+        # ``pickle`` this is not possible. The idea would be to save the 
+        # generator into an attribute of `cage` and yield the next 
+        # linker from it each time this function is used on that cage. 
+        # Instead of the generator the list is saved to the attribute 
+        # alongside the index which is to be accessed the next time this 
+        # function is run on the same `cage`.
         
         if not hasattr(cage, '_similar_lk_mols'):
             lk = next(x for x in cage.building_blocks if 
