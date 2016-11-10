@@ -34,7 +34,7 @@ class GAProgress:
             plt.plot(self.gens, self.means, color='green')
             plt.plot(self.gens, self.mins, color='blue')
             plt.plot(self.gens, self.maxs, color='red')
-            fig.savefig(plot_name, dpi=fig.dpi)
+            fig.savefig(plot_name, dpi=1000)
             plt.close('all')
             
         else:
@@ -51,7 +51,7 @@ class GAProgress:
                 
                 new_plot_name = str(x).join(os.path.splitext(plot_name))                
                 
-                fig.savefig(new_plot_name, dpi=fig.dpi)
+                fig.savefig(new_plot_name, dpi=1000)
                 plt.close('all')
 
             
