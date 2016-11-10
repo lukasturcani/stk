@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from ...fitness import *
         
 class GAProgress:
     def __init__(self):
@@ -25,12 +26,13 @@ class GAProgress:
             self.maxs.append(max(x.fitness for x in population))
             self.mins.append(min(x.fitness for x in population))
         
-    def epp(self, plot_name):
+    def epp(self, plot_name, fitness_func):
         if (isinstance(self.maxs[0], float) or 
                                         isinstance(self.maxs[0], int)):
             fig = plt.figure()
-            plt.xlabel('Generation number')
-            plt.ylabel('Fitness')
+            plt.xlabel('Generation Number')
+            plt.ylabel('Fitness Value')
+            plt.title('Evolutionary Progress Plot', fontsize=18)
             plt.plot(self.gens, self.means, color='green')
             plt.plot(self.gens, self.mins, color='blue')
             plt.plot(self.gens, self.maxs, color='red')
@@ -40,7 +42,10 @@ class GAProgress:
         else:
             for x in range(len(self.means[0])):
                 fig = plt.figure()
-                plt.xlabel('Generation number')
+                plt.xlabel('Generation Number')
+                plt.ylabel('Unscaled ' + 
+                           globals()[fitness_func.name].param_labels[x])                
+                plt.title(' Evolutionary Progress Plot', fontsize=18)
                 y_mean = [v[x] for v in self.means]
                 y_max = [v[x] for v in self.maxs]
                 y_min = [v[x] for v in self.mins]

@@ -173,6 +173,23 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
+    
+    
+# This function is used as a decorator to add param_labels to the cage
+# function.
+def param_labels(*labels):
+    
+    def call_labels(func):
+        
+        func.param_labels = labels    
+        return func
+        
+    return call_labels
+
+# Call the decorator with the specific labels
+@param_labels('Cavity Difference ','Window Difference ',
+                'Asymmetry ', 'Negative Energy per Bond ', 
+                'Positive Energy per Bond ')
 def cage(macro_mol, target_cavity, macromodel_path, 
          target_window=None, coeffs=None, exponents=None, means=None):
     """
@@ -300,7 +317,7 @@ def cage(macro_mol, target_cavity, macromodel_path,
 
     """
 
-    # Go into this ``if`` block if the `means` paramter is provided.
+    # Go into this ``if`` block if the `means` parameter is provided.
     # This means that the unnormalized fitness paramters have already 
     # been found and their mean taken. Now the scaled fitness paramters
     # must be found and combined into a single final, fitness value.
