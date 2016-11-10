@@ -183,6 +183,10 @@ class GAInput:
         The function from the ``optimization.py`` module to be used for
         optimizing ``MacroMolecule`` instances.
 
+    fitness_func : FunctionData
+        The function from ``fitness.py`` to be used for calculating the
+        fitness of ``MacroMolecule`` instances.
+        
     """
     
     def __init__(self, input_file):
