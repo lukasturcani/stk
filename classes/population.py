@@ -670,7 +670,7 @@ class Population:
         
         """
      
-        self.ga_tools.ga_progress.epp(plot_name)
+        self.ga_tools.ga_progress.epp(plot_name, self.ga_tools.fitness)
          
     def __iter__(self):
         """
