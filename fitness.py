@@ -149,7 +149,11 @@ def calc_fitness(func_data, population):
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
 
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
+#        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+
+    # After each macro_mol has a fitness value, sort the population on fitness
+    for macro_mol in sorted(population):
+        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
             
 def random_fitness(macro_mol):
     """
