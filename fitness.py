@@ -149,7 +149,11 @@ def calc_fitness(func_data, population):
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
 
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
+#        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+
+    # After each macro_mol has a fitness value, sort the population on fitness
+    for macro_mol in sorted(population, reverse=True):
+        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
             
 def random_fitness(macro_mol):
     """
@@ -169,6 +173,32 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
+def param_labels(*labels):
+    """
+    Decorates the cage function with labels for plotting.
+    
+    Parameters
+    ----------
+    labels : tuple
+        List of strings about the fitness labels used for plotting EPPs.
+    
+    Returns
+    -------
+    func
+        Decorated function.
+        
+    """
+    
+    def call_labels(func):
+        func.param_labels = labels    
+        return func
+        
+    return call_labels
+
+# Calls the decorator with the specific labels
+@param_labels('Cavity Difference ','Window Difference ',
+                'Asymmetry ', 'Negative Energy per Bond ', 
+                'Positive Energy per Bond ')
 def cage(macro_mol, target_cavity, macromodel_path, 
          target_window=None, coeffs=None, exponents=None, means=None):
     """
@@ -296,7 +326,7 @@ def cage(macro_mol, target_cavity, macromodel_path,
 
     """
 
-    # Go into this ``if`` block if the `means` paramter is provided.
+    # Go into this ``if`` block if the `means` parameter is provided.
     # This means that the unnormalized fitness paramters have already 
     # been found and their mean taken. Now the scaled fitness paramters
     # must be found and combined into a single final, fitness value.
