@@ -1874,6 +1874,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         except Exception as ex:
             self.building_blocks = building_blocks
             self.topology = topology
+            self.prist_mol = chem.Mol()
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
