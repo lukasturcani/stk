@@ -179,29 +179,17 @@ def param_labels(*labels):
     
     Parameters
     ----------
-    labels : lst
+    labels : tuple
         List of strings about the fitness labels used for plotting EPPs.
     
     Returns
     -------
     func
         Decorated function.
+        
     """
     
     def call_labels(func):
-        """
-        Decorates the function with an attribute 'labels'
-        
-        Parameters
-        ----------
-        func: func
-            Function to be decorated.
-        
-        Returns
-        -------
-        func
-        """
-        
         func.param_labels = labels    
         return func
         
