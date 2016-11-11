@@ -173,20 +173,41 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
-    
-    
-# This function is used as a decorator to add param_labels to the cage
-# function.
 def param_labels(*labels):
+    """
+    Decorates the cage function with labels for plotting.
+    
+    Parameters
+    ----------
+    labels : lst
+        List of strings about the fitness labels used for plotting EPPs.
+    
+    Returns
+    -------
+    func
+        Decorated function.
+    """
     
     def call_labels(func):
+        """
+        Decorates the function with an attribute 'labels'
+        
+        Parameters
+        ----------
+        func: func
+            Function to be decorated.
+        
+        Returns
+        -------
+        func
+        """
         
         func.param_labels = labels    
         return func
         
     return call_labels
 
-# Call the decorator with the specific labels
+# Calls the decorator with the specific labels
 @param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Negative Energy per Bond ', 
                 'Positive Energy per Bond ')
