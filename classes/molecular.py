@@ -717,7 +717,7 @@ class StructUnit(metaclass=Cached):
         """
         Returns molecules from `database` ordered by similarity.
         
-        This method uses the Morgan fingerprints of length 4 to evaluate 
+        This method uses the Morgan fingerprints of radius 4 to evaluate 
         how similar the molecules in `database` are to `self`.
         
         Parameters
