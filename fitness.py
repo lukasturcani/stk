@@ -149,9 +149,8 @@ def calc_fitness(func_data, population):
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
 
-#        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
-
-    # After each macro_mol has a fitness value, sort the population on fitness
+    # After each macro_mol has a fitness value, sort the population by 
+    # fitness and print.
     for macro_mol in sorted(population, reverse=True):
         print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
             
@@ -175,12 +174,32 @@ def random_fitness(macro_mol):
 
 def param_labels(*labels):
     """
-    Decorates the cage function with labels for plotting.
+    Adds `param_labels` attribute to a fitness function.
+    
+    Fitness functions which undergo the scaling procedure have an EPP 
+    graph plotted for each attribute used to calculate total fitness. 
+    For example, if the ``cage`` fitness function was used
+    during the GA run 5 graphs would be plotted at the end of the run.
+    One for each unscaled ``var`` (see ``cage`` documentation for more 
+    details). This plotting is done by the ``GAProgress`` class. 
+    
+    In order for the ``GAProgress`` class to produce decent graphs, 
+    which means that each graph has the y-axis and title labeled with 
+    the name of the ``var`` plotted, it needs to know what each ``var`` 
+    should be called.
+    
+    This is done by adding a `param_labels` attribute to the fitness
+    function. The ``GAProgress`` class acccesses this attribute during
+    plotting and uses it to set the y-axis / title.
     
     Parameters
     ----------
     labels : tuple
         List of strings about the fitness labels used for plotting EPPs.
+        The order of the strings should represent the order of the
+        fitness ``vars`` in the fitness funciton. In practice it should
+        correspond to the order of the ``coeffs`` or ``exponents`` 
+        parameters given to the fitness function.
     
     Returns
     -------
@@ -189,11 +208,11 @@ def param_labels(*labels):
         
     """
     
-    def call_labels(func):
+    def add_labels(func):
         func.param_labels = labels    
         return func
         
-    return call_labels
+    return add_labels
 
 # Calls the decorator with the specific labels
 @param_labels('Cavity Difference ','Window Difference ',
