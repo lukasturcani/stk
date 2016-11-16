@@ -63,8 +63,23 @@ with time_it():
     pop_init = getattr(Population, ga_input.init_func.name)
     print(('\n\nGenerating initial population.\n'
          '------------------------------\n\n'))
-    pop = pop_init(**ga_input.init_func.params, 
-                   ga_tools=ga_tools)
+    
+    if pop_init.__name__ == 'load':
+        pop = pop_init(**ga_input.init_func.params, ga_tools=ga_tools)
+        ga_input.pop_size = len(pop)
+        
+        for mem in pop:
+            prist_name = os.path.basename(mem.prist_mol_file)
+            heavy_name = os.path.basename(mem.heavy_mol_file)
+            
+            mem.prist_mol_file = os.path.join(os.getcwd(), prist_name)
+            mem.heavy_mol_file = os.path.join(os.getcwd(), heavy_name)
+        
+        pop.write_population_to_dir(os.getcwd())
+        
+    else:
+        pop = pop_init(**ga_input.init_func.params, 
+                       size=ga_input.pop_size, ga_tools=ga_tools)
 
 with time_it():    
     print(('\n\nOptimizing the population.\n'
@@ -144,6 +159,7 @@ for x in range(ga_input.num_generations):
     os.mkdir('selected')
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
+    pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
     
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible
