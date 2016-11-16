@@ -187,7 +187,7 @@ class GAInput:
                 # assign it to an attribute. If its not, raise a
                 # ``ValueError``.
                 kw, val = raw_line.split("=")
-                if kw in {'num_generations', 'num_mutations', 
+                if kw in {'pop_size', 'num_generations', 'num_mutations', 
                           'num_matings', 'mutation_weights'}:
                     setattr(self, kw, eval(val))
                 else:
