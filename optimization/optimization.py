@@ -19,7 +19,7 @@ def optimize_all(func_data, population):
     structure again.
     
     If this function should be used, rather than its serial counterpart
-    ``optimize_all_serial``, the ``optimize_population`` method in the
+    ``optimize_all_serial()``, the ``optimize_population`` method in the
     ``Population`` class must be told to use it.
 
     The parallel optimization creates cloned instances of the 
