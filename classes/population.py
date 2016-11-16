@@ -216,6 +216,12 @@ class Population:
             pop = pickle.load(dump_file)
             if ga_tools is not None:
                 pop.ga_tools = ga_tools
+                
+            # Make sure the the cache is updated with the loaded
+            # population.
+            for member in pop:
+                member.update_cache()
+                
             return pop
 
     def all_members(self):
