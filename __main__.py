@@ -132,7 +132,7 @@ for x in range(ga_input.num_generations):
                '----------------------------\n\n')    )
         pop.remove_duplicates()        
     
-    pop.dump(os.path.join(os.getcwd(), 'pop_dump'))    
+    pop.dump(os.path.join(os.getcwd(), 'unselected_pop_dump'))    
     
     with time_it():        
         print(('\n\nOptimizing the population.\n'
