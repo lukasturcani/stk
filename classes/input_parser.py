@@ -1,5 +1,5 @@
 from .ga import FunctionData
-from MMEA.classes.topology import *
+from .topology import *
     
 class GAInput:
     """
