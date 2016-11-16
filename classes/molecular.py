@@ -28,8 +28,8 @@ class CachedMacroMol(type):
     Extending MMEA
     --------------
     If a MacroMolecule class is added such that one of its initializer
-    args of kwargs should not be used for caching, the `__call__` method
-    in this class will need to be modified.    
+    args of kwargs should not be used for caching, the `__call__()` 
+    method in this class will need to be modified.    
     
     """    
     
@@ -1961,16 +1961,64 @@ class MacroMolecule(metaclass=CachedMacroMol):
 
 
     def update_cache(self):
+        """
+        Updates the caching dictionary so that it contains `self`.
+        
+        When an instance of ``MacroMolecule`` is first created it is
+        cached. Using multiprocessing to perform optimizations returns
+        modified copies of the cached molecules. In order to ensure that
+        the cache points to the modified copies not to the originally
+        initialized molecule, this method must be run.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # The caching is done by the class. Access it and use its
+        # ``_update_cache()`` method.
         cls = type(self)
         cls._update_cache(self)
 
     def update_from_mae(self, mae_path=None):
+        """
+        Updates data in attributes to match what is held a .mae file.
+        
+        The molecule can be updated from a random .mae file held
+        anywhere. Alterntatively, if no path is specified it is assumed
+        the .mae file has the same path and name as 
+        `self.prist_mol_file` only with .mol replaced with .mae.
+        
+        Parameters
+        ----------
+        mae_path : str (default = None)
+            The full path of the .mae file from which the attributes
+            should be updated. If ``None`` the .mae file is assumed to
+            have the same path and name as `self.prist_mol_file` only
+            with .mol replaced by .mae.
+        
+        Modifies
+        --------
+        self.prist_mol : rdkit.Chem.rdchem.Mol
+            The rdkit molecule held in this attribute is changed so that
+            it matches the moleclue held in the .mae file.
+            
+        self.prist_mol_file's content
+            The content in this file is changed to match the content in
+            the .mae file.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
         if mae_path is None:
             mae_path = self.prist_mol_file.replace('.mol', '.mae')
         
         self.prist_mol = mol_from_mae_file(mae_path)
         self.write_mol_file('prist')
-        
                 
     @LazyAttr
     def energy(self):
