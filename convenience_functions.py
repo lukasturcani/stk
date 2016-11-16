@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import gzip
 import re
 from collections import deque
-
+import shutil
 
 # This dictionary gives easy access to the rdkit bond types.
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
@@ -20,6 +20,40 @@ bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
              '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
              'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
 
+def archive_output():
+    """
+    Places the ``output`` folder into ``old_output``.
+    
+    This function assumes that the ``output`` folder is in the current
+    working directory.
+    
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
+    if 'output' in os.listdir():
+        # Make the ``old_output`` folder if it does not exist already.
+        if 'old_output' not in os.listdir():
+            os.mkdir('old_output')
+        
+        # Find out with what number the ``output`` folder should be
+        # labelled within ``old_output``.
+        num = len(os.listdir('old_output'))
+        new_dir = os.path.join('old_output', str(num))
+        print('Moving old output dir.')
+        shutil.copytree('output', new_dir)
+    
+        # Wait for the copy to complete before removing the old folder.
+        mv_complete = False    
+        while not mv_complete:
+            try:
+                shutil.rmtree('output')
+                mv_complete = True
+            except:
+                pass
+             
 def normalize_vector(vector):
     """
     Normalizes the given vector.
