@@ -1,4 +1,4 @@
-init_func; init_random_cages; bb_db="/home/lukas/Dropbox/GA/db_OPLS3_opt/aldehydes3f"; lk_db="/home/lukas/Dropbox/GA/db_OPLS3_opt/amines2f"; topologies=[FourPlusSix]; size=25
+init_func; init_random_cages; bb_db="/home/lukas/Dropbox/GA/db_OPLS3_opt/aldehydes3f"; lk_db="/home/lukas/Dropbox/GA/db_OPLS3_opt/amines2f"; topologies=[FourPlusSix]
 
 generational_select_func; stochastic_sampling; use_rank=True
 parent_select_func; mating_roulette 
@@ -17,3 +17,4 @@ num_generations=100
 num_mutations=10
 num_matings=15  
 mutation_weights=[1/2,1/2]
+pop_size=25
