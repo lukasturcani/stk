@@ -4,11 +4,10 @@ import sys
 import warnings
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
-                      GAInput, StructUnit3, StructUnit2, Cage)
-from .classes.topology import FourPlusSix
+                      GAInput)
 from .classes.exception import PopulationSizeError
 from .optimization import kill_macromodel
-from .convenience_functions import time_it
+from .convenience_functions import time_it, archive_output
 
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible
@@ -20,35 +19,23 @@ kill_macromodel()
 # ``GAInput`` docstring.
 ga_input = GAInput(sys.argv[1])
 
-# If an output folder of MMEA exists, archive it.
-if 'output' in os.listdir():
-    if 'old_output' not in os.listdir():
-        os.mkdir('old_output')
-    num = len(os.listdir('old_output'))
-    new_dir = os.path.join('old_output', str(num))
-    print('Moving old output dir.')
-    shutil.copytree('output', new_dir)
-
-    # Wait for the copy to complete before removing the old folder.
-    mv_complete = False    
-    while not mv_complete:
-        try:
-            shutil.rmtree('output')
-            mv_complete = True
-        except:
-            pass
+# If an output folder of MMEA exists, archive it. This just moves any
+# ``output`` folder in the cwd to the ``old_output`` folder.
+archive_output()
+# Save the current directory as the `launch_dir`.
+launch_dir = os.getcwd()
     
 # Create a new output directory and move into it. Save its path as the
 # root directory.
 
-# Wait for previous operations to finish before starting these.
+# Wait for previous operations to finish before making a new directory.
 mk_complete = False    
 while not mk_complete:
     try:
         os.mkdir('output')
         mk_complete = True
     except:
-        pass
+        continue
 
 # Copy the input script into the output folder - this is useful for
 # keeping track of what input was used to generate the output.
@@ -77,7 +64,6 @@ with time_it():
     print(('\n\nGenerating initial population.\n'
          '------------------------------\n\n'))
     pop = pop_init(**ga_input.init_func.params, 
-                   size=ga_input.pop_size, 
                    ga_tools=ga_tools)
 
 with time_it():    
@@ -168,3 +154,6 @@ kill_macromodel()
 pop.progress_update()
 pop.plot_epp(os.path.join(root_dir, 'epp.png'))
 
+# Move the ``output`` folder into the ``old_output`` folder.
+os.chdir(launch_dir)
+archive_output()
