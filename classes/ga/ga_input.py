@@ -1,8 +1,6 @@
 from . import FunctionData
 from ..topology import *
 
-__all__ = ['GAInput']
-
 class GAInput:
     """
     A class for concisely holding information from MMEA's input file.
