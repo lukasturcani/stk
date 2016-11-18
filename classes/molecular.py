@@ -18,6 +18,11 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
                                      mol_from_mol_file, 
                                      mol_from_mae_file, ChargedMolError)
 
+# More imports at the end of file.
+
+__all__ = ['StructUnit', 'StructUnit2', 'StructUnit3', 'MacroMolecule',
+           'Cage', 'Polymer']
+
 class CachedMacroMol(type):
     """
     A metaclass for creating classes which create cached instances.
