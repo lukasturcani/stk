@@ -1,0 +1,7 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Installing MaMEA}{2}{section.2}
+\contentsline {section}{\numberline {3}Input Files}{2}{section.3}
+\contentsline {section}{\numberline {4}Running MaMEA}{2}{section.4}
+\contentsline {subsection}{\numberline {4.1}From the command line.}{2}{subsection.4.1}
+\contentsline {section}{\numberline {5}Output}{2}{section.5}
+\contentsline {section}{\numberline {6}MaMEA as a Library}{2}{section.6}
