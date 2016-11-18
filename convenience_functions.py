@@ -5,15 +5,24 @@ import numpy as np
 import time
 from contextlib import contextmanager
 import os 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+
+# Prevents the matplotlib import from printing warnings in Spyder. These
+# are printed because Spyder automatically imports matplotlib so the
+# call to `matplotlib.use()` results in a warning.
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
 import gzip
 import re
 from collections import deque
 import shutil
 
 # This dictionary gives easy access to the rdkit bond types.
+
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
              'am' : rdkit.Chem.rdchem.BondType.SINGLE,
              '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
