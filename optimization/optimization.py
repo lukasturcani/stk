@@ -2,6 +2,7 @@ import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
 import multiprocessing as mp
 from functools import partial
+
 # More imports at the bottom of script.
 
 def optimize_all(func_data, population):
