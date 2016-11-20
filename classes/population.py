@@ -188,7 +188,7 @@ class Population:
         return cls(*cage_gen, ga_tools)
 
     @staticmethod
-    def load(file_name):
+    def load(file_name, ga_tools=None):
         """
         Initializes a Population from one dumped to a file with pickle.
         
@@ -197,6 +197,11 @@ class Population:
         file_name : str
             The full path of the file holding the dumped population.
             
+        ga_tools : GATools (default = None)
+            A GATools instance to be used by the loaded population. If
+            ``None`` the ``GATools`` instance of the loaded population
+            is used.
+            
         Returns
         -------
         Population
@@ -204,8 +209,20 @@ class Population:
             
         """
         
+        # Read the pickle file, load it into the `pop` variable. If
+        # `ga_tools` parameter was supplied, place it into the 
+        # `ga_tools` attribute of `pop`.     
         with open(file_name, 'rb') as dump_file:
-            return pickle.load(dump_file)
+            pop = pickle.load(dump_file)
+            if ga_tools is not None:
+                pop.ga_tools = ga_tools
+                
+            # Make sure the the cache is updated with the loaded
+            # population.
+            for member in pop:
+                member.update_cache()
+                
+            return pop
 
     def all_members(self):
         """
@@ -550,16 +567,16 @@ class Population:
         """
         Optimizes all the members of the population.
 
-        This function should invoke either the ``optimize_all`` or
-        ``optimize_all_serial`` functions. ``optimize_all`` optimizes
-        all members of the population in parallel. 
-        ``optimize_all_serial`` does them serially. Probably best not to
-        use the serial version unless debugging.
+        This function should invoke either the ``optimize_all()`` or
+        ``optimize_all_serial()`` functions. ``optimize_all()`` 
+        optimizes all members of the population in parallel. 
+        ``optimize_all_serial()`` does them serially. Probably best not 
+        to use the serial version unless debugging.
         
         The parallel optimization creates cloned instances of the
         population's members. It is these that are optimized. This means
         that the ``.mol`` files are changed but any instance attributes
-        are not. See ``optimize_all`` function documentation in 
+        are not. See ``optimize_all()`` function documentation in 
         ``optimization.py`` for more details.
 
         Modifies
@@ -670,7 +687,7 @@ class Population:
         
         """
      
-        self.ga_tools.ga_progress.epp(plot_name)
+        self.ga_tools.ga_progress.epp(plot_name, self.ga_tools.fitness)
          
     def __iter__(self):
         """

@@ -148,9 +148,11 @@ def calc_fitness(func_data, population):
                 
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
-            macro_mol.topology.windows = None
 
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)            
+    # After each macro_mol has a fitness value, sort the population by 
+    # fitness and print.
+    for macro_mol in sorted(population, reverse=True):
+        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
             
 def random_fitness(macro_mol):
     """
@@ -170,9 +172,54 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
-def cage(macro_mol, target_size, macromodel_path, 
-         target_window_area=None, 
-         coeffs=None, exponents=None, means=None):
+def param_labels(*labels):
+    """
+    Adds `param_labels` attribute to a fitness function.
+    
+    Fitness functions which undergo the scaling procedure have an EPP 
+    graph plotted for each attribute used to calculate total fitness. 
+    For example, if the ``cage`` fitness function was used
+    during the GA run 5 graphs would be plotted at the end of the run.
+    One for each unscaled ``var`` (see ``cage`` documentation for more 
+    details). This plotting is done by the ``GAProgress`` class. 
+    
+    In order for the ``GAProgress`` class to produce decent graphs, 
+    which means that each graph has the y-axis and title labeled with 
+    the name of the ``var`` plotted, it needs to know what each ``var`` 
+    should be called.
+    
+    This is done by adding a `param_labels` attribute to the fitness
+    function. The ``GAProgress`` class acccesses this attribute during
+    plotting and uses it to set the y-axis / title.
+    
+    Parameters
+    ----------
+    labels : tuple
+        List of strings about the fitness labels used for plotting EPPs.
+        The order of the strings should represent the order of the
+        fitness ``vars`` in the fitness funciton. In practice it should
+        correspond to the order of the ``coeffs`` or ``exponents`` 
+        parameters given to the fitness function.
+    
+    Returns
+    -------
+    func
+        Decorated function.
+        
+    """
+    
+    def add_labels(func):
+        func.param_labels = labels    
+        return func
+        
+    return add_labels
+
+# Calls the decorator with the specific labels
+@param_labels('Cavity Difference ','Window Difference ',
+                'Asymmetry ', 'Negative Energy per Bond ', 
+                'Positive Energy per Bond ')
+def cage(macro_mol, target_cavity, macromodel_path, 
+         target_window=None, coeffs=None, exponents=None, means=None):
     """
     Calculates the fitness of a cage.
     
@@ -193,12 +240,12 @@ def cage(macro_mol, target_size, macromodel_path,
     fitness. These parameters are calculated by the fitness function and
     placed in variables, for example:
         
-        1) `cavity_diff` - the difference between the cage's cavity and
-           the desired cavity size
-        2) `window_area_diff` - the difference between the size of the 
+        1) `cavity_diff` - the difference between the cage's cavity
+           (diameter) and the desired cavity size
+        2) `window_diff` - the difference between the diameter of the 
            window of the cage and the size required to allow the target
            to enter the cavity
-        3) `asymmetry` - sum of the difference between the size of of
+        3) `asymmetry` - sum of the difference between the size of the
            windows of the same type
         4) `neg_eng_per_bond` - the formation energy of the cage divided 
            by the number of bonds for during assembly, when the energy
@@ -231,11 +278,12 @@ def cage(macro_mol, target_size, macromodel_path,
     in equation (2).
     
     Assume that for a given GA run, it is not worthwhile factoring in 
-    the `window_area_diff` parameter. This may be because cages which 
-    form via templating are also to be considered. In this case the 
+    the `window_diff` parameter. This may be because cages which 
+    form via templating are also to be considered. If the cage forms
+    around the target, its windows size is irrelevant. In this case the 
     `coeffs` parameter passed to the function would be:
 
-        np.array([1,0,1,1, 0.25])
+        np.array([1, 0, 1, 1, 0.25])
         
     In this way the contribution of that parameter to the fitness will
     always be 0. Note that you may also want to set the corresponding 
@@ -251,15 +299,15 @@ def cage(macro_mol, target_size, macromodel_path,
     macro_mol : Cage
         The cage whose fitness is to be calculated.
         
-    target_size : float
+    target_cavity : float
         The desried size of the cage's pore.
         
     macromodel_path : str
         The Schrodinger directory path.
 
-    target_window_area : float (default = None)
-        The desired size of the largest window of the cage. If ``None``
-        the square of `target_size` is used.
+    target_window : float (default = None)
+        The desired radius of the largest window of the cage. If 
+        ``None`` then `target_cavity` is used.
         
     coeffs : numpy.array (default = None)
         An array holding the coeffients A to N in equation (2).
@@ -268,18 +316,26 @@ def cage(macro_mol, target_size, macromodel_path,
         An array holding the exponents a to n in equation (2).
         
     means : numpy.array (default = None)
-        A numpy array holding the mean values of var1 to varx over the
+        A numpy array holding the mean values of var1 to varX over the
         population. Used in the scaling procedure decribed in 
-        ``calc_fitnes``.
+        ``calc_fitness``.
     
     Returns
     -------
+    The fitness function will be called on each cage twice. Once to get
+    the unscaled values of all the var parameters. This will return an 
+    array. The second time the average of the unscaled values is used 
+    for scaling. The scaled values are then used to calculate the final 
+    fitness as a float. This is returned after the second call. More
+    details in ``calc_fitness``.
+    
     float
         The fitness of `macro_mol`.
         
     numpy.array
-        A numpy array holding values of var1 to varx. This is returned
-        during the scaling procedure described in ``calc_fitness``.
+        A numpy array holding unsacled values of var1 to varX. This is 
+        returned during the scaling procedure described in 
+        ``calc_fitness``.
 
     Raises
     ------
@@ -289,7 +345,7 @@ def cage(macro_mol, target_size, macromodel_path,
 
     """
 
-    # Go into this ``if`` block if the `means` paramter is provided.
+    # Go into this ``if`` block if the `means` parameter is provided.
     # This means that the unnormalized fitness paramters have already 
     # been found and their mean taken. Now the scaled fitness paramters
     # must be found and combined into a single final, fitness value.
@@ -346,19 +402,18 @@ def cage(macro_mol, target_size, macromodel_path,
 
     # Calculate the difference between the cavity size of the cage and
     # the desired cavity size.
-    cavity_diff = abs(target_size - macro_mol.topology.cavity_size())
+    cavity_diff = abs(target_cavity - macro_mol.topology.cavity_size())
     # Calculate the window area required to fit a molecule of the target
     # size through.
-    if target_window_area is None:
-        target_window_area = np.square(target_size)
+    if target_window is None:
+        target_window = target_cavity
     # The point is to allow only molecules of the target size to
     # diffuse through the cage, no bigger molecules. To do this the
     # biggest window of the cage must be found. The difference between
     # this window and the target window size is then found.
-    window_area = np.square(max(macro_mol.topology.windows))
-    window_area_diff = abs(target_window_area - window_area) 
+    window_diff = abs(target_window - max(macro_mol.topology.windows)) 
     # Check the assymetry of the cage.
-    asymmetry = macro_mol.topology.window_difference(500)
+    asymmetry = macro_mol.topology.window_difference()
     # Check the formation energy of the cage. Treat the positive and
     # negative cases separately.
     energy_per_bond = macro_mol.formation_energy(macromodel_path)
@@ -371,7 +426,7 @@ def cage(macro_mol, target_size, macromodel_path,
 
     unscaled =  np.array([
                      cavity_diff, 
-                     window_area_diff,                                                          
+                     window_diff,                                                          
                      asymmetry,
                      pos_eng_per_bond,
                      neg_eng_per_bond
