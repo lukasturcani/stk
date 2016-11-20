@@ -21,6 +21,14 @@ class FunctionData:
         self.name = name
         self.params = kwargs
         
+    def __repr__(self):
+        return ("<FunctionData, name={}"
+                ", params={}>").format(self.name, self.params)
+        
+    def __str__(self):
+        return ("<FunctionData, name = {}"
+                ", params = {}>").format(self.name, self.params)
+        
 class GATools:
     """
     Stores objects which carry out GA operations on populations.

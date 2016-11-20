@@ -5,21 +5,64 @@ import numpy as np
 import time
 from contextlib import contextmanager
 import os 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+
+# Prevents the matplotlib import from printing warnings in Spyder. These
+# are printed because Spyder automatically imports matplotlib so the
+# call to `matplotlib.use()` results in a warning.
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
 import gzip
 import re
 from collections import deque
-
+import shutil
 
 # This dictionary gives easy access to the rdkit bond types.
+
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
              'am' : rdkit.Chem.rdchem.BondType.SINGLE,
              '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
              '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
              'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
 
+def archive_output():
+    """
+    Places the ``output`` folder into ``old_output``.
+    
+    This function assumes that the ``output`` folder is in the current
+    working directory.
+    
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
+    if 'output' in os.listdir():
+        # Make the ``old_output`` folder if it does not exist already.
+        if 'old_output' not in os.listdir():
+            os.mkdir('old_output')
+        
+        # Find out with what number the ``output`` folder should be
+        # labelled within ``old_output``.
+        num = len(os.listdir('old_output'))
+        new_dir = os.path.join('old_output', str(num))
+        print('Moving old output dir.')
+        shutil.copytree('output', new_dir)
+    
+        # Wait for the copy to complete before removing the old folder.
+        mv_complete = False    
+        while not mv_complete:
+            try:
+                shutil.rmtree('output')
+                mv_complete = True
+            except:
+                pass
+             
 def normalize_vector(vector):
     """
     Normalizes the given vector.
@@ -241,7 +284,11 @@ class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
         self.msg = msg
-
+class MolFileError(Exception):
+    def __init__(self, mol_file, msg):
+        self.mol_file = mol_file
+        self.msg = msg
+        
 def mol_from_mol_file(mol_file):
     """
     Creates a rdkit molecule from a ``.mol`` (V3000) file.
@@ -263,6 +310,8 @@ def mol_from_mol_file(mol_file):
         If an atom row has more than 8 coloumns it is usually because
         there is a 9th coloumn indicating atomic charge. Such molecules
         are not currently supported, so an error is raised.
+    MolFileError
+        If the file is not a V3000 .mol file.
     
     """
     
@@ -272,8 +321,12 @@ def mol_from_mol_file(mol_file):
     with open(mol_file, 'r') as f:
         take_atom = False
         take_bond = False
+        v3000 = False
         
         for line in f:
+            if 'V3000' in line:
+                v3000 = True
+                
             if 'M  V30 BEGIN ATOM' in line:
                 take_atom = True
                 continue
@@ -307,7 +360,9 @@ def mol_from_mol_file(mol_file):
                 e_mol.AddBond(int(atom1)-1, int(atom2)-1, 
                               bond_dict[bond_order])                   
                 continue
-
+    if not v3000:
+        raise MolFileError(mol_file, 'Not a V3000 .mol file.')
+            
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
