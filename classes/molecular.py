@@ -18,6 +18,11 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
                                      mol_from_mol_file, 
                                      mol_from_mae_file, ChargedMolError)
 
+# More imports at the end of file.
+
+__all__ = ['StructUnit', 'StructUnit2', 'StructUnit3', 'MacroMolecule',
+           'Cage', 'Polymer']
+
 class CachedMacroMol(type):
     """
     A metaclass for creating classes which create cached instances.
@@ -28,8 +33,8 @@ class CachedMacroMol(type):
     Extending MMEA
     --------------
     If a MacroMolecule class is added such that one of its initializer
-    args of kwargs should not be used for caching, the `__call__` method
-    in this class will need to be modified.    
+    args of kwargs should not be used for caching, the `__call__()` 
+    method in this class will need to be modified.    
     
     """    
     
@@ -208,7 +213,7 @@ FGInfo.functional_group_list = [
     FGInfo("aldehyde", "C(=O)[H]", [ DelAtom(bond_dict['2'], 8) ], 
                                                        6, 39, "C", "Y"), 
     
-    FGInfo("carboxylic acid", "C(=O)O[H]", 
+    FGInfo("carboxylic_acid", "C(=O)O[H]", 
            [ DelAtom(bond_dict['1'], 8) ], 6, 40, "C", "Zr"),
     
     FGInfo("amide", "C(=O)N([H])[H]", [ DelAtom(bond_dict['1'], 7) ], 
@@ -221,7 +226,7 @@ FGInfo.functional_group_list = [
     FGInfo("thiol", "[S][H]", [], 16, 44, "S", "Ru"),
     FGInfo("amine", "[N]([H])[H]", [], 7, 45, "N", "Rh"),       
     FGInfo("nitroso", "N=O", [], 7, 46, "N", "Pd"),
-    FGInfo("boronic acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
+    FGInfo("boronic_acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
                              
                              ]
 
@@ -715,22 +720,23 @@ class StructUnit(metaclass=Cached):
 
     def similar_molecules(self, database):
         """
-        Yields molecules from `database`, most similar first.
+        Returns molecules from `database` ordered by similarity.
         
-        This method uses the Morgan fingerprints of length 4 to evaluate 
-        how similar the molecules in `database` are to `self`. It then 
-        yields the molecules from the database, most similar first.
+        This method uses the Morgan fingerprints of radius 4 to evaluate 
+        how similar the molecules in `database` are to `self`.
         
         Parameters
         ----------
         database : str
             The full path of the database from which the molecules are
-            yielded.
+            checked for similarity.
             
-        Yields
-        ------
-        str
-            The full path of the .mol file holding the similar molecule.
+        Returns
+        -------
+        list of tuples of form (float, str)
+            The float is the similarity of a given molecule in the
+            database to `self` while the str is the full path of the 
+            .mol file of that molecule.
         
         """
         # First get the fingerprint of `self`.
@@ -756,8 +762,7 @@ class StructUnit(metaclass=Cached):
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
             mols.append((similarity, path))
         
-        mols.sort(reverse=True)
-        yield from (x[-1] for x in mols)
+        return sorted(mols, reverse=True)
         
     def atom_coords(self, mol_type, atom_id):
         """
@@ -1874,6 +1879,7 @@ class MacroMolecule(metaclass=CachedMacroMol):
         except Exception as ex:
             self.building_blocks = building_blocks
             self.topology = topology
+            self.prist_mol = chem.Mol()
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
@@ -1960,16 +1966,64 @@ class MacroMolecule(metaclass=CachedMacroMol):
 
 
     def update_cache(self):
+        """
+        Updates the caching dictionary so that it contains `self`.
+        
+        When an instance of ``MacroMolecule`` is first created it is
+        cached. Using multiprocessing to perform optimizations returns
+        modified copies of the cached molecules. In order to ensure that
+        the cache points to the modified copies not to the originally
+        initialized molecule, this method must be run.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # The caching is done by the class. Access it and use its
+        # ``_update_cache()`` method.
         cls = type(self)
         cls._update_cache(self)
 
     def update_from_mae(self, mae_path=None):
+        """
+        Updates data in attributes to match what is held a .mae file.
+        
+        The molecule can be updated from a random .mae file held
+        anywhere. Alterntatively, if no path is specified it is assumed
+        the .mae file has the same path and name as 
+        `self.prist_mol_file` only with .mol replaced with .mae.
+        
+        Parameters
+        ----------
+        mae_path : str (default = None)
+            The full path of the .mae file from which the attributes
+            should be updated. If ``None`` the .mae file is assumed to
+            have the same path and name as `self.prist_mol_file` only
+            with .mol replaced by .mae.
+        
+        Modifies
+        --------
+        self.prist_mol : rdkit.Chem.rdchem.Mol
+            The rdkit molecule held in this attribute is changed so that
+            it matches the moleclue held in the .mae file.
+            
+        self.prist_mol_file's content
+            The content in this file is changed to match the content in
+            the .mae file.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
         if mae_path is None:
             mae_path = self.prist_mol_file.replace('.mol', '.mae')
         
         self.prist_mol = mol_from_mae_file(mae_path)
         self.write_mol_file('prist')
-        
                 
     @LazyAttr
     def energy(self):
