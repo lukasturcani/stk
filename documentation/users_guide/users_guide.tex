@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\graphicspath{ {pictures/} }
+
+\title{MaMEA User's Guide}
+\author{Lukas Turcani}
+\begin{document}
+
+\begin{titlepage}
+	\maketitle
+\end{titlepage}
+
+\tableofcontents
+\newpage
+\section{Introduction}
+MaMEA (MacroMolecular Evolutionary Algorithm) is a genetic algorithm (GA) for chemistry. It aims to be as general as possible, being suitable for use with any class of molecules. While it does not support all types of molecules out of the box it is designed to be easily extended. This is made easier by being written in Python. For notes on how to extend MaMEA to a new class of molecules or add GA operations, see the developer's guide.
+
+\section{Installing MaMEA}
+
+\section{Input Files}
+
+To run MaMEA you need to submit an input file. These contain all the details required to start a GA calculation. Among other things, this may include things like which the fitness function you want to use, the number of generations MaMEA should make and how big the population should be.
+
+Using an example, the format and sturcture of input files is explained in section \ref{input_files_format_and_structure}. A guide to finding out what GA operations and tools are available is in section \ref{input_files_valid_parameters}.
+
+\subsection{Format and structure.}
+\label{input_files_format_and_structure}
+
+An example input file can be downloaded from \url{https://sabercathost.com/1aoC/mamea_input.in}.
+
+Any lines consisting of only whitespace or beginning with "\#" are ignored. This is used to create comments in the input file and allows us to divide it into sections. Notice that there are two kinds of non-comment line in the input file. The first kind has the form
+\begin{verbatim}
+keyword; function_name; param1=val1; param2=val2; param3=val3
+\end{verbatim}
+Lines 5, 11, 17 in the example input file are examples of this. Here is line 11 (in case you did not download the file).
+\begin{verbatim}
+generational_select_func; stochastic_sampling; use_rank=True
+\end{verbatim}
+This means that in line 11 the keyword is ``generational\_select\_func", the function name is ``stochastic\_sampling", parameter 1's name is ``use\_rank" and its ``True". As you can see, in this line there is only 1 parameter name-value pair.
+
+Lines with this format define functions used by MaMEA. These functions will correspond to the various GA operations, such as crossover, mating and selection or to things like the fitness function or optimization function (more on this later). The words on these lines are separated from the adjacent ones by a semicolon. Notice that the last word on the line is not followed by a semicolon. The keyword defines which GA operation the line desribes. For example, in line 11 the keyword ``generational\_select\_func" signifies that the line describes which function is to be used for selection members of the next generation. In line 17 the keyword ``parent\_select\_func" signifies that the line defines the function to be used for selecting parents for crossover. A list of valid keywords is described in section \ref{input_files_valid_parameters}.
+
+The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MaMEA.
+
+
+
+\subsection{Valid parameters.}
+\label{input_files_valid_parameters}
+
+\section{Running MaMEA}
+
+\subsection{From the command line.}
+
+
+\section{Output}
+
+\section{MaMEA as a Library}
+
+\end{document}

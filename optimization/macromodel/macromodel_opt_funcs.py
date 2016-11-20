@@ -11,6 +11,9 @@ import re
 
 # More imports at bottom.
 
+__all__ = ['macromodel_opt', 'macromodel_md_opt', 'macromodel_cage_opt',
+           'kill_macromodel', 'optimize_folder']
+
 class ConversionError(Exception):
     def __init__(self, message):
         self.message = message
