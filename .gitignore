@@ -3,3 +3,4 @@
 tests/HEAVY/
 tests/*.mol
 tests/*.dmp
+tests/.cache
