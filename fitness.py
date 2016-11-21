@@ -487,16 +487,6 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     if cage.fitness:
         print('Skipping {0}'.format(cage.prist_mol_file))
         return cage.fitness
-            
-    # If the size of the window is too small for the target molecule to
-    # enter the cage return the minimum fitness value.
-    if max(cage.topology.windows) < min_window_size:
-        return 1
-        
-    # If the size of the cage cavity is too small for the target, return
-    # the minimum fitness value.
-    if cage.topology.cavity_size() < target_size:
-        return 1
     
     # The first time running the fitness function create an instance
     # of the target molecule as a ``StructUnit``. Due to caching,
@@ -547,7 +537,7 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     # individual energies. If more than complex was made, use the
     # most stable version.
     energy_separate = cage.energy + target.energy
-    energy_diff =  min(energy_separate - macromol_complex.energy for 
+    energy_diff =  min(macromol_complex.energy - energy_separate for 
                             macromol_complex in macromol_complexes)
     
                        

@@ -20,9 +20,6 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
 
 # More imports at the end of file.
 
-__all__ = ['StructUnit', 'StructUnit2', 'StructUnit3', 'MacroMolecule',
-           'Cage', 'Polymer']
-
 class CachedMacroMol(type):
     """
     A metaclass for creating classes which create cached instances.
