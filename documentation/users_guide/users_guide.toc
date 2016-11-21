@@ -2,8 +2,10 @@
 \contentsline {section}{\numberline {2}Installing MaMEA}{2}{section.2}
 \contentsline {section}{\numberline {3}Input Files}{2}{section.3}
 \contentsline {subsection}{\numberline {3.1}Format and structure.}{2}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Valid parameters.}{3}{subsection.3.2}
-\contentsline {section}{\numberline {4}Running MaMEA}{3}{section.4}
-\contentsline {subsection}{\numberline {4.1}From the command line.}{3}{subsection.4.1}
-\contentsline {section}{\numberline {5}Output}{3}{section.5}
-\contentsline {section}{\numberline {6}MaMEA as a Library}{3}{section.6}
+\contentsline {subsection}{\numberline {3.2}Valid input values.}{3}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}List and explanation of valid keywords.}{4}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Finding available functions and their arguments.}{4}{subsubsection.3.2.2}
+\contentsline {section}{\numberline {4}Running MaMEA}{4}{section.4}
+\contentsline {subsection}{\numberline {4.1}From the command line.}{4}{subsection.4.1}
+\contentsline {section}{\numberline {5}Output}{4}{section.5}
+\contentsline {section}{\numberline {6}MaMEA as a Library}{4}{section.6}
