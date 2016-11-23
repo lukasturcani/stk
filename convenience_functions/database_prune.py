@@ -80,7 +80,15 @@ def mol2_to_mol(input_folder, output_folder):
         input_list[3] = os.path.join(input_folder, x)
         input_list[5] = os.path.join(output_folder, x).replace('.mol2', '.mol')
         sp.call(input_list)
- 
+
+def mol2_mol(input_folder, output_folder):
+    for i, x in enumerate(os.listdir(input_folder)):
+        mol = chem.MolFromMol2File(os.path.join(input_folder, x))
+        chem.MolToMolFile(mol, os.path.join(output_folder, x), forceV3000=True)
+        if i == 100:
+            break
+        
+        
 def fg_distance_prune(folder, fg):
     """
     Deletes molecules with functional groups seperated by 1 atom.
