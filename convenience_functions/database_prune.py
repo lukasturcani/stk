@@ -61,6 +61,13 @@ def fg_distance_prune(folder, fg):
             os.remove(path)
 
 def substurct_prune(folder, substruct):
-    substruct = chem.MolFromSmiles("C(=O)N")
+    substruct_mol = chem.MolFromSmiles(substruct)
+    for file_name in os.listdir(folder):
+        path = os.path.join(folder, file_name)
+        mol = chem.MolFromMolFile(path)
+        if mol.HasSubstructMatch(substruct_mol):
+            print('Removing {}.'.format(path))
+            os.remove(path)
+            
     
             
