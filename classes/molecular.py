@@ -1463,17 +1463,26 @@ class StructUnit(metaclass=Cached):
         
         return MacroMolecule.write_mol_file(self, mol_type, path=path)
 
+    def graph(self, mol_type):
+        """
+        See `graph()` documentation in ``MacroMolecule``.
+        
+        """
+        
+        return MacroMolecule.graph(self, mol_type)
+        
     @staticmethod
     def load(file_name):
         """
-        See `load` documentation in ``MacroMolecule``.
+        See `load()` documentation in ``MacroMolecule``.
         
-        """        
+        """  
+        
         return MacroMolecule.load(file_name)
         
     def dump(self, file_name):
         """
-        See `write` documentation in ``MacroMolecule``.
+        See `write()` documentation in ``MacroMolecule``.
         
         """
         

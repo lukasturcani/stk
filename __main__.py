@@ -93,11 +93,6 @@ with time_it():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         pop.calculate_member_fitness()
-
-# Make CC3
-cc3_bb = StructUnit3('/home/lukas/Dropbox/small_db/aldehydes_3f/aldehyde3f_25.mol')
-cc3_lk = StructUnit2('/home/lukas/Dropbox/small_db/amines_2f/amine2f_89.mol')
-cc3 = Cage((cc3_bb, cc3_lk), FourPlusSix, 'cc3.mol')
         
 # Run the GA.
 for x in range(ga_input.num_generations):
@@ -166,10 +161,7 @@ for x in range(ga_input.num_generations):
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
     pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
-    
-    # Check if cc3 is in the population.
-    if cc3 in pop:
-        break
+
     
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible
