@@ -4,7 +4,8 @@ import sys
 import warnings
 
 from .classes import (Population, GATools, Selection, Mutation, Mating, 
-                      GAInput)
+                      GAInput, StructUnit2, StructUnit3, Cage)
+from .classes.topology import FourPlusSix
 from .classes.exception import PopulationSizeError
 from .optimization import kill_macromodel
 from .convenience_functions import time_it, archive_output
@@ -63,8 +64,23 @@ with time_it():
     pop_init = getattr(Population, ga_input.init_func.name)
     print(('\n\nGenerating initial population.\n'
          '------------------------------\n\n'))
-    pop = pop_init(**ga_input.init_func.params, 
-                   ga_tools=ga_tools)
+    
+    if pop_init.__name__ == 'load':
+        pop = pop_init(**ga_input.init_func.params, ga_tools=ga_tools)
+        ga_input.pop_size = len(pop)
+        
+        for mem in pop:
+            prist_name = os.path.basename(mem.prist_mol_file)
+            heavy_name = os.path.basename(mem.heavy_mol_file)
+            
+            mem.prist_mol_file = os.path.join(os.getcwd(), prist_name)
+            mem.heavy_mol_file = os.path.join(os.getcwd(), heavy_name)
+        
+        pop.write_population_to_dir(os.getcwd())
+        
+    else:
+        pop = pop_init(**ga_input.init_func.params, 
+                       size=ga_input.pop_size, ga_tools=ga_tools)
 
 with time_it():    
     print(('\n\nOptimizing the population.\n'
@@ -78,6 +94,11 @@ with time_it():
         warnings.simplefilter("ignore")
         pop.calculate_member_fitness()
 
+# Make CC3
+cc3_bb = StructUnit3('/home/lukas/Dropbox/small_db/aldehydes_3f/aldehyde3f_25.mol')
+cc3_lk = StructUnit2('/home/lukas/Dropbox/small_db/amines_2f/amine2f_89.mol')
+cc3 = Cage((cc3_bb, cc3_lk), FourPlusSix, 'cc3.mol')
+        
 # Run the GA.
 for x in range(ga_input.num_generations):
     # Save the min, max and mean values of the population.    
@@ -117,7 +138,7 @@ for x in range(ga_input.num_generations):
                '----------------------------\n\n')    )
         pop.remove_duplicates()        
     
-    pop.dump(os.path.join(os.getcwd(), 'pop_dump'))    
+    pop.dump(os.path.join(os.getcwd(), 'unselected_pop_dump'))    
     
     with time_it():        
         print(('\n\nOptimizing the population.\n'
@@ -144,6 +165,11 @@ for x in range(ga_input.num_generations):
     os.mkdir('selected')
     os.chdir('selected')
     pop.write_population_to_dir(os.getcwd())
+    pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
+    
+    # Check if cc3 is in the population.
+    if cc3 in pop:
+        break
     
 # Running MacroModel optimizations sometimes leaves applications open.
 # This closes them. If this is not done, directories may not be possible

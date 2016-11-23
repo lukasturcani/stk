@@ -1,11 +1,4 @@
-from .two_plus_three import (TwoPlusThree, FourPlusSix, SixPlusNine, EightPlusTwelve, 
-                             Dodecahedron)
-
-from .two_plus_four import (TwoPlusFour, ThreePlusSix, FourPlusEight,
-                            SixPlusTwelve, TenPlusTwenty)
-
-from .three_plus_three import OnePlusOne, TwoPlusTwo, FourPlusFour
-
-from .three_plus_four import SixPlusEight
-
-from .base import CageTopology
+from .two_plus_three import *
+from .two_plus_four import *
+from .three_plus_three import *
+from .three_plus_four import *
