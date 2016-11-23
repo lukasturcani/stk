@@ -5,21 +5,29 @@ import numpy as np
 import time
 from contextlib import contextmanager
 import os 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+# Prevents the matplotlib import from printing warnings in Spyder. These
+# are printed because Spyder automatically imports matplotlib so the
+# call to `matplotlib.use()` results in a warning.
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
 import gzip
 import re
 from collections import deque
 import shutil
 
 # This dictionary gives easy access to the rdkit bond types.
+
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
              'am' : rdkit.Chem.rdchem.BondType.SINGLE,
              '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
              '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
              'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
-
+        
 def archive_output():
     """
     Places the ``output`` folder into ``old_output``.
@@ -742,4 +750,4 @@ atom_vdw_radii = {
                   'Tb': 2,    'Tl': 1.96, 'Th': 2,    'Tm': 2,    'Sn': 2.17, 'Ti': 2,    'W':  2,
                   'U':  1.86, 'V':  2,    'Xe': 2.16, 'Yb': 2,    'Y':  2,    'Zn': 1.29, 'Zr': 2,
                   'X':  1.0,  'D':  1.0
-                 }                  
+                 }
