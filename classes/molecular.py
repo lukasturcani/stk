@@ -18,6 +18,8 @@ from ..convenience_functions import (bond_dict, flatten, periodic_table,
                                      mol_from_mol_file, 
                                      mol_from_mae_file, ChargedMolError)
 
+# More imports at the end of file.
+
 class CachedMacroMol(type):
     """
     A metaclass for creating classes which create cached instances.
@@ -208,7 +210,7 @@ FGInfo.functional_group_list = [
     FGInfo("aldehyde", "C(=O)[H]", [ DelAtom(bond_dict['2'], 8) ], 
                                                        6, 39, "C", "Y"), 
     
-    FGInfo("carboxylic acid", "C(=O)O[H]", 
+    FGInfo("carboxylic_acid", "C(=O)O[H]", 
            [ DelAtom(bond_dict['1'], 8) ], 6, 40, "C", "Zr"),
     
     FGInfo("amide", "C(=O)N([H])[H]", [ DelAtom(bond_dict['1'], 7) ], 
@@ -221,7 +223,7 @@ FGInfo.functional_group_list = [
     FGInfo("thiol", "[S][H]", [], 16, 44, "S", "Ru"),
     FGInfo("amine", "[N]([H])[H]", [], 7, 45, "N", "Rh"),       
     FGInfo("nitroso", "N=O", [], 7, 46, "N", "Pd"),
-    FGInfo("boronic acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
+    FGInfo("boronic_acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
                              
                              ]
 
