@@ -100,7 +100,7 @@ def macromodel_opt(macro_mol, force_field=16,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        convert_mol_to_mae(macro_mol, macromodel_path)        
+        create_mae(macro_mol, macromodel_path)        
         # generate the ``.com`` file for the MacroModel run.
         generate_com(macro_mol, force_field, no_fix)        
         # Run the optimization.
@@ -168,7 +168,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        convert_mol_to_mae(macro_mol, macromodel_path)        
+        create_mae(macro_mol, macromodel_path)        
         # Generate the ``.com`` file for the MacroModel MD run.
         generate_md_com(macro_mol, force_field=force_field, temp=temp, 
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
@@ -295,7 +295,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
     try:    
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        convert_mol_to_mae(macro_mol, macromodel_path)        
+        create_mae(macro_mol, macromodel_path)        
         # generate the ``.com`` file for the MacroModel run.
         generate_com(macro_mol, force_field, no_fix)
         # Run the optimization.
@@ -455,7 +455,7 @@ def kill_bmin(macro_mol, macromodel_path):
 def run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
     mae_out = mae.replace('.mae', '_htreated.mae')
-    convert_mol_to_mae(macro_mol, macromodel_path)
+    create_mae(macro_mol, macromodel_path)
     
     app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
     cmd = [app, mae, mae_out]
