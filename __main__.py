@@ -170,7 +170,7 @@ kill_macromodel()
 
 # Update a final time and plot the results of the GA run.
 pop.progress_update()
-pop.plot_epp(os.path.join(root_dir, 'epp.png'))
+pop.plot.epp(os.path.join(root_dir, 'epp.png'))
 
 # Move the ``output`` folder into the ``old_output`` folder.
 os.chdir(launch_dir)
