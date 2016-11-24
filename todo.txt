@@ -7,3 +7,4 @@
 -keep track of which mutation function was used
 -mutation functions random_bb etc. won't work with StructUnit3 lk cages (3+4 topologies).
 -rework macromolecule / structunit caching so that instead of using .key attribute, the __hash__ function is used instead.
+-add support for various molecular file formats
