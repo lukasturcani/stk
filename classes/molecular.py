@@ -237,10 +237,10 @@ FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x
 @total_ordering        
 class StructUnit(metaclass=Cached):
     """
-    Represents the building blocks of macromolecules examined by MaMEA.
+    Represents the building blocks of macromolecules examined by MMEA.
     
     ``Building blocks`` in this case refers to the smallest molecular 
-    unit of the assembled molecules (such as cages) examined by MaMEA. 
+    unit of the assembled molecules (such as cages) examined by MMEA. 
     This is not the be confused with building-blocks* of cages. 
     Building-blocks* of cages are examples of the ``building blocks`` 
     referred to here. To be clear, the ``StructUnit`` class represents 
@@ -352,7 +352,7 @@ class StructUnit(metaclass=Cached):
     A good guide is to ask ``Can this question be answered by examining
     a single building block molecule in and of itself?``. 
     
-    This should be kept in mind when extending MaMEA as well. If a 
+    This should be kept in mind when extending MMEA as well. If a 
     functionality which only requires a building block ``in a vaccuum`` 
     is to be added, it should be placed here. If it requires the 
     building blocks relationship to other objects there should be a 
@@ -374,7 +374,7 @@ class StructUnit(metaclass=Cached):
         The full path of the molecular structure file holding the 
         unsubstituted molecule. The supported file formats are the keys 
         in `init_funcs` dictionary in the ``__init__()`` method. As long 
-        as a file of one of these types is provided, MaMEA will 
+        as a file of one of these types is provided, MMEA will 
         automatically use the correct initialization function.
         
     prist_mol : rdkit.Chem.rdchem.Mol
