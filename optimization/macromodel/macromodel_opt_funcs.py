@@ -100,7 +100,7 @@ def macromodel_opt(macro_mol, force_field=16,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        convert_mol_to_mae(macro_mol, macromodel_path)        
+        create_mae(macro_mol, macromodel_path)        
         # generate the ``.com`` file for the MacroModel run.
         generate_com(macro_mol, force_field, no_fix)        
         # Run the optimization.
@@ -168,7 +168,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        convert_mol_to_mae(macro_mol, macromodel_path)        
+        create_mae(macro_mol, macromodel_path)        
         # Generate the ``.com`` file for the MacroModel MD run.
         generate_md_com(macro_mol, force_field=force_field, temp=temp, 
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
@@ -295,7 +295,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
     try:    
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        convert_mol_to_mae(macro_mol, macromodel_path)        
+        create_mae(macro_mol, macromodel_path)        
         # generate the ``.com`` file for the MacroModel run.
         generate_com(macro_mol, force_field, no_fix)
         # Run the optimization.
@@ -455,7 +455,7 @@ def kill_bmin(macro_mol, macromodel_path):
 def run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
     mae_out = mae.replace('.mae', '_htreated.mae')
-    convert_mol_to_mae(macro_mol, macromodel_path)
+    create_mae(macro_mol, macromodel_path)
     
     app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
     cmd = [app, mae, mae_out]
@@ -647,16 +647,16 @@ def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, s
         # details of the macromodel run
         com.write(main_string)
 
-def convert_mol_to_mae(macro_mol, macromodel_path):
+def create_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.    
 
     Parameters
     ----------
     macro_mol : MacroMolecule
-        The macromolecule which is to be optimized. Its ``.mol`` file is
-        converted to a ``.mae`` file. The original ``.mol`` file is also
-        kept.
+        The macromolecule which is to be optimized. Its molecular 
+        structure file is converted to a ``.mae`` file. The original 
+        file is also kept.
         
     macromodel_path : str
         The full path of the installation directory of the Schrodinger 
@@ -665,7 +665,7 @@ def convert_mol_to_mae(macro_mol, macromodel_path):
 
     Modifies
     --------
-    This function creates a new ``.mae`` file from the ``.mol`` file in
+    This function creates a new ``.mae`` file from the structure file in
     `macro_mol.prist_mol_file`. This new file is placed in the same
     folder as the ``.mol`` file and has the same name. Only the 
     extensions are different.
@@ -677,13 +677,15 @@ def convert_mol_to_mae(macro_mol, macromodel_path):
     
     """
  
-    print('Converting .mol to .mae - {}.'.format(
+    _, ext = os.path.splitext(macro_mol.prist_mol_file)
+    
+    print('Converting {} to .mae - {}.'.format(ext,
                                               macro_mol.prist_mol_file))
    
     # Create the name of the new ``.mae`` file. It is the same as the
-    # ``.mol`` file, including the same path. Only the extensions are
-    # different.
-    mae_file = macro_mol.prist_mol_file.replace('.mol', '.mae')  
+    # original structure file, including the same path. Only the 
+    # extensions are different.
+    mae_file = macro_mol.prist_mol_file.replace(ext, '.mae')  
     structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
     return mae_file
 

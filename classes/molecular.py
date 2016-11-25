@@ -1,5 +1,5 @@
 import numpy as np
-from functools import total_ordering
+from functools import total_ordering, partial
 import itertools
 from rdkit import Chem as chem
 from rdkit.Chem import AllChem as ac
@@ -237,10 +237,10 @@ FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x
 @total_ordering        
 class StructUnit(metaclass=Cached):
     """
-    Represents the building blocks of macromolecules examined by MMEA.
+    Represents the building blocks of macromolecules examined by MaMEA.
     
     ``Building blocks`` in this case refers to the smallest molecular 
-    unit of the assembled molecules (such as cages) examined by MMEA. 
+    unit of the assembled molecules (such as cages) examined by MaMEA. 
     This is not the be confused with building-blocks* of cages. 
     Building-blocks* of cages are examples of the ``building blocks`` 
     referred to here. To be clear, the ``StructUnit`` class represents 
@@ -256,8 +256,8 @@ class StructUnit(metaclass=Cached):
     and perform operations on, single instances of the building blocks 
     used to form macromolecules. The class stores information regarding
     the rdkit instance of the building block and the location of its 
-    ``.mol`` file. See the attributes section of this docstring for a 
-    full list of information stored.
+    molecular structure file. See the attributes section of this 
+    docstring for a full list of information stored.
     
     This class also takes care of perfoming substitutions of the 
     functional groups in the building blocks via the 
@@ -352,7 +352,7 @@ class StructUnit(metaclass=Cached):
     A good guide is to ask ``Can this question be answered by examining
     a single building block molecule in and of itself?``. 
     
-    This should be kept in mind when extending MMEA as well. If a 
+    This should be kept in mind when extending MaMEA as well. If a 
     functionality which only requires a building block ``in a vaccuum`` 
     is to be added, it should be placed here. If it requires the 
     building blocks relationship to other objects there should be a 
@@ -367,14 +367,15 @@ class StructUnit(metaclass=Cached):
 
     PPS. The ``StructUnit`` class is itself cached via the ``Cached``
     metaclass.
-
+    
     Attributes
     ----------
     prist_mol_file : str
-        The full path of the ``.mol`` file (V3000) holding the 
-        unsubstituted molecule. This is the only attribute which needs 
-        to be provided to the initializer. The remaining attributes have 
-        values derived from this ``.mol`` file.
+        The full path of the molecular structure file holding the 
+        unsubstituted molecule. The supported file formats are the keys 
+        in `init_funcs` dictionary in the ``__init__()`` method. As long 
+        as a file of one of these types is provided, MaMEA will 
+        automatically use the correct initialization function.
         
     prist_mol : rdkit.Chem.rdchem.Mol
         This is an ``rdkit molecule type``. It is the rdkit instance
@@ -421,12 +422,13 @@ class StructUnit(metaclass=Cached):
         Parameters
         ----------
         prist_mol_file : str
-            The full path of the ``.mol`` file holding the building
-            block structure.
+            The full path of the molecular structure file holding the 
+            building block.
             
         minimal : bool (default = False)
-            If ``True`` the full initialization is not carried out. This
-            is used in the `cage_target` fitness function.
+            If ``True`` the full initialization is not carried out. It
+            stops the initialization before the functional groups in the
+            molecule are replaced by heavy atoms.
             
         """
         
@@ -441,20 +443,28 @@ class StructUnit(metaclass=Cached):
         if not heavy_dir:        
             os.mkdir("HEAVY")
         
+        # This dictionary maps file extensions to the initialization 
+        # functions.
+        init_funcs = {'.mol' : partial(chem.MolFromMolFile, 
+                                    sanitize=False, removeHs=False), 
+                   '.mol2' : partial(chem.MolFromMol2File, 
+                                     sanitize=False, removeHs=False),
+                    '.mae' : mol_from_mae_file,
+                    '.pdb' : partial(chem.MolFromPDBFile,
+                                     sanitize=False, removeHs=False)}
+ 
         self.prist_mol_file = prist_mol_file
-        
-        # First try to load the molecule using the MMEA .mol reading
-        # function. If it excepts due to a ChargedMolError, try the
-        # rdkit function. This one may however cause cages to crash due
-        # poor ring finding.
-        try:
-            self.prist_mol = mol_from_mol_file(prist_mol_file)
-        except ChargedMolError:
-            self.prist_mol = chem.MolFromMolFile(prist_mol_file,
-                                                 sanitize=False,
-                                                 removeHs=False)
-        
+        _, ext = os.path.splitext(prist_mol_file)
+        if ext not in init_funcs:
+            raise TypeError(
+            'Unable to initialize from "{}" files.'.format(ext))
+                                     
+        self.prist_mol = init_funcs[ext](prist_mol_file)
         self.optimized = False        
+
+        # Check for minimal initialization.
+        if minimal:
+            return
         
         # Define a generator which yields an ``FGInfo`` instance from
         # the `FGInfo.functional_group_list`. The yielded ``FGInfo``
@@ -472,10 +482,6 @@ class StructUnit(metaclass=Cached):
         # If this is not the case, the generator will return the 
         # functional group which appears first in 
         # `FGInfo.functional_group_list`.
-        
-        # Check for minimal initialization.
-        if minimal:
-            return
         
         # Calling the ``next`` function on this generator causes it to
         # yield the first (and what should be the only) result. The
@@ -2122,11 +2128,13 @@ class MacroMolecule(metaclass=CachedMacroMol):
         elif rdkit_mol_type == 'heavy':
             rdkit_mol= self.heavy_mol
             file_name = self.heavy_mol_file
-
+            
         else:
             raise ValueError(("The argument `rdkit_mol_type` must be "
                               "either 'prist' or 'heavy'."))
-    
+
+        file_name = os.path.splitext(file_name)[0] + '.mol'
+            
         main_string = ("\n"
                        "     RDKit          3D\n"
                        "\n"
