@@ -1,11 +1,12 @@
 import os
 import shutil
 import networkx as nx
-import subprocess as sp
 import rdkit.Chem as chem
+import rdkit.Chem.AllChem as ac
 
 from ..classes import StructUnit, FGInfo
 from .convenience_functions import MolFileError
+from ..optimization.macromodel.macromodel_opt_funcs import structconvert
 
 def fg_prune(input_folder, output_folder, fg, fg_num):
     """
@@ -115,6 +116,65 @@ def substurct_prune(folder, substruct):
         if mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
-            
-    
-            
+
+def categorize(path, output_dir):
+    try:
+        fgs = ['amine', 'aldehyde']
+        dirs = ['amines2f', 'amines3f', 'amines4f',
+                'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
+      
+        mol = StructUnit(path, minimal=True)
+        
+        for fg in fgs:
+            mol.func_grp = next((x for x in 
+                                    FGInfo.functional_group_list if 
+                                    x.name == fg), None)
+            mol.heavy_ids = []
+            mol._generate_heavy_attrs()
+            fg_n = str(len(mol.heavy_ids))
+            folder = next((x for x in dirs if fg_n in x and fg in x), None)
+            if folder is not None:
+                shutil.copy(path, os.path.join(output_dir,folder))
+
+    except:
+        print('Failed with {}.'.format(path))
+
+
+def neutralize(path, output_dir, macromodel_path):
+    try:
+        m = chem.MolFromMol2File(path)
+        if m is None:
+            new_path = path.replace('.mol2', '.mol')
+            structconvert(path, new_path, macromodel_path)
+            m = chem.MolFromMolFile(new_path, sanitize=False)
+        
+        m = chem.MolToSmiles(m)            
+        m = m.replace("[H]", "").replace("H", "").replace("()", "")
+        m = m.replace("+", "").replace("-", "")
+        mol = chem.MolFromSmarts(m)
+        mol.UpdatePropertyCache()
+        mol = chem.AddHs(mol)
+        ac.EmbedMolecule(mol)
+        name = os.path.basename(path)
+        chem.MolToMolFile(mol, os.path.join(output_dir, name),
+                          forceV3000=True)
+        return (0, None)
+    except ValueError as ex:
+        return (1,path)
+
+    except Exception as ex:
+        print('{} failed with exception {}.'.format(path, ex))
+        return (2,path)
+        
+
+
+
+
+
+
+
+
+
+
+
+
