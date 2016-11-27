@@ -8,17 +8,18 @@ from rdkit import DataStructs
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
-from collections import namedtuple
 import pickle
 
-from ..convenience_functions import (bond_dict, flatten, periodic_table, 
-                                     normalize_vector, rotation_matrix,
-                                     vector_theta, LazyAttr,
-                                     rotation_matrix_arbitrary_axis,
-                                     mol_from_mol_file, 
-                                     mol_from_mae_file, ChargedMolError)
+from ..convenience_tools import (flatten, periodic_table, 
+                                 normalize_vector, rotation_matrix,
+                                 vector_theta, LazyAttr,
+                                 rotation_matrix_arbitrary_axis,
+                                 mol_from_mol_file, 
+                                 mol_from_mae_file, ChargedMolError,
+                                 FGInfo)
 
-# More imports at the end of file.
+from ..optimization.macromodel.macromodel_opt_funcs import macromodel_opt
+from .exception import MacroMolError
 
 class CachedMacroMol(type):
     """
@@ -102,138 +103,6 @@ class Cached(type):
             obj = super().__call__(*args, **kwargs)
             self.__cache[key] = obj
             return obj
-
-                               
-class FGInfo:
-    """
-    Contains key information for functional group substitutions.
-    
-    The point of this class is to register which atom is substituted
-    for which, when an atom in a functional group is substituted with a 
-    heavy metal atom. If MMEA is to incorporate a new functional group, 
-    a new ``FGInfo`` instance should be added to the 
-    `functional_group_list` class attribute of ``FGInfo``. 
-    
-    Adding a new ``FGInfo`` instace to `functional_group_list` will 
-    allow the `Topology.join_mols` method to connect this functional 
-    group to (all) others during assembly. Nothing except adding this
-    instance should need to be done in order to incorporate new 
-    functional groups.
-    
-    If this new functional group is to connect to another functional 
-    group with a double bond during assembly, the symbols of the heavy 
-    atoms of both functional groups should be added to the 
-    `double_bond_combs` class attribute. The order in which the heavy 
-    symbols are placed in the tuple does not matter. Again, this is all
-    that needs to be done for MMEA to create double bonds between
-    certain functional groups.  
-    
-    Class attributes
-    ----------------
-    functional_groups_list : list of FGInfo instances
-        This list holds all ``FGInfo`` instances used by MMEA. If a new
-        functional group is to be used by MMEA, a new ``FGInfo`` 
-        instance must be added to this list.
-        
-    double_bond_combs : list of tuples of strings
-        When assembly is carried out, if the heavy atoms being joined
-        form a tuple in this list, they will be joined with a double
-        rather than single bond. If a single bond is desired there is no
-        need to change this variable.
-        
-    heavy_symbols : set of str
-        A set of all the heavy symbols used by ``FGInfo`` instances in 
-        MMEA. This set updates itself automatically. There is no need to
-        modify it when changes are made to any part of MMEA.
-        
-    heavy_atomic_nums : set of ints
-        A set of all atomic numbers of heavy atoms used by ``FGInfo``
-        instances in MMEA. This set updates itself automatically. There
-        is no need to modify it when chagnes are made to any part of
-        MMEA.
-
-    Attributes
-    ----------
-    name : str
-        The name of the functional group.
-    
-    smarts_start : str
-        A ``SMARTS`` string describing the functional group before 
-        substitution by a heavy atom.
-        
-    del_tags : list of DelAtom instances
-        Every member of this list represents an atom on the functional
-        group which should be deleted during assembly. One atom in each
-        functional group is removed for each list member.
-    
-    target_atomic_num : int
-        The atomic number of the atom being substituted by a heavy atom.
-    
-    heavy_atomic_num : int
-        The atomic number of the heavy atom which replaces the target 
-        atom.
-    
-    target_symbol : str
-        The atomic symbol of the atom, being substituted by a heavy 
-        atom.       
-    
-    heavy_symbol : str
-        The atomic symbol of the heavy atom which replaces the target 
-        atom.
-    
-    """
-    
-    __slots__ = ['name', 'smarts_start', 'del_tags', 
-                 'target_atomic_num', 'heavy_atomic_num', 
-                 'target_symbol', 'heavy_symbol'] 
-    
-    def __init__(self, name, smarts_start, del_tags, target_atomic_num, 
-                 heavy_atomic_num, target_symbol, heavy_symbol):
-         self.name = name
-         self.smarts_start = smarts_start
-         self.del_tags = del_tags
-         self.target_atomic_num = target_atomic_num
-         self.heavy_atomic_num = heavy_atomic_num
-         self.target_symbol = target_symbol
-         self.heavy_symbol = heavy_symbol
-
-# An atom is deleted based on what type of bond connects it to the
-# substituted functional group atom. The element of the atom is ofcourse
-# a factor as well. When both of these are satisfied the atom is
-# removed. The ``DelAtom`` class conveniently stores this information.
-# Bond type is an rdkit bond type (see the bond dictionary above for
-# the two possible values it may take) and atomic num in an integer.
-DelAtom = namedtuple('DelAtom', ['bond_type', 'atomic_num'])
-
-FGInfo.functional_group_list = [
-                        
-    FGInfo("aldehyde", "C(=O)[H]", [ DelAtom(bond_dict['2'], 8) ], 
-                                                       6, 39, "C", "Y"), 
-    
-    FGInfo("carboxylic_acid", "C(=O)O[H]", 
-           [ DelAtom(bond_dict['1'], 8) ], 6, 40, "C", "Zr"),
-    
-    FGInfo("amide", "C(=O)N([H])[H]", [ DelAtom(bond_dict['1'], 7) ], 
-                                                      6, 41, "C", "Nb"),
-    
-    FGInfo("thioacid", "C(=O)S[H]", [ DelAtom(bond_dict['1'], 16) ], 
-                                                      6, 42, "C", "Mo"),
-    
-    FGInfo("alcohol", "O[H]", [], 8, 43, "O", "Tc"),
-    FGInfo("thiol", "[S][H]", [], 16, 44, "S", "Ru"),
-    FGInfo("amine", "[N]([H])[H]", [], 7, 45, "N", "Rh"),       
-    FGInfo("nitroso", "N=O", [], 7, 46, "N", "Pd"),
-    FGInfo("boronic_acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
-                             
-                             ]
-
-FGInfo.double_bond_combs = [("Rh","Y"), ("Nb","Y"), ("Mb","Rh")]
-
-FGInfo.heavy_symbols = {x.heavy_symbol for x 
-                                        in FGInfo.functional_group_list}
-                        
-FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
-                                        in FGInfo.functional_group_list}
 
 class Molecule:
     """
@@ -1892,106 +1761,7 @@ class StructUnit(Molecule, metaclass=Cached):
         ", prist_mol_file={0.prist_mol_file!r}>".format(self))
         repr_ = repr_.replace("class ", "class=")
         return repr_
-        
-class StructUnit3(StructUnit):
-    """
-    Represents building blocks with 3 functional groups.
-    
-    """
-
-    def heavy_plane_normal(self):
-        """
-        Returns the normal vector to the plane formed by heavy atoms.
-        
-        The normal of the plane is defined such that it goes in the
-        direction toward the centroid of the building-block*.        
-        
-        Returns
-        -------        
-        numpy.array
-            A unit vector which describes the normal to the plane of the
-            heavy atoms.
-        
-        """
-        
-        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
-        normal_v = normalize_vector(np.cross(v1, v2))
-        
-        theta = vector_theta(normal_v, 
-                             self.centroid_centroid_dir_vector())
-                             
-        if theta > np.pi/2:
-            normal_v = np.multiply(normal_v, -1)
-        
-        return normal_v
-    
-    def heavy_plane(self):
-        """
-        Returns the coefficients of the plane formed by heavy atoms.
-        
-        A plane is defined by the scalar plane equation,
-            
-            ax + by + cz = d.
-        
-        This method returns the a, b, c and d coefficients of this 
-        equation for the plane formed by the heavy atoms. The 
-        coefficents a, b and c decribe the normal vector to the plane.
-        The coefficent d is found by substituting these coefficients
-        along with the x, y and z variables in the scalar equation and
-        solving for d. The variables x, y and z are substituted by the
-        coordinate of some point on the plane. For example, the position
-        of one of the heavy atoms.
-        
-        Returns
-        -------
-        numpy.array
-            This array has the form [a, b, c, d] and represents the 
-            scalar equation of the plane formed by the heavy atoms.
-        
-        References
-        ----------
-        http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx                
-        
-        """
-        
-        heavy_coord = self.atom_coords('heavy', self.heavy_ids[0])
-        d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
-                                           heavy_coord)), -1)
-        return np.append(self.heavy_plane_normal(), d)
-        
-    def set_heavy_mol_orientation(self, end):
-        """
-        Rotates heavy molecule so plane normal is aligned with `end`.
-
-        Here ``plane normal`` referes to the normal of the plane formed
-        by the heavy atoms in the substituted molecule. The molecule
-        is rotated about the centroid of the heavy atoms. The rotation
-        results in the normal of their plane being aligned with `end`.
-
-        Parameters
-        ----------
-        end : numpy.array
-            The vector with which the normal of plane of heavy atoms 
-            shoould be aligned.
-        
-        Modifies
-        --------
-        heavy_mol : rdkit.Chem.rdchem.Mol   
-            The conformer in this rdkit instance is changed due to
-            rotation of the molecule about the centroid of the heavy
-            atoms.        
-
-        Returns
-        -------
-        rdkit.Chem.rdchem.Mol
-            An rdkit molecule instance of the rotated molecule. This is 
-            a copy of the rdkit molecule in `heavy_mol`.
-            
-        """
-        
-        start = self.heavy_plane_normal()
-        return StructUnit._set_heavy_mol_orientation(self, start, end)        
-
+  
 class StructUnit2(StructUnit):
     """
     Represents building blocks with 2 functional groups.
@@ -2079,6 +1849,106 @@ class StructUnit2(StructUnit):
                 break
             
             prev_theta = theta
+
+      
+class StructUnit3(StructUnit):
+    """
+    Represents building blocks with 3 functional groups.
+    
+    """
+
+    def heavy_plane(self):
+        """
+        Returns the coefficients of the plane formed by heavy atoms.
+        
+        A plane is defined by the scalar plane equation,
+            
+            ax + by + cz = d.
+        
+        This method returns the a, b, c and d coefficients of this 
+        equation for the plane formed by the heavy atoms. The 
+        coefficents a, b and c decribe the normal vector to the plane.
+        The coefficent d is found by substituting these coefficients
+        along with the x, y and z variables in the scalar equation and
+        solving for d. The variables x, y and z are substituted by the
+        coordinate of some point on the plane. For example, the position
+        of one of the heavy atoms.
+        
+        Returns
+        -------
+        numpy.array
+            This array has the form [a, b, c, d] and represents the 
+            scalar equation of the plane formed by the heavy atoms.
+        
+        References
+        ----------
+        http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx                
+        
+        """
+        
+        heavy_coord = self.atom_coords('heavy', self.heavy_ids[0])
+        d = np.multiply(np.sum(np.multiply(self.heavy_plane_normal(), 
+                                           heavy_coord)), -1)
+        return np.append(self.heavy_plane_normal(), d)
+
+    def heavy_plane_normal(self):
+        """
+        Returns the normal vector to the plane formed by heavy atoms.
+        
+        The normal of the plane is defined such that it goes in the
+        direction toward the centroid of the building-block*.        
+        
+        Returns
+        -------        
+        numpy.array
+            A unit vector which describes the normal to the plane of the
+            heavy atoms.
+        
+        """
+        
+        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
+        normal_v = normalize_vector(np.cross(v1, v2))
+        
+        theta = vector_theta(normal_v, 
+                             self.centroid_centroid_dir_vector())
+                             
+        if theta > np.pi/2:
+            normal_v = np.multiply(normal_v, -1)
+        
+        return normal_v
+        
+    def set_heavy_mol_orientation(self, end):
+        """
+        Rotates heavy molecule so plane normal is aligned with `end`.
+
+        Here ``plane normal`` referes to the normal of the plane formed
+        by the heavy atoms in the substituted molecule. The molecule
+        is rotated about the centroid of the heavy atoms. The rotation
+        results in the normal of their plane being aligned with `end`.
+
+        Parameters
+        ----------
+        end : numpy.array
+            The vector with which the normal of plane of heavy atoms 
+            shoould be aligned.
+        
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            The conformer in this rdkit instance is changed due to
+            rotation of the molecule about the centroid of the heavy
+            atoms.        
+
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance of the rotated molecule. This is 
+            a copy of the rdkit molecule in `heavy_mol`.
+            
+        """
+        
+        start = self.heavy_plane_normal()
+        return StructUnit._set_heavy_mol_orientation(self, start, end)        
 
 @total_ordering
 class MacroMolecule(Molecule, metaclass=CachedMacroMol):
@@ -2496,7 +2366,3 @@ class Polymer(MacroMolecule):
     
     """
     pass
-
-
-from ..optimization.macromodel.macromodel_opt_funcs import macromodel_opt
-from .exception import MacroMolError
