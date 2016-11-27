@@ -7,7 +7,7 @@ from inspect import signature
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
 from . import optimization
-from .convenience_functions import rotation_matrix_arbitrary_axis
+from .convenience_tools import rotation_matrix_arbitrary_axis
 
 def calc_fitness(func_data, population):
     """

@@ -3,10 +3,13 @@ import shutil
 import networkx as nx
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
+from functools import partial
+from multiprocessing import Pool
 
-from ..classes import StructUnit, FGInfo
-from .convenience_functions import MolFileError
-from ..optimization.macromodel.macromodel_opt_funcs import structconvert
+from .classes import StructUnit, FGInfo
+from .convenience_tools import MolFileError
+from .optimization import *
+
 
 def fg_prune(input_folder, output_folder, fg, fg_num):
     """
@@ -165,16 +168,27 @@ def neutralize(path, output_dir, macromodel_path):
     except Exception as ex:
         print('{} failed with exception {}.'.format(path, ex))
         return (2,path)
-        
 
+def optimize_folder(path, macromodel_path):
+    
+    # First make a list holding all macromolecule objects to be 
+    # optimzied. Because the objects need to be initialized from a .mol
+    # file a StructUnit instance not a MacroMolecule instance is used.
+    # minimal = True, because it is all that is needed to run 
+    # optimziations, plus you want to avoid doing functional group
+    # substitutions.
+    names = [os.path.join(path, file_name) for file_name in 
+             os.listdir(path) if file_name.endswith(".mol")]    
+    macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
+                                                                  names]
 
+    # .mol files often get moved around. Make sure the `prist_mol_file`
+    # attribute is updated to account for this.
+    for name, macro_mol in zip(names, macro_mols):
+        macro_mol.prist_mol_file = name
 
-
-
-
-
-
-
-
-
-
+    md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
+        timeout=False, temp=1000, confs=1000, eq_time=100, sim_time=10000)    
+    
+    with Pool() as p:
+        p.map(md_opt, macro_mols)
