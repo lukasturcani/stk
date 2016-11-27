@@ -7,7 +7,7 @@ from collections import Counter
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
 from .plotter import Plotter
-from ..convenience_functions import dedupe, plot_counter
+from ..convenience_tools import dedupe, plot_counter
 from ..optimization.optimization import optimize_all, optimize_all_serial
 from ..fitness import calc_fitness
 

@@ -99,13 +99,11 @@ class MacroMolError(Exception):
             f.write('prist_mol_file = {}\n'.format(
                                               macro_mol.prist_mol_file))
             
-            if isinstance(macro_mol, MacroMolecule):
+            if hasattr(macro_mol, 'building_blocks'):       
                 f.write('building blocks = {}\n'.format(
                                              macro_mol.building_blocks))
     
                 f.write('topology = {}\n'.format(macro_mol.topology)) 
-    
-     
                
                 f.write('topology_args = {}\n'.format(
                                               macro_mol.topology_args))    
@@ -115,5 +113,3 @@ class MacroMolError(Exception):
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
-        
-from .molecular import MacroMolecule
