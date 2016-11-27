@@ -2,7 +2,10 @@ import os
 import numpy as np
 from collections import Counter
 
-# More imports at the bottom of module.
+from ..population import Population
+from ..molecular import StructUnit3, StructUnit2, Cage, Polymer
+from ..exception import MacroMolError
+from ...convenience_tools import plot_counter
 
 class Mutation:
     """
@@ -362,8 +365,3 @@ class Mutation:
                                              isinstance(x, StructUnit3))
         return Cage((new_lk, bb), type(cage.topology),
               os.path.join(os.getcwd(), self.name.format(self.n_calls)))
-        
-from ..population import Population
-from ..molecular import StructUnit3, StructUnit2, Cage, Polymer
-from ..exception import MacroMolError
-from ...convenience_functions import plot_counter
