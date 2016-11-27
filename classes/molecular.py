@@ -234,8 +234,987 @@ FGInfo.heavy_symbols = {x.heavy_symbol for x
                         
 FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
                                         in FGInfo.functional_group_list}
+
+class Molecule:
+    """
+    The most basic class representing molecules.
+
+    This class defines defines the operations which any class describing
+    molecules should inherit or may find useful. Examples of such 
+    classes are ``StructUnit`` and ``MacroMolecule``. This calls is
+    unlikely to be useful as in and of itself. It lacks an `__init__()`
+    method because it does not need one. Child classes should define it.
+    
+    It is assumed that child classes will have some basic attributes.
+    
+    Minimum required attributes of child classes
+    --------------------------------------------
+    prist_mol : rdkit.Chem.rdchem.Mol
+        A rdkit molecule instance representing the molecule.
+        
+    heavy_mol : rdkit.Chem.rdchem.Mol
+        A rdkit molecule instance representing the molecule where the
+        functional groups have been substited with heavy atoms.
+        
+    prist_mol_file : str
+        The full path of the molecular structure file holding the 
+        structure of the pristine molecule.
+        
+    heavy_mol_file : str
+        The full path of the molecular structure file holding the
+        structure of the substituted molecule.
+    
+    """
+
+    def all_atom_coords(self, mol_type):
+        """
+        Yields the coordinates of atoms in `heavy_mol` or `prist_mol`.        
+
+        This yields the coordinates of every atom in the pristine or
+        heavy molecule, depending on `mol_type`.
+
+        The `heavy_mol` and `prist_mol` attributes hold a 
+        ``rdkit.Chem.rdchem.Mol`` instance. This instance holds a 
+        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
+        holds the positions of the atoms within that conformer. This
+        generator yields those coordinates.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.   
+       
+        Yields
+        ------
+        tuple of (int, numpy.array)
+            The ``int`` represents the atom id of the atom whose
+            coordinates are being yielded.
+        
+            The array represents the complete position in space. Each 
+            float within the array represents the value of the x, y or z 
+            coordinate of an atom. The x, y and z coordinates are 
+            located in the array in that order. 
+            
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        # Get the conformer from the rdkit instance. 
+        conformer = rdkit_mol.GetConformer()
+        
+        # Go through all the atoms and ask the conformer to return
+        # the position of each atom. This is done by supplying the 
+        # conformers `GetAtomPosition` method with the atom's id.
+        for atom in rdkit_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_position = conformer.GetAtomPosition(atom_id)
+            yield atom_id, np.array([*atom_position]) 
+
+    def all_heavy_atom_distances(self):
+        """
+        Yield distances between all pairs of heavy atoms in `heavy_mol`.
+        
+        All distances are only yielded once. This means that if the 
+        distance between atoms with ids ``1`` and ``2``is yielded as
+        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be 
+        yielded.
+        
+        Only distances between heavy atoms used for functional group
+        substitutions are considered. Distances between heavy atoms
+        and regular atoms or between two regular atoms are not yielded.
+        
+        Yields
+        ------
+        tuple of form (scipy.double, int, int)
+            This tuple holds the distance between two heavy atoms. The 
+            first element is the distance and the next two are the 
+            relevant atom ids.
+
+        """
+                
+        # Iterate through each pair of atoms - do not allow iterating
+        # through the same pair twice. In otherwords, recombinations of 
+        # the same pair are not allowed.
+        for atom1, atom2 in itertools.combinations(
+                                        self.heavy_mol.GetAtoms(), 2):
+ 
+            # Only yield if both atoms are heavy. 
+            if (atom1.GetAtomicNum() in FGInfo.heavy_atomic_nums and 
+                atom2.GetAtomicNum() in FGInfo.heavy_atomic_nums):               
+                
+                # Get the atom ids, use them to calculate the distance
+                # and yield the resulting data.
+                atom1_id = atom1.GetIdx()
+                atom2_id = atom2.GetIdx()
+                yield (self.atom_distance('heavy', atom1_id, atom2_id), 
+                      atom1_id, atom2_id)
+
+    def atom_coords(self, mol_type, atom_id):
+        """
+        Return coordinates of an atom in `heavy_mol` or `prist_mol`.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.             
+        
+        atom_id : int
+            The id of the atom whose coordinates are desired.
+            
+        Returns
+        -------
+        numpy.array
+            An array hodling the x, y and z coordinates (respectively) 
+            of atom with id of `atom_id` in `heavy_mol`.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        conf = rdkit_mol.GetConformer()
+        atom_position = conf.GetAtomPosition(atom_id)
+        return np.array([*atom_position])
+
+    def atom_distance(self, mol_type, atom1_id, atom2_id):
+        """
+        Return the distance between atoms in `heavy_mol` or `prist_mol`.
+        
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.
+            
+        atom1_id : int
+            The id of the first atom.
+        
+        atom2_id : int
+            The id of the second atom.
+            
+        Returns 
+        -------
+        scipy.double
+            The distance between the first and second atoms.
+
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+
+        # Get the atomic positions of each atom and use the scipy 
+        # function to calculate their distance in Euclidean space.              
+        atom1_coords = self.atom_coords(mol_type, atom1_id)
+        atom2_coords = self.atom_coords(mol_type, atom2_id)
+        
+        return euclidean(atom1_coords, atom2_coords)
+
+    def atom_symbol(self, mol_type, atom_id):
+        """
+        Returns the symbol of the atom with id `atom_id`.
+        
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.        
+
+        Returns
+        -------
+        str
+            The atomic symbol of the atom with id number `atom_id`.        
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+            
+        atom = rdkit_mol.GetAtomWithIdx(atom_id)
+        atomic_num = atom.GetAtomicNum()
+        return periodic_table[atomic_num] 
+
+    def center_of_mass(self, mol_type):
+        """
+        Returns the centre of mass of the pristine or heavy molecule.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.
+            
+        Returns
+        -------
+        numpy.array
+            The array holds the x, y and z coordinates of the center of
+            mass, in that order.
+                
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+
+        References
+        ----------
+        https://en.wikipedia.org/wiki/Center_of_mass
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+              
+        center = np.array([0,0,0])        
+        total_mass = 0
+        for atom_id, coord in self.all_atom_coords(mol_type):
+            mass = rdkit_mol.GetAtomWithIdx(atom_id).GetMass()
+            total_mass += mass
+            center = np.add(center, np.multiply(mass, coord))
+
+        return np.divide(center, total_mass)
+
+    def centroid(self, mol_type):
+        """
+        Returns the centroid of the heavy or pristine rdkit molecule.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.
+
+        Returns
+        -------
+        numpy.array
+            A numpy array holding the position of the centroid.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+            
+        centroid = sum(x for _, x in self.all_atom_coords(mol_type)) 
+        return np.divide(centroid, rdkit_mol.GetNumAtoms())
+
+    def dump(self, file_name):
+        """
+        Write the MacroMolecule object to a file.
+        
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file to which the macromolecule should
+            be written.
+            
+        Returns
+        -------
+        None : NoneType
+
+        """
+        
+        with open(file_name, 'wb') as dump_file:    
+            pickle.dump(self, dump_file)     
+
+    @LazyAttr
+    def energy(self):
+        """
+        Returns the total energy the molecule as found by macromodel.
+        
+        This lazy attribute reads the log file generated by a macromodel
+        optimization and sets the energy within as the value of the
+        `energy` attribute.
+        
+        Modifies
+        --------
+        self.energy : float
+            Creates this attribute.
+            
+        Raises
+        ------
+        AttributeError
+            If the molecule did not undergo an optimization there will
+            be no log file to read.
+        
+        """
+        
+        if not self.optimized:
+            raise AttributeError(('A molecule must be optimized for'
+                                  ' its energy to be taken.'))
+        
+        # Go thorugh the log file line by line and find the line which
+        # says ``Total Energy = ``. This line holds the energy value in
+        # index 3 after ``split()`` has been applied.
+        log_file = self.prist_mol_file.replace('.mol', '.log')
+        with open(log_file, 'r') as log:
+            for line in log:
+                if 'Total Energy =    ' in line:
+                    return float(line.split()[3])
+
+    def graph(self, mol_type):
+        """
+        Returns a mathematical graph representing the molecule.        
+        
+        Parameters
+        ----------        
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used. 
+       
+        Returns
+        -------
+        networkx.Graph
+            A graph where the nodes are the ids of the atoms in the
+            rdkit molecule and the edges are the bonds.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        # Create a graph instance and add the atom ids as nodes. Use the
+        # the atom ids from each end of a bond to define edges. Do this
+        # for all bonds to account for all edges.
+        
+        graph = nx.Graph()        
+        
+        for atom in rdkit_mol.GetAtoms():
+            graph.add_node(atom.GetIdx())
+        
+        for bond in rdkit_mol.GetBonds():
+            graph.add_edge(bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+             
+        return graph
+
+    def heavy_atom_position_matrix(self):
+        """
+        Returns a matrix holding positions of heavy atoms.
+
+        Returns
+        -------
+        numpy.matrix
+            The matrix is 3 x n. Each column holds the x, y and z
+            coordinates of a heavy atom. The index of the column 
+            corresponds to the index of the atom id in `heavy_ids`.    
+        
+        """
+        
+        pos_array = np.array([])
+
+        for atom_id in self.heavy_ids:
+            pos_vect = np.array([*self.atom_coords('heavy', atom_id)])
+            pos_array = np.append(pos_array, pos_vect)
+
+        return np.matrix(pos_array.reshape(-1,3).T)
+
+    def heavy_direction_vector_atoms(self):
+        """
+        Yields the atoms which form `heavy_direction_vectors`.
+
+        The method `heavy_direction_vectors` yields direction vectors.
+        This method yields the atom ids of atoms which form those 
+        direction vectors. The atoms ids are yielded in the same order
+        as the vectors.
+
+        Yield
+        -------
+        tuple of ints
+            The tuple holds the start and end atom ids of a
+            `heavy_direction_vector`. The first tuple will correspond 
+            to the atoms forming the first `heavy_direction_vector` and
+            so on. The atom id at index 0 is the start atom and the atom
+            id at index 1 is the end atom.
+        
+        """
+
+        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids,
+                                                                     2):
+            yield atom2_id, atom1_id  
+
+    def heavy_direction_vectors(self):
+        """
+        Yields the direction vectors between all pairs of heavy atoms.
+                
+        The yielded vector is normalized. If a pair (1,2) is yielded, 
+        the pair (2,1) will not be.
+        
+        Yields
+        ------
+        The next direction vector running between a pair of heavy atoms.
+        
+        """
+        
+        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids, 
+                                                                     2):
+            p1 = self.atom_coords('heavy', atom1_id)
+            p2 = self.atom_coords('heavy', atom2_id)
+        
+            yield normalize_vector(p1-p2)
+
+    @staticmethod
+    def load(file_name):
+        """
+        Initializes a MacroMolecule from one dumped to a file.
+        
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file holding the dumped molecule.
+            
+        Returns
+        -------
+        MacroMolecule
+            The macromolecule stored in the dump file.
+            
+        """
+        
+        with open(file_name, 'rb') as dump_file:
+            return pickle.load(dump_file)
+
+    def position_matrix(self, mol_type):
+        """
+        Return position of all atoms in the building block as a matrix. 
+        
+        Positions of the atoms in the heavy or pristine rdkit instance
+        will be returned based on `mol_type`.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.           
+        
+        Returns
+        -------
+        numpy.matrix
+            The matrix is 3 x n. Each column holds the x, y and z
+            coordinates of an atom. The index of the column corresponds
+            to the id of the atom in the rdkit molecule whose 
+            coordinates it holds.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))       
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+
+        pos_array = np.array([])
+        for atom in rdkit_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            pos_vect = np.array([*self.atom_coords(mol_type, atom_id)])
+            pos_array = np.append(pos_array, pos_vect)
+
+        return np.matrix(pos_array.reshape(-1,3).T)
+
+    def rotate(self, theta, axis):
+        """
+        Rotates the heavy rdkit molecule by `theta` about `axis`.
+        
+        The rotation occurs about the heavy atom centroid.        
+        
+        Parameters
+        ----------        
+        theta : float
+            The size of the rotation in radians.
+        
+        axis : numpy.array
+            The axis about which rotation happens.
+        
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated.
+    
+        Returns
+        -------
+        None : NoneType
+            
+        """
+        
+        og_position = self.heavy_atom_centroid()
+        self.set_heavy_atom_centroid([0,0,0])
+        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
+        self.set_position_from_matrix('heavy', new_pos_mat)
+        self.set_heavy_atom_centroid(og_position)
+
+
+    def set_position(self, mol_type, position):
+        """
+        Changes the position of the rdkit molecule. 
+        
+        This method translates the heavy or pristine building block 
+        molecule so that its centroid is on the point `position`. Which
+        one is set depends on `mol_type`.
+        
+        Unlike `shift_mol` this method does change the original
+        rdkit molecule found in `prist_mol` or `heav_mol`. A copy is NOT 
+        created. This method does not change the ``.mol`` files however.
+        
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.        
+        
+        position : numpy.array
+            This array holds the position on which the centroid of the 
+            building block should be placed.
+            
+        Modifies
+        --------
+        prist_mol : rdkit.Chem.rdchem.Mol       
+            If `mol_type` is 'prist',  the conformer in this rdkit 
+            instance is changed so that its centroid falls on 
+            `position`.         
+        
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            If `mol_type` is 'heavy', the conformer in this rdkit 
+            instance is changed so that its centroid falls on 
+            `position`.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            The heavy rdkit molecule with the centroid placed at 
+            `position`. This is the same instance as that in 
+            `heavy_mol`.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        centroid = self.centroid(mol_type)
+        shift = position - centroid
+        new_conf = self.shift(mol_type, shift).GetConformer()
+
+        rdkit_mol.RemoveAllConformers()
+        rdkit_mol.AddConformer(new_conf)
+        
+        return rdkit_mol        
+
+    def set_position_from_matrix(self, mol_type, pos_mat):
+        """
+        Set atomic positions of rdkit molecule to those in `pos_mat`.
+        
+        The form of the `pos_mat` is 3 x n. The column of `pos_mat` 
+        represents the x, y and z coordinates to which an atom
+        in the heavy molecule should be set. The 1st column sets the
+        coordinate of the atom in `heavy_mol` with id 0. The next column
+        sets the coordinate of the atom in `heavy_mol` with id 1, and
+        so on.
+        
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.       
+        
+        pos_mat : numpy.array
+            The matrix holds the coordinates to which atoms of the heavy 
+            molecule should be set. The index of the column in
+            the matrix corresponds to the id of the atom who's
+            coordinates it holds.            
+            
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            If `mol_type` is 'heavy', the coordinates of atoms in this 
+            molecule are set to the coordinates in `pos_mat`.
+    
+        prist_mol : rdkit.Chem.rdchem.Mol   
+            if `mol_type` is 'prist', the coordinates of atoms in this 
+            molecule are set to the coordinates in `pos_mat`.
+    
+        Returns
+        -------
+        None : NoneType
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        conf = rdkit_mol.GetConformer()
+        for i, coord_mat in enumerate(pos_mat.T):
+            coord = rdkit_geo.Point3D(coord_mat.item(0), 
+                                      coord_mat.item(1), 
+                                      coord_mat.item(2))
+            conf.SetAtomPosition(i, coord)
+        
+    def shift(self, mol_type, shift):
+        """
+        Shifts the coordinates of all atoms.
+        
+        This method will shift the rdkit instance of either the pristine 
+        or heavy molecule depending on `mol_type`.
+        
+        The `heavy_mol` and `prist_mol` attributes hold a 
+        ``rdkit.Chem.rdchem.Mol`` instance. This instance holds holds a 
+        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
+        holds the positions of the atoms in the molecule. This function 
+        creates a new conformer with all the coordinates shifted by the
+        values supplied in `shift`. This function does not change the 
+        existing conformer.
+        
+        To be clear, consider the following code:
+        
+            >>> b = a.shift('heavy', [10,10,10])
+            >>> c = a.shift('heavy', [10,10,10])
+        
+        In the preceeding code where ``a`` is a ``StructUnit`` instance, 
+        ``b`` and ``c`` are two new ``rdkit.Chem.rdchem.Mol`` instances. 
+        The ``rdkit.Chem.rdchem.Mol`` instances held by ``a`` in 
+        `prist_mol` and `heavy_mol` are completely unchanged. As are any 
+        other attributes of ``a``. Both ``b`` and ``c`` are rdkit 
+        molecule instances with conformers which are exactly the same.
+        Both of these conformers are exactly like the conformer of the 
+        heavy rdkit molecule in ``a`` except all the atomic positions
+        are increased by 10 in the x, y and z directions. 
+        
+        Because ``a`` was not modified by runnig the method, running it
+        again with the same arguments leads to the same result. This is 
+        why the conformers in ``b`` and ``c`` are the same.
+
+        Parameters
+        ----------
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.
+            
+        shift : numpy.array
+            A numpy array holding the value of the shift along the
+            x, y and z axes in that order.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance which has a modified version of 
+            the conformer found in either `heavy_mol` or `prist_mol`.
+        
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+        
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
+        
+        # The function does not modify the existing conformer, as a 
+        # result a new instance is created and used for modification.
+        conformer = chem.Conformer(rdkit_mol.GetConformer())
+        
+        # For each atom, get the atomic positions from the conformer 
+        # and shift them. Create a new geometry instance from these new
+        # coordinate values. The geometry instance is used by rdkit to
+        # store the coordinates of atoms. Finally, set the conformers
+        # atomic position to the values stored in this newly generated
+        # geometry instance.
+        for atom in rdkit_mol.GetAtoms():
+            
+            # Remember the id of the atom you are currently using. It 
+            # is used to change the position of the correct atom at the
+            # end of the loop.
+            atom_id = atom.GetIdx()
+            
+            # `atom_position` in an instance holding in the x, y and z 
+            # coordinates of an atom in its 'x', 'y' and 'z' attributes.
+            atom_position = np.array(conformer.GetAtomPosition(atom_id))
+            
+            # Inducing the shift.
+            new_atom_position = atom_position + shift
+            
+            # Creating a new geometry instance.
+            new_coords = rdkit_geo.Point3D(*new_atom_position)            
+            
+            # Changes the position of the atom in the conformer to the
+            # values stored in the new geometry instance.
+            conformer.SetAtomPosition(atom_id, new_coords)
+        
+        # Create a new copy of the rdkit molecule instance representing
+        # the molecule - the original instance is not to be modified.
+        new_mol = chem.Mol(rdkit_mol)
+        
+        # The new rdkit molecule was copied from the one held in the
+        # `heavy_mol` or `prist_mol` attribute, as result it has a copy 
+        # of its conformer. To prevent the rdkit molecule from holding 
+        # multiple conformers the `RemoveAllConformers` method is run 
+        # first. The shifted conformer is then given to the rdkit 
+        # molecule, which is returned.
+        new_mol.RemoveAllConformers()
+        new_mol.AddConformer(conformer)
+        return new_mol 
+
+    def update_from_mae(self, mae_path=None):
+        """
+        Updates data in attributes to match what is held a .mae file.
+        
+        The molecule can be updated from a random .mae file held
+        anywhere. Alterntatively, if no path is specified it is assumed
+        the .mae file has the same path and name as 
+        `self.prist_mol_file` only with .mol replaced with .mae.
+        
+        Parameters
+        ----------
+        mae_path : str (default = None)
+            The full path of the .mae file from which the attributes
+            should be updated. If ``None`` the .mae file is assumed to
+            have the same path and name as `self.prist_mol_file` only
+            with .mol replaced by .mae.
+        
+        Modifies
+        --------
+        self.prist_mol : rdkit.Chem.rdchem.Mol
+            The rdkit molecule held in this attribute is changed so that
+            it matches the moleclue held in the .mae file.
+            
+        self.prist_mol_file's content
+            The content in this file is changed to match the content in
+            the .mae file.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        if mae_path is None:
+            mae_path = self.prist_mol_file.replace('.mol', '.mae')
+        
+        self.prist_mol = mol_from_mae_file(mae_path)
+        self.write_mol_file('prist')
+
+    def write_mol_file(self, rdkit_mol_type, path=None):
+        """
+        Writes a V3000 ``.mol`` file of the macromolecule.
+
+        The heavy or pristine molecule can be written via the argument
+        `rdkit_mol_type`. The molecule is written to the location in the
+        `prist_mol_file`/`heavy_mol_file` attribute. The function uses
+        the structure of the rdkit molecules held in the `prist_mol` and
+        `heavy_mol` attributes as the basis for what is written to the
+        file.
+
+        This bypasses the need to use rdkit's writing functions, which
+        have issues with macromolecules due to poor ring finding and
+        sanitization issues.
+
+        Parameters
+        ----------
+        rdkit_mol_type : str
+            Allowed values for this parameter 'prist' and 'heavy'.
+            
+        path : str (default = None)
+            If the .mol file is to be written to a directory other than
+            the one in `prist_mol_file` or `heavy_mol_file`, it should
+            be written here.
+        
+        Modifies
+        --------
+        prist_mol_file's content
+            If the string 'prist' was passed, the content in this
+            ``.mol`` file will be replaced with the structure of the 
+            current rdkit molecule in `prist_mol`.
+            
+        heavy_mol_file's content
+            If the string 'heavy' was passed, the content in this
+            ``.mol`` file will be replaced with the structure of the 
+            current rdkit molecule in `heavy_mol`.
+                
+        Returns
+        -------
+        None : NoneType
+        
+        Raises
+        ------
+        ValueError
+            If the `rdkit_mol_type` value is not either 'prist' or 
+            'heavy'.
+        
+        """
+        
+        if rdkit_mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            file_name = self.prist_mol_file
+
+        elif rdkit_mol_type == 'heavy':
+            rdkit_mol= self.heavy_mol
+            file_name = self.heavy_mol_file
+            
+        else:
+            raise ValueError(("The argument `rdkit_mol_type` must be "
+                              "either 'prist' or 'heavy'."))
+
+        file_name = os.path.splitext(file_name)[0] + '.mol'
+            
+        main_string = ("\n"
+                       "     RDKit          3D\n"
+                       "\n"
+                       "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
+                       "M  V30 BEGIN CTAB\n"
+                       "M  V30 COUNTS {0} {1} 0 0 0\n"
+                       "M  V30 BEGIN ATOM\n"
+                       "!!!ATOM!!!BLOCK!!!HERE!!!\n"
+                       "M  V30 END ATOM\n"
+                       "M  V30 BEGIN BOND\n"
+                       "!!!BOND!!!BLOCK!!!HERE!!!\n"
+                       "M  V30 END BOND\n"
+                       "M  V30 END CTAB\n"
+                       "M  END\n"
+                       "\n"
+                       "$$$$\n")
+
+        # id atomic_symbol x y z
+        atom_line = "M  V30 {0} {1} {2:.4f} {3:.4f} {4:.4f} 0\n"
+        atom_block = ""        
+        
+        # id bond_order atom1 atom2
+        bond_line = "M  V30 {0} {1} {2} {3}\n"
+        bond_block = ""
+        
+        
+        main_string = main_string.format(rdkit_mol.GetNumAtoms(),
+                                         rdkit_mol.GetNumBonds())
+                                         
+        for atom in rdkit_mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_sym = periodic_table[atom.GetAtomicNum()]
+            x, y, z = self.atom_coords(rdkit_mol_type, atom_id)
+            atom_block += atom_line.format(atom_id+1, atom_sym, x, y, z)
+            
+        for bond in rdkit_mol.GetBonds():
+            bond_id = bond.GetIdx()
+            atom1_id = bond.GetBeginAtomIdx() + 1
+            atom2_id = bond.GetEndAtomIdx() + 1
+            bond_order = int(bond.GetBondTypeAsDouble())
+            bond_block += bond_line.format(bond_id, bond_order, 
+                                           atom1_id, atom2_id)
+
+        main_string = main_string.replace("!!!ATOM!!!BLOCK!!!HERE!!!\n",
+                                          atom_block)
+        main_string = main_string.replace("!!!BOND!!!BLOCK!!!HERE!!!\n",
+                                          bond_block)
+        
+        if path:
+            base_name = os.path.basename(file_name)
+            file_name = os.path.join(path, base_name)
+        
+        with open(file_name, 'w') as f:
+            f.write(main_string)
+
 @total_ordering        
-class StructUnit(metaclass=Cached):
+class StructUnit(Molecule, metaclass=Cached):
     """
     Represents the building blocks of macromolecules examined by MMEA.
     
@@ -497,6 +1476,48 @@ class StructUnit(metaclass=Cached):
         # with heavy atoms.
         self._generate_heavy_attrs()
 
+    def _delete_tag_ids(self, heavy_atom):
+        """
+        Returns the ids of neighbor atoms tagged for deletion.
+        
+        These are neighbors to `heavy_atom`.
+
+        Parameters
+        ----------
+        heavy_atom : rdkit.Chem.rdchem.Atom
+            The heavy atom who's neighbors should be deleted.
+            
+        Returns
+        -------
+        list of ints
+            The ids of neighbor atoms which have been tagged for
+            deletion.
+        
+        """
+        
+        heavy_id = heavy_atom.GetIdx()
+        
+        del_ids = []
+        
+        # For each deletion tag, go through all the neighors that
+        # `heavy_atom` has. If the atom's element and bond type matches
+        # the deletion tag, add the atom's id to the ``del_ids`` list.        
+        for del_atom in self.func_grp.del_tags:
+            for n in heavy_atom.GetNeighbors():
+                n_id = n.GetIdx()
+
+                bond = self.heavy_mol.GetBondBetweenAtoms(heavy_id, 
+                                                          n_id)
+                bond_type = bond.GetBondType()
+
+                if (n.GetAtomicNum() == del_atom.atomic_num and
+                    bond_type == del_atom.bond_type and
+                    n_id not in del_ids):
+                    del_ids.append(n_id)
+                    break
+        
+        return del_ids
+
     def _generate_heavy_attrs(self):
         """
         Adds attributes associated with a substituted functional group.
@@ -610,588 +1631,6 @@ class StructUnit(metaclass=Cached):
         for atom in self.heavy_mol.GetAtoms():
             if atom.GetAtomicNum() == self.func_grp.heavy_atomic_num:
                 self.heavy_ids.append(atom.GetIdx())
-             
-    def _delete_tag_ids(self, heavy_atom):
-        """
-        Returns the ids of neighbor atoms tagged for deletion.
-        
-        These are neighbors to `heavy_atom`.
-
-        Parameters
-        ----------
-        heavy_atom : rdkit.Chem.rdchem.Atom
-            The heavy atom who's neighbors should be deleted.
-            
-        Returns
-        -------
-        list of ints
-            The ids of neighbor atoms which have been tagged for
-            deletion.
-        
-        """
-        
-        heavy_id = heavy_atom.GetIdx()
-        
-        del_ids = []
-        
-        # For each deletion tag, go through all the neighors that
-        # `heavy_atom` has. If the atom's element and bond type matches
-        # the deletion tag, add the atom's id to the ``del_ids`` list.        
-        for del_atom in self.func_grp.del_tags:
-            for n in heavy_atom.GetNeighbors():
-                n_id = n.GetIdx()
-
-                bond = self.heavy_mol.GetBondBetweenAtoms(heavy_id, 
-                                                          n_id)
-                bond_type = bond.GetBondType()
-
-                if (n.GetAtomicNum() == del_atom.atomic_num and
-                    bond_type == del_atom.bond_type and
-                    n_id not in del_ids):
-                    del_ids.append(n_id)
-                    break
-        
-        return del_ids
-
-    @LazyAttr
-    def energy(self):
-        """
-        Returns the energy the molecule as found by macromodel.
-        
-        This lazy attribute reads the log file generated by a macromodel
-        optimization and sets the energy within as the value of the
-        `energy` attribute.
-        
-        Modifies
-        --------
-        self.energy : float
-            Creates this attribute.
-            
-        Raises
-        ------
-        AttributeError
-            If the molecule did not undergo an optimization there will
-            be no log file to read.
-        
-        """
-        
-        if not self.optimized:
-            raise AttributeError(('A molecule must be optimized for'
-                                  ' its energy to be taken.'))
-        
-        # Go thorugh the log file line by line and find the line which
-        # says ``Total Energy = ``. This line holds the energy value in
-        # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('.mol', '.log')
-        with open(log_file, 'r') as log:
-            for line in reversed(log.readlines()):
-                if 'Total Energy =    ' in line:
-                    return float(line.split()[3])
-
-    def find_functional_group_atoms(self):
-        """
-        Returns a container of atom ids of atoms in functional groups.
-
-        The ``StructUnit`` instance (`self`) represents a molecule. 
-        This molecule is in turn represented in rdkit by a 
-        ``rdkit.Chem.rdchem.Mol`` instance. This rdkit molecule instance 
-        is held in the `prist_mol` attribute. The rdkit molecule 
-        instance is made up of constitutent atoms which are
-        ``rdkit.Chem.rdchem.Atom`` instances. Each atom instance has its
-        own id. These are the ids contained in the tuple returned by 
-        this function.   
-
-        Returns
-        -------
-        tuple of tuples of ints
-            The form of the returned tuple is:
-            ((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with
-            ids 1 to 9 are in a functional group and that the atoms 1, 2
-            and 3 all form one functional group together. So do 4, 5 and 
-            5 and so on.
-
-        """
-        
-        # Generate a ``rdkit.Chem.rdchem.Mol`` instance which represents
-        # the functional group of the molecule.        
-        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
-        
-        # Do a substructure search on the the molecule in `prist_mol`
-        # to find which atoms match the functional group. Return the
-        # atom ids of those atoms.
-        return self.prist_mol.GetSubstructMatches(func_grp_mol)        
-
-    def similar_molecules(self, database):
-        """
-        Returns molecules from `database` ordered by similarity.
-        
-        This method uses the Morgan fingerprints of radius 4 to evaluate 
-        how similar the molecules in `database` are to `self`.
-        
-        Parameters
-        ----------
-        database : str
-            The full path of the database from which the molecules are
-            checked for similarity.
-            
-        Returns
-        -------
-        list of tuples of form (float, str)
-            The float is the similarity of a given molecule in the
-            database to `self` while the str is the full path of the 
-            .mol file of that molecule.
-        
-        """
-        # First get the fingerprint of `self`.
-        chem.GetSSSR(self.prist_mol)
-        self.prist_mol.UpdatePropertyCache(strict=False)
-        fp = ac.GetMorganFingerprint(self.prist_mol, 4)
-        
-        # For every .mol file in the database create an rdkit molecule.
-        # Place these in a list.
-        mols = []
-        for file in os.listdir(database):
-            path = os.path.join(database, file)
-            # Ignore files which are not .mol and the .mol file of the
-            # molecule itself.
-            if not path.endswith('.mol') or path == self.prist_mol_file:
-                continue
-            mol = chem.MolFromMolFile(path, 
-                                      sanitize=False, 
-                                      removeHs=False)
-            chem.GetSSSR(mol)
-            mol.UpdatePropertyCache(strict=False)
-            mol_fp = ac.GetMorganFingerprint(mol, 4)
-            similarity = DataStructs.DiceSimilarity(fp, mol_fp)
-            mols.append((similarity, path))
-        
-        return sorted(mols, reverse=True)
-        
-    def atom_coords(self, mol_type, atom_id):
-        """
-        Return coordinates of an atom in `heavy_mol` or `prist_mol`.
-
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.             
-        
-        atom_id : int
-            The id of the atom whose coordinates are desired.
-            
-        Returns
-        -------
-        numpy.array
-            An array hodling the x, y and z coordinates (respectively) 
-            of atom with id of `atom_id` in `heavy_mol`.
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-        
-        conf = rdkit_mol.GetConformer()
-        atom_position = conf.GetAtomPosition(atom_id)
-        return np.array([*atom_position])
-
-    def all_atom_coords(self, mol_type):
-        """
-        Yields the coordinates of atoms in `heavy_mol` or `prist_mol`.        
-
-        This yields the coordinates of every atom in the pristine or
-        heavy molecule, depending on `mol_type`.
-
-        The `heavy_mol` and `prist_mol` attributes hold a 
-        ``rdkit.Chem.rdchem.Mol`` instance. This instance holds a 
-        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
-        holds the positions of the atoms within that conformer. This
-        generator yields those coordinates.
-
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.   
-       
-        Yields
-        ------
-        tuple of (int, numpy.array)
-            The ``int`` represents the atom id of the atom whose
-            coordinates are being yielded.
-        
-            The array represents the complete position in space. Each 
-            float within the array represents the value of the x, y or z 
-            coordinate of an atom. The x, y and z coordinates are 
-            located in the array in that order. 
-            
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-        
-        # Get the conformer from the rdkit instance. 
-        conformer = rdkit_mol.GetConformer()
-        
-        # Go through all the atoms and ask the conformer to return
-        # the position of each atom. This is done by supplying the 
-        # conformers `GetAtomPosition` method with the atom's id.
-        for atom in rdkit_mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            atom_position = conformer.GetAtomPosition(atom_id)
-            yield atom_id, np.array([*atom_position]) 
-
-    def position_matrix(self, mol_type):
-        """
-        Return position of all atoms in the building block as a matrix. 
-        
-        Positions of the atoms in the heavy or pristine rdkit instance
-        will be returned based on `mol_type`.
-
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.           
-        
-        Returns
-        -------
-        numpy.matrix
-            The matrix is 3 x n. Each column holds the x, y and z
-            coordinates of an atom. The index of the column corresponds
-            to the id of the atom in the rdkit molecule whose 
-            coordinates it holds.
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))       
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-
-        pos_array = np.array([])
-        for atom in rdkit_mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            pos_vect = np.array([*self.atom_coords(mol_type, atom_id)])
-            pos_array = np.append(pos_array, pos_vect)
-
-        return np.matrix(pos_array.reshape(-1,3).T)
-
-    def atom_distance(self, mol_type, atom1_id, atom2_id):
-        """
-        See `atom_distance` documentation in ``MacroMolecule``.
-        
-        """
-        
-        return MacroMolecule.atom_distance(self, mol_type, 
-                                           atom1_id, atom2_id)
-
-    def centroid(self, mol_type):
-        """
-        Returns the centroid of the heavy or pristine rdkit molecule.
-
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.
-
-        Returns
-        -------
-        numpy.array
-            A numpy array holding the position of the centroid.
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-            
-        centroid = sum(x for _, x in self.all_atom_coords(mol_type)) 
-        return np.divide(centroid, rdkit_mol.GetNumAtoms())
-
-    def shift(self, mol_type, shift):
-        """
-        Shifts the coordinates of all atoms.
-        
-        This method will shift the rdkit instance of either the pristine 
-        or heavy molecule depending on `mol_type`.
-        
-        The `heavy_mol` and `prist_mol` attributes hold a 
-        ``rdkit.Chem.rdchem.Mol`` instance. This instance holds holds a 
-        ``rdkit.Chem.rdchem.Conformer`` instance. The conformer instance
-        holds the positions of the atoms in the molecule. This function 
-        creates a new conformer with all the coordinates shifted by the
-        values supplied in `shift`. This function does not change the 
-        existing conformer.
-        
-        To be clear, consider the following code:
-        
-            >>> b = a.shift('heavy', [10,10,10])
-            >>> c = a.shift('heavy', [10,10,10])
-        
-        In the preceeding code where ``a`` is a ``StructUnit`` instance, 
-        ``b`` and ``c`` are two new ``rdkit.Chem.rdchem.Mol`` instances. 
-        The ``rdkit.Chem.rdchem.Mol`` instances held by ``a`` in 
-        `prist_mol` and `heavy_mol` are completely unchanged. As are any 
-        other attributes of ``a``. Both ``b`` and ``c`` are rdkit 
-        molecule instances with conformers which are exactly the same.
-        Both of these conformers are exactly like the conformer of the 
-        heavy rdkit molecule in ``a`` except all the atomic positions
-        are increased by 10 in the x, y and z directions. 
-        
-        Because ``a`` was not modified by runnig the method, running it
-        again with the same arguments leads to the same result. This is 
-        why the conformers in ``b`` and ``c`` are the same.
-
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.
-            
-        shift : numpy.array
-            A numpy array holding the value of the shift along the
-            x, y and z axes in that order.
-        
-        Returns
-        -------
-        rdkit.Chem.rdchem.Mol
-            An rdkit molecule instance which has a modified version of 
-            the conformer found in either `heavy_mol` or `prist_mol`.
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-        
-        # The function does not modify the existing conformer, as a 
-        # result a new instance is created and used for modification.
-        conformer = chem.Conformer(rdkit_mol.GetConformer())
-        
-        # For each atom, get the atomic positions from the conformer 
-        # and shift them. Create a new geometry instance from these new
-        # coordinate values. The geometry instance is used by rdkit to
-        # store the coordinates of atoms. Finally, set the conformers
-        # atomic position to the values stored in this newly generated
-        # geometry instance.
-        for atom in rdkit_mol.GetAtoms():
-            
-            # Remember the id of the atom you are currently using. It 
-            # is used to change the position of the correct atom at the
-            # end of the loop.
-            atom_id = atom.GetIdx()
-            
-            # `atom_position` in an instance holding in the x, y and z 
-            # coordinates of an atom in its 'x', 'y' and 'z' attributes.
-            atom_position = np.array(conformer.GetAtomPosition(atom_id))
-            
-            # Inducing the shift.
-            new_atom_position = atom_position + shift
-            
-            # Creating a new geometry instance.
-            new_coords = rdkit_geo.Point3D(*new_atom_position)            
-            
-            # Changes the position of the atom in the conformer to the
-            # values stored in the new geometry instance.
-            conformer.SetAtomPosition(atom_id, new_coords)
-        
-        # Create a new copy of the rdkit molecule instance representing
-        # the molecule - the original instance is not to be modified.
-        new_mol = chem.Mol(rdkit_mol)
-        
-        # The new rdkit molecule was copied from the one held in the
-        # `heavy_mol` or `prist_mol` attribute, as result it has a copy 
-        # of its conformer. To prevent the rdkit molecule from holding 
-        # multiple conformers the `RemoveAllConformers` method is run 
-        # first. The shifted conformer is then given to the rdkit 
-        # molecule, which is returned.
-        new_mol.RemoveAllConformers()
-        new_mol.AddConformer(conformer)
-        return new_mol        
-
-    def set_position(self, mol_type, position):
-        """
-        Changes the position of the rdkit molecule. 
-        
-        This method translates the heavy or pristine building block 
-        molecule so that its centroid is on the point `position`. Which
-        one is set depends on `mol_type`.
-        
-        Unlike `shift_mol` this method does change the original
-        rdkit molecule found in `prist_mol` or `heav_mol`. A copy is NOT 
-        created. This method does not change the ``.mol`` files however.
-        
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.        
-        
-        position : numpy.array
-            This array holds the position on which the centroid of the 
-            building block should be placed.
-            
-        Modifies
-        --------
-        prist_mol : rdkit.Chem.rdchem.Mol       
-            If `mol_type` is 'prist',  the conformer in this rdkit 
-            instance is changed so that its centroid falls on 
-            `position`.         
-        
-        heavy_mol : rdkit.Chem.rdchem.Mol   
-            If `mol_type` is 'heavy', the conformer in this rdkit 
-            instance is changed so that its centroid falls on 
-            `position`.
-        
-        Returns
-        -------
-        rdkit.Chem.rdchem.Mol
-            The heavy rdkit molecule with the centroid placed at 
-            `position`. This is the same instance as that in 
-            `heavy_mol`.
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-        
-        centroid = self.centroid(mol_type)
-        shift = position - centroid
-        new_conf = self.shift(mol_type, shift).GetConformer()
-
-        rdkit_mol.RemoveAllConformers()
-        rdkit_mol.AddConformer(new_conf)
-        
-        return rdkit_mol
-
-    def set_position_from_matrix(self, mol_type, pos_mat):
-        """
-        Set atomic positions of rdkit molecule to those in `pos_mat`.
-        
-        The form of the `pos_mat` is 3 x n. The column of `pos_mat` 
-        represents the x, y and z coordinates to which an atom
-        in the heavy molecule should be set. The 1st column sets the
-        coordinate of the atom in `heavy_mol` with id 0. The next column
-        sets the coordinate of the atom in `heavy_mol` with id 1, and
-        so on.
-        
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.       
-        
-        pos_mat : numpy.array
-            The matrix holds the coordinates to which atoms of the heavy 
-            molecule should be set. The index of the column in
-            the matrix corresponds to the id of the atom who's
-            coordinates it holds.            
-            
-        Modifies
-        --------
-        heavy_mol : rdkit.Chem.rdchem.Mol
-            If `mol_type` is 'heavy', the coordinates of atoms in this 
-            molecule are set to the coordinates in `pos_mat`.
-    
-        prist_mol : rdkit.Chem.rdchem.Mol   
-            if `mol_type` is 'prist', the coordinates of atoms in this 
-            molecule are set to the coordinates in `pos_mat`.
-    
-        Returns
-        -------
-        None : NoneType
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-        
-        conf = rdkit_mol.GetConformer()
-        for i, coord_mat in enumerate(pos_mat.T):
-            coord = rdkit_geo.Point3D(coord_mat.item(0), 
-                                      coord_mat.item(1), 
-                                      coord_mat.item(2))
-            conf.SetAtomPosition(i, coord)
 
     def _set_heavy_mol_orientation(self, start, end):
         """
@@ -1281,103 +1720,6 @@ class StructUnit(metaclass=Cached):
 
         return chem.Mol(self.heavy_mol)
 
-    def rotate(self, theta, axis):
-        """
-        Rotates the heavy linker by `theta` about `axis`.
-        
-        The rotation occurs about the heavy atom centroid.        
-        
-        Parameters
-        ----------        
-        theta : float
-            The size of the rotation in radians.
-        
-        axis : numpy.array
-            The axis about which rotation happens.
-        
-        Modifies
-        --------
-        heavy_mol : rdkit.Chem.rdchem.Mol
-            The atoms in this molecule are rotated.
-    
-        Returns
-        -------
-        None : NoneType
-            
-        """
-        
-        og_position = self.heavy_atom_centroid()
-        self.set_heavy_atom_centroid([0,0,0])
-        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
-        new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
-        self.set_position_from_matrix('heavy', new_pos_mat)
-        self.set_heavy_atom_centroid(og_position)                
-
-    def heavy_atom_position_matrix(self):
-        """
-        Returns a matrix holding positions of heavy atoms.
-
-        Returns
-        -------
-        numpy.matrix
-            The matrix is 3 x n. Each column holds the x, y and z
-            coordinates of a heavy atom. The index of the column 
-            corresponds to the index of the atom id in `heavy_ids`.    
-        
-        """
-        
-        pos_array = np.array([])
-
-        for atom_id in self.heavy_ids:
-            pos_vect = np.array([*self.atom_coords('heavy', atom_id)])
-            pos_array = np.append(pos_array, pos_vect)
-
-        return np.matrix(pos_array.reshape(-1,3).T)
-
-    def heavy_direction_vectors(self):
-        """
-        Yields the direction vectors between all pairs of heavy atoms.
-                
-        The yielded vector is normalized. If a pair (1,2) is yielded, 
-        the pair (2,1) will not be.
-        
-        Yields
-        ------
-        The next direction vector running between a pair of heavy atoms.
-        
-        """
-        
-        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids, 
-                                                                     2):
-            p1 = self.atom_coords('heavy', atom1_id)
-            p2 = self.atom_coords('heavy', atom2_id)
-        
-            yield normalize_vector(p1-p2)
-
-    def heavy_direction_vector_atoms(self):
-        """
-        Yields the atoms which form `heavy_direction_vectors`.
-
-        The method `heavy_direction_vectors` yields direction vectors.
-        This method yields the atom ids of atoms which form those 
-        direction vectors. The atoms ids are yielded in the same order
-        as the vectors.
-
-        Yield
-        -------
-        tuple of ints
-            The tuple holds the start and end atom ids of a
-            `heavy_direction_vector`. The first tuple will correspond 
-            to the atoms forming the first `heavy_direction_vector` and
-            so on. The atom id at index 0 is the start atom and the atom
-            id at index 1 is the end atom.
-        
-        """
-
-        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids,
-                                                                     2):
-            yield atom2_id, atom1_id                                                                 
-
     def centroid_centroid_dir_vector(self):
         """
         Returns the direction vector between the 2 molecular centroids.
@@ -1396,6 +1738,39 @@ class StructUnit(metaclass=Cached):
     
         return normalize_vector(self.centroid('heavy') - 
                                 self.heavy_atom_centroid())
+
+    def find_functional_group_atoms(self):
+        """
+        Returns a container of atom ids of atoms in functional groups.
+
+        The ``StructUnit`` instance (`self`) represents a molecule. 
+        This molecule is in turn represented in rdkit by a 
+        ``rdkit.Chem.rdchem.Mol`` instance. This rdkit molecule instance 
+        is held in the `prist_mol` attribute. The rdkit molecule 
+        instance is made up of constitutent atoms which are
+        ``rdkit.Chem.rdchem.Atom`` instances. Each atom instance has its
+        own id. These are the ids contained in the tuple returned by 
+        this function.   
+
+        Returns
+        -------
+        tuple of tuples of ints
+            The form of the returned tuple is:
+            ((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with
+            ids 1 to 9 are in a functional group and that the atoms 1, 2
+            and 3 all form one functional group together. So do 4, 5 and 
+            5 and so on.
+
+        """
+        
+        # Generate a ``rdkit.Chem.rdchem.Mol`` instance which represents
+        # the functional group of the molecule.        
+        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
+        
+        # Do a substructure search on the the molecule in `prist_mol`
+        # to find which atoms match the functional group. Return the
+        # atom ids of those atoms.
+        return self.prist_mol.GetSubstructMatches(func_grp_mol)        
 
     def heavy_atom_centroid(self):
         """
@@ -1453,46 +1828,51 @@ class StructUnit(metaclass=Cached):
         
         return chem.Mol(self.heavy_mol)
 
-    def update_from_mae(self, mae_path=None):
+    def similar_molecules(self, database):
         """
-        See `update_from_mae` documentation in ``MacroMolecule``.
+        Returns molecules from `database` ordered by similarity.
         
-        """
-
-        return MacroMolecule.update_from_mae(self, mae_path)
-           
-    def write_mol_file(self, mol_type, path=None):
-        """
-        See `write_mol_file` documentation in ``MacroMolecule``.
+        This method uses the Morgan fingerprints of radius 4 to evaluate 
+        how similar the molecules in `database` are to `self`.
         
-        """
-        
-        return MacroMolecule.write_mol_file(self, mol_type, path=path)
-
-    def graph(self, mol_type):
-        """
-        See `graph()` documentation in ``MacroMolecule``.
-        
-        """
-        
-        return MacroMolecule.graph(self, mol_type)
-        
-    @staticmethod
-    def load(file_name):
-        """
-        See `load()` documentation in ``MacroMolecule``.
-        
-        """  
-        
-        return MacroMolecule.load(file_name)
-        
-    def dump(self, file_name):
-        """
-        See `write()` documentation in ``MacroMolecule``.
+        Parameters
+        ----------
+        database : str
+            The full path of the database from which the molecules are
+            checked for similarity.
+            
+        Returns
+        -------
+        list of tuples of form (float, str)
+            The float is the similarity of a given molecule in the
+            database to `self` while the str is the full path of the 
+            .mol file of that molecule.
         
         """
+        # First get the fingerprint of `self`.
+        chem.GetSSSR(self.prist_mol)
+        self.prist_mol.UpdatePropertyCache(strict=False)
+        fp = ac.GetMorganFingerprint(self.prist_mol, 4)
         
-        return MacroMolecule.dump(self, file_name)
+        # For every .mol file in the database create an rdkit molecule.
+        # Place these in a list.
+        mols = []
+        for file in os.listdir(database):
+            path = os.path.join(database, file)
+            # Ignore files which are not .mol and the .mol file of the
+            # molecule itself.
+            if not path.endswith('.mol') or path == self.prist_mol_file:
+                continue
+            mol = chem.MolFromMolFile(path, 
+                                      sanitize=False, 
+                                      removeHs=False)
+            chem.GetSSSR(mol)
+            mol.UpdatePropertyCache(strict=False)
+            mol_fp = ac.GetMorganFingerprint(mol, 4)
+            similarity = DataStructs.DiceSimilarity(fp, mol_fp)
+            mols.append((similarity, path))
+        
+        return sorted(mols, reverse=True)
 
     def __eq__(self, other):
         return self.prist_mol_file == other.prist_mol_file
@@ -1701,7 +2081,7 @@ class StructUnit2(StructUnit):
             prev_theta = theta
 
 @total_ordering
-class MacroMolecule(metaclass=CachedMacroMol):
+class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     """
     A class for MMEA assembled macromolecules.
     
@@ -1937,516 +2317,6 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # Dump the molecule in case it causes an issue later on.
         self.dump(self.prist_mol_file.replace('.mol', '.dmp'))
 
-    @staticmethod
-    def load(file_name):
-        """
-        Initializes a MacroMolecule from one dumped to a file.
-        
-        Parameters
-        ----------
-        file_name : str
-            The full path of the file holding the dumped molecule.
-            
-        Returns
-        -------
-        MacroMolecule
-            The macromolecule stored in the dump file.
-            
-        """
-        
-        with open(file_name, 'rb') as dump_file:
-            return pickle.load(dump_file)
-        
-    def dump(self, file_name):
-        """
-        Write the MacroMolecule object to a file.
-        
-        Parameters
-        ----------
-        file_name : str
-            The full path of the file to which the macromolecule should
-            be written.
-            
-        Returns
-        -------
-        None : NoneType
-
-        """
-        
-        with open(file_name, 'wb') as dump_file:    
-            pickle.dump(self, dump_file)          
-
-
-    def update_cache(self):
-        """
-        Updates the caching dictionary so that it contains `self`.
-        
-        When an instance of ``MacroMolecule`` is first created it is
-        cached. Using multiprocessing to perform optimizations returns
-        modified copies of the cached molecules. In order to ensure that
-        the cache points to the modified copies not to the originally
-        initialized molecule, this method must be run.
-        
-        Returns
-        -------
-        None : NoneType
-        
-        """
-        
-        # The caching is done by the class. Access it and use its
-        # ``_update_cache()`` method.
-        cls = type(self)
-        cls._update_cache(self)
-
-    def update_from_mae(self, mae_path=None):
-        """
-        Updates data in attributes to match what is held a .mae file.
-        
-        The molecule can be updated from a random .mae file held
-        anywhere. Alterntatively, if no path is specified it is assumed
-        the .mae file has the same path and name as 
-        `self.prist_mol_file` only with .mol replaced with .mae.
-        
-        Parameters
-        ----------
-        mae_path : str (default = None)
-            The full path of the .mae file from which the attributes
-            should be updated. If ``None`` the .mae file is assumed to
-            have the same path and name as `self.prist_mol_file` only
-            with .mol replaced by .mae.
-        
-        Modifies
-        --------
-        self.prist_mol : rdkit.Chem.rdchem.Mol
-            The rdkit molecule held in this attribute is changed so that
-            it matches the moleclue held in the .mae file.
-            
-        self.prist_mol_file's content
-            The content in this file is changed to match the content in
-            the .mae file.
-            
-        Returns
-        -------
-        None : NoneType
-        
-        """
-        
-        if mae_path is None:
-            mae_path = self.prist_mol_file.replace('.mol', '.mae')
-        
-        self.prist_mol = mol_from_mae_file(mae_path)
-        self.write_mol_file('prist')
-                
-    @LazyAttr
-    def energy(self):
-        """
-        Returns the total energy the molecule as found by macromodel.
-        
-        This lazy attribute reads the log file generated by a macromodel
-        optimization and sets the energy within as the value of the
-        `energy` attribute.
-        
-        Modifies
-        --------
-        self.energy : float
-            Creates this attribute.
-            
-        Raises
-        ------
-        AttributeError
-            If the molecule did not undergo an optimization there will
-            be no log file to read.
-        
-        """
-        
-        if not self.optimized:
-            raise AttributeError(('A molecule must be optimized for'
-                                  ' its energy to be taken.'))
-        
-        # Go thorugh the log file line by line and find the line which
-        # says ``Total Energy = ``. This line holds the energy value in
-        # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('.mol', '.log')
-        with open(log_file, 'r') as log:
-            for line in log:
-                if 'Total Energy =    ' in line:
-                    return float(line.split()[3])
-
-    def write_mol_file(self, rdkit_mol_type, path=None):
-        """
-        Writes a V3000 ``.mol`` file of the macromolecule.
-
-        The heavy or pristine molecule can be written via the argument
-        `rdkit_mol_type`. The molecule is written to the location in the
-        `prist_mol_file`/`heavy_mol_file` attribute. The function uses
-        the structure of the rdkit molecules held in the `prist_mol` and
-        `heavy_mol` attributes as the basis for what is written to the
-        file.
-
-        This bypasses the need to use rdkit's writing functions, which
-        have issues with macromolecules due to poor ring finding and
-        sanitization issues.
-
-        Parameters
-        ----------
-        rdkit_mol_type : str
-            Allowed values for this parameter 'prist' and 'heavy'.
-            
-        path : str (default = None)
-            If the .mol file is to be written to a directory other than
-            the one in `prist_mol_file` or `heavy_mol_file`, it should
-            be written here.
-        
-        Modifies
-        --------
-        prist_mol_file's content
-            If the string 'prist' was passed, the content in this
-            ``.mol`` file will be replaced with the structure of the 
-            current rdkit molecule in `prist_mol`.
-            
-        heavy_mol_file's content
-            If the string 'heavy' was passed, the content in this
-            ``.mol`` file will be replaced with the structure of the 
-            current rdkit molecule in `heavy_mol`.
-                
-        Returns
-        -------
-        None : NoneType
-        
-        Raises
-        ------
-        ValueError
-            If the `rdkit_mol_type` value is not either 'prist' or 
-            'heavy'.
-        
-        """
-        
-        if rdkit_mol_type == 'prist':
-            rdkit_mol = self.prist_mol
-            file_name = self.prist_mol_file
-
-        elif rdkit_mol_type == 'heavy':
-            rdkit_mol= self.heavy_mol
-            file_name = self.heavy_mol_file
-            
-        else:
-            raise ValueError(("The argument `rdkit_mol_type` must be "
-                              "either 'prist' or 'heavy'."))
-
-        file_name = os.path.splitext(file_name)[0] + '.mol'
-            
-        main_string = ("\n"
-                       "     RDKit          3D\n"
-                       "\n"
-                       "  0  0  0  0  0  0  0  0  0  0999 V3000\n"
-                       "M  V30 BEGIN CTAB\n"
-                       "M  V30 COUNTS {0} {1} 0 0 0\n"
-                       "M  V30 BEGIN ATOM\n"
-                       "!!!ATOM!!!BLOCK!!!HERE!!!\n"
-                       "M  V30 END ATOM\n"
-                       "M  V30 BEGIN BOND\n"
-                       "!!!BOND!!!BLOCK!!!HERE!!!\n"
-                       "M  V30 END BOND\n"
-                       "M  V30 END CTAB\n"
-                       "M  END\n"
-                       "\n"
-                       "$$$$\n")
-
-        # id atomic_symbol x y z
-        atom_line = "M  V30 {0} {1} {2:.4f} {3:.4f} {4:.4f} 0\n"
-        atom_block = ""        
-        
-        # id bond_order atom1 atom2
-        bond_line = "M  V30 {0} {1} {2} {3}\n"
-        bond_block = ""
-        
-        
-        main_string = main_string.format(rdkit_mol.GetNumAtoms(),
-                                         rdkit_mol.GetNumBonds())
-                                         
-        for atom in rdkit_mol.GetAtoms():
-            atom_id = atom.GetIdx()
-            atom_sym = periodic_table[atom.GetAtomicNum()]
-            x, y, z = self.atom_coords(rdkit_mol_type, atom_id)
-            atom_block += atom_line.format(atom_id+1, atom_sym, x, y, z)
-            
-        for bond in rdkit_mol.GetBonds():
-            bond_id = bond.GetIdx()
-            atom1_id = bond.GetBeginAtomIdx() + 1
-            atom2_id = bond.GetEndAtomIdx() + 1
-            bond_order = int(bond.GetBondTypeAsDouble())
-            bond_block += bond_line.format(bond_id, bond_order, 
-                                           atom1_id, atom2_id)
-
-        main_string = main_string.replace("!!!ATOM!!!BLOCK!!!HERE!!!\n",
-                                          atom_block)
-        main_string = main_string.replace("!!!BOND!!!BLOCK!!!HERE!!!\n",
-                                          bond_block)
-        
-        if path:
-            base_name = os.path.basename(file_name)
-            file_name = os.path.join(path, base_name)
-        
-        with open(file_name, 'w') as f:
-            f.write(main_string)
-
-    def graph(self, mol_type):
-        """
-        Returns a mathematical graph representing the molecule.        
-        
-        Parameters
-        ----------        
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used. 
-       
-        Returns
-        -------
-        networkx.Graph
-            A graph where the nodes are the ids of the atoms in the
-            rdkit molecule and the edges are the bonds.
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-        
-        # Create a graph instance and add the atom ids as nodes. Use the
-        # the atom ids from each end of a bond to define edges. Do this
-        # for all bonds to account for all edges.
-        
-        graph = nx.Graph()        
-        
-        for atom in rdkit_mol.GetAtoms():
-            graph.add_node(atom.GetIdx())
-        
-        for bond in rdkit_mol.GetBonds():
-            graph.add_edge(bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
-             
-        return graph
-
-    def atom_symbol(self, mol_type, atom_id):
-        """
-        Returns the symbol of the atom with id `atom_id`.
-        
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.        
-
-        Returns
-        -------
-        str
-            The atomic symbol of the atom with id number `atom_id`.        
-        
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-            
-        atom = rdkit_mol.GetAtomWithIdx(atom_id)
-        atomic_num = atom.GetAtomicNum()
-        return periodic_table[atomic_num]
-
-    def atom_coords(self, mol_type, atom_id):
-        """
-        See `atom_coords` documentation in ``StructUnit``.         
-        
-        """
-        
-        return StructUnit.atom_coords(self, mol_type, atom_id)
-
-    def all_atom_coords(self, mol_type):
-        """
-        See `all_atom_coords` documentation in ``StructUnit``.
-        
-        """
-        
-        return StructUnit.all_atom_coords(self, mol_type)         
-
-    def position_matrix(self, mol_type):
-        """
-        See `position_matrix` documentation in ``StructUnit``.        
-        
-        """
-        
-        return StructUnit.position_matrix(self, mol_type)
-
-    def set_position_from_matrix(self, mol_type, pos_mat):
-        """
-        See `set_position_from_matrix` documentation in ``StructUnit``.        
-        
-        """
-
-        return StructUnit.set_position_from_matrix(self, 
-                                                   mol_type, pos_mat)        
-        
-    def atom_distance(self, mol_type, atom1_id, atom2_id):
-        """
-        Return the distance between atoms in `heavy_mol` or `prist_mol`.
-        
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.
-            
-        atom1_id : int
-            The id of the first atom.
-        
-        atom2_id : int
-            The id of the second atom.
-            
-        Returns 
-        -------
-        scipy.double
-            The distance between the first and second atoms.
-
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))
-
-        # Get the atomic positions of each atom and use the scipy 
-        # function to calculate their distance in Euclidean space.              
-        atom1_coords = self.atom_coords(mol_type, atom1_id)
-        atom2_coords = self.atom_coords(mol_type, atom2_id)
-        
-        return euclidean(atom1_coords, atom2_coords)
-
-    def all_heavy_atom_distances(self):
-        """
-        Yield distances between all pairs of heavy atoms in `heavy_mol`.
-        
-        All distances are only yielded once. This means that if the 
-        distance between atoms with ids ``1`` and ``2``is yielded as
-        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be 
-        yielded.
-        
-        Only distances between heavy atoms used for functional group
-        substitutions are considered. Distances between heavy atoms
-        and regular atoms or between two regular atoms are not yielded.
-        
-        Yields
-        ------
-        tuple of form (scipy.double, int, int)
-            This tuple holds the distance between two heavy atoms. The 
-            first element is the distance and the next two are the 
-            relevant atom ids.
-
-        """
-                
-        # Iterate through each pair of atoms - do not allow iterating
-        # through the same pair twice. In otherwords, recombinations of 
-        # the same pair are not allowed.
-        for atom1, atom2 in itertools.combinations(
-                                        self.heavy_mol.GetAtoms(), 2):
- 
-            # Only yield if both atoms are heavy. 
-            if (atom1.GetAtomicNum() in FGInfo.heavy_atomic_nums and 
-                atom2.GetAtomicNum() in FGInfo.heavy_atomic_nums):               
-                
-                # Get the atom ids, use them to calculate the distance
-                # and yield the resulting data.
-                atom1_id = atom1.GetIdx()
-                atom2_id = atom2.GetIdx()
-                yield (self.atom_distance('heavy', atom1_id, atom2_id), 
-                      atom1_id, atom2_id)
-
-    def centroid(self, mol_type):
-        """
-        See `centroid` documentation in ``StructUnit``.
-        
-        """
-        
-        return StructUnit.centroid(self, mol_type)
-
-    def center_of_mass(self, mol_type):
-        """
-        Returns the centre of mass of the pristine or heavy molecule.
-
-        Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.
-            
-        Returns
-        -------
-        numpy.array
-            The array holds the x, y and z coordinates of the center of
-            mass, in that order.
-                
-        Raises
-        ------
-        ValueError
-            If the `mol_type` string is not 'heavy' or 'prist'.
-
-        References
-        ----------
-        https://en.wikipedia.org/wiki/Center_of_mass
-        
-        """
-        
-        if mol_type not in {'prist', 'heavy'}:
-            raise ValueError(("`mol_type` must be either 'prist'"
-                                " or 'heavy'."))        
-        if mol_type == 'prist':
-            rdkit_mol = self.prist_mol            
-        elif mol_type == 'heavy':
-            rdkit_mol = self.heavy_mol
-              
-        center = np.array([0,0,0])        
-        total_mass = 0
-        for atom_id, coord in self.all_atom_coords(mol_type):
-            mass = rdkit_mol.GetAtomWithIdx(atom_id).GetMass()
-            total_mass += mass
-            center = np.add(center, np.multiply(mass, coord))
-
-        return np.divide(center, total_mass)
-
-    def shift(self, mol_type, shift):
-        """
-        See `shift` documentation in ``StructUnit``.
-        
-        """
-        
-        return StructUnit.shift(self, mol_type, shift)
-
-    def set_position(self, mol_type, position):
-        """
-        See `set_position` documentation in ``StructUnit``.
-        
-        """
-        return StructUnit.set_position(self, mol_type, position)
-        
     def same(self, other):
         """
         Check if the `other` instance has the same molecular structure.
@@ -2470,6 +2340,27 @@ class MacroMolecule(metaclass=CachedMacroMol):
         # same structure.
         return (self.building_blocks == other.building_blocks and 
                                     self.topology == other.topology)
+
+    def update_cache(self):
+        """
+        Updates the caching dictionary so that it contains `self`.
+        
+        When an instance of ``MacroMolecule`` is first created it is
+        cached. Using multiprocessing to perform optimizations returns
+        modified copies of the cached molecules. In order to ensure that
+        the cache points to the modified copies not to the originally
+        initialized molecule, this method must be run.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # The caching is done by the class. Access it and use its
+        # ``_update_cache()`` method.
+        cls = type(self)
+        cls._update_cache(self)
     
     def __eq__(self, other):
         return self.fitness == other.fitness
@@ -2538,13 +2429,23 @@ class Cage(MacroMolecule):
                             bb in self.building_blocks)
                             
         return (self.energy - energy_before) / self.topology.bonds_made
+
+    @classmethod
+    def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
+        bb = StructUnit3(bb_file)        
         
-    def normalized_energy(self):
+        while True:
+            lk_file = np.random.choice(os.listdir(lk_db))
+            if lk_file.endswith(".mol"):
+                break
+            
+        lk_file = os.path.join(lk_db, lk_file)
+        lk = StructUnit2(lk_file)
         
-        denominator = np.prod(list(self.topology.bb_counter.values()))
+        topology = np.random.choice(topologies)        
         
-        return self.energy / denominator
-    
+        return cls((bb, lk), topology, prist_mol_file)
+  
     @classmethod
     def init_random(cls, bb_db, lk_db, topologies, prist_mol_file):
         """
@@ -2582,21 +2483,11 @@ class Cage(MacroMolecule):
         
         return cls((bb, lk), topology, prist_mol_file)
 
-    @classmethod
-    def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
-        bb = StructUnit3(bb_file)        
+    def normalized_energy(self):
         
-        while True:
-            lk_file = np.random.choice(os.listdir(lk_db))
-            if lk_file.endswith(".mol"):
-                break
-            
-        lk_file = os.path.join(lk_db, lk_file)
-        lk = StructUnit2(lk_file)
+        denominator = np.prod(list(self.topology.bb_counter.values()))
         
-        topology = np.random.choice(topologies)        
-        
-        return cls((bb, lk), topology, prist_mol_file)
+        return self.energy / denominator
 
 
 class Polymer(MacroMolecule):
