@@ -18,7 +18,6 @@ from ..convenience_tools import (flatten, periodic_table,
                                  mol_from_mae_file, ChargedMolError,
                                  FGInfo)
 
-from ..optimization.macromodel.macromodel_opt_funcs import macromodel_opt
 from .exception import MacroMolError
 
 class CachedMacroMol(type):
@@ -2291,10 +2290,6 @@ class Cage(MacroMolecule):
     """
     
     def formation_energy(self, macromodel_path):
-        for bb in self.building_blocks:
-            macromodel_opt(bb, no_fix=True,
-                           macromodel_path=macromodel_path)
-
         energy_before = sum(self.topology.bb_counter[bb] * bb.energy for 
                             bb in self.building_blocks)
                             
