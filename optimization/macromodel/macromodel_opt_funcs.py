@@ -5,14 +5,10 @@ import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 import warnings
 import psutil
-from multiprocessing import Pool
-from functools import partial
 import re
 
-# More imports at bottom.
-
-__all__ = ['macromodel_opt', 'macromodel_md_opt', 'macromodel_cage_opt',
-           'kill_macromodel', 'optimize_folder']
+from ...classes.exception import MacroMolError
+from ...convenience_tools import MAEExtractor, FGInfo
 
 class ConversionError(Exception):
     def __init__(self, message):
@@ -416,7 +412,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
 
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not license_found(macro_mol, proc_out):
+    if not license_found(proc_out, macro_mol):
         return run_bmin(macro_mol, macromodel_path)
 
     # Make sure the .maegz file created by the optimization is present.
@@ -435,7 +431,7 @@ def kill_bmin(macro_mol, macromodel_path):
                  stderr=sp.STDOUT, universal_newlines=True)
  
     # If no license if found, keep re-running the function until it is.
-    if not license_found('', out.stdout):
+    if not license_found(out.stdout):
         return kill_bmin(macro_mol, macromodel_path)  
    
    
@@ -463,12 +459,12 @@ def run_applyhtreat(macro_mol, macromodel_path):
                  stderr=sp.STDOUT, universal_newlines=True)
 
     # If no license if found, keep re-running the function until it is.
-    if not license_found('', out.stdout):
+    if not license_found(out.stdout):
         return run_applyhtreat(macro_mol, macromodel_path)     
     
     macro_mol.update_from_mae(mae_out)    
     
-def license_found(macro_mol, output):
+def license_found(output, macro_mol=None):
     """
     Checks to see if minimization failed due to a missing license.
 
@@ -479,15 +475,14 @@ def license_found(macro_mol, output):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule or any other type
-        The macromolecule being optimized. If the .log file is not to
-        be checked, a non MacroMolecule object should be placed here
-        instead. An empty string would do nicely.
-    
     output : str
         The outout from submitting the minimization of the structure
         to the ``bmin`` program.
-        
+
+    macro_mol : MacroMolecule (default=None)
+        The macromolecule being optimized. If the .log file is not to
+        be checked, the default ``None`` should be used.
+
     Returns
     -------
     bool
@@ -498,7 +493,7 @@ def license_found(macro_mol, output):
 
     if 'Could not check out a license for mmlibs' in output:
         return False
-    if not isinstance(macro_mol, MacroMolecule):
+    if macro_mol is None:
         return True
 
     # To check if the log file mentions a missing license file open the
@@ -751,7 +746,7 @@ def structconvert(iname, oname, macromodel_path):
                               ' `structconvert` function.'))
 
     # If no license if found, keep re-running the function until it is.
-    if not license_found('', convrt_return.stdout):
+    if not license_found(convrt_return.stdout):
         return structconvert(iname, oname, macromodel_path)    
 
     # If force field failed, raise.
@@ -1097,34 +1092,4 @@ def kill_macromodel():
         sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
     if os.name == 'posix':
         sp.run(["pkill", "jservergo"])
-        sp.run(["pkill", "jserver-watcher"])
-
-def optimize_folder(path, macromodel_path):
-    
-    # First make a list holding all macromolecule objects to be 
-    # optimzied. Because the objects need to be initialized from a .mol
-    # file a StructUnit instance not a MacroMolecule instance is used.
-    # minimal = True, because it is all that is needed to run 
-    # optimziations, plus you want to avoid doing functional group
-    # substitutions.
-    names = [os.path.join(path, file_name) for file_name in 
-             os.listdir(path) if file_name.endswith(".mol")]    
-    macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
-                                                                  names]
-
-    # .mol files often get moved around. Make sure the `prist_mol_file`
-    # attribute is updated to account for this.
-    for name, macro_mol in zip(names, macro_mols):
-        macro_mol.prist_mol_file = name
-
-    md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
-        timeout=False, temp=1000, confs=1000, eq_time=100, sim_time=10000)    
-    
-    with Pool() as p:
-        p.map(md_opt, macro_mols)
-    
-    
-
-from ...classes.exception import MacroMolError       
-from ...classes.molecular import FGInfo, StructUnit, MacroMolecule
-from ...convenience_functions import MAEExtractor        
+        sp.run(["pkill", "jserver-watcher"])          

@@ -6,7 +6,7 @@ import rdkit.Chem as chem
 from scipy.spatial.distance import euclidean
 
 from ..molecular import FGInfo
-from ...convenience_functions import (centroid, vector_theta,
+from ...convenience_tools import (centroid, vector_theta,
                                       rotation_matrix_arbitrary_axis,
                                       normalize_vector)       
 

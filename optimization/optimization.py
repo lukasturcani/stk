@@ -3,7 +3,7 @@ import rdkit.Chem as chem
 import multiprocessing as mp
 from functools import partial
 
-# More imports at the bottom of script.
+from .macromodel import macromodel_opt, macromodel_cage_opt, macromodel_md_opt
 
 def optimize_all(func_data, population):
     """
@@ -220,6 +220,4 @@ def do_not_optimize(macro_mol):
     
     print('Optimizing', macro_mol.prist_mol_file)
     macro_mol.optimized = True   
-    return macro_mol
-
-from .macromodel import macromodel_opt, macromodel_cage_opt, macromodel_md_opt    
+    return macro_mol   
