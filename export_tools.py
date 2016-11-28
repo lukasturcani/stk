@@ -1,11 +1,15 @@
 import os
 import shutil
 import networkx as nx
-import subprocess as sp
 import rdkit.Chem as chem
+import rdkit.Chem.AllChem as ac
+from functools import partial
+from multiprocessing import Pool
 
-from ..classes import StructUnit, FGInfo
-from .convenience_functions import MolFileError
+from .classes import StructUnit, FGInfo
+from .convenience_tools import MolFileError
+from .optimization import *
+
 
 def fg_prune(input_folder, output_folder, fg, fg_num):
     """
@@ -55,40 +59,7 @@ def fg_prune(input_folder, output_folder, fg, fg_num):
         if len(mol.find_functional_group_atoms()) == fg_num:
             print('Moving {}.'.format(path))
             shutil.copy(path, output_folder)
-            
-def mol2_to_mol(input_folder, output_folder):
-    """
-    Converts all .mol2 in a folder to V3000 .mol files.
-    
-    Parameters
-    ----------
-    input_folder : str
-        The full path of the folder filled with .mol2 files.
-    
-    output_folder : str
-        The full path of the folder where the V3000 .mol files should be
-        placed.
-        
-    Returns
-    -------
-    None : NoneType
-    
-    """
-    
-    input_list = ['babel', '-m', '-imol2', '' , '-omol', '', '-x3']
-    for x in os.listdir(input_folder):
-        input_list[3] = os.path.join(input_folder, x)
-        input_list[5] = os.path.join(output_folder, x).replace('.mol2', '.mol')
-        sp.call(input_list)
 
-def mol2_mol(input_folder, output_folder):
-    for i, x in enumerate(os.listdir(input_folder)):
-        mol = chem.MolFromMol2File(os.path.join(input_folder, x))
-        chem.MolToMolFile(mol, os.path.join(output_folder, x), forceV3000=True)
-        if i == 100:
-            break
-        
-        
 def fg_distance_prune(folder, fg):
     """
     Deletes molecules with functional groups seperated by 1 atom.
@@ -148,6 +119,76 @@ def substurct_prune(folder, substruct):
         if mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
-            
+
+def categorize(path, output_dir):
+    try:
+        fgs = ['amine', 'aldehyde']
+        dirs = ['amines2f', 'amines3f', 'amines4f',
+                'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
+      
+        mol = StructUnit(path, minimal=True)
+        
+        for fg in fgs:
+            mol.func_grp = next((x for x in 
+                                    FGInfo.functional_group_list if 
+                                    x.name == fg), None)
+            mol.heavy_ids = []
+            mol._generate_heavy_attrs()
+            fg_n = str(len(mol.heavy_ids))
+            folder = next((x for x in dirs if fg_n in x and fg in x), None)
+            if folder is not None:
+                shutil.copy(path, os.path.join(output_dir,folder))
+
+    except:
+        print('Failed with {}.'.format(path))
+
+
+def neutralize(path, output_dir, macromodel_path):
+    try:
+        m = chem.MolFromMol2File(path)
+        if m is None:
+            new_path = path.replace('.mol2', '.mol')
+            structconvert(path, new_path, macromodel_path)
+            m = chem.MolFromMolFile(new_path, sanitize=False)
+        
+        m = chem.MolToSmiles(m)            
+        m = m.replace("[H]", "").replace("H", "").replace("()", "")
+        m = m.replace("+", "").replace("-", "")
+        mol = chem.MolFromSmarts(m)
+        mol.UpdatePropertyCache()
+        mol = chem.AddHs(mol)
+        ac.EmbedMolecule(mol)
+        name = os.path.basename(path)
+        chem.MolToMolFile(mol, os.path.join(output_dir, name),
+                          forceV3000=True)
+        return (0, None)
+    except ValueError as ex:
+        return (1,path)
+
+    except Exception as ex:
+        print('{} failed with exception {}.'.format(path, ex))
+        return (2,path)
+
+def optimize_folder(path, macromodel_path):
     
-            
+    # First make a list holding all macromolecule objects to be 
+    # optimzied. Because the objects need to be initialized from a .mol
+    # file a StructUnit instance not a MacroMolecule instance is used.
+    # minimal = True, because it is all that is needed to run 
+    # optimziations, plus you want to avoid doing functional group
+    # substitutions.
+    names = [os.path.join(path, file_name) for file_name in 
+             os.listdir(path) if file_name.endswith(".mol")]    
+    macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
+                                                                  names]
+
+    # .mol files often get moved around. Make sure the `prist_mol_file`
+    # attribute is updated to account for this.
+    for name, macro_mol in zip(names, macro_mols):
+        macro_mol.prist_mol_file = name
+
+    md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
+        timeout=False, temp=1000, confs=1000, eq_time=100, sim_time=10000)    
+    
+    with Pool() as p:
+        p.map(md_opt, macro_mols)
