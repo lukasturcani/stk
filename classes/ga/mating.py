@@ -1,7 +1,10 @@
 import os
 from collections import Counter
 
-# More imports at the bottom of module.
+from ..population import Population
+from ..molecular import Cage
+from ..exception import MacroMolError
+from ...convenience_tools import plot_counter
 
 class Mating:
     """
@@ -212,9 +215,3 @@ class Mating:
             offspring_pop.add_members((offspring1, offspring2))
 
         return offspring_pop
-        
-        
-from ..population import Population
-from ..molecular import Cage
-from ..exception import MacroMolError
-from ...convenience_functions import plot_counter
