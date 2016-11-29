@@ -151,16 +151,13 @@ def neutralize(path, output_dir, macromodel_path):
             structconvert(path, new_path, macromodel_path)
             m = chem.MolFromMolFile(new_path, sanitize=False)
         
-        m = chem.MolToSmiles(m)            
-        m = m.replace("[H]", "").replace("H", "").replace("()", "")
-        m = m.replace("+", "").replace("-", "")
-        mol = chem.MolFromSmarts(m)
-        mol.UpdatePropertyCache()
-        mol = chem.AddHs(mol)
-        ac.EmbedMolecule(mol)
-        name = os.path.basename(path)
-        chem.MolToMolFile(mol, os.path.join(output_dir, name),
-                          forceV3000=True)
+        m = chem.RemoveHs(m)         
+        name = os.path.basename(path).replace(".mol2", ".mol")
+        b = chem.MolToMolBlock(m, forceV3000=True, kekulize=False)
+        b = b.replace("CHG=-1", "").replace("CHG=1", "")
+        with open(os.path.join(output_dir, name), 'w') as mf:
+            mf.write(b)
+        
         return (0, None)
     except ValueError as ex:
         return (1,path)
