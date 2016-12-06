@@ -156,7 +156,7 @@ class CageTopology(Topology):
         
 class VertexOnlyCageTopology(CageTopology): 
     
-    def __init__(self, macro_mol, random_placement=False):
+    def __init__(self, macro_mol, random_placement=True):
         Topology.__init__(self, macro_mol)
         self.random_placement = random_placement
         self.connect()

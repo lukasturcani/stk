@@ -434,8 +434,8 @@ def cage(macro_mol, target_cavity, macromodel_path,
     macro_mol.unscaled_fitness_vars = unscaled
     return unscaled
     
-def cage_target(cage, target_mol_file, target_size, *, macromodel_path, 
-                rotate=False, min_window_size=0):
+def cage_target(cage, target_mol_file, macromodel_path, 
+                rotations=0):
     """
     Calculates the fitness of a cage / target complex.
     
@@ -447,7 +447,7 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     rotation takes place.
     
     To see which rotations take place see the documentation of the
-    `generate_complexes` method.
+    ``_generate_complexes()`` function.
     
     Parameters
     ----------
@@ -458,22 +458,12 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
         The full path of the .mol file hodling the target molecule
         placed inside the cage.
         
-    target_size : float
-        The minimum size which the cage cavity needs to be in order to
-        encapsulate the target.
-        
-    min_window_size : float (default = 0)
-        The smallest windows size allowing the target to enter the cage.
-        Default is 0, which implies that there is no minimum. This can
-        occur when the target acts a template for cage assembly.
-
-    rotate : bool (default = False)
-        When ``True`` the target molecule will be rotated inside the
-        cavity of the cage. When ``False`` only the orientation
-        within the .mol file is used.
-        
-    macromodel_path : str (keyword-only)
+    macromodel_path : str
         The Schrodinger directory path.
+
+    rotations : int (default = 0)
+        The number of times the target should be randomly rotated within 
+        the cage cavity in order to find the most stable conformation.
         
     Returns
     -------
@@ -494,9 +484,6 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     # re-initialize.
     target = StructUnit(target_mol_file, minimal=True)
 
-    optimization.macromodel_opt(target, no_fix=True, 
-                                macromodel_path=macromodel_path)
-
     # This function creates a new molecule holding both the target
     # and the cage centered at the origin. It then calculates the 
     # energy of this complex and compares it to the energies of the
@@ -505,33 +492,23 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
     
     # Create rdkit instances of the target in the cage for each
     # rotation.        
-    rdkit_complexes = list(_generate_complexes(cage, target, rotate))
+    rdkit_complexes = _generate_complexes(cage, target, rotations+1)
     
-    # Place the rdkit complexes into a new .mol file and use that 
-    # to make a new ``StructUnit`` instance of the complex.
-    # ``StructUnit`` is the class of choice here because it can be
-    # initialized from a .mol file. ``MacroMolecule`` requires
-    # things like topology and building blocks for initialization.
+    # Optimize the strcuture of the cage/target complexes.
     macromol_complexes = []        
     for i, complex_ in enumerate(rdkit_complexes):
-        # First the data is loaded into a ``MacroMolecule`` instance
-        # as this is the class which is able to write rdkit
-        # instances to .mol files. Note that this ``MacroMolecule``
-        # instance is just a dummy and only holds the bare minimum
-        # information required to write the complex to a .mol file.
+        # In order to use the optimization functions, first the data is 
+        # loaded into a ``MacroMolecule`` instance and its .mol file is 
+        # written to the disk.
         mm_complex = MacroMolecule.__new__(MacroMolecule)
         mm_complex.prist_mol = complex_
         mm_complex.prist_mol_file = cage.prist_mol_file.replace(
                             '.mol', '_COMPLEX_{0}.mol'.format(i))
         mm_complex.write_mol_file('prist')
         
-        # Once the .mol file is written load it into a 
-        # ``StructUnit`` instance.
-        macromol_complex = StructUnit(mm_complex.prist_mol_file, 
-                                      minimal=True)
-        optimization.macromodel_opt(macromol_complex, no_fix=True,
+        optimization.macromodel_opt(mm_complex, no_fix=True,
                        macromodel_path=macromodel_path)
-        macromol_complexes.append(macromol_complex)
+        macromol_complexes.append(mm_complex)
     
     # Calculate the energy of the complex and compare to the
     # individual energies. If more than complex was made, use the
@@ -547,9 +524,12 @@ def cage_target(cage, target_mol_file, target_size, *, macromodel_path,
         
     return raw_fitness
    
-def _generate_complexes(cage, target, rotate):
+def _generate_complexes(cage, target, number=1):
     """
     Yields rdkit instances of cage / target complexes.
+    
+    If multiple complexes are returned, they will be different via a
+    random rotation accross the x, y and z axes.
     
     Parameters
     ----------
@@ -559,10 +539,8 @@ def _generate_complexes(cage, target, rotate):
     target : StructUnit
         The target used to form the complex.
         
-    rotate : bool
-        When ``True`` the target molecule will undergo rotations
-        within the cage cavity and a complex will be yielded for 
-        each configuration.
+    number : int (default = 1)
+        The number of complexes to be returned.
         
     Yields
     ------
@@ -570,12 +548,6 @@ def _generate_complexes(cage, target, rotate):
         An rdkit instance holding the cage / target complex. 
     
     """
-    
-    # Define the rotations which are to be used on the target.
-    if rotate:        
-        rotations = [0, np.pi/2, np.pi, 3*np.pi/2]
-    else:
-        rotations = [0]
 
     # First place both the target and cage at the origin.
     cage.set_position('prist', [0,0,0])
@@ -585,9 +557,13 @@ def _generate_complexes(cage, target, rotate):
     og_pos_mat = target.position_matrix('prist')
     
     # Carry out every rotation and yield a complex for each case.
-    for rot1, rot2, rot3 in it.combinations_with_replacement(
-                                                    rotations, 3):
+    for i in range(number):
         rot_target = copy.deepcopy(target)
+        
+        rot1 = np.random.rand() * 2*np.pi
+        rot2 = np.random.rand() * 2*np.pi
+        rot3 = np.random.rand() * 2*np.pi
+        
         rot_mat1 = rotation_matrix_arbitrary_axis(rot1, [1,0,0])
         rot_mat2 = rotation_matrix_arbitrary_axis(rot2, [0,1,0])
         rot_mat3 = rotation_matrix_arbitrary_axis(rot3, [0,0,1])
