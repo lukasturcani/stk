@@ -227,13 +227,27 @@ def kabsch(coords1, coords2):
     if int(np.linalg.det(v)) < 0:
         v[:,2] = -v[:,2]
 
-    
     return np.dot(v, u)
 
 def rotation_matrix_arbitrary_axis(angle, axis):
-    """ Applies the rotation to a molecule by using the quaternion method. 
-    The coordinates of each atom are rotated by a specific Angle is while 
-    keeping the axis fixed. It return the rotated coordinates for the molecule.
+    """ 
+    
+    Returns a rotation matrix of `angle` radians about `axis`.
+    
+    Parameters
+    ----------
+    angle : int or float
+        The size of the rotation in radians.
+        
+    axis : numpy.array
+        A 3 element aray which represents a vector. The vector is the
+        axis about which the rotation is carried out.
+        
+    Returns
+    -------
+    numpy.array
+        A 3x3 array representing a rotation matrix.
+    
     """
     # Calculation of the rotation matrix
     axis = normalize_vector(axis)    
