@@ -47,6 +47,8 @@ Finally, on line 11 ``param1" and ``val1" correspond to ``use\_rank" and ``True"
 
 In the case of selection functions the first two arguments (``cls" and ``population") are dealt with automatically by MMEA. If the user wants to use one of the selection functions they have to provide values to any of the remaining arguments in the form ``param1=val1". The order in which they are given in the input file does not matter. If the user wants to change the default values of any of the function's keyword arguments, they may do so using the same notation on the same line. Keyword arguments otherwise do not have to be provided in the input script and will be default initialized to whatever is defined within the source code of MMEA. All of this holds true for other functions defined in the input file, not just selection functions. How a user can easily view what functions and parameters are available, as well as what they mean, is addressed in section \ref{input_files_valid_parameters}.
 
+All keywords should be defined in the input file once. The exception to this is ``mutation\_func".
+
 There is a second kind of non-comment line in the input file of MMEA. These lines have the form
 \begin{verbatim}
 keyword=val
@@ -57,40 +59,53 @@ As you can see, these are much simpler. They define basic constants relevant to 
 \label{input_files_valid_parameters}
 In order to prevent the need to continuously update this documentation when a new function is added to MMEA, only valid keywords are described here. However, this does not mean a user has to go into the source code to find out what functions they have at their disposal. This section describes how MMEA can be made to output valid function names and parameters for each keyword.
 \subsubsection{List and explanation of valid keywords.}
-\textbf{init\_func} - function defintion format - The function used to create the initial population.
+
+Here a list of valid keywords, the type of line formatting the keyword requires and which arguments do not need to be provided to the functions. Recall in section \ref{input_files_format_and_structure} the selection function did not require the ``population" argument to be provided explictily in the input file. Other functions, such as crossover/mating functions do not require other parameters to be provided. The format here is:
 \\
 \\
-\textbf{generational\_select\_func} - function defintion format - The function used to select members of the next generation.
+\textbf{keyword} - \textit{line format} - excluded\_param1, excluded\_param2 - Explantion of keyword.
 \\
 \\
-\textbf{parent\_select\_func} - function defintion format - The function used to select parents for crossover.
+The keywords are:
 \\
 \\
-\textbf{mutant\_select\_func} - function defintion format - The function used to select individuals for mutation.
+\textbf{init\_func} - \textit{function defintion format} - ga\_tools - The function used to create the initial population.
 \\
 \\
-\textbf{mating\_func} - function defintion format - The function which carries out the mating/crossover operation.
+\textbf{generational\_select\_func} - \textit{function defintion format} - population - The function used to select members of the next generation.
 \\
 \\
-\textbf{mutation\_func} - function defintion format - The function which carries out the mutation operation.
+\textbf{parent\_select\_func} - \textit{function defintion format} - population - The function used to select parents for crossover.
 \\
 \\
-\textbf{opt\_func} - function defintion format - The function which optimizes the geometry of the molecules.
+\textbf{mutant\_select\_func} - \textit{function defintion format} - population - The function used to select individuals for mutation.
 \\
 \\
-\textbf{fitness\_func} - function defintion format - The function which calculates fitness.
+\textbf{mating\_func} - \textit{function defintion format} - marco\_mol1, macro\_mol2 - The function which carries out the mating/crossover operation.
 \\
 \\
-\textbf{num\_generations} - constant defintion format - The number of generations which MMEA will create.
+\textbf{mutation\_func} - \textit{function defintion format} - macro\_mol - The function which carries out the mutation operation.
 \\
 \\
-\textbf{num\_mutations} - constant defintion format - The number of mutations MMEA will carry out each generation.
+\textbf{opt\_func} - \textit{function defintion format} - macro\_mol - The function which optimizes the geometry of the molecules.
 \\
 \\
-\textbf{num\_matings} - constant defintion format - The number of mating/crossover operations MMEA will carry out each generation.
+\textbf{fitness\_func} - \textit{function defintion format} - macro\_mol - The function which calculates fitness.
 \\
 \\
-\textbf{pop\_size} - constant defintion format - The size of the population.
+\textbf{num\_generations} - \textit{constant defintion format} - The number of generations which MMEA will create.
+\\
+\\
+\textbf{num\_mutations} - \textit{constant defintion format} - The number of mutations MMEA will carry out each generation.
+\\
+\\
+\textbf{num\_matings} - \textit{constant defintion format} - The number of mating/crossover operations MMEA will carry out each generation.
+\\
+\\
+\textbf{pop\_size} - \textit{constant defintion format} - The size of the population.
+\\
+\\
+\textbf{mutation\_weights} - \textit{constant definition format} - 
 
 \subsubsection{Finding available functions and their arguments.}
 
