@@ -5,7 +5,7 @@ from functools import partial
 
 from .macromodel import macromodel_opt, macromodel_cage_opt, macromodel_md_opt
 
-def optimize_all(func_data, population):
+def _optimize_all(func_data, population):
     """
     Apply optimization function to all population members in parallel.
 
@@ -80,7 +80,7 @@ def optimize_all(func_data, population):
             member.update_cache()
         return optimized
     
-def optimize_all_serial(func_data, population):
+def _optimize_all_serial(func_data, population):
     """
     Apply optimization function to all population members, serially.
 
