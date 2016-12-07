@@ -14,13 +14,13 @@
 \tableofcontents
 \newpage
 \section{Introduction}
-MaMEA (MacroMolecular Evolutionary Algorithm) is a genetic algorithm (GA) for chemistry. It aims to be as general as possible, being suitable for use with any class of molecules. While it does not support all types of molecules out of the box it is designed to be easily extended. This is made easier by being written in Python. For notes on how to extend MaMEA to a new class of molecules or add GA operations, see the developer's guide.
+MMEA (MacroMolecular Evolutionary Algorithm) is a genetic algorithm (GA) for chemistry. It aims to be as general as possible, being suitable for use with any class of molecules. While it does not support all types of molecules out of the box, it is designed to be easily extended. This is made easier by being written in Python. For notes on how to extend MMEA to a new class of molecules or add GA operations, see the developer's guide.
 
 \section{Installing MaMEA}
 
 \section{Input Files}
 
-To run MaMEA you need to submit an input file. These contain all the details required to start a GA calculation. Among other things, this may include things like which the fitness function you want to use, the number of generations MaMEA should make and how big the population should be.
+To run MaMEA you need to submit an input file. These contain all the details required to start a GA calculation. Among other things, this may include things like which fitness function you want to use, the number of generations MMEA should make and how big the population should be.
 
 Using an example, the format and sturcture of input files is explained in section \ref{input_files_format_and_structure}. A guide to finding out what GA operations and tools are available is in section \ref{input_files_valid_parameters}.
 
@@ -29,7 +29,7 @@ Using an example, the format and sturcture of input files is explained in sectio
 
 An example input file can be downloaded from \url{https://sabercathost.com/1aoC/mamea_input.in}.
 
-Any lines consisting of only whitespace or beginning with ``\#" are ignored. This is used to create comments in the input file and allows us to divide it into sections. Notice that there are two kinds of non-comment line in the input file. The first kind has the form
+Any lines consisting of only whitespace or beginning with ``\#" are ignored. This is used to create comments in the input file and allows division of it into sections. Notice that there are two kinds of non-comment line in the input file. The first kind has the form
 \begin{verbatim}
 keyword; function_name; param1=val1; param2=val2; param3=val3
 \end{verbatim}
@@ -39,28 +39,62 @@ generational_select_func; stochastic_sampling; use_rank=True
 \end{verbatim}
 This means that in line 11 the keyword is ``generational\_select\_func", the function name is ``stochastic\_sampling", parameter 1's name is ``use\_rank" and its value is ``True". As you can see, in this line there is only 1 parameter name-value pair.
 
-Lines with this format define functions used by MaMEA. These functions will correspond to the various GA operations, such as crossover, mating and selection or to things like the fitness function or optimization function (more on this later). The words on these lines are separated from the adjacent ones by a semicolon. Notice that the last word on the line is not followed by a semicolon. The keyword defines which GA operation the line describes. For example, in line 11 the keyword ``generational\_select\_func" signifies that the line describes which function is to be used for selection members of the next generation. In line 17 the keyword ``parent\_select\_func" signifies that the line defines the function to be used for selecting parents for crossover. A list of valid keywords is described in section \ref{input_files_valid_parameters}.
+Lines with this format define functions used by MMEA. It is called the "function definition format". These functions will correspond to the various GA operations, such as crossover, mating and selection or to things like the fitness function or optimization function (more on this later). The words on these lines are separated from the adjacent ones by a semicolon. Notice that the last word on the line is not followed by a semicolon. The keyword defines which GA operation the line describes. For example, in line 11 the keyword ``generational\_select\_func" signifies that the line describes which function is to be used for selecting members of the next generation. In line 17 the keyword ``parent\_select\_func" signifies that the line defines the function to be used for selecting parents for crossover. A list of valid keywords is described in section \ref{input_files_valid_parameters}.
 
-The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MaMEA. For example, if the keyword is ``generational\_select\_func" then ``stochastic\_sampling" or ``roulette" are both valid values for ``function\_name", because the module ``selection.py" within MaMEA defines functions with these names. Indeed, any function defined within this module can be used as the selection function.
+The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MMEA. For example, if the keyword is ``generational\_select\_func" then ``stochastic\_sampling" or ``roulette" are both valid values for ``function\_name", because the module ``selection.py" within MMEA defines functions with these names. Indeed, any function defined within this module can be used as the selection function.
 
 Finally, on line 11 ``param1" and ``val1" correspond to ``use\_rank" and ``True", respectively. As mentioned before ``stochastic\_sampling" is the name of a function defined within the ``selection.py" module. As is usual for Python functions, it takes arguments. Looking at ``stochastic\_sampling()" within ``selection.py" it can be seen that its arguments are ``cls" and ``population" and its keyword arguments are ``elitism" (defaults to ``False"), ``truncation" (defaults to ``False"), ``duplicates" (defaults to ``False") and ``use\_rank" (defaults to ``False").
 
-In the case of selection functions the first two arguments (``cls" and ``population") are dealt with automatically by MaMEA. If the user wants to use one of the selection functions they have to provide values to any of the remaining arguments in the form ``param1=val1". The order in which they are given in the input file does not matter. If the user wants to change the default values of any of the function's keyword arguments, they may do so using the same notation on the same line. Keyword arguments otherwise do not have to be provided in the input script and will be default initialized to whatever is defined within the source code of MaMEA. All of this holds true for other functions defined in the input file, not just selection functions. How a user can easily view what functions and parameters are available, as well as what they mean, is addresses in section \ref{input_files_valid_parameters}.
+In the case of selection functions the first two arguments (``cls" and ``population") are dealt with automatically by MMEA. If the user wants to use one of the selection functions they have to provide values to any of the remaining arguments in the form ``param1=val1". The order in which they are given in the input file does not matter. If the user wants to change the default values of any of the function's keyword arguments, they may do so using the same notation on the same line. Keyword arguments otherwise do not have to be provided in the input script and will be default initialized to whatever is defined within the source code of MMEA. All of this holds true for other functions defined in the input file, not just selection functions. How a user can easily view what functions and parameters are available, as well as what they mean, is addressed in section \ref{input_files_valid_parameters}.
 
-There is a second kind of non-comment line in the input file of MaMEA. These lines have the form
+There is a second kind of non-comment line in the input file of MMEA. These lines have the form
 \begin{verbatim}
 keyword=val
 \end{verbatim}
-As you can see these, are much simpler. They define basic constants relevant to the GA. This includes things like population size, number of matings carried out during each generation and so on. It is merely the keyword, a ``=" and the value. No spaces. Valid keywords for these lines are discussed in section \ref{input_files_valid_parameters}.
+As you can see, these are much simpler. They define basic constants relevant to the GA. As a result, this is called the "constant definition format". This includes things like population size, number of matings carried out during each generation and so on. It is merely the keyword, a ``=" and the value. No spaces. Valid keywords for these lines are discussed in section \ref{input_files_valid_parameters}.
 
 \subsection{Valid input values.}
 \label{input_files_valid_parameters}
-In order to prevent the need to continuously update this documentation when a new function is added to MaMEA, only valid keywords are described here. However, this does not mean a user has to go into the source code to find out what functions they have at their disposal. This section describes how MaMEA can be made to output valid function names and parameters for each keyword.
+In order to prevent the need to continuously update this documentation when a new function is added to MMEA, only valid keywords are described here. However, this does not mean a user has to go into the source code to find out what functions they have at their disposal. This section describes how MMEA can be made to output valid function names and parameters for each keyword.
 \subsubsection{List and explanation of valid keywords.}
+\textbf{init\_func} - function defintion format - The function used to create the initial population.
+\\
+\\
+\textbf{generational\_select\_func} - function defintion format - The function used to select members of the next generation.
+\\
+\\
+\textbf{parent\_select\_func} - function defintion format - The function used to select parents for crossover.
+\\
+\\
+\textbf{mutant\_select\_func} - function defintion format - The function used to select individuals for mutation.
+\\
+\\
+\textbf{mating\_func} - function defintion format - The function which carries out the mating/crossover operation.
+\\
+\\
+\textbf{mutation\_func} - function defintion format - The function which carries out the mutation operation.
+\\
+\\
+\textbf{opt\_func} - function defintion format - The function which optimizes the geometry of the molecules.
+\\
+\\
+\textbf{fitness\_func} - function defintion format - The function which calculates fitness.
+\\
+\\
+\textbf{num\_generations} - constant defintion format - The number of generations which MMEA will create.
+\\
+\\
+\textbf{num\_mutations} - constant defintion format - The number of mutations MMEA will carry out each generation.
+\\
+\\
+\textbf{num\_matings} - constant defintion format - The number of mating/crossover operations MMEA will carry out each generation.
+\\
+\\
+\textbf{pop\_size} - constant defintion format - The size of the population.
 
 \subsubsection{Finding available functions and their arguments.}
 
-\section{Running MaMEA}
+\section{Running MMEA}
 
 \subsection{From the command line.}
 
