@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2016.11.7)  7 DEC 2016 12:06
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) (preloaded format=pdflatex 2016.11.7)  7 DEC 2016 12:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -326,8 +326,8 @@ Package rerunfilecheck Warning: File `users_guide.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `users_guide.out':
-(rerunfilecheck)             Before: 58AB69814AFEB18F0F16B0FF2FBA5B5E;702
-(rerunfilecheck)             After:  DEA0F23C4A39B5DBE50D603CA40ECC3D;701.
+(rerunfilecheck)             Before: DEA0F23C4A39B5DBE50D603CA40ECC3D;701
+(rerunfilecheck)             After:  9C118DC6842B4EF96EA5E90E75205C6C;700.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 106.
  ) 
 Here is how much of TeX's memory you used:
@@ -344,7 +344,7 @@ e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on users_guide.pdf (6 pages, 96342 bytes).
+Output written on users_guide.pdf (6 pages, 96351 bytes).
 PDF statistics:
  124 PDF objects out of 1000 (max. 8388607)
  108 compressed objects within 2 object streams
