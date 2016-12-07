@@ -150,7 +150,32 @@ class Selection:
     """
 
     @staticmethod
-    def elites(population, n):
+    def _elites(population, n):
+        """
+        Returns the `n` fittest members of `population`.
+        
+        This is used internally by selection functions when applying 
+        elitism. This is not a selection function in and of itself. As
+        a result, this method is private. Use ``fittest()`` if you want
+        a selection function which yields the fittest individuals first.
+        
+        Parameters
+        ----------
+        population : Population
+            The population from which the fittest members are selected.
+        
+        n : int
+            The number of members to be returned.
+        
+        Returns
+        -------
+        list
+            A list holding the `n` fittest members of `population`.
+        
+        
+        
+        """
+        
         pop = sorted(population, 
                      key=attrgetter('fitness'), reverse=True)[:n]
         return pop
@@ -527,7 +552,7 @@ class Selection:
     """
 
     @staticmethod
-    def all_combinations(population):
+    def mating_all_combinations(population):
         """
         Yields every possible pairing of individuals from a population.
         
@@ -553,7 +578,7 @@ class Selection:
             yield mol1, mol2 
     
     @classmethod
-    def all_combinations_n_fittest(cls, population, n):
+    def mating_all_combinations_n_fittest(cls, population, n):
         """
         Yields all pairings of the `n` fittest individuals.
 
@@ -693,22 +718,4 @@ class Selection:
             ind1, ind2 = np.random.choice(mating_pop, 
                                           size=2, replace=False)
             yield ind1, ind2
-        
-    """
-    The following methods are inteded for convenience while 
-    debugging or testing and should not be used during typical 
-    execution of the program.
     
-    """
-
-    @classmethod
-    def default(cls):
-        func_data = FunctionData('fittest', size=5)
-        return cls(*[func_data for x in range(0,3)])
-
-    
-    
-
-
-       
-from ..population import Population
