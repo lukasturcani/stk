@@ -9,7 +9,7 @@ from .classes.molecular import MacroMolecule, StructUnit
 from . import optimization
 from .convenience_tools import rotation_matrix_arbitrary_axis
 
-def calc_fitness(func_data, population):
+def _calc_fitness(func_data, population):
     """
     Calculates the fitness values of all members of a population.
     
@@ -172,7 +172,7 @@ def random_fitness(macro_mol):
 
     return np.random.randint(1,10)
 
-def param_labels(*labels):
+def _param_labels(*labels):
     """
     Adds `param_labels` attribute to a fitness function.
     
@@ -215,7 +215,7 @@ def param_labels(*labels):
     return add_labels
 
 # Calls the decorator with the specific labels
-@param_labels('Cavity Difference ','Window Difference ',
+@_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Negative Energy per Bond ', 
                 'Positive Energy per Bond ')
 def cage(macro_mol, target_cavity, macromodel_path, 
