@@ -8,4 +8,4 @@
 \contentsline {section}{\numberline {4}Running MMEA}{5}{section.4}
 \contentsline {subsection}{\numberline {4.1}From the command line.}{5}{subsection.4.1}
 \contentsline {section}{\numberline {5}Output}{5}{section.5}
-\contentsline {section}{\numberline {6}MaMEA as a Library}{5}{section.6}
+\contentsline {section}{\numberline {6}MMEA as a Library}{5}{section.6}
