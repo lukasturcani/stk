@@ -1,5 +1,13 @@
+from types import ModuleType
+
 from . import FunctionData
 from ..topology import *
+from ..population import Population
+from .selection import Selection
+from .mating import Mating
+from .mutation import Mutation
+from ...optimization import optimization
+from ... import fitness
 
 class GAInput:
     """
@@ -246,3 +254,87 @@ class GAInput:
         
     def __str__(self):
         return repr(self)
+        
+class InputHelp:
+    """
+    A class which creates output when ``-h`` option is used as input.
+    
+    The ``-h`` option is used in the following way:
+        
+        python -m MMEA -h keyword
+        
+    Here ``keyword`` corresponds to one of the attributes of the 
+    ``GAInput`` class. The output when this command is used will be 
+    a list of all functions which can be used with that keyword and 
+    the corresponding documentation.
+    
+    Class attributes
+    ----------------
+    modules : dict
+        Maps the name of the keyword to the object which holds the
+        functions or methods that are to be used with that keyword.
+    
+    """
+    
+    modules = {
+               'init_func' : iter(func for name, func in 
+                                  Population.__dict__.items() if 
+                                  name.startswith('init')),
+               
+               'generational_select_func' : iter(
+                                 func for name, func in 
+                                 Selection.__dict__.items() if 
+                                 not name.startswith('mating') and
+                                 not name.startswith('_')),
+
+               'parent_select_func' : iter(
+                                 func for name, func in 
+                                 Selection.__dict__.items() if 
+                                 name.startswith('mating')),
+                                           
+               'mutant_select_func' : iter(
+                                 func for name, func in 
+                                 Selection.__dict__.items() if 
+                                 not name.startswith('mating') and
+                                 not name.startswith('_')),
+                                           
+               'mating_func' : iter(func for name, func in 
+                                    Mating.__dict__.items() if 
+                                    not name.startswith('_')),
+               
+               'mutation_func' : iter(func for name, func in 
+                                    Mutation.__dict__.items() if 
+                                    not name.startswith('_')),
+                                      
+               'opt_func' : iter(func for name, func in 
+                                 optimization.__dict__.items() if
+                                 not name.startswith('_') and 
+                                 not isinstance(func, ModuleType) and
+                                 'optimization' in func.__module__),
+                                 
+               'fitness_func' : iter(func for name, func in 
+                                 fitness.__dict__.items() if
+                                 not name.startswith('_') and 
+                                 not isinstance(func, ModuleType) and 
+                                 'fitness' in func.__module__)
+               }
+        
+    
+    def __init__(self, keyword):
+        print('')
+        for func in self.modules[keyword]:
+            if hasattr(func, '__func__'):
+                func = func.__func__
+                
+            print(func.__name__)
+            print('-'*len(func.__name__))
+            print(func.__doc__)
+    
+        
+    
+    
+    
+    
+    
+    
+        

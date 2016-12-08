@@ -142,7 +142,7 @@ class Mating:
         
         This operation is basically:
         
-            > bb1-lk1 + bb2-lk2 --> bb1-lk2 + bb2-lk1,
+            bb1-lk1 + bb2-lk2 --> bb1-lk2 + bb2-lk1,
             
         where bb-lk represents a building-block* - linker combination
         of a cage.
