@@ -8,8 +8,8 @@ from .molecular import MacroMolecule, Cage
 from .ga import GATools
 from .plotter import Plotter
 from ..convenience_tools import dedupe, plot_counter
-from ..optimization.optimization import optimize_all, optimize_all_serial
-from ..fitness import calc_fitness
+from ..optimization.optimization import _optimize_all, _optimize_all_serial
+from ..fitness import _calc_fitness
 
 class Population:
     """
@@ -187,7 +187,35 @@ class Population:
     @classmethod
     def init_fixed_bb_cages(cls, bb_file, lk_db,
                             topologies, size, ga_tools):
+        """
+        Creates a population of random cages sharing a building-block*.
+        
+        The population created consists of cages where the linkers are
+        randomly selected from the database `lk_db`. The building-block*
+        of all cages corresponds to molecule in the file `bb_file`.
+        
+        Parameters
+        ----------
+        bb_file : str
+            The full path of the molecular structure file holding 
+            building-block* used by all cages.
+            
+        lk_db : str
+            The full path to the directory which holds the database of 
+            linker molecules.
+            
+        topologies : iterable of ``Topology`` child classes.
+            An iterable holding topologies which should be randomly
+            selected for cage initialization.
 
+        size : int
+            The size of the population.
+
+        ga_tools : GATools
+            The GATools instance to be used by created population.        
+        
+        """
+        
         cage_gen = iter(Cage.init_fixed_bb(bb_file, lk_db, topologies,
                     os.path.join(os.getcwd(),"init_{}.mol".format(x)))
                         for x in range(size))
@@ -605,10 +633,10 @@ class Population:
 
         """
 
-        return optimize_all(self.ga_tools.optimization, self)
+        return _optimize_all(self.ga_tools.optimization, self)
 
     def calculate_member_fitness(self):
-        calc_fitness(self.ga_tools.fitness, self)
+        _calc_fitness(self.ga_tools.fitness, self)
 
     def mean(self, attr_name, delegate=False):
         """
@@ -918,6 +946,15 @@ class Population:
 
     @classmethod
     def init_empty(cls):
+        """
+        Initializes a population of empty cages.
+        
+        Empty cages means that they do not have their attributes
+        initialized. This should only be used during debugging, in cases 
+        when  building cages is not needed.
+        
+        """
+        
         pops = []
 
         for x in range(0,8):
