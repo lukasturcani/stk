@@ -14,7 +14,7 @@ from ..molecular import Cage
 from ..exception import MacroMolError
 from ...convenience_tools import plot_counter
 
-class Crossover:
+class Mating:
     """
     Carries out mating operations on the population.
     

@@ -9,6 +9,7 @@ import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
 import pickle
+import subprocess as sp
 
 from ..convenience_tools import (flatten, periodic_table, 
                                  normalize_vector, rotation_matrix,
@@ -132,7 +133,8 @@ class Energy:
         self.molecule = molecule
         self.values = {}
         
-    def formation_energy(self, key, building_blocks, products):
+    def formation(self, key, building_blocks, 
+                  products, force_e_calc=False):
         """
         Calculates the formation energy.
         
@@ -157,6 +159,13 @@ class Energy:
             This tuple holds the molecules produced in addition to 
             `self.molecule`, when  a single `self.molecule` is made. The
             ``int`` represents the number made per `self.molecule`.
+
+        force_e_calc : bool (default = False)
+            If the this is ``True`` then all building blocks, products
+            and `self.molecule` will have their energies recalculated.
+            Even if the energy values have already been found if the 
+            chosen forcefield/method. If ``False`` the energy is only
+            calculated if the value has not already been foud.
         
         Modifies
         --------
@@ -173,8 +182,38 @@ class Energy:
         
         """
         
-        func_name, *params = key 
+        func_name, *params = key
+        
+        # Recalculate energies if requested.
+        if force_e_calc:
+            for _, mol in itertools.chain(building_blocks, products):
+                getattr(mol.energy, func_name)(*params)
+        
+            getattr(self, func_name)(*params)
 
+        # Calculate the energy of building blocks and products using the
+        # chosen force field, if it has not been found already.
+        e_reactants = 0
+        for n, mol in building_blocks:
+            if (func_name, params[0]) not in mol.energy.values.keys():
+                getattr(mol.energy, func_name)(*params)
+            
+            e_reactants += n * mol.energy.values[(func_name, params[0])]
+        
+        e_products = (self.values[(func_name, params[0])] if 
+                    (func_name, params[0]) in self.values.keys() else
+                    getattr(self, func_name)(*params))
+
+        for n, mol in products:
+            if (func_name, params[0]) not in mol.energy.values.keys():
+                getattr(mol.energy, func_name)(*params)
+            
+            e_products += n * mol.energy.values[(func_name, params[0])]
+        
+        eng = e_reactants - e_products
+        self.values[('formation', func_name, params[0])] = eng         
+        return eng
+                            
                 
 
     def rdkit(self, forcefield):
@@ -204,7 +243,9 @@ class Energy:
         if forcefield == 'uff':
             ff = ac.UFFGetMoleculeForceField(self.molecule.prist_mol)
         if forcefield == 'mmff':
-            ff = ac.MMFFGetMoleculeForceField(self.molecule.prist_mol)
+            chem.GetSSSR(self.molecule.prist_mol)      
+            ff = ac.MMFFGetMoleculeForceField(self.molecule.prist_mol,
+                  ac.MMFFGetMoleculeProperties(self.molecule.prist_mol))
 
         eng = ff.CalcEnergy()        
         self.values[('rdkit', forcefield)] = eng
@@ -243,8 +284,53 @@ class Energy:
         
         """
         
-        
+        file_root, ext = os.path.splitext(self.molecule.prist_mol_file)
 
+        # Create a .mae file of the molecule if it does not exist
+        # already.
+        if ext != '.mae':
+            convrt_app = os.path.join(macromodel_path, 'utilities', 
+                                                        'structconvert')
+            convrt_cmd = [convrt_app, 
+                         self.molecule.prist_mol_file, file_root+'.mae']
+            sp.call(convrt_cmd)
+
+        # Create an input file and run it.        
+        input_script = (
+        "{0}.mae\n"
+        "{0}-out.maegz\n"
+        " MMOD       0      1      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " FFLD{1:8}      1      0      0     1.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " BGIN       0      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " READ      -1      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " ELST      -1      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " WRIT       0      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " END       0      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n\n"
+        ).format(file_root, forcefield)
+        
+        with open(file_root+'.com', 'w') as f:
+            f.write(input_script)
+        
+        cmd = [os.path.join(macromodel_path,'bmin'), 
+               file_root, "-WAIT", "-LOCAL"]
+        sp.call(cmd)
+        
+        # Read the .log file and return the energy.
+        with open(file_root+'.log', 'r') as f:
+            for line in f:
+                if "                   Total Energy =" in line:
+                    eng = float(line.split()[-2].replace("=", ""))
+    
+        self.values[('macromodel', forcefield)] = eng
+        return eng
+        
 class Molecule:
     """
     The most basic class representing molecules.
@@ -588,41 +674,6 @@ class Molecule:
         
         with open(file_name, 'wb') as dump_file:    
             pickle.dump(self, dump_file)     
-
-    @LazyAttr
-    def energy(self):
-        """
-        Returns the total energy the molecule as found by macromodel.
-        
-        This lazy attribute reads the log file generated by a macromodel
-        optimization and sets the energy within as the value of the
-        `energy` attribute.
-        
-        Modifies
-        --------
-        self.energy : float
-            Creates this attribute.
-            
-        Raises
-        ------
-        AttributeError
-            If the molecule did not undergo an optimization there will
-            be no log file to read.
-        
-        """
-        
-        if not self.optimized:
-            raise AttributeError(('A molecule must be optimized for'
-                                  ' its energy to be taken.'))
-        
-        # Go thorugh the log file line by line and find the line which
-        # says ``Total Energy = ``. This line holds the energy value in
-        # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('.mol', '.log')
-        with open(log_file, 'r') as log:
-            for line in log:
-                if 'Total Energy =    ' in line:
-                    return float(line.split()[3])
 
     def graph(self, mol_type):
         """
@@ -1105,7 +1156,7 @@ class Molecule:
         """
         
         if mae_path is None:
-            mae_path = self.prist_mol_file.replace('.mol', '.mae')
+            mae_path = os.path.splitext(self.prist_mol_file)[0] + '.mae'
         
         self.prist_mol = mol_from_mae_file(mae_path)
         self.write_mol_file('prist')
@@ -1456,6 +1507,7 @@ class StructUnit(Molecule, metaclass=Cached):
             'Unable to initialize from "{}" files.'.format(ext))
                                      
         self.prist_mol = init_funcs[ext](prist_mol_file)
+        self.energy = Energy(self)
         self.optimized = False        
 
         # Check for minimal initialization.
@@ -2317,6 +2369,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         heavy_mol_file = list(os.path.splitext(prist_mol_file))
         heavy_mol_file.insert(1,'HEAVY')        
         self.heavy_mol_file = '_'.join(heavy_mol_file) 
+        
+        self.energy = Energy(self)        
         
         # Ask the ``Topology`` instance to assemble/build the cage. This
         # creates the cage's ``.mol`` file all  the building blocks and

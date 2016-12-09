@@ -415,10 +415,14 @@ def mol_from_mae_file(mae_path):
 
 
     labels, data_block, *_ = atom_block.split(':::')
-    labels = [l for l in labels.split('\n') if not l.isspace() and l != '']
-    data_block = [a.split() for a in data_block.split('\n') if not a.isspace() and a != '']
+    labels = [l for l in labels.split('\n') if 
+               not l.isspace() and l != '']
+    
+    data_block = [a.split() for a in data_block.split('\n') if 
+                   not a.isspace() and a != '']    
     
     for line in data_block:
+        line = [word for word in line if word != '"']
         if len(labels) != len(line):
             raise RuntimeError(('Number of labels does'
                       ' not match number of columns in .mae file.'))
