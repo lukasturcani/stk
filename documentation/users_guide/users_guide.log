@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.1.28)  9 DEC 2016 15:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.1.28)  9 DEC 2016 16:03
 entering extended mode
 **./users_guide.tex
 (users_guide.tex
@@ -327,22 +327,15 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 158.
  (users_guide.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 158.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 158.
-
-
-Package rerunfilecheck Warning: File `users_guide.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `users_guide.out':
-(rerunfilecheck)             Before: 69601E6A7A6DDDBA43B992E86B147A01;710
-(rerunfilecheck)             After:  984CFD3DC4BE08A20FEA99FB6FF3C204;769.
+Package rerunfilecheck Info: File `users_guide.out' has not changed.
+(rerunfilecheck)             Checksum: 984CFD3DC4BE08A20FEA99FB6FF3C204;769.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 158.
  ) 
 Here is how much of TeX's memory you used:
- 4974 strings out of 493634
- 73211 string characters out of 3143744
+ 4975 strings out of 493634
+ 73227 string characters out of 3143744
  157294 words of memory out of 3000000
- 8337 multiletter control sequences out of 15000+200000
+ 8338 multiletter control sequences out of 15000+200000
  8409 words of font info for 30 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
  29i,6n,28p,958b,354s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -353,9 +346,9 @@ X 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fon
 ts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
 public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
 msfonts/cm/cmtt10.pfb>
-Output written on users_guide.pdf (7 pages, 128370 bytes).
+Output written on users_guide.pdf (7 pages, 128815 bytes).
 PDF statistics:
- 136 PDF objects out of 1000 (max. 8388607)
+ 140 PDF objects out of 1000 (max. 8388607)
  20 named destinations out of 1000 (max. 500000)
- 89 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 97 words of extra memory for PDF output out of 10000 (max. 10000000)
 
