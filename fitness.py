@@ -434,24 +434,14 @@ def cage(macro_mol, target_cavity, macromodel_path,
     macro_mol.unscaled_fitness_vars = unscaled
     return unscaled
     
-def cage_target(cage, target_mol_file, macromodel_path, 
+def cage_target(macro_mol, target_mol_file, macromodel_path, 
                 rotations=0):
     """
     Calculates the fitness of a cage / target complex.
     
-    Depending of `rotate` a different number of cage / target 
-    complexes will be generated. When `rotate` is ``True``, the 
-    target molecule is rotated along the x, y and z axes and each
-    rotation forms a new complex. The lowest energy complex is used
-    for the fitness calculation. When `rotate` is ``False`` not 
-    rotation takes place.
-    
-    To see which rotations take place see the documentation of the
-    ``_generate_complexes()`` function.
-    
     Parameters
     ----------
-    cage : Cage
+    macro_mol : Cage
         The cage which is to have its fitness calculated,
 
     target_mol_file : str
@@ -468,15 +458,15 @@ def cage_target(cage, target_mol_file, macromodel_path,
     Returns
     -------
     float
-        The fitness value of `cage`.
+        The fitness value of `macro_mol`.
     
     """
     
     # If the cage already has a fitness value, don't run the
     # calculation again.
-    if cage.fitness:
-        print('Skipping {0}'.format(cage.prist_mol_file))
-        return cage.fitness
+    if macro_mol.fitness:
+        print('Skipping {0}'.format(macro_mol.prist_mol_file))
+        return macro_mol.fitness
     
     # The first time running the fitness function create an instance
     # of the target molecule as a ``StructUnit``. Due to caching,
@@ -492,7 +482,7 @@ def cage_target(cage, target_mol_file, macromodel_path,
     
     # Create rdkit instances of the target in the cage for each
     # rotation.        
-    rdkit_complexes = _generate_complexes(cage, target, rotations+1)
+    rdkit_complexes = _generate_complexes(macro_mol, target, rotations+1)
     
     # Optimize the strcuture of the cage/target complexes.
     macromol_complexes = []        
@@ -502,7 +492,7 @@ def cage_target(cage, target_mol_file, macromodel_path,
         # written to the disk.
         mm_complex = MacroMolecule.__new__(MacroMolecule)
         mm_complex.prist_mol = complex_
-        mm_complex.prist_mol_file = cage.prist_mol_file.replace(
+        mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
                             '.mol', '_COMPLEX_{0}.mol'.format(i))
         mm_complex.write_mol_file('prist')
         
@@ -513,7 +503,7 @@ def cage_target(cage, target_mol_file, macromodel_path,
     # Calculate the energy of the complex and compare to the
     # individual energies. If more than complex was made, use the
     # most stable version.
-    energy_separate = cage.energy + target.energy
+    energy_separate = macro_mol.energy + target.energy
     energy_diff =  min(macromol_complex.energy - energy_separate for 
                             macromol_complex in macromol_complexes)
     
@@ -524,7 +514,7 @@ def cage_target(cage, target_mol_file, macromodel_path,
         
     return raw_fitness
    
-def _generate_complexes(cage, target, number=1):
+def _generate_complexes(macro_mol, target, number=1):
     """
     Yields rdkit instances of cage / target complexes.
     
@@ -533,7 +523,7 @@ def _generate_complexes(cage, target, number=1):
     
     Parameters
     ----------
-    cage : Cage
+    macro_mol : Cage
         The cage used to form the complex.
         
     target : StructUnit
@@ -550,7 +540,7 @@ def _generate_complexes(cage, target, number=1):
     """
 
     # First place both the target and cage at the origin.
-    cage.set_position('prist', [0,0,0])
+    macro_mol.set_position('prist', [0,0,0])
     target.set_position('prist', [0,0,0])
     
     # Get the position matrix of the target molecule.        
@@ -574,7 +564,7 @@ def _generate_complexes(cage, target, number=1):
         
         rot_target.set_position_from_matrix('prist', new_pos_mat)
         
-        yield chem.CombineMols(cage.prist_mol, rot_target.prist_mol)
+        yield chem.CombineMols(macro_mol.prist_mol, rot_target.prist_mol)
     
 
 
