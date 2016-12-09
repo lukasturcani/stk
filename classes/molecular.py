@@ -116,7 +116,7 @@ class Energy:
         The energetic information held by an instance of ``Energy`` 
         concerns the molecule held in this attribute.
     
-    value : float or NoneType (default = None)
+    value : dict of 
         The energy value of the molecule held in `molecule`.
         
     forcefield : str or NoneType  (default = None)
@@ -130,17 +130,119 @@ class Energy:
 
     def __init__(self, molecule):
         self.molecule = molecule
-        self.value = None
-        self.forcefield = None
-        self.function = None
-
-    def calc(self, func_name, *, ):
+        self.values = {}
         
+    def formation_energy(self, key, building_blocks, products):
+        """
+        Calculates the formation energy.
         
-    def formation_energy(self, building_blocks):
-        pass
+        The formation energy is calculated under the assumption that the
+        molecule in `self.molecule` is composed of the molecules in 
+        `building_blocks` and that during formation molecules in 
+        `products` are formed in addition to `self.molecule`.     
+        
+        Parameters
+        ----------
+        key : tuple
+            The first member of the tuple is a string holding the name 
+            of a method used to calculate energies. For exmaple 'rdkit'
+            or 'macromodel'. The remaning elements in the tuple are the
+            parameters that the user wishes to pass to the function.
+        
+        building_blocks : tuple of form (float, Molecule)
+            This tuple holds the molecules which compose `self.molecule`
+            and the number required to make 1 `self.molecule`.
+            
+        products : tuple of form (float, Molecule)
+            This tuple holds the molecules produced in addition to 
+            `self.molecule`, when  a single `self.molecule` is made. The
+            ``int`` represents the number made per `self.molecule`.
+        
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('formation_energy', `key`). The value is the 
+            calculated formation energy.            
+        
+        Returns
+        -------
+        float
+            The formation energy. Note that this value is also stored
+            in the dictionary `self.values`.
+        
+        """
+        
+        func_name, *params = key 
 
-    def rdkit(self):
+                
+
+    def rdkit(self, forcefield):
+        """
+        Uses rdkit to calculate the energy of `self.molecule`.
+        
+        Parameters
+        ----------
+        forcefield : str
+            The name of the forcefield to be used.
+            
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('rdkit', `forcefield`). The value is the caculated 
+            energy.
+            
+        Returns 
+        -------
+        float
+            The calculated energy. Note that this value is also stored
+            in the dictionary `self.values`.
+        
+        """
+        
+        if forcefield == 'uff':
+            ff = ac.UFFGetMoleculeForceField(self.molecule.prist_mol)
+        if forcefield == 'mmff':
+            ff = ac.MMFFGetMoleculeForceField(self.molecule.prist_mol)
+
+        eng = ff.CalcEnergy()        
+        self.values[('rdkit', forcefield)] = eng
+        return eng
+        
+    def macromodel(self, forcefield, macromodel_path):
+        """
+        Calculates the energy of `self.molecule` using macromodel.
+
+        Note that this requires macromodel to be installed and have a 
+        valid license.
+
+        Parameters
+        ----------
+        forcefield : int
+            The id number of the forcefield to be used by macromodel.  
+            
+        macromodel_path : str
+            The full path of the ``Schrodinger`` suite within the user's 
+            machine. For example, in a default Microsoft installation 
+            the folder will probably be something like
+            ``C:\Program Files\Schrodinger2016-2``.
+ 
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('macromodel', `forcefield`). The value is the 
+            caculated energy.
+            
+        Returns 
+        -------
+        float
+            The calculated energy. Note that this value is also stored
+            in the dictionary `self.values`.
+        
+        """
+        
         
 
 class Molecule:
