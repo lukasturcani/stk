@@ -103,6 +103,46 @@ class Cached(type):
             self.__cache[key] = obj
             return obj
 
+class Energy:
+    """
+    Handles all things related to a ``Molecule``'s energy.
+
+    An instance of this class will be placed in the `energy` attribute
+    of a ``Molecule`` instance.    
+
+    Attributes
+    ----------
+    molecule : Molecule    
+        The energetic information held by an instance of ``Energy`` 
+        concerns the molecule held in this attribute.
+    
+    value : float or NoneType (default = None)
+        The energy value of the molecule held in `molecule`.
+        
+    forcefield : str or NoneType  (default = None)
+        The name of the forcefield used to calculate the energy.
+        
+    function : str or NoneType (default = None)
+        The name of the method defined in the ``Energy`` class which was
+        used to calculate `value`.
+
+    """
+
+    def __init__(self, molecule):
+        self.molecule = molecule
+        self.value = None
+        self.forcefield = None
+        self.function = None
+
+    def calc(self, func_name, *, ):
+        
+        
+    def formation_energy(self, building_blocks):
+        pass
+
+    def rdkit(self):
+        
+
 class Molecule:
     """
     The most basic class representing molecules.
@@ -131,6 +171,11 @@ class Molecule:
     heavy_mol_file : str
         The full path of the molecular structure file holding the
         structure of the substituted molecule.
+        
+    energy : Energy
+        An instance of the ``Energy`` class. It handles all things
+        energy.
+        
     
     """
 
@@ -1253,8 +1298,10 @@ class StructUnit(Molecule, metaclass=Cached):
         heavy molecule. The ids correspond to the ids in the rkdit 
         molecule.
 
-    energy : float
-        This is a lazy attribute. See its method documenation below.
+    energy : Energy
+        This attribute handles information about the energy of the 
+        instance. See the documentation of ``Energy`` to see what is
+        available.  
         
     optimized : bool (default = False)
         A flag to monitor whether an optimization has been performed on
@@ -2085,8 +2132,10 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         optimized. Optimization functions set this flag to ``True``
         after an optimization.
         
-    energy : float
-        This is a lazy attribute. See its method documenation below.
+    energy : Energy
+        This attribute handles information about the energy of the 
+        instance. See the documentation of ``Energy`` to see what is
+        available.        
 
     fitness : float (default = False)
         The fitness value of the macromolecule, as determined by the 
