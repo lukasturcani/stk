@@ -1,6 +1,6 @@
 import itertools
 import os
-from statistics import mean
+import numpy as np
 import pickle
 from collections import Counter
 
@@ -638,48 +638,35 @@ class Population:
     def calculate_member_fitness(self):
         _calc_fitness(self.ga_tools.fitness, self)
 
-    def mean(self, attr_name, delegate=False):
+    def mean(self, key):
         """
-        Calculates the mean value of a given attribute of the members.
+        Calculates the mean given a key.
 
-        Calculates the mean across all members in the population,
-        including those in subpopulations.
+        This method applies key(member) on every member of the 
+        population and returns the mean of returned values.
+
+        For example, if the mean value of the attribute `cavity_size`
+        was desired:
+            
+            population.mean(
+                    lambda macro_mol : macro_mol.topology.cavity_size())
 
         Parameters
         ----------
-        attr_name : str
-            The name of the attribute whose mean value should be
-            calculated.
-
-        delegate : False or str (default = False)
-            If ``False`` the attr_name is assumed to correspond to an
-            attribute held by the members directly. If a string is
-            provided it should be the name of the attribute held by the
-            members. For example, if the user wishes to know the average
-            cavity size of the ``Cage`` instances in the population. The
-            ``Cage`` instances do not have a `cavity_size` attribute. 
-            However their `topology` attribute does have a `cavity_size` 
-            attribute. Therefore 
-            
-                attr_name=`cavity_size`, delegate=`topology`.
-
-            This is because `cavity_size` is not held by members
-            directly. It is held in the `topology` attribute of the
-            members.
+        key : function
+            A function which should take a MacroMolecule instance as its
+            argument and return a value.
 
         Returns
         -------
         float
-            The mean of a given attribute held by members of the
-            population.
+            The mean of the values returned by the function `key` when 
+            its applied to all members of the population.
 
         """
-
-        if delegate:
-            return mean(getattr(getattr(x, delegate), attr_name)
-                                                          for x in self)
-        else:
-            return mean(getattr(x, attr_name) for x in self)
+        
+        return np.mean([key(member) for member in self])        
+        
 
     def dump(self, file_name):
         """
