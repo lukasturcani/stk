@@ -549,7 +549,7 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
     
     """
 
-    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
+    print('Creating .com file - {}.'.format(macro_mol.prist_mol_file))
     
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
