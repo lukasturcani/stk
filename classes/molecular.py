@@ -133,8 +133,8 @@ class Energy:
         self.molecule = molecule
         self.values = {}
         
-    def formation(self, key, building_blocks, 
-                  products, force_e_calc=False):
+    def formation(self, key, products, 
+                  building_blocks=None, force_e_calc=False):
         """
         Calculates the formation energy.
         
@@ -150,15 +150,19 @@ class Energy:
             of a method used to calculate energies. For exmaple 'rdkit'
             or 'macromodel'. The remaning elements in the tuple are the
             parameters that the user wishes to pass to the function.
-        
-        building_blocks : tuple of form (float, Molecule)
-            This tuple holds the molecules which compose `self.molecule`
-            and the number required to make 1 `self.molecule`.
             
         products : tuple of form (float, Molecule)
             This tuple holds the molecules produced in addition to 
             `self.molecule`, when  a single `self.molecule` is made. The
             ``int`` represents the number made per `self.molecule`.
+
+        building_blocks : tuple (default = None)
+            This argument should be a tuple of the form 
+            (float, Molecule). It holds the number of a given Molecule
+            required to build a single molecule held in `self.molecule`.
+            This argument can be omitted when the formation energy of a 
+            MacroMolecule instance is being found, as they keep this 
+            data stored elsewhere already.
 
         force_e_calc : bool (default = False)
             If the this is ``True`` then all building blocks, products
@@ -181,12 +185,39 @@ class Energy:
             in the dictionary `self.values`.
         
         """
+
+        func_name, *params = key
+        
+        # Recalculate energies if requested.
+        if force_e_calc:
+            for _, mol in products:
+                getattr(mol.energy, func_name)(*params)
+        
+        e_products = 0
+        for n, mol in products:
+            if (func_name, params[0]) not in mol.energy.values.keys():
+                getattr(mol.energy, func_name)(*params)
+            
+            e_products += n * mol.energy.values[(func_name, params[0])]
+        
+        eng = self.pseudoformation(key, building_blocks, force_e_calc) 
+        eng -= e_products
+        print(e_products)
+        print(products[0][1].energy.values)
+        self.values[('formation', func_name, params[0])] = eng         
+        return eng
+
+    def pseudoformation(self, key, 
+                        building_blocks=None, force_e_calc=False):
+        if building_blocks is None:
+            building_blocks = ((n, mol) for mol, n in 
+                              self.molecule.topology.bb_counter.items())
         
         func_name, *params = key
         
         # Recalculate energies if requested.
         if force_e_calc:
-            for _, mol in itertools.chain(building_blocks, products):
+            for _, mol in building_blocks:
                 getattr(mol.energy, func_name)(*params)
         
             getattr(self, func_name)(*params)
@@ -204,17 +235,9 @@ class Energy:
                     (func_name, params[0]) in self.values.keys() else
                     getattr(self, func_name)(*params))
 
-        for n, mol in products:
-            if (func_name, params[0]) not in mol.energy.values.keys():
-                getattr(mol.energy, func_name)(*params)
-            
-            e_products += n * mol.energy.values[(func_name, params[0])]
-        
         eng = e_reactants - e_products
-        self.values[('formation', func_name, params[0])] = eng         
-        return eng
-                            
-                
+        self.values[('pseudoformation', func_name, params[0])] = eng         
+        return eng        
 
     def rdkit(self, forcefield):
         """
@@ -241,6 +264,7 @@ class Energy:
         """
         
         if forcefield == 'uff':
+            self.molecule.prist_mol.UpdatePropertyCache()
             ff = ac.UFFGetMoleculeForceField(self.molecule.prist_mol)
         if forcefield == 'mmff':
             chem.GetSSSR(self.molecule.prist_mol)      
