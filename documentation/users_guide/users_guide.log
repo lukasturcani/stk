@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.1.28)  10 DEC 2016 17:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.1.28)  10 DEC 2016 19:42
 entering extended mode
 **./users_guide.tex
 (users_guide.tex
@@ -161,35 +161,78 @@ File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
 \Gin@req@height=\dimen107
 \Gin@req@width=\dimen108
 )
+("C:\Program Files\MiKTeX 2.9\tex\latex\appendix\appendix.sty"
+Package: appendix 2009/09/02 v1.2b extra appendix facilities
+\c@@pps=\count98
+\c@@ppsavesec=\count99
+\c@@ppsaveapp=\count100
+)
+("C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.sty"
+Package: babel 2016/01/08 3.9n The Babel package
+
+*************************************
+* Local config file bblopts.cfg used
+*
+("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\bblopts.cfg"
+File: bblopts.cfg 2006/07/31 v1.0 MiKTeX 'babel' configuration
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\babel-english\english.ldf"
+Language: english 2012/08/20 v3.3p English support from the babel system
+
+("C:\Program Files\MiKTeX 2.9\tex\generic\babel\babel.def"
+File: babel.def 2016/01/08 3.9n Babel common definitions
+\babel@savecnt=\count101
+\U@D=\dimen109
+)
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+))
+("C:\Program Files\MiKTeX 2.9\tex\latex\geometry\geometry.sty"
+Package: geometry 2010/09/12 v5.6 Page Geometry
+\Gm@cnth=\count102
+\Gm@cntv=\count103
+\c@Gm@tempcnt=\count104
+\Gm@bindingoffset=\dimen110
+\Gm@wd@mp=\dimen111
+\Gm@odd@mp=\dimen112
+\Gm@even@mp=\dimen113
+\Gm@layoutwidth=\dimen114
+\Gm@layoutheight=\dimen115
+\Gm@layouthoffset=\dimen116
+\Gm@layoutvoffset=\dimen117
+\Gm@dimlist=\toks15
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
 (users_guide.aux)
 \openout1 = `users_guide.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 8.
-LaTeX Font Info:    ... okay on input line 8.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
 \AtBeginShipoutBox=\box26
-Package hyperref Info: Link coloring OFF on input line 8.
+Package hyperref Info: Link coloring OFF on input line 13.
  ("C:\Program Files\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\gettitlestring.sty"
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count98
+\c@section@level=\count105
 )
-LaTeX Info: Redefining \ref on input line 8.
-LaTeX Info: Redefining \pageref on input line 8.
-LaTeX Info: Redefining \nameref on input line 8.
+LaTeX Info: Redefining \ref on input line 13.
+LaTeX Info: Redefining \pageref on input line 13.
+LaTeX Info: Redefining \nameref on input line 13.
 
 (users_guide.out) (users_guide.out)
 \@outlinefile=\write3
@@ -198,32 +241,66 @@ LaTeX Info: Redefining \nameref on input line 8.
 
 ("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count99
-\scratchdimen=\dimen109
+\scratchcounter=\count106
+\scratchdimen=\dimen118
 \scratchbox=\box27
-\nofMPsegments=\count100
-\nofMParguments=\count101
-\everyMPshowfont=\toks15
-\MPscratchCnt=\count102
-\MPscratchDim=\dimen110
-\MPnumerator=\count103
-\makeMPintoPDFobject=\count104
-\everyMPtoPDFconversion=\toks16
+\nofMPsegments=\count107
+\nofMParguments=\count108
+\everyMPshowfont=\toks16
+\MPscratchCnt=\count109
+\MPscratchDim=\dimen119
+\MPnumerator=\count110
+\makeMPintoPDFobject=\count111
+\everyMPtoPDFconversion=\toks17
 )
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: <default>
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(54.2025pt, 505.89pt, 54.2025pt)
+* v-part:(T,H,B)=(54.2025pt, 686.56499pt, 54.2025pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=505.89pt
+* \textheight=686.56499pt
+* \oddsidemargin=-18.06749pt
+* \evensidemargin=-18.06749pt
+* \topmargin=-55.06749pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 12.
+(Font)              <12> on input line 17.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 12.
+(Font)              <8> on input line 17.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 12.
- [1
+(Font)              <6> on input line 17.
+[1
 
 {C:/Users/lukas/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
 (users_guide.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 4.
+(Font)              <7> on input line 5.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 4.
+(Font)              <5> on input line 5.
 )
 \tf@toc=\write4
 \openout4 = `users_guide.toc'.
@@ -232,113 +309,101 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.15 \newpage
+l.20 \newpage
               [1] [2]
-Overfull \hbox (2.82294pt too wide) in paragraph at lines 56--57
-[]\OT1/cmr/m/n/10 Finally, on line 11 ``param1" and ``val1" cor-re-spond to ``u
-se[]rank" and ``True",
- []
-
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Overfull \hbox (2.8474pt too wide) in paragraph at lines 77--123
-\OT1/cmr/bx/n/10 num[]mutations \OT1/cmr/m/n/10 - \OT1/cmr/m/it/10 con-stant de
-f-i-ni-tion for-mat \OT1/cmr/m/n/10 - The num-ber of mu-ta-tions MMEA
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 77--123
+Underfull \hbox (badness 10000) in paragraph at lines 80--126
 
  []
 
-[4] [5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 158.
- [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 158.
+[3] [4]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 161.
+ [5]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 161.
  (users_guide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 158.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 158.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 161.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 161.
 Package rerunfilecheck Info: File `users_guide.out' has not changed.
 (rerunfilecheck)             Checksum: 984CFD3DC4BE08A20FEA99FB6FF3C204;769.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 158.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 161.
  ) 
 Here is how much of TeX's memory you used:
- 4975 strings out of 493634
- 73227 string characters out of 3143744
- 157294 words of memory out of 3000000
- 8338 multiletter control sequences out of 15000+200000
+ 5898 strings out of 493634
+ 86078 string characters out of 3143744
+ 187858 words of memory out of 3000000
+ 9240 multiletter control sequences out of 15000+200000
  8409 words of font info for 30 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 29i,6n,28p,958b,354s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 29i,6n,32p,958b,347s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTe
@@ -346,9 +411,9 @@ X 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fon
 ts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/
 public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
 msfonts/cm/cmtt10.pfb>
-Output written on users_guide.pdf (7 pages, 128564 bytes).
+Output written on users_guide.pdf (6 pages, 126438 bytes).
 PDF statistics:
- 140 PDF objects out of 1000 (max. 8388607)
- 20 named destinations out of 1000 (max. 500000)
+ 133 PDF objects out of 1000 (max. 8388607)
+ 19 named destinations out of 1000 (max. 500000)
  97 words of extra memory for PDF output out of 10000 (max. 10000000)
 
