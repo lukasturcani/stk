@@ -11,7 +11,7 @@ requirement is that the first argument is ``macro_mol`` (excluding any
 The naming requirement of ``macro_mol`` exists to help users identify 
 which arguments are handled automatically by MMEA and which they need to 
 define in the input file. The convention is that if the mutation 
-function takes an arguments called  ``macro_mol`` it does not have to be 
+function takes an argument called  ``macro_mol`` it does not have to be 
 specified in the input file.
 
 If the mutation function does not fit neatly into a single function
