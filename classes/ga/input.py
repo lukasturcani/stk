@@ -292,7 +292,7 @@ class InputHelp:
                                  Selection.__dict__.items() if 
                                  name.startswith('crossover')),
                                            
-               'crossover_select_func' : iter(
+               'mutant_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
                                  not name.startswith('crossover') and
