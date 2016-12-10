@@ -45,8 +45,8 @@ class GATools:
         The ``Selection`` instance which performes selections of a 
         population's members.
     
-    mating : Mating
-        The ``Mating`` instance which mates a population's members.
+    crossover : Crossover
+        The ``Crossover`` instance which crosses a population's members.
     
     mutation : Mutation
         The ``Mutation`` instance which mutates a population's members
@@ -67,13 +67,13 @@ class GATools:
     
     """
     
-    __slots__ = ['selection', 'mating', 'mutation', 
+    __slots__ = ['selection', 'crossover', 'mutation', 
                  'optimization', 'fitness', 'ga_input', 'ga_progress']    
     
-    def __init__(self, selection, mating, 
+    def __init__(self, selection, crossover, 
                  mutation, optimization, fitness):
         self.selection = selection
-        self.mating = mating
+        self.crossover = crossover
         self.mutation = mutation
         self.optimization = optimization
         self.fitness = fitness

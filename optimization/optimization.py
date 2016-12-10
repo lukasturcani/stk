@@ -1,3 +1,12 @@
+"""
+Defines optimization functions.
+
+Extending MMEA: Adding optimization functions
+---------------------------------------------
+
+
+"""
+
 import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
 import multiprocessing as mp
