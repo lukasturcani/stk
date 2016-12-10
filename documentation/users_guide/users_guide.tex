@@ -74,6 +74,20 @@ Finally, in the command above ``param1" and ``val1" correspond to ``use\_rank" a
 
 In the case of selection functions the first two arguments (``cls" and ``population") are dealt with automatically by MMEA. If the user wants to use one of the selection functions they have to provide values to any of the remaining arguments in the form ``param1=val1". The order in which they are given in the input file does not matter. If the user wants to change the default values of any of the function's keyword arguments, they may add them to the command using the same notation. Keyword arguments otherwise do not have to be provided in the input script and will be default initialized to whatever is defined within the source code of MMEA. All of this holds true for other functions defined in the input file, not just selection functions. How a user can easily view what functions and parameters are available, as well as what they mean, is addressed in section \ref{input_files_valid_parameters}.
 
+When the user provides the value of a parameter, it must reflect its type. For example if a parameter wanted an a list of numbers then
+\begin{verbatim}
+param=[1,2,3,4]
+\end{verbatim}
+if it wanted a string
+\begin{verbatim}
+param="this is a string"
+\end{verbatim}
+or if it wanted a the name of a function or class defined within MMEA
+\begin{verbatim}
+param=some_mmea_function_name
+\end{verbatim}
+In essence it must be provided as valid Python syntax.
+
 All keywords should be defined in the input file once. The exception to this is ``mutation\_func". It is quite possible that during a GA run the user's wishes to use multiple mutation operations. As a result it is perfectly reasonable to include multiple commands with the keyword  ``mutation\_func". When this is done, the user must also include the line 
 \begin{verbatim}
 mutation_weights=[0.1, 0.45,0.45]$
@@ -151,18 +165,21 @@ python -m MMEA -h keyword
 \end{verbatim}
 where keyword is one of the valid function definition keywords defined in section \ref{list and explanation of valid keywords.}.
 
+\includegraphics[scale=1]{console1}
+
 MMEA will then output a list of valid functions, their description, and a list of their parameters.
 
+\includegraphics[scale=0.7]{console2}
 
 In this example, the keyword ``crossover\_func" was used and the only available function was ``bb\_lk\_exchange" Other keywords will have more options available (and more may be added to this one). As you can see the only parameters the function takes are macro\_mol1 and macro\_mol2. As these are handled automatically by MMEA (\ref{list and explanation of valid keywords.}) no parameters should be provided in the input file. A valid line would look like
 \begin{verbatim}
 crossover_func; bb_lk_exchange$
 \end{verbatim}
 
-
-
 \subsection{Examples}
 \label{examples}
+Here are example input files followed by a line by line explanation of what they're doing.
+
 \subsection{Example 1}
 \label{example 1}
 \begin{Verbatim}
@@ -231,7 +248,7 @@ macromodel_path="/home/username/program_files/schrodinger2016-3"$
 ##################################################################################
 
 fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];
-energy_params={'key':('macromodel', 16, "/home/username/program_files/schrodinger2016-3")}$
+energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}$
 
 ##################################################################################
 # Number of generations to create.
@@ -257,6 +274,10 @@ num_crossovers=15$
 
 pop_size=20$
 \end{Verbatim}
+
+The first command runs from line 5 to 8. It has the keyword ``init\_func", which means that it defines the initialization function for the GA population. The initialization function is called ``init\_random\_cages". This function creates a population consisting of randomly assembled ``cage" molecules. The function takes the parameter ``bb\_db" which receives a string. The string is the path of a directory which holds monomers used for constructing the cages. The parameter ``lk\_db" has the same role. The parameter ``topologies" requires an array or list. The list contains the names of cage topologies defined within MMEA.
+
+The second command is on line 14. The keyword ``generational\_select\_func" indicates that the command defines the selection function used for selecting the next generation.
 
 \section{Running MMEA}
 
