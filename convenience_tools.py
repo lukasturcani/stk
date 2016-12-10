@@ -4,7 +4,8 @@ from rdkit.Geometry import Point3D
 import numpy as np
 import time
 from contextlib import contextmanager
-import os 
+import os
+import subprocess as sp 
 # Prevents the matplotlib import from printing warnings in Spyder. These
 # are printed because Spyder automatically imports matplotlib so the
 # call to `matplotlib.use()` results in a warning.
@@ -765,6 +766,27 @@ FGInfo.heavy_symbols = {x.heavy_symbol for x
                         
 FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
                                         in FGInfo.functional_group_list}
+def kill_macromodel():
+    """
+    Kills any applications left open as a result running MacroModel.    
+    
+    Applications that are typically left open are 
+    ``jserver-watcher.exe`` and ``jservergo.exe``.    
+    
+    Returns
+    -------
+    None : NoneType    
+    
+    """
+    
+    if os.name == 'nt':
+        # In Windows, use the ``Taskkill`` command to force a close on
+        # the applications.           
+        sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"])
+        sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
+    if os.name == 'posix':
+        sp.run(["pkill", "jservergo"])
+        sp.run(["pkill", "jserver-watcher"])    
                 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',

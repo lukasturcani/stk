@@ -4,7 +4,7 @@ from . import FunctionData
 from ..topology import *
 from ..population import Population
 from .selection import Selection
-from .mating import Mating
+from .crossover import Crossover
 from .mutation import Mutation
 from ...optimization import optimization
 from ... import fitness
@@ -76,8 +76,8 @@ class GAInput:
     num_mutations: int
         The number of successful mutations per generation.
         
-    num_matings: int
-        The number of successful matings per generation.
+    num_crosses: int
+        The number of successful crossovers per generation.
         
     init_func : FunctionData
         The ``Population`` method used for initialization. This must
@@ -99,10 +99,10 @@ class GAInput:
         Must correspond to a method defined within the ``Selection`` 
         class.                        
         
-    mating_func : FunctionData
-        The ``Mating`` class method used to mate ``MacroMolecule`` 
+    crossover_func : FunctionData
+        The ``Crossover`` class method used to cross ``MacroMolecule`` 
         instances to generate offspring. Must correspond to a method
-        defined within the ``Mating`` class.
+        defined within the ``Crossover`` class.
     
     mutation_func : FunctionData
         The ``Mutation`` class method used to mutate ``MacroMolecule`` 
@@ -135,10 +135,10 @@ class GAInput:
         # Read the input file and extract its information.
         self._extract_data()
         
-        # If the input file did not specify the number of matings or
+        # If the input file did not specify the number of crossovers or
         # mutations it is assumed that none are wanted.
-        if not hasattr(self, 'num_matings'):
-            self.num_matings = 0
+        if not hasattr(self, 'num_crosses'):
+            self.num_crosses = 0
         
         if not hasattr(self, 'num_mutations'):
             self.num_mutations = 0
@@ -196,7 +196,7 @@ class GAInput:
                 # ``ValueError``.
                 kw, val = raw_line.split("=")
                 if kw in {'pop_size', 'num_generations', 'num_mutations', 
-                          'num_matings', 'mutation_weights'}:
+                          'num_crosses', 'mutation_weights'}:
                     setattr(self, kw, eval(val))
                 else:
                     raise ValueError(
@@ -284,22 +284,22 @@ class InputHelp:
                'generational_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
-                                 not name.startswith('mating') and
+                                 not name.startswith('crossover') and
                                  not name.startswith('_')),
 
                'parent_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
-                                 name.startswith('mating')),
+                                 name.startswith('crossover')),
                                            
-               'mutant_select_func' : iter(
+               'crossover_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
-                                 not name.startswith('mating') and
+                                 not name.startswith('crossover') and
                                  not name.startswith('_')),
                                            
-               'mating_func' : iter(func for name, func in 
-                                    Mating.__dict__.items() if 
+               'crossover_func' : iter(func for name, func in 
+                                    Crossover.__dict__.items() if 
                                     not name.startswith('_')),
                
                'mutation_func' : iter(func for name, func in 
