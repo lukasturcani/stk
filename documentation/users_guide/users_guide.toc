@@ -3,12 +3,12 @@
 \contentsline {section}{\numberline {2}Installing MMEA}{2}{section.2}
 \contentsline {section}{\numberline {3}Input Files}{2}{section.3}
 \contentsline {subsection}{\numberline {3.1}Format and structure.}{2}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Valid input values.}{4}{subsection.3.2}
-\contentsline {subsubsection}{\numberline {3.2.1}List and explanation of valid keywords.}{4}{subsubsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2}Valid input values.}{5}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}List and explanation of valid keywords.}{5}{subsubsection.3.2.1}
 \contentsline {subsubsection}{\numberline {3.2.2}Finding available functions and their arguments.}{6}{subsubsection.3.2.2}
-\contentsline {subsection}{\numberline {3.3}Examples}{6}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Example 1}{6}{subsection.3.4}
-\contentsline {section}{\numberline {4}Running MMEA}{8}{section.4}
-\contentsline {subsection}{\numberline {4.1}From the command line.}{8}{subsection.4.1}
-\contentsline {section}{\numberline {5}Output}{8}{section.5}
-\contentsline {section}{\numberline {6}MMEA as a Library}{8}{section.6}
+\contentsline {subsection}{\numberline {3.3}Examples}{7}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Example 1}{7}{subsection.3.4}
+\contentsline {section}{\numberline {4}Running MMEA}{10}{section.4}
+\contentsline {subsection}{\numberline {4.1}From the command line.}{10}{subsection.4.1}
+\contentsline {section}{\numberline {5}Output}{10}{section.5}
+\contentsline {section}{\numberline {6}MMEA as a Library}{10}{section.6}
