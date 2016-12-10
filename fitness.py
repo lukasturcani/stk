@@ -12,6 +12,12 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input 
 file. 
 
+Optionally, a fitness function may take an argument ``population``. If
+this is done, it should be the argument after ``macro_mol``. When this
+argument is present the population is also passed to the fitness
+function, along with the MacroMolecule instance. This can be useful if
+some sort of normalization is desired.
+
 Fitness functions should return a value. This value represents the 
 fitness of the MacroMolecule instance in the argument `macro_mol`. They 
 do not assign the value to the ``MacroMolecule`` instance. This is done
@@ -25,56 +31,10 @@ such as ``_generate_complexes()`` within this module but make sure they
 are private. This means that names of helper functions begin with a 
 leading underscore. 
 
-
-Fitness values output by fitness functions can be normalized. The 
-normalized value is set as the fitness value of the MacroMolecule
-instance, rather than the original value.
-
-If a fitness function defines an argument `means` 
-
-
-Some fitness functions will need to have certain internal values 
-normalized. In this section, the ``cage`` fitness function is used
-as an example.
-
-The cage fitness function has the form
-
-    (1) fitness = A*(var1^a) + B(var2^b) + C(var3^c) + D(var4^d).
-    
-Here var1 to var4 represent the parameters of a cage which factor
-into its fitness. If raw values of these parameters are used, due
-to different units and naturally different orders of magnitude one
-parameter may have an undue influence on the fitness only because
-of its units. The goal is for fitness function contributions to be
-determined soley by the coeffiecients A to D and exponents a to d.
-
-In order to do this the average value of var1 throughout the entire
-population is calculated first and then used as a scaling factor.
-The variables in the fitness function therefore have the form
-
-    (2) var = var_ind / <var>,
-    
-where var can be any of var1 to var4 in equation (1), var_ind is the
-variable of for that individual and <var> is the average of that 
-variable throughout the population.
-
-In order to calculate the fitness in this way the fitness function
-needs to be applied twice to each member of the population. The
-first loop calculates var_ind and <var> and the second loop 
-calculates var. See the implementation.
-
-Fitness functions which require this scaling procedure will need to
-have a keyword argument called `means` which is default initialized
-to ``None``. In order to make use of this they will also have to
-have the general form of equation (1). Nothing else is reqiured
-but they should allow the user to supply array holding the c
-oefficients and exponents. See the implementation of ``cage``.
-
 """
 
 import numpy as np
 import rdkit.Chem as chem
-import itertools as it
 import copy
 from inspect import signature
 
@@ -116,7 +76,6 @@ def _calc_fitness(func_data, population):
     # example, storing the mean values of cavity differences each
     # generation is used by the ``cage()`` fitness function.
     population._fitness_cache = {}
-
 
     # Apply the function to every member of the population.
     for macro_mol in population:
@@ -201,7 +160,7 @@ def random_fitness(macro_mol):
                 'Positive Energy per Bond ')
 def cage(macro_mol, population, target_cavity, macromodel_path, 
          target_window=None, coeffs=None, exponents=None, 
-         energy_params={'key':('rdkit', 'uff'), 'force_e_calc' : True}):
+         energy_params={'key':('rdkit', 'uff')}):
     """
     Calculates the fitness of a cage.
     

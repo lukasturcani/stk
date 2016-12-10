@@ -117,15 +117,9 @@ class Energy:
         The energetic information held by an instance of ``Energy`` 
         concerns the molecule held in this attribute.
     
-    value : dict of 
-        The energy value of the molecule held in `molecule`.
-        
-    forcefield : str or NoneType  (default = None)
-        The name of the forcefield used to calculate the energy.
-        
-    function : str or NoneType (default = None)
-        The name of the method defined in the ``Energy`` class which was
-        used to calculate `value`.
+    values : dict
+        The keys in the dict code for the function and parameters which
+        were used to calculate the energy. The values are the energies.
 
     """
 
@@ -175,7 +169,7 @@ class Energy:
         --------
         self.values : dict
             Adds an entry to this dictionary. The key is a tuple of the
-            form ('formation_energy', `key`). The value is the 
+            form ('formation', key[0], key[1]). The value is the 
             calculated formation energy.            
         
         Returns
@@ -209,6 +203,50 @@ class Energy:
 
     def pseudoformation(self, key, 
                         building_blocks=None, force_e_calc=False):
+        """
+        Calculates the formation energy, sans other products.
+
+        This is the formation energy if the energy of the other products
+        of the reaction is not taken into account.
+        
+        Parameters
+        ----------
+        key : tuple
+            The first member of the tuple is a string holding the name 
+            of a method used to calculate energies. For exmaple 'rdkit'
+            or 'macromodel'. The remaning elements in the tuple are the
+            parameters that the user wishes to pass to the function.
+
+        building_blocks : tuple (default = None)
+            This argument should be a tuple of the form 
+            (float, Molecule). It holds the number of a given Molecule
+            required to build a single molecule held in `self.molecule`.
+            This argument can be omitted when the formation energy of a 
+            MacroMolecule instance is being found, as they keep this 
+            data stored elsewhere already.
+
+        force_e_calc : bool (default = False)
+            If the this is ``True`` then all building blocks, products
+            and `self.molecule` will have their energies recalculated.
+            Even if the energy values have already been found if the 
+            chosen forcefield/method. If ``False`` the energy is only
+            calculated if the value has not already been foud.        
+        
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('formation', key[0], key[1]). The value is the 
+            calculated formation energy sans products (pseudoformation).            
+        
+        Returns
+        -------
+        float
+            The pseudoformation energy. Note that this value is also 
+            stored in the dictionary `self.values`.
+        
+        """
+        
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in 
                               self.molecule.topology.bb_counter.items())

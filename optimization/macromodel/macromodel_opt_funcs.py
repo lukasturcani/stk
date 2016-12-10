@@ -10,23 +10,23 @@ import re
 from ...classes.exception import MacroMolError
 from ...convenience_tools import MAEExtractor, FGInfo
 
-class ConversionError(Exception):
+class _ConversionError(Exception):
     def __init__(self, message):
         self.message = message
-class PathError(Exception):
+class _PathError(Exception):
     def __init__(self, message):
         self.message = message
-class LicenseError(Exception):
+class _LicenseError(Exception):
     def __init__(self, message):
         print('License not found.')
         self.message = message
-class ForceFieldError(Exception):
+class _ForceFieldError(Exception):
     def __init__(self, message):
         self.message = message
-class OptimizationError(Exception):
+class _OptimizationError(Exception):
     def __init__(self, message):
         self.message = message
-class LewisStructureError(Exception):
+class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
 
@@ -357,7 +357,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
                       'exception during `macromodel_cage_opt`.'))
         return macro_mol
 
-def run_bmin(macro_mol, macromodel_path, timeout=True):
+def _run_bmin(macro_mol, macromodel_path, timeout=True):
 
     print("", time.ctime(time.time()),
     'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
@@ -422,7 +422,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
         raise OptimizationError(('The .log and/or .maegz '
                      'files were not created by the optimization.'))
         
-def kill_bmin(macro_mol, macromodel_path):
+def _kill_bmin(macro_mol, macromodel_path):
     name = macro_mol.prist_mol_file.replace('.mol', '')
     name = re.split(r'\\|/', name)[-1]
     app = os.path.join(macromodel_path, 'jobcontrol')
@@ -448,7 +448,7 @@ def kill_bmin(macro_mol, macromodel_path):
         if time.time() - start > 600:
             break
                  
-def run_applyhtreat(macro_mol, macromodel_path):
+def _run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
     mae_out = mae.replace('.mae', '_htreated.mae')
     create_mae(macro_mol, macromodel_path)
@@ -464,7 +464,7 @@ def run_applyhtreat(macro_mol, macromodel_path):
     
     macro_mol.update_from_mae(mae_out)    
     
-def license_found(output, macro_mol=None):
+def _license_found(output, macro_mol=None):
     """
     Checks to see if minimization failed due to a missing license.
 
@@ -510,7 +510,7 @@ def license_found(output, macro_mol=None):
 
     return True
  
-def generate_com(macro_mol, force_field=16, no_fix=False):
+def _generate_com(macro_mol, force_field=16, no_fix=False):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -601,7 +601,7 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
+def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
 
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
 
@@ -642,7 +642,7 @@ def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, s
         # details of the macromodel run
         com.write(main_string)
 
-def create_mae(macro_mol, macromodel_path):
+def _create_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.    
 
@@ -684,7 +684,7 @@ def create_mae(macro_mol, macromodel_path):
     structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
     return mae_file
 
-def convert_maegz_to_mae(macro_mol, macromodel_path):
+def _convert_maegz_to_mae(macro_mol, macromodel_path):
     """
     Converts a ``.maegz`` file to a ``.mae`` file.
     
@@ -729,7 +729,7 @@ def convert_maegz_to_mae(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
     return structconvert(maegz, mae, macromodel_path)
     
-def structconvert(iname, oname, macromodel_path):
+def _structconvert(iname, oname, macromodel_path):
   
     convrt_app = os.path.join(macromodel_path, 'utilities', 
                                                      'structconvert')
@@ -761,7 +761,7 @@ def structconvert(iname, oname, macromodel_path):
 
     return convrt_return
 
-def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
+def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
     
@@ -813,7 +813,7 @@ def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                 "COMES_HERE!!!\n"), fix_block)
 
-def fix_distance_in_com_file(macro_mol, fix_block):
+def _fix_distance_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond distances to ``.com`` body string.
     
@@ -874,7 +874,7 @@ def fix_distance_in_com_file(macro_mol, fix_block):
 
     return fix_block
     
-def fix_bond_angle_in_com_file(macro_mol, fix_block):
+def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond angles to ``.com`` body string.
     
@@ -956,7 +956,7 @@ def fix_bond_angle_in_com_file(macro_mol, fix_block):
     
     return fix_block
     
-def fix_torsional_angle_in_com_file(macro_mol, fix_block):
+def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing torsional bond angles to ``.com`` body string.
     
@@ -1042,7 +1042,7 @@ def fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     return fix_block
 
-def wait_for_file(file_name, timeout=20):
+def _wait_for_file(file_name, timeout=20):
     """
     Stalls until a given file exists or `timeout` expires.
     
@@ -1070,26 +1070,4 @@ def wait_for_file(file_name, timeout=20):
             tick += 1
         
         if os.path.exists(file_name) or time_taken > timeout:
-            break 
-
-def kill_macromodel():
-    """
-    Kills any applications left open as a result running MacroModel.    
-    
-    Applications that are typically left open are 
-    ``jserver-watcher.exe`` and ``jservergo.exe``.    
-    
-    Returns
-    -------
-    None : NoneType    
-    
-    """
-    
-    if os.name == 'nt':
-        # In Windows, use the ``Taskkill`` command to force a close on
-        # the applications.           
-        sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"])
-        sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
-    if os.name == 'posix':
-        sp.run(["pkill", "jservergo"])
-        sp.run(["pkill", "jserver-watcher"])          
+            break       
