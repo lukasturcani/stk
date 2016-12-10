@@ -3,12 +3,10 @@ import shutil
 import sys
 import warnings
 
-from .classes import (Population, GATools, Selection, Mutation, Mating, 
-                      GAInput, InputHelp, StructUnit2, StructUnit3, Cage)
-from .classes.topology import FourPlusSix
+from .classes import (Population, GATools, Selection, Mutation, 
+                      Crossover, GAInput, InputHelp)
 from .classes.exception import PopulationSizeError
-from .optimization import kill_macromodel
-from .convenience_tools import time_it, archive_output
+from .convenience_tools import time_it, archive_output, kill_macromodel
 
 def run():
     
@@ -54,7 +52,7 @@ def run():
     selector = Selection(ga_input.generational_select_func, 
                          ga_input.parent_select_func, 
                          ga_input.mutant_select_func)
-    mator = Mating(ga_input.mating_func, ga_input.num_matings)
+    mator = Crossover(ga_input.crossover_func, ga_input.num_crosses)
     mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
                        weights=ga_input.mutation_weights)
     ga_tools = GATools(selector, mator, mutator, 
@@ -118,7 +116,7 @@ def run():
         os.chdir(str(x))
         
         with time_it():
-            print('\n\nStarting mating.\n----------------\n\n')
+            print('\n\nStarting crossovers.\n----------------\n\n')
             offspring = pop.gen_offspring()
     
         with time_it():
