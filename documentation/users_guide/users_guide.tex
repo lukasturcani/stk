@@ -49,7 +49,7 @@ generational_select_func; stochastic_sampling; use_rank=True$
 \end{verbatim}
 This means that in line 11 the keyword is ``generational\_select\_func", the function name is ``stochastic\_sampling", parameter 1's name is ``use\_rank" and its value is ``True". As you can see, in this line there is only 1 parameter name-value pair.
 
-Lines with this format define functions used by MMEA. It is called the "function definition format". These functions will correspond to the various GA operations, such as crossover, mating and selection or to things like the fitness function or optimization function (more on this later). The words on these lines are separated from the adjacent ones by a semicolon. Notice that the last word on the line is not followed by a semicolon. The keyword defines which GA operation the line describes. For example, in line 11 the keyword ``generational\_select\_func" signifies that the line describes which function is to be used for selecting members of the next generation. In line 17 the keyword ``parent\_select\_func" signifies that the line defines the function to be used for selecting parents for crossover. A list of valid keywords is described in section \ref{input_files_valid_parameters}.
+Lines with this format define functions used by MMEA. It is called the "function definition format". These functions will correspond to the various GA operations, such as crossover, mutation and selection or to things like the fitness function or optimization function (more on this later). The words on these lines are separated from the adjacent ones by a semicolon. Notice that the last word on the line is not followed by a semicolon. The keyword defines which GA operation the line describes. For example, in line 11 the keyword ``generational\_select\_func" signifies that the line describes which function is to be used for selecting members of the next generation. In line 17 the keyword ``parent\_select\_func" signifies that the line defines the function to be used for selecting parents for crossover. A list of valid keywords is described in section \ref{input_files_valid_parameters}.
 
 The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MMEA. For example, if the keyword is ``generational\_select\_func" then ``stochastic\_sampling" or ``roulette" are both valid values for ``function\_name", because the module ``selection.py" within MMEA defines functions with these names. Indeed, any function defined within this module can be used as the selection function.
 
@@ -67,14 +67,14 @@ There is a second kind of non-comment line in the input file of MMEA. These line
 \begin{verbatim}
 keyword=val
 \end{verbatim}
-As you can see, these are much simpler. They define basic constants relevant to the GA. As a result, this is called the ``constant definition format". This includes things like population size, number of matings carried out during each generation and so on. It is merely the keyword, a ``=" and the value. No spaces. Valid keywords for these lines are discussed in section \ref{input_files_valid_parameters}.
+As you can see, these are much simpler. They define basic constants relevant to the GA. As a result, this is called the ``constant definition format". This includes things like population size, number of crossovers carried out during each generation and so on. It is merely the keyword, a ``=" and the value. No spaces. Valid keywords for these lines are discussed in section \ref{input_files_valid_parameters}.
 
 \subsection{Valid input values.}
 \label{input_files_valid_parameters}
 In order to prevent the need to continuously update this documentation when a new function is added to MMEA, only valid keywords are described here. However, this does not mean a user has to go into the source code to find out what functions they have at their disposal. This section describes how MMEA can be made to output valid function names and parameters for each keyword.
 \subsubsection{List and explanation of valid keywords.}
 \label{list and explanation of valid keywords.}
-Here a list of valid keywords, the type of line formatting the keyword requires and which arguments do not need to be provided to the functions. Recall in section \ref{input_files_format_and_structure} the selection function did not require the ``population" argument to be provided explictily in the input file. Other functions, such as crossover/mating functions do not require other parameters to be provided. The format here is:
+Here a list of valid keywords, the type of line formatting the keyword requires and which arguments do not need to be provided to the functions. Recall in section \ref{input_files_format_and_structure} the selection function did not require the ``population" argument to be provided explictily in the input file. Other functions, such as crossover functions do not require other parameters to be provided. The format here is:
 \\
 \\
 \textbf{keyword} - \textit{line format} - excluded\_param1, excluded\_param2 - Explantion of keyword.
@@ -95,7 +95,7 @@ The keywords are:
 \textbf{mutant\_select\_func} - \textit{function definition format} - population - The function used to select individuals for mutation.
 \\
 \\
-\textbf{mating\_func} - \textit{function definition format} - marco\_mol1, macro\_mol2 - The function which carries out the mating/crossover operation.
+\textbf{crossover\_func} - \textit{function definition format} - marco\_mol1, macro\_mol2 - The function which carries out the crossover operation.
 \\
 \\
 \textbf{mutation\_func} - \textit{function definition format} - macro\_mol - The function which carries out the mutation operation.
@@ -113,7 +113,7 @@ The keywords are:
 \textbf{num\_mutations} - \textit{constant definition format} - The number of mutations MMEA will carry out each generation.
 \\
 \\
-\textbf{num\_matings} - \textit{constant definition format} - The number of mating/crossover operations MMEA will carry out each generation.
+\textbf{num\_crosses} - \textit{constant definition format} - The number of crossover operations MMEA will carry out each generation.
 \\
 \\
 \textbf{pop\_size} - \textit{constant definition format} - The size of the population.
@@ -136,9 +136,9 @@ where keyword is one of the valid function definition keywords defined in sectio
 MMEA will then output a list of valid functions, their description, and a list of their parameters.
 
 
-In this example, the keyword ``mating\_func" was used and the only available function was ``bb\_lk\_exchange" Other keywords will have more options available (and more may be added to this one). As you can see the only parameters the function takes are macro\_mol1 and macro\_mol2. As these are handled automatically by MMEA (\ref{list and explanation of valid keywords.}) no parameters should be provided in the input file. A valid line would look like
+In this example, the keyword ``crossover\_func" was used and the only available function was ``bb\_lk\_exchange" Other keywords will have more options available (and more may be added to this one). As you can see the only parameters the function takes are macro\_mol1 and macro\_mol2. As these are handled automatically by MMEA (\ref{list and explanation of valid keywords.}) no parameters should be provided in the input file. A valid line would look like
 \begin{verbatim}
-mating_func; bb_lk_exchange$
+crossover_func; bb_lk_exchange$
 \end{verbatim}
 
 
