@@ -3,7 +3,26 @@ Defines selection functions via the ``Selection`` class.
 
 Extending MMEA: Adding selection functions
 ------------------------------------------
+If a new selection operation is to be added to MMEA it should be added
+as a method in the ``Selection`` class defined in this module. The only
+requirements are that the first argument is ``population`` (excluding 
+any ``self`` or ``cls`` arguments) and that functions which select 
+parents for crossover begin with ``crossover_``. For example, 
+``crossover_roulette``.
 
+The naming requirement of ``population`` exists to help users identify 
+which arguments are handled automatically by MMEA and which they need to 
+defined in the input file. The convention is that if the mutation 
+function takes an argument called  ``macro_mol`` it does not have to be 
+specified in the input file.
+
+All selection functios should be defined as generators, which yield an
+member of ``population``. In the case of crossover selection functions, 
+they should yield a tuple of selected parents.
+
+If the selection function does not fit neatly into a single function
+make sure that any helper functions are private, ie that their names 
+start with a leading underscore. 
 
 """
 
@@ -29,10 +48,11 @@ class Selection:
     
     Initialization of this class takes the names of methods defined in 
     this class (as strings) and saves them into the instance's 
-    `generational`, `mating` and `mutation` attributes. These attributes 
-    should therefore always hold the names of methods that are to be 
-    used for the given purpose - such as generational selection. The 
-    selection algorithms should be written as methods within this class.
+    `generational`, `crossover` and `mutation` attributes. These 
+    attributes should therefore always hold the names of methods that 
+    are to be used for the given purpose - such as generational 
+    selection. The selection algorithms should be written as methods 
+    within this class.
     
     When an instance of this class is called it requires a 
     ``Population`` instance and a string to be provided as arguments. 
@@ -58,7 +78,7 @@ class Selection:
     argument a ``Selection`` instance requires when it is being called.
     This is the string `generational` in the code example above. The
     string should be the name of one of the attributes of the 
-    ``Selection`` class. This means that 'generational', 'mating' and
+    ``Selection`` class. This means that 'generational', 'crossover' and
     'mutation' are valid strings at the time of this being written. If 
     more types of selection are added to MMEA, an attribute named after
     that type of selection should be added to the ``Selection`` class.
@@ -94,7 +114,7 @@ class Selection:
         selection function used for selecting the next generation of 
         individuals along with any parameters the function may require.
 
-    mating : FunctionData
+    crossover : FunctionData
         Holds the ``FunctionData`` object representing the selection 
         function used for selecting parents, along with any parameters
         the function may require.
@@ -106,9 +126,9 @@ class Selection:
     
     """
     
-    def __init__(self, generational, mating, mutation):        
+    def __init__(self, generational, crossover, mutation):        
         self.generational = generational
-        self.mating = mating
+        self.crossover = crossover
         self.mutation = mutation
     
     def __call__(self, population, type_):
@@ -123,15 +143,15 @@ class Selection:
         type_ : str
             The name of a ``Selection`` attribute. The name corresponds
             to the type of selection that is desired, ie generational,
-            mating or mutation.
+            crossover or mutation.
             
         Returns
         -------
         generator
             A generator which yields selected members of the population.
             The generator will yield ``MacroMolecule`` instances unless
-            it yields parents for mating. In this case it yields a tuple
-            of ``MacroMolecule`` instances.
+            it yields parents for crossover. In this case it yields a 
+            tuple of ``MacroMolecule`` instances.
         
         """
         
@@ -557,7 +577,7 @@ class Selection:
     """
 
     @staticmethod
-    def mating_all_combinations(population):
+    def crossover_all_combinations(population):
         """
         Yields every possible pairing of individuals from a population.
         
@@ -583,7 +603,7 @@ class Selection:
             yield mol1, mol2 
     
     @classmethod
-    def mating_all_combinations_n_fittest(cls, population, n):
+    def crossover_all_combinations_n_fittest(cls, population, n):
         """
         Yields all pairings of the `n` fittest individuals.
 
@@ -605,7 +625,7 @@ class Selection:
             yield ind1, ind2
     
     @staticmethod
-    def mating_roulette(population, truncation=False):
+    def crossover_roulette(population, truncation=False):
         """
         Yields parents using roulette selection.
 
@@ -655,7 +675,7 @@ class Selection:
             yield ind1, ind2       
     
     @staticmethod
-    def mating_deterministic_sampling(population, truncation=False):
+    def crossover_deterministic_sampling(population, truncation=False):
         """
         Yields parents according to determnistic sampling.
 
@@ -668,13 +688,13 @@ class Selection:
         where fn is the normalized fitness value and f is the original
         fitness value. 
         
-        Deterministic sampling then creates a temporary, mating 
+        Deterministic sampling then creates a temporary, parent 
         population of the same size as the original population. An 
-        individual is guaranteed to be placed into the mating population 
+        individual is guaranteed to be placed into the parent population 
         n times, where n is the integer part of fn. Any remaining slots
         are to individuals with the largest decimal values.
         
-        Parents are then randomly selected from the mating population.
+        Parents are then randomly selected from the parent population.
 
         This method supports the application of truncation. Truncation 
         means that only the n fittest individuals are subject to 
@@ -708,19 +728,19 @@ class Selection:
         mean_fitness = population.mean('fitness')            
         fns = [(ind, ind.fitness/mean_fitness) for ind in pop]
 
-        mating_pop = []
+        parent_pop = []
         for ind, fn in fns:
-            if int(fn) < 1 and len(mating_pop) >= len(population):
+            if int(fn) < 1 and len(parent_pop) >= len(population):
                 break
             
             if int(fn) < 1:
-                mating_pop.append(ind)
+                parent_pop.append(ind)
             
             for x in range(int(fn)):
-                mating_pop.append(ind)
+                parent_pop.append(ind)
         
         while True:
-            ind1, ind2 = np.random.choice(mating_pop, 
+            ind1, ind2 = np.random.choice(parent_pop, 
                                           size=2, replace=False)
             yield ind1, ind2
     
