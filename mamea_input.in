@@ -14,7 +14,7 @@ generational_select_func; stochastic_sampling; use_rank=True
 # Selection function for selecting parents.
 ##################################################################################
 
-parent_select_func; mating_roulette 
+parent_select_func; crossover_roulette 
 
 ##################################################################################
 # Selection function for selecting molecules for mutation.
@@ -23,10 +23,10 @@ parent_select_func; mating_roulette
 mutant_select_func; stochastic_sampling; duplicates=True
 
 ##################################################################################
-# Crossover / Mating function.
+# Crossover function.
 ##################################################################################
 
-mating_func; bb_lk_exchange
+crossover_func; bb_lk_exchange
 
 ##################################################################################
 # Mutation function 1.
@@ -74,7 +74,7 @@ num_mutations=10
 # Number of crossover/mating operations to perform each generation.
 ##################################################################################
 
-num_matings=15  
+num_crosses=15  
 
 ##################################################################################
 # Size of the population.
