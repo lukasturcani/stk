@@ -9,7 +9,7 @@ class GAProgress:
 
     def update(self, population):
         self.gens.append(len(self.gens))
-        if hasattr(population[0], 'unscaled_fitness_vars'):
+        if hasattr(population[0], '_unscaled_fitness_vars'):
             unscaled_var_mat = np.matrix(
             [x.unscaled_fitness_vars.tolist() for 
              x in population if x.unscaled_fitness_vars is not None])

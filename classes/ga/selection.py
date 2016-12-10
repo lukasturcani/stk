@@ -1,10 +1,15 @@
+"""
+Defines selection functions via the ``Selection`` class.
+
+Extending MMEA: Adding selection functions
+------------------------------------------
+
+
+"""
+
 from operator import attrgetter
 import itertools
 import numpy as np
- 
-# Note that import of the Population class occurs at the end of the
-# file. There is a good reason for this.
-from .containers import FunctionData
 
 class Selection:
     """

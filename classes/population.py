@@ -446,7 +446,7 @@ class Population:
         `type_` parameter. The valid values for `type_` will correspond
         to one of the attribute names of the ``Selection`` instance.
 
-        For example, if `type_` is set to 'mating' a selection
+        For example, if `type_` is set to 'crossover' a selection
         algorithm which yields a parents will be invoked. If the
         `type_` is set to 'generational' an algorithm which yields the
         next generation will be invoked.
@@ -467,7 +467,7 @@ class Population:
 
             Valid values include:
                 'generational' - selects the next generation
-                'mating' - selects parents
+                'crossover' - selects parents
                 'mutation' - selects ``MacroMolecule`` instances for
                              mutation
 
@@ -488,29 +488,29 @@ class Population:
         Returns a population of offspring ``MacroMolecule`` instances.
 
         This is a GA operation and as a result this method merely
-        delegates the request to the ``Mating`` instance held in the
-        `ga_tools` attribute. The ``Mating`` instance takes care of
+        delegates the request to the ``Crossover`` instance held in the
+        `ga_tools` attribute. The ``Crossover`` instance takes care of
         selecting parents and combining them to form offspring. The
-        ``Mating`` instace delegates the selection to the ``Selection``
-        instance as would be expected. The request to perform mating is
-        done by calling the ``Mating`` instance with the population as
-        the argument. Calling of the ``Mating``instance returns a
-        ``Population`` instance holding the generated offspring. All
-        details regarding the mating procedure are handled by the
-        ``Mating`` instance.
+        ``Crossover`` instance delegates the selection to the 
+        ``Selection`` instance as would be expected. The request to 
+        perform crossovers is done by calling the ``Crossover`` instance 
+        with the population as the argument. Calling of the 
+        ``Crossover``instance returns a ``Population`` instance holding 
+        the generated offspring. All details regarding the crossover 
+        procedure are handled by the ``Crossover`` instance.
 
-        For more details about how mating is implemented see the
-        ``Mating`` class documentation.
+        For more details about how crossover is implemented see the
+        ``Crossover`` class documentation.
 
         Returns
         -------
         Population
-            A population holding offspring created by mating contained
+            A population holding offspring created by crossing contained
             the ``MacroMolecule`` instances.
 
         """
 
-        return self.ga_tools.mating(self)
+        return self.ga_tools.crossover(self)
 
     def gen_mutants(self):
         """
