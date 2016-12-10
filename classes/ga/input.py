@@ -15,12 +15,12 @@ class GAInput:
     
     A description of the input file follows, also see the User's guide.
 
-    The input file consists of a sequence of lines. Each line defines a 
-    variable or a function used by MMEA. If the line defines a function 
-    used by MMEA the same line must also define any parameters necessary
-    to use the function. It does not have to define any default
-    initialized parameters, though it may if desired. A line terminates
-    with the ``$`` symbol. This means that 
+    The input file consists of a sequence of commands. Each command 
+    defines a variable or a function used by MMEA. If the command 
+    defines a function used by MMEA it must also define any parameters 
+    necessary to use the function. It does not have to define any 
+    default initialized parameters, though it may if desired. A command 
+    terminates with the ``$`` symbol. This means that 
     
         generational_select_func; 
         stochastic_sampling; 
@@ -30,9 +30,9 @@ class GAInput:
     
         generational_select_func; stochastic_sampling; use_rank=True$
         
-    define the same ``line``.
+    define the same command.
     
-    If the line is empty or the first character is ``#`` it is skipped.
+    If a line is empty or the first character is ``#`` it is skipped.
     This may be convenient if you wish to organize the input file into
     sections or add comments.
     
@@ -48,8 +48,8 @@ class GAInput:
     instance to 25. Notice there is no whitespace in this line. This is
     required.
     
-    For lines where the keyword defines a function or method the syntax 
-    is as follows:
+    For commands where the keyword defines a function or method the 
+    syntax is as follows:
         
         keyword; func_name; param1_name=param1_val; 
         param2_name=param2_val$
@@ -70,7 +70,7 @@ class GAInput:
     NOTE: Not all parameters required by the ``cage`` function
           are defined.
 
-    This line specifices that the ``cage()`` function defined within
+    This command specifices that the ``cage()`` function defined within
     ``fitness.py`` is to be used as the fitness function. Notice that
     if the value passed to a parameter can be a list or a string.
     However, the type must be made explicit with either ``[]`` or quotes 
