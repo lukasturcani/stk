@@ -1,7 +1,12 @@
 \documentclass{article}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage[toc,page]{appendix}
 \graphicspath{ {pictures/} }
+\usepackage[english]{babel}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+\usepackage[margin=0.75in]{geometry}
 
 \title{MMEA User's Guide}
 \author{Lukas Turcani}
@@ -19,16 +24,14 @@ MMEA (MacroMolecular Evolutionary Algorithm) is a genetic algorithm (GA) for che
 \section{Installing MMEA}
 
 \section{Input Files}
-
 To run MMEA you need to submit an input file. These contain all the details required to start a GA calculation. Among other things, this may include things like which fitness function you want to use, the number of generations MMEA should make and how big the population should be.
 
 Using an example, the format and structure of input files is explained in section \ref{input_files_format_and_structure}. A guide to finding out what GA operations and tools are available is in section \ref{input_files_valid_parameters}.
 
+More examples of input files and accompanied explanations of what each line does are provided in section \ref{examples}.
+
 \subsection{Format and structure.}
 \label{input_files_format_and_structure}
-
-An example input file can be downloaded from \url{https://sabercathost.com/1aoC/mamea_input.in}.
-
 Any lines consisting of only whitespace or beginning with ``\#" are ignored. This is used to create comments in the input file and allows division of it into sections. All lines terminate with a ``\$" symbol. This means that both
 \begin{verbatim}
 generational_select_func; 
@@ -144,7 +147,7 @@ crossover_func; bb_lk_exchange$
 
 
 \subsection{Examples}
-
+\label{examples}
 
 \section{Running MMEA}
 
