@@ -62,7 +62,7 @@ class Crossover:
         chosen for crossover and any additional paramters and 
         corresponding values the function may require.
     
-    num_crosses : int
+    num_crossovers : int
         The number of crossover operations that need to be performed 
         each generation.
     
@@ -77,9 +77,9 @@ class Crossover:
     """
     
     
-    def __init__(self, func_data, num_crosses):
+    def __init__(self, func_data, num_crossovers):
         self.func_data = func_data
-        self.num_crosses = num_crosses
+        self.num_crossovers = num_crossovers
         self.n_calls = 0
         self.name = "crossover_{0}_topology_{1}_offspring_{2}.mol"
     
@@ -122,7 +122,7 @@ class Crossover:
         func = getattr(self, self.func_data.name)
         
         # Keep a count of the number of successful crossovers.
-        num_crosses = 0
+        num_crossovers = 0
         for parents in parent_pool:
             counter.update(parents)
             try:
@@ -133,10 +133,10 @@ class Crossover:
                 
                 # Add the new offspring to the offspring population.                
                 offspring_pop.add_members(offspring)
-                num_crosses += 1
+                num_crossovers += 1
                 print('Cross number {0}. Finish when {1}.'.format(
-                                num_crosses, self.num_crosses))
-                if num_crosses == self.num_crosses:
+                                num_crossovers, self.num_crossovers))
+                if num_crossovers == self.num_crossovers:
                     break
             except Exception as ex:
                 for i, parent in enumerate(parents):

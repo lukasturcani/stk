@@ -7,8 +7,8 @@ import warnings
 import psutil
 import re
 
-from ...classes.exception import MacroMolError
-from ...convenience_tools import MAEExtractor, FGInfo
+from ..classes.exception import MacroMolError
+from ..convenience_tools import MAEExtractor, FGInfo
 
 class _ConversionError(Exception):
     def __init__(self, message):

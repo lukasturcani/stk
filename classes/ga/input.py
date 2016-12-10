@@ -19,7 +19,18 @@ class GAInput:
     variable or a function used by MMEA. If the line defines a function 
     used by MMEA the same line must also define any parameters necessary
     to use the function. It does not have to define any default
-    initialized parameters, though it may if desired.
+    initialized parameters, though it may if desired. A line terminates
+    with the ``$`` symbol. This means that 
+    
+        generational_select_func; 
+        stochastic_sampling; 
+        use_rank=True$
+        
+    and 
+    
+        generational_select_func; stochastic_sampling; use_rank=True$
+        
+    define the same ``line``.
     
     If the line is empty or the first character is ``#`` it is skipped.
     This may be convenient if you wish to organize the input file into
@@ -31,7 +42,7 @@ class GAInput:
     such as ``num_generations`` they are simply followed by a ``=`` and 
     the desired value. For example,
         
-        num_generations=25
+        num_generations=25$
         
     would set the `num_generations` attribute of the ``GAInput`` 
     instance to 25. Notice there is no whitespace in this line. This is
@@ -40,10 +51,12 @@ class GAInput:
     For lines where the keyword defines a function or method the syntax 
     is as follows:
         
-        keyword; func_name; param1_name=param1_val; param2_name=param2_val
+        keyword; func_name; param1_name=param1_val; 
+        param2_name=param2_val$
           
     Key points from the line example are:
-        > Every unit is separated by a semicolon, ``;``, except the last.
+        > Every unit is separated by a semicolon, ``;``, except the last
+          which terminates with a ``$``.
         > Parameter names are followed by a ``=`` with NO WHITESPACE.
         > The ``=`` after the parameter name is followed by the value of
           the parameter with NO WHITESPACE.
@@ -52,11 +65,9 @@ class GAInput:
     is being defined. For example:
     
         fitness_func; cage; target_cavity=5.7348; coeffs=[1,1,0,0,0]; 
-        macromodel_path="/home/lukas/program_files/schrodinger2016-3"
+        macromodel_path="/home/lukas/program_files/schrodinger2016-3"$
 
-    NOTE: In the input file this example would be on a single line. It
-          was placed on 2 here to conform to style guidelines. In 
-          addition, not all parameters required by the ``cage`` function
+    NOTE: Not all parameters required by the ``cage`` function
           are defined.
 
     This line specifices that the ``cage()`` function defined within
@@ -76,7 +87,7 @@ class GAInput:
     num_mutations: int
         The number of successful mutations per generation.
         
-    num_crosses: int
+    num_crossovers: int
         The number of successful crossovers per generation.
         
     init_func : FunctionData
@@ -137,8 +148,8 @@ class GAInput:
         
         # If the input file did not specify the number of crossovers or
         # mutations it is assumed that none are wanted.
-        if not hasattr(self, 'num_crosses'):
-            self.num_crosses = 0
+        if not hasattr(self, 'num_crossovers'):
+            self.num_crossovers = 0
         
         if not hasattr(self, 'num_mutations'):
             self.num_mutations = 0
@@ -175,10 +186,20 @@ class GAInput:
         # lines. If the keyword is not recognized, raise a 
         # ``ValueError``.        
         with open(self.input_file, 'r') as input_file:
+            
+            # First remove all empty and comment lines.
+            input_file = iter(line.strip() for line in input_file if 
+                            not (line.isspace() or 
+                                 line.strip()[0] == '#' or 
+                                 line.strip() == ''))
+                                 
+            # Join up the file again and split across "$" to get full
+            # commands.
+            input_file = iter(line.strip() for line in 
+                            " ".join(input_file).split("$") if
+                            line != '')
+                
             for raw_line in input_file:
-                # Skip empty or comment lines.
-                if raw_line.isspace() or "#" == raw_line.strip()[0] :
-                    continue
 
                 # Check if the keyword indicates a function defintion.
                 kw, *_ = (word.strip() for word in raw_line.split(";"))
@@ -196,7 +217,7 @@ class GAInput:
                 # ``ValueError``.
                 kw, val = raw_line.split("=")
                 if kw in {'pop_size', 'num_generations', 'num_mutations', 
-                          'num_crosses', 'mutation_weights'}:
+                          'num_crossovers', 'mutation_weights'}:
                     setattr(self, kw, eval(val))
                 else:
                     raise ValueError(
@@ -243,7 +264,7 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            p_name, p_vals = param.split("=")    
+            p_name, p_vals = param.split("=") 
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
