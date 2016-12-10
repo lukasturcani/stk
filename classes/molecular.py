@@ -2168,7 +2168,12 @@ class StructUnit3(StructUnit):
         
         """
         
-        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
+        if sum(1 for _ in self.heavy_direction_vectors()) < 2:
+            raise ValueError(("StructUnit3 molecule "
+                             "has fewer than 3 functional groups."))
+        
+        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 2)
+    
         normal_v = normalize_vector(np.cross(v1, v2))
         
         theta = vector_theta(normal_v, 
@@ -2409,7 +2414,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
-            
+
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
             

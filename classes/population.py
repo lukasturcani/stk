@@ -664,8 +664,8 @@ class Population:
             its applied to all members of the population.
 
         """
-        
-        return np.mean([key(member) for member in self])        
+
+        return np.mean([key(member) for member in self], axis=0)        
         
 
     def dump(self, file_name):
@@ -923,40 +923,3 @@ class Population:
 
     def __repr__(self):
         return str(self)
-
-    """
-    The following methods are inteded for convenience while
-    debugging or testing and should not be used during typical
-    execution of the program.
-
-    """
-
-    @classmethod
-    def init_empty(cls):
-        """
-        Initializes a population of empty cages.
-        
-        Empty cages means that they do not have their attributes
-        initialized. This should only be used during debugging, in cases 
-        when  building cages is not needed.
-        
-        """
-        
-        pops = []
-
-        for x in range(0,8):
-            pop = cls(*iter(Cage.init_empty() for x in range(0,3)),
-                      GATools.default())
-            pops.append(pop)
-
-        pops[1].populations.append(pops[3])
-        pops[1].populations.append(pops[4])
-        pops[1].populations.append(pops[5])
-
-        pops[2].populations.append(pops[6])
-        pops[2].populations.append(pops[7])
-
-        pops[0].populations.append(pops[1])
-        pops[0].populations.append(pops[2])
-
-        return pops[0]
