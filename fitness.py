@@ -37,6 +37,7 @@ import numpy as np
 import rdkit.Chem as chem
 import copy
 from inspect import signature
+from functools import partial
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
@@ -88,6 +89,7 @@ def _calc_fitness(func_data, population):
                 
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
+            raise ex
 
     # After each macro_mol has a fitness value, sort the population by 
     # fitness and print.
@@ -158,7 +160,7 @@ def random_fitness(macro_mol):
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Negative Energy per Bond ', 
                 'Positive Energy per Bond ')
-def cage(macro_mol, population, target_cavity, macromodel_path, 
+def cage(macro_mol, population, target_cavity,  
          target_window=None, coeffs=None, exponents=None, 
          energy_params={'key':('rdkit', 'uff')}):
     """
@@ -259,9 +261,6 @@ def cage(macro_mol, population, target_cavity, macromodel_path,
         
     exponents : numpy.array (default = None)
         An array holding the exponents a to n in equation (2).
-        
-    energy_params : tuple
-        A tuple holding the paramaters for the energy calculation. 
     
     Returns
     -------
@@ -288,10 +287,29 @@ def cage(macro_mol, population, target_cavity, macromodel_path,
 
     """
 
-    # If pyWindow returned ``None`` some error occured. Return minimum
-    # fitness value. 
-    if macro_mol.topology.windows is None:
-        return 1e-4    
+    # Calculate the mean values of the parameters across the population.
+    # Only if they have not been calculated already however.
+    if not population._fitness_cache:
+        print(('\n\n\nCalculating mean values'
+               ' of fitness parameters.\n\n\n'))
+        # These lines calculate the unscaled parameters of all 
+        # population members and return the means of those parameters.
+        p_calc_vars = partial(_calc_fitness_vars(
+                               target_cavity=target_cavity,
+                               target_window=target_window,
+                               energy_params=energy_params))
+                               
+        mean = population.mean(p_calc_vars)
+        # The means are saved to the cache.
+        population._fitness_cache['mean'] = mean
+
+    # At this point all members of the population will have had their
+    # unscaled fitness parameters calculated.
+
+    # If one or more of the fitness parameters failed, return minimum 
+    # fitness. 
+    if macro_mol._fitness_fail:
+        return 1e-4
 
     # Set the default coeffient values.
     if coeffs is None:
@@ -301,111 +319,10 @@ def cage(macro_mol, population, target_cavity, macromodel_path,
     if exponents is None:
         exponents = np.array([1,1,1,1,1]) 
 
-    # Calculate the unscaled fitness variables, only if they have not
-    # already been calculated.
-    if not hasattr(macro_mol, '_unscaled_fitness_vars'):
-
-        # Calculate the difference between the cavity size of the cage and
-        # the desired cavity size.
-        cavity_diff = abs(target_cavity -
-                          macro_mol.topology.cavity_size())
-        
-        # Calculate the window area required to fit a molecule of the target
-        # size through.
-        if target_window is None:
-            target_window = target_cavity
-        # The point is to allow only molecules of the target size to
-        # diffuse through the cage, no bigger molecules. To do this the
-        # biggest window of the cage must be found. The difference between
-        # this window and the target window size is then found.
-        window_diff = abs(target_window - 
-                          max(macro_mol.topology.windows)) 
-    
-        # Check the assymetry of the cage.
-        asymmetry = macro_mol.topology.window_difference()
-    
-        # Check the formation energy of the cage. Treat the positive and
-        # negative cases separately.
-        energy_per_bond = macro_mol.energy.pseudoformation(
-                                                        **energy_params)
-        energy_per_bond /= macro_mol.topology.bonds_made
-        if energy_per_bond < 0:
-            ne_per_bond = energy_per_bond
-            pe_per_bond = 0
-        else:
-            ne_per_bond = 0
-            pe_per_bond = energy_per_bond
- 
-        macro_mol._unscaled_fitness_vars = np.array([
-                                                     cavity_diff, 
-                                                     window_diff,                                                          
-                                                     asymmetry,
-                                                     ne_per_bond,
-                                                     pe_per_bond
-                                                     ])
-
-    # Calculate the mean values of the parameters across the population.
-    # Only if they have not been calculated already however.
-    if not population._fitness_cache:
-        mean_cavity_diff = population.mean(
-                                    lambda x : abs(target_cavity -
-                                              x.topology.cavity_size()))  
-        
-        mean_window_diff = population.mean(
-                                    lambda x : abs(target_window - 
-                                               max(x.topology.windows))) 
-        mean_asymmetry = population.mean(
-                              lambda x : x.topology.window_difference()) 
-
-        mean_ne_per_bond = population.mean(lambda x:
-                             x.energy.pseudoformation(**energy_params) / 
-                             x.topology.bonds_made if 
-                             x.energy.pseudoformation(**energy_params) / 
-                             x.topology.bonds_made < 0
-                             else 0)
-
-        mean_pe_per_bond = population.mean(lambda x:
-                             x.energy.pseudoformation(**energy_params) / 
-                             x.topology.bonds_made if 
-                             x.energy.pseudoformation(**energy_params) / 
-                             x.topology.bonds_made > 0
-                             else 0)
-
-        population._fitness_cache['cavity_diff'] = mean_cavity_diff
-        population._fitness_cache['window_diff'] = mean_window_diff
-        population._fitness_cache['asymmetry'] = mean_asymmetry
-        population._fitness_cache['ne_per_bond'] = mean_ne_per_bond
-        population._fitness_cache['pe_per_bond'] = mean_pe_per_bond
-
-
-    mean_cavity_diff = population._fitness_cache['cavity_diff']
-    mean_window_diff = population._fitness_cache['window_diff']
-    mean_asymmetry = population._fitness_cache['asymmetry']
-    mean_ne_per_bond = population._fitness_cache['ne_per_bond']
-    mean_pe_per_bond = population._fitness_cache['pe_per_bond']
-
-    s_cavity_diff = (cavity_diff / mean_cavity_diff if
-                     mean_cavity_diff != 0 else cavity_diff)
-                     
-    s_window_diff = (window_diff / mean_window_diff if 
-                     mean_window_diff != 0 else window_diff)
-                     
-    s_asymmetry = (asymmetry / mean_asymmetry if 
-                   mean_asymmetry != 0 else asymmetry)
-                   
-    s_ne_per_bond = (ne_per_bond  / mean_ne_per_bond if 
-                     mean_ne_per_bond != 0 else ne_per_bond)
-                          
-    s_pe_per_bond = (pe_per_bond / mean_pe_per_bond if 
-                     mean_pe_per_bond != 0 else pe_per_bond)
-
-    scaled =  np.array([
-                     s_cavity_diff, 
-                     s_window_diff,                                                          
-                     s_asymmetry,
-                     s_ne_per_bond,
-                     s_pe_per_bond
-                     ])
+    # Calculate the scaled fitness parameters by dividing the unscaled
+    # ones by the fitness.
+    scaled = np.divide(macro_mol._unscaled_fitness_vars, 
+                       population._fitness_cache['mean'])
        
     fitness_vars = np.power(scaled, exponents)
     fitness_vars = np.multiply(fitness_vars, coeffs)    
@@ -419,6 +336,82 @@ def cage(macro_mol, population, target_cavity, macromodel_path,
     carrot_term = fitness_vars[-1]
     
     return penalty_term + carrot_term    
+
+def _calc_fitness_vars(macro_mol, target_cavity, 
+                       target_window, energy_params):
+    """
+    Calculates the unscaled fitness parameters for ``cage()``.
+
+    Parameters
+    ----------
+    macro_mol : Cage
+        The  Cage instance which needs to have its fitness calculated.
+        
+    target_cavity : float
+        The desried size of the cage's cavity.
+        
+    target_window : float
+        The desired radius of the largest window of the cage. If 
+        ``None`` then `target_cavity` is used.
+    
+    Modifies
+    --------
+    macro_mol._unscaled_fitness_vars : numpy.array
+        Creates this attribute and places the unscaled fitness
+        parameters within.
+    
+    macro_mol._fitness_fail : bool
+        If the calculation of one of the fitness parameters failed this
+        is ``True``, else ``False``.
+    
+    Returns
+    -------
+    numpy.array
+        An array holding the unscaled fitness parameters of `macro_mol`.
+    
+    """
+     
+    # If the parameters have already been calculated for this 
+    # `macro_mol` do not recalculate them.
+    if hasattr(macro_mol, '_unscaled_fitness_vars'):
+        return macro_mol._unscaled_fitness_vars
+                   
+    cavity_diff = abs(target_cavity - macro_mol.topology.cavity_size())
+
+    window_diff = (abs(target_window - 
+                      max(macro_mol.topology.windows)) if 
+                      macro_mol.topology.windows is not None else None)
+                      
+    asymmetry = (macro_mol.topology.window_difference() if
+                 macro_mol.topology.window_difference() is not None 
+                                                        else None) 
+
+    e_per_bond = macro_mol.energy.pseudoformation(**energy_params)
+    e_per_bond /= macro_mol.topology.bond_made
+
+    if e_per_bond < 0:
+        ne_per_bond = e_per_bond
+        pe_per_bond = 0
+    else:
+        ne_per_bond = 0
+        pe_per_bond = e_per_bond
+    
+    fitness_vars = [cavity_diff,
+                    window_diff,
+                    asymmetry,
+                    ne_per_bond,
+                    pe_per_bond]
+                    
+    macro_mol._fitness_fail = True if None in fitness_vars else False
+
+    macro_mol._unscaled_fitness_vars = np.array([
+                    cavity_diff,
+                    (window_diff if window_diff is not None else 0),
+                    (asymmetry if asymmetry is not None else 0),
+                    ne_per_bond,
+                    pe_per_bond])
+                                               
+    return macro_mol._unscaled_fitness_vars
 
 def cage_target(macro_mol, target_mol_file, macromodel_path, 
                 rotations=0):

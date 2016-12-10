@@ -40,7 +40,8 @@ def run():
     
     # Copy the input script into the output folder - this is useful for
     # keeping track of what input was used to generate the output.
-    shutil.copyfile(sys.argv[1], os.path.join('output', sys.argv[1]))
+    shutil.copyfile(sys.argv[1], os.path.join('output', 
+                                os.path.split(sys.argv[1])[-1]))
         
     os.chdir('output')
     root_dir = os.getcwd()
