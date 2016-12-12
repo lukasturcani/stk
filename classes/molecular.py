@@ -911,7 +911,52 @@ class Molecule:
 
         return np.matrix(pos_array.reshape(-1,3).T)
 
-    def rotate(self, theta, axis):
+    def rotate(self, mol_type, theta, axis):
+        """
+        Rotates the heavy rdkit molecule by `theta` about `axis`.
+        
+        The rotation occurs about the molecular centroid.        
+        
+        Parameters
+        ----------    
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.           
+        
+        theta : float
+            The size of the rotation in radians.
+        
+        axis : numpy.array
+            The axis about which rotation happens.
+        
+        Modifies
+        --------
+        prist_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated if `mol_type` is 
+            'prist'.
+        
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated if `mol_type` is 
+            'heavy'.
+    
+        Returns
+        -------
+        None : NoneType
+            
+        """
+
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))       
+        
+        og_position = self.centroid(mol_type)
+        self.set_position(mol_type, [0,0,0])
+        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(mol_type))
+        self.set_position_from_matrix(mol_type, new_pos_mat)
+        self.set_position(mol_type, og_position)
+        
+    def rotate2(self, theta, axis):
         """
         Rotates the heavy rdkit molecule by `theta` about `axis`.
         
@@ -943,7 +988,105 @@ class Molecule:
         self.set_position_from_matrix('heavy', new_pos_mat)
         self.set_heavy_atom_centroid(og_position)
 
+    def set_orientation(self, mol_type, start, end):
+        """
+        Rotates heavy molecule by rotation of `start` to `end`.
+ 
+        Note: The difference between this method and 
+        `_set_heavy_mol_orientation()` is about which point the rotation
+        occurs (centroid of entire molecule versus centroid of heavy 
+        atoms, respectively). This method works on both heavy and 
+        pristine molecules while `_set_heavy_mol_orientation()` doesn't.
+        
+        Given two direction vectors, `start` and `end`, this method
+        applies the rotation required transform `start` to `end` on 
+        the molecule. The rotation occurs about the centroid of the
+        molecule.
+        
+        For example, if the `start` and `end` vectors
+        are 45 degrees apart, a 45 degree rotation will be applied to
+        the molecule. The rotation will be along the appropriate axis.
+        
+        The great thing about this method is that you as long as you can 
+        associate a gemotric feature of the molecule with a vector, then 
+        the molecule can be roatated so that this vector is aligned with 
+        `end`. The defined vector can be virtually anything. This means 
+        that any geomteric feature of the molecule can be easily aligned 
+        with any arbitrary axis.
+        
+        Parameters
+        ----------
+        mol_type : str
+            Must be either 'prist' or 'heavy' to signify which rdkit
+            molecule this method should operate on.
+        
+        start : numpy.array
+            A vector which is to be rotated so that it transforms to the
+            `end` vector.
+        
+        end : numpy.array
+            This array holds the directional vector along which the 
+            heavy atoms in the linker should be placed.
+            
+        Modifies
+        --------
+        prist_mol : rdkit.Chem.rdchem.Mol   
+            When `mol_type` is 'prist', the conformer in this rdkit 
+            instance is changed due to rotation of the molecule about
+            its centroid.
+        
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            When `mol_type` is 'heavy', the conformer in this rdkit 
+            instance is changed due to rotation of the molecule about
+            its centroid.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance of the rotated molecule. This is 
+            a copy of the rdkit molecule in `heavy_mol` or `prist_mol`.
+            
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+            
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
 
+        # Normalize the input direction vectors.
+        start = normalize_vector(start)
+        end = normalize_vector(end)
+        
+        # Record the position of the molecule then translate the heavy
+        # atom centroid to the origin. This is so that the rotation
+        # occurs about this point.
+        og_center = self.centroid(mol_type)
+        self.set_position(mol_type, [0,0,0]) 
+        
+        # Get the rotation matrix.
+        rot_mat = rotation_matrix(start, end)
+        
+        # Apply the rotation matrix to the atomic positions to yield the
+        # new atomic positions.
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(mol_type))
+
+        # Set the positions in the heavy rdkit molecule.
+        self.set_position_from_matrix(mol_type, new_pos_mat)
+        self.set_position(mol_type, og_center)
+
+        return chem.Mol(rdkit_mol)        
+
+            
     def set_position(self, mol_type, position):
         """
         Changes the position of the rdkit molecule. 
@@ -1765,10 +1908,10 @@ class StructUnit(Molecule, metaclass=Cached):
 
     def _set_heavy_mol_orientation(self, start, end):
         """
-        Rotates heavy molecule by rotation of `start` to `end`.
+        Rotates from `start` to `end`.
         
         Given two direction vectors, `start` and `end`, this method
-        applies the rotation required to go from `start` to `end` on 
+        applies the rotation required to transform `start` to `end` on 
         the heavy molecule. The rotation occurs about the centroid
         of the heavy atoms. 
         
@@ -1793,7 +1936,7 @@ class StructUnit(Molecule, metaclass=Cached):
         is run.
         
         As the above examples demonstrate, the great thing about this 
-        method is that you as long as you can associate a gemotric 
+        method is that you as long as you can associate a geometric 
         feature of the molecule with a vector, then the molecule can be 
         roatated so that this vector is aligned with `end`. The defined 
         vector can be virtually anything. This means that any geomteric 
@@ -2093,7 +2236,7 @@ class StructUnit2(StructUnit):
                              vector)
                              
         # First determine the direction in which iteration should occur.
-        self.rotate(step, axis)
+        self.rotate2(step, axis)
         theta2 = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)       
         if theta2 > theta:
@@ -2101,13 +2244,13 @@ class StructUnit2(StructUnit):
             
         prev_theta = theta2
         while True:
-            self.rotate(step, axis)
+            self.rotate2(step, axis)
             theta = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)
             
             if theta > prev_theta:
                 axis = np.multiply(axis, -1)
-                self.rotate(step, axis)
+                self.rotate2(step, axis)
                 break
             
             prev_theta = theta
