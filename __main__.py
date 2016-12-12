@@ -53,7 +53,7 @@ def run():
     selector = Selection(ga_input.generational_select_func, 
                          ga_input.parent_select_func, 
                          ga_input.mutant_select_func)
-    mator = Crossover(ga_input.crossover_func, ga_input.num_crosses)
+    mator = Crossover(ga_input.crossover_func, ga_input.num_crossovers)
     mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
                        weights=ga_input.mutation_weights)
     ga_tools = GATools(selector, mator, mutator, 
