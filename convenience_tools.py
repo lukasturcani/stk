@@ -280,7 +280,7 @@ def matrix_centroid(matrix):
     
     Parameters
     ----------
-    matrix : np.array
+    matrix : np.matrix
         A n x 3 matrix. Each row holds the x, y and z coordinate of some
         point, respectively.
         
@@ -292,8 +292,8 @@ def matrix_centroid(matrix):
     
     """
     
-    sum_ = sum( x[0] for x in matrix)
-    return sum_ / len(matrix)
+
+    return np.array(np.sum(matrix, axis=0) / len(matrix))[0]
 
 class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
