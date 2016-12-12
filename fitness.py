@@ -579,8 +579,8 @@ def cage_c60(macro_mol, target_mol_file,
         mm_complex.write_mol_file('prist')
         mm_complex.optimized = False
         mm_complex.energy = Energy(mm_complex)
-#        optimization.macromodel_opt(mm_complex, no_fix=True,
-#                       macromodel_path=macromodel_path)
+        optimization.macromodel_opt(mm_complex, no_fix=True,
+                       macromodel_path=macromodel_path)
         macromol_complexes.append(mm_complex)
 
     # Calculate the energy of the complex and compare to the
