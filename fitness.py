@@ -261,6 +261,10 @@ def cage(macro_mol, population, target_cavity,
         
     exponents : numpy.array (default = None)
         An array holding the exponents a to n in equation (2).
+        
+    energy_params : dict
+        A dictionary holding the name arguments and values for the 
+        ``Energy.pseudoformation()`` function.
     
     Returns
     -------
