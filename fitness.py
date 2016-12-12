@@ -38,11 +38,13 @@ import rdkit.Chem as chem
 import copy
 from inspect import signature
 from functools import partial
+import networkx as nx
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit
 from . import optimization
-from .convenience_tools import rotation_matrix_arbitrary_axis
+from .convenience_tools import (rotation_matrix_arbitrary_axis, 
+                                matrix_centroid)
 
 def _calc_fitness(func_data, population):
     """
@@ -496,7 +498,95 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
         raw_fitness = 1e10
         
     return raw_fitness
-   
+ 
+def cage_c60(macro_mol, target_mol_file, 
+             macromodel_path, n5fold, n2fold):
+    """
+    Calculates the fitness of a cage / C60 complex.
+    
+    The difference between this function and `cage_target()` is that
+    the rotations are specifically aimed at sampling C60 entirely and
+    systematically. Rather than the random sampling of the other
+    function.
+    
+    Parameters
+    ----------
+    macro_mol : Cage
+        The cage which is to have its fitness calculated,
+
+    target_mol_file : str
+        The full path of the .mol file hodling the target molecule
+        placed inside the cage.
+        
+    macromodel_path : str
+        The Schrodinger directory path.
+
+    n5fold : int
+        The number of rotations along the 5-fold axis of symmetry.
+        
+    n2fold : int
+        The number of rotations along the 2 fold axis of symmetry per
+        rotation along the 5-fold axis.
+        
+    Returns
+    -------
+    float
+        The fitness value of `macro_mol`.
+    
+    """
+    
+    # If the cage already has a fitness value, don't run the
+    # calculation again.
+    if macro_mol.fitness:
+        print('Skipping {0}'.format(macro_mol.prist_mol_file))
+        return macro_mol.fitness
+    
+    # The first time running the fitness function create an instance
+    # of the target molecule as a ``StructUnit``. Due to caching,
+    # running the initialization again on later attempts will not 
+    # re-initialize.
+    target = StructUnit(target_mol_file, minimal=True)
+
+    # This function creates a new molecule holding both the target
+    # and the cage centered at the origin. It then calculates the 
+    # energy of this complex and compares it to the energies of the
+    # molecules when separate. The more stable the complex relative
+    # to the individuals the higher the fitness.
+    
+    # Create rdkit instances of the target in the cage for each
+    # rotation.        
+    rdkit_complexes = _c60_rotations(macro_mol, target, n5fold, n2fold)
+    
+    # Optimize the strcuture of the cage/target complexes.
+    macromol_complexes = []        
+    for i, complex_ in enumerate(rdkit_complexes):
+        # In order to use the optimization functions, first the data is 
+        # loaded into a ``MacroMolecule`` instance and its .mol file is 
+        # written to the disk.
+        mm_complex = MacroMolecule.__new__(MacroMolecule)
+        mm_complex.prist_mol = complex_
+        mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
+                            '.mol', '_COMPLEX_{0}.mol'.format(i))
+        mm_complex.write_mol_file('prist')
+        
+        optimization.macromodel_opt(mm_complex, no_fix=True,
+                       macromodel_path=macromodel_path)
+        macromol_complexes.append(mm_complex)
+    
+    # Calculate the energy of the complex and compare to the
+    # individual energies. If more than complex was made, use the
+    # most stable version.
+    energy_separate = macro_mol.energy + target.energy
+    energy_diff =  min(macromol_complex.energy - energy_separate for 
+                            macromol_complex in macromol_complexes)
+    
+                       
+    raw_fitness = np.exp(energy_diff*1e-5) + 1
+    if raw_fitness > 1e10:
+        raw_fitness = 1e10
+        
+    return raw_fitness
+    
 def _generate_complexes(macro_mol, target, number=1):
     """
     Yields rdkit instances of cage / target complexes.
@@ -549,7 +639,68 @@ def _generate_complexes(macro_mol, target, number=1):
         
         yield chem.CombineMols(macro_mol.prist_mol, rot_target.prist_mol)
     
+def _c60_rotations(macro_mol, c60, n5fold, n2fold):
+    """
+    Rotates C60 about its axes of symmetry and places it in `macro_mol`.
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The cage which should have C60 placed inside it.
+        
+    c60 : StructUnit
+        A StructUnit instance of C60.
+        
+    n5fold : int
+        The number of rotations along the 5-fold axis of symmetry.
+        
+    n2fold : int
+        The number of rotations along the 2 fold axis of symmetry per
+        rotation along the 5-fold axis.
+        
+    Yields
+    ------
+    rdkit.Chem.rdchem.Mol
+        An rdkit instance holding the cage / C60 complex. 
+    
+    """
+    
+    
+    macro_mol.set_position('prist', [0,0,0])
+    c60.set_position('prist', [0,0,0])
+    
+    # Step 1: Align the 5 membered ring with the z-axis.
+    
+    # Find a the ids of atoms in a membered ring.
+    g = c60.graph('prist')
+    ids = next(x for x in nx.cycle_basis(g) if len(x) == 5)
+    # Place the coordinates of those atoms in a matrix.
+    ring_matrix = np.matrix(
+                        [c60.atom_coords('prist', id_) for id_ in ids])
 
+    # Get the centroid of the ring.    
+    ring_centroid = matrix_centroid(ring_matrix)
+    # Align the centroid of the ring with the z-axis.
+    c60.set_orientation('prist', ring_centroid, [0,0,1])
+    aligned_c60 = copy.deepcopy(c60)
+    
+    # Step 2: Get the rotation angles and apply the rotations. Yield 
+    # the resulting complex.
+    
+    # Get the angles of the 5 and 2 fold rotations.
+    angles5fold = np.arange(0, 72/180*np.pi, n5fold)
+    angles2fold = np.arange(0, np.pi, n2fold)
+    
+    for angle5 in angles5fold:
+        for angle2 in angles2fold:
+            buckyball = copy.deepcopy(aligned_c60)
+            buckyball.rotate('prist', angle5, [0,0,1])
+            buckyball.rotate('prist', angle2, [0,1,0])
+            yield chem.CombineMols(macro_mol.prist_mol, c60.prist_mol)
+
+    
+    
+    
 
     
     
