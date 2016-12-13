@@ -89,12 +89,7 @@ def _calc_fitness(func_data, population):
 
 def _calc_fitness_serial(func_data, population):
     """
-    Calculates the fitness values of all members of a population.
-    
-    A fitness function should take a ``MacroMolecule`` instance and
-    return a number representing its fitness. The assignement to the
-    `fitness` attribute of a population member happens here, not by the
-    fitness function.    
+    Calculates the fitness values of all members of a population.  
     
     Parameters
     ----------
@@ -114,25 +109,14 @@ def _calc_fitness_serial(func_data, population):
     # Get the fitness function object.
     func = globals()[func_data.name]
     
-    # Check if the fitness function wants to use the population as well.
-    use_pop = 'population' in signature(func).parameters.keys()
-    # Fitness functions can cache values here each generation. For
-    # example, storing the mean values of cavity differences each
-    # generation is used by the ``cage()`` fitness function.
-    population._fitness_cache = {}
 
     # Apply the function to every member of the population.
     for macro_mol in population:
         try:
-            if use_pop:
-                macro_mol.fitness = func(macro_mol, population, 
-                                         **func_data.params)
-            else:
-                macro_mol.fitness = func(macro_mol, **func_data.params)
+            func(macro_mol, **func_data.params)
                 
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
-            raise ex
 
     # After each macro_mol has a fitness value, sort the population by 
     # fitness and print.
@@ -341,94 +325,12 @@ def cage(macro_mol, population, target_cavity,
 
     """
 
-    # Calculate the mean values of the parameters across the population.
-    # Only if they have not been calculated already however.
-    if not population._fitness_cache:
-        print(('\n\n\nCalculating mean values'
-               ' of fitness parameters.\n\n\n'))
-        # These lines calculate the unscaled parameters of all 
-        # population members and return the means of those parameters.
-        p_calc_vars = partial(_calc_fitness_vars(
-                               target_cavity=target_cavity,
-                               target_window=target_window,
-                               energy_params=energy_params))
-                               
-        mean = population.mean(p_calc_vars)
-        # The means are saved to the cache.
-        population._fitness_cache['mean'] = mean
 
-    # At this point all members of the population will have had their
-    # unscaled fitness parameters calculated.
-
-    # If one or more of the fitness parameters failed, return minimum 
-    # fitness. 
-    if macro_mol._fitness_fail:
-        return 1e-4
-
-    # Set the default coeffient values.
-    if coeffs is None:
-        coeffs = np.array([1,1,1,1,0.2])
-        
-    # Set the default exponent values.
-    if exponents is None:
-        exponents = np.array([1,1,1,1,1]) 
-
-    # Calculate the scaled fitness parameters by dividing the unscaled
-    # ones by the fitness.
-    scaled = np.divide(macro_mol._unscaled_fitness_vars, 
-                       population._fitness_cache['mean'])
-       
-    fitness_vars = np.power(scaled, exponents)
-    fitness_vars = np.multiply(fitness_vars, coeffs)    
-    penalty_term = np.sum(fitness_vars[:-1])
-    penalty_term =  np.divide(1,penalty_term)
-    if penalty_term > 1e101:
-        penalty_term = 1e101
-    
-    # Carrots and sticks, where the previous fitness parameters were
-    # the sticks.
-    carrot_term = fitness_vars[-1]
-    
-    return penalty_term + carrot_term    
-
-def _calc_fitness_vars(macro_mol, target_cavity, 
-                       target_window, energy_params):
-    """
-    Calculates the unscaled fitness parameters for ``cage()``.
-
-    Parameters
-    ----------
-    macro_mol : Cage
-        The  Cage instance which needs to have its fitness calculated.
-        
-    target_cavity : float
-        The desried size of the cage's cavity.
-        
-    target_window : float
-        The desired radius of the largest window of the cage. If 
-        ``None`` then `target_cavity` is used.
-    
-    Modifies
-    --------
-    macro_mol._unscaled_fitness_vars : numpy.array
-        Creates this attribute and places the unscaled fitness
-        parameters within.
-    
-    macro_mol._fitness_fail : bool
-        If the calculation of one of the fitness parameters failed this
-        is ``True``, else ``False``.
-    
-    Returns
-    -------
-    numpy.array
-        An array holding the unscaled fitness parameters of `macro_mol`.
-    
-    """
      
     # If the parameters have already been calculated for this 
     # `macro_mol` do not recalculate them.
-    if hasattr(macro_mol, '_unscaled_fitness_vars'):
-        return macro_mol._unscaled_fitness_vars
+    if macro_mol.fitness:
+        return macro_mol
                    
     cavity_diff = abs(target_cavity - macro_mol.topology.cavity_size())
 
@@ -458,14 +360,14 @@ def _calc_fitness_vars(macro_mol, target_cavity,
                     
     macro_mol._fitness_fail = True if None in fitness_vars else False
 
-    macro_mol._unscaled_fitness_vars = np.array([
+    macro_mol.fitness = np.array([
                     cavity_diff,
                     (window_diff if window_diff is not None else 0),
                     (asymmetry if asymmetry is not None else 0),
                     ne_per_bond,
                     pe_per_bond])
-                                               
-    return macro_mol._unscaled_fitness_vars
+    
+    return macro_mol
 
 def cage_target(macro_mol, target_mol_file, macromodel_path, 
                 rotations=0):
