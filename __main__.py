@@ -3,12 +3,10 @@ import shutil
 import sys
 import warnings
 
-from .classes import (Population, GATools, Selection, Mutation, Mating, 
-                      GAInput, InputHelp, StructUnit2, StructUnit3, Cage)
-from .classes.topology import FourPlusSix
+from .classes import (Population, GATools, Selection, Mutation, 
+                      Crossover, GAInput, InputHelp)
 from .classes.exception import PopulationSizeError
-from .optimization import kill_macromodel
-from .convenience_tools import time_it, archive_output
+from .convenience_tools import time_it, archive_output, kill_macromodel
 
 def run():
     
@@ -42,7 +40,8 @@ def run():
     
     # Copy the input script into the output folder - this is useful for
     # keeping track of what input was used to generate the output.
-    shutil.copyfile(sys.argv[1], os.path.join('output', sys.argv[1]))
+    shutil.copyfile(sys.argv[1], os.path.join('output', 
+                                os.path.split(sys.argv[1])[-1]))
         
     os.chdir('output')
     root_dir = os.getcwd()
@@ -54,7 +53,7 @@ def run():
     selector = Selection(ga_input.generational_select_func, 
                          ga_input.parent_select_func, 
                          ga_input.mutant_select_func)
-    mator = Mating(ga_input.mating_func, ga_input.num_matings)
+    mator = Crossover(ga_input.crossover_func, ga_input.num_crossovers)
     mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
                        weights=ga_input.mutation_weights)
     ga_tools = GATools(selector, mator, mutator, 
@@ -94,7 +93,7 @@ def run():
             '----------------------------------------------\n\n') 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            pop.calculate_member_fitness()
+            pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
             
     # Run the GA.
     for x in range(ga_input.num_generations):
@@ -118,7 +117,7 @@ def run():
         os.chdir(str(x))
         
         with time_it():
-            print('\n\nStarting mating.\n----------------\n\n')
+            print('\n\nStarting crossovers.\n--------------------\n\n')
             offspring = pop.gen_offspring()
     
         with time_it():
@@ -147,7 +146,8 @@ def run():
                 '----------------------------------------------\n\n')    
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                pop.calculate_member_fitness()    
+                pop = Population(pop.ga_tools, 
+                                 *pop.calculate_member_fitness())
     
         with time_it():        
             print(('\n\nSelecting members of the next generation.\n'

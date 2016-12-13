@@ -1,10 +1,11 @@
 from types import ModuleType
+import sys
 
 from . import FunctionData
 from ..topology import *
 from ..population import Population
 from .selection import Selection
-from .mating import Mating
+from .crossover import Crossover
 from .mutation import Mutation
 from ...optimization import optimization
 from ... import fitness
@@ -15,13 +16,24 @@ class GAInput:
     
     A description of the input file follows, also see the User's guide.
 
-    The input file consists of a sequence of lines. Each line defines a 
-    variable or a function used by MMEA. If the line defines a function 
-    used by MMEA the same line must also define any parameters necessary
-    to use the function. It does not have to define any default
-    initialized parameters, though it may if desired.
+    The input file consists of a sequence of commands. Each command 
+    defines a variable or a function used by MMEA. If the command 
+    defines a function used by MMEA it must also define any parameters 
+    necessary to use the function. It does not have to define any 
+    default initialized parameters, though it may if desired. A command 
+    terminates with the ``$`` symbol. This means that 
     
-    If the line is empty or the first character is ``#`` it is skipped.
+        generational_select_func; 
+        stochastic_sampling; 
+        use_rank=True$
+        
+    and 
+    
+        generational_select_func; stochastic_sampling; use_rank=True$
+        
+    define the same command.
+    
+    If a line is empty or the first character is ``#`` it is skipped.
     This may be convenient if you wish to organize the input file into
     sections or add comments.
     
@@ -31,19 +43,21 @@ class GAInput:
     such as ``num_generations`` they are simply followed by a ``=`` and 
     the desired value. For example,
         
-        num_generations=25
+        num_generations=25$
         
     would set the `num_generations` attribute of the ``GAInput`` 
     instance to 25. Notice there is no whitespace in this line. This is
     required.
     
-    For lines where the keyword defines a function or method the syntax 
-    is as follows:
+    For commands where the keyword defines a function or method the 
+    syntax is as follows:
         
-        keyword; func_name; param1_name=param1_val; param2_name=param2_val
+        keyword; func_name; param1_name=param1_val; 
+        param2_name=param2_val$
           
     Key points from the line example are:
-        > Every unit is separated by a semicolon, ``;``, except the last.
+        > Every unit is separated by a semicolon, ``;``, except the last
+          which terminates with a ``$``.
         > Parameter names are followed by a ``=`` with NO WHITESPACE.
         > The ``=`` after the parameter name is followed by the value of
           the parameter with NO WHITESPACE.
@@ -52,14 +66,12 @@ class GAInput:
     is being defined. For example:
     
         fitness_func; cage; target_cavity=5.7348; coeffs=[1,1,0,0,0]; 
-        macromodel_path="/home/lukas/program_files/schrodinger2016-3"
+        macromodel_path="/home/lukas/program_files/schrodinger2016-3"$
 
-    NOTE: In the input file this example would be on a single line. It
-          was placed on 2 here to conform to style guidelines. In 
-          addition, not all parameters required by the ``cage`` function
+    NOTE: Not all parameters required by the ``cage`` function
           are defined.
 
-    This line specifices that the ``cage()`` function defined within
+    This command specifices that the ``cage()`` function defined within
     ``fitness.py`` is to be used as the fitness function. Notice that
     if the value passed to a parameter can be a list or a string.
     However, the type must be made explicit with either ``[]`` or quotes 
@@ -76,8 +88,8 @@ class GAInput:
     num_mutations: int
         The number of successful mutations per generation.
         
-    num_matings: int
-        The number of successful matings per generation.
+    num_crossovers: int
+        The number of successful crossovers per generation.
         
     init_func : FunctionData
         The ``Population`` method used for initialization. This must
@@ -99,10 +111,10 @@ class GAInput:
         Must correspond to a method defined within the ``Selection`` 
         class.                        
         
-    mating_func : FunctionData
-        The ``Mating`` class method used to mate ``MacroMolecule`` 
+    crossover_func : FunctionData
+        The ``Crossover`` class method used to cross ``MacroMolecule`` 
         instances to generate offspring. Must correspond to a method
-        defined within the ``Mating`` class.
+        defined within the ``Crossover`` class.
     
     mutation_func : FunctionData
         The ``Mutation`` class method used to mutate ``MacroMolecule`` 
@@ -135,10 +147,10 @@ class GAInput:
         # Read the input file and extract its information.
         self._extract_data()
         
-        # If the input file did not specify the number of matings or
+        # If the input file did not specify the number of crossovers or
         # mutations it is assumed that none are wanted.
-        if not hasattr(self, 'num_matings'):
-            self.num_matings = 0
+        if not hasattr(self, 'num_crossovers'):
+            self.num_crossovers = 0
         
         if not hasattr(self, 'num_mutations'):
             self.num_mutations = 0
@@ -175,10 +187,20 @@ class GAInput:
         # lines. If the keyword is not recognized, raise a 
         # ``ValueError``.        
         with open(self.input_file, 'r') as input_file:
+            
+            # First remove all empty and comment lines.
+            input_file = iter(line.strip() for line in input_file if 
+                            not (line.isspace() or 
+                                 line.strip()[0] == '#' or 
+                                 line.strip() == ''))
+                                 
+            # Join up the file again and split across "$" to get full
+            # commands.
+            input_file = iter(line.strip() for line in 
+                            " ".join(input_file).split("$") if
+                            line != '')
+                
             for raw_line in input_file:
-                # Skip empty or comment lines.
-                if raw_line.isspace() or "#" == raw_line.strip()[0] :
-                    continue
 
                 # Check if the keyword indicates a function defintion.
                 kw, *_ = (word.strip() for word in raw_line.split(";"))
@@ -194,9 +216,16 @@ class GAInput:
                 # Check if the keyword is a simple value. If it is, 
                 # assign it to an attribute. If its not, raise a
                 # ``ValueError``.
-                kw, val = raw_line.split("=")
+                try:
+                    kw, val = raw_line.split("=")
+                except Exception:
+                    print(("\n\nERROR: Issue with the input file on the"
+                    " following line (or its vicinity):\n\n"), raw_line,
+                    "\n\n", sep="")
+                    sys.exit()
+        
                 if kw in {'pop_size', 'num_generations', 'num_mutations', 
-                          'num_matings', 'mutation_weights'}:
+                          'num_crossovers', 'mutation_weights'}:
                     setattr(self, kw, eval(val))
                 else:
                     raise ValueError(
@@ -243,7 +272,20 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            p_name, p_vals = param.split("=")    
+            try:
+                p_name, p_vals = param.split("=")
+            except ValueError:
+                if param.count("=") > 1:
+                    print(('\n\nERROR: Multiple "=" detected in the'
+                    ' following line, did you forget a "$"?\n\n'), 
+                    line, "\n\n", sep="")
+                    sys.exit()
+                
+            except Exception:
+                print(("\n\nERROR: Issue with the input file on the"
+                " following line (or its vicinity):\n\n"), line, "\n\n",
+                sep="")
+                sys.exit()                        
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
@@ -284,22 +326,22 @@ class InputHelp:
                'generational_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
-                                 not name.startswith('mating') and
+                                 not name.startswith('crossover') and
                                  not name.startswith('_')),
 
                'parent_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
-                                 name.startswith('mating')),
+                                 name.startswith('crossover')),
                                            
                'mutant_select_func' : iter(
                                  func for name, func in 
                                  Selection.__dict__.items() if 
-                                 not name.startswith('mating') and
+                                 not name.startswith('crossover') and
                                  not name.startswith('_')),
                                            
-               'mating_func' : iter(func for name, func in 
-                                    Mating.__dict__.items() if 
+               'crossover_func' : iter(func for name, func in 
+                                    Crossover.__dict__.items() if 
                                     not name.startswith('_')),
                
                'mutation_func' : iter(func for name, func in 

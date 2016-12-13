@@ -9,6 +9,7 @@ import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
 import pickle
+import subprocess as sp
 
 from ..convenience_tools import (flatten, periodic_table, 
                                  normalize_vector, rotation_matrix,
@@ -103,6 +104,295 @@ class Cached(type):
             self.__cache[key] = obj
             return obj
 
+class Energy:
+    """
+    Handles all things related to a ``Molecule``'s energy.
+
+    An instance of this class will be placed in the `energy` attribute
+    of a ``Molecule`` instance.    
+
+    Attributes
+    ----------
+    molecule : Molecule    
+        The energetic information held by an instance of ``Energy`` 
+        concerns the molecule held in this attribute.
+    
+    values : dict
+        The keys in the dict code for the function and parameters which
+        were used to calculate the energy. The values are the energies.
+
+    """
+
+    def __init__(self, molecule):
+        self.molecule = molecule
+        self.values = {}
+        
+    def formation(self, key, products, 
+                  building_blocks=None, force_e_calc=False):
+        """
+        Calculates the formation energy.
+        
+        The formation energy is calculated under the assumption that the
+        molecule in `self.molecule` is composed of the molecules in 
+        `building_blocks` and that during formation molecules in 
+        `products` are formed in addition to `self.molecule`.     
+        
+        Parameters
+        ----------
+        key : tuple
+            The first member of the tuple is a string holding the name 
+            of a method used to calculate energies. For exmaple 'rdkit'
+            or 'macromodel'. The remaning elements in the tuple are the
+            parameters that the user wishes to pass to the function.
+            
+        products : tuple of form (float, Molecule)
+            This tuple holds the molecules produced in addition to 
+            `self.molecule`, when  a single `self.molecule` is made. The
+            ``int`` represents the number made per `self.molecule`.
+
+        building_blocks : tuple (default = None)
+            This argument should be a tuple of the form 
+            (float, Molecule). It holds the number of a given Molecule
+            required to build a single molecule held in `self.molecule`.
+            This argument can be omitted when the formation energy of a 
+            MacroMolecule instance is being found, as they keep this 
+            data stored elsewhere already.
+
+        force_e_calc : bool (default = False)
+            If the this is ``True`` then all building blocks, products
+            and `self.molecule` will have their energies recalculated.
+            Even if the energy values have already been found if the 
+            chosen forcefield/method. If ``False`` the energy is only
+            calculated if the value has not already been foud.
+        
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('formation', key[0], key[1]). The value is the 
+            calculated formation energy.            
+        
+        Returns
+        -------
+        float
+            The formation energy. Note that this value is also stored
+            in the dictionary `self.values`.
+        
+        """
+
+        func_name, *params = key
+        
+        # Recalculate energies if requested.
+        if force_e_calc:
+            for _, mol in products:
+                getattr(mol.energy, func_name)(*params)
+        
+        e_products = 0
+        for n, mol in products:
+            if (func_name, params[0]) not in mol.energy.values.keys():
+                getattr(mol.energy, func_name)(*params)
+            
+            e_products += n * mol.energy.values[(func_name, params[0])]
+        
+        eng = self.pseudoformation(key, building_blocks, force_e_calc) 
+        eng -= e_products
+        print(e_products)
+        print(products[0][1].energy.values)
+        self.values[('formation', func_name, params[0])] = eng         
+        return eng
+
+    def pseudoformation(self, key, 
+                        building_blocks=None, force_e_calc=False):
+        """
+        Calculates the formation energy, sans other products.
+
+        This is the formation energy if the energy of the other products
+        of the reaction is not taken into account.
+        
+        Parameters
+        ----------
+        key : tuple
+            The first member of the tuple is a string holding the name 
+            of a method used to calculate energies. For exmaple 'rdkit'
+            or 'macromodel'. The remaning elements in the tuple are the
+            parameters that the user wishes to pass to the function.
+
+        building_blocks : tuple (default = None)
+            This argument should be a tuple of the form 
+            (float, Molecule). It holds the number of a given Molecule
+            required to build a single molecule held in `self.molecule`.
+            This argument can be omitted when the formation energy of a 
+            MacroMolecule instance is being found, as they keep this 
+            data stored elsewhere already.
+
+        force_e_calc : bool (default = False)
+            If the this is ``True`` then all building blocks, products
+            and `self.molecule` will have their energies recalculated.
+            Even if the energy values have already been found if the 
+            chosen forcefield/method. If ``False`` the energy is only
+            calculated if the value has not already been foud.        
+        
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('formation', key[0], key[1]). The value is the 
+            calculated formation energy sans products (pseudoformation).            
+        
+        Returns
+        -------
+        float
+            The pseudoformation energy. Note that this value is also 
+            stored in the dictionary `self.values`.
+        
+        """
+        
+        if building_blocks is None:
+            building_blocks = ((n, mol) for mol, n in 
+                              self.molecule.topology.bb_counter.items())
+        
+        func_name, *params = key
+        
+        # Recalculate energies if requested.
+        if force_e_calc:
+            for _, mol in building_blocks:
+                getattr(mol.energy, func_name)(*params)
+        
+            getattr(self, func_name)(*params)
+
+        # Calculate the energy of building blocks and products using the
+        # chosen force field, if it has not been found already.
+        e_reactants = 0
+        for n, mol in building_blocks:
+            if (func_name, params[0]) not in mol.energy.values.keys():
+                getattr(mol.energy, func_name)(*params)
+            
+            e_reactants += n * mol.energy.values[(func_name, params[0])]
+        
+        e_products = (self.values[(func_name, params[0])] if 
+                    (func_name, params[0]) in self.values.keys() else
+                    getattr(self, func_name)(*params))
+
+        eng = e_reactants - e_products
+        self.values[('pseudoformation', func_name, params[0])] = eng         
+        return eng        
+
+    def rdkit(self, forcefield):
+        """
+        Uses rdkit to calculate the energy of `self.molecule`.
+        
+        Parameters
+        ----------
+        forcefield : str
+            The name of the forcefield to be used.
+            
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('rdkit', `forcefield`). The value is the caculated 
+            energy.
+            
+        Returns 
+        -------
+        float
+            The calculated energy. Note that this value is also stored
+            in the dictionary `self.values`.
+        
+        """
+        
+        if forcefield == 'uff':
+            self.molecule.prist_mol.UpdatePropertyCache()
+            ff = ac.UFFGetMoleculeForceField(self.molecule.prist_mol)
+        if forcefield == 'mmff':
+            chem.GetSSSR(self.molecule.prist_mol)      
+            ff = ac.MMFFGetMoleculeForceField(self.molecule.prist_mol,
+                  ac.MMFFGetMoleculeProperties(self.molecule.prist_mol))
+
+        eng = ff.CalcEnergy()        
+        self.values[('rdkit', forcefield)] = eng
+        return eng
+        
+    def macromodel(self, forcefield, macromodel_path):
+        """
+        Calculates the energy of `self.molecule` using macromodel.
+
+        Note that this requires macromodel to be installed and have a 
+        valid license.
+
+        Parameters
+        ----------
+        forcefield : int
+            The id number of the forcefield to be used by macromodel.  
+            
+        macromodel_path : str
+            The full path of the ``Schrodinger`` suite within the user's 
+            machine. For example, in a default Microsoft installation 
+            the folder will probably be something like
+            ``C:\Program Files\Schrodinger2016-2``.
+ 
+        Modifies
+        --------
+        self.values : dict
+            Adds an entry to this dictionary. The key is a tuple of the
+            form ('macromodel', `forcefield`). The value is the 
+            caculated energy.
+            
+        Returns 
+        -------
+        float
+            The calculated energy. Note that this value is also stored
+            in the dictionary `self.values`.
+        
+        """
+        
+        file_root, ext = os.path.splitext(self.molecule.prist_mol_file)
+
+        # Create a .mae file of the molecule if it does not exist
+        # already.
+        if ext != '.mae':
+            convrt_app = os.path.join(macromodel_path, 'utilities', 
+                                                        'structconvert')
+            convrt_cmd = [convrt_app, 
+                         self.molecule.prist_mol_file, file_root+'.mae']
+            sp.call(convrt_cmd)
+
+        # Create an input file and run it.        
+        input_script = (
+        "{0}.mae\n"
+        "{0}-out.maegz\n"
+        " MMOD       0      1      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " FFLD{1:8}      1      0      0     1.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " BGIN       0      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " READ      -1      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " ELST      -1      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " WRIT       0      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n"
+        " END       0      0      0      0     0.0000     0.0000     "
+        "0.0000     0.0000\n\n"
+        ).format(file_root, forcefield)
+        
+        with open(file_root+'.com', 'w') as f:
+            f.write(input_script)
+        
+        cmd = [os.path.join(macromodel_path,'bmin'), 
+               file_root, "-WAIT", "-LOCAL"]
+        sp.call(cmd)
+        
+        # Read the .log file and return the energy.
+        with open(file_root+'.log', 'r') as f:
+            for line in f:
+                if "                   Total Energy =" in line:
+                    eng = float(line.split()[-2].replace("=", ""))
+    
+        self.values[('macromodel', forcefield)] = eng
+        return eng
+        
 class Molecule:
     """
     The most basic class representing molecules.
@@ -131,6 +421,11 @@ class Molecule:
     heavy_mol_file : str
         The full path of the molecular structure file holding the
         structure of the substituted molecule.
+        
+    energy : Energy
+        An instance of the ``Energy`` class. It handles all things
+        energy.
+        
     
     """
 
@@ -442,41 +737,6 @@ class Molecule:
         with open(file_name, 'wb') as dump_file:    
             pickle.dump(self, dump_file)     
 
-    @LazyAttr
-    def energy(self):
-        """
-        Returns the total energy the molecule as found by macromodel.
-        
-        This lazy attribute reads the log file generated by a macromodel
-        optimization and sets the energy within as the value of the
-        `energy` attribute.
-        
-        Modifies
-        --------
-        self.energy : float
-            Creates this attribute.
-            
-        Raises
-        ------
-        AttributeError
-            If the molecule did not undergo an optimization there will
-            be no log file to read.
-        
-        """
-        
-        if not self.optimized:
-            raise AttributeError(('A molecule must be optimized for'
-                                  ' its energy to be taken.'))
-        
-        # Go thorugh the log file line by line and find the line which
-        # says ``Total Energy = ``. This line holds the energy value in
-        # index 3 after ``split()`` has been applied.
-        log_file = self.prist_mol_file.replace('.mol', '.log')
-        with open(log_file, 'r') as log:
-            for line in log:
-                if 'Total Energy =    ' in line:
-                    return float(line.split()[3])
-
     def graph(self, mol_type):
         """
         Returns a mathematical graph representing the molecule.        
@@ -651,7 +911,52 @@ class Molecule:
 
         return np.matrix(pos_array.reshape(-1,3).T)
 
-    def rotate(self, theta, axis):
+    def rotate(self, mol_type, theta, axis):
+        """
+        Rotates the heavy rdkit molecule by `theta` about `axis`.
+        
+        The rotation occurs about the molecular centroid.        
+        
+        Parameters
+        ----------    
+        mol_type : str (allowed values = 'heavy' or 'prist')
+            A string which defines whether the pristine or heavy
+            molecule is used.           
+        
+        theta : float
+            The size of the rotation in radians.
+        
+        axis : numpy.array
+            The axis about which rotation happens.
+        
+        Modifies
+        --------
+        prist_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated if `mol_type` is 
+            'prist'.
+        
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated if `mol_type` is 
+            'heavy'.
+    
+        Returns
+        -------
+        None : NoneType
+            
+        """
+
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))       
+        
+        og_position = self.centroid(mol_type)
+        self.set_position(mol_type, [0,0,0])
+        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(mol_type))
+        self.set_position_from_matrix(mol_type, new_pos_mat)
+        self.set_position(mol_type, og_position)
+        
+    def rotate2(self, theta, axis):
         """
         Rotates the heavy rdkit molecule by `theta` about `axis`.
         
@@ -683,7 +988,105 @@ class Molecule:
         self.set_position_from_matrix('heavy', new_pos_mat)
         self.set_heavy_atom_centroid(og_position)
 
+    def set_orientation(self, mol_type, start, end):
+        """
+        Rotates heavy molecule by rotation of `start` to `end`.
+ 
+        Note: The difference between this method and 
+        `_set_heavy_mol_orientation()` is about which point the rotation
+        occurs (centroid of entire molecule versus centroid of heavy 
+        atoms, respectively). This method works on both heavy and 
+        pristine molecules while `_set_heavy_mol_orientation()` doesn't.
+        
+        Given two direction vectors, `start` and `end`, this method
+        applies the rotation required transform `start` to `end` on 
+        the molecule. The rotation occurs about the centroid of the
+        molecule.
+        
+        For example, if the `start` and `end` vectors
+        are 45 degrees apart, a 45 degree rotation will be applied to
+        the molecule. The rotation will be along the appropriate axis.
+        
+        The great thing about this method is that you as long as you can 
+        associate a gemotric feature of the molecule with a vector, then 
+        the molecule can be roatated so that this vector is aligned with 
+        `end`. The defined vector can be virtually anything. This means 
+        that any geomteric feature of the molecule can be easily aligned 
+        with any arbitrary axis.
+        
+        Parameters
+        ----------
+        mol_type : str
+            Must be either 'prist' or 'heavy' to signify which rdkit
+            molecule this method should operate on.
+        
+        start : numpy.array
+            A vector which is to be rotated so that it transforms to the
+            `end` vector.
+        
+        end : numpy.array
+            This array holds the directional vector along which the 
+            heavy atoms in the linker should be placed.
+            
+        Modifies
+        --------
+        prist_mol : rdkit.Chem.rdchem.Mol   
+            When `mol_type` is 'prist', the conformer in this rdkit 
+            instance is changed due to rotation of the molecule about
+            its centroid.
+        
+        heavy_mol : rdkit.Chem.rdchem.Mol   
+            When `mol_type` is 'heavy', the conformer in this rdkit 
+            instance is changed due to rotation of the molecule about
+            its centroid.
+        
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            An rdkit molecule instance of the rotated molecule. This is 
+            a copy of the rdkit molecule in `heavy_mol` or `prist_mol`.
+            
+        Raises
+        ------
+        ValueError
+            If the `mol_type` string is not 'heavy' or 'prist'.
+            
+        """
+        
+        if mol_type not in {'prist', 'heavy'}:
+            raise ValueError(("`mol_type` must be either 'prist'"
+                                " or 'heavy'."))
+        
+        if mol_type == 'prist':
+            rdkit_mol = self.prist_mol
+            
+        elif mol_type == 'heavy':
+            rdkit_mol = self.heavy_mol
 
+        # Normalize the input direction vectors.
+        start = normalize_vector(start)
+        end = normalize_vector(end)
+        
+        # Record the position of the molecule then translate the heavy
+        # atom centroid to the origin. This is so that the rotation
+        # occurs about this point.
+        og_center = self.centroid(mol_type)
+        self.set_position(mol_type, [0,0,0]) 
+        
+        # Get the rotation matrix.
+        rot_mat = rotation_matrix(start, end)
+        
+        # Apply the rotation matrix to the atomic positions to yield the
+        # new atomic positions.
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(mol_type))
+
+        # Set the positions in the heavy rdkit molecule.
+        self.set_position_from_matrix(mol_type, new_pos_mat)
+        self.set_position(mol_type, og_center)
+
+        return chem.Mol(rdkit_mol)        
+
+            
     def set_position(self, mol_type, position):
         """
         Changes the position of the rdkit molecule. 
@@ -958,7 +1361,7 @@ class Molecule:
         """
         
         if mae_path is None:
-            mae_path = self.prist_mol_file.replace('.mol', '.mae')
+            mae_path = os.path.splitext(self.prist_mol_file)[0] + '.mae'
         
         self.prist_mol = mol_from_mae_file(mae_path)
         self.write_mol_file('prist')
@@ -1253,8 +1656,10 @@ class StructUnit(Molecule, metaclass=Cached):
         heavy molecule. The ids correspond to the ids in the rkdit 
         molecule.
 
-    energy : float
-        This is a lazy attribute. See its method documenation below.
+    energy : Energy
+        This attribute handles information about the energy of the 
+        instance. See the documentation of ``Energy`` to see what is
+        available.  
         
     optimized : bool (default = False)
         A flag to monitor whether an optimization has been performed on
@@ -1307,6 +1712,7 @@ class StructUnit(Molecule, metaclass=Cached):
             'Unable to initialize from "{}" files.'.format(ext))
                                      
         self.prist_mol = init_funcs[ext](prist_mol_file)
+        self.energy = Energy(self)
         self.optimized = False        
 
         # Check for minimal initialization.
@@ -1502,10 +1908,10 @@ class StructUnit(Molecule, metaclass=Cached):
 
     def _set_heavy_mol_orientation(self, start, end):
         """
-        Rotates heavy molecule by rotation of `start` to `end`.
+        Rotates from `start` to `end`.
         
         Given two direction vectors, `start` and `end`, this method
-        applies the rotation required to go from `start` to `end` on 
+        applies the rotation required to transform `start` to `end` on 
         the heavy molecule. The rotation occurs about the centroid
         of the heavy atoms. 
         
@@ -1530,7 +1936,7 @@ class StructUnit(Molecule, metaclass=Cached):
         is run.
         
         As the above examples demonstrate, the great thing about this 
-        method is that you as long as you can associate a gemotric 
+        method is that you as long as you can associate a geometric 
         feature of the molecule with a vector, then the molecule can be 
         roatated so that this vector is aligned with `end`. The defined 
         vector can be virtually anything. This means that any geomteric 
@@ -1830,7 +2236,7 @@ class StructUnit2(StructUnit):
                              vector)
                              
         # First determine the direction in which iteration should occur.
-        self.rotate(step, axis)
+        self.rotate2(step, axis)
         theta2 = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)       
         if theta2 > theta:
@@ -1838,13 +2244,13 @@ class StructUnit2(StructUnit):
             
         prev_theta = theta2
         while True:
-            self.rotate(step, axis)
+            self.rotate2(step, axis)
             theta = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)
             
             if theta > prev_theta:
                 axis = np.multiply(axis, -1)
-                self.rotate(step, axis)
+                self.rotate2(step, axis)
                 break
             
             prev_theta = theta
@@ -1905,7 +2311,12 @@ class StructUnit3(StructUnit):
         
         """
         
-        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 0, 2)
+        if sum(1 for _ in self.heavy_direction_vectors()) < 2:
+            raise ValueError(("StructUnit3 molecule "
+                             "has fewer than 3 functional groups."))
+        
+        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 2)
+    
         normal_v = normalize_vector(np.cross(v1, v2))
         
         theta = vector_theta(normal_v, 
@@ -2085,8 +2496,10 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         optimized. Optimization functions set this flag to ``True``
         after an optimization.
         
-    energy : float
-        This is a lazy attribute. See its method documenation below.
+    energy : Energy
+        This attribute handles information about the energy of the 
+        instance. See the documentation of ``Energy`` to see what is
+        available.        
 
     fitness : float (default = False)
         The fitness value of the macromolecule, as determined by the 
@@ -2144,7 +2557,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
             MacroMolError(ex, self, 'During initialization.')
-            
+
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
             
@@ -2166,6 +2579,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         heavy_mol_file = list(os.path.splitext(prist_mol_file))
         heavy_mol_file.insert(1,'HEAVY')        
         self.heavy_mol_file = '_'.join(heavy_mol_file) 
+        
+        self.energy = Energy(self)        
         
         # Ask the ``Topology`` instance to assemble/build the cage. This
         # creates the cage's ``.mol`` file all  the building blocks and
