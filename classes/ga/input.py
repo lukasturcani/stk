@@ -273,7 +273,7 @@ class GAInput:
                 p_name, p_vals = param.split("=") 
             except Exception:
                 raise Exception(("Issue with the input file on the"
-                " following line (or its vicinity)."), raw_line)                        
+                " following line (or its vicinity)."), line)                        
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
