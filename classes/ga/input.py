@@ -68,14 +68,20 @@ class GAInput:
         fitness_func; cage; target_cavity=5.7348; coeffs=[1,1,0,0,0]; 
         macromodel_path="/home/lukas/program_files/schrodinger2016-3"$
 
-    NOTE: Not all parameters required by the ``cage`` function
-          are defined.
-
-    This command specifices that the ``cage()`` function defined within
-    ``fitness.py`` is to be used as the fitness function. Notice that
+    This command specifices that the ``cage()`` function (defined within
+    ``fitness.py``) is to be used as the fitness function. Notice that
     if the value passed to a parameter can be a list or a string.
     However, the type must be made explicit with either ``[]`` or quotes 
     for a string. Just like it would in a python script.
+    
+    If a new keyword is added to MMEA it should be added into the set
+    `keywords`.
+    
+    Class attributes
+    ----------------
+    keywords : list
+        Holds all valid keywords used by MMEA. Used to give users useful
+        error messages.
     
     Attributes
     ----------
@@ -116,10 +122,12 @@ class GAInput:
         instances to generate offspring. Must correspond to a method
         defined within the ``Crossover`` class.
     
-    mutation_func : FunctionData
-        The ``Mutation`` class method used to mutate ``MacroMolecule`` 
-        instances to generate mutants. Must correspond to a method 
-        defined within the ``Mutation`` class.
+    mutation_func : list of FunctionData instances
+        The ``Mutation`` class methods used to mutate ``MacroMolecule`` 
+        instances are held here. This is a list as multiple 
+        mutation functions can be used during the GAs run. The
+        FunctionData instances mut correspond to a methods defined 
+        within the ``Mutation`` class. 
         
     opt_func : FunctionData
         The function from the ``optimization.py`` module to be used for
@@ -129,7 +137,19 @@ class GAInput:
         The function from ``fitness.py`` to be used for calculating the
         fitness of ``MacroMolecule`` instances.
         
+    mutation_weights : array-like
+        The probability that each function in `mutation_func` will be 
+        selected each time a mutation operation is carried out. The
+        order of the probabilities corresponds to the order of the 
+        mutation functions in `mutation_func`.
+    
     """
+    
+    keywords = ['num_generations', 'num_mutations', 'num_crossovers',
+                'init_func', 'generational_select_func', 
+                'parent_select_func', 'mutant_select_func', 
+                'mutation_func', 'opt_func', 'mutation_weights',
+                'crossover_func', 'fitness_func']
     
     def __init__(self, input_file):
         """
@@ -201,6 +221,22 @@ class GAInput:
                             line != '')
                 
             for raw_line in input_file:
+                
+                keyword_count = sum(1 for kw in self.keywords if
+                                    kw in raw_line)
+                # Ensure that the user defined valid keywords
+                if keyword_count == 0:
+                    print(("\n\nCommand does not define"
+                                            " a valid keyword.\n\n"), 
+                                            raw_line, "\n\n", sep="")
+                    sys.exit()  
+                # Ensure that the user did not forget to put a ``$`` 
+                # symbol somewhere.
+                if keyword_count > 1:
+                    print(('\n\nERROR: Multiple keywords detected in '
+                    'the following commnad, did you forget a "$"?\n\n'), 
+                    raw_line, "\n\n", sep="")
+                    sys.exit()                
 
                 # Check if the keyword indicates a function defintion.
                 kw, *_ = (word.strip() for word in raw_line.split(";"))
@@ -212,26 +248,11 @@ class GAInput:
                         func_data = mutation_funcs
                     setattr(self, kw, func_data)
                     continue
-            
-                # Check if the keyword is a simple value. If it is, 
-                # assign it to an attribute. If its not, raise a
-                # ``ValueError``.
-                try:
-                    kw, val = raw_line.split("=")
-                except Exception:
-                    print(("\n\nERROR: Issue with the input file on the"
-                    " following line (or its vicinity):\n\n"), raw_line,
-                    "\n\n", sep="")
-                    sys.exit()
-        
-                if kw in {'pop_size', 'num_generations', 'num_mutations', 
-                          'num_crossovers', 'mutation_weights'}:
-                    setattr(self, kw, eval(val))
-                else:
-                    raise ValueError(
-                      "Line does not define a valid keyword.", raw_line)
-                    
-    @staticmethod
+
+                kw, val = raw_line.split("=")                
+                setattr(self, kw, eval(val))
+
+    @staticmethod      
     def line_data(line):
         """
         Creates a ``FunctionData`` instance based on data in line.
@@ -272,20 +293,7 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            try:
-                p_name, p_vals = param.split("=")
-            except ValueError:
-                if param.count("=") > 1:
-                    print(('\n\nERROR: Multiple "=" detected in the'
-                    ' following line, did you forget a "$"?\n\n'), 
-                    line, "\n\n", sep="")
-                    sys.exit()
-                
-            except Exception:
-                print(("\n\nERROR: Issue with the input file on the"
-                " following line (or its vicinity):\n\n"), line, "\n\n",
-                sep="")
-                sys.exit()                        
+            p_name, p_vals = param.split("=")                
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
