@@ -50,7 +50,11 @@ class GATools:
     
     mutation : Mutation
         The ``Mutation`` instance which mutates a population's members
-        
+    
+    normalization : Normalization
+        A ``Normalization`` instance which rescales or normalizes the 
+        fitness values of the population.
+    
     optimization : FuncionData
         Holds the name of the function in ``optimization.py`` to be 
         used for ``MacroMolecule`` optimizations and any additional 
@@ -67,14 +71,15 @@ class GATools:
     
     """
     
-    __slots__ = ['selection', 'crossover', 'mutation', 
+    __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
                  'optimization', 'fitness', 'ga_input', 'ga_progress']    
     
-    def __init__(self, selection, crossover, 
-                 mutation, optimization, fitness):
+    def __init__(self, selection, crossover, mutation, 
+                       normalization ,optimization, fitness):
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
+        self.normalization = normalization
         self.optimization = optimization
         self.fitness = fitness
         self.ga_progress = GAProgress()
