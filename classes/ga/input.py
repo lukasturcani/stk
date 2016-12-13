@@ -219,7 +219,7 @@ class GAInput:
                 try:
                     kw, val = raw_line.split("=")
                 except Exception:
-                    print(("\n\nIssue with the input file on the"
+                    print(("\n\nERROR: Issue with the input file on the"
                     " following line (or its vicinity):\n\n"), raw_line,
                     "\n\n", sep="")
                     sys.exit()
@@ -275,7 +275,7 @@ class GAInput:
             try:
                 p_name, p_vals = param.split("=") 
             except Exception:
-                print(("\n\nIssue with the input file on the"
+                print(("\n\nERROR: Issue with the input file on the"
                 " following line (or its vicinity):\n\n"), line, "\n\n",
                 sep="")
                 sys.exit()                        
