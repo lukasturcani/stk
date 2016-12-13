@@ -93,7 +93,7 @@ def run():
             '----------------------------------------------\n\n') 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            pop.calculate_member_fitness()
+            pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
             
     # Run the GA.
     for x in range(ga_input.num_generations):
@@ -117,7 +117,7 @@ def run():
         os.chdir(str(x))
         
         with time_it():
-            print('\n\nStarting crossovers.\n----------------\n\n')
+            print('\n\nStarting crossovers.\n--------------------\n\n')
             offspring = pop.gen_offspring()
     
         with time_it():
@@ -146,7 +146,8 @@ def run():
                 '----------------------------------------------\n\n')    
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                pop.calculate_member_fitness()    
+                pop = Population(pop.ga_tools, 
+                                 *pop.calculate_member_fitness())
     
         with time_it():        
             print(('\n\nSelecting members of the next generation.\n'
