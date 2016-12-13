@@ -142,6 +142,10 @@ class GAInput:
         selected each time a mutation operation is carried out. The
         order of the probabilities corresponds to the order of the 
         mutation functions in `mutation_func`.
+        
+    scaling_func : FunctionData
+        A function which rescales or normalizes the populations fitness
+        values.
     
     """
     
@@ -149,7 +153,7 @@ class GAInput:
                 'init_func', 'generational_select_func', 
                 'parent_select_func', 'mutant_select_func', 
                 'mutation_func', 'opt_func', 'mutation_weights',
-                'crossover_func', 'fitness_func']
+                'crossover_func', 'fitness_func', 'scaling_func']
     
     def __init__(self, input_file):
         """
