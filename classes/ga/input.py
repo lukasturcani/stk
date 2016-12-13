@@ -273,7 +273,14 @@ class GAInput:
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
             try:
-                p_name, p_vals = param.split("=") 
+                p_name, p_vals = param.split("=")
+            except ValueError:
+                if param.count("=") > 1:
+                    print(('\n\nERROR: Multiple "=" detected in the'
+                    ' following line, did you forget a "$"?\n\n'), 
+                    line, "\n\n", sep="")
+                    sys.exit()
+                
             except Exception:
                 print(("\n\nERROR: Issue with the input file on the"
                 " following line (or its vicinity):\n\n"), line, "\n\n",
