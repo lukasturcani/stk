@@ -269,7 +269,11 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            p_name, p_vals = param.split("=") 
+            try:
+                p_name, p_vals = param.split("=") 
+            except Exception:
+                raise Exception(("Issue with the input file on the"
+                " following line (or its vicinity)."), raw_line)                        
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
