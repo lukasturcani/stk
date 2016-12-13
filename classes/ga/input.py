@@ -143,8 +143,8 @@ class GAInput:
         order of the probabilities corresponds to the order of the 
         mutation functions in `mutation_func`.
         
-    scaling_func : FunctionData
-        A function which rescales or normalizes the populations fitness
+    normalization_func : FunctionData
+        A function which rescales or normalizes the population's fitness
         values.
     
     """
@@ -153,7 +153,7 @@ class GAInput:
                 'init_func', 'generational_select_func', 
                 'parent_select_func', 'mutant_select_func', 
                 'mutation_func', 'opt_func', 'mutation_weights',
-                'crossover_func', 'fitness_func', 'scaling_func']
+                'crossover_func', 'fitness_func', 'normalization_func']
     
     def __init__(self, input_file):
         """
@@ -181,6 +181,9 @@ class GAInput:
             
         if not hasattr(self, 'mutation_weights'):
             self.mutation_weights = [1]
+            
+        if not hasattr(self, 'normalization_func'):
+            self.normalization_func = None
         
     def _extract_data(self):
         """
