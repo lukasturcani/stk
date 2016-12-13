@@ -134,7 +134,7 @@ class Crossover:
                 # Add the new offspring to the offspring population.                
                 offspring_pop.add_members(offspring)
                 num_crossovers += 1
-                print('Cross number {0}. Finish when {1}.'.format(
+                print('Crossover number {0}. Finish when {1}.'.format(
                                 num_crossovers, self.num_crossovers))
                 if num_crossovers == self.num_crossovers:
                     break
