@@ -57,7 +57,7 @@ def fg_prune(input_folder, output_folder, fg, fg_num):
         mol.heavy_ids = []
         mol._generate_heavy_attrs()
         if len(mol.find_functional_group_atoms()) == fg_num:
-            print('Moving {}.'.format(path))
+            print('Copying {}.'.format(path))
             shutil.copy(path, output_folder)
 
 def fg_distance_prune(folder, fg):

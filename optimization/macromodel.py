@@ -7,26 +7,26 @@ import warnings
 import psutil
 import re
 
-from ...classes.exception import MacroMolError
-from ...convenience_tools import MAEExtractor, FGInfo
+from ..classes.exception import MacroMolError
+from ..convenience_tools import MAEExtractor, FGInfo
 
-class ConversionError(Exception):
+class _ConversionError(Exception):
     def __init__(self, message):
         self.message = message
-class PathError(Exception):
+class _PathError(Exception):
     def __init__(self, message):
         self.message = message
-class LicenseError(Exception):
+class _LicenseError(Exception):
     def __init__(self, message):
         print('License not found.')
         self.message = message
-class ForceFieldError(Exception):
+class _ForceFieldError(Exception):
     def __init__(self, message):
         self.message = message
-class OptimizationError(Exception):
+class _OptimizationError(Exception):
     def __init__(self, message):
         self.message = message
-class LewisStructureError(Exception):
+class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
 
@@ -96,14 +96,14 @@ def macromodel_opt(macro_mol, force_field=16,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        create_mae(macro_mol, macromodel_path)        
+        _create_mae(macro_mol, macromodel_path)        
         # generate the ``.com`` file for the MacroModel run.
-        generate_com(macro_mol, force_field, no_fix)        
+        _generate_com(macro_mol, force_field, no_fix)        
         # Run the optimization.
-        run_bmin(macro_mol, macromodel_path)
+        _run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and 
         # convert it to a ``.mol2`` file.
-        convert_maegz_to_mae(macro_mol, macromodel_path)
+        _convert_maegz_to_mae(macro_mol, macromodel_path)
         macro_mol.update_from_mae() 
 
         if md:
@@ -112,19 +112,19 @@ def macromodel_opt(macro_mol, force_field=16,
         macro_mol.optimized = True       
         return macro_mol 
 
-    except ConversionError as ex:
+    except _ConversionError as ex:
         MacroMolError(ex, macro_mol, '`structconvert` failed.')
         return macro_mol        
 
-    except PathError as ex:
+    except _PathError as ex:
         MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
         return macro_mol
 
-    except OptimizationError as ex:
+    except _OptimizationError as ex:
         MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
-    except ForceFieldError as ex:        
+    except _ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field == 14:
             MacroMolError(Exception(), macro_mol, 
@@ -139,9 +139,9 @@ def macromodel_opt(macro_mol, force_field=16,
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md)
 
-    except LewisStructureError as ex:
+    except _LewisStructureError as ex:
         if not lewis_fixed:
-            run_applyhtreat(macro_mol, macromodel_path)
+            _run_applyhtreat(macro_mol, macromodel_path)
             return macromodel_opt(macro_mol, force_field=force_field,
                               lewis_fixed=True,
                               macromodel_path=macromodel_path,
@@ -164,29 +164,29 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        create_mae(macro_mol, macromodel_path)        
+        _create_mae(macro_mol, macromodel_path)        
         # Generate the ``.com`` file for the MacroModel MD run.
-        generate_md_com(macro_mol, force_field=force_field, temp=temp, 
+        _generate_md_com(macro_mol, force_field=force_field, temp=temp, 
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
         # Run the optimization.
-        run_bmin(macro_mol, macromodel_path, timeout)        
+        _run_bmin(macro_mol, macromodel_path, timeout)        
         # Extract the lowest energy conformer into its own .mae file.        
         conformer_mae = MAEExtractor(macro_mol).path
         macro_mol.update_from_mae(conformer_mae) 
 
-    except ConversionError as ex:
+    except _ConversionError as ex:
         MacroMolError(ex, macro_mol, '`structconvert` failed.')
         return macro_mol
 
-    except PathError as ex:
+    except _PathError as ex:
         MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
         return macro_mol
 
-    except OptimizationError as ex:
+    except _OptimizationError as ex:
         MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
-    except ForceFieldError as ex:        
+    except _ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field == 14:
             MacroMolError(Exception(), macro_mol, 
@@ -202,9 +202,9 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
                                  temp=temp, confs=confs, 
                                  eq_time=eq_time, sim_time=sim_time) 
 
-    except LewisStructureError as ex:
+    except _LewisStructureError as ex:
         if not lewis_fixed:
-            run_applyhtreat(macro_mol, macromodel_path)
+            _run_applyhtreat(macro_mol, macromodel_path)
             return macromodel_md_opt(macro_mol, macromodel_path, 
                                  timeout=timeout, force_field=force_field,
                                  lewis_fixed=True,
@@ -291,14 +291,14 @@ def macromodel_cage_opt(macro_mol, force_field=16,
     try:    
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molding the pristine molecule.    
-        create_mae(macro_mol, macromodel_path)        
+        _create_mae(macro_mol, macromodel_path)        
         # generate the ``.com`` file for the MacroModel run.
-        generate_com(macro_mol, force_field, no_fix)
+        _generate_com(macro_mol, force_field, no_fix)
         # Run the optimization.
-        run_bmin(macro_mol, macromodel_path)
+        _run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and 
         # convert it to a ``.mol2`` file.
-        convert_maegz_to_mae(macro_mol, macromodel_path)
+        _convert_maegz_to_mae(macro_mol, macromodel_path)
         macro_mol.update_from_mae() 
 
         with warnings.catch_warnings():
@@ -313,19 +313,19 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         macro_mol.optimized = True       
         return macro_mol
 
-    except ConversionError as ex:
+    except _ConversionError as ex:
         MacroMolError(ex, macro_mol, '`structconvert` failed.')
         return macro_mol        
 
-    except PathError as ex:
+    except _PathError as ex:
         MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
         return macro_mol
 
-    except OptimizationError as ex:
+    except _OptimizationError as ex:
         MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
-    except ForceFieldError as ex:        
+    except _ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field==14:
             MacroMolError(Exception(), macro_mol, 
@@ -340,9 +340,9 @@ def macromodel_cage_opt(macro_mol, force_field=16,
                               no_fix=no_fix, md=md, 
                               lewis_fixed=lewis_fixed)    
 
-    except LewisStructureError as ex:
+    except _LewisStructureError as ex:
         if not lewis_fixed:
-            run_applyhtreat(macro_mol, macromodel_path)
+            _run_applyhtreat(macro_mol, macromodel_path)
             return macromodel_cage_opt(macro_mol, force_field=force_field,
                               lewis_fixed=True,
                               macromodel_path=macromodel_path,
@@ -357,7 +357,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
                       'exception during `macromodel_cage_opt`.'))
         return macro_mol
 
-def run_bmin(macro_mol, macromodel_path, timeout=True):
+def _run_bmin(macro_mol, macromodel_path, timeout=True):
 
     print("", time.ctime(time.time()),
     'Running bmin - {0}.'.format(macro_mol.prist_mol_file), sep='\n')
@@ -385,7 +385,7 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
                'by force - {}\n').format(macro_mol.prist_mol_file))
-        kill_bmin(macro_mol, macromodel_path)
+        _kill_bmin(macro_mol, macromodel_path)
         proc_out = ""
 
     with open(log_file, 'r') as log: 
@@ -393,36 +393,36 @@ def run_bmin(macro_mol, macromodel_path, timeout=True):
 
     # Check the log for error reports.
     if "termination due to error condition           21-" in log_content:
-        raise OptimizationError(("`bmin` crashed due to"
+        raise _OptimizationError(("`bmin` crashed due to"
                                 " an error condition. See .log file."))
     if "FATAL do_nosort_typing: NO MATCH found for atom " in log_content:
-        raise ForceFieldError('The log implies the force field failed.')
+        raise _ForceFieldError('The log implies the force field failed.')
     if (("FATAL gen_lewis_structure(): could not find best Lewis"
          " structure") in log_content and ("skipping input structure  "
          "due to forcefield interaction errors") in log_content):
-        raise LewisStructureError(
+        raise _LewisStructureError(
                 '`bmin` failed due to poor Lewis structure.')
         
 
     # If optimization fails because a wrong Schrodinger path was given,
     # raise.
     if 'The system cannot find the path specified' in proc_out:
-        raise PathError(('Wrong Schrodinger path supplied to'
+        raise _PathError(('Wrong Schrodinger path supplied to'
                               ' `macromodel_opt` function.'))
 
     # If optimization fails because the license is not found, rerun the
     # function.
-    if not license_found(proc_out, macro_mol):
-        return run_bmin(macro_mol, macromodel_path)
+    if not _license_found(proc_out, macro_mol):
+        return _run_bmin(macro_mol, macromodel_path)
 
     # Make sure the .maegz file created by the optimization is present.
     maegz = macro_mol.prist_mol_file.replace('.mol', '-out.maegz')
-    wait_for_file(maegz)
+    _wait_for_file(maegz)
     if not os.path.exists(log_file) or not os.path.exists(maegz):
-        raise OptimizationError(('The .log and/or .maegz '
+        raise _OptimizationError(('The .log and/or .maegz '
                      'files were not created by the optimization.'))
         
-def kill_bmin(macro_mol, macromodel_path):
+def _kill_bmin(macro_mol, macromodel_path):
     name = macro_mol.prist_mol_file.replace('.mol', '')
     name = re.split(r'\\|/', name)[-1]
     app = os.path.join(macromodel_path, 'jobcontrol')
@@ -431,8 +431,8 @@ def kill_bmin(macro_mol, macromodel_path):
                  stderr=sp.STDOUT, universal_newlines=True)
  
     # If no license if found, keep re-running the function until it is.
-    if not license_found(out.stdout):
-        return kill_bmin(macro_mol, macromodel_path)  
+    if not _license_found(out.stdout):
+        return _kill_bmin(macro_mol, macromodel_path)  
    
    
    # This loop causes the function to wait until the job has been killed
@@ -448,10 +448,10 @@ def kill_bmin(macro_mol, macromodel_path):
         if time.time() - start > 600:
             break
                  
-def run_applyhtreat(macro_mol, macromodel_path):
+def _run_applyhtreat(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace('.mol', '.mae')
     mae_out = mae.replace('.mae', '_htreated.mae')
-    create_mae(macro_mol, macromodel_path)
+    _create_mae(macro_mol, macromodel_path)
     
     app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
     cmd = [app, mae, mae_out]
@@ -459,12 +459,12 @@ def run_applyhtreat(macro_mol, macromodel_path):
                  stderr=sp.STDOUT, universal_newlines=True)
 
     # If no license if found, keep re-running the function until it is.
-    if not license_found(out.stdout):
-        return run_applyhtreat(macro_mol, macromodel_path)     
+    if not _license_found(out.stdout):
+        return _run_applyhtreat(macro_mol, macromodel_path)     
     
     macro_mol.update_from_mae(mae_out)    
     
-def license_found(output, macro_mol=None):
+def _license_found(output, macro_mol=None):
     """
     Checks to see if minimization failed due to a missing license.
 
@@ -510,7 +510,7 @@ def license_found(output, macro_mol=None):
 
     return True
  
-def generate_com(macro_mol, force_field=16, no_fix=False):
+def _generate_com(macro_mol, force_field=16, no_fix=False):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -549,7 +549,7 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
     
     """
 
-    print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
+    print('Creating .com file - {}.'.format(macro_mol.prist_mol_file))
     
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
@@ -586,7 +586,7 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
     
     # This function adds all the lines which fix bond distances and 
     # angles into ``main_string``.
-    main_string = fix_params_in_com_file(macro_mol, 
+    main_string = _fix_params_in_com_file(macro_mol, 
                                           main_string, no_fix)
     
     # Writes the ``.com`` file.
@@ -601,7 +601,7 @@ def generate_com(macro_mol, force_field=16, no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
+def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
 
     print('Creating .com file - {0}.'.format(macro_mol.prist_mol_file))
 
@@ -642,7 +642,7 @@ def generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, s
         # details of the macromodel run
         com.write(main_string)
 
-def create_mae(macro_mol, macromodel_path):
+def _create_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.    
 
@@ -681,10 +681,10 @@ def create_mae(macro_mol, macromodel_path):
     # original structure file, including the same path. Only the 
     # extensions are different.
     mae_file = macro_mol.prist_mol_file.replace(ext, '.mae')  
-    structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
+    _structconvert(macro_mol.prist_mol_file, mae_file, macromodel_path)
     return mae_file
 
-def convert_maegz_to_mae(macro_mol, macromodel_path):
+def _convert_maegz_to_mae(macro_mol, macromodel_path):
     """
     Converts a ``.maegz`` file to a ``.mae`` file.
     
@@ -727,9 +727,9 @@ def convert_maegz_to_mae(macro_mol, macromodel_path):
     maegz = macro_mol.prist_mol_file.replace(".mol", "-out.maegz")      
     # Replace extensions to get the names of the various files.
     mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
-    return structconvert(maegz, mae, macromodel_path)
+    return _structconvert(maegz, mae, macromodel_path)
     
-def structconvert(iname, oname, macromodel_path):
+def _structconvert(iname, oname, macromodel_path):
   
     convrt_app = os.path.join(macromodel_path, 'utilities', 
                                                      'structconvert')
@@ -742,26 +742,26 @@ def structconvert(iname, oname, macromodel_path):
     # If conversion fails because a wrong Schrodinger path was given,
     # raise.
     if 'The system cannot find the path specif' in convrt_return.stdout:
-        raise PathError(('Wrong Schrodinger path supplied to'
+        raise _PathError(('Wrong Schrodinger path supplied to'
                               ' `structconvert` function.'))
 
     # If no license if found, keep re-running the function until it is.
-    if not license_found(convrt_return.stdout):
+    if not _license_found(convrt_return.stdout):
         return structconvert(iname, oname, macromodel_path)    
 
     # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:
-        raise ForceFieldError(convrt_return.stdout)    
+        raise _ForceFieldError(convrt_return.stdout)    
 
-    wait_for_file(oname)
+    _wait_for_file(oname)
     if not os.path.exists(oname):
-        raise ConversionError(('Conversion output file {} was not found.'
+        raise _ConversionError(('Conversion output file {} was not found.'
                 ' Console output was {}.').format(oname, 
                                                   convrt_return.stdout))
 
     return convrt_return
 
-def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
+def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
     
@@ -804,16 +804,16 @@ def fix_params_in_com_file(macro_mol, main_string, no_fix=False):
         return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                     "COMES_HERE!!!\n"), fix_block)
     # Add lines that fix the bond distance.
-    fix_block = fix_distance_in_com_file(macro_mol, fix_block)  
+    fix_block = _fix_distance_in_com_file(macro_mol, fix_block)  
     # Add lines that fix the bond angles.                          
-    fix_block = fix_bond_angle_in_com_file(macro_mol, fix_block)
+    fix_block = _fix_bond_angle_in_com_file(macro_mol, fix_block)
     # Add lines that fix the torsional angles.
-    fix_block = fix_torsional_angle_in_com_file(macro_mol, fix_block)
+    fix_block = _fix_torsional_angle_in_com_file(macro_mol, fix_block)
     
     return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                 "COMES_HERE!!!\n"), fix_block)
 
-def fix_distance_in_com_file(macro_mol, fix_block):
+def _fix_distance_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond distances to ``.com`` body string.
     
@@ -874,7 +874,7 @@ def fix_distance_in_com_file(macro_mol, fix_block):
 
     return fix_block
     
-def fix_bond_angle_in_com_file(macro_mol, fix_block):
+def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond angles to ``.com`` body string.
     
@@ -956,7 +956,7 @@ def fix_bond_angle_in_com_file(macro_mol, fix_block):
     
     return fix_block
     
-def fix_torsional_angle_in_com_file(macro_mol, fix_block):
+def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing torsional bond angles to ``.com`` body string.
     
@@ -1042,7 +1042,7 @@ def fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     return fix_block
 
-def wait_for_file(file_name, timeout=20):
+def _wait_for_file(file_name, timeout=20):
     """
     Stalls until a given file exists or `timeout` expires.
     
@@ -1070,26 +1070,4 @@ def wait_for_file(file_name, timeout=20):
             tick += 1
         
         if os.path.exists(file_name) or time_taken > timeout:
-            break 
-
-def kill_macromodel():
-    """
-    Kills any applications left open as a result running MacroModel.    
-    
-    Applications that are typically left open are 
-    ``jserver-watcher.exe`` and ``jservergo.exe``.    
-    
-    Returns
-    -------
-    None : NoneType    
-    
-    """
-    
-    if os.name == 'nt':
-        # In Windows, use the ``Taskkill`` command to force a close on
-        # the applications.           
-        sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"])
-        sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"])
-    if os.name == 'posix':
-        sp.run(["pkill", "jservergo"])
-        sp.run(["pkill", "jserver-watcher"])          
+            break       
