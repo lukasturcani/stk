@@ -12,16 +12,16 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input 
 file. 
 
-Optionally, a fitness function may take an argument ``population``. If
-this is done, it should be the argument after ``macro_mol``. When this
-argument is present the population is also passed to the fitness
-function, along with the MacroMolecule instance. This can be useful if
-some sort of normalization is desired.
+Fitness functions should return the `macro_mol` instance they took as
+an argument. Within the fitness function itself the attribute 
+`macro_mol.fitness` should have the fitness value calculated by the 
+function placed into it. This ensures that the functions can be 
+parallelized.
 
-Fitness functions should return a value. This value represents the 
-fitness of the MacroMolecule instance in the argument `macro_mol`. They 
-do not assign the value to the ``MacroMolecule`` instance. This is done
-by the ``_calc_fitness()`` function. Don't worry about it.
+A scaling function can be defined in ``scaling.py`` if some sort of 
+normalization of fitness values across the population is required. This 
+is completely optional. Fitness functions should be atomic and depend
+only on the individual whose fitness they are calculating.
 
 A fitness function may be complex and may not fit neatly into a single 
 function. For example, the ``cage_target()`` fitness function needs to 
@@ -39,6 +39,8 @@ import copy
 from inspect import signature
 from functools import partial
 import networkx as nx
+import os
+import multiprocessing as mp
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit, Energy
@@ -47,6 +49,45 @@ from .convenience_tools import (rotation_matrix_arbitrary_axis,
                                 matrix_centroid)
 
 def _calc_fitness(func_data, population):
+    """
+    Calculates the fitness values of all members of a population.   
+    
+    Parameters
+    ----------
+    func_data : FunctionData
+        A ``FunctionData`` instance representing the chosen fitness 
+        function and any additional parameters it may require.
+    
+    population : Population
+        The population whose members must have their fitness calculated.
+        
+    Returns
+    -------
+    None : NoneType    
+    
+    """
+
+    # Get the fitness function object.
+    func = globals()[func_data.name]
+    p_func = partial(func, **func_data.params)
+
+    # Apply the function to every member of the population, in parallel.
+    with mp.get_context('spawn').Pool() as pool:
+        evaluated = pool.map(p_func, population)
+
+        # Make sure the cache is updated with the evaluated versions.
+        for member in evaluated:
+            member.update_cache()
+
+
+    # After each macro_mol has a fitness value, sort the population by 
+    # fitness and print.
+    for macro_mol in sorted(evaluated, reverse=True):
+        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+        
+    return evaluated
+
+def _calc_fitness_serial(func_data, population):
     """
     Calculates the fitness values of all members of a population.
     
@@ -149,15 +190,22 @@ def random_fitness(macro_mol):
     macro_mol : MacroMolecule
         The macromolecule to which a fitness value is to be assigned.
     
+    Modifies
+    --------
+    macro_mol.fitness : float
+        Assigns a fitness to this attribute.
+    
     Returns
     -------
-    int
-        An integer between 0 (including) and 100 (excluding).
+    macro_mol
+        The `macro_mol` with an integer between 0 (including) and 100 
+        (excluding) as its fitness.
 
     """
 
-    return np.random.randint(1,10)
-
+    macro_mol.fitness = np.random.randint(1,10)
+    return macro_mol    
+    
 # Calls the decorator with the specific labels
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Negative Energy per Bond ', 
@@ -527,11 +575,16 @@ def cage_c60(macro_mol, target_mol_file,
     n2fold : int
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
-        
+
+    Modifies
+    --------
+    macro_mol.fitness : float
+        Places a fitness value into this attribute
+
     Returns
     -------
-    float
-        The fitness value of `macro_mol`.
+    macro_mol
+        The `macro_mol` with its fitnes value calculated
     
     """
     
@@ -539,10 +592,11 @@ def cage_c60(macro_mol, target_mol_file,
     # calculation again.
     if macro_mol.fitness:
         print('Skipping {0}'.format(macro_mol.prist_mol_file))
-        return macro_mol.fitness
+        return macro_mol
  
     if min_cavity and min_cavity < macro_mol.topology.cavity_size():
-        return 1e-4
+        macro_mol.fitness = 1e-4
+        return macro_mol
        
     # Make a copy version of `macro_mol` which is unoptimizted.
     unopt_macro_mol = copy.deepcopy(macro_mol)
@@ -554,6 +608,16 @@ def cage_c60(macro_mol, target_mol_file,
     # running the initialization again on later attempts will not 
     # re-initialize.
     target = StructUnit(target_mol_file, minimal=True)
+    _, molname = os.path.split(macro_mol.prist_mol_file)
+    
+    # Write a copy of the target for each macro_mol. So that parallel
+    # energy calculations don't clash. There is room for optimization
+    # here.
+    molname, ext = os.path.splitext(molname)
+    target.prist_mol_file = os.path.join(os.getcwd(), 
+                                         molname+"target"+ext)    
+    target.write_mol_file('prist')
+    
 
     # This function creates a new molecule holding both the target
     # and the cage centered at the origin. It then calculates the 
@@ -597,7 +661,8 @@ def cage_c60(macro_mol, target_mol_file,
     if raw_fitness > 1e10:
         raw_fitness = 1e10
         
-    return raw_fitness
+    macro_mol.fitness = raw_fitness
+    return macro_mol
     
 def _generate_complexes(macro_mol, target, number=1):
     """
