@@ -9,7 +9,7 @@ from .ga import GATools
 from .plotter import Plotter
 from ..convenience_tools import dedupe, plot_counter
 from ..optimization.optimization import _optimize_all, _optimize_all_serial
-from ..fitness import _calc_fitness
+from ..fitness import _calc_fitness, _calc_fitness_serial
 
 class Population:
     """
@@ -636,7 +636,7 @@ class Population:
         return _optimize_all(self.ga_tools.optimization, self)
 
     def calculate_member_fitness(self):
-        _calc_fitness(self.ga_tools.fitness, self)
+        return _calc_fitness(self.ga_tools.fitness, self)
 
     def mean(self, key):
         """
