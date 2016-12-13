@@ -1,6 +1,6 @@
 import itertools
 import os
-from statistics import mean
+import numpy as np
 import pickle
 from collections import Counter
 
@@ -9,7 +9,7 @@ from .ga import GATools
 from .plotter import Plotter
 from ..convenience_tools import dedupe, plot_counter
 from ..optimization.optimization import _optimize_all, _optimize_all_serial
-from ..fitness import _calc_fitness
+from ..fitness import _calc_fitness, _calc_fitness_serial
 
 class Population:
     """
@@ -446,7 +446,7 @@ class Population:
         `type_` parameter. The valid values for `type_` will correspond
         to one of the attribute names of the ``Selection`` instance.
 
-        For example, if `type_` is set to 'mating' a selection
+        For example, if `type_` is set to 'crossover' a selection
         algorithm which yields a parents will be invoked. If the
         `type_` is set to 'generational' an algorithm which yields the
         next generation will be invoked.
@@ -467,7 +467,7 @@ class Population:
 
             Valid values include:
                 'generational' - selects the next generation
-                'mating' - selects parents
+                'crossover' - selects parents
                 'mutation' - selects ``MacroMolecule`` instances for
                              mutation
 
@@ -488,29 +488,29 @@ class Population:
         Returns a population of offspring ``MacroMolecule`` instances.
 
         This is a GA operation and as a result this method merely
-        delegates the request to the ``Mating`` instance held in the
-        `ga_tools` attribute. The ``Mating`` instance takes care of
+        delegates the request to the ``Crossover`` instance held in the
+        `ga_tools` attribute. The ``Crossover`` instance takes care of
         selecting parents and combining them to form offspring. The
-        ``Mating`` instace delegates the selection to the ``Selection``
-        instance as would be expected. The request to perform mating is
-        done by calling the ``Mating`` instance with the population as
-        the argument. Calling of the ``Mating``instance returns a
-        ``Population`` instance holding the generated offspring. All
-        details regarding the mating procedure are handled by the
-        ``Mating`` instance.
+        ``Crossover`` instance delegates the selection to the 
+        ``Selection`` instance as would be expected. The request to 
+        perform crossovers is done by calling the ``Crossover`` instance 
+        with the population as the argument. Calling of the 
+        ``Crossover``instance returns a ``Population`` instance holding 
+        the generated offspring. All details regarding the crossover 
+        procedure are handled by the ``Crossover`` instance.
 
-        For more details about how mating is implemented see the
-        ``Mating`` class documentation.
+        For more details about how crossover is implemented see the
+        ``Crossover`` class documentation.
 
         Returns
         -------
         Population
-            A population holding offspring created by mating contained
+            A population holding offspring created by crossing contained
             the ``MacroMolecule`` instances.
 
         """
 
-        return self.ga_tools.mating(self)
+        return self.ga_tools.crossover(self)
 
     def gen_mutants(self):
         """
@@ -636,50 +636,37 @@ class Population:
         return _optimize_all(self.ga_tools.optimization, self)
 
     def calculate_member_fitness(self):
-        _calc_fitness(self.ga_tools.fitness, self)
+        return _calc_fitness(self.ga_tools.fitness, self)
 
-    def mean(self, attr_name, delegate=False):
+    def mean(self, key):
         """
-        Calculates the mean value of a given attribute of the members.
+        Calculates the mean given a key.
 
-        Calculates the mean across all members in the population,
-        including those in subpopulations.
+        This method applies key(member) on every member of the 
+        population and returns the mean of returned values.
+
+        For example, if the mean value of the attribute `cavity_size`
+        was desired:
+            
+            population.mean(
+                    lambda macro_mol : macro_mol.topology.cavity_size())
 
         Parameters
         ----------
-        attr_name : str
-            The name of the attribute whose mean value should be
-            calculated.
-
-        delegate : False or str (default = False)
-            If ``False`` the attr_name is assumed to correspond to an
-            attribute held by the members directly. If a string is
-            provided it should be the name of the attribute held by the
-            members. For example, if the user wishes to know the average
-            cavity size of the ``Cage`` instances in the population. The
-            ``Cage`` instances do not have a `cavity_size` attribute. 
-            However their `topology` attribute does have a `cavity_size` 
-            attribute. Therefore 
-            
-                attr_name=`cavity_size`, delegate=`topology`.
-
-            This is because `cavity_size` is not held by members
-            directly. It is held in the `topology` attribute of the
-            members.
+        key : function
+            A function which should take a MacroMolecule instance as its
+            argument and return a value.
 
         Returns
         -------
         float
-            The mean of a given attribute held by members of the
-            population.
+            The mean of the values returned by the function `key` when 
+            its applied to all members of the population.
 
         """
 
-        if delegate:
-            return mean(getattr(getattr(x, delegate), attr_name)
-                                                          for x in self)
-        else:
-            return mean(getattr(x, attr_name) for x in self)
+        return np.mean([key(member) for member in self], axis=0)        
+        
 
     def dump(self, file_name):
         """
@@ -936,40 +923,3 @@ class Population:
 
     def __repr__(self):
         return str(self)
-
-    """
-    The following methods are inteded for convenience while
-    debugging or testing and should not be used during typical
-    execution of the program.
-
-    """
-
-    @classmethod
-    def init_empty(cls):
-        """
-        Initializes a population of empty cages.
-        
-        Empty cages means that they do not have their attributes
-        initialized. This should only be used during debugging, in cases 
-        when  building cages is not needed.
-        
-        """
-        
-        pops = []
-
-        for x in range(0,8):
-            pop = cls(*iter(Cage.init_empty() for x in range(0,3)),
-                      GATools.default())
-            pops.append(pop)
-
-        pops[1].populations.append(pops[3])
-        pops[1].populations.append(pops[4])
-        pops[1].populations.append(pops[5])
-
-        pops[2].populations.append(pops[6])
-        pops[2].populations.append(pops[7])
-
-        pops[0].populations.append(pops[1])
-        pops[0].populations.append(pops[2])
-
-        return pops[0]

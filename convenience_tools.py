@@ -4,7 +4,8 @@ from rdkit.Geometry import Point3D
 import numpy as np
 import time
 from contextlib import contextmanager
-import os 
+import os
+import subprocess as sp 
 # Prevents the matplotlib import from printing warnings in Spyder. These
 # are printed because Spyder automatically imports matplotlib so the
 # call to `matplotlib.use()` results in a warning.
@@ -279,7 +280,7 @@ def matrix_centroid(matrix):
     
     Parameters
     ----------
-    matrix : np.array
+    matrix : np.matrix
         A n x 3 matrix. Each row holds the x, y and z coordinate of some
         point, respectively.
         
@@ -291,8 +292,8 @@ def matrix_centroid(matrix):
     
     """
     
-    sum_ = sum( x[0] for x in matrix)
-    return sum_ / len(matrix)
+
+    return np.array(np.sum(matrix, axis=0) / len(matrix))[0]
 
 class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
@@ -415,10 +416,14 @@ def mol_from_mae_file(mae_path):
 
 
     labels, data_block, *_ = atom_block.split(':::')
-    labels = [l for l in labels.split('\n') if not l.isspace() and l != '']
-    data_block = [a.split() for a in data_block.split('\n') if not a.isspace() and a != '']
+    labels = [l for l in labels.split('\n') if 
+               not l.isspace() and l != '']
+    
+    data_block = [a.split() for a in data_block.split('\n') if 
+                   not a.isspace() and a != '']    
     
     for line in data_block:
+        line = [word for word in line if word != '"']
         if len(labels) != len(line):
             raise RuntimeError(('Number of labels does'
                       ' not match number of columns in .mae file.'))
@@ -761,6 +766,31 @@ FGInfo.heavy_symbols = {x.heavy_symbol for x
                         
 FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
                                         in FGInfo.functional_group_list}
+def kill_macromodel():
+    """
+    Kills any applications left open as a result running MacroModel.    
+    
+    Applications that are typically left open are 
+    ``jserver-watcher.exe`` and ``jservergo.exe``.    
+    
+    Returns
+    -------
+    None : NoneType    
+    
+    """
+    
+    if os.name == 'nt':
+        # In Windows, use the ``Taskkill`` command to force a close on
+        # the applications.           
+        sp.run(["Taskkill", "/IM", "jserver-watcher.exe", "/F"], 
+               stdout=sp.PIPE, stderr=sp.PIPE)
+        sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"],
+               stdout=sp.PIPE, stderr=sp.PIPE)
+    if os.name == 'posix':
+        sp.run(["pkill", "jservergo"],
+               stdout=sp.PIPE, stderr=sp.PIPE)
+        sp.run(["pkill", "jserver-watcher"],
+               stdout=sp.PIPE, stderr=sp.PIPE)    
                 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {1: 'H',

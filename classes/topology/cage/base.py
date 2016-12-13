@@ -99,6 +99,10 @@ class CageTopology(Topology):
         float
             The total difference of window size when considering every
             combination of windows of the same type.
+            
+        None : NoneType
+            If not all windows were found.
+            
                        
         Raises
         ------
@@ -109,9 +113,8 @@ class CageTopology(Topology):
         """
         
 
-        if len(self.windows) < self.n_windows:
-            raise WindowError(('Number of windows found is less than'
-                               ' the number of expected windows.'))
+        if self.windows is None or len(self.windows) < self.n_windows:
+            return None
 
         # Cluster the windows into groups so that only size differences
         # between windows of the same type are taken into account. To do

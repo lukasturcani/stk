@@ -1,9 +1,37 @@
+"""
+Defines optimization functions.
+
+Extending MMEA: Adding optimization functions
+---------------------------------------------
+New optimization functions are added by writing them into this module.
+The only requirements are that the first argument is ``macro_mol`` and
+that the function returns the optimized instance of ``macro_mol``. The
+frist requirement allows users to identify which arguments are handled
+automatically by MMEA and which need to be defined in the input file.
+The convention is that if the optimization function takes an argument 
+called ``macro_mol`` the users does not have to specify that argument in 
+the input file. The second requirment is necessary for reasons to do
+with parallization. If it is not fulfilled, the molecule will not be
+updated with the optimized version.
+
+Optionally optimizations can be complicated. If the use of helper
+functions is required make sure that they are private, ie that their
+names begin with a leading underscore. In the event that the
+optimization is so complex that it requires its own module, place the 
+module in the to same folder as this file. Then import the optimization
+function into this file. See the ``macromodel.py`` as an example. Make
+sure that only the optimization functions are imported back into this
+file, not any of the helper functions or classes. 
+
+"""
+
 import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
 import multiprocessing as mp
 from functools import partial
 
-from .macromodel import macromodel_opt, macromodel_cage_opt, macromodel_md_opt
+from .macromodel import (macromodel_opt, 
+                         macromodel_cage_opt, macromodel_md_opt)
 
 def _optimize_all(func_data, population):
     """
