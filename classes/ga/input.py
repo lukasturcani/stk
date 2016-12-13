@@ -1,4 +1,5 @@
 from types import ModuleType
+import sys
 
 from . import FunctionData
 from ..topology import *
@@ -218,8 +219,9 @@ class GAInput:
                 try:
                     kw, val = raw_line.split("=")
                 except Exception:
-                    raise Exception(("Issue with the input file on the"
-                    " following line (or its vicinity)."), raw_line)
+                    print(("Issue with the input file on the"
+                    " following line (or its vicinity).\n"), raw_line)
+                    sys.exit()
         
                 if kw in {'pop_size', 'num_generations', 'num_mutations', 
                           'num_crossovers', 'mutation_weights'}:
@@ -272,8 +274,9 @@ class GAInput:
             try:
                 p_name, p_vals = param.split("=") 
             except Exception:
-                raise Exception(("Issue with the input file on the"
-                " following line (or its vicinity)."), line)                        
+                print(("Issue with the input file on the"
+                " following line (or its vicinity).\n"), line)
+                sys.exit()                        
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
