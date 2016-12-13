@@ -4,7 +4,7 @@ import sys
 import warnings
 
 from .classes import (Population, GATools, Selection, Mutation, 
-                      Crossover, GAInput, InputHelp)
+                      Crossover, GAInput, InputHelp, Normalization)
 from .classes.exception import PopulationSizeError
 from .convenience_tools import time_it, archive_output, kill_macromodel
 
@@ -56,7 +56,8 @@ def run():
     mator = Crossover(ga_input.crossover_func, ga_input.num_crossovers)
     mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
                        weights=ga_input.mutation_weights)
-    ga_tools = GATools(selector, mator, mutator, 
+    normalizator = Normalization(ga_input.normalization_func)
+    ga_tools = GATools(selector, mator, mutator, normalizator,
                        ga_input.opt_func, ga_input.fitness_func)
     ga_tools.ga_input = ga_input
     
@@ -94,6 +95,12 @@ def run():
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
+
+    if pop.ga_tools.normalization:
+        with time_it():
+            print(('\n\nNormalizing fitness values.\n',
+                       '---------------------------\n\n'))
+            pop.normalize_fitness_values()
             
     # Run the GA.
     for x in range(ga_input.num_generations):
@@ -148,6 +155,12 @@ def run():
                 warnings.simplefilter("ignore")
                 pop = Population(pop.ga_tools, 
                                  *pop.calculate_member_fitness())
+
+        if pop.ga_tools.normalization:
+            with time_it():
+                print(('\n\nNormalizing fitness values.\n',
+                           '---------------------------\n\n'))
+                pop.normalize_fitness_values()
     
         with time_it():        
             print(('\n\nSelecting members of the next generation.\n'
