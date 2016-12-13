@@ -215,7 +215,12 @@ class GAInput:
                 # Check if the keyword is a simple value. If it is, 
                 # assign it to an attribute. If its not, raise a
                 # ``ValueError``.
-                kw, val = raw_line.split("=")
+                try:
+                    kw, val = raw_line.split("=")
+                except Exception:
+                    raise Exception(("Issue with the input file on the"
+                    " following line (or its vicinity)."), raw_line)
+        
                 if kw in {'pop_size', 'num_generations', 'num_mutations', 
                           'num_crossovers', 'mutation_weights'}:
                     setattr(self, kw, eval(val))
