@@ -391,7 +391,7 @@ class Selection:
                 if not duplicates:
                     pop.remove(ind)
 
-        mean_fitness = population.mean('fitness')
+        mean_fitness = population.mean(lambda x : x.fitness)
         fns = {ind : ind.fitness/mean_fitness for ind in pop}
 
         if duplicates:            
@@ -510,7 +510,7 @@ class Selection:
             fns = {ind : 1/(r * mean_fitness) for r, ind in 
                                                     enumerate(pop, 1)}
         else:
-            mean_fitness = population.mean('fitness')
+            mean_fitness = population.mean(lambda x : x.fitness)
             fns = {ind : ind.fitness/mean_fitness for ind in pop}
 
         if duplicates:            
@@ -725,7 +725,7 @@ class Selection:
         if truncation:
             pop = pop[:truncation]
 
-        mean_fitness = population.mean('fitness')            
+        mean_fitness = population.mean(lambda x : x.fitness)            
         fns = [(ind, ind.fitness/mean_fitness) for ind in pop]
 
         parent_pop = []
