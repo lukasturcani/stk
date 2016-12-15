@@ -1,5 +1,6 @@
 from types import ModuleType
 import sys
+import re
 
 from . import FunctionData
 from ..topology import *
@@ -88,6 +89,9 @@ class GAInput:
     input_file : str
         The full path of the MMEA input file.
         
+    pop_size : int
+        The size of the population.        
+
     num_generations : int
         The number of generations formed by MMEA.
         
@@ -150,7 +154,7 @@ class GAInput:
     """
     
     keywords = ['num_generations', 'num_mutations', 'num_crossovers',
-                'init_func', 'generational_select_func', 
+                'init_func', 'generational_select_func', 'pop_size',
                 'parent_select_func', 'mutant_select_func', 
                 'mutation_func', 'opt_func', 'mutation_weights',
                 'crossover_func', 'fitness_func', 'normalization_func']
@@ -216,48 +220,42 @@ class GAInput:
         with open(self.input_file, 'r') as input_file:
             
             # First remove all empty and comment lines.
-            input_file = iter(line.strip() for line in input_file if 
+            input_file = " ".join(line.strip() for line in input_file if 
                             not (line.isspace() or 
                                  line.strip()[0] == '#' or 
                                  line.strip() == ''))
                                  
             # Join up the file again and split across "$" to get full
             # commands.
-            input_file = iter(line.strip() for line in 
-                            " ".join(input_file).split("$") if
-                            line != '')
+            p =  "(" + "|".join(self.keywords) + ")"
+            p = re.compile(p)
+            input_file = [line for line in re.split(p, input_file)
+                                if line]
+            keywords = input_file[::2]
+            content = input_file[1::2]
+            lines = [keyword + c for keyword, c in 
+                     zip(keywords, content)]
                 
-            for raw_line in input_file:
-                
-                keyword_count = sum(1 for kw in self.keywords if
-                                    kw in raw_line)
-                # Ensure that the user defined valid keywords
-                if keyword_count == 0:
-                    print(("\n\nCommand does not define"
-                                            " a valid keyword.\n\n"), 
-                                            raw_line, "\n\n", sep="")
-                    sys.exit()  
-                # Ensure that the user did not forget to put a ``$`` 
-                # symbol somewhere.
-                if keyword_count > 1:
-                    print(('\n\nERROR: Multiple keywords detected in '
-                    'the following commnad, did you forget a "$"?\n\n'), 
-                    raw_line, "\n\n", sep="")
-                    sys.exit()                
-
-                # Check if the keyword indicates a function defintion.
-                kw, *_ = (word.strip() for word in raw_line.split(";"))
-                if '_func' in kw:
-                    func_data = self.line_data(raw_line)
-                    if 'mutation' in kw:
-                        mutation_funcs = getattr(self, kw, [])
-                        mutation_funcs.append(func_data)
-                        func_data = mutation_funcs
-                    setattr(self, kw, func_data)
-                    continue
-
-                kw, val = raw_line.split("=")                
-                setattr(self, kw, eval(val))
+            for raw_line in lines:             
+                try:
+                    # Check if the keyword indicates a function defintion.
+                    kw, *_ = (word.strip() for word in raw_line.split(";"))
+                    if '_func' in kw:
+                        func_data = self.line_data(raw_line)
+                        if 'mutation' in kw:
+                            mutation_funcs = getattr(self, kw, [])
+                            mutation_funcs.append(func_data)
+                            func_data = mutation_funcs
+                        setattr(self, kw, func_data)
+                        continue
+    
+                    kw, val = raw_line.split("=")                
+                    setattr(self, kw, eval(val))
+                except:
+                    print(("\n\n\nERROR: Something is wrong with the"
+                           " following line or in its vicinity.\n\n"),
+                            raw_line, sep="")
+                    sys.exit()
 
     @staticmethod      
     def line_data(line):
