@@ -22,15 +22,16 @@ class GAInput:
     defines a function used by MMEA it must also define any parameters 
     necessary to use the function. It does not have to define any 
     default initialized parameters, though it may if desired. A command 
-    terminates with the ``$`` symbol. This means that 
+    terminates at the start of the next command. Commands may be 
+    multiline, which means that
     
         generational_select_func; 
         stochastic_sampling; 
-        use_rank=True$
+        use_rank=True
         
     and 
     
-        generational_select_func; stochastic_sampling; use_rank=True$
+        generational_select_func; stochastic_sampling; use_rank=True
         
     define the same command.
     
@@ -44,7 +45,7 @@ class GAInput:
     such as ``num_generations`` they are simply followed by a ``=`` and 
     the desired value. For example,
         
-        num_generations=25$
+        num_generations=25
         
     would set the `num_generations` attribute of the ``GAInput`` 
     instance to 25. Notice there is no whitespace in this line. This is
@@ -54,11 +55,11 @@ class GAInput:
     syntax is as follows:
         
         keyword; func_name; param1_name=param1_val; 
-        param2_name=param2_val$
+        param2_name=param2_val
           
     Key points from the line example are:
-        > Every unit is separated by a semicolon, ``;``, except the last
-          which terminates with a ``$``.
+        > Every unit is separated by a semicolon, ``;``, except the 
+          last.
         > Parameter names are followed by a ``=`` with NO WHITESPACE.
         > The ``=`` after the parameter name is followed by the value of
           the parameter with NO WHITESPACE.
@@ -67,7 +68,7 @@ class GAInput:
     is being defined. For example:
     
         fitness_func; cage; target_cavity=5.7348; coeffs=[1,1,0,0,0]; 
-        macromodel_path="/home/lukas/program_files/schrodinger2016-3"$
+        macromodel_path="/home/lukas/program_files/schrodinger2016-3"
 
     This command specifices that the ``cage()`` function (defined within
     ``fitness.py``) is to be used as the fitness function. Notice that
@@ -75,7 +76,7 @@ class GAInput:
     However, the type must be made explicit with either ``[]`` or quotes 
     for a string. Just like it would in a python script.
     
-    If a new keyword is added to MMEA it should be added into the set
+    If a new keyword is added to MMEA it should be added into the list
     `keywords`.
     
     Class attributes
