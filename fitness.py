@@ -554,17 +554,24 @@ def cage_c60(macro_mol, target_mol_file,
     # most stable version.
     energy_separate = (macro_mol.energy.macromodel(16, macromodel_path) + 
                         target.energy.macromodel(16, macromodel_path))
-    energy_diff =  min(
+    binding_energy =  min(
            macromol_complex.energy.macromodel(16, macromodel_path) - 
            energy_separate for macromol_complex in macromol_complexes)
-    
-                       
-    raw_fitness = np.exp(energy_diff*1e-5) + 1
-    if raw_fitness > 1e10:
-        raw_fitness = 1e10
         
-    macro_mol.fitness = raw_fitness
+    macro_mol.fitness = _tilted_hyperbola(binding_energy) + 1
     return macro_mol
+
+def _tilted_hyperbola(x, a=50000, b=50000, k=0):
+    term1  = (x-k)**2
+    term1 /= b**2
+    term1 += 1
+    term1 = np.sqrt(term1)
+    term1 *= a
+    y = term1 + k
+    
+    r = np.sqrt(y**2 + x**2)
+    theta = np.arctan2(y,x) - np.pi/4
+    return r * np.sin(theta)    
     
 def _generate_complexes(macro_mol, target, number=1):
     """
