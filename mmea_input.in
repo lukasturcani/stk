@@ -74,7 +74,7 @@ num_mutations=10
 # Number of crossover/mating operations to perform each generation.
 ##################################################################################
 
-num_crosses=15
+num_crossovers=15
 
 ##################################################################################
 # Size of the population.
