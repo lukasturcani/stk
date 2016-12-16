@@ -1,5 +1,6 @@
 from types import ModuleType
 import sys
+import re
 
 from . import FunctionData
 from ..topology import *
@@ -21,15 +22,16 @@ class GAInput:
     defines a function used by MMEA it must also define any parameters 
     necessary to use the function. It does not have to define any 
     default initialized parameters, though it may if desired. A command 
-    terminates with the ``$`` symbol. This means that 
+    terminates at the start of the next command. Commands may be 
+    multiline, which means that
     
         generational_select_func; 
         stochastic_sampling; 
-        use_rank=True$
+        use_rank=True
         
     and 
     
-        generational_select_func; stochastic_sampling; use_rank=True$
+        generational_select_func; stochastic_sampling; use_rank=True
         
     define the same command.
     
@@ -43,7 +45,7 @@ class GAInput:
     such as ``num_generations`` they are simply followed by a ``=`` and 
     the desired value. For example,
         
-        num_generations=25$
+        num_generations=25
         
     would set the `num_generations` attribute of the ``GAInput`` 
     instance to 25. Notice there is no whitespace in this line. This is
@@ -53,11 +55,11 @@ class GAInput:
     syntax is as follows:
         
         keyword; func_name; param1_name=param1_val; 
-        param2_name=param2_val$
+        param2_name=param2_val
           
     Key points from the line example are:
-        > Every unit is separated by a semicolon, ``;``, except the last
-          which terminates with a ``$``.
+        > Every unit is separated by a semicolon, ``;``, except the 
+          last.
         > Parameter names are followed by a ``=`` with NO WHITESPACE.
         > The ``=`` after the parameter name is followed by the value of
           the parameter with NO WHITESPACE.
@@ -66,22 +68,31 @@ class GAInput:
     is being defined. For example:
     
         fitness_func; cage; target_cavity=5.7348; coeffs=[1,1,0,0,0]; 
-        macromodel_path="/home/lukas/program_files/schrodinger2016-3"$
+        macromodel_path="/home/lukas/program_files/schrodinger2016-3"
 
-    NOTE: Not all parameters required by the ``cage`` function
-          are defined.
-
-    This command specifices that the ``cage()`` function defined within
-    ``fitness.py`` is to be used as the fitness function. Notice that
+    This command specifices that the ``cage()`` function (defined within
+    ``fitness.py``) is to be used as the fitness function. Notice that
     if the value passed to a parameter can be a list or a string.
     However, the type must be made explicit with either ``[]`` or quotes 
     for a string. Just like it would in a python script.
+    
+    If a new keyword is added to MMEA it should be added into the list
+    `keywords`.
+    
+    Class attributes
+    ----------------
+    keywords : list
+        Holds all valid keywords used by MMEA. Used to give users useful
+        error messages.
     
     Attributes
     ----------
     input_file : str
         The full path of the MMEA input file.
         
+    pop_size : int
+        The size of the population.        
+
     num_generations : int
         The number of generations formed by MMEA.
         
@@ -116,10 +127,12 @@ class GAInput:
         instances to generate offspring. Must correspond to a method
         defined within the ``Crossover`` class.
     
-    mutation_func : FunctionData
-        The ``Mutation`` class method used to mutate ``MacroMolecule`` 
-        instances to generate mutants. Must correspond to a method 
-        defined within the ``Mutation`` class.
+    mutation_func : list of FunctionData instances
+        The ``Mutation`` class methods used to mutate ``MacroMolecule`` 
+        instances are held here. This is a list as multiple 
+        mutation functions can be used during the GAs run. The
+        FunctionData instances mut correspond to a methods defined 
+        within the ``Mutation`` class. 
         
     opt_func : FunctionData
         The function from the ``optimization.py`` module to be used for
@@ -129,7 +142,23 @@ class GAInput:
         The function from ``fitness.py`` to be used for calculating the
         fitness of ``MacroMolecule`` instances.
         
+    mutation_weights : array-like
+        The probability that each function in `mutation_func` will be 
+        selected each time a mutation operation is carried out. The
+        order of the probabilities corresponds to the order of the 
+        mutation functions in `mutation_func`.
+        
+    normalization_func : FunctionData
+        A function which rescales or normalizes the population's fitness
+        values.
+    
     """
+    
+    keywords = ['num_generations', 'num_mutations', 'num_crossovers',
+                'init_func', 'generational_select_func', 'pop_size',
+                'parent_select_func', 'mutant_select_func', 
+                'mutation_func', 'opt_func', 'mutation_weights',
+                'crossover_func', 'fitness_func', 'normalization_func']
     
     def __init__(self, input_file):
         """
@@ -157,6 +186,9 @@ class GAInput:
             
         if not hasattr(self, 'mutation_weights'):
             self.mutation_weights = [1]
+            
+        if not hasattr(self, 'normalization_func'):
+            self.normalization_func = None
         
     def _extract_data(self):
         """
@@ -189,49 +221,44 @@ class GAInput:
         with open(self.input_file, 'r') as input_file:
             
             # First remove all empty and comment lines.
-            input_file = iter(line.strip() for line in input_file if 
+            input_file = " ".join(line.strip() for line in input_file if 
                             not (line.isspace() or 
                                  line.strip()[0] == '#' or 
                                  line.strip() == ''))
                                  
             # Join up the file again and split across "$" to get full
             # commands.
-            input_file = iter(line.strip() for line in 
-                            " ".join(input_file).split("$") if
-                            line != '')
+            p =  "(" + "|".join(self.keywords) + ")"
+            p = re.compile(p)
+            input_file = [line for line in re.split(p, input_file)
+                                if line]
+            keywords = input_file[::2]
+            content = input_file[1::2]
+            lines = [keyword + c for keyword, c in 
+                     zip(keywords, content)]
                 
-            for raw_line in input_file:
-
-                # Check if the keyword indicates a function defintion.
-                kw, *_ = (word.strip() for word in raw_line.split(";"))
-                if '_func' in kw:
-                    func_data = self.line_data(raw_line)
-                    if 'mutation' in kw:
-                        mutation_funcs = getattr(self, kw, [])
-                        mutation_funcs.append(func_data)
-                        func_data = mutation_funcs
-                    setattr(self, kw, func_data)
-                    continue
-            
-                # Check if the keyword is a simple value. If it is, 
-                # assign it to an attribute. If its not, raise a
-                # ``ValueError``.
+            for raw_line in lines:             
                 try:
-                    kw, val = raw_line.split("=")
-                except Exception:
-                    print(("\n\nERROR: Issue with the input file on the"
-                    " following line (or its vicinity):\n\n"), raw_line,
-                    "\n\n", sep="")
-                    sys.exit()
-        
-                if kw in {'pop_size', 'num_generations', 'num_mutations', 
-                          'num_crossovers', 'mutation_weights'}:
+                    # Check if the keyword indicates a function defintion.
+                    kw, *_ = (word.strip() for word in raw_line.split(";"))
+                    if '_func' in kw:
+                        func_data = self.line_data(raw_line)
+                        if 'mutation' in kw:
+                            mutation_funcs = getattr(self, kw, [])
+                            mutation_funcs.append(func_data)
+                            func_data = mutation_funcs
+                        setattr(self, kw, func_data)
+                        continue
+    
+                    kw, val = raw_line.split("=")                
                     setattr(self, kw, eval(val))
-                else:
-                    raise ValueError(
-                      "Line does not define a valid keyword.", raw_line)
-                    
-    @staticmethod
+                except:
+                    print(("\n\n\nERROR: Something is wrong with the"
+                           " following line or in its vicinity.\n\n"),
+                            raw_line, sep="")
+                    sys.exit()
+
+    @staticmethod      
     def line_data(line):
         """
         Creates a ``FunctionData`` instance based on data in line.
@@ -272,20 +299,7 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            try:
-                p_name, p_vals = param.split("=")
-            except ValueError:
-                if param.count("=") > 1:
-                    print(('\n\nERROR: Multiple "=" detected in the'
-                    ' following line, did you forget a "$"?\n\n'), 
-                    line, "\n\n", sep="")
-                    sys.exit()
-                
-            except Exception:
-                print(("\n\nERROR: Issue with the input file on the"
-                " following line (or its vicinity):\n\n"), line, "\n\n",
-                sep="")
-                sys.exit()                        
+            p_name, p_vals = param.split("=")                
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)

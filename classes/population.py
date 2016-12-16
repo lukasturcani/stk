@@ -637,6 +637,9 @@ class Population:
 
     def calculate_member_fitness(self):
         return _calc_fitness(self.ga_tools.fitness, self)
+        
+    def normalize_fitness_values(self):
+        return self.ga_tools.normalization(self)
 
     def mean(self, key):
         """

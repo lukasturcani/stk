@@ -73,6 +73,8 @@ class MacroMolError(Exception):
         # and fitness functions, set these attributes of `macro_mol`.
         macro_mol.optimized = True
         macro_mol.fitness = 1e-4
+        macro_mol.unscaled_fitness = 1e-4
+        macro_mol.fitness_fail = True
         
         self.ex = ex
         self.notes = notes
