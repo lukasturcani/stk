@@ -747,7 +747,7 @@ def _structconvert(iname, oname, macromodel_path):
 
     # If no license if found, keep re-running the function until it is.
     if not _license_found(convrt_return.stdout):
-        return structconvert(iname, oname, macromodel_path)    
+        return _structconvert(iname, oname, macromodel_path)    
 
     # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:

@@ -391,7 +391,8 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
 @_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
                'Asymmetry') 
 def cage_c60(macro_mol, target_mol_file, 
-             macromodel_path, n5fold, n2fold, min_cavity=None):
+             macromodel_path, n5fold, n2fold, min_cavity=None,
+             md=False):
     """
     Calculates the fitness of a cage / C60 complex.
     
@@ -489,7 +490,7 @@ def cage_c60(macro_mol, target_mol_file,
             mm_complex.optimized = False
             mm_complex.energy = Energy(mm_complex)
             optimization.macromodel_opt(mm_complex, no_fix=True,
-                           macromodel_path=macromodel_path)
+                           macromodel_path=macromodel_path, md=md)
             macromol_complexes.append(mm_complex)
     
         # Calculate the energy of the complex and compare to the
