@@ -474,8 +474,7 @@ class Selection:
             calculated from the rank is used for selection. The formula
             is
                 
-                f = 1/rank.
-                
+                f = 1/rank.                
             
         Yields
         ------
