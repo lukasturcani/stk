@@ -41,9 +41,12 @@ from functools import partial
 import networkx as nx
 import os
 import multiprocessing as mp
+import warnings
+from collections import Counter
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit, Energy
+from .classes.topology.cage import CageTopology
 from . import optimization
 from .convenience_tools import (rotation_matrix_arbitrary_axis, 
                                 matrix_centroid)
@@ -78,12 +81,6 @@ def _calc_fitness(func_data, population):
         # Make sure the cache is updated with the evaluated versions.
         for member in evaluated:
             member.update_cache()
-
-
-    # After each macro_mol has a fitness value, sort the population by 
-    # fitness and print.
-    for macro_mol in sorted(evaluated, reverse=True):
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
         
     return evaluated
 
@@ -118,10 +115,6 @@ def _calc_fitness_serial(func_data, population):
         except Exception as ex:
             MacroMolError(ex, macro_mol, 'During fitness calculation.')
 
-    # After each macro_mol has a fitness value, sort the population by 
-    # fitness and print.
-    for macro_mol in sorted(population, reverse=True):
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
 
 def _param_labels(*labels):
     """
@@ -190,184 +183,130 @@ def random_fitness(macro_mol):
     macro_mol.fitness = np.random.randint(1,10)
     return macro_mol    
     
-# Calls the decorator with the specific labels
+# Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ','Window Difference ',
-                'Asymmetry ', 'Negative Energy per Bond ', 
-                'Positive Energy per Bond ')
-def cage(macro_mol, population, target_cavity,  
-         target_window=None, coeffs=None, exponents=None, 
+                'Asymmetry ', 'Positive Energy per Bond ', 
+                'Negative Energy per Bond ')
+def cage(macro_mol, target_cavity, target_window=None, 
          energy_params={'key':('rdkit', 'uff')}):
     """
     Calculates the fitness of a cage.
     
-    The fitness function has the form
-    
-        (1) fitness = penalty_term + carrot_term
-        
-    where
-        
-        (2) penalty_term = 1 / [ A*(var1^a) + B*(var2^b) + C*(var3^c) + 
-                                 D*(var4^d) ],
-                                 
-    and 
-    
-        (3) carrot_term = E*(var5^e).
-        
-    Here var1 to var5 signify parameters of the cage which factor into
-    fitness. These parameters are calculated by the fitness function and
-    placed in variables, for example:
-        
-        1) `cavity_diff` - the difference between the cage's cavity
-           (diameter) and the desired cavity size
-        2) `window_diff` - the difference between the diameter of the 
-           window of the cage and the size required to allow the target
-           to enter the cavity
-        3) `asymmetry` - sum of the difference between the size of the
-           windows of the same type
-        4) `neg_eng_per_bond` - the formation energy of the cage divided 
-           by the number of bonds for during assembly, when the energy
-           is < 0. This is a measure of the stability or strain of a 
-           cage.
-        5) Same as 4) but used when the energy is > 0.
-        
-    The design of the fitness function is as follows. Consider two
-    cages, ``CageA`` and ``CageB``. If the parameters, 1) to 4), in
-    CageA, which signify poor fitness are 10 times that of CageB and the
-    parameter which signifies good fitness, 5), is 10 times less than 
-    CageB, then CageA should have a fitness value 10 times less than 
-    CageB.
-    
-    This is assuming all coefficients and powers are 1. Note that a cage
-    will always have either 4) or 5) at 0. This is because its total 
-    energy will always be either positive or negative.
-    
-    The `coeffs` parameter has the form
-    
-        np.array([1,2,3,4,5]),
+    This function is intended to be used with the normalization function
+    ``carrots_and_sticks()`` defined in ``normalization.py``.
 
-    where 1, 2, 3, 4 and 5 correspond to the desired values of A, B, C,  
-    D and E in equation (2). Equally the `exponents` parameter also has 
-    the form
+    The fitness function creates a tuple of 2 arrays. The first array
+    holds parameters of `macro_mol` which contribute to a high fitness.
+    The second array holds parameters of `macro_mol` which cause a low
+    fitness.
 
-        np.array([5,6,7,8,9]),
-    
-    where 5, 6, 7, 8 and 9 correspond to the values of a, b, c, d and e
-    in equation (2).
-    
-    Assume that for a given GA run, it is not worthwhile factoring in 
-    the `window_diff` parameter. This may be because cages which 
-    form via templating are also to be considered. If the cage forms
-    around the target, its windows size is irrelevant. In this case the 
-    `coeffs` parameter passed to the function would be:
-
-        np.array([1, 0, 1, 1, 0.25])
-        
-    In this way the contribution of that parameter to the fitness will
-    always be 0. Note that you may also want to set the corresponding 
-    exponent to 0 as well. This may lead to a faster calculation. Notice
-    that the carrot term has the coeffiecient set to 0.25. This gives
-    it the same weighing as the other terms in the penalty term. The 
-    difference is due to the fact that the penality term's exponents are
-    summed first and then used in 1/x, while the carrot term is not 
-    summed or passed through an inverse function.
+    The parameter which indicates high fitness is the negative formation 
+    energy per bond made. The remaining parameters indicate low fitness
+    and are:
+        1) `cavity_diff` - the difference between the cavity of 
+           `macro_mol` and the `target_cavity`.
+        2) `window_diff` - the difference between the largest window of
+           `macro_mol` and `target_window`.
+        3) `asymmetry` - the sum of the size differences of all the
+           windows in `macro_mol`.
+        4) `pos_eng_per_bond` - The postive formation energy of 
+           `macro_mol` per bond made.
   
     Parameters
     ----------
     macro_mol : Cage
         The cage whose fitness is to be calculated.
         
-    population : Population
-        The population in which `macro_mol` is held. Used for scaling 
-        purposes.
-        
     target_cavity : float
-        The desried size of the cage's pore.
-        
-    macromodel_path : str
-        The Schrodinger directory path.
+        The desried diameter of the cage's pore.
 
     target_window : float (default = None)
-        The desired radius of the largest window of the cage. If 
+        The desired diameter of the largest window of the cage. If 
         ``None`` then `target_cavity` is used.
-        
-    coeffs : numpy.array (default = None)
-        An array holding the coeffients A to N in equation (2).
-        
-    exponents : numpy.array (default = None)
-        An array holding the exponents a to n in equation (2).
         
     energy_params : dict
         A dictionary holding the name arguments and values for the 
         ``Energy.pseudoformation()`` function.
     
+    Modifies
+    --------
+    macro_mol.fitness_fail : bool
+        The function sets this to ``True`` if one of the parameters 
+        was not calculated. ``False`` if every parameter was calculated
+        successfully.
+        
+    macro_mol.unscaled_fitness : tuple of 2 numpy.arrays
+        The first numpy array holds the value of the negative energy
+        per bond made. The second array holds the remaining parameters
+        described above.   
+        
+    macro_mol.progress_params : list
+        Places the calculated parameters in a single list. The order
+        corresponds to the arguments in the ``_param_labels()`` 
+        decorator applied to this function.
+        
     Returns
     -------
-    The fitness function will be called on each cage twice. Once to get
-    the unscaled values of all the var parameters. This will return an 
-    array. The second time the average of the unscaled values is used 
-    for scaling. The scaled values are then used to calculate the final 
-    fitness as a float. This is returned after the second call. More
-    details in ``calc_fitness``.
-    
-    float
-        The fitness of `macro_mol`.
-        
-    numpy.array
-        A numpy array holding unsacled values of var1 to varX. This is 
-        returned during the scaling procedure described in 
-        ``calc_fitness``.
-
-    Raises
-    ------
-    ValueError
-        When the average of the negavite bond formation energy is 
-        positive.
+    macro_mol : Cage
+        The `macro_mol` with its fitness parameters calculated.
 
     """
 
-
-     
-    # If the parameters have already been calculated for this 
-    # `macro_mol` do not recalculate them.
-    if macro_mol.fitness:
+    # Prevents warnings from getting printed when using multiprocessing.
+    warnings.filterwarnings('ignore')
+    try:
+         
+        # If the parameters have already been calculated for this 
+        # `macro_mol` do not recalculate them.
+        if macro_mol.unscaled_fitness:
+            return macro_mol
+                       
+        if target_window is None:
+            target_window = target_cavity                       
+                       
+        cavity_diff = abs(target_cavity - 
+                          macro_mol.topology.cavity_size())
+    
+        if macro_mol.topology.windows is not None:
+            window_diff = abs(target_window - 
+                              max(macro_mol.topology.windows))
+        else:
+            window_diff  = None
+            
+        if  macro_mol.topology.window_difference() is not None:             
+            asymmetry = macro_mol.topology.window_difference()
+        else:
+            asymmetry = None
+    
+        e_per_bond = macro_mol.energy.pseudoformation(**energy_params)
+        e_per_bond /= macro_mol.topology.bonds_made
+    
+        if e_per_bond < 0:
+            ne_per_bond = abs(e_per_bond)
+            pe_per_bond = 0
+        else:
+            ne_per_bond = 0
+            pe_per_bond = e_per_bond
+        
+        macro_mol.progress_params = [cavity_diff, window_diff, 
+                                   asymmetry, pe_per_bond, -ne_per_bond]  
+                        
+        macro_mol.fitness_fail = (True if None in 
+                                  macro_mol.progress_params else False)
+    
+        macro_mol.unscaled_fitness = (np.array([ne_per_bond]),
+                        np.array([cavity_diff,
+                        (window_diff if window_diff is not None else 0),
+                        (asymmetry if asymmetry is not None else 0),
+                        pe_per_bond]))
+        
+          
+        
         return macro_mol
-                   
-    cavity_diff = abs(target_cavity - macro_mol.topology.cavity_size())
 
-    window_diff = (abs(target_window - 
-                      max(macro_mol.topology.windows)) if 
-                      macro_mol.topology.windows is not None else None)
-                      
-    asymmetry = (macro_mol.topology.window_difference() if
-                 macro_mol.topology.window_difference() is not None 
-                                                        else None) 
-
-    e_per_bond = macro_mol.energy.pseudoformation(**energy_params)
-    e_per_bond /= macro_mol.topology.bond_made
-
-    if e_per_bond < 0:
-        ne_per_bond = e_per_bond
-        pe_per_bond = 0
-    else:
-        ne_per_bond = 0
-        pe_per_bond = e_per_bond
-    
-    fitness_vars = [cavity_diff,
-                    window_diff,
-                    asymmetry,
-                    ne_per_bond,
-                    pe_per_bond]
-                    
-    macro_mol._fitness_fail = True if None in fitness_vars else False
-
-    macro_mol.fitness = np.array([
-                    cavity_diff,
-                    (window_diff if window_diff is not None else 0),
-                    (asymmetry if asymmetry is not None else 0),
-                    ne_per_bond,
-                    pe_per_bond])
-    
-    return macro_mol
+    except Exception as ex:
+        MacroMolError(ex, macro_mol, "During fitness calculation")
+        return macro_mol
 
 def cage_target(macro_mol, target_mol_file, macromodel_path, 
                 rotations=0):
@@ -448,7 +387,9 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
         raw_fitness = 1e10
         
     return raw_fitness
- 
+
+@_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
+               'Asymmetry') 
 def cage_c60(macro_mol, target_mol_file, 
              macromodel_path, n5fold, n2fold, min_cavity=None):
     """
@@ -490,88 +431,129 @@ def cage_c60(macro_mol, target_mol_file,
     
     """
     
-    # If the cage already has a fitness value, don't run the
-    # calculation again.
-    if macro_mol.fitness:
-        print('Skipping {0}'.format(macro_mol.prist_mol_file))
-        return macro_mol
- 
-    if min_cavity and min_cavity < macro_mol.topology.cavity_size():
-        macro_mol.fitness = 1e-4
-        return macro_mol
-       
-    # Make a copy version of `macro_mol` which is unoptimizted.
-    unopt_macro_mol = copy.deepcopy(macro_mol)
-    unopt_macro_mol.topology.final_sub()
-    
-    
-    # The first time running the fitness function create an instance
-    # of the target molecule as a ``StructUnit``. Due to caching,
-    # running the initialization again on later attempts will not 
-    # re-initialize.
-    target = StructUnit(target_mol_file, minimal=True)
-    _, molname = os.path.split(macro_mol.prist_mol_file)
-    
-    # Write a copy of the target for each macro_mol. So that parallel
-    # energy calculations don't clash. There is room for optimization
-    # here.
-    molname, ext = os.path.splitext(molname)
-    target.prist_mol_file = os.path.join(os.getcwd(), 
-                                         molname+"target"+ext)    
-    target.write_mol_file('prist')
-    
-
-    # This function creates a new molecule holding both the target
-    # and the cage centered at the origin. It then calculates the 
-    # energy of this complex and compares it to the energies of the
-    # molecules when separate. The more stable the complex relative
-    # to the individuals the higher the fitness.
-    
-    # Create rdkit instances of the target in the cage for each
-    # rotation.        
-    rdkit_complexes = _c60_rotations(unopt_macro_mol, target, 
-                                     n5fold, n2fold)
-
-    # Optimize the strcuture of the cage/target complexes.
-    macromol_complexes = []        
-    for i, complex_ in enumerate(rdkit_complexes):
-        # In order to use the optimization functions, first the data is 
-        # loaded into a ``MacroMolecule`` instance and its .mol file is 
-        # written to the disk.
-        mm_complex = MacroMolecule.__new__(MacroMolecule)
-        mm_complex.prist_mol = complex_
-        mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
-                            '.mol', '_COMPLEX_{0}.mol'.format(i))
-        mm_complex.write_mol_file('prist')
-        mm_complex.optimized = False
-        mm_complex.energy = Energy(mm_complex)
-        optimization.macromodel_opt(mm_complex, no_fix=True,
-                       macromodel_path=macromodel_path)
-        macromol_complexes.append(mm_complex)
-
-    # Calculate the energy of the complex and compare to the
-    # individual energies. If more than complex was made, use the
-    # most stable version.
-    energy_separate = (macro_mol.energy.macromodel(16, macromodel_path) + 
-                        target.energy.macromodel(16, macromodel_path))
-    binding_energy =  min(
-           macromol_complex.energy.macromodel(16, macromodel_path) - 
-           energy_separate for macromol_complex in macromol_complexes)
+    warnings.filterwarnings('ignore')
+    try:
+        # If the cage already has a fitness value, don't run the
+        # calculation again.
+        if macro_mol.unscaled_fitness:
+            print('Skipping {0}'.format(macro_mol.prist_mol_file))
+            return macro_mol
+     
+        if min_cavity and min_cavity < macro_mol.topology.cavity_size():
+            macro_mol.fitness = 1e-4
+            return macro_mol
+           
+        # Make a copy version of `macro_mol` which is unoptimizted.
+        unopt_macro_mol = copy.deepcopy(macro_mol)
+        unopt_macro_mol.topology.final_sub()
         
-    macro_mol.fitness = _tilted_hyperbola(binding_energy) + 1
-    return macro_mol
-
-def _tilted_hyperbola(x, a=50000, b=50000, k=0):
-    term1  = (x-k)**2
-    term1 /= b**2
-    term1 += 1
-    term1 = np.sqrt(term1)
-    term1 *= a
-    y = term1 + k
+        
+        # The first time running the fitness function create an instance
+        # of the target molecule as a ``StructUnit``. Due to caching,
+        # running the initialization again on later attempts will not 
+        # re-initialize.
+        target = StructUnit(target_mol_file, minimal=True)
+        _, molname = os.path.split(macro_mol.prist_mol_file)
+        
+        # Write a copy of the target for each macro_mol. So that parallel
+        # energy calculations don't clash. There is room for optimization
+        # here.
+        molname, ext = os.path.splitext(molname)
+        target.prist_mol_file = os.path.join(os.getcwd(), 
+                                             molname+"target"+ext)    
+        target.write_mol_file('prist')
+        
     
-    r = np.sqrt(y**2 + x**2)
-    theta = np.arctan2(y,x) - np.pi/4
-    return r * np.sin(theta)    
+        # This function creates a new molecule holding both the target
+        # and the cage centered at the origin. It then calculates the 
+        # energy of this complex and compares it to the energies of the
+        # molecules when separate. The more stable the complex relative
+        # to the individuals the higher the fitness.
+        
+        # Create rdkit instances of the target in the cage for each
+        # rotation.        
+        rdkit_complexes = _c60_rotations(unopt_macro_mol, target, 
+                                         n5fold, n2fold)
+    
+        # Optimize the strcuture of the cage/target complexes.
+        macromol_complexes = []        
+        for i, complex_ in enumerate(rdkit_complexes):
+            # In order to use the optimization functions, first the data is 
+            # loaded into a ``MacroMolecule`` instance and its .mol file is 
+            # written to the disk.
+            mm_complex = MacroMolecule.__new__(MacroMolecule)
+            mm_complex.prist_mol = complex_
+            mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
+                                '.mol', '_COMPLEX_{0}.mol'.format(i))
+            mm_complex.write_mol_file('prist')
+            mm_complex.optimized = False
+            mm_complex.energy = Energy(mm_complex)
+            optimization.macromodel_opt(mm_complex, no_fix=True,
+                           macromodel_path=macromodel_path)
+            macromol_complexes.append(mm_complex)
+    
+        # Calculate the energy of the complex and compare to the
+        # individual energies. If more than complex was made, use the
+        # most stable version.
+        energy_separate = (macro_mol.energy.macromodel(16, macromodel_path) + 
+                            target.energy.macromodel(16, macromodel_path))
+        min_eng_cmplx = min(macromol_complexes, 
+                    key=lambda x : x.energy.macromodel(16, macromodel_path))                        
+    
+        binding_energy = (min_eng_cmplx.energy.values[('macromodel', 16)] - 
+                           energy_separate)
+            
+        if binding_energy > 0:
+            pos_be = binding_energy
+            neg_be = 0
+        else:
+            pos_be = 0
+            neg_be = abs(binding_energy)
+
+        frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.prist_mol, 
+                                        asMols=True,
+                                        sanitizeFrags=False)
+                                      
+        cage_counter = Counter(x.GetAtomicNum() for x in 
+                                macro_mol.prist_mol.GetAtoms())
+        frag_counters = [(frag1, Counter(x.GetAtomicNum() for x in 
+                                frag1.GetAtoms())),
+
+                        (frag2, Counter(x.GetAtomicNum() for x in 
+                                frag2.GetAtoms()))]
+    
+        cmplx_cage_mol = next(frag for frag, counter in frag_counters if 
+                            counter == cage_counter)
+        
+        cmplx_cage = MacroMolecule.__new__(MacroMolecule)
+        cmplx_cage.prist_mol = cmplx_cage_mol
+        cmplx_cage.topology = type(macro_mol.topology)(cmplx_cage)
+        cmplx_cage.prist_mol_file = macro_mol.prist_mol_file.replace(
+                         '.mol', '_COMPLEX_{0}_no_target.mol'.format(i))
+        cmplx_cage.write_mol_file('prist')
+        
+    
+        if cmplx_cage.topology.window_difference() is not None:             
+            asymmetry = macro_mol.topology.window_difference()
+        else:
+            asymmetry = None        
+    
+        
+        macro_mol.progress_params = [neg_be, pos_be, asymmetry]        
+        
+        macro_mol.fitness_fail = (True if None in 
+                                   macro_mol.progress_params else False)
+    
+        macro_mol.unscaled_fitness = (
+                              np.array([neg_be]),
+                              np.array([pos_be, 
+                              (asymmetry if asymmetry is not None else 0)]))
+    
+        return macro_mol
+        
+    except Exception as ex:
+        MacroMolError(ex, macro_mol, "During fitness calculation.")
+        return macro_mol
     
 def _generate_complexes(macro_mol, target, number=1):
     """

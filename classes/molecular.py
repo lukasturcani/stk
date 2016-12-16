@@ -2504,7 +2504,24 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     fitness : float (default = False)
         The fitness value of the macromolecule, as determined by the 
         chosen fitness function. This attribute is assigned by fitness
-        functions and initialized with ``False``.
+        functions and initialized with ``False``. If a scaling or
+        normalization procedure is used, the fitness function will often
+        assign to the attribute `unscaled_fitness` while normalization
+        function will assign to `fitness`.
+        
+    unscaled_fitness = float or array (default = False)
+        Fitness functions which couple with scaling or normalization 
+        functions assign fitness values into this attribute.
+        
+    fitness_fail : bool (default = True)
+        Used to indicate if the fitness function failed to calculate
+        a value for the MacroMolecule. Not all fitness functions or
+        normalization fucntions use this attribute but it can be useful.
+        
+    progress_params : list (default = False)
+        Holds the fitness parameters which the GA should track to make
+        progress plots. If the default ``False`` is used, the fitness
+        value will be used.
         
     key : str
         The key used for caching the molecule. Necessary for 
@@ -2597,6 +2614,9 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         # A numerical fitness is assigned by fitness functions evoked
         # by a ``Population`` instance's `GATools` attribute.
         self.fitness = False
+        self.unscaled_fitness = False
+        self.fitness_fail = True
+        self.progress_params = False
         
         # Dump the molecule in case it causes an issue later on.
         self.dump(self.prist_mol_file.replace('.mol', '.dmp'))
@@ -2703,12 +2723,6 @@ class Cage(MacroMolecule):
         details.
     
     """
-    
-    def formation_energy(self, macromodel_path):
-        energy_before = sum(self.topology.bb_counter[bb] * bb.energy for 
-                            bb in self.building_blocks)
-                            
-        return (self.energy - energy_before) / self.topology.bonds_made
 
     @classmethod
     def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
@@ -2762,13 +2776,6 @@ class Cage(MacroMolecule):
         topology = np.random.choice(topologies)
         
         return cls((bb, lk), topology, prist_mol_file)
-
-    def normalized_energy(self):
-        
-        denominator = np.prod(list(self.topology.bb_counter.values()))
-        
-        return self.energy / denominator
-
 
 class Polymer(MacroMolecule):
     """
