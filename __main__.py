@@ -1,7 +1,8 @@
+import warnings
+warnings.filterwarnings("ignore")
 import os
 import shutil
 import sys
-import warnings
 
 from .classes import (Population, GATools, Selection, Mutation, 
                       Crossover, GAInput, InputHelp, Normalization)
@@ -92,15 +93,16 @@ def run():
     with time_it():    
         print('\n\nCalculating the fitness of population members.\n'
             '----------------------------------------------\n\n') 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
+        pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
 
     if pop.ga_tools.normalization:
         with time_it():
-            print(('\n\nNormalizing fitness values.\n',
+            print(('\n\nNormalizing fitness values.\n'
                        '---------------------------\n\n'))
             pop.normalize_fitness_values()
+
+    for macro_mol in sorted(pop, key=lambda x : x.fitness, reverse=True):
+        print(macro_mol.fitness, '-',macro_mol.prist_mol_file)
             
     # Run the GA.
     for x in range(ga_input.num_generations):
@@ -151,16 +153,18 @@ def run():
         with time_it():        
             print('\n\nCalculating the fitness of population members.\n'
                 '----------------------------------------------\n\n')    
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                pop = Population(pop.ga_tools, 
-                                 *pop.calculate_member_fitness())
+            pop = Population(pop.ga_tools, 
+                             *pop.calculate_member_fitness())
 
         if pop.ga_tools.normalization:
             with time_it():
-                print(('\n\nNormalizing fitness values.\n',
+                print(('\n\nNormalizing fitness values.\n'
                            '---------------------------\n\n'))
                 pop.normalize_fitness_values()
+                
+        for macro_mol in sorted(pop, 
+                                key=lambda x : x.fitness, reverse=True):
+            print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
     
         with time_it():        
             print(('\n\nSelecting members of the next generation.\n'
