@@ -9,10 +9,10 @@ class GAProgress:
 
     def update(self, population):
         self.gens.append(len(self.gens))
-        if hasattr(population[0], '_unscaled_fitness_vars'):
-            unscaled_var_mat = np.matrix(
-            [x.unscaled_fitness_vars.tolist() for 
-             x in population if x.unscaled_fitness_vars is not None])
+        if any(x.progress_params for x in population):
+            unscaled_var_mat = np.matrix([
+                x.progress_params for x in population if not 
+                x.fitness_fail])
 
             self.maxs.append(np.max(unscaled_var_mat, axis=0).tolist()[0])
             self.mins.append(np.min(unscaled_var_mat, axis=0).tolist()[0])
