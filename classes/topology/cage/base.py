@@ -65,7 +65,7 @@ class CageTopology(Topology):
         
     def cavity_size(self):
         """
-        Returns the size of the cage cavity.
+        Returns the diameter of the cage cavity.
 
         Returns
         -------

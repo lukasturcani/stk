@@ -10,34 +10,59 @@ class Normalization:
         self.scaling_func(population)        
         
     @staticmethod
-    def cage(population):
-        # If one or more of the fitness parameters failed, return minimum 
-        # fitness. 
-        if macro_mol._fitness_fail:
-            return 1e-4
-    
-        # Set the default coeffient values.
-        if coeffs is None:
-            coeffs = np.array([1,1,1,1,0.2])
+    def carrots_and_sticks(population, carrot_coeffs, stick_coeffs,
+                           carrot_exponents, stick_exponents):
+        
+        unscaled_carrots = [x.unscaled_fitness[0] for x in population if
+                            x.unscaled_fitness]
+                            
+        unscaled_sticks = [x.unscaled_fitness[1] for x in population if
+                           x.unscaled_fitness]
+                           
+        _carrot_means = np.mean(unscaled_carrots, axis=0)
+        carrot_means = []
+        for x in _carrot_means:
+            if x == 0:
+                carrot_means.append(1)
+            else:
+                carrot_means.append(x)
+        
+        _stick_means = np.mean(unscaled_sticks, axis=0)
+        stick_means = []
+        for x in _stick_means:
+            if x == 0:
+                stick_means.append(1)
+            else:
+                stick_means.append(x)
+        
+        
+        for macro_mol in population:        
+        
+            # If one or more of the fitness parameters failed, 
+            # return minimum fitness. 
+            if macro_mol.fitness_fail:
+                macro_mol.fitness = 1e-4
+                continue
+        
+            # Calculate the scaled fitness parameters by dividing the 
+            # unscaled ones by the fitness.
+            scaled_carrots = np.divide(macro_mol.unscaled_fitness[0], 
+                                       carrot_means)
+              
+            scaled_sticks = np.divide(macro_mol.unscaled_fitness[1],
+                                      stick_means)        
+              
+              
+            scaled_carrots = np.power(scaled_carrots, carrot_exponents)
+            scaled_sticks = np.power(scaled_sticks, stick_exponents)
             
-        # Set the default exponent values.
-        if exponents is None:
-            exponents = np.array([1,1,1,1,1]) 
-    
-        # Calculate the scaled fitness parameters by dividing the unscaled
-        # ones by the fitness.
-        scaled = np.divide(macro_mol._unscaled_fitness_vars, 
-                           population._fitness_cache['mean'])
-           
-        fitness_vars = np.power(scaled, exponents)
-        fitness_vars = np.multiply(fitness_vars, coeffs)    
-        penalty_term = np.sum(fitness_vars[:-1])
-        penalty_term =  np.divide(1,penalty_term)
-        if penalty_term > 1e101:
-            penalty_term = 1e101
-        
-        # Carrots and sticks, where the previous fitness parameters were
-        # the sticks.
-        carrot_term = fitness_vars[-1]
-        
-        return penalty_term + carrot_term    
+            scaled_carrots = np.multiply(scaled_carrots, carrot_coeffs)
+            scaled_sticks = np.multiply(scaled_sticks, stick_coeffs)
+
+            carrot_term = np.sum(scaled_carrots)
+            penalty_term = np.sum(scaled_sticks)
+            penalty_term =  np.divide(1,penalty_term)
+            if penalty_term > 1e101:
+                penalty_term = 1e101
+                        
+            macro_mol.fitness = penalty_term + carrot_term    
