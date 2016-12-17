@@ -14,10 +14,10 @@ class Normalization:
                            carrot_exponents, stick_exponents):
         
         unscaled_carrots = [x.unscaled_fitness[0] for x in population if
-                            x.unscaled_fitness]
+                            isinstance(x.unscaled_fitness, tuple)]
                             
         unscaled_sticks = [x.unscaled_fitness[1] for x in population if
-                           x.unscaled_fitness]
+                           isinstance(x.unscaled_fitness, tuple)]
                            
         _carrot_means = np.mean(unscaled_carrots, axis=0)
         carrot_means = []
