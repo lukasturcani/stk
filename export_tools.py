@@ -120,13 +120,14 @@ def substurct_prune(folder, substruct):
             print('Removing {}.'.format(path))
             os.remove(path)
 
-def categorize(path, output_dir):
+def categorize(path, filename, output_dir):
     try:
         fgs = ['amine', 'aldehyde']
         dirs = ['amines2f', 'amines3f', 'amines4f',
                 'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
       
         mol = StructUnit(path, minimal=True)
+                
         
         for fg in fgs:
             mol.func_grp = next((x for x in 
@@ -137,12 +138,28 @@ def categorize(path, output_dir):
             fg_n = str(len(mol.heavy_ids))
             folder = next((x for x in dirs if fg_n in x and fg in x), None)
             if folder is not None:
-                shutil.copy(path, os.path.join(output_dir,folder))
+                oname = os.path.join(output_dir,folder,filename)
+                with open(oname, 'w') as f:
+                    f.write(path)
+                
 
-    except:
-        print('Failed with {}.'.format(path))
+    except Exception as ex:
+        with open('/home/lukas/database/fails.mol2', 'a') as f:
+            f.write(path)
+            
 
+        
+def categorize_folder(ifolder, ofolder):
+    for n1, filename in enumerate(os.listdir(ifolder)):
+        with open(os.path.join(ifolder,filename), 'r') as f:
+            content = f.read()
+            mols = content.split('@<TRIPOS>MOLECULE\n')
+            for n2, mol in enumerate(mols[1:]):
+                mol = '@<TRIPOS>MOLECULE\n' + mol
+                filename = "{}{}.mol2".format(n1,n2)
+                categorize(mol, filename, ofolder)
 
+        
 def neutralize(path, output_dir, macromodel_path):
     try:
         m = chem.MolFromMol2File(path)
