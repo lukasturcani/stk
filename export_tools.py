@@ -141,23 +141,29 @@ def categorize(path, filename, output_dir):
                 oname = os.path.join(output_dir,folder,filename)
                 with open(oname, 'w') as f:
                     f.write(path)
-                
+
 
     except Exception as ex:
-        with open('/home/lukas/database/fails.mol2', 'a') as f:
+        with open('/home/lukas/database/fails{}.mol2'.format(filename[0]), 'a') as f:
             f.write(path)
-            
 
+def mol_file_iter(mol_file):
+    mol_block = ''
+    for line in mol_file:
+        if 'ROOT' not in line:
+            mol_block += line
+        else:
+            mol_block += line
+            yield mol_block
+            mol_block = ''
         
 def categorize_folder(ifolder, ofolder):
     for n1, filename in enumerate(os.listdir(ifolder)):
         with open(os.path.join(ifolder,filename), 'r') as f:
-            content = f.read()
-            mols = content.split('@<TRIPOS>MOLECULE\n')
-            for n2, mol in enumerate(mols[1:]):
-                mol = '@<TRIPOS>MOLECULE\n' + mol
-                filename = "{}{}.mol2".format(n1,n2)
-                categorize(mol, filename, ofolder)
+            for n2, mol_block in enumerate(mol_file_iter(f)):
+                fn = "{}{}.mol2".format(n1,n2)
+                categorize(mol_block, fn, ofolder)
+
 
         
 def neutralize(path, output_dir, macromodel_path):
