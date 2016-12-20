@@ -196,8 +196,6 @@ class Energy:
         
         eng = self.pseudoformation(key, building_blocks, force_e_calc) 
         eng -= e_products
-        print(e_products)
-        print(products[0][1].energy.values)
         self.values[('formation', func_name, params[0])] = eng         
         return eng
 
