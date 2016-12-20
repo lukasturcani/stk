@@ -1710,12 +1710,13 @@ class StructUnit(Molecule, metaclass=Cached):
  
         self.prist_mol_file = prist_mol_file
         _, ext = os.path.splitext(prist_mol_file)
-        ext = 'mol2_block'
+#        ext = 'mol2_block'
         if ext not in init_funcs:
             raise TypeError(
             'Unable to initialize from "{}" files.'.format(ext))
                                      
         self.prist_mol = init_funcs[ext](prist_mol_file)
+        print(init_funcs[ext], ext)
         self.energy = Energy(self)
         self.optimized = False        
 

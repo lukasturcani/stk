@@ -119,7 +119,7 @@ def substurct_prune(folder, substruct):
         if mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
-
+import gc
 def categorize(path, filename, output_dir):
     try:
         fgs = ['amine', 'aldehyde']
@@ -127,7 +127,6 @@ def categorize(path, filename, output_dir):
                 'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
       
         mol = StructUnit(path, minimal=True)
-                
         
         for fg in fgs:
             mol.func_grp = next((x for x in 
@@ -144,7 +143,7 @@ def categorize(path, filename, output_dir):
 
 
     except Exception as ex:
-        with open('/home/lukas/database/fails{}.mol2'.format(filename[0]), 'a') as f:
+        with open(r'C:\Users\lukas\Dropbox\fails{}.mol2'.format(filename[0]), 'a') as f:
             f.write(path)
 
 def mol_file_iter(mol_file):
@@ -159,10 +158,12 @@ def mol_file_iter(mol_file):
         
 def categorize_folder(ifolder, ofolder):
     for n1, filename in enumerate(os.listdir(ifolder)):
+        print(n1)
         with open(os.path.join(ifolder,filename), 'r') as f:
             for n2, mol_block in enumerate(mol_file_iter(f)):
                 fn = "{}{}.mol2".format(n1,n2)
                 categorize(mol_block, fn, ofolder)
+
 
 
         
