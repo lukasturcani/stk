@@ -119,32 +119,70 @@ def substurct_prune(folder, substruct):
         if mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
-import gc
-def categorize(path, filename, output_dir):
+
+def nonamine_groups(group_tuples, mol):
+    invalid_groups = []
+    for group in group_tuples:
+        n = next(mol.GetAtomWithIdx(x) for x in group if 
+                    mol.GetAtomWithIdx(x).GetAtomicNum() == 7)
+        non_Hs_neighbors = 0
+        for neighbor in n.GetNeighbors():
+            if neighbor.GetAtomicNum() != 1:
+                non_Hs_neighbors += 1
+        
+        if non_Hs_neighbors > 1:
+            invalid_groups.append(group)
+        
+    return invalid_groups
+            
+def categorize(mol2block, filename, output_dir):
+
     try:
-        fgs = ['amine', 'aldehyde']
+        fgs = [chem.MolFromSmarts('C(=O)N([H])[H]'),
+               chem.MolFromSmarts('C(=O)[H]'),
+               chem.MolFromSmarts('[N]([H])[H]')]
+               
+
         dirs = ['amines2f', 'amines3f', 'amines4f',
                 'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
-      
-        mol = StructUnit(path, minimal=True)
-        
-        for fg in fgs:
-            mol.func_grp = next((x for x in 
-                                    FGInfo.functional_group_list if 
-                                    x.name == fg), None)
-            mol.heavy_ids = []
-            mol._generate_heavy_attrs()
-            fg_n = str(len(mol.heavy_ids))
-            folder = next((x for x in dirs if fg_n in x and fg in x), None)
-            if folder is not None:
-                oname = os.path.join(output_dir,folder,filename)
-                with open(oname, 'w') as f:
-                    f.write(path)
 
+        mol = chem.MolFromMol2Block(mol2block, sanitize=False,
+                                    removeHs=False)
+        
+        amide_matches = mol.GetSubstructMatches(fgs[0])
+        if len(amide_matches) > 0:
+            return 
+            
+        aldehyde_matches = mol.GetSubstructMatches(fgs[1])
+        amine_matches = mol.GetSubstructMatches(fgs[2])
+        remove = nonamine_groups(amine_matches, mol)
+        amine_matches = [x for x in amine_matches if 
+                         x not in remove]
+        
+        non0 = sum(1 for x in [amide_matches, aldehyde_matches,
+                               amine_matches]
+                        if len(x) > 0)
+        
+        if non0 > 1 or non0 == 0:
+            return
+        
+            
+        fg, fg_n = next((name, str(len(x))) for name, x in  [('amines', amine_matches), 
+                                        ('aldehydes', aldehyde_matches)]
+                     if len(x) > 0)
+        
+
+        
+        folder = next((x for x in dirs if fg_n in x and fg in x), None)
+        if folder is not None:
+            oname = os.path.join(output_dir,folder,filename)
+            with open(oname, 'w') as f:
+                f.write(mol2block)
 
     except Exception as ex:
-        with open(r'C:\Users\lukas\Dropbox\fails{}.mol2'.format(filename[0]), 'a') as f:
-            f.write(path)
+
+        with open('/home/lukas/database/fails{}.mol2'.format(filename[0]), 'a') as f:
+            f.write(mol2block)
 
 def mol_file_iter(mol_file):
     mol_block = ''
@@ -161,7 +199,7 @@ def categorize_folder(ifolder, ofolder):
         print(n1)
         with open(os.path.join(ifolder,filename), 'r') as f:
             for n2, mol_block in enumerate(mol_file_iter(f)):
-                fn = "{}{}.mol2".format(n1,n2)
+                fn = "{}_{}.mol2".format(n1,n2)
                 categorize(mol_block, fn, ofolder)
 
 
