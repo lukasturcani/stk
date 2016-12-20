@@ -179,7 +179,7 @@ def categorize(mol2block, filename, output_dir):
             with open(oname, 'w') as f:
                 f.write(mol2block)
 
-    except Exception as ex:
+    except:
 
         with open('/home/lukas/database/fails{}.mol2'.format(filename[0]), 'a') as f:
             f.write(mol2block)
