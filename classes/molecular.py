@@ -1703,20 +1703,16 @@ class StructUnit(Molecule, metaclass=Cached):
                                      sanitize=False, removeHs=False),
                     '.mae' : mol_from_mae_file,
                     '.pdb' : partial(chem.MolFromPDBFile,
-                                     sanitize=False, removeHs=False),
-                    'mol2_block' : partial(chem.MolFromMol2Block,
-                                           sanitize=False,
-                                           removeHs=False)}
+                                     sanitize=False, removeHs=False)}
  
         self.prist_mol_file = prist_mol_file
         _, ext = os.path.splitext(prist_mol_file)
-#        ext = 'mol2_block'
+
         if ext not in init_funcs:
             raise TypeError(
             'Unable to initialize from "{}" files.'.format(ext))
                                      
         self.prist_mol = init_funcs[ext](prist_mol_file)
-        print(init_funcs[ext], ext)
         self.energy = Energy(self)
         self.optimized = False        
 
@@ -1854,7 +1850,7 @@ class StructUnit(Molecule, metaclass=Cached):
         self.heavy_mol_file = os.path.split(self.heavy_mol_file)[1]
         self.heavy_mol_file = os.path.join(os.getcwd(), "HEAVY", 
                                            self.heavy_mol_file)
-        #self.write_mol_file('heavy')      
+        self.write_mol_file('heavy')      
 
     def _make_atoms_heavy(self):
         """
