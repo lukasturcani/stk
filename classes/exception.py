@@ -1,4 +1,5 @@
 import os
+import traceback
 
 class MacroMolError(Exception):
     """
@@ -95,8 +96,11 @@ class MacroMolError(Exception):
         name = os.path.join(cwd, 'failures.txt')
         
         with open(name, 'a') as f:
-            f.write("{} - {}\n".format(type(self.ex).__name__, self.ex))
-            f.write('note = {}\n'.format(self.notes))
+            f.write("{} - {}\n\n".format(type(self.ex).__name__, self.ex))
+            
+            traceback.print_exc(file=f)
+            
+            f.write('\nnote = {}\n'.format(self.notes))
 
             f.write('prist_mol_file = {}\n'.format(
                                               macro_mol.prist_mol_file))
