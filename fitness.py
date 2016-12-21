@@ -308,10 +308,21 @@ def cage(macro_mol, target_cavity, target_window=None,
         MacroMolError(ex, macro_mol, "During fitness calculation")
         return macro_mol
 
+@_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
+               'Asymmetry') 
 def cage_target(macro_mol, target_mol_file, macromodel_path, 
-                rotations=0):
+                rotations=0, md=False):
     """
     Calculates the fitness of a cage / target complex.
+    
+    This function should be used with the ``carrots_and_sticks()``
+    normalization function.    
+    
+    The function calculates the binding energy of the cage/target 
+    complex and the asymmetry of the molecule. It creates a tuple:
+    
+        macro_mol.unscaled_fitness = (numpy.array([neg_binding_eng],
+                               numpy.array([pos_binding_eng, asymmetry])
     
     Parameters
     ----------
@@ -329,70 +340,37 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
         The number of times the target should be randomly rotated within 
         the cage cavity in order to find the most stable conformation.
         
+    Modifies
+    --------
+    macro_mol.progress_params : list
+        Places the various physical properties of `macro_mol` which 
+        contribute to fitness in this attribute. This is used for
+        plotting the EPP and other stats.        
+
+    macro_mol.fitness_fail : bool    
+        This attribute is set to ``True`` if the fitness function
+        completes successfully.  Otherwise set to ``False``.
+    
+    macro_mol.unscaled_fitness : tuple of numpy.arrays
+        Places the unscaled fitness parameters into this attribute.
+        The parameters which increase with fitness are placed in the
+        first element of the tuple while the parameters which decrease
+        with increased fitness are placed in the second element.
+
     Returns
     -------
-    float
-        The fitness value of `macro_mol`.
+    macro_mol
+        The `macro_mol` with its unscaled fitness parameters calculated.
     
     """
-    
-    # If the cage already has a fitness value, don't run the
-    # calculation again.
-    if macro_mol.fitness:
-        print('Skipping {0}'.format(macro_mol.prist_mol_file))
-        return macro_mol.fitness
-    
-    # The first time running the fitness function create an instance
-    # of the target molecule as a ``StructUnit``. Due to caching,
-    # running the initialization again on later attempts will not 
-    # re-initialize.
-    target = StructUnit(target_mol_file, minimal=True)
 
-    # This function creates a new molecule holding both the target
-    # and the cage centered at the origin. It then calculates the 
-    # energy of this complex and compares it to the energies of the
-    # molecules when separate. The more stable the complex relative
-    # to the individuals the higher the fitness.
-    
-    # Create rdkit instances of the target in the cage for each
-    # rotation.        
-    rdkit_complexes = _generate_complexes(macro_mol, target, rotations+1)
-    
-    # Optimize the strcuture of the cage/target complexes.
-    macromol_complexes = []        
-    for i, complex_ in enumerate(rdkit_complexes):
-        # In order to use the optimization functions, first the data is 
-        # loaded into a ``MacroMolecule`` instance and its .mol file is 
-        # written to the disk.
-        mm_complex = MacroMolecule.__new__(MacroMolecule)
-        mm_complex.prist_mol = complex_
-        mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
-                            '.mol', '_COMPLEX_{0}.mol'.format(i))
-        mm_complex.write_mol_file('prist')
-        
-        optimization.macromodel_opt(mm_complex, no_fix=True,
-                       macromodel_path=macromodel_path)
-        macromol_complexes.append(mm_complex)
-    
-    # Calculate the energy of the complex and compare to the
-    # individual energies. If more than complex was made, use the
-    # most stable version.
-    energy_separate = macro_mol.energy + target.energy
-    energy_diff =  min(macromol_complex.energy - energy_separate for 
-                            macromol_complex in macromol_complexes)
-    
-                       
-    raw_fitness = np.exp(energy_diff*1e-5) + 1
-    if raw_fitness > 1e10:
-        raw_fitness = 1e10
-        
-    return raw_fitness
+    return _cage_target(macro_mol, target_mol_file, macromodel_path,
+                        _generate_complexes, rotations, md=md)
 
 @_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
                'Asymmetry') 
 def cage_c60(macro_mol, target_mol_file, 
-             macromodel_path, n5fold, n2fold, min_cavity=None,
-             md=False):
+             macromodel_path, n5fold, n2fold, md=False):
     """
     Calculates the fitness of a cage / C60 complex.
     
@@ -401,10 +379,19 @@ def cage_c60(macro_mol, target_mol_file,
     systematically. Rather than the random sampling of the other
     function.
     
+    This function should be used in together with the 
+    ``carrots_and_sticks()`` normalization function.
+  
+    The function calculates the binding energy of the cage/target 
+    complex and the asymmetry of the molecule. It creates a tuple:
+    
+        macro_mol.unscaled_fitness = (numpy.array([neg_binding_eng],
+                               numpy.array([pos_binding_eng, asymmetry])
+  
     Parameters
     ----------
     macro_mol : Cage
-        The cage which is to have its fitness calculated,
+        The cage which is to have its fitness calculated.
 
     target_mol_file : str
         The full path of the .mol file hodling the target molecule
@@ -420,28 +407,102 @@ def cage_c60(macro_mol, target_mol_file,
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
 
+    md : bool (default = False)
+        If ``True`` the generated complexes will have a MD simulation
+        performed on them to find the lowest energy conformer.
+
     Modifies
     --------
-    macro_mol.fitness : float
-        Places a fitness value into this attribute
+    macro_mol.progress_params : list
+        Places the various physical properties of `macro_mol` which 
+        contribute to fitness in this attribute. This is used for
+        plotting the EPP and other stats.        
+
+    macro_mol.fitness_fail : bool    
+        This attribute is set to ``True`` if the fitness function
+        completes successfully.  Otherwise set to ``False``.
+    
+    macro_mol.unscaled_fitness : tuple of numpy.arrays
+        Places the unscaled fitness parameters into this attribute.
+        The parameters which increase with fitness are placed in the
+        first element of the tuple while the parameters which decrease
+        with increased fitness are placed in the second element.
 
     Returns
     -------
     macro_mol
-        The `macro_mol` with its fitnes value calculated
+        The `macro_mol` with its unscaled fitness parameters calculated.
     
     """
+    return _cage_target(macro_mol, target_mol_file, macromodel_path,
+                        _c60_rotations, n5fold, n2fold, md=md)
+
+
+def _cage_target(macro_mol, target_mol_file, macromodel_path, 
+                 rotation_func, *rot_args, md=False):
+    """
+    A general fitness function for calculting fitness of complexes.
+
+    This function should be inherited by other fitness functions which
+    defined their own rotation function. For example ``cage_c60()`` and
+    ``cage_target()``.
     
+    This function is meant to be used with the ``carrots_and_sticks()``
+    normalization function in ``normalization.py``.
+    
+    Parameters
+    ----------
+    macro_mol : Cage
+        The cage which is to have its fitness calculated.
+
+    target_mol_file : str
+        The full path of the .mol file hodling the target molecule
+        placed inside the cage.
+        
+    macromodel_path : str
+        The Schrodinger directory path.
+        
+    rotation_func : function
+        A generator which carries out the rotations of the target within
+        the cage. It yields the complexes.
+
+    *rot_args : tuple
+        Parameters to be passed to `rotation_func`.
+        
+    md : bool (default = False)
+        If ``True`` the generated complexes will have a MD simulation
+        performed on them to find the lowest energy conformer.
+
+    Modifies
+    --------
+    macro_mol.progress_params : list
+        Places the various physical properties of `macro_mol` which 
+        contribute to fitness in this attribute. This is used for
+        plotting the EPP and other stats.        
+
+    macro_mol.fitness_fail : bool    
+        This attribute is set to ``True`` if the fitness function
+        completes successfully.  Otherwise set to ``False``.
+    
+    macro_mol.unscaled_fitness : tuple of numpy.arrays
+        Places the unscaled fitness parameters into this attribute.
+        The parameters which increase with fitness are placed in the
+        first element of the tuple while the parameters which decrease
+        with increased fitness are placed in the second element.
+
+    Returns
+    -------
+    macro_mol
+        The `macro_mol` with its unscaled fitness parameters calculated.
+    
+    """
+                     
     warnings.filterwarnings('ignore')
     try:
         # If the cage already has a fitness value, don't run the
         # calculation again.
         if macro_mol.unscaled_fitness:
             print('Skipping {0}'.format(macro_mol.prist_mol_file))
-            return macro_mol
-     
-        if min_cavity and min_cavity < macro_mol.topology.cavity_size():
-            macro_mol.fitness = 1e-4
             return macro_mol
            
         # Make a copy version of `macro_mol` which is unoptimizted.
@@ -456,9 +517,9 @@ def cage_c60(macro_mol, target_mol_file,
         target = StructUnit(target_mol_file, minimal=True)
         _, molname = os.path.split(macro_mol.prist_mol_file)
         
-        # Write a copy of the target for each macro_mol. So that parallel
-        # energy calculations don't clash. There is room for optimization
-        # here.
+        # Write a copy of the target for each macro_mol. So that 
+        # parallel energy calculations don't clash. There is room for 
+        # performance imporovement here.
         molname, ext = os.path.splitext(molname)
         target.prist_mol_file = os.path.join(os.getcwd(), 
                                              molname+"target"+ext)    
@@ -473,15 +534,15 @@ def cage_c60(macro_mol, target_mol_file,
         
         # Create rdkit instances of the target in the cage for each
         # rotation.        
-        rdkit_complexes = _c60_rotations(unopt_macro_mol, target, 
-                                         n5fold, n2fold)
+        rdkit_complexes = rotation_func(unopt_macro_mol, target, 
+                                         *rot_args)
     
         # Optimize the strcuture of the cage/target complexes.
         macromol_complexes = []        
         for i, complex_ in enumerate(rdkit_complexes):
-            # In order to use the optimization functions, first the data is 
-            # loaded into a ``MacroMolecule`` instance and its .mol file is 
-            # written to the disk.
+            # In order to use the optimization functions, first the data 
+            # is loaded into a ``MacroMolecule`` instance and its .mol 
+            # file is written to the disk.
             mm_complex = MacroMolecule.__new__(MacroMolecule)
             mm_complex.prist_mol = complex_
             mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
@@ -496,13 +557,17 @@ def cage_c60(macro_mol, target_mol_file,
         # Calculate the energy of the complex and compare to the
         # individual energies. If more than complex was made, use the
         # most stable version.
-        energy_separate = (macro_mol.energy.macromodel(16, macromodel_path) + 
-                            target.energy.macromodel(16, macromodel_path))
+        energy_separate = (
+                macro_mol.energy.macromodel(16, macromodel_path) + 
+                target.energy.macromodel(16, macromodel_path))
+                
         min_eng_cmplx = min(macromol_complexes, 
-                    key=lambda x : x.energy.macromodel(16, macromodel_path))                        
+                    key=lambda x : 
+                        x.energy.macromodel(16, macromodel_path))                        
     
-        binding_energy = (min_eng_cmplx.energy.values[('macromodel', 16)] - 
-                           energy_separate)
+        binding_energy = (
+                    min_eng_cmplx.energy.values[('macromodel', 16)] - 
+                        energy_separate)
             
         if binding_energy > 0:
             pos_be = binding_energy
@@ -546,9 +611,9 @@ def cage_c60(macro_mol, target_mol_file,
                                    macro_mol.progress_params else False)
     
         macro_mol.unscaled_fitness = (
-                              np.array([neg_be]),
-                              np.array([pos_be, 
-                              (asymmetry if asymmetry is not None else 0)]))
+                          np.array([neg_be]),
+                          np.array([pos_be, 
+                          (asymmetry if asymmetry is not None else 0)]))
     
         return macro_mol
         
@@ -556,6 +621,7 @@ def cage_c60(macro_mol, target_mol_file,
         MacroMolError(ex, macro_mol, "During fitness calculation.")
         return macro_mol
     
+
 def _generate_complexes(macro_mol, target, number=1):
     """
     Yields rdkit instances of cage / target complexes.
