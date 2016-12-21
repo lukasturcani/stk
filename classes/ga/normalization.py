@@ -1,5 +1,6 @@
 from functools import partial
 import numpy as np
+import sys
 
 class Normalization:
     def __init__(self, func_data):
@@ -52,12 +53,36 @@ class Normalization:
             scaled_sticks = np.divide(macro_mol.unscaled_fitness[1],
                                       stick_means)        
               
-              
-            scaled_carrots = np.power(scaled_carrots, carrot_exponents)
-            scaled_sticks = np.power(scaled_sticks, stick_exponents)
-            
-            scaled_carrots = np.multiply(scaled_carrots, carrot_coeffs)
-            scaled_sticks = np.multiply(scaled_sticks, stick_coeffs)
+            try:  
+                scaled_carrots = np.power(scaled_carrots, 
+                                          carrot_exponents)
+                scaled_sticks = np.power(scaled_sticks, 
+                                         stick_exponents)
+                                         
+                scaled_carrots = np.multiply(scaled_carrots, 
+                                             carrot_coeffs)
+                scaled_sticks = np.multiply(scaled_sticks, 
+                                            stick_coeffs)
+
+            # If the user forgot put the wrong number values in the 
+            # exponent or coefficient arrays MMEA will tell them and 
+            # exit gracefully.
+            except  ValueError:
+                print(('Fitness function calculates carrot array of '
+                       'size {} and stick array of size {}. This does '
+                       'not match the array sizes given to the '
+                       'normalization function:\n'
+                       '\tcarrot_coeffs : {}\n'
+                       '\tcarrot_exponents : {}\n'
+                       '\tstick_coeffs : {}\n'
+                       '\tstick_exponents : {}\n').format(
+                                   len(scaled_carrots),
+                                   len(scaled_sticks),
+                                   len(carrot_coeffs),
+                                   len(carrot_exponents),
+                                   len(stick_coeffs),
+                                   len(stick_exponents)))
+                sys.exit()
 
             carrot_term = np.sum(scaled_carrots)
             penalty_term = np.sum(scaled_sticks)
