@@ -605,7 +605,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
             asymmetry = None        
     
         
-        macro_mol.progress_params = [neg_be, pos_be, asymmetry]        
+        macro_mol.progress_params = [-neg_be, pos_be, asymmetry]        
         
         macro_mol.fitness_fail = (True if None in 
                                    macro_mol.progress_params else False)
