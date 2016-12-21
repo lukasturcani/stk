@@ -89,7 +89,7 @@ def fg_distance_prune(folder, fg):
                 os.remove(path)
                 break
 
-def substurct_prune(folder, substruct):
+def substruct_prune(folder, substruct):
     """
     Deletes molecules which contain the substructure `substruct`.
     
