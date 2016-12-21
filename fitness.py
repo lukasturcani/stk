@@ -510,21 +510,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         unopt_macro_mol.topology.final_sub()
         
         
-        # The first time running the fitness function create an instance
-        # of the target molecule as a ``StructUnit``. Due to caching,
-        # running the initialization again on later attempts will not 
-        # re-initialize.
-        target = StructUnit(target_mol_file, minimal=True)
-        _, molname = os.path.split(macro_mol.prist_mol_file)
-        
-        # Write a copy of the target for each macro_mol. So that 
-        # parallel energy calculations don't clash. There is room for 
-        # performance imporovement here.
-        molname, ext = os.path.splitext(molname)
-        target.prist_mol_file = os.path.join(os.getcwd(), 
-                                             molname+"target"+ext)    
-        target.write_mol_file('prist')
-        
+        # Create an instance of the target molecule as a ``StructUnit``.
+        target = StructUnit(target_mol_file, minimal=True)        
     
         # This function creates a new molecule holding both the target
         # and the cage centered at the origin. It then calculates the 
