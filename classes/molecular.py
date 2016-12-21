@@ -344,6 +344,12 @@ class Energy:
         
         """
         
+        # To prevent conflicts when running this function in parallel,
+        # a temporary copy of the molecular structure file is made and
+        # used for macromodel calculations.
+        tmp_file = os.path.split(self.prist_mol_file        
+        
+        
         file_root, ext = os.path.splitext(self.molecule.prist_mol_file)
 
         # Create a .mae file of the molecule if it does not exist
