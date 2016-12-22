@@ -5,27 +5,24 @@ import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 from functools import partial
 from multiprocessing import Pool
+import itertools as it
 
 from .classes import StructUnit, FGInfo
 from .convenience_tools import MolFileError
 from .optimization import *
 
 
-def fg_prune(input_folder, output_folder, fg, fg_num):
+def fg_prune(ifolder, fg, fg_num):
     """
-    Copies molecules with a given functional group between folders.
+    Deletes molecules without a given functional group from a folder.
     
     Parameters
     ----------
-    input_folder : str
-        The full path of the folder holding V3000 .mol files. Any
-        molecules with a functional group `fg` in this folder are copied
-        to `output_folder`.
-        
-    output_folder : str
-        The full path of the folder into which files with a given 
-        functional group `fg` are copied to.
-    
+    ifolder : str
+        The full path of the folder holding .mol files. Any
+        molecules without functional group `fg` `fg_num` amount of times
+        are deleted.
+
     fg : str
         The name of the functional group which the copied molecules must
         possess. The name must correspond to one of the name of a 
@@ -42,23 +39,20 @@ def fg_prune(input_folder, output_folder, fg, fg_num):
         
     """
     
-    for file_name in os.listdir(input_folder):
-        path = os.path.join(input_folder, file_name)
-        try:
-            mol = StructUnit(path, minimal=True)
-        
-        except MolFileError as error:
-            print('V3000 {}.'.format(path))
+    for file_name in os.listdir(ifolder):
+        if not file_name.endswith('.mol'):
             continue
+        path = os.path.join(ifolder, file_name)
+        mol = StructUnit(path, minimal=True)
     
         mol.func_grp = next((x for x in 
                                 FGInfo.functional_group_list if 
                                 x.name == fg), None)
         mol.heavy_ids = []
         mol._generate_heavy_attrs()
-        if len(mol.find_functional_group_atoms()) == fg_num:
-            print('Copying {}.'.format(path))
-            shutil.copy(path, output_folder)
+        if len(mol.find_functional_group_atoms()) != fg_num:
+            print('Deleting {}.'.format(path))
+            os.remove(path)
 
 def fg_distance_prune(folder, fg):
     """
@@ -77,26 +71,25 @@ def fg_distance_prune(folder, fg):
     
     for file_name in os.listdir(folder):
         path = os.path.join(folder, file_name)
-        try:
-            mol = StructUnit(path, minimal=True)
-            
-        except MolFileError as error:
-            print('V3000 {}.'.format(path))
+        if not file_name.endswith('.mol'):
             continue
-    
+
+        mol = StructUnit(path, minimal=True)
+
         mol.func_grp = next((x for x in 
                                 FGInfo.functional_group_list if 
                                 x.name == fg), None)
         
         mol.heavy_ids = []
         mol._generate_heavy_attrs()
-        
         g = mol.graph('heavy')
-        if nx.shortest_path_length(g, *mol.heavy_ids) < 3:
-            print('Removing {}.'.format(path))
-            os.remove(path)
+        for start, end in it.combinations(mol.heavy_ids, 2):
+            if nx.shortest_path_length(g, *mol.heavy_ids) < 3:
+                print('Removing {}.'.format(path))
+                os.remove(path)
+                break
 
-def substurct_prune(folder, substruct):
+def substruct_prune(folder, substruct):
     """
     Deletes molecules which contain the substructure `substruct`.
     
@@ -107,57 +100,104 @@ def substurct_prune(folder, substruct):
         substructure and deleted.
         
     substruct : str
-        The smiles string of the substructure, which if present in a 
+        The smarts string of the substructure, which if present in a 
         molecule causes it to be deleted from `folder`.
     
     """
     
-    substruct_mol = chem.MolFromSmiles(substruct)
+    substruct_mol = chem.MolFromSmarts(substruct)
     for file_name in os.listdir(folder):
+        if not file_name.endswith('.mol'):
+            continue
         path = os.path.join(folder, file_name)
-        mol = chem.MolFromMolFile(path)
+        mol = chem.MolFromMolFile(path, sanitize=False, removeHs=False)
         if mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
 
-def categorize(path, filename, output_dir):
+def nonamine_groups(group_tuples, mol):
+    invalid_groups = []
+    for group in group_tuples:
+        n = next(mol.GetAtomWithIdx(x) for x in group if 
+                    mol.GetAtomWithIdx(x).GetAtomicNum() == 7)
+        non_Hs_neighbors = 0
+        for neighbor in n.GetNeighbors():
+            if neighbor.GetAtomicNum() != 1:
+                non_Hs_neighbors += 1
+        
+        if non_Hs_neighbors > 1:
+            invalid_groups.append(group)
+        
+    return invalid_groups
+            
+def categorize(mol2block, filename, output_dir):
+
     try:
-        fgs = ['amine', 'aldehyde']
+        fgs = [chem.MolFromSmarts('C(=O)N([H])[H]'),
+               chem.MolFromSmarts('C(=O)[H]'),
+               chem.MolFromSmarts('[N]([H])[H]')]
+               
+
         dirs = ['amines2f', 'amines3f', 'amines4f',
                 'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
-      
-        mol = StructUnit(path, minimal=True)
-                
+
+        mol = chem.MolFromMol2Block(mol2block, sanitize=False,
+                                    removeHs=False)
         
-        for fg in fgs:
-            mol.func_grp = next((x for x in 
-                                    FGInfo.functional_group_list if 
-                                    x.name == fg), None)
-            mol.heavy_ids = []
-            mol._generate_heavy_attrs()
-            fg_n = str(len(mol.heavy_ids))
-            folder = next((x for x in dirs if fg_n in x and fg in x), None)
-            if folder is not None:
-                oname = os.path.join(output_dir,folder,filename)
-                with open(oname, 'w') as f:
-                    f.write(path)
-                
-
-    except Exception as ex:
-        with open('/home/lukas/database/fails.mol2', 'a') as f:
-            f.write(path)
+        amide_matches = mol.GetSubstructMatches(fgs[0])
+        if len(amide_matches) > 0:
+            return 
             
+        aldehyde_matches = mol.GetSubstructMatches(fgs[1])
+        amine_matches = mol.GetSubstructMatches(fgs[2])
+        remove = nonamine_groups(amine_matches, mol)
+        amine_matches = [x for x in amine_matches if 
+                         x not in remove]
+        
+        non0 = sum(1 for x in [amide_matches, aldehyde_matches,
+                               amine_matches]
+                        if len(x) > 0)
+        
+        if non0 > 1 or non0 == 0:
+            return
+        
+            
+        fg, fg_n = next((name, str(len(x))) for name, x in  [('amines', amine_matches), 
+                                        ('aldehydes', aldehyde_matches)]
+                     if len(x) > 0)
+        
 
+        
+        folder = next((x for x in dirs if fg_n in x and fg in x), None)
+        if folder is not None:
+            oname = os.path.join(output_dir,folder,filename)
+            with open(oname, 'w') as f:
+                f.write(mol2block)
+
+    except:
+
+        with open('/home/lukas/database/fails{}.mol2'.format(filename[0]), 'a') as f:
+            f.write(mol2block)
+
+def mol_file_iter(mol_file):
+    mol_block = ''
+    for line in mol_file:
+        if 'ROOT' not in line:
+            mol_block += line
+        else:
+            mol_block += line
+            yield mol_block
+            mol_block = ''
         
 def categorize_folder(ifolder, ofolder):
     for n1, filename in enumerate(os.listdir(ifolder)):
+        print(n1)
         with open(os.path.join(ifolder,filename), 'r') as f:
-            content = f.read()
-            mols = content.split('@<TRIPOS>MOLECULE\n')
-            for n2, mol in enumerate(mols[1:]):
-                mol = '@<TRIPOS>MOLECULE\n' + mol
-                filename = "{}{}.mol2".format(n1,n2)
-                categorize(mol, filename, ofolder)
+            for n2, mol_block in enumerate(mol_file_iter(f)):
+                fn = "{}_{}.mol2".format(n1,n2)
+                categorize(mol_block, fn, ofolder)
+
+
 
         
 def neutralize(path, output_dir, macromodel_path):
@@ -202,7 +242,7 @@ def optimize_folder(path, macromodel_path):
         macro_mol.prist_mol_file = name
 
     md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
-        timeout=False, temp=1000, confs=1000, eq_time=100, sim_time=10000)    
+        timeout=False, temp=300, confs=500, eq_time=50, sim_time=500)    
     
     with Pool() as p:
         p.map(md_opt, macro_mols)
