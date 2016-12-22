@@ -7,6 +7,7 @@ import rdkit.Geometry.rdGeometry as rdkit_geo
 from rdkit import DataStructs
 import os
 import shutil
+import uuid
 import networkx as nx
 from scipy.spatial.distance import euclidean
 import pickle
@@ -353,7 +354,7 @@ class Energy:
         # the prist_mol_file path.
         tmp_file = os.path.split(self.molecule.prist_mol_file)[-1]
         tmp_file, ext = os.path.splitext(tmp_file)
-        r_int = np.random.randint(1000000)
+        r_int = uuid.uuid4().int
         tmp_file = tmp_file + str(r_int) + ext
         tmp_file = os.path.join(os.getcwd(), tmp_file)
         
@@ -365,7 +366,7 @@ class Energy:
                                                     'structconvert')
         convrt_cmd = [convrt_app, 
                      tmp_file, file_root+'.mae']
-        sp.call(convrt_cmd)
+        sp.call(convrt_cmd, stdout=sp.PIPE, stderr=sp.PIPE)
 
         # Create an input file and run it.        
         input_script = (
