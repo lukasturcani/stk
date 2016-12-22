@@ -736,14 +736,15 @@ def _structconvert(iname, oname, macromodel_path):
     convrt_cmd = [convrt_app, iname, oname]
 
     # Execute the file conversion.
-    convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, 
+    try:
+        convrt_return = sp.run(convrt_cmd, stdout=sp.PIPE, 
                            stderr=sp.STDOUT, universal_newlines=True) 
 
     # If conversion fails because a wrong Schrodinger path was given,
     # raise.
-    if 'The system cannot find the path specif' in convrt_return.stdout:
+    except FileNotFoundError:
         raise _PathError(('Wrong Schrodinger path supplied to'
-                              ' `structconvert` function.'))
+                            ' `structconvert` function.'))
 
     # If no license if found, keep re-running the function until it is.
     if not _license_found(convrt_return.stdout):
@@ -1042,7 +1043,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     return fix_block
 
-def _wait_for_file(file_name, timeout=20):
+def _wait_for_file(file_name, timeout=10):
     """
     Stalls until a given file exists or `timeout` expires.
     
