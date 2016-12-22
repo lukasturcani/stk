@@ -547,7 +547,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         energy_separate = (
                 macro_mol.energy.macromodel(16, macromodel_path) + 
                 target.energy.macromodel(16, macromodel_path))
-                
+        
+        print('\n\nCalculating complex energies.\n')
         min_eng_cmplx = min(macromol_complexes, 
                     key=lambda x : 
                         x.energy.macromodel(16, macromodel_path))                        
