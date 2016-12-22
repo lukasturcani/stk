@@ -277,7 +277,8 @@ def cage(macro_mol, target_cavity, target_window=None,
             asymmetry = macro_mol.topology.window_difference()
         else:
             asymmetry = None
-    
+
+        print('\n\nCalculating complex energies.\n')    
         e_per_bond = macro_mol.energy.pseudoformation(**energy_params)
         e_per_bond /= macro_mol.topology.bonds_made
     
