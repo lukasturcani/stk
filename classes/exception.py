@@ -1,4 +1,5 @@
 import os
+import traceback
 
 class MacroMolError(Exception):
     """
@@ -91,12 +92,22 @@ class MacroMolError(Exception):
         
         """        
         
+        # If the ``output`` folder exists (such as when running a GA
+        # run) place the ``failures.txt`` file in it. If the file does
+        # not exist (like when using MMEA as a library) place the
+        # ``failures.txt`` in the same folder as ``MMEA``.
         cwd = os.getcwd().split('output')[0]
-        name = os.path.join(cwd, 'failures.txt')
+        if 'output' in os.listdir(cwd):
+            name = os.path.join(cwd, 'output', 'failures.txt')
+        else:
+            name = os.path.join(cwd, 'failures.txt')
         
         with open(name, 'a') as f:
-            f.write("{} - {}\n".format(type(self.ex).__name__, self.ex))
-            f.write('note = {}\n'.format(self.notes))
+            f.write("{} - {}\n\n".format(type(self.ex).__name__, self.ex))
+            
+            traceback.print_exc(file=f)
+            
+            f.write('\nnote = {}\n'.format(self.notes))
 
             f.write('prist_mol_file = {}\n'.format(
                                               macro_mol.prist_mol_file))
