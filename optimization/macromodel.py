@@ -729,7 +729,7 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
     mae = macro_mol.prist_mol_file.replace(".mol", ".mae")
     return _structconvert(maegz, mae, macromodel_path)
     
-def _structconvert(iname, oname, macromodel_path, depth=0):
+def _structconvert(iname, oname, macromodel_path):
   
     convrt_app = os.path.join(macromodel_path, 'utilities', 
                                                      'structconvert')
@@ -756,9 +756,6 @@ def _structconvert(iname, oname, macromodel_path, depth=0):
 
     _wait_for_file(oname)
     if not os.path.exists(oname):
-        if depth<3:
-            depth += 1
-            return _structconvert(iname, oname, macromodel_path, depth)
         raise _ConversionError(('Conversion output file {} was not found.'
                 ' Console output was {}.').format(oname, 
                                                   convrt_return.stdout))
