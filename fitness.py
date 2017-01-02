@@ -174,7 +174,7 @@ def random_fitness(macro_mol):
     
     Returns
     -------
-    macro_mol
+    macro_mol : MacroMolecule
         The `macro_mol` with an integer between 0 (including) and 100 
         (excluding) as its fitness.
 
@@ -182,6 +182,46 @@ def random_fitness(macro_mol):
 
     macro_mol.fitness = np.random.randint(1,10)
     return macro_mol    
+
+@_param_labels('carrot_var1', 'carrot_var2', 'stick_var1', 'stick_var2')
+def random_fitness_tuple(macro_mol):
+    """
+    Returns a tuple holding 2 arrays with random values.
+    
+    To be used a random fitness function when testing out the
+    carrots_and_sticks() normalization function.
+    
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule which is to have its fitness calculated.
+        
+    Modifies
+    --------
+    macro_mol.fitness_fail : bool
+        Set to ``False``.
+        
+    macro_mol.unscaled_fitness : numpy.array
+        The tuple of random arrays is placed in this attribute.
+        
+    macro_mol.progress_params : list
+        The values of the random arrays are placed in this attribute 
+        for use by the ``Plotter`` class.
+        
+    Returns
+    -------
+    macro_mol : MacroMolecule
+        The `macro_mol` with a tuple of 2 random arrays as its fitness
+        value.
+        
+    """
+    
+    carrot_array = np.random.randint(1,100,2)
+    stick_array = np.random.randint(1,100,2)
+    macro_mol.unscaled_fitness = (carrot_array, stick_array)
+    macro_mol.fitness_fail = False
+    macro_mol.progress_params = [*carrot_array, *stick_array]
+    return macro_mol
     
 # Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ','Window Difference ',
