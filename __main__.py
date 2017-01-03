@@ -198,10 +198,40 @@ def run():
     
 def helper():
     InputHelp(sys.argv[-1])
+
+def compare():
+    pop = Population()
+    inp = GAInput(sys.argv[2])
+
+    pop.ga_tools = Population.load(sys.argv[3]).ga_tools
+    pop.ga_tools.fitness = inp.fitness_func
+    pop.ga_tools.normalization = (Normalization(inp.normalization_func) if 
+                    inp.normalization_func else None)    
+    
+    for pop_path in sys.argv[3:]:
+        sp = Population.load(pop_path)
+    
+        for ind in sp:
+            ind.unscaled_fitness = None
+            ind.fitness_fail = None
+            ind.fitness = None
+        
+        sp.ga_tools.fitness = pop.ga_tools.fitness
+        sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
+        pop.add_subpopulation(sp)
+    
+    if inp.normalization_func:
+        pop.normalize_fitness_values()    
+    
+    pop.plot.subpopulations('fitness_comparison.png')
+    pop.plot.progress_params('param_comparison.png')
+        
     
 if __name__ == '__main__':
     if '-h' in sys.argv:
         helper()
+    elif '-c' in sys.argv:
+        compare()
     else:
         run()
 
