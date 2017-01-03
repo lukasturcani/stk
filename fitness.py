@@ -179,8 +179,10 @@ def random_fitness(macro_mol):
         (excluding) as its fitness.
 
     """
-
-    macro_mol.fitness = np.random.randint(1,10)
+    
+    if macro_mol.fitness:
+        return macro_mol
+    macro_mol.fitness = abs(np.random.normal(50,20))
     return macro_mol    
 
 @_param_labels('carrot_var1', 'carrot_var2', 'stick_var1', 'stick_var2')
@@ -216,8 +218,11 @@ def random_fitness_tuple(macro_mol):
         
     """
     
-    carrot_array = np.random.randint(1,100,2)
-    stick_array = np.random.randint(1,100,2)
+    if macro_mol.unscaled_fitness:
+        return macro_mol
+    
+    carrot_array = abs(np.random.normal(50,20,2))
+    stick_array = abs(np.random.normal(50,20,2))
     macro_mol.unscaled_fitness = (carrot_array, stick_array)
     macro_mol.fitness_fail = False
     macro_mol.progress_params = [*carrot_array, *stick_array]

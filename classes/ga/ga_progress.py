@@ -9,7 +9,7 @@ class GAProgress:
 
     def update(self, population):
         self.gens.append(len(self.gens))
-        if any(x.progress_params for x in population):
+        if any(getattr(x, 'progress_params', False) for x in population):
             unscaled_var_mat = np.matrix([
                 x.progress_params for x in population if not 
                 x.fitness_fail])
