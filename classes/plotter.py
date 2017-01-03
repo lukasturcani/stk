@@ -23,7 +23,7 @@ class Plotter:
     
     def epp(self, plot_name):
 
-        progress = self.pop.ga_tools.ga_progress        
+        progress = self.pop.ga_tools.progress        
         
         if (isinstance(progress.maxs[0], float) or 
                               isinstance(progress.maxs[0], int)):
@@ -113,32 +113,31 @@ class Plotter:
         
         """
         
-        progress = self.pop.ga_tools.ga_progress        
-        
         func_name = self.pop.ga_tools.ga_input.fitness_func.name
         fitness_func = globals()[func_name]
         
         min_params = []
         max_params = []
         mean_params = []
-        
+        xvals = list(range(1, 
+                           len(self.pop.populations) + 1))
         for subpop in self.pop.populations:
-            min_params.append(subpop.progress.mins[-1])
-            max_params.append(subpop.progress.maxs[-1])
-            mean_params.append(subpop.progress.means[-1])
+            min_params.append(subpop.ga_tools.progress.mins[-1])
+            max_params.append(subpop.ga_tools.progress.maxs[-1])
+            mean_params.append(subpop.ga_tools.progress.means[-1])
         
-        for x in range(len(params[0])):
+        for x in range(len(min_params[0])):
             fig = plt.figure()
-            plt.xlabel('Generation Number')                             
+            plt.xlabel('Population')                             
             plt.ylabel('Unscaled ' + fitness_func.param_labels[x])                
             plt.title('Population Comparison', fontsize=18)
             y_mean = [array[x] for array in mean_params]
             y_max = [array[x] for array in max_params]
             y_min = [array[x] for array in min_params]
 
-            plt.scatter(progress.gens, y_mean, color='green', marker='x')
-            plt.scatter(progress.gens, y_min, color='blue', marker='x')
-            plt.scatter(progress.gens, y_max, color='red', marker='x')
+            plt.scatter(xvals, y_mean, color='green', marker='x')
+            plt.scatter(xvals, y_min, color='blue', marker='x')
+            plt.scatter(xvals, y_max, color='red', marker='x')
             
             new_plot_name = str(x).join(os.path.splitext(plot_name))                
             
