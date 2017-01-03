@@ -57,7 +57,8 @@ def run():
     mator = Crossover(ga_input.crossover_func, ga_input.num_crossovers)
     mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
                        weights=ga_input.mutation_weights)
-    normalizator = Normalization(ga_input.normalization_func)
+    normalizator = (Normalization(ga_input.normalization_func) if 
+                    ga_input.normalization_func else None)
     ga_tools = GATools(selector, mator, mutator, normalizator,
                        ga_input.opt_func, ga_input.fitness_func)
     ga_tools.ga_input = ga_input
