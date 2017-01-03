@@ -23,7 +23,7 @@ class Plotter:
     
     def epp(self, plot_name):
 
-        progress = self.pop.ga_tools.ga_progress        
+        progress = self.pop.ga_tools.progress        
         
         if (isinstance(progress.maxs[0], float) or 
                               isinstance(progress.maxs[0], int)):
@@ -122,9 +122,9 @@ class Plotter:
         xvals = list(range(1, 
                            len(self.pop.populations) + 1))
         for subpop in self.pop.populations:
-            min_params.append(subpop.ga_tools.ga_progress.mins[-1])
-            max_params.append(subpop.ga_tools.ga_progress.maxs[-1])
-            mean_params.append(subpop.ga_tools.ga_progress.means[-1])
+            min_params.append(subpop.ga_tools.progress.mins[-1])
+            max_params.append(subpop.ga_tools.progress.maxs[-1])
+            mean_params.append(subpop.ga_tools.progress.means[-1])
         
         for x in range(len(min_params[0])):
             fig = plt.figure()

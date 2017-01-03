@@ -1,4 +1,4 @@
-from .ga_progress import GAProgress
+from .progress import GAProgress
 
 class FunctionData:
     """
@@ -72,7 +72,7 @@ class GATools:
     """
     
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
-                 'optimization', 'fitness', 'ga_input', 'ga_progress']    
+                 'optimization', 'fitness', 'ga_input', 'progress']    
     
     def __init__(self, selection, crossover, mutation, 
                        normalization ,optimization, fitness):
@@ -82,4 +82,4 @@ class GATools:
         self.normalization = normalization
         self.optimization = optimization
         self.fitness = fitness
-        self.ga_progress = GAProgress()
+        self.progress = GAProgress()
