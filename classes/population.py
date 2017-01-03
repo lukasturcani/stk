@@ -695,7 +695,7 @@ class Population:
         Updates the values in the ``GAProgress`` instance.
 
         The ``GAProgress`` instance is held by the attribute
-        `ga_tools.ga_progress`. It keeps track of historical fitness
+        `ga_tools.progress`. It keeps track of historical fitness
         values of the population. This is necessary when plotting the
         evolutionary progress plot.
 
@@ -704,12 +704,12 @@ class Population:
 
         Modifies
         --------
-        ga_tools.ga_progress : GAProgress
+        ga_tools.progress : GAProgress
             See documentation of `update` in GAProgess class.
 
         """
 
-        self.ga_tools.ga_progress.update(self)
+        self.ga_tools.progress.update(self)
 
     def __iter__(self):
         """
