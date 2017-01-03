@@ -291,12 +291,12 @@ class Selection:
               
         elite_pop = []
         if elitism:
-            elite_pop = cls.elites(pop, elitism)
+            elite_pop = cls._elites(pop, elitism)
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
                     pop.remove(ind)
- 
+
         total_fitness = sum(ind.fitness for ind in pop if 
                                isinstance(ind.fitness, float) or 
                                isinstance(ind.fitness, int))
@@ -385,7 +385,7 @@ class Selection:
         
         elite_pop = []
         if elitism:
-            elite_pop = cls.elites(pop, elitism)
+            elite_pop = cls._elites(pop, elitism)
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
@@ -498,7 +498,7 @@ class Selection:
             
         elite_pop = []
         if elitism:
-            elite_pop = cls.elites(pop, elitism)
+            elite_pop = cls._elites(pop, elitism)
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
