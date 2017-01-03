@@ -512,26 +512,19 @@ def plot_counter(counter, plot_name):
     """
 
     fig = plt.figure()
-    x_vals_b = []
-    y_vals_b = []
+    x_vals = list(range(1, len(counter.items())+1))
+    y_vals = []
+    labels = []
     
-    x_vals_r = []
-    y_vals_r = []    
+    for ind, value in sorted(counter.items(), reverse=True):
+        y_vals.append(value)
+        labels.append(ind.fitness)
     
-    for ind, value in counter.items():
-        if value == 0:
-            x_vals_r.append(ind.fitness)
-            y_vals_r.append(0.5)
-        else:
-            x_vals_b.append(ind.fitness)
-            y_vals_b.append(value)
-    
-    plt.bar(x_vals_b, y_vals_b, color='blue')
-    plt.bar(x_vals_r, y_vals_r, color='red')
+    plt.bar(x_vals, y_vals, color='blue')
+    plt.xticks([x+0.5 for x in x_vals], labels, rotation='vertical')
+    plt.tight_layout()
     fig.savefig(plot_name, dpi=fig.dpi)
     plt.close('all')
-
-    
 
 def dedupe(iterable, seen=None):
     if seen is None:
