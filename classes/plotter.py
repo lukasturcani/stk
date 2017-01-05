@@ -34,7 +34,9 @@ class Plotter:
             plt.plot(progress.gens, progress.means, color='green')
             plt.plot(progress.gens, progress.mins, color='blue')
             plt.plot(progress.gens, progress.maxs, color='red')
-            fig.savefig(plot_name, dpi=1000)
+            lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            fig.savefig(plot_name, dpi=1000,
+                    bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.close('all')
             
         else:
@@ -50,13 +52,15 @@ class Plotter:
                 y_max = [v[x] for v in progress.maxs]
                 y_min = [v[x] for v in progress.mins]
 
-                plt.plot(progress.gens, y_mean, color='green')
-                plt.plot(progress.gens, y_min, color='blue')
-                plt.plot(progress.gens, y_max, color='red')
+                plt.plot(progress.gens, y_mean, color='green', label='mean')
+                plt.plot(progress.gens, y_min, color='blue', label='min')
+                plt.plot(progress.gens, y_max, color='red', label='max')
                 
                 new_plot_name = str(x).join(os.path.splitext(plot_name))                
                 
-                fig.savefig(new_plot_name, dpi=1000)
+                lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+                fig.savefig(new_plot_name, dpi=1000,
+                            bbox_extra_artists=(lgd,), bbox_inches='tight')
                 plt.close('all')
 
     def subpopulations(self, plot_name):
@@ -88,10 +92,12 @@ class Plotter:
         fig = plt.figure()
         plt.xlabel('Population')
         plt.ylabel('Fitness')
-        plt.scatter(xvals, maxs, color='red', marker='x')
-        plt.scatter(xvals, means, color='green', marker='x')
-        plt.scatter(xvals, mins, color='blue', marker='x')
-        fig.savefig(plot_name, dpi=1000)
+        plt.scatter(xvals, maxs, color='red', marker='x', label='max')
+        plt.scatter(xvals, means, color='green', marker='x', label='mean')
+        plt.scatter(xvals, mins, color='blue', marker='x', label='min')
+        lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        fig.savefig(plot_name, dpi=1000,
+                    bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.close('all')
     
     def progress_params(self, plot_name):
@@ -135,13 +141,15 @@ class Plotter:
             y_max = [array[x] for array in max_params]
             y_min = [array[x] for array in min_params]
 
-            plt.scatter(xvals, y_mean, color='green', marker='x')
-            plt.scatter(xvals, y_min, color='blue', marker='x')
-            plt.scatter(xvals, y_max, color='red', marker='x')
+            plt.scatter(xvals, y_mean, color='green', marker='x', label='mean')
+            plt.scatter(xvals, y_min, color='blue', marker='x', label='min')
+            plt.scatter(xvals, y_max, color='red', marker='x', label='max')
+            lgd=plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             
             new_plot_name = str(x).join(os.path.splitext(plot_name))                
             
-            fig.savefig(new_plot_name, dpi=1000)
+            fig.savefig(new_plot_name, dpi=1000,
+                        bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.close('all')
         
         
