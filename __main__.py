@@ -247,17 +247,20 @@ def compare():
     os.chdir('output')
     for i, pop_path in enumerate(inp.comparison_pops):
         sp_dir = os.path.join(os.getcwd(), 'pop{}'.format(i))
-        sp = Population.load(pop_path, pop.ga_tools)
+        sp = Population.load(pop_path, GATools.init_empty())
+        sp.ga_tools.fitness = pop.ga_tools.fitness
+        sp.ga_tools.normalization = pop.ga_tools.normalization
         
         # Before calculating fitness, remove data from previous fitness
         # calculations. Also update the file name with the new 
         # directory.
-        for x, ind in enumerate(sp):
+        for ind in sp:
             _, name = os.path.split(ind.prist_mol_file)
             ind.prist_mol_file = os.path.join(sp_dir, name)
             ind.unscaled_fitness = None
-            ind.fitness_fail = None
-            ind.fitness = None   
+            ind.fitness_fail = True
+            ind.fitness = None
+            ind.progress_params = None
             
         sp.write(sp_dir)
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
@@ -265,10 +268,10 @@ def compare():
         pop.add_subpopulation(sp)
     
     if inp.normalization_func:
-        pop.normalize_fitness_values()    
+        pop.normalize_fitness_values()
+        pop.plot.progress_params('param_comparison.png')
     
     pop.plot.subpopulations('fitness_comparison.png')
-    pop.plot.progress_params('param_comparison.png')
 
     os.chdir(launch_dir)
     archive_output()
