@@ -255,7 +255,8 @@ def compare():
             ind.fitness = None
 
         for ind_i, ind in enumerate(sp):
-            ind.prist_mol_file = '{}.mol'.format(ind_i)
+            name = os.path.join(os.getcwd(), '{}.mol'.format(ind_i))
+            ind.prist_mol_file = name
         sp.write_population('cpop{}'.format(i))
         
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
