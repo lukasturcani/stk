@@ -81,7 +81,7 @@ def run():
                 mem.prist_mol_file = os.path.join(os.getcwd(), prist_name)
                 mem.heavy_mol_file = os.path.join(os.getcwd(), heavy_name)
             
-            pop.write_population(os.getcwd())
+            pop.write(os.getcwd())
             
         else:
             pop = pop_init(**ga_input.init_func.params, 
@@ -181,7 +181,7 @@ def run():
         with time_it():
             os.mkdir('selected')
             os.chdir('selected')
-            pop.write_population(os.getcwd())
+            pop.write(os.getcwd())
             pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
     
         
@@ -207,6 +207,7 @@ def helper():
     InputHelp(sys.argv[-1])
 
 def compare():
+    launch_dir = os.getcwd()
     # If an output folder of MMEA exists, archive it. This just moves any
     # ``output`` folder in the cwd to the ``old_output`` folder.
     archive_output()
@@ -221,45 +222,46 @@ def compare():
             os.mkdir('output')
             mk_complete = True
         except:
-            continue
+            continue  
     
     # Copy the input script into the output folder - this is useful for
     # keeping track of what input was used to generate the output.
     shutil.copyfile(sys.argv[2], os.path.join('output', 
                                 os.path.split(sys.argv[2])[-1]))
         
-    # Create the encapsulating population.
-    pop = Population()
-    # Get the fitness and normazliation function data from the input 
+    # Get the fitness and normaliztion function data from the input 
     # file.
     inp = GAInput(sys.argv[2])
     
-    # Give the population a GATools instance.
-    pop.ga_tools = Population.load(sys.argv[3]).ga_tools
-    # Load the fitness and normalization functions into it.
+    # Create the encapsulating population.
+    pop = Population(GATools.init_empty())
+    # Load the fitness and normalization functions into the population.
+    pop.ga_tools.ga_input = inp
     pop.ga_tools.fitness = inp.fitness_func
-    pop.ga_tools.normalization = (Normalization(inp.normalization_func) if 
-                    inp.normalization_func else None)    
+    pop.ga_tools.normalization = (
+                            Normalization(inp.normalization_func) if 
+                            inp.normalization_func else None)    
     
-    pops = [Population.load(pop_path) for pop_path in sys.argv[3:]]
-   
-    launch_dir = os.getcwd()
-    os.chdir('output')      
-   
-    # For each population re-calculate the fitness values using the 
-    # fitness function specified in the input file.
-    for i, sp in enumerate(pops):
-        for ind in sp:
+    # Load the populations you want to compare, calculate the fitness
+    # of members and place them into the encapsulating population.
+    os.chdir('output')
+    for i, pop_path in enumerate(inp.comparison_pops):
+        sp_dir = os.path.join(os.getcwd(), 'pop{}'.format(i))
+        sp = Population.load(pop_path, pop.ga_tools)
+        
+        # Before calculating fitness, remove data from previous fitness
+        # calculations. Also update the file name with the new 
+        # directory.
+        for x, ind in enumerate(sp):
+            _, name = os.path.split(ind.prist_mol_file)
+            ind.prist_mol_file = os.path.join(sp_dir, name)
             ind.unscaled_fitness = None
             ind.fitness_fail = None
-            ind.fitness = None
-
-        for ind_i, ind in enumerate(sp):
-            name = os.path.join(os.getcwd(), '{}.mol'.format(ind_i))
-            ind.prist_mol_file = name
-        sp.write_population('cpop{}'.format(i))
-        
+            ind.fitness = None   
+            
+        sp.write(sp_dir)
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
+        sp.progress_update()
         pop.add_subpopulation(sp)
     
     if inp.normalization_func:
@@ -267,7 +269,7 @@ def compare():
     
     pop.plot.subpopulations('fitness_comparison.png')
     pop.plot.progress_params('param_comparison.png')
-    
+
     os.chdir(launch_dir)
     archive_output()
     

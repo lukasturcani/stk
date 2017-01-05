@@ -137,10 +137,11 @@ class Plotter:
             plt.xlabel('Population')                             
             plt.ylabel('Unscaled ' + fitness_func.param_labels[x])                
             plt.title('Population Comparison', fontsize=18)
+            
             y_mean = [array[x] for array in mean_params]
             y_max = [array[x] for array in max_params]
             y_min = [array[x] for array in min_params]
-
+            
             plt.scatter(xvals, y_mean, color='green', marker='x', label='mean')
             plt.scatter(xvals, y_min, color='blue', marker='x', label='min')
             plt.scatter(xvals, y_max, color='red', marker='x', label='max')

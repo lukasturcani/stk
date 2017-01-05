@@ -75,7 +75,7 @@ class GATools:
                  'optimization', 'fitness', 'ga_input', 'progress']    
     
     def __init__(self, selection, crossover, mutation, 
-                       normalization ,optimization, fitness):
+                       normalization, optimization, fitness):
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
@@ -83,3 +83,7 @@ class GATools:
         self.optimization = optimization
         self.fitness = fitness
         self.progress = GAProgress()
+
+    @classmethod
+    def init_empty(cls):
+        return cls(None, None, None, None, None, None)
