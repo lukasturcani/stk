@@ -54,7 +54,7 @@ def archive_output():
         num = len(os.listdir('old_output'))
         new_dir = os.path.join('old_output', str(num))
         s = 'Moving old output dir.'
-        print(s + '\n' + '-'*len(s) + '\n\n')
+        print('\n'+s + '\n' + '-'*len(s) + '\n\n')
         shutil.copytree('output', new_dir)
     
         # Wait for the copy to complete before removing the old folder.
