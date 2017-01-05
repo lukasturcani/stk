@@ -81,7 +81,7 @@ def run():
                 mem.prist_mol_file = os.path.join(os.getcwd(), prist_name)
                 mem.heavy_mol_file = os.path.join(os.getcwd(), heavy_name)
             
-            pop.write_population_to_dir(os.getcwd())
+            pop.write_population(os.getcwd())
             
         else:
             pop = pop_init(**ga_input.init_func.params, 
@@ -181,7 +181,7 @@ def run():
         with time_it():
             os.mkdir('selected')
             os.chdir('selected')
-            pop.write_population_to_dir(os.getcwd())
+            pop.write_population(os.getcwd())
             pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
     
         
@@ -207,23 +207,57 @@ def helper():
     InputHelp(sys.argv[-1])
 
 def compare():
+    # If an output folder of MMEA exists, archive it. This just moves any
+    # ``output`` folder in the cwd to the ``old_output`` folder.
+    archive_output()
+        
+    # Create a new output directory and move into it. Save its path as the
+    # root directory.
+    
+    # Wait for previous operations to finish before making a new directory.
+    mk_complete = False    
+    while not mk_complete:
+        try:
+            os.mkdir('output')
+            mk_complete = True
+        except:
+            continue
+    
+    # Copy the input script into the output folder - this is useful for
+    # keeping track of what input was used to generate the output.
+    shutil.copyfile(sys.argv[2], os.path.join('output', 
+                                os.path.split(sys.argv[2])[-1]))
+        
+    # Create the encapsulating population.
     pop = Population()
+    # Get the fitness and normazliation function data from the input 
+    # file.
     inp = GAInput(sys.argv[2])
-
+    
+    # Give the population a GATools instance.
     pop.ga_tools = Population.load(sys.argv[3]).ga_tools
+    # Load the fitness and normalization functions into it.
     pop.ga_tools.fitness = inp.fitness_func
     pop.ga_tools.normalization = (Normalization(inp.normalization_func) if 
                     inp.normalization_func else None)    
     
-    for pop_path in sys.argv[3:]:
-        sp = Population.load(pop_path)
-    
+    pops = [Population.load(pop_path) for pop_path in sys.argv[3:]]
+   
+    launch_dir = os.getcwd()
+    os.chdir('output')      
+   
+    # For each population re-calculate the fitness values using the 
+    # fitness function specified in the input file.
+    for i, sp in enumerate(pops):
         for ind in sp:
             ind.unscaled_fitness = None
             ind.fitness_fail = None
             ind.fitness = None
+
+        for ind_i, ind in enumerate(sp):
+            ind.prist_mol_file = '{}.mol'.format(ind_i)
+        sp.write_population('cpop{}'.format(i))
         
-        sp.ga_tools.fitness = pop.ga_tools.fitness
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
         pop.add_subpopulation(sp)
     
@@ -232,7 +266,9 @@ def compare():
     
     pop.plot.subpopulations('fitness_comparison.png')
     pop.plot.progress_params('param_comparison.png')
-        
+    
+    os.chdir(launch_dir)
+    archive_output()
     
 if __name__ == '__main__':
     if '-h' in sys.argv:
