@@ -152,13 +152,18 @@ class GAInput:
         A function which rescales or normalizes the population's fitness
         values.
     
+    comparison_pops : list of strings
+        A list of the full paths to pop_dump files which are to be
+        compared. Only needed when using the `-c` option.
+    
     """
     
     keywords = ['num_generations', 'num_mutations', 'num_crossovers',
                 'init_func', 'generational_select_func', 'pop_size',
                 'parent_select_func', 'mutant_select_func', 
                 'mutation_func', 'opt_func', 'mutation_weights',
-                'crossover_func', 'fitness_func', 'normalization_func']
+                'crossover_func', 'fitness_func', 'normalization_func',
+                'comparison_pops']
     
     def __init__(self, input_file):
         """
