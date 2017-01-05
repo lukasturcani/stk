@@ -2519,15 +2519,15 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         instance. See the documentation of ``Energy`` to see what is
         available.        
 
-    fitness : float (default = False)
+    fitness : float (default = None)
         The fitness value of the macromolecule, as determined by the 
         chosen fitness function. This attribute is assigned by fitness
-        functions and initialized with ``False``. If a scaling or
+        functions and initialized with ``None``. If a scaling or
         normalization procedure is used, the fitness function will often
         assign to the attribute `unscaled_fitness` while normalization
         function will assign to `fitness`.
         
-    unscaled_fitness = float or array (default = False)
+    unscaled_fitness = float or array (default = None)
         Fitness functions which couple with scaling or normalization 
         functions assign fitness values into this attribute.
         
@@ -2536,15 +2536,15 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         a value for the MacroMolecule. Not all fitness functions or
         normalization fucntions use this attribute but it can be useful.
         
-    progress_params : list (default = False)
+    progress_params : list (default = None)
         Holds the fitness parameters which the GA should track to make
-        progress plots. If the default ``False`` is used, the fitness
+        progress plots. If the default ``None`` is used, the fitness
         value will be used.
         
     key : str
         The key used for caching the molecule. Necessary for 
-        `update_cache` to work. This attribute is assigned by in the 
-        `__call__` method of the ``CachedMacroMol`` class.
+        `update_cache` to work. This attribute is assigned by the 
+        `__call__()` method of the ``CachedMacroMol`` class.
     
     """
 
@@ -2599,44 +2599,29 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         if topology_args is None:
             topology_args = {}
 
+        self.optimized = False
+        self.fitness = None
+        self.unscaled_fitness = None
+        self.fitness_fail = True
+        self.progress_params = None
         self.building_blocks = tuple(building_blocks)
-
-        # A ``Topology`` subclass instance must be initialized with a 
-        # copy of the cage it is describing.
-        self.topology = topology(self, **topology_args)
-        # The topology_args attribute is saved for error handling. See
-        # MacroMolError class.
         self.topology_args = topology_args
-        self.prist_mol_file = prist_mol_file
-
-        # This generates the name of the heavy ``.mol`` file by adding
-        # ``HEAVY_`` at the end of the pristine's ``.mol`` file's name. 
-        heavy_mol_file = list(os.path.splitext(prist_mol_file))
-        heavy_mol_file.insert(1,'HEAVY')        
-        self.heavy_mol_file = '_'.join(heavy_mol_file) 
+        self.prist_mol_file = prist_mol_file    
+        self.heavy_mol_file = prist_mol_file.replace('.mol', 
+                                                     '_HEAVY.mol')        
+        self.energy = Energy(self)  
         
-        self.energy = Energy(self)        
-        
+        self.topology = topology(self, **topology_args)
         # Ask the ``Topology`` instance to assemble/build the cage. This
         # creates the cage's ``.mol`` file all  the building blocks and
         # linkers joined up. Both the substituted and pristine versions.      
         self.topology.build()
-    
 
         # Write the ``.mol`` files.
         self.write_mol_file('prist')
         self.write_mol_file('heavy')
-                                             
-        self.optimized = False
-
-        # A numerical fitness is assigned by fitness functions evoked
-        # by a ``Population`` instance's `GATools` attribute.
-        self.fitness = False
-        self.unscaled_fitness = False
-        self.fitness_fail = True
-        self.progress_params = False
         
-        # Dump the molecule in case it causes an issue later on.
+        # Dump the molecule binary.
         self.dump(self.prist_mol_file.replace('.mol', '.dmp'))
 
     def same(self, other):
