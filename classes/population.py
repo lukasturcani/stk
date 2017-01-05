@@ -565,7 +565,7 @@ class Population:
         return new_gen
 
 
-    def write_population(self, dir_path):
+    def write(self, dir_path):
         """
         Writes the ``.mol`` files of members to a directory.
 
