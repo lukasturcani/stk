@@ -36,17 +36,14 @@ leading underscore.
 import numpy as np
 import rdkit.Chem as chem
 import copy
-from inspect import signature
 from functools import partial
 import networkx as nx
-import os
 import multiprocessing as mp
 import warnings
 from collections import Counter
 
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit, Energy
-from .classes.topology.cage import CageTopology
 from . import optimization
 from .convenience_tools import (rotation_matrix_arbitrary_axis, 
                                 matrix_centroid)
@@ -220,7 +217,7 @@ def random_fitness_tuple(macro_mol):
     
     if macro_mol.unscaled_fitness:
         return macro_mol
-    
+      
     carrot_array = abs(np.random.normal(50,20,2))
     stick_array = abs(np.random.normal(50,20,2))
     macro_mol.unscaled_fitness = (carrot_array, stick_array)
