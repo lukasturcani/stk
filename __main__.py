@@ -7,7 +7,8 @@ import sys
 from .classes import (Population, GATools, Selection, Mutation, 
                       Crossover, GAInput, InputHelp, Normalization)
 from .classes.exception import PopulationSizeError
-from .convenience_tools import time_it, archive_output, kill_macromodel
+from .convenience_tools import (time_it, tar_output, 
+                                archive_output, kill_macromodel)
 
 def run():
     
@@ -175,12 +176,13 @@ def run():
         # Create a folder within a generational folder for the the ``.mol``
         # files corresponding to molecules selected for the next generation.
         # Place the ``.mol`` files into that folder.
-        print(('\n\nCopying .mol files to population directory.\n'
-               '-------------------------------------------\n\n'))
-        os.mkdir('selected')
-        os.chdir('selected')
-        pop.write_population_to_dir(os.getcwd())
-        pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
+        print(('\n\nPlacing selected memebers in `selected` directory.\n'
+               '--------------------------------------------------\n\n'))
+        with time_it():
+            os.mkdir('selected')
+            os.chdir('selected')
+            pop.write_population_to_dir(os.getcwd())
+            pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
     
         
     # Running MacroModel optimizations sometimes leaves applications open.
@@ -194,7 +196,12 @@ def run():
     
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
-    archive_output()
+    
+    with time_it():
+        tar_output()
+        
+    with time_it():
+        archive_output()
     
 def helper():
     InputHelp(sys.argv[-1])
