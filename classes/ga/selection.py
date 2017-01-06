@@ -298,8 +298,7 @@ class Selection:
                     pop.remove(ind)
 
         total_fitness = sum(ind.fitness for ind in pop if 
-                               isinstance(ind.fitness, float) or 
-                               isinstance(ind.fitness, int))
+                               isinstance(ind.fitness, (int,float)))
                               
         weights = []
         for ind in pop:

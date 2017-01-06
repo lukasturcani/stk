@@ -8,8 +8,10 @@ from ..population import Population
 from .selection import Selection
 from .crossover import Crossover
 from .mutation import Mutation
+from .normalization import Normalization
 from ...optimization import optimization
 from ... import fitness
+from .containers import GATools
 
 class GAInput:
     """
@@ -308,6 +310,83 @@ class GAInput:
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
+
+    def crosser(self):
+        """
+        Returns a Crossover instance loaded with data from input file.
+        
+        Returns
+        -------
+        Crossover
+            A Crossover instance which has all of the crossover
+            related data held in the GAInput instance.
+        
+        """
+        
+        return Crossover(self.crossover_func, self.num_crossovers)
+        
+    def selector(self):
+        """
+        Returns a Selection instance loaded with data from input file.
+        
+        Returns
+        -------
+        Selection
+            A Selection instance which has all of the selection  
+            related data held in the GAInput instance.
+            
+        """
+        
+        return Selection(self.generational_select_func, 
+                         self.parent_select_func, 
+                         self.mutant_select_func)
+        
+        
+    def mutator(self):
+        """
+        Returns a Mutation instance loaded with data from input file.        
+        
+        Returns
+        -------
+        Mutation
+            A Mutation instance which has all of the mutation related
+            data held in the GAInput instance.
+        
+        """
+            
+        return Mutation(self.mutation_func, 
+                        self.num_mutations, self.mutation_weights)
+                       
+    def normalizer(self):
+        """
+        Returns Normalization instance loaded with data from input file.
+        
+        Returns
+        -------
+        Normalization
+            A Normalization instance which has all of the normalization
+            related data held in the GAInput instance.
+        
+        """
+        
+        return (Normalization(self.normalization_func) if 
+                             self.normalization_func else None)
+        
+    def ga_tools(self):
+        """
+        Return a GATools instance loaded with data from the input file.
+        
+        Returns
+        -------
+        GATools
+            A GATools instance which has all of the input data held in
+            the GAInput instance.
+        
+        """
+    
+        return GATools(self.selector(), self.crosser(), 
+                       self.mutator(), self.normalizer(), 
+                       self.opt_func, self.fitness_func, self)
         
     def __repr__(self):
         return "\n\n".join("{} : {}".format(key, value) for key, value in

@@ -1,125 +1,103 @@
-import warnings
+import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
-import os
-import shutil
-import sys
 
-from .classes import (Population, GATools, Selection, Mutation, 
-                      Crossover, GAInput, InputHelp, Normalization)
+from .classes import (Population, GATools, 
+                      GAInput, InputHelp, Normalization)
 from .classes.exception import PopulationSizeError
 from .convenience_tools import (time_it, tar_output, 
                                 archive_output, kill_macromodel)
 
+def print_info(info):
+    print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')    
+
 def run():
+    
+    # Save the current directory as the `launch_dir`.
+    launch_dir = os.getcwd()
     
     # Running MacroModel optimizations sometimes leaves applications open.
     # This closes them. If this is not done, directories may not be possible
     # to move. 
     kill_macromodel()
-                          
-    # Get the name of the input file and load its contents into a 
-    # ``GAInput`` instance. Info about input file structure is documented in
-    # ``GAInput`` docstring.
-    ga_input = GAInput(sys.argv[1])
     
     # If an output folder of MMEA exists, archive it. This just moves any
     # ``output`` folder in the cwd to the ``old_output`` folder.
     archive_output()
-    # Save the current directory as the `launch_dir`.
-    launch_dir = os.getcwd()
         
     # Create a new output directory and move into it. Save its path as the
     # root directory.
-    
-    # Wait for previous operations to finish before making a new directory.
-    mk_complete = False    
-    while not mk_complete:
-        try:
-            os.mkdir('output')
-            mk_complete = True
-        except:
-            continue
-    
+    os.mkdir('output')
+
     # Copy the input script into the output folder - this is useful for
     # keeping track of what input was used to generate the output.
     shutil.copyfile(sys.argv[1], os.path.join('output', 
-                                os.path.split(sys.argv[1])[-1]))
-        
+                                     os.path.split(sys.argv[1])[-1]))
+     
     os.chdir('output')
     root_dir = os.getcwd()
-    os.mkdir('initial')
-    os.chdir('initial')
-    
-    # Use data from the input file to create a ``GATools`` instance for the
-    # main population.
-    selector = Selection(ga_input.generational_select_func, 
-                         ga_input.parent_select_func, 
-                         ga_input.mutant_select_func)
-    mator = Crossover(ga_input.crossover_func, ga_input.num_crossovers)
-    mutator = Mutation(ga_input.mutation_func, ga_input.num_mutations,
-                       weights=ga_input.mutation_weights)
-    normalizator = (Normalization(ga_input.normalization_func) if 
-                    ga_input.normalization_func else None)
-    ga_tools = GATools(selector, mator, mutator, normalizator,
-                       ga_input.opt_func, ga_input.fitness_func)
-    ga_tools.ga_input = ga_input
-    
+    # Get the name of the input file and load its contents into a 
+    # ``GAInput`` instance. Info about input file structure is 
+    # documented in ``GAInput`` docstring.
+    ga_input = GAInput(os.path.basename(sys.argv[1]))
+
     # Generate and optimize an initial population.
+    os.mkdir('initial')
+    os.chdir('initial')    
     with time_it():
         pop_init = getattr(Population, ga_input.init_func.name)
-        print(('\n\nGenerating initial population.\n'
-             '------------------------------\n\n'))
+        print_info('Generating initial population.')
         
+        # If the initialization function is ``load()`` a restart run is
+        # assumed.
         if pop_init.__name__ == 'load':
-            pop = pop_init(**ga_input.init_func.params, ga_tools=ga_tools)
+            pop = pop_init(**ga_input.init_func.params,
+                           ga_tools=ga_input.ga_tools())
             ga_input.pop_size = len(pop)
             
             for mem in pop:
                 prist_name = os.path.basename(mem.prist_mol_file)
                 heavy_name = os.path.basename(mem.heavy_mol_file)
                 
-                mem.prist_mol_file = os.path.join(os.getcwd(), prist_name)
-                mem.heavy_mol_file = os.path.join(os.getcwd(), heavy_name)
+                mem.prist_mol_file = os.path.join(os.getcwd(), 
+                                                    prist_name)
+                mem.heavy_mol_file = os.path.join(os.getcwd(), 
+                                                    heavy_name)
             
             pop.write(os.getcwd())
             
         else:
             pop = pop_init(**ga_input.init_func.params, 
-                           size=ga_input.pop_size, ga_tools=ga_tools)
+                           size=ga_input.pop_size, 
+                           ga_tools=ga_input.ga_tools())
     
-    with time_it():    
-        print(('\n\nOptimizing the population.\n'
-              '--------------------------\n\n'))
+    with time_it():
+        print_info('Optimizing the population.')
         pop = Population(pop.ga_tools, *pop.optimize_population())
     
-    with time_it():    
-        print('\n\nCalculating the fitness of population members.\n'
-            '----------------------------------------------\n\n') 
+    with time_it():
+        print_info('Calculating the fitness of population members.')
         pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
 
     if pop.ga_tools.normalization:
         with time_it():
-            print(('\n\nNormalizing fitness values.\n'
-                       '---------------------------\n\n'))
+            print_info('Normalizing fitness values.')
             pop.normalize_fitness_values()
 
-    for macro_mol in sorted(pop, key=lambda x : x.fitness, reverse=True):
-        print(macro_mol.fitness, '-',macro_mol.prist_mol_file)
+    for macro_mol in sorted(pop, reverse=True):
+        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
             
     # Run the GA.
-    for x in range(ga_input.num_generations):
+    for x in range(1, ga_input.num_generations+1):
         # Save the min, max and mean values of the population.    
         pop.progress_update()
         
         # Check that the population has the correct size.
         if len(pop) != ga_input.pop_size:
             raise PopulationSizeError('Population has the wrong size.')
-        
-        print(('\n\nGeneration {0} started. Stop at generation {1}. '
-                'Population size is {2}.\n'
-                '---------------------------------------------------------'
-                '--------------\n\n').format(x, ga_input.num_generations-1, 
-                                                len(pop)))
+
+        print_info('Generation {} of {}.'.format(x, 
+                                              ga_input.num_generations))
+
         # At the start of each generation go into the root directory and 
         # create a folder to hold the next generation's ``.mol`` files.
         # Change into the newly created directory.
@@ -128,66 +106,57 @@ def run():
         os.chdir(str(x))
         
         with time_it():
-            print('\n\nStarting crossovers.\n--------------------\n\n')
+            print_info('Starting crossovers.')
             offspring = pop.gen_offspring()
     
         with time_it():
-            print('\n\nStarting mutations.\n-------------------\n\n')
+            print_info('Starting mutations.')
             mutants = pop.gen_mutants()
         
         with time_it():
-            print(('\n\nAdding offsping and mutants to population.'
-                  '\n------------------------------------------\n\n'))
+            print_info('Adding offsping and mutants to population.')
             pop += offspring + mutants
         
         with time_it():
-            print(('\n\nRemoving duplicates, if any.\n'
-                   '----------------------------\n\n')    )
+            print_info('Removing duplicates, if any.')
             pop.remove_duplicates()        
         
         pop.dump(os.path.join(os.getcwd(), 'unselected_pop_dump'))    
         
         with time_it():        
-            print(('\n\nOptimizing the population.\n'
-                  '--------------------------\n\n'))
+            print_info('Optimizing the population.')
             pop = Population(pop.ga_tools, *pop.optimize_population())
     
         with time_it():        
-            print('\n\nCalculating the fitness of population members.\n'
-                '----------------------------------------------\n\n')    
+            print_info('Calculating the fitness of population members.')    
             pop = Population(pop.ga_tools, 
                              *pop.calculate_member_fitness())
 
         if pop.ga_tools.normalization:
             with time_it():
-                print(('\n\nNormalizing fitness values.\n'
-                           '---------------------------\n\n'))
+                print_info('Normalizing fitness values.')
                 pop.normalize_fitness_values()
                 
-        for macro_mol in sorted(pop, 
-                                key=lambda x : x.fitness, reverse=True):
+        for macro_mol in sorted(pop, reverse=True):
             print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
     
         with time_it():        
-            print(('\n\nSelecting members of the next generation.\n'
-                   '-----------------------------------------\n\n'))
+            print_info('Selecting members of the next generation.')
             pop = pop.gen_next_gen(ga_input.pop_size)
             
-        # Create a folder within a generational folder for the the ``.mol``
-        # files corresponding to molecules selected for the next generation.
-        # Place the ``.mol`` files into that folder.
-        print(('\n\nPlacing selected memebers in `selected` directory.\n'
-               '--------------------------------------------------\n\n'))
+        # Create a folder within a generational folder for the the 
+        # ``.mol``files corresponding to molecules selected for the next
+        # generation. Place the ``.mol`` files into that folder.
+        print_info('Placing selected memebers in `selected` directory.')
         with time_it():
             os.mkdir('selected')
             os.chdir('selected')
             pop.write(os.getcwd())
             pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
-    
         
-    # Running MacroModel optimizations sometimes leaves applications open.
-    # This closes them. If this is not done, directories may not be possible
-    # to move.     
+    # Running MacroModel optimizations sometimes leaves applications 
+    # open. This closes them. If this is not done, directories may not 
+    # be possible to move.     
     kill_macromodel()
     
     # Update a final time and plot the results of the GA run.
@@ -208,33 +177,25 @@ def helper():
 
 def compare():
     launch_dir = os.getcwd()
-    # If an output folder of MMEA exists, archive it. This just moves any
+    
+    # If an output folder of MMEA exists, archive it. This moves any
     # ``output`` folder in the cwd to the ``old_output`` folder.
     archive_output()
         
-    # Create a new output directory and move into it. Save its path as the
-    # root directory.
-    
-    # Wait for previous operations to finish before making a new directory.
-    mk_complete = False    
-    while not mk_complete:
-        try:
-            os.mkdir('output')
-            mk_complete = True
-        except:
-            continue  
+    # Create a new output directory.
+    os.mkdir('output')
     
     # Copy the input script into the output folder - this is useful for
     # keeping track of what input was used to generate the output.
     shutil.copyfile(sys.argv[2], os.path.join('output', 
-                                os.path.split(sys.argv[2])[-1]))
+                                   os.path.split(sys.argv[2])[-1]))
         
     # Get the fitness and normaliztion function data from the input 
     # file.
     inp = GAInput(sys.argv[2])
     
     # Create the encapsulating population.
-    pop = Population(GATools.init_empty())
+    pop = Population()
     # Load the fitness and normalization functions into the population.
     pop.ga_tools.ga_input = inp
     pop.ga_tools.fitness = inp.fitness_func
