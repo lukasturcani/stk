@@ -15,17 +15,17 @@ def run():
     # Save the current directory as the `launch_dir`.
     launch_dir = os.getcwd()
     
-    # Running MacroModel optimizations sometimes leaves applications open.
-    # This closes them. If this is not done, directories may not be possible
-    # to move. 
+    # Running MacroModel optimizations sometimes leaves applications 
+    # open.This closes them. If this is not done, directories may not be 
+    # possible to move. 
     kill_macromodel()
     
-    # If an output folder of MMEA exists, archive it. This just moves any
-    # ``output`` folder in the cwd to the ``old_output`` folder.
+    # If an output folder of MMEA exists, archive it. This just moves 
+    # any ``output`` folder in the cwd to the ``old_output`` folder.
     archive_output()
         
-    # Create a new output directory and move into it. Save its path as the
-    # root directory.
+    # Create a new output directory and move into it. Save its path as 
+    # the root directory.
     os.mkdir('output')
 
     # Copy the input script into the output folder - this is useful for
