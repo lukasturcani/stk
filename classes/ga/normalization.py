@@ -36,7 +36,6 @@ class Normalization:
             else:
                 stick_means.append(x)
         
-        
         for macro_mol in population:        
         
             # If one or more of the fitness parameters failed, 

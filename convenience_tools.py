@@ -56,15 +56,7 @@ def archive_output():
         s = 'Moving old output dir.'
         print('\n'+s + '\n' + '-'*len(s) + '\n\n')
         shutil.copytree('output', new_dir)
-    
-        # Wait for the copy to complete before removing the old folder.
-        mv_complete = False    
-        while not mv_complete:
-            try:
-                shutil.rmtree('output')
-                mv_complete = True
-            except:
-                pass
+        shutil.rmtree('output')
 
 def tar_output():
     """
