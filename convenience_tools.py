@@ -21,6 +21,7 @@ import re
 from collections import deque
 import shutil
 from collections import namedtuple
+import tarfile
 
 # This dictionary gives easy access to the rdkit bond types.
 
@@ -52,18 +53,40 @@ def archive_output():
         # labelled within ``old_output``.
         num = len(os.listdir('old_output'))
         new_dir = os.path.join('old_output', str(num))
-        print('Moving old output dir.')
+        s = 'Moving old output dir.'
+        print('\n'+s + '\n' + '-'*len(s) + '\n\n')
         shutil.copytree('output', new_dir)
+        shutil.rmtree('output')
+
+def tar_output():
+    """
+    Places all the content in the `outout` into a .gz file.
+
+    This function also deletes all the folders in the `output` folder
+    expect the one holding the final generation.
+
+    Returns
+    -------
+    None : NoneType    
     
-        # Wait for the copy to complete before removing the old folder.
-        mv_complete = False    
-        while not mv_complete:
-            try:
-                shutil.rmtree('output')
-                mv_complete = True
-            except:
-                pass
-             
+    """
+    
+    s = "Compressing output."
+    print("\n\n"+s+"\n"+"-"*len(s)+"\n\n")
+    
+    with tarfile.open(os.path.join('output','output.gz'), 'w:gz') as tar:
+        tar.add('output')
+    
+    folders = [x for x in os.listdir('output') if 
+                os.path.isdir(os.path.join('output', x))]
+
+    max_folder = max((x for x in folders if x != 'initial'), 
+                     key=lambda x : int(x))    
+
+    for folder in folders:
+        if folder != max_folder:
+            shutil.rmtree(os.path.join('output', folder))
+        
 def normalize_vector(vector):
     """
     Normalizes the given vector.
@@ -548,7 +571,8 @@ def time_it():
     time_taken = time.time() - start
     m,s = divmod(time_taken, 60)
     h,m = divmod(m, 60)
-    print('\nTime taken was {0} : {1} : {2}'.format(int(h), int(m), s))
+    print('\nTime taken was {0} : {1} : {2}.\n\n'.format(
+                                                    int(h), int(m), s))
 
 
 class LazyAttr:

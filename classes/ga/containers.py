@@ -67,19 +67,23 @@ class GATools:
     
     ga_input : GAInput
         The GAInput object holding data gathered from the input file.
-        This attribute is added in the ``__main__.py`` script.
-    
+
     """
     
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
                  'optimization', 'fitness', 'ga_input', 'progress']    
     
     def __init__(self, selection, crossover, mutation, 
-                       normalization ,optimization, fitness):
+                       normalization, optimization, fitness, ga_input):
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
         self.normalization = normalization
         self.optimization = optimization
         self.fitness = fitness
+        self.ga_input = ga_input
         self.progress = GAProgress()
+
+    @classmethod
+    def init_empty(cls):
+        return cls(None, None, None, None, None, None, None)
