@@ -1,5 +1,5 @@
 import os
-import shutil
+import glob
 import networkx as nx
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
@@ -7,10 +7,45 @@ from functools import partial
 from multiprocessing import Pool
 import itertools as it
 
-from .classes import StructUnit, FGInfo
+from .classes import StructUnit, FGInfo, Population, Cage
 from .convenience_tools import MolFileError
 from .optimization import *
 
+
+def redump_pop(folder, ofolder=None):
+    """
+    Collects all the MacroMolecule .dmp files and creates a dump file.
+    
+    The function creates a population of all the .dmp files in `folder`
+    and creates a dump file of that population. The dump file gets 
+    placed in `folder` if `ofolder` is ``None``. Otherwise the dump
+    file gets placed in `ofolder`.
+    
+    Parameters
+    ----------
+    folder : str
+        The full path of the folder holding the MacroMolecule .dmp
+        files.
+        
+    ofolder : str (default = None)
+        The folder in which the dump file should be placed.
+    
+    Modifies
+    --------
+    ofolder/pop_dump
+        Creates a file holding the population dump at this location.    
+    
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
+    if not ofolder:
+        ofolder = folder
+    s = os.path.join(ofolder, '*.dmp')
+    pop = Population(*(Cage.load(x) for x in glob.glob(s)))
+    pop.dump(os.path.join(ofolder, 'pop_dump'))
 
 def fg_prune(ifolder, fg, fg_num):
     """
