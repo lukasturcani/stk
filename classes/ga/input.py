@@ -417,46 +417,50 @@ class InputHelp:
     """
     
     modules = {
-               'init_func' : iter(func for name, func in 
-                                  Population.__dict__.items() if 
-                                  name.startswith('init')),
+               'init_func' : (func for name, func in 
+                              Population.__dict__.items() if 
+                              name.startswith('init')),
                
-               'generational_select_func' : iter(
+               'generational_select_func' : (
                                  func for name, func in 
                                  Selection.__dict__.items() if 
                                  not name.startswith('crossover') and
                                  not name.startswith('_')),
 
-               'parent_select_func' : iter(
+               'parent_select_func' : (
                                  func for name, func in 
                                  Selection.__dict__.items() if 
                                  name.startswith('crossover')),
                                            
-               'mutant_select_func' : iter(
+               'mutant_select_func' : (
                                  func for name, func in 
                                  Selection.__dict__.items() if 
                                  not name.startswith('crossover') and
                                  not name.startswith('_')),
                                            
-               'crossover_func' : iter(func for name, func in 
-                                    Crossover.__dict__.items() if 
-                                    not name.startswith('_')),
+               'crossover_func' : (func for name, func in 
+                                   Crossover.__dict__.items() if 
+                                   not name.startswith('_')),
                
-               'mutation_func' : iter(func for name, func in 
-                                    Mutation.__dict__.items() if 
-                                    not name.startswith('_')),
+               'mutation_func' : (func for name, func in 
+                                  Mutation.__dict__.items() if 
+                                  not name.startswith('_')),
                                       
-               'opt_func' : iter(func for name, func in 
-                                 optimization.__dict__.items() if
-                                 not name.startswith('_') and 
-                                 not isinstance(func, ModuleType) and
-                                 'optimization' in func.__module__),
+               'opt_func' : (func for name, func in 
+                             optimization.__dict__.items() if
+                             not name.startswith('_') and 
+                             not isinstance(func, ModuleType) and
+                             'optimization' in func.__module__),
                                  
-               'fitness_func' : iter(func for name, func in 
+               'fitness_func' : (func for name, func in 
                                  fitness.__dict__.items() if
                                  not name.startswith('_') and 
                                  not isinstance(func, ModuleType) and 
-                                 'fitness' in func.__module__)
+                                 'fitness' in func.__module__),
+                                 
+               'normalization_func' :  (func for name, func in 
+                                        Normalization.__dict__.items()
+                                        if not name.startswith('_'))
                }
         
     
