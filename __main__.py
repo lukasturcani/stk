@@ -121,7 +121,7 @@ def run():
             print_info('Removing duplicates, if any.')
             pop.remove_duplicates()        
         
-        pop.dump(os.path.join(os.getcwd(), 'unselected_pop_dump'))    
+        pop.dump(os.path.join(os.getcwd(), 'preselection_pop_dump'))    
         
         with time_it():        
             print_info('Optimizing the population.')

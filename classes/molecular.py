@@ -59,6 +59,7 @@ class CachedMacroMol(type):
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
+            obj.dump(obj.prist_mol_file.replace('.mol', '.dmp'))
             self._cache[key] = obj            
             return obj
 
@@ -2620,9 +2621,6 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         # Write the ``.mol`` files.
         self.write_mol_file('prist')
         self.write_mol_file('heavy')
-        
-        # Dump the molecule binary.
-        self.dump(self.prist_mol_file.replace('.mol', '.dmp'))
 
     def same(self, other):
         """

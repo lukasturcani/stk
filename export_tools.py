@@ -12,22 +12,21 @@ from .convenience_tools import MolFileError
 from .optimization import *
 
 
-def redump_pop(folder, ofolder=None):
+def redump_pop(*folders, ofolder):
     """
     Collects all the MacroMolecule .dmp files and creates a dump file.
     
-    The function creates a population of all the .dmp files in `folder`
+    The function creates a population of all the .dmp files in `folders`
     and creates a dump file of that population. The dump file gets 
-    placed in `folder` if `ofolder` is ``None``. Otherwise the dump
-    file gets placed in `ofolder`.
+    placed in `ofolder`.
     
     Parameters
     ----------
-    folder : str
-        The full path of the folder holding the MacroMolecule .dmp
+    *folders : str
+        The full paths of the folders holding the MacroMolecule .dmp
         files.
         
-    ofolder : str (default = None)
+    ofolder : str
         The folder in which the dump file should be placed.
     
     Modifies
@@ -41,10 +40,12 @@ def redump_pop(folder, ofolder=None):
     
     """
     
-    if not ofolder:
-        ofolder = folder
-    s = os.path.join(ofolder, '*.dmp')
-    pop = Population(*(Cage.load(x) for x in glob.glob(s)))
+    cage_paths = []
+    for folder in folders:
+        s = os.path.join(folder, '*.dmp')
+        cage_paths.extend(glob.glob(s))
+    
+    pop = Population(*(Cage.load(x) for x in cage_paths))
     pop.dump(os.path.join(ofolder, 'pop_dump'))
 
 def fg_prune(ifolder, fg, fg_num):
