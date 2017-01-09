@@ -78,9 +78,8 @@ class Population:
 
         This initializer creates a new population from the
         ``Population`` and ``MacroMolecule`` instances given as
-        arguments. It also accepts a single, optional, ``GATools``
-        instance if the population is to have GA operations performed on
-        it.
+        arguments. It also accepts a ``GATools`` instance if the 
+        population is to have GA operations performed on it.
 
         The arguments can be provided in any order regardless of type.
 
@@ -90,30 +89,28 @@ class Population:
             A population is initialized with as many ``MacroMolecule``
             or ``Population`` arguments as required. These are placed
             into the `members` or `populations` attributes,
-            respectively. A single ``GATools`` instance may be included
+            respectively. A ``GATools`` instance may be included
             and will be placed into the `ga_tools` attribute.
 
         Raises
         ------
         TypeError
             If the instance is initialized with something other than
-            ``MacroMolecule``, ``Population`` or more than 1 ``GATools``
-            object.
+            ``MacroMolecule``, ``Population`` or ``GATools`` object.
 
         """
 
         # Generate `populations`, `members` and `ga_tools` attributes.
         self.populations = []
         self.members = []
-        self.ga_tools = None
+        self.ga_tools = GATools.init_empty()
         self.plot = Plotter(self)
 
         # Determine type of supplied arguments and place in the
         # appropriate attribute.  ``Population`` types added to
         # `populations` attribute, ``MacroMolecule`` into `members` and
         # if ``GATools`` is supplied it is placed into `ga_tools`.
-        # Raise a ``TypeError`` if more than 1 ``GATools`` argument
-        # was supplied or if an argument was not ``GATools``,
+        # Raise a ``TypeError``  if an argument was not ``GATools``,
         # ``MacroMolecule`` or ``Population`` type.
         for arg in args:
             if isinstance(arg, Population):
@@ -124,26 +121,14 @@ class Population:
                 self.members.append(arg)
                 continue
 
-            if isinstance(arg, GATools) and self.ga_tools is None:
+            if isinstance(arg, GATools):
                 self.ga_tools = arg
                 continue
 
-            # Some methods create a new ``Population`` instance by using
-            # another as a template. In these cases the `ga_tools`
-            # attribute of the template population is passed to the
-            # initializer. If the template instance did not have a
-            # defined ``GATools`` instance, the default ``None``
-            # argument is passed. The following 2 lines prevent
-            # exceptions being raised in such a scenario. A consequence
-            # of this is that any number of ``None`` arguments can be
-            # passed to the initializer.
-            if arg is None:
-                continue
-
-            raise TypeError(("Population can only be"
-                             " initialized with 'Population',"
-                             " 'MacroMolecule' and 1 'GATools' type."),
-                                                                    arg)
+            raise TypeError(
+                    ("Population can only be"
+                     " initialized with ``Population``,"
+                     " ``MacroMolecule`` and ``GATools`` types."), arg)
 
     @classmethod
     def init_random_cages(cls, bb_db, lk_db,
@@ -565,7 +550,7 @@ class Population:
         return new_gen
 
 
-    def write_population_to_dir(self, dir_path):
+    def write(self, dir_path):
         """
         Writes the ``.mol`` files of members to a directory.
 
