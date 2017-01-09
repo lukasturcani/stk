@@ -11,6 +11,32 @@ from .classes import StructUnit, FGInfo, Population, Cage
 from .convenience_tools import MolFileError
 from .optimization import *
 
+def assign_keys(population):
+    """
+    Some old Cage .dmp files do not have `key` attribute so give it.
+
+    Parameters
+    ----------
+    population : Population
+        Assigns the `key` attribute to every MacroMolecule in this 
+        population.
+
+    Modifies
+    --------
+    population
+        All the MacroMolecule instances in this Population instance
+        have the `key` attribute assigned.
+        
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
+    for mem in population:
+        mem.key = (str([mem.building_blocks, type(mem.topology)]) + 
+                    str(mem.topology_args))
+    
 
 def redump_pop(*folders, ofolder):
     """
@@ -27,7 +53,7 @@ def redump_pop(*folders, ofolder):
         files.
         
     ofolder : str
-        The folder in which the dump file should be placed.
+        The folder in which the dump file should be placed. 
     
     Modifies
     --------
@@ -46,6 +72,9 @@ def redump_pop(*folders, ofolder):
         cage_paths.extend(glob.glob(s))
     
     pop = Population(*(Cage.load(x) for x in cage_paths))
+
+    assign_keys(pop)      
+    
     pop.dump(os.path.join(ofolder, 'pop_dump'))
 
 def fg_prune(ifolder, fg, fg_num):
