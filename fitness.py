@@ -266,7 +266,7 @@ def cage(macro_mol, target_cavity, target_window=None,
         The desired diameter of the largest window of the cage. If 
         ``None`` then `target_cavity` is used.
         
-    energy_params : dict
+    energy_params : dict (default = {'key':('rdkit', 'uff')})
         A dictionary holding the name arguments and values for the 
         ``Energy.pseudoformation()`` function.
     
@@ -382,6 +382,9 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
     rotations : int (default = 0)
         The number of times the target should be randomly rotated within 
         the cage cavity in order to find the most stable conformation.
+        
+    md : bool (default = False)
+        Toggles the running of MD on cage-target complexes.
         
     Modifies
     --------
