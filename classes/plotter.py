@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+from operator import attrgetter
 
 from ..fitness import *
 
@@ -31,37 +32,81 @@ class Plotter:
             plt.xlabel('Generation Number')
             plt.ylabel('Fitness Value')
             plt.title('Evolutionary Progress Plot', fontsize=18)
-            plt.plot(progress.gens, progress.means, color='green')
-            plt.plot(progress.gens, progress.mins, color='blue')
-            plt.plot(progress.gens, progress.maxs, color='red')
+            
+            plt.plot(progress.gens, progress.means, color='green', label='mean')
+            plt.plot(progress.gens, progress.mins, color='blue', label='min')
+            plt.plot(progress.gens, progress.maxs, color='red', label='max')
+            
             lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            fig.savefig(plot_name, dpi=1000,
-                    bbox_extra_artists=(lgd,), bbox_inches='tight')
+            fig.savefig(new_plot_name, dpi=1000,
+                        bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.close('all')
             
         else:
+            self.renormalized_epp(plot_name)           
             func_name = self.pop.ga_tools.ga_input.fitness_func.name
             fitness_func = globals()[func_name]
             
             for x in range(len(progress.means[0])):
+                y_mean = [v[x] for v in progress.means]
+                y_max = [v[x] for v in progress.maxs]
+                y_min = [v[x] for v in progress.mins]
+
                 fig = plt.figure()
                 plt.xlabel('Generation Number')                             
                 plt.ylabel('Unscaled ' + fitness_func.param_labels[x])                
                 plt.title(' Evolutionary Progress Plot', fontsize=18)
-                y_mean = [v[x] for v in progress.means]
-                y_max = [v[x] for v in progress.maxs]
-                y_min = [v[x] for v in progress.mins]
 
                 plt.plot(progress.gens, y_mean, color='green', label='mean')
                 plt.plot(progress.gens, y_min, color='blue', label='min')
                 plt.plot(progress.gens, y_max, color='red', label='max')
                 
-                new_plot_name = str(x).join(os.path.splitext(plot_name))                
-                
+                new_plot_name = str(x).join(os.path.splitext(plot_name))
                 lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
                 fig.savefig(new_plot_name, dpi=1000,
                             bbox_extra_artists=(lgd,), bbox_inches='tight')
                 plt.close('all')
+
+    def renormalized_epp(self, plot_name):
+        """
+        Normalizes fitness values across all generations and plots EPP.
+
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        Population = type(self.pop)
+        p = Population(self.pop.ga_tools)
+        for gen in self.pop.ga_tools.progress.past_pops:
+            p.add_subpopulation(gen)
+        
+        p.normalize_fitness_values()
+        
+        gens = []
+        mins = []
+        means = []
+        maxs = []
+        for i, gen in enumerate(p.populations, 1):
+            gens.append(i)
+            mins.append(min(gen, key=attrgetter('fitness')).fitness)
+            means.append(gen.mean(attrgetter('fitness')))
+            maxs.append(max(gen, key=attrgetter('fitness')).fitness)
+            
+        fig = plt.figure()
+        plt.xlabel('Generation Number')
+        plt.ylabel('Fitness Value')
+        plt.title('Evolutionary Progress Plot', fontsize=18)
+        
+        plt.plot(gens, means, color='green', label='mean')
+        plt.plot(gens, mins, color='blue', label='min')
+        plt.plot(gens, maxs, color='red', label='max')
+        
+        lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        fig.savefig(plot_name, dpi=1000,
+                    bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.close('all')
 
     def subpopulations(self, plot_name):
         """
