@@ -423,18 +423,31 @@ class Mutation:
         # that cage. Instead of the generator the list is saved to the 
         # attribute alongside the index which is to be accessed the next 
         # time this function is run on the same `macro_mol`.
+
+        _, og_lk = max(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))
+        lk_type = type(og_lk)
+        
+        _, bb = min(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))  
         
         if not hasattr(macro_mol, '_similar_lk_mols'):
-            lk = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit2))
             macro_mol._similar_lk_mols = (
-                            lk.similar_molecules(database), 0)
+                            og_lk.similar_molecules(database), 0)
 
         sim_mols, cur_index = macro_mol._similar_lk_mols
-        new_lk = StructUnit2(sim_mols[cur_index][-1])
+        new_lk = lk_type(sim_mols[cur_index][-1])
+        
+        if len(og_lk.heavy_ids) != len(new_lk.heavy_ids):
+            print(('MUTATION ERROR: Replacement linker does not'
+                  ' have the same number of functional groups as the'
+                  ' original linker.\n\nOriginal linker:\n\n{}\n\n'
+                  'Replacement linker:\n\n{}\n\n').format(
+                                                 og_lk.prist_mol_file, 
+                                                 new_lk.prist_mol_file))
+            sys.exit()
+        
         macro_mol._similar_lk_mols = sim_mols, cur_index + 1
         
-        bb = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit3))
         return Cage((new_lk, bb), type(macro_mol.topology),
               os.path.join(os.getcwd(), self.name.format(self.n_calls)))
