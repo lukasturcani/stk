@@ -1,14 +1,17 @@
 import numpy as np
-      
+import copy
+
 class GAProgress:
     def __init__(self):
         self.gens = []
         self.means = []
         self.mins = []
         self.maxs = []
+        self.past_pops= []
 
     def update(self, population):
         self.gens.append(len(self.gens))
+        self.past_pops.append(copy.deepcopy(population))
         
         if any(x.progress_params for x in population):
             unscaled_var_mat = np.matrix([
