@@ -151,7 +151,7 @@ def run():
         # Create a folder within a generational folder for the the 
         # ``.mol``files corresponding to molecules selected for the next
         # generation. Place the ``.mol`` files into that folder.
-        print_info('Placing selected memebers in `selected` directory.')
+        print_info('Placing selected members in `selected` directory.')
         with time_it():
             os.mkdir('selected')
             os.chdir('selected')
