@@ -84,7 +84,9 @@ def run():
             pop.normalize_fitness_values()
 
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+        print(macro_mol.prist_mol_file)
+        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
+        print('\n')
             
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):
@@ -138,7 +140,9 @@ def run():
                 pop.normalize_fitness_values()
                 
         for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+            print(macro_mol.prist_mol_file)
+            print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
+            print('\n')
     
         with time_it():        
             print_info('Selecting members of the next generation.')
