@@ -136,7 +136,7 @@ def fg_distance_prune(folder, fg):
     
     for file_name in os.listdir(folder):
         path = os.path.join(folder, file_name)
-        if not file_name.endswith('.mol'):
+        if not file_name.endswith('.mol2'):
             continue
 
         mol = StructUnit(path, minimal=True)
@@ -149,7 +149,7 @@ def fg_distance_prune(folder, fg):
         mol._generate_heavy_attrs()
         g = mol.graph('heavy')
         for start, end in it.combinations(mol.heavy_ids, 2):
-            if nx.shortest_path_length(g, *mol.heavy_ids) < 3:
+            if nx.shortest_path_length(g, start, end) < 3:
                 print('Removing {}.'.format(path))
                 os.remove(path)
                 break
@@ -172,10 +172,10 @@ def substruct_prune(folder, substruct):
     
     substruct_mol = chem.MolFromSmarts(substruct)
     for file_name in os.listdir(folder):
-        if not file_name.endswith('.mol'):
+        if not file_name.endswith('.mol2'):
             continue
         path = os.path.join(folder, file_name)
-        mol = chem.MolFromMolFile(path, sanitize=False, removeHs=False)
+        mol = chem.MolFromMol2File(path, sanitize=False, removeHs=False)
         if mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
