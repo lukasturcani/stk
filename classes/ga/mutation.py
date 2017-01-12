@@ -23,6 +23,7 @@ start with a leading underscore.
 import os
 import numpy as np
 from collections import Counter
+import sys
 
 from ..population import Population
 from ..molecular import StructUnit3, StructUnit2, Cage, Polymer
@@ -184,15 +185,32 @@ class Mutation:
             a random building-block* from `database`.
         
         """
+
+        _, lk = max(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))
+        
+        _, og_bb = min(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))        
         
         while True:
-            bb_file = np.random.choice(os.listdir(database))
-            if bb_file.endswith(".mol"):
+            try:
+                bb_file = np.random.choice(os.listdir(database))
+                bb_file = os.path.join(database, bb_file)
+                bb = StructUnit3(bb_file)
                 break
-        bb_file = os.path.join(database, bb_file)
-        bb = StructUnit3(bb_file)
-        lk = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit2))        
+            
+            except TypeError:
+                continue        
+
+        if len(og_bb.heavy_ids) != len(bb.heavy_ids):
+            print(('MUTATION ERROR: Replacement building block does not'
+                  ' have the same number of functional groups as the'
+                  ' original building block.\n\nOriginal building '
+                  'block:\n\n{}\n\nReplacement building block:\n\n'
+                  '{}\n\n').format(og_bb.prist_mol_file, 
+                                    bb.prist_mol_file))
+            sys.exit()
+            
         return Cage((bb, lk), type(macro_mol.topology),
             os.path.join(os.getcwd(), self.name.format(self.n_calls)))
 
@@ -220,14 +238,32 @@ class Mutation:
         
         """        
 
+        _, og_lk = max(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))
+        lk_type = type(og_lk)
+        
+        _, bb = min(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))
+
         while True:
-            lk_file = np.random.choice(os.listdir(database))
-            if lk_file.endswith(".mol"):
+            try:
+                lk_file = np.random.choice(os.listdir(database))
+                lk_file = os.path.join(database, lk_file)
+                lk = lk_type(lk_file)
                 break
-        lk_file = os.path.join(database, lk_file)
-        lk = StructUnit2(lk_file)
-        bb = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit3))        
+            
+            except TypeError:
+                continue
+            
+        if len(og_lk.heavy_ids) != len(lk.heavy_ids):
+            print(('MUTATION ERROR: Replacement linker does not'
+                  ' have the same number of functional groups as the'
+                  ' original linker.\n\nOriginal linker:\n\n{}\n\n'
+                  'Replacement linker:\n\n{}\n\n').format(
+                                                   og_lk.prist_mol_file, 
+                                                   lk.prist_mol_file))
+            sys.exit()
+        
         return Cage((bb, lk), type(macro_mol.topology),
             os.path.join(os.getcwd(), self.name.format(self.n_calls)))
 
@@ -299,7 +335,7 @@ class Mutation:
         """
         
         # The idea here is to create a list of molecules from `database`
-        # order by similarity to the building-block* of `macro_mol`. 
+        # ordered by similarity to the building-block* of `macro_mol`. 
         # Each time this function is called on `cage` the next molecule 
         # from this list is used to substitute the building-block* of 
         # the cage and create a new mutant. The most elegant way to do 
@@ -311,19 +347,31 @@ class Mutation:
         # generator the list is saved to the attribute alongside the 
         # index which is to be accessed the next time this function is 
         # run on the same `macro_mol`.
+
+        _, lk = max(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))
+        
+        _, og_bb = min(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))  
         
         if not hasattr(macro_mol, '_similar_bb_mols'):
-            bb = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit3))
             macro_mol._similar_bb_mols = (
-                                      bb.similar_molecules(database), 0)
+                                   og_bb.similar_molecules(database), 0)
         
         sim_mols, cur_index = macro_mol._similar_bb_mols
         new_bb = StructUnit3(sim_mols[cur_index][-1])
+        
+        if len(og_bb.heavy_ids) != len(new_bb.heavy_ids):
+            print(('MUTATION ERROR: Replacement building block does not'
+                  ' have the same number of functional groups as the'
+                  ' original building block.\n\nOriginal building '
+                  'block:\n\n{}\n\nReplacement building block:\n\n'
+                  '{}\n\n').format(og_bb.prist_mol_file, 
+                                   new_bb.prist_mol_file))
+            sys.exit()        
+        
         macro_mol._similar_bb_mols = sim_mols, cur_index + 1
         
-        lk = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit2))
         return Cage((new_bb, lk), type(macro_mol.topology),
               os.path.join(os.getcwd(), self.name.format(self.n_calls)))
         
@@ -375,18 +423,31 @@ class Mutation:
         # that cage. Instead of the generator the list is saved to the 
         # attribute alongside the index which is to be accessed the next 
         # time this function is run on the same `macro_mol`.
+
+        _, og_lk = max(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))
+        lk_type = type(og_lk)
+        
+        _, bb = min(zip(macro_mol.topology.bb_counter.values(),
+                        macro_mol.topology.bb_counter.keys()))  
         
         if not hasattr(macro_mol, '_similar_lk_mols'):
-            lk = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit2))
             macro_mol._similar_lk_mols = (
-                            lk.similar_molecules(database), 0)
+                            og_lk.similar_molecules(database), 0)
 
         sim_mols, cur_index = macro_mol._similar_lk_mols
-        new_lk = StructUnit2(sim_mols[cur_index][-1])
+        new_lk = lk_type(sim_mols[cur_index][-1])
+        
+        if len(og_lk.heavy_ids) != len(new_lk.heavy_ids):
+            print(('MUTATION ERROR: Replacement linker does not'
+                  ' have the same number of functional groups as the'
+                  ' original linker.\n\nOriginal linker:\n\n{}\n\n'
+                  'Replacement linker:\n\n{}\n\n').format(
+                                                 og_lk.prist_mol_file, 
+                                                 new_lk.prist_mol_file))
+            sys.exit()
+        
         macro_mol._similar_lk_mols = sim_mols, cur_index + 1
         
-        bb = next(x for x in macro_mol.building_blocks if 
-                                             isinstance(x, StructUnit3))
         return Cage((new_lk, bb), type(macro_mol.topology),
               os.path.join(os.getcwd(), self.name.format(self.n_calls)))
