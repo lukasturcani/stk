@@ -26,7 +26,7 @@ from collections import Counter
 import sys
 
 from ..population import Population
-from ..molecular import StructUnit3, StructUnit2, Cage, Polymer
+from ..molecular import StructUnit3, Cage
 from ..exception import MacroMolError
 from ...convenience_tools import plot_counter
 

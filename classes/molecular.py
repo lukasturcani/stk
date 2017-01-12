@@ -1636,6 +1636,13 @@ class StructUnit(Molecule, metaclass=Cached):
     PPS. The ``StructUnit`` class is itself cached via the ``Cached``
     metaclass.
     
+    Class attributes
+    ----------------
+    init_funcs : dict of str : function
+        This dictionary holds the various functions which can be used
+        to initialize rdkit molecules and pairs them with the 
+        appropriate file extension.
+    
     Attributes
     ----------
     prist_mol_file : str
@@ -1684,6 +1691,15 @@ class StructUnit(Molecule, metaclass=Cached):
         the molecule.
     
     """
+
+    init_funcs = {'.mol' : partial(chem.MolFromMolFile, 
+                                   sanitize=False, removeHs=False), 
+                  '.mol2' : partial(chem.MolFromMol2File, 
+                                 sanitize=False, removeHs=False),
+                  '.mae' : mol_from_mae_file,
+                  
+                  '.pdb' : partial(chem.MolFromPDBFile,
+                                 sanitize=False, removeHs=False)}
     
     def __init__(self, prist_mol_file, minimal=False):
         """
@@ -1712,25 +1728,15 @@ class StructUnit(Molecule, metaclass=Cached):
         # If ``HEAVY`` folder not created yet, make it.
         if not heavy_dir:        
             os.mkdir("HEAVY")
-        
-        # This dictionary maps file extensions to the initialization 
-        # functions.
-        init_funcs = {'.mol' : partial(chem.MolFromMolFile, 
-                                    sanitize=False, removeHs=False), 
-                   '.mol2' : partial(chem.MolFromMol2File, 
-                                     sanitize=False, removeHs=False),
-                    '.mae' : mol_from_mae_file,
-                    '.pdb' : partial(chem.MolFromPDBFile,
-                                     sanitize=False, removeHs=False)}
  
         self.prist_mol_file = prist_mol_file
         _, ext = os.path.splitext(prist_mol_file)
 
-        if ext not in init_funcs:
+        if ext not in self.init_funcs:
             raise TypeError(
             'Unable to initialize from "{}" files.'.format(ext))
                                      
-        self.prist_mol = init_funcs[ext](prist_mol_file)
+        self.prist_mol = self.init_funcs[ext](prist_mol_file)
         self.energy = Energy(self)
         self.optimized = False        
 
@@ -2142,23 +2148,24 @@ class StructUnit(Molecule, metaclass=Cached):
             .mol file of that molecule.
         
         """
+        
         # First get the fingerprint of `self`.
         chem.GetSSSR(self.prist_mol)
         self.prist_mol.UpdatePropertyCache(strict=False)
         fp = ac.GetMorganFingerprint(self.prist_mol, 4)
         
-        # For every .mol file in the database create an rdkit molecule.
-        # Place these in a list.
+        # For every structure file in the database create a rdkit 
+        # molecule. Place these in a list.
         mols = []
         for file in os.listdir(database):
             path = os.path.join(database, file)
-            # Ignore files which are not .mol and the .mol file of the
-            # molecule itself.
-            if not path.endswith('.mol') or path == self.prist_mol_file:
+            # Ignore files which are not structure files and the 
+            # structure file of the molecule itself.            
+            _, ext = os.path.splitext(path)
+            if ext not in self.init_funcs or path == self.prist_mol_file:
                 continue
-            mol = chem.MolFromMolFile(path, 
-                                      sanitize=False, 
-                                      removeHs=False)
+                                     
+            mol = self.init_funcs[ext](path)
             chem.GetSSSR(mol)
             mol.UpdatePropertyCache(strict=False)
             mol_fp = ac.GetMorganFingerprint(mol, 4)
