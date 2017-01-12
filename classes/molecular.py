@@ -2759,23 +2759,32 @@ class Cage(MacroMolecule):
         """
         
         while True:
-            bb_file = np.random.choice(os.listdir(bb_db))
-            if bb_file.endswith(".mol"):
+            try:
+                bb_file = np.random.choice(os.listdir(bb_db))
+                bb_file = os.path.join(bb_db, bb_file)
+                bb = StructUnit3(bb_file)
                 break
             
-        bb_file = os.path.join(bb_db, bb_file)
-        bb = StructUnit3(bb_file)
+            except TypeError:
+                continue
         
         while True:
-            lk_file = np.random.choice(os.listdir(lk_db))
-            if lk_file.endswith(".mol"):
+            try:
+                lk_file = np.random.choice(os.listdir(lk_db))
+                lk_file = os.path.join(lk_db, lk_file)
+                lk = StructUnit(lk_file)
+                
+                if len(lk.heavy_ids) >= 3:
+                    lk = StructUnit3(lk_file)
+                else:
+                    lk = StructUnit2(lk_file)
+                
                 break
             
-        lk_file = os.path.join(lk_db, lk_file)
-        lk = StructUnit2(lk_file)
+            except TypeError:
+                continue
         
         topology = np.random.choice(topologies)
-        
         return cls((bb, lk), topology, prist_mol_file)
 
 class Polymer(MacroMolecule):
