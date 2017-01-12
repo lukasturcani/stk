@@ -238,6 +238,11 @@ def compare():
     
     pop.plot.subpopulations('fitness_comparison.png')
 
+    for macro_mol in sorted(pop, reverse=True):
+        print(macro_mol.prist_mol_file)
+        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
+        print('\n')
+
     os.chdir(launch_dir)
     archive_output()
     
