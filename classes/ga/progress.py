@@ -1,4 +1,5 @@
 import numpy as np
+from operator import attrgetter
 
 from ..population import Population
 
@@ -30,4 +31,15 @@ class GAProgress:
             self.mins.append(min(x.fitness for x in pop))
         
 
+    def normalize(self, norm_func):
+        norm_func(self.pops)
         
+        self.gens = []
+        self.mins = []
+        self.means = []
+        self.maxs = []
+        for i, gen in enumerate(self.pops.populations, 1):
+            self.gens.append(i)
+            self.mins.append(min(gen, key=attrgetter('fitness')).fitness)
+            self.means.append(gen.mean(attrgetter('fitness')))
+            self.maxs.append(max(gen, key=attrgetter('fitness')).fitness)
