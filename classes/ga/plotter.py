@@ -19,8 +19,8 @@ class Plotter:
     
     """
 
-    def __init__(self, pop):
-        self.pop = pop
+    def __init__(self, progress):
+        self.progress = progress
     
     def epp(self, plot_name):
 
@@ -38,7 +38,7 @@ class Plotter:
             plt.plot(progress.gens, progress.maxs, color='red', label='max')
             
             lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            fig.savefig(new_plot_name, dpi=1000,
+            fig.savefig(plot_name, dpi=1000,
                         bbox_extra_artists=(lgd,), bbox_inches='tight')
             plt.close('all')
             
@@ -77,11 +77,8 @@ class Plotter:
         
         """
         
-        Population = type(self.pop)
-        p = Population(self.pop.ga_tools)
-        for gen in self.pop.ga_tools.progress.past_pops:
-            p.add_subpopulation(Population.load(gen))
         
+        p = self.pop.ga_tools.progress.past_pops
         p.normalize_fitness_values()
         
         gens = []

@@ -90,10 +90,9 @@ def run():
 
     # Save the min, max and mean values of the population.  
     with time_it():
-        dump_path = os.path.join(os.getcwd(), 'pop_dump')
-        pop.dump(dump_path)
+        pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         print_info('Recording progress.')
-        pop.progress_update(dump_path)   
+        pop.progress_update()   
             
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):        
@@ -160,13 +159,12 @@ def run():
             os.mkdir('selected')
             os.chdir('selected')
             pop.write(os.getcwd())
-            dump_path = os.path.join(os.getcwd(), 'pop_dump')
-            pop.dump(dump_path)
+            pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         
         # Save the min, max and mean values of the population.  
         with time_it():
             print_info('Recording progress.')
-            pop.progress_update(dump_path)        
+            pop.progress_update()        
         
     # Running MacroModel optimizations sometimes leaves applications 
     # open. This closes them. If this is not done, directories may not 
@@ -210,7 +208,7 @@ def compare():
     # Create the encapsulating population.
     pop = Population()
     # Load the fitness and normalization functions into the population.
-    pop.ga_tools.ga_input = inp
+    pop.ga_tools.input = inp
     pop.ga_tools.fitness = inp.fitness_func
     pop.ga_tools.normalization = (
                             Normalization(inp.normalization_func) if 
