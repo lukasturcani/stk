@@ -206,6 +206,65 @@ class Selection:
         return pop
 
     @staticmethod
+    def _carrot_and_stick_elites(population, n, norm_func):
+        """
+        Returns `n` fittest members for each carrot and stick parameter.
+        
+        Fitness functions which are to be used with the 
+        "carrots_and_sticks()" place a tuple into the `unscaled_fitness`
+        attribute of population members. The first element of the tuple
+        holds parameters which should be increased and the second 
+        element of the tuple holds elements which should be decreased.
+        
+        If a member is in the top `n` values for a given parameter, it
+        will be returned by this function.
+        
+        Parameters
+        ----------
+        population : Population
+            The population whose members are being selected.
+            
+        n : int
+            The number of members which should be returned for each
+            parameter.
+            
+        norm_func : FunctionData
+            The "carrots_and_sticks()" normalization function.
+            
+        Returns
+        -------
+        list
+            A list holding macromolecules which are in the `n` best 
+            members for a given `unscaled_fitness` carrot or stick 
+            parameter.
+        
+        """
+        
+        pop = [x for x in population if 
+                                isinstance(x.unscaled_fitness, tuple)]        
+        
+        # To get the number of carrot and stick parameters looks at the
+        # normalization function defined in the input file.
+        n_carrots = len(norm_func.params['carrot_coeffs'])
+        n_sticks = len(norm_func.params['stick_coeffs'])
+        
+        elites = []
+        # For each carrot parameter get the `n` fittest members and add
+        # them to `elites`.
+        for i in range(n_carrots):
+            elites.extend(sorted(pop, 
+                          key=lambda x : x.unscaled_fitness[0][i],
+                          reverse=True)[:n])
+                          
+        # For each stick parameter get the `n` fittest members and add
+        # them to `elites`.                          
+        for i in range(n_sticks):
+            elites.extend(sorted(pop, 
+                          key=lambda x : x.unscaled_fitness[1][i])[:n])
+
+        return elites
+
+    @staticmethod
     def fittest(population):        
         """
         Yields members of the population, fittest first.
@@ -231,7 +290,8 @@ class Selection:
     
     @classmethod    
     def roulette(cls, population, elitism=False, 
-                 truncation=False, duplicates=False):
+                 truncation=False, duplicates=False,
+                 carrot_and_stick_elitism=False):
         """
         Yields individuals using roulette selection.
         
@@ -271,6 +331,14 @@ class Selection:
             selected individual cannot be selected again. This option is
             suitable for generational selecitons.
             
+        carrot_and_stick_elitism : bool (default = False) or int
+            This option should only be used when the 
+            ``carrots_and_sticks()`` normalization function is being 
+            used. This option works just like elitism but instead of
+            considering the overall fitness, each carrot and stick 
+            parameter is considered individually. The elites for each 
+            parameter are then guaranteed to be yieled.
+            
         Yields
         ------
         MacroMolecule
@@ -297,6 +365,16 @@ class Selection:
                 if not duplicates:
                     pop.remove(ind)
 
+        if carrot_and_stick_elitism:
+            norm_func = population.ga_tools.ga_input.normalization_func
+            cs_elites = cls._carrot_and_stick_elites(
+                               pop, carrot_and_stick_elitism, norm_func)
+            elite_pop.extend(cs_elites)
+            for ind in cs_elites:
+                yield ind
+                if not duplicates and ind in pop:
+                    pop.remove(ind)
+
         total_fitness = sum(ind.fitness for ind in pop if 
                                isinstance(ind.fitness, (int,float)))
                               
@@ -318,7 +396,8 @@ class Selection:
 
     @classmethod
     def deterministic_sampling(cls, population, elitism=False, 
-                               truncation=False, duplicates=False):
+                               truncation=False, duplicates=False,
+                               carrot_and_stick_elitism=False):
         """
         Yields individuals using deterministic sampling.
 
@@ -367,6 +446,14 @@ class Selection:
             appropriate when selecting for mutation. If ``False`` a
             selected individual cannot be selected again. This option is
             suitable for generational selecitons.
+
+        carrot_and_stick_elitism : bool (default = False) or int
+            This option should only be used when the 
+            ``carrots_and_sticks()`` normalization function is being 
+            used. This option works just like elitism but instead of
+            considering the overall fitness, each carrot and stick 
+            parameter is considered individually. The elites for each 
+            parameter are then guaranteed to be yieled.
             
         Yields
         ------
@@ -388,6 +475,16 @@ class Selection:
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
+                    pop.remove(ind)
+
+        if carrot_and_stick_elitism:
+            norm_func = population.ga_tools.ga_input.normalization_func
+            cs_elites = cls._carrot_and_stick_elites(
+                               pop, carrot_and_stick_elitism, norm_func)
+            elite_pop.extend(cs_elites)
+            for ind in cs_elites:
+                yield ind
+                if not duplicates and ind in pop:
                     pop.remove(ind)
 
         mean_fitness = population.mean(lambda x : x.fitness)
@@ -418,7 +515,8 @@ class Selection:
     @classmethod
     def stochastic_sampling(cls, population, elitism=False, 
                             truncation=False, duplicates=False,
-                            use_rank=False):
+                            use_rank=False,
+                            carrot_and_stick_elitism=False):
         """
         Yields individuals via stochastic sampling.
         
@@ -475,6 +573,14 @@ class Selection:
                 
                 f = 1/rank.                
             
+        carrot_and_stick_elitism : bool (default = False) or int
+            This option should only be used when the 
+            ``carrots_and_sticks()`` normalization function is being 
+            used. This option works just like elitism but instead of
+            considering the overall fitness, each carrot and stick 
+            parameter is considered individually. The elites for each 
+            parameter are then guaranteed to be yieled.            
+            
         Yields
         ------
         MacroMolecule
@@ -501,6 +607,16 @@ class Selection:
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
+                    pop.remove(ind)
+
+        if carrot_and_stick_elitism:
+            norm_func = population.ga_tools.ga_input.normalization_func
+            cs_elites = cls._carrot_and_stick_elites(
+                               pop, carrot_and_stick_elitism, norm_func)
+            elite_pop.extend(cs_elites)
+            for ind in cs_elites:
+                yield ind
+                if not duplicates and ind in pop:
                     pop.remove(ind)
 
         if use_rank:

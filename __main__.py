@@ -84,13 +84,19 @@ def run():
             pop.normalize_fitness_values()
 
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+        print(macro_mol.prist_mol_file)
+        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
+        print('\n')
+
+    # Save the min, max and mean values of the population.  
+    with time_it():
+        dump_path = os.path.join(os.getcwd(), 'pop_dump')
+        pop.dump(dump_path)
+        print_info('Recording progress.')
+        pop.progress_update(dump_path)   
             
     # Run the GA.
-    for x in range(1, ga_input.num_generations+1):
-        # Save the min, max and mean values of the population.    
-        pop.progress_update()
-        
+    for x in range(1, ga_input.num_generations+1):        
         # Check that the population has the correct size.
         if len(pop) != ga_input.pop_size:
             raise PopulationSizeError('Population has the wrong size.')
@@ -138,7 +144,9 @@ def run():
                 pop.normalize_fitness_values()
                 
         for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.fitness, '-', macro_mol.prist_mol_file)
+            print(macro_mol.prist_mol_file)
+            print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
+            print('\n')
     
         with time_it():        
             print_info('Selecting members of the next generation.')
@@ -147,20 +155,25 @@ def run():
         # Create a folder within a generational folder for the the 
         # ``.mol``files corresponding to molecules selected for the next
         # generation. Place the ``.mol`` files into that folder.
-        print_info('Placing selected memebers in `selected` directory.')
+        print_info('Placing selected members in `selected` directory.')
         with time_it():
             os.mkdir('selected')
             os.chdir('selected')
             pop.write(os.getcwd())
-            pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
+            dump_path = os.path.join(os.getcwd(), 'pop_dump')
+            pop.dump(dump_path)
+        
+        # Save the min, max and mean values of the population.  
+        with time_it():
+            print_info('Recording progress.')
+            pop.progress_update(dump_path)        
         
     # Running MacroModel optimizations sometimes leaves applications 
     # open. This closes them. If this is not done, directories may not 
     # be possible to move.     
     kill_macromodel()
     
-    # Update a final time and plot the results of the GA run.
-    pop.progress_update()
+    # Plot the results of the GA run.
     pop.plot.epp(os.path.join(root_dir, 'epp.png'))
     
     # Move the ``output`` folder into the ``old_output`` folder.
@@ -233,6 +246,11 @@ def compare():
         pop.plot.progress_params('param_comparison.png')
     
     pop.plot.subpopulations('fitness_comparison.png')
+
+    for macro_mol in sorted(pop, reverse=True):
+        print(macro_mol.prist_mol_file)
+        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
+        print('\n')
 
     os.chdir(launch_dir)
     archive_output()
