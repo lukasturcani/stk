@@ -251,17 +251,16 @@ class Selection:
         elites = []
         # For each carrot parameter get the `n` fittest members and add
         # them to `elites`.
-        for x in range(n_carrots):
+        for i in range(n_carrots):
             elites.extend(sorted(pop, 
-                          key=lambda x : x.unscaled_fitness[0][x],
+                          key=lambda x : x.unscaled_fitness[0][i],
                           reverse=True)[:n])
                           
         # For each stick parameter get the `n` fittest members and add
         # them to `elites`.                          
-        for x in range(n_sticks):
+        for i in range(n_sticks):
             elites.extend(sorted(pop, 
-                          key=lambda x : x.unscaled_fitness[1][x],
-                          reverse=True)[:n])
+                          key=lambda x : x.unscaled_fitness[1][i])[:n])
 
         return elites
 
@@ -373,7 +372,7 @@ class Selection:
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
                 yield ind
-                if not duplicates:
+                if not duplicates and ind in pop:
                     pop.remove(ind)
 
         total_fitness = sum(ind.fitness for ind in pop if 
@@ -485,7 +484,7 @@ class Selection:
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
                 yield ind
-                if not duplicates:
+                if not duplicates and ind in pop:
                     pop.remove(ind)
 
         mean_fitness = population.mean(lambda x : x.fitness)
@@ -617,7 +616,7 @@ class Selection:
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
                 yield ind
-                if not duplicates:
+                if not duplicates and ind in pop:
                     pop.remove(ind)
 
         if use_rank:
