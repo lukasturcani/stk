@@ -22,10 +22,7 @@ class Plotter:
     def __init__(self, progress):
         self.progress = progress
     
-    def epp(self, plot_name):
-
-        progress = self.pop.ga_tools.progress        
-        
+    def epp(self, plot_name, norm_func=None):
         if (isinstance(progress.maxs[0], float) or 
                               isinstance(progress.maxs[0], int)):
             fig = plt.figure()
