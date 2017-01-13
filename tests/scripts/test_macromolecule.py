@@ -89,44 +89,9 @@ def test_energy():
     delattr(mol, 'energy')
     assert mol.energy == -1876.4573  
 
-def test_graph():
-    """
-    Tests the output of the `graph` method.    
-    
-    """
-    # Test the pristine version first.
-    graph = mol.graph('prist')
-    expected_nodes = 236
-    expected_edges = 256
-    assert len(graph.nodes()) == expected_nodes
-    assert len(graph.edges()) == expected_edges
 
-    
-    # Test the heavy version second.
-    graph = mol.graph('heavy')
-    expected_nodes = 224
-    expected_edges = 244
 
-    assert len(graph.nodes()) == expected_nodes
-    assert len(graph.edges()) == expected_edges
 
-def test_atom_symbol():
-    """
-    Tests the `atom_symbol` method.
-    
-    """
-    
-    # First test when `mol_type` == 'prist'.
-    for atom in mol.prist_mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        atom_sym = periodic_table[atom.GetAtomicNum()]
-        assert atom_sym == mol.atom_symbol('prist', atom_id)
-    
-    # Test when `mol_typ` == 'heavy'.
-    for atom in mol.heavy_mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        atom_sym = periodic_table[atom.GetAtomicNum()]
-        assert atom_sym == mol.atom_symbol('heavy', atom_id)
         
 def test_atom_coords_prist():
     """
@@ -187,117 +152,9 @@ def test_all_atom_coords_heavy():
         
         assert atom_id == atom.GetIdx()
         conf_coord = np.array(conf.GetAtomPosition(atom_id))
-        assert np.allclose(coord, conf_coord, atol=1e-8)            
-
-def test_atom_distance_prist():
-    """
-    Test `atom_distance` when mol_type == 'prist'.
-    
-    """
-
-    # This test takes too long if all distances are checked. Randomly 
-    # sample 10 instead.  
-    
-    # Go through all combinations of atoms in the molecule. Calculate
-    # the distance and compare it the distance calculated by the method.
-    conf = mol.prist_mol.GetConformer()
-    for atom1, atom2 in it.combinations(
-                          np.random.choice(
-                                mol.prist_mol.GetAtoms(),size=10), 2):
-        atom1_id = atom1.GetIdx()
-        atom2_id = atom2.GetIdx()
-        assert (mol.atom_distance('prist', 
-                                          atom1_id, atom2_id) ==
-               euclidean(conf.GetAtomPosition(atom1_id), 
-                         conf.GetAtomPosition(atom2_id))) 
-        
-def test_atom_distance_heavy():
-    """
-    Test `atom_distance` when mol_type == 'heavy'.
-    
-    """
-
-    # This test takes too long if all distances are checked. Randomly 
-    # sample 10 instead. 
-    
-    # Go through all combinations of atoms in the molecule. Calculate
-    # the distance and compare it the distance calculated by the method.
-    conf = mol.heavy_mol.GetConformer()
-    for atom1, atom2 in it.combinations(
-                          np.random.choice(
-                              mol.heavy_mol.GetAtoms(), size=10), 2):
-        atom1_id = atom1.GetIdx()
-        atom2_id = atom2.GetIdx()
-        assert (mol.atom_distance('heavy', 
-                                          atom1_id, atom2_id) ==
-               euclidean(conf.GetAtomPosition(atom1_id), 
-                         conf.GetAtomPosition(atom2_id)))   
+        assert np.allclose(coord, conf_coord, atol=1e-8)  
    
-def test_all_heavy_atom_distances():
-    """
-    Tests `all_heavy_atom_distances`.
-    
-    """
 
-    # Check that the correct number of distances is found.
-    assert sum(1 for _ in mol.all_heavy_atom_distances()) == 276
-
-def test_centroid_functions_prist():
-    """
-    Tests functions related to centroid manipulation of prist molecule.
-    
-    Functions tested:
-        > centroid
-        > set_position
-    
-    """
-        
-    # Get the centroid.
-    prist_centroid = mol.centroid('prist')
-    # Get the heavy centroid to make sure its not changed in this test.    
-    heavy_centroid = mol.centroid('heavy')
-    # Position the centroid.
-    new_pos = np.array([25,15,10])
-    mol.set_position('prist', new_pos)
-    # Check that the centroid is at the desired position and that it's
-    # different to the original position.
-    assert not np.allclose(prist_centroid, 
-                           mol.centroid('prist'), atol=1e-8)
-    assert np.allclose(new_pos, mol.centroid('prist'), 
-                       atol = 1e-8)
-
-    # Check that the heavy centroid is unmoved.
-    assert np.array_equal(heavy_centroid, mol.centroid('heavy'))
-    assert not np.allclose(new_pos, mol.centroid('heavy'), 
-                       atol = 1e-8)
-
-def test_centroid_functions_heavy():
-    """
-    Tests functions related to centroid manipulation of heavy molecule.
-    
-    Functions tested:
-        > centroid
-        > set_position
-    
-    """
-        
-    # Get the centroid.
-    heavy_centroid = mol.centroid('heavy')
-    # Get the prist centroid to make sure its not changed in this test.    
-    prist_centroid = mol.centroid('prist')
-    # Position the centroid.
-    new_pos = np.array([10.,15.,25.])
-    mol.set_position('heavy', new_pos)
-    # Check that the centroid is at the desired position and that it's
-    # different to the original position.
-    assert not np.allclose(heavy_centroid, 
-                           mol.centroid('heavy'), atol=1e-8)
-    assert np.allclose(new_pos, mol.centroid('heavy'), 
-                       atol = 1e-8)
-
-    # Check that the prist centroid is unmoved.
-    assert np.allclose(prist_centroid, mol.centroid('prist'), atol=1e-8)
-    assert not np.allclose(new_pos, mol.centroid('prist'), atol = 1e-8) 
 
 def test_center_of_mass():
     """
