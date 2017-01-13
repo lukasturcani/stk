@@ -1,3 +1,8 @@
+"""
+This module defines general-purpose objects, functions and classes.
+
+"""
+
 import rdkit.Chem as chem
 import rdkit
 from rdkit.Geometry import Point3D
@@ -10,11 +15,9 @@ import gzip
 import re
 from collections import deque
 import shutil
-from collections import namedtuple
 import tarfile
 
 # This dictionary gives easy access to the rdkit bond types.
-
 bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
              'am' : rdkit.Chem.rdchem.BondType.SINGLE,
              '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
@@ -50,10 +53,10 @@ def archive_output():
 
 def tar_output():
     """
-    Places all the content in the `outout` into a .gz file.
+    Places all the content in the `output` folder into a .tgz file.
 
     This function also deletes all the folders in the `output` folder
-    expect the one holding the final generation.
+    except the one holding the final generation.
 
     Returns
     -------
@@ -68,12 +71,16 @@ def tar_output():
     with tarfile.open(tname, 'w:gz') as tar:
         tar.add('output')
     
+    # Get a list of all the folders in the ``output`` directory.
     folders = [x for x in os.listdir('output') if 
                 os.path.isdir(os.path.join('output', x))]
 
+    # Get name of the folder of the last generation. Ie the one which 
+    # is the largest number.
     max_folder = max((x for x in folders if x != 'initial'), 
                      key=lambda x : int(x))    
 
+    # Delete all folders except the last.
     for folder in folders:
         if folder != max_folder:
             shutil.rmtree(os.path.join('output', folder))
@@ -505,6 +512,28 @@ def del_charged_mols(database):
             os.remove(full_path)
 
 def dedupe(iterable, seen=None):
+    """
+    Yields items from `iterable` barring duplicates.
+
+    If `seen` is provided it contains elements which are not to be 
+    yielded at all.
+
+    Parameters
+    ----------
+    iterable : iterable
+        An iterable of elements which are to be yielded, only once.
+        
+    seen : set (default = None)
+        Holds items which are not to be yielded.
+        
+    Yields
+    ------
+    object 
+        Element in `iterable` which is not in `seen` and has not been
+        yielded before.
+    
+    """
+    
     if seen is None:
         seen = set()        
     for x in iterable:
@@ -513,6 +542,41 @@ def dedupe(iterable, seen=None):
             yield x
             
 def flatten(iterable, excluded_types={str}):
+    """
+    Transforms an nested iterable into a flat one.
+    
+    For example
+        
+        [[1,2,3], [[4], [5],[[6]], 7]
+        
+    becomes
+    
+        [1,2,3,4,5,6,7]
+        
+    If a type is found in `excluded_types` it will not be yielded from.
+    For example if `str` is in `excluded_types`
+    
+        a = ["abcd", ["efgh"]]
+        
+    "abcd" and "efgh" are yielded if `a` is passed to `iterable`. If
+    `str` was not in `excluded_types` then "a", "b", "c", "d", "e", "f",
+    "g" and "h" would all be yielded individually.
+        
+    Parameters
+    ----------
+    iterable : iterable
+        The iterable which is to be flattened
+    
+    excluded_types : set
+        Holds container types which are not be flattened.
+        
+    Yields
+    ------
+    object
+        A nested element of `iterable`.
+    
+    """
+    
     for x in iterable:
         if hasattr(x, '__iter__') and type(x) not in excluded_types:          
             yield from flatten(x)
@@ -521,14 +585,28 @@ def flatten(iterable, excluded_types={str}):
 
 @contextmanager
 def time_it():
+    """
+    Times the code executed within the indent.
+
+    This is a context manager so it should be used as:
+
+        with time_it():
+            something1()
+            something2()
+            something3()
+            
+    After all 3 functions are finished and the nested block is exited
+    the time taken to process the entire block is printed.
+    
+    """
+    
     start = time.time()  
     yield
     time_taken = time.time() - start
     m,s = divmod(time_taken, 60)
     h,m = divmod(m, 60)
-    print('\nTime taken was {0} : {1} : {2}.\n\n'.format(
+    print('\nTime taken was {} : {} : {}.\n\n'.format(
                                                     int(h), int(m), s))
-
 
 class LazyAttr:
     """
@@ -549,14 +627,43 @@ class LazyAttr:
 class MAEExtractor:
     """
     Extracts the lowest energy conformer from a .maegz file.
+    
+    Macromodel conformer searches produce -out.maegz files containing 
+    all of the conformers found during the search and their energies
+    and other data.
+
+    Initializing this class with a MacroMolecule finds that 
+    MacroMolecules -out.maegz file and converts it to a .mae file. It
+    then creates and additional .mae file holding only the lowest
+    energy conformer found.
 
     Attributes
     ----------
     macro_mol : MacroMolecule 
+        The macromolecule which needs to have its conformer extracted
+        from the .mae file.
+        
+    maegz_path : str
+        The path to the `-out.maegz` file generated by the macromodel 
+        conformer search.
+        
+    mae_path : str
+        The path to the .mae file holding the conformers generated by
+        the macromodel conformer search.        
+        
+    content : str
+        The content of the .mae file hodling all the conformers from the
+        macromodel conformer search. This holds other data such as 
+        their energies too.
+
+    path : str
+        The full path of the .mae file holding the extracted lowest
+        energy conformer.            
             
     """
     
     def __init__(self, macro_mol):
+        
         self.maegz_path = macro_mol.prist_mol_file.replace('.mol', 
                                                            "-out.maegz")
         self.macro_mol = macro_mol
@@ -564,35 +671,67 @@ class MAEExtractor:
         self.extract_conformer()
 
     def extract_conformer(self):
+        """
+        Creates a .mae file holding the lowest energy conformer.
+        
+        """
+        
         print("Extracting conformer - {}.".format(
                                         self.macro_mol.prist_mol_file))        
                 
-        
+        # Get the id of the lowest energy conformer.
         num = self.lowest_energy_conformer()        
         
+        # Get the structure block corresponding to the lowest energy
+        # conformer.
         content = self.content.split("f_m_ct")
         new_mae = "f_m_ct".join([content[0], content[num]])
-        new_name = self.mae_path.replace('.mae', '_EXTRACTED_{}.mae'.format(num))
+        
+        # Write the structure block in its own .mae file, named after
+        # conformer extracted.
+        new_name = self.mae_path.replace('.mae', 
+                                        '_EXTRACTED_{}.mae'.format(num))
         with open(new_name, 'w') as mae_file:
             mae_file.write(new_mae)
+        
+        # Save the path of the newly created file.
         self.path = new_name
             
     def extract_energy(self, block):
+        """
+        Extracts the energy value from a .mae energy data block.
+        
+        """
+        
         block = block.split(":::")
-        for name, value in zip(block[0].split('\n'), block[1].split('\n')):
+        for name, value in zip(block[0].split('\n'), 
+                               block[1].split('\n')):
             if 'r_mmod_Potential_Energy' in name:
                 return float(value)            
         
     def lowest_energy_conformer(self):
+        """
+        Returns the id of the lowest energy conformer in the .mae file.        
+        
+        """
+        
+        # Open the .mae file holding all the conformers and load its
+        # content.
         with open(self.mae_path, 'r') as mae_file:
             self.content = mae_file.read()
-            self.content_split = re.split(r"[{}]", self.content)
+            # Split the content across curly braces. This divides the
+            # various sections of the .mae file.
+            content_split = re.split(r"[{}]", self.content)
 
+
+        # Go through all the datablocks in the the .mae file. For each
+        # energy block extract the energy and store it in the `energies`
+        # list. Store the `index`  (conformer id) along with each 
+        # extracted energy.
         energies = []
-
         prev_block = deque([""], maxlen=1)
         index = 1        
-        for block in self.content_split:
+        for block in content_split:
             if ("f_m_ct" in prev_block[0] and
                                 "r_mmod_Potential_Energy" in block):              
                 energy = self.extract_energy(block)
@@ -600,144 +739,21 @@ class MAEExtractor:
                 index += 1
                 
             prev_block.append(block)
+        
+        # Return the id of the lowst energy conformer.
         return min(energies)[1]
   
     def maegz_to_mae(self):
+        """
+        Converts the .maegz file to a .mae file.
+        
+        """
+        
         self.mae_path = self.maegz_path.replace('.maegz', '.mae')            
         with gzip.open(self.maegz_path, 'r') as maegz_file:
             with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())       
-                
-class FGInfo:
-    """
-    Contains key information for functional group substitutions.
-    
-    The point of this class is to register which atom is substituted
-    for which, when an atom in a functional group is substituted with a 
-    heavy metal atom. If MMEA is to incorporate a new functional group, 
-    a new ``FGInfo`` instance should be added to the 
-    `functional_group_list` class attribute of ``FGInfo``. 
-    
-    Adding a new ``FGInfo`` instace to `functional_group_list` will 
-    allow the `Topology.join_mols` method to connect this functional 
-    group to (all) others during assembly. Nothing except adding this
-    instance should need to be done in order to incorporate new 
-    functional groups.
-    
-    If this new functional group is to connect to another functional 
-    group with a double bond during assembly, the symbols of the heavy 
-    atoms of both functional groups should be added to the 
-    `double_bond_combs` class attribute. The order in which the heavy 
-    symbols are placed in the tuple does not matter. Again, this is all
-    that needs to be done for MMEA to create double bonds between
-    certain functional groups.  
-    
-    Class attributes
-    ----------------
-    functional_groups_list : list of FGInfo instances
-        This list holds all ``FGInfo`` instances used by MMEA. If a new
-        functional group is to be used by MMEA, a new ``FGInfo`` 
-        instance must be added to this list.
-        
-    double_bond_combs : list of tuples of strings
-        When assembly is carried out, if the heavy atoms being joined
-        form a tuple in this list, they will be joined with a double
-        rather than single bond. If a single bond is desired there is no
-        need to change this variable.
-        
-    heavy_symbols : set of str
-        A set of all the heavy symbols used by ``FGInfo`` instances in 
-        MMEA. This set updates itself automatically. There is no need to
-        modify it when changes are made to any part of MMEA.
-        
-    heavy_atomic_nums : set of ints
-        A set of all atomic numbers of heavy atoms used by ``FGInfo``
-        instances in MMEA. This set updates itself automatically. There
-        is no need to modify it when chagnes are made to any part of
-        MMEA.
 
-    Attributes
-    ----------
-    name : str
-        The name of the functional group.
-    
-    smarts_start : str
-        A ``SMARTS`` string describing the functional group before 
-        substitution by a heavy atom.
-        
-    del_tags : list of DelAtom instances
-        Every member of this list represents an atom on the functional
-        group which should be deleted during assembly. One atom in each
-        functional group is removed for each list member.
-    
-    target_atomic_num : int
-        The atomic number of the atom being substituted by a heavy atom.
-    
-    heavy_atomic_num : int
-        The atomic number of the heavy atom which replaces the target 
-        atom.
-    
-    target_symbol : str
-        The atomic symbol of the atom, being substituted by a heavy 
-        atom.       
-    
-    heavy_symbol : str
-        The atomic symbol of the heavy atom which replaces the target 
-        atom.
-    
-    """
-    
-    __slots__ = ['name', 'smarts_start', 'del_tags', 
-                 'target_atomic_num', 'heavy_atomic_num', 
-                 'target_symbol', 'heavy_symbol'] 
-    
-    def __init__(self, name, smarts_start, del_tags, target_atomic_num, 
-                 heavy_atomic_num, target_symbol, heavy_symbol):
-         self.name = name
-         self.smarts_start = smarts_start
-         self.del_tags = del_tags
-         self.target_atomic_num = target_atomic_num
-         self.heavy_atomic_num = heavy_atomic_num
-         self.target_symbol = target_symbol
-         self.heavy_symbol = heavy_symbol
-
-# An atom is deleted based on what type of bond connects it to the
-# substituted functional group atom. The element of the atom is ofcourse
-# a factor as well. When both of these are satisfied the atom is
-# removed. The ``DelAtom`` class conveniently stores this information.
-# Bond type is an rdkit bond type (see the bond dictionary above for
-# the two possible values it may take) and atomic num in an integer.
-DelAtom = namedtuple('DelAtom', ['bond_type', 'atomic_num'])
-
-FGInfo.functional_group_list = [
-                        
-    FGInfo("aldehyde", "C(=O)[H]", [ DelAtom(bond_dict['2'], 8) ], 
-                                                       6, 39, "C", "Y"), 
-    
-    FGInfo("carboxylic_acid", "C(=O)O[H]", 
-           [ DelAtom(bond_dict['1'], 8) ], 6, 40, "C", "Zr"),
-    
-    FGInfo("amide", "C(=O)N([H])[H]", [ DelAtom(bond_dict['1'], 7) ], 
-                                                      6, 41, "C", "Nb"),
-    
-    FGInfo("thioacid", "C(=O)S[H]", [ DelAtom(bond_dict['1'], 16) ], 
-                                                      6, 42, "C", "Mo"),
-    
-    FGInfo("alcohol", "O[H]", [], 8, 43, "O", "Tc"),
-    FGInfo("thiol", "[S][H]", [], 16, 44, "S", "Ru"),
-    FGInfo("amine", "[N]([H])[H]", [], 7, 45, "N", "Rh"),       
-    FGInfo("nitroso", "N=O", [], 7, 46, "N", "Pd"),
-    FGInfo("boronic_acid", "[B](O[H])O[H]", [], 5, 47, "B", "Ag")
-                             
-                             ]
-
-FGInfo.double_bond_combs = [("Rh","Y"), ("Nb","Y"), ("Mb","Rh")]
-
-FGInfo.heavy_symbols = {x.heavy_symbol for x 
-                                        in FGInfo.functional_group_list}
-                        
-FGInfo.heavy_atomic_nums = {x.heavy_atomic_num for x 
-                                        in FGInfo.functional_group_list}
 def kill_macromodel():
     """
     Kills any applications left open as a result running MacroModel.    
@@ -758,6 +774,7 @@ def kill_macromodel():
                stdout=sp.PIPE, stderr=sp.PIPE)
         sp.run(["Taskkill", "/IM", "jservergo.exe", "/F"],
                stdout=sp.PIPE, stderr=sp.PIPE)
+               
     if os.name == 'posix':
         sp.run(["pkill", "jservergo"],
                stdout=sp.PIPE, stderr=sp.PIPE)
