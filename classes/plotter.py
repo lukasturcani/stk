@@ -80,7 +80,7 @@ class Plotter:
         Population = type(self.pop)
         p = Population(self.pop.ga_tools)
         for gen in self.pop.ga_tools.progress.past_pops:
-            p.add_subpopulation(gen)
+            p.add_subpopulation(Population.load(gen))
         
         p.normalize_fitness_values()
         
