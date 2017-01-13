@@ -200,39 +200,30 @@ class Crossover:
         # Place each new cage into a ``Population`` instance and return
         # that.
         
-        # The build_block here refers to any building block, be it a
-        # building-block* or linker. The first building block of the 
-        # first cage is taken initially. This may be a linker or 
-        # building-block*.
-        build_block1 = macro_mol1.building_blocks[0]
-        # The counterpart to this ``build_block1`` is the 
-        # ``StructUnit3`` or ``StructUnit2`` instance of the other cage 
-        # which can be used together with ``build_block1`` to make a new 
-        # cage. For example, if ``build_block1`` is a ``StructUnit3`` 
-        # instance then its counter part is the ``StructUnit2`` instance 
-        # in `macro_mol2`. The generator below returns the building 
-        # block instance from ``macro_mol2`` which is not the same type 
-        # as ``build_block1``. This means that a ``StructUnit3`` is 
-        # paired up with a ``StructUnit2`` and vice versa.
-        counterpart1 = next(x for x in macro_mol2.building_blocks if 
-                            type(build_block1) != type(x))
-        # Same as above but for the other building block.
-        build_block2 = macro_mol1.building_blocks[1]
-        counterpart2 = next(x for x in macro_mol2.building_blocks if 
-                            type(build_block2) != type(x))
+        _, c1_lk = max(zip(macro_mol1.topology.bb_counter.values(),
+                        macro_mol1.topology.bb_counter.keys()))
+        _, c1_bb = min(zip(macro_mol1.topology.bb_counter.values(),
+                        macro_mol1.topology.bb_counter.keys()))
+        
+        _, c2_lk = max(zip(macro_mol2.topology.bb_counter.values(),
+                        macro_mol1.topology.bb_counter.keys()))
+        _, c2_bb = min(zip(macro_mol2.topology.bb_counter.values(),
+                        macro_mol1.topology.bb_counter.keys()))
+        
         # Get all the topologies. A set automatically removes 
         # duplicates.
-        topologies = {type(x.topology) for x in (macro_mol1, macro_mol2)}
+        topologies = {type(x.topology) for x in 
+                                              (macro_mol1, macro_mol2)}
 
         offspring_pop = Population()
         # For each topology create a new pair of offspring using the
         # building block pairings determined earlier.
         for index, topology in enumerate(topologies):
-            offspring1 = Cage((build_block1, counterpart1), topology, 
+            offspring1 = Cage((c1_lk, c2_bb), topology, 
                               os.path.join(os.getcwd(),
                               self.name.format(self.n_calls, index, 1)))
                               
-            offspring2 = Cage((build_block2, counterpart2), topology,
+            offspring2 = Cage((c2_lk, c1_bb), topology,
                               os.path.join(os.getcwd(),
                               self.name.format(self.n_calls, index, 2)))
             offspring_pop.add_members((offspring1, offspring2))

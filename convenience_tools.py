@@ -74,7 +74,8 @@ def tar_output():
     s = "Compressing output."
     print("\n\n"+s+"\n"+"-"*len(s)+"\n\n")
     
-    with tarfile.open(os.path.join('output','output.gz'), 'w:gz') as tar:
+    tname = os.path.join('output','output.tgz')
+    with tarfile.open(tname, 'w:gz') as tar:
         tar.add('output')
     
     folders = [x for x in os.listdir('output') if 
