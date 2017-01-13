@@ -129,102 +129,8 @@ def test_find_functional_group_atoms():
     func_grp_atoms = struct_unit.find_functional_group_atoms()
 
     assert func_grp_atoms == expected
-
-def test_atom_coords_prist():
-    """
-    Tests `atom_coords` when mol_type == 'prist'.
-    
-    """
-    
-    conf = struct_unit.prist_mol.GetConformer()    
-    
-    for atom in struct_unit.prist_mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        coords = struct_unit.atom_coords('prist', atom_id)
-        conf_coords = conf.GetAtomPosition(atom_id)
-        assert np.allclose(coords, conf_coords, atol=1e-8)
-    
-def test_atom_coords_heavy():
-    """
-    Test `atom_coords` when mol_type == 'heavy'.
-    
-    """
-    
-    conf = struct_unit.heavy_mol.GetConformer()    
-    
-    for atom in struct_unit.heavy_mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        coords = struct_unit.atom_coords('heavy', atom_id)
-        conf_coords = conf.GetAtomPosition(atom_id)
-        assert np.allclose(coords, conf_coords, atol=1e-8)   
-
-def test_all_atom_coords_prist():
-    """
-    Test `all_atom_coords` when mol_type == 'prist'.
-
-    """
-        
-    conf = struct_unit.prist_mol.GetConformer()
-    for (atom_id, coord), atom in it.zip_longest(
-                                struct_unit.all_atom_coords('prist'), 
-                                struct_unit.prist_mol.GetAtoms()):
-        
-        assert atom_id == atom.GetIdx()
-        conf_coord = np.array(conf.GetAtomPosition(atom_id))
-        assert np.allclose(coord, conf_coord, atol=1e-8)
-        
-def test_all_atom_coords_heavy():
-    """
-    Test `all_atom_coords` when mol_type == 'heavy'.
-
-    """
-        
-    conf = struct_unit.heavy_mol.GetConformer()
-    for (atom_id, coord), atom in it.zip_longest(
-                                struct_unit.all_atom_coords('heavy'), 
-                                struct_unit.heavy_mol.GetAtoms()):
-        
-        assert atom_id == atom.GetIdx()
-        conf_coord = np.array(conf.GetAtomPosition(atom_id))
-        assert np.allclose(coord, conf_coord, atol=1e-8)
  
-def test_position_matrix_prist():
-    """
-    Test `postion_matrix` when mol_type == 'prist'.
-    
-    """
-    
-    # Go through each atom id. For each atom id get the column in the 
-    # position matrix with that id as its index. Make sure that the data
-    # is the same. 
-    pos_mat1 = struct_unit.position_matrix('prist')
-    conf = struct_unit.prist_mol.GetConformer()
-       
-    for atom in struct_unit.prist_mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        conf_coord = np.array(conf.GetAtomPosition(atom_id))   
-        mat_coord = pos_mat1.T[atom_id]
 
-        assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
-
-def test_position_matrix_heavy():
-    """
-    Test `postion_matrix` when mol_type == 'heavy'.
-    
-    """
-    
-    # Go through each atom id. For each atom id get the column in the 
-    # position matrix with that id as its index. Make sure that the data
-    # is the same. 
-    pos_mat1 = struct_unit.position_matrix('heavy')
-    conf = struct_unit.heavy_mol.GetConformer()
-       
-    for atom in struct_unit.heavy_mol.GetAtoms():
-        atom_id = atom.GetIdx()
-        conf_coord = np.array(conf.GetAtomPosition(atom_id))   
-        mat_coord = pos_mat1.T[atom_id]
-
-        assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
 
 def test_atom_distance_prist():
     """
@@ -461,55 +367,10 @@ def test_set_heavy_mol_orientation():
     assert np.array_equal(prist_pos_mat, 
                           struct_unit.position_matrix('prist'))
 
-def test_rotate():
-    """
-    Tests `rotate`.
-    
-    """
-    
-    og_vector = next(struct_unit.heavy_direction_vectors())
-    axis = np.cross(og_vector, [1,1,1])   
-    struct_unit.rotate(np.pi/2, axis)
-    new_vector = next(struct_unit.heavy_direction_vectors()) 
-    theta = vector_theta(og_vector, new_vector)
-    assert abs(theta - np.pi/2) < 0.001 
-    
-    
-def test_heavy_atom_position_matrix():
-    """
-    Tests the output of `heavy_atom_position` matrix.
-    
-    """
-    
-    # For every heavy atom id, get the column in the 
-    # heavy_atom_position_matrix which holds its coords. Check that
-    # these coords are the same as those held in the heavy confomer.    
-    
-    conf = struct_unit.heavy_mol.GetConformer()
-    pos_mat = struct_unit.heavy_atom_position_matrix()    
-    
-    for atom_id in struct_unit.heavy_ids:
-        coord = np.array(conf.GetAtomPosition(atom_id))      
-        
-        column_i = struct_unit.heavy_ids.index(atom_id)
-        column = pos_mat.T[column_i]
-        
-        assert np.allclose(coord, column, atol=1e-8)
-        
-def test_heavy_direction_vectors():
-    """
-    Tests `heavy_direction` vectors.
-    
-    """
-    with open(obj_file_name+'2', 'rb') as dump_file:
-        struct_unit = pickle.load(dump_file)
-        
-    # Check that the ouput is of the correct type and tha the correct
-    # number of vectors are produced.
 
-    for vector in struct_unit.heavy_direction_vectors():
-        assert isinstance(vector, np.ndarray)
-    assert sum(1 for _ in struct_unit.heavy_direction_vectors()) == 3
+
+        
+
 
 def test_centroid_centroid_dir_vector():
     """
