@@ -1,5 +1,7 @@
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 from .fitness import *
 
@@ -106,18 +108,22 @@ def progress_params(pop, plot_name):
     
     """
     
-    func_name = pop.ga_tools.ga_input.fitness_func.name
+    func_name = pop.ga_tools.input.fitness_func.name
     fitness_func = globals()[func_name]
     
     min_params = []
     max_params = []
     mean_params = []
-    xvals = list(range(1, 
-                       len(pop.populations) + 1))
-    for subpop in pop.populations:
-        min_params.append(subpop.ga_tools.progress.mins[-1])
-        max_params.append(subpop.ga_tools.progress.maxs[-1])
-        mean_params.append(subpop.ga_tools.progress.means[-1])
+    xvals = list(range(1, len(pop.populations)+1 ))
+
+    for sp in pop.populations:
+        
+        unscaled_var_mat = np.matrix([
+                  x.progress_params for x in sp if not x.fitness_fail])
+
+        max_params.append(np.max(unscaled_var_mat, axis=0).tolist()[0])
+        min_params.append(np.min(unscaled_var_mat, axis=0).tolist()[0])
+        mean_params.append(np.mean(unscaled_var_mat, axis=0).tolist()[0])
     
     for x in range(len(min_params[0])):
         fig = plt.figure()
