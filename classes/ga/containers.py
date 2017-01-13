@@ -1,4 +1,3 @@
-from .progress import GAProgress
 
 class FunctionData:
     """
