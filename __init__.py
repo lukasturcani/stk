@@ -3,3 +3,4 @@ from .classes import *
 from .optimization import *
 from .fitness import *
 from .convenience_tools import *
+from .plotting import *

@@ -175,8 +175,10 @@ def run():
     kill_macromodel()
     
     # Plot the results of the GA run.
+    print_info('Plotting EPP.')
     epp(progress, os.path.join(root_dir, 'epp.png'),
-        ga_input.fitness_func, ga_input.normalization.scaling_func)
+        ga_input.fitness_func,
+        pop.ga_tools.normalization.scaling_func)
     
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
