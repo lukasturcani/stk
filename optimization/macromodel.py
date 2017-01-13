@@ -8,7 +8,8 @@ import psutil
 import re
 
 from ..classes.exception import MacroMolError
-from ..convenience_tools import MAEExtractor, FGInfo
+from ..classes.fg_info import FGInfo
+from ..convenience_tools import MAEExtractor
 
 class _ConversionError(Exception):
     def __init__(self, message):
