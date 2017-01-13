@@ -1,11 +1,12 @@
 import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
 
-from .classes import (Population, GATools, 
+from .classes import (Population, GATools, GAProgress,
                       GAInput, InputHelp, Normalization)
 from .classes.exception import PopulationSizeError
 from .convenience_tools import (time_it, tar_output, 
                                 archive_output, kill_macromodel)
+from .plotting import epp
 
 def print_info(info):
     print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')    
@@ -39,7 +40,9 @@ def run():
     # ``GAInput`` instance. Info about input file structure is 
     # documented in ``GAInput`` docstring.
     ga_input = GAInput(os.path.basename(sys.argv[1]))
-
+    # Make a GAProgress object to keep track of progress.
+    progress = GAProgress()
+    
     # Generate and optimize an initial population.
     os.mkdir('initial')
     os.chdir('initial')    
@@ -92,7 +95,7 @@ def run():
     with time_it():
         pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         print_info('Recording progress.')
-        pop.progress_update()   
+        progress.update(pop)   
             
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):        
@@ -164,7 +167,7 @@ def run():
         # Save the min, max and mean values of the population.  
         with time_it():
             print_info('Recording progress.')
-            pop.progress_update()        
+            progress.update(pop)        
         
     # Running MacroModel optimizations sometimes leaves applications 
     # open. This closes them. If this is not done, directories may not 
@@ -172,7 +175,8 @@ def run():
     kill_macromodel()
     
     # Plot the results of the GA run.
-    pop.plot.epp(os.path.join(root_dir, 'epp.png'))
+    epp(progress, os.path.join(root_dir, 'epp.png'),
+        ga_input.fitness_func, ga_input.normalization)
     
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
