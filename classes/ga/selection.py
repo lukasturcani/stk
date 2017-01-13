@@ -366,7 +366,7 @@ class Selection:
                     pop.remove(ind)
 
         if carrot_and_stick_elitism:
-            norm_func = population.ga_tools.ga_input.normalization_func
+            norm_func = population.ga_tools.input.normalization_func
             cs_elites = cls._carrot_and_stick_elites(
                                pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
@@ -478,7 +478,7 @@ class Selection:
                     pop.remove(ind)
 
         if carrot_and_stick_elitism:
-            norm_func = population.ga_tools.ga_input.normalization_func
+            norm_func = population.ga_tools.input.normalization_func
             cs_elites = cls._carrot_and_stick_elites(
                                pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
@@ -610,7 +610,7 @@ class Selection:
                     pop.remove(ind)
 
         if carrot_and_stick_elitism:
-            norm_func = population.ga_tools.ga_input.normalization_func
+            norm_func = population.ga_tools.input.normalization_func
             cs_elites = cls._carrot_and_stick_elites(
                                pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
