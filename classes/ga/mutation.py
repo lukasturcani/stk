@@ -203,9 +203,9 @@ class Mutation:
                 continue        
 
         if len(og_bb.heavy_ids) != len(bb.heavy_ids):
-            print(('MUTATION ERROR: Replacement building block does not'
-                  ' have the same number of functional groups as the'
-                  ' original building block.\n\nOriginal building '
+            print(('\n\nMUTATION ERROR: Replacement building block does'
+                   ' not have the same number of functional groups as '
+                   'the original building block.\n\nOriginal building '
                   'block:\n\n{}\n\nReplacement building block:\n\n'
                   '{}\n\n').format(og_bb.prist_mol_file, 
                                     bb.prist_mol_file))
@@ -256,7 +256,7 @@ class Mutation:
                 continue
             
         if len(og_lk.heavy_ids) != len(lk.heavy_ids):
-            print(('MUTATION ERROR: Replacement linker does not'
+            print(('\n\nMUTATION ERROR: Replacement linker does not'
                   ' have the same number of functional groups as the'
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
                   'Replacement linker:\n\n{}\n\n').format(
@@ -362,9 +362,9 @@ class Mutation:
         new_bb = StructUnit3(sim_mols[cur_index][-1])
         
         if len(og_bb.heavy_ids) != len(new_bb.heavy_ids):
-            print(('MUTATION ERROR: Replacement building block does not'
-                  ' have the same number of functional groups as the'
-                  ' original building block.\n\nOriginal building '
+            print(('\n\nMUTATION ERROR: Replacement building block does'
+                   ' not have the same number of functional groups as '
+                   'the original building block.\n\nOriginal building '
                   'block:\n\n{}\n\nReplacement building block:\n\n'
                   '{}\n\n').format(og_bb.prist_mol_file, 
                                    new_bb.prist_mol_file))
@@ -439,7 +439,7 @@ class Mutation:
         new_lk = lk_type(sim_mols[cur_index][-1])
         
         if len(og_lk.heavy_ids) != len(new_lk.heavy_ids):
-            print(('MUTATION ERROR: Replacement linker does not'
+            print(('\n\nMUTATION ERROR: Replacement linker does not'
                   ' have the same number of functional groups as the'
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
                   'Replacement linker:\n\n{}\n\n').format(
