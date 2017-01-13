@@ -28,7 +28,7 @@ import sys
 from ..population import Population
 from ..molecular import StructUnit3, Cage
 from ..exception import MacroMolError
-from ...convenience_tools import plot_counter
+from ...plotting import plot_counter
 
 class Mutation:
     """
