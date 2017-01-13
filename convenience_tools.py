@@ -6,16 +6,6 @@ import time
 from contextlib import contextmanager
 import os
 import subprocess as sp 
-# Prevents the matplotlib import from printing warnings in Spyder. These
-# are printed because Spyder automatically imports matplotlib so the
-# call to `matplotlib.use()` results in a warning.
-import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore')
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-
 import gzip
 import re
 from collections import deque
@@ -513,42 +503,6 @@ def del_charged_mols(database):
         if 'CHG=' in content:
             print('Deleting', mol_file)
             os.remove(full_path)
-    
-def plot_counter(counter, plot_name):
-    """
-    Saves a .png file holding a plot of `counter`.
-    
-    The counter should hold the number of times a certain population
-    member was selected.
-    
-    Parameters
-    ----------
-    counter : Counter
-        A counter of which members of a population were picked.
-    
-    plot_name : str
-        The full path of the .png where the plot is to be saved.
-        
-    Returns
-    -------
-    None : NoneType
-    
-    """
-
-    fig = plt.figure()
-    x_vals = list(range(1, len(counter.items())+1))
-    y_vals = []
-    labels = []
-    
-    for ind, value in sorted(counter.items(), reverse=True):
-        y_vals.append(value)
-        labels.append(ind.fitness)
-    
-    plt.bar(x_vals, y_vals, color='blue')
-    plt.xticks([x+0.5 for x in x_vals], labels, rotation='vertical')
-    plt.tight_layout()
-    fig.savefig(plot_name, dpi=fig.dpi)
-    plt.close('all')
 
 def dedupe(iterable, seen=None):
     if seen is None:
