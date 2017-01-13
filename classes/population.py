@@ -675,7 +675,7 @@ class Population:
         with open(file_name, 'wb') as dump_file:
             pickle.dump(self, dump_file)
 
-    def progress_update(self):
+    def progress_update(self, pop_path=None):
         """
         Updates the values in the ``GAProgress`` instance.
 
@@ -687,14 +687,24 @@ class Population:
         This function just delegates the call to the `update` method in
         the ``GAProgress`` class.
 
+        Parameters
+        ----------
+        pop_path : str (default = None)
+            If the user wants to keep track of past populations, the 
+            path of the dump file of the population can be here.
+
         Modifies
         --------
         ga_tools.progress : GAProgress
-            See documentation of `update` in GAProgess class.
+            See documentation of ``update()`` in GAProgess class.
+            
+        Returns
+        -------
+        None : NoneType
 
         """
 
-        self.ga_tools.progress.update(self)
+        self.ga_tools.progress.update(self, pop_path)
 
     def __iter__(self):
         """
