@@ -206,7 +206,7 @@ class Selection:
         return pop
 
     @staticmethod
-    def _carrot_and_stick_elites(population, n):
+    def _carrot_and_stick_elites(population, n, norm_func):
         """
         Returns `n` fittest members for each carrot and stick parameter.
         
@@ -228,8 +228,11 @@ class Selection:
             The number of members which should be returned for each
             parameter.
             
-        Yields
-        ------
+        norm_func : FunctionData
+            The "carrots_and_sticks()" normalization function.
+            
+        Returns
+        -------
         list
             A list holding macromolecules which are in the `n` best 
             members for a given `unscaled_fitness` carrot or stick 
@@ -239,7 +242,6 @@ class Selection:
         
         # To get the number of carrot and stick parameters looks at the
         # normalization function defined in the input file.
-        norm_func = population.ga_tools.ga_input.normalization_func
         n_carrots = len(norm_func.params['carrot_coeffs'])
         n_sticks = len(norm_func.params['stick_coeffs'])
         
@@ -362,8 +364,9 @@ class Selection:
                     pop.remove(ind)
 
         if carrot_and_stick_elitism:
+            norm_func = population.ga_tools.ga_input.normalization_func
             cs_elites = cls._carrot_and_stick_elites(
-                                          pop, carrot_and_stick_elitism)
+                               pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
                 yield ind
@@ -473,8 +476,9 @@ class Selection:
                     pop.remove(ind)
 
         if carrot_and_stick_elitism:
+            norm_func = population.ga_tools.ga_input.normalization_func
             cs_elites = cls._carrot_and_stick_elites(
-                                          pop, carrot_and_stick_elitism)
+                               pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
                 yield ind
@@ -604,8 +608,9 @@ class Selection:
                     pop.remove(ind)
 
         if carrot_and_stick_elitism:
+            norm_func = population.ga_tools.ga_input.normalization_func
             cs_elites = cls._carrot_and_stick_elites(
-                                          pop, carrot_and_stick_elitism)
+                               pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
                 yield ind
