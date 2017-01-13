@@ -9,9 +9,17 @@ from .convenience_tools import (time_it, tar_output,
 from . import plotting as plot
 
 def print_info(info):
+    """
+    Prints `info` and underlines it.    
+    
+    """
     print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')    
 
 def run():
+    """
+    Runs the GA.
+    
+    """
     
     # Save the current directory as the `launch_dir`.
     launch_dir = os.getcwd()
@@ -81,11 +89,14 @@ def run():
         print_info('Calculating the fitness of population members.')
         pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
 
+    # Only try to run a normalization function if one was defined in the
+    # input file.
     if pop.ga_tools.normalization:
         with time_it():
             print_info('Normalizing fitness values.')
             pop.normalize_fitness_values()
 
+    # Print the scaled and unscaled fitness values.
     for macro_mol in sorted(pop, reverse=True):
         print(macro_mol.prist_mol_file)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
@@ -140,11 +151,14 @@ def run():
             pop = Population(pop.ga_tools, 
                              *pop.calculate_member_fitness())
 
+        # Only try to run a normalization function if one was defined in 
+        # the input file.
         if pop.ga_tools.normalization:
             with time_it():
                 print_info('Normalizing fitness values.')
                 pop.normalize_fitness_values()
                 
+        # Print the scaled and unscaled fitness values.        
         for macro_mol in sorted(pop, reverse=True):
             print(macro_mol.prist_mol_file)
             print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
@@ -175,10 +189,11 @@ def run():
     kill_macromodel()
     
     # Plot the results of the GA run.
-    print_info('Plotting EPP.')
-    plot.epp(progress, os.path.join(root_dir, 'epp.png'),
-        ga_input.fitness_func,
-        pop.ga_tools.normalization.scaling_func)
+    with time_it():
+        print_info('Plotting EPP.')
+        plot.epp(progress, os.path.join(root_dir, 'epp.png'),
+                 ga_input.fitness_func, 
+                 pop.ga_tools.normalization.scaling_func)
     
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
@@ -190,9 +205,19 @@ def run():
         archive_output()
     
 def helper():
+    """
+    Takes care of the -h option.
+    
+    """
+    
     InputHelp(sys.argv[-1])
 
 def compare():
+    """
+    Takes care of the -c option.    
+    
+    """
+    
     launch_dir = os.getcwd()
     
     # If an output folder of MMEA exists, archive it. This moves any
@@ -239,20 +264,23 @@ def compare():
             ind.fitness_fail = True
             ind.fitness = None
             ind.progress_params = None
-            
+
         sp.write(sp_dir)
         
         # Calculation of fitness is done here, not in the overall pop, 
         # to maintain structure.
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
         pop.add_subpopulation(sp)
-    
+        
+    # Only try to run a normalization function if one was defined in the
+    # input file.    
     if inp.normalization_func:
         pop.normalize_fitness_values()
         plot.progress_params(pop, 'param_comparison.png')
     
     plot.subpopulations(pop, 'fitness_comparison.png')
 
+    # Print the scaled and unscaled fitness values. 
     for macro_mol in sorted(pop, reverse=True):
         print(macro_mol.prist_mol_file)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
