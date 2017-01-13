@@ -9,9 +9,11 @@ class GAProgress:
         self.maxs = []
         self.past_pops= []
 
-    def update(self, population):
+    def update(self, population, pop_path=None):
         self.gens.append(len(self.gens))
-        self.past_pops.append(copy.deepcopy(population))
+        
+        if pop_path:    
+            self.past_pops.append(pop_path)
         
         if any(x.progress_params for x in population):
             unscaled_var_mat = np.matrix([
