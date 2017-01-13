@@ -3,4 +3,3 @@ from .topology import *
 from .ga import *
 from .population import *
 from .exception import *
-from .plotter import *
