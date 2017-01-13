@@ -6,7 +6,7 @@ from .classes import (Population, GATools, GAProgress,
 from .classes.exception import PopulationSizeError
 from .convenience_tools import (time_it, tar_output, 
                                 archive_output, kill_macromodel)
-from .plotting import epp
+from . import plotting as plot
 
 def print_info(info):
     print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')    
@@ -176,7 +176,7 @@ def run():
     
     # Plot the results of the GA run.
     print_info('Plotting EPP.')
-    epp(progress, os.path.join(root_dir, 'epp.png'),
+    plot.epp(progress, os.path.join(root_dir, 'epp.png'),
         ga_input.fitness_func,
         pop.ga_tools.normalization.scaling_func)
     
@@ -241,15 +241,17 @@ def compare():
             ind.progress_params = None
             
         sp.write(sp_dir)
+        
+        # Calculation of fitness is done here, not in the overall pop, 
+        # to maintain structure.
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
-        sp.progress_update()
         pop.add_subpopulation(sp)
     
     if inp.normalization_func:
         pop.normalize_fitness_values()
-        pop.plot.progress_params('param_comparison.png')
+        plot.progress_params(pop, 'param_comparison.png')
     
-    pop.plot.subpopulations('fitness_comparison.png')
+    plot.subpopulations(pop, 'fitness_comparison.png')
 
     for macro_mol in sorted(pop, reverse=True):
         print(macro_mol.prist_mol_file)
