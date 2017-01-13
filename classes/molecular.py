@@ -931,7 +931,7 @@ class Molecule:
 
     def rotate(self, mol_type, theta, axis):
         """
-        Rotates the heavy rdkit molecule by `theta` about `axis`.
+        Rotates the molecule by `theta` about `axis`.
         
         The rotation occurs about the molecular centroid.        
         
@@ -973,38 +973,6 @@ class Molecule:
         new_pos_mat = np.dot(rot_mat, self.position_matrix(mol_type))
         self.set_position_from_matrix(mol_type, new_pos_mat)
         self.set_position(mol_type, og_position)
-        
-    def rotate2(self, theta, axis):
-        """
-        Rotates the heavy rdkit molecule by `theta` about `axis`.
-        
-        The rotation occurs about the heavy atom centroid.        
-        
-        Parameters
-        ----------        
-        theta : float
-            The size of the rotation in radians.
-        
-        axis : numpy.array
-            The axis about which rotation happens.
-        
-        Modifies
-        --------
-        heavy_mol : rdkit.Chem.rdchem.Mol
-            The atoms in this molecule are rotated.
-    
-        Returns
-        -------
-        None : NoneType
-            
-        """
-        
-        og_position = self.heavy_atom_centroid()
-        self.set_heavy_atom_centroid([0,0,0])
-        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
-        new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
-        self.set_position_from_matrix('heavy', new_pos_mat)
-        self.set_heavy_atom_centroid(og_position)
 
     def set_orientation(self, mol_type, start, end):
         """
@@ -2087,6 +2055,38 @@ class StructUnit(Molecule, metaclass=Cached):
         centroid = sum(self.atom_coords('heavy', x) for x in 
                                                         self.heavy_ids) 
         return np.divide(centroid, len(self.heavy_ids))
+
+    def rotate2(self, theta, axis):
+        """
+        Rotates the heavy rdkit molecule by `theta` about `axis`.
+        
+        The rotation occurs about the heavy atom centroid.        
+        
+        Parameters
+        ----------        
+        theta : float
+            The size of the rotation in radians.
+        
+        axis : numpy.array
+            The axis about which rotation happens.
+        
+        Modifies
+        --------
+        heavy_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this molecule are rotated.
+    
+        Returns
+        -------
+        None : NoneType
+            
+        """
+        
+        og_position = self.heavy_atom_centroid()
+        self.set_heavy_atom_centroid([0,0,0])
+        rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
+        new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
+        self.set_position_from_matrix('heavy', new_pos_mat)
+        self.set_heavy_atom_centroid(og_position)
 
     def set_heavy_atom_centroid(self, position):
         """
