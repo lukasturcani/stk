@@ -240,6 +240,9 @@ class Selection:
         
         """
         
+        pop = [x for x in population if 
+                                isinstance(x.unscaled_fitness, tuple)]        
+        
         # To get the number of carrot and stick parameters looks at the
         # normalization function defined in the input file.
         n_carrots = len(norm_func.params['carrot_coeffs'])
@@ -249,14 +252,14 @@ class Selection:
         # For each carrot parameter get the `n` fittest members and add
         # them to `elites`.
         for x in range(n_carrots):
-            elites.extend(sorted(population, 
+            elites.extend(sorted(pop, 
                           key=lambda x : x.unscaled_fitness[0][x],
                           reverse=True)[:n])
                           
         # For each stick parameter get the `n` fittest members and add
         # them to `elites`.                          
         for x in range(n_sticks):
-            elites.extend(sorted(population, 
+            elites.extend(sorted(pop, 
                           key=lambda x : x.unscaled_fitness[1][x],
                           reverse=True)[:n])
 
