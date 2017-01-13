@@ -1,6 +1,8 @@
 import os
 import matplotlib.pyplot as plt
 
+from .fitness import *
+
 def epp(progress, plot_name, fitness_func=None, norm_func=None):
     
     if norm_func:
@@ -24,7 +26,10 @@ def fitness_epp(progress, plot_name):
                 bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close('all')
 
-def parameter_epp(progress, fitness_func, plot_name):    
+def parameter_epp(progress, fitness_func, plot_name):
+    
+    fitness_func = globals()[fitness_func.name]
+    
     for x in range(len(progress.means[0])):
         y_mean = [v[x] for v in progress.means]
         y_max = [v[x] for v in progress.maxs]
