@@ -1,9 +1,65 @@
+"""
+Defines energy calculations via the ``Energy`` class.
+
+Extending MMEA: Supporting more energy calculations.
+----------------------------------------------------
+It may well be the case that more ways to calculate energy of molcules
+will need to be added. For example if support for using some external
+software to do the calculations is needed.
+
+In order to add a new function which calculates the energy, just add it 
+as a method to the ``Energy`` class. There really aren't really any 
+requirements beyond this.
+
+To calculate the energy of some ``Molecule`` object the only thing that
+is needed is calling one of the ``Energy`` methods:
+    
+    >>>  molecule.energy.rdkit('uff')
+    OUT: 16.501
+    
+Here the `Energy.rdkit()` method was used as an example and `molecule` 
+is just some  ``Molecule`` instance. (Each ``Molecule`` object has an 
+``Energy`` instance in its `energy` attribute.)
+
+Each ``Energy`` instance has a `values` attribute which stores the 
+result of previous calculations. Using the molecule from the previous 
+example:
+
+    >>>  molecule.values
+    OUT: {('rdkit', 'uff') : 16.501}
+    
+The methods themselves do not need to add the data into the `values`
+dictionary. Calling any method of the class updates the dictionary
+automatically. 
+
+"""
+
+
 import os
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 import subprocess as sp
 import shutil
 import uuid
+
+class ValuesDescriptor:
+    """
+    This class does the magic of automatically updating `values`...
+
+    ... when an ``Energy`` method is called.    
+    
+    """
+
+    
+    def __init__(self):
+        ...
+        
+    def __get__(self, obj, cls):
+        ...
+        
+    def __set__(self, obj, cls):
+        ...
+
 
 class Energy:
     """
