@@ -7,22 +7,89 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 from .fitness import *
 
 def epp(progress, plot_name, fitness_func=None, norm_func=None):
     """
-    Plots an EPP.    
+    Plots all the EPPs.    
+
+    Parameters
+    ----------
+    progress : GAProgress
+    
+    plot_name : str
+        The full path of the .png file to which the plots should be
+        saved. Values may be attached to the end of this name if
+        multiple plots are plotted.
+        
+    fitness_func : FunctionData (default=None)
+        The FunctionData instance of the fitness function used to 
+        calculate the `progress_params` saved in `progress`.
+        
+    norm_func : callable (default=None)
+        The normalization function used to recalculate all the fitness
+        values found in `progress`.
+    
+    Modifies
+    --------
+    Creates plots at the path of `plot_name`.
+    
+    If `norm_func` is provided the data in `progress` is replaced with
+    normalized values.
+    
+    Returns
+    -------
+    None : NoneType
     
     """
-    
-    if norm_func:
+
+    # ``True`` if the fitness function defined `progress_params`. In 
+    # this case plot the EPP for each of the `progress_params`.
+    if isinstance(progress.mins[0], list):
         parameter_epp(progress, fitness_func, plot_name)
+    
+    # Renormalize all the fitness values across the entire GA run if
+    # a normalization function was provided. If previously the values
+    # progress.maxs (and mins etc) were lists, they will be converted
+    # to ints/floats.
+    if norm_func:
         progress.normalize(norm_func)
-        
+    
+    # Plot the EPP of the fitness values.
     fitness_epp(progress, plot_name)
 
 def fitness_epp(progress, plot_name):
+    """
+    Plots an EPP of the fitness values.
+    
+    This function assumes that the values of `mins`, `maxs` and `means`
+    attributes of `progress` are floats or ints. For example:
+        
+        progress.gens = [0, 1, 2, 3, 4]
+        progress.mins = [1, 2, 3, 4, 5]
+        progress.maxs = [10, 20, 30, 40, 50]
+        
+    It would plot a single graph where there is one line showing the
+    `mins` values across the generations 0 to 5 and on the same graph
+    another line showing the `maxs` values across the generations. Same 
+    for the `means`.
+    
+    Parameters
+    ----------
+    progress : GAProgress
+        An instance holding the maximum, minimum and mean fitness values
+        in the population, across different generations.
+    
+    plot_name : str
+        The full path of the .png file to which the plot should be
+        saved. 
+        
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
     fig = plt.figure()
     plt.xlabel('Generation Number')
     plt.ylabel('Fitness Value')
@@ -38,6 +105,45 @@ def fitness_epp(progress, plot_name):
     plt.close('all')
 
 def parameter_epp(progress, fitness_func, plot_name):
+    """
+    Plots multiple EPPs, one for each progress parameter.    
+    
+    This function assumes that the values of `mins`, `maxs` and `means`
+    attributes of `progress` are lists of ints/floats. For example:
+        
+        progress.gens = [0,1,2]
+        progress.maxs = [[1,2,3], [4,5,6], [7,8,9]]
+        
+    In this case, the function would plot 3 graphs. One graph showing
+    the values of the first progress parameter across the generations.
+    This would be the values 1, 4 and 7. One for the second progress
+    parameter across the generations, this would be the values 2, 5 and
+    8. And so on.
+    
+    On each graph, the lines for mins and means would be plotted as with
+    the maxs line.
+    
+    Parameters
+    ----------
+    progress : GAProgress
+        An instance holding the maximum, minimum and mean fitness values
+        in the population, across different generations.
+    
+    fitness_func : FunctionData
+        The fitness function used to calculate the progress paramters.
+        Provided here in order to get extract the labels of y-axes for 
+        each graph.        
+        
+    plot_name : str
+        The full path of the .png file to which the plots should be
+        saved. Indices will be attached to the end of this name for
+        each parameter plotted.        
+
+    Returns
+    -------
+    None : NoneType    
+    
+    """
     
     fitness_func = globals()[fitness_func.name]
     
@@ -67,6 +173,10 @@ def subpopulations(pop, plot_name):
     
     Parameters
     ----------
+    pop : Population
+        A population containing any number of subpopulations and no
+        direct members.
+    
     plot_name : str
         The full path of where the plot should be saved.
         
@@ -108,6 +218,10 @@ def progress_params(pop, plot_name):
 
     Parameters
     ----------
+    pop : Population
+        A population holding any number of subpopulations and no
+        direct members.
+    
     plot_name : str
         The full path of where the plots should be saved.
         
