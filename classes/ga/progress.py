@@ -5,6 +5,23 @@ from ..population import Population
 
 
 class GAProgress:
+    """
+    Stores the GA's data across generations.
+
+    Attributes
+    ----------
+    gens : list of ints
+        
+    means : list
+    
+    mins : list
+    
+    maxs : list
+    
+    pops : Population
+
+    """
+    
     def __init__(self):
         self.gens = []
         self.means = []
