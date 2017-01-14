@@ -12,16 +12,27 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input 
 file. 
 
-Fitness functions should return the `macro_mol` instance they took as
-an argument. Within the fitness function itself the attribute 
-`macro_mol.fitness` should have the fitness value calculated by the 
-function placed into it. This ensures that the functions can be 
-parallelized.
+In order for fitness functions to be parallelizable, 2 requirements must
+be met. First, fitness function's return value should be the `macro_mol` 
+instance they took as an argument. Second, the entire fitness function
+should be encapsulated in a ``try/except`` block. See the `cage()`
+function for an example.
 
-A scaling function can be defined in ``scaling.py`` if some sort of 
-normalization of fitness values across the population is required. This 
-is completely optional. Fitness functions should be atomic and depend
-only on the individual whose fitness they are calculating.
+The simplest fitness functions will only need to assign a value to the 
+`fitness` attribute of the `macro_mol` and set its `fitness_fail` 
+attribute to ``False`` if that assignment was successful. The value
+calculated for `fitness` must be between 0 (exclusive) and infinity.  
+
+More complicated fitness functions can be designed by assigning to the
+`unscaled_fitness` attribute of `macro_mol`. In these cases, the 
+fitness function assignes to the `unscaled_fitness` attribute. This
+value is then used by a normalization function to calculate the fitness
+value. Note that in these cases the normalization function assignes to
+the `fitness` attribute, not the fitness function itself. 
+
+In these cases any value or object can be placed in `unscaled_fitness`,
+as long as normalization function which knows how to convert that data
+into a fitness value is used together with the fitness function.
 
 A fitness function may be complex and may not fit neatly into a single 
 function. For example, the ``cage_target()`` fitness function needs to 
@@ -30,6 +41,47 @@ before outputting a fitness value. This is fine. Define helper functions
 such as ``_generate_complexes()`` within this module but make sure they 
 are private. This means that names of helper functions begin with a 
 leading underscore. 
+
+A note on plotting.
+-------------------
+As mentioned before some fitness functions may be complex and as a
+result manipulate all sorts of data. Typically, in order to measure the
+progress of a GA, the fitness values in the population are tracked 
+across generations. However, let's say that some hypothetical fitness 
+function also calculates the energies of molecules. It may be quite 
+interesting plot the evolution of energies across generations too. If 
+this is the case the fitness function may assign to the 
+`progress_params` attribute of `macro_mol`: 
+
+    macro_mol.progress_params = [mol_energy]
+    
+Now a plot showing the change in `mol_energy` across generations will be 
+made too, along with the plot showing the changes in fitness.
+
+What if two things are needed to be kept track of?
+
+    macro_mol.progress_params = [mol_energy, mol_radius]
+    
+Great, now a progress plot for each of the variables will be made.
+
+How will the y axes be labelled in each plot?
+The decorator `_param_labels()` exists for this.
+
+Let's create a basic outline of a some fitness function:
+
+    @_param_labels('Molecule Energy / J mol-1', 'Molecule Radius / m-9')
+    def this_is_the_fitness_function(macro_mol, some_param):
+        ...
+        calculate_stuff()
+        ...
+        macro_mol.progress_params = [mol_energy, mol_radius]
+        ...
+        macro_mol.fitness_fail = False
+        return macro_mol
+
+If this function is used in the GA, a progress plot will be made for 
+each of the `progress_params` and they will have their y-axes labelled
+'Molecule Energy / J mol-1' and 'Molecule Radius / m-9', respectively.
 
 """
 
@@ -115,23 +167,10 @@ def _calc_fitness_serial(func_data, population):
 
 def _param_labels(*labels):
     """
-    Adds `param_labels` attribute to a fitness function.
+    Adds the `param_labels` attribute to a fitness function.
     
-    Fitness functions which undergo the scaling procedure have an EPP 
-    graph plotted for each attribute used to calculate total fitness. 
-    For example, if the ``cage`` fitness function was used
-    during the GA run 5 graphs would be plotted at the end of the run.
-    One for each unscaled ``var`` (see ``cage`` documentation for more 
-    details). This plotting is done by the ``GAProgress`` class. 
-    
-    In order for the ``GAProgress`` class to produce decent graphs, 
-    which means that each graph has the y-axis and title labeled with 
-    the name of the ``var`` plotted, it needs to know what each ``var`` 
-    should be called.
-    
-    This is done by adding a `param_labels` attribute to the fitness
-    function. The ``GAProgress`` class acccesses this attribute during
-    plotting and uses it to set the y-axis / title.
+    The point of this decorator is described in the module level
+    docstring.
     
     Parameters
     ----------
@@ -260,15 +299,26 @@ def cage(macro_mol, target_cavity, target_window=None,
         The cage whose fitness is to be calculated.
         
     target_cavity : float
-        The desried diameter of the cage's pore.
+        The desired diameter of the cage's pore.
 
     target_window : float (default = None)
         The desired diameter of the largest window of the cage. If 
         ``None`` then `target_cavity` is used.
         
     energy_params : dict (default = {'key':('rdkit', 'uff')})
-        A dictionary holding the name arguments and values for the 
-        ``Energy.pseudoformation()`` function.
+        The formation energy must be calculated by this fitness 
+        function. This is done by the  ``Energy.pseudoformation()`` 
+        function. `energy_params` is a dictionary which has the names
+        of Energy.pseudoformation() arguments as keys and the values
+        which are to be passed to those arguments as values
+        
+        Default initialized arguments of Energy.pseudoformation() only 
+        need to be specified in `energy_params` if the user wishes to
+        change the default value.
+        
+        To see the docstring of `Energy.pseudoformation()` using the
+        `-h` option, try:
+            python -m mmea -h energy
     
     Modifies
     --------
@@ -343,11 +393,11 @@ def cage(macro_mol, target_cavity, target_window=None,
                         (asymmetry if asymmetry is not None else 0),
                         pe_per_bond]))
         
-          
-        
         return macro_mol
 
     except Exception as ex:
+        # Prevents the error from being raised, but records it in 
+        # ``failures.txt``.
         MacroMolError(ex, macro_mol, "During fitness calculation")
         return macro_mol
 
@@ -411,7 +461,7 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
     """
 
     return _cage_target(macro_mol, target_mol_file, macromodel_path,
-                        _generate_complexes, rotations, md=md)
+                        _generate_complexes, rotations+1, md=md)
 
 @_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
                'Asymmetry') 
