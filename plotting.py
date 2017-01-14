@@ -1,3 +1,8 @@
+"""
+A module for defining plotting functions.
+
+"""
+
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,6 +11,10 @@ import numpy as np
 from .fitness import *
 
 def epp(progress, plot_name, fitness_func=None, norm_func=None):
+    """
+    Plots an EPP.    
+    
+    """
     
     if norm_func:
         parameter_epp(progress, fitness_func, plot_name)
