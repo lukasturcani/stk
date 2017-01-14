@@ -9,6 +9,7 @@ from .selection import Selection
 from .crossover import Crossover
 from .mutation import Mutation
 from .normalization import Normalization
+from ..energy import Energy
 from ...optimization import optimization
 from ... import fitness
 from .containers import GATools
@@ -460,7 +461,11 @@ class InputHelp:
                                  
                'normalization_func' :  (func for name, func in 
                                         Normalization.__dict__.items()
-                                        if not name.startswith('_'))
+                                        if not name.startswith('_')),
+                                            
+                'energy' : (func for name, func in 
+                                    Energy.__dict__.items() if not
+                                    name.startswith('_'))
                }
         
     
