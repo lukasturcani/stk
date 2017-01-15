@@ -3,9 +3,9 @@ Defines energy calculations via the ``Energy`` class.
 
 Extending MMEA: Supporting more energy calculations.
 ----------------------------------------------------
-It may well be the case that more ways to calculate energy of molcules
-will need to be added. For example if support for using some external
-software to do the calculations is needed.
+It may well be the case that more ways to calculate the energy of 
+molcules will need to be added. For example, if support for using some 
+external software to perform the calculations needs to be added.
 
 In order to add a new function which calculates the energy, just add it 
 as a method to the ``Energy`` class. There really aren't any 
@@ -27,18 +27,91 @@ result of previous calculations. Using the molecule from the previous
 example:
 
     >>>  molecule.energy.values
-    OUT: {('rdkit', {'forcefield' : 'uff'}) : 16.501}
+    OUT: {FunctionData('rdkit', forcefield=uff) : 16.501}
 
 IE this indicates that the `rdkit` method was called with the
-`forcefield` argument set to 'uff'.    
+`forcefield` argument set to 'uff' and the result was 16.501.    
     
 Calling any method of the ``Energy`` class updates the dictionary 
 automatically. When adding a new method to the class, no mechanism for
 updating the dictionary needs to be provided. Writing the method within
-the class is enough for it to update the dictionary when called.
+the class is enough for it to update the `values` dictionary when 
+called.
 
-Make use of this dictionary instead of running the same calculation 
-repeatedly.
+Sometimes a function will require a parameter which does not affect the
+outcome of the energy calculation. For example, to calculate the energy
+using the ``macromodel`` program, the ``Energy.macromodel()`` function
+can be used:
+    
+    molecule.energy.macromodel(forcefield=16, 
+                               macromodel_path='path/to/macromodel/dir')
+    
+This function requires the number of a forcefield (16) and the directory
+where ``macromodel`` is installed on the users computer 
+('path/to/macromodel/dir'). However, the directory does not affect the
+value of the calculated energy. When running:
+
+    >>> molecule.energy.values
+    
+We want the output to be:
+    
+    OUT: {FunctionData('rdkit', forcefield=uff) : 16.501,
+          FunctionData('macromolecule', forcefield=16): 200}
+
+(Assuming we are still dealing with the same `molecule` instance from
+the `rdkit` example, both calculated energies should be kept in the 
+dictionary.)
+
+However if we just define the ``Energy.macromodel()`` function within
+the energy class, and then run:
+
+    molecule.energy.macromodel(forcefield=16, 
+                               macromodel_path='path/to/macromodel/dir')
+                               
+The output of 
+
+    >>> molecule.energy.values
+
+will be
+
+    OUT: {FunctionData('rdkit', forcefield=uff) : 16.501,
+          FunctionData('macromolecule', forcefield=16, 
+                        macromodel_path='path/to/macromodel/dir'): 200}
+                        
+In order to make sure that the macromodel_path is excluded from the key,
+decorate the function ``Energy.macromodel()`` with the ``exclude()`` 
+decorator. For example:
+
+    @exclude('macromodel_path')
+    def macromodel(self, forcefield, macromodel_path):
+        ...
+        
+Now the parameter `macromodel_path` will not form part of the key in
+the `values` dictionary. If there were 2 parameters you wanted to 
+exlude:
+
+    @exclude('exclude1', 'exclude2')
+    def energy_func(include1, include2, exclude1, exclude2):
+        ...
+
+and so on.
+
+Exclusion of some parameters is doubly beneficial because it means less
+typing needs to be done to make the key:
+
+    >>>  key = FunctionData('macromodel', forcefield=16)
+    >>>  molecule.energy.values[key]
+    OUT: 200
+
+rather than:
+
+    >>>  key = FunctionData('macromodel', forcefield=16,
+                             macromodel_path='path/to/macromodel/dir')
+    >>>  molecule.energy.values[key]
+    OUT: 200
+
+Make sure to use the `values` dictionary instead of running the same 
+calculation repeatedly.
 
 The automatic updating of the dictionary is  achieved by the ``EMeta`` 
 metaclass, ``EMethod`` descriptor and ``e_logger`` decorator. You do not 
@@ -57,7 +130,7 @@ from types import MethodType
 from functools import wraps
 from inspect import signature as sig
 
-from .ga.cotainers import FunctionData
+from .function_data import FunctionData
 
 class EMethod:
     def __init__(self, func):
@@ -94,6 +167,14 @@ class EMeta(type):
         
         return type.__new__(cls, cls_name, bases, cls_dict)
 
+def exclude(*args):
+    
+    def inner(func):
+        func.exclude = args
+        return func
+        
+    return inner
+
 class Energy(metaclass=EMeta):
     """
     Handles all things related to a ``Molecule``'s energy.
@@ -116,10 +197,10 @@ class Energy(metaclass=EMeta):
     def __init__(self, molecule):
         self.molecule = molecule
         self.values = {}
-        
+    
+    @exclude('force_e_calc')
     def formation(self, key, products, 
-                  building_blocks=None, force_e_calc=False,
-                  nonkey_params=['force_e_calc']):
+                  building_blocks=None, force_e_calc=False):
         """
         Calculates the formation energy.
         
@@ -189,9 +270,9 @@ class Energy(metaclass=EMeta):
         eng -= e_products       
         return eng
 
+    @exclude('force_e_calc')
     def pseudoformation(self, key, 
-                        building_blocks=None,  force_e_calc=False, 
-                        nonkey_params=['force_e_calc']):
+                        building_blocks=None,  force_e_calc=False):
         """
         Calculates the formation energy, sans other products.
 
@@ -299,9 +380,9 @@ class Energy(metaclass=EMeta):
 
         eng = ff.CalcEnergy()        
         return eng
-        
-    def macromodel(self, forcefield, macromodel_path, 
-                         nonkey_params=['macromodel_path']):
+     
+    @exclude('macromodel_path')
+    def macromodel(self, forcefield, macromodel_path):
         """
         Calculates the energy of `self.molecule` using macromodel.
 
@@ -433,16 +514,12 @@ def call_sig(func, *args, **kwargs):
     bound.update(default)
     bound.pop('self')
     # Remove any parameters that should not form key, listed in the 
-    # `nonkey_params` parameter.
-    if 'nonkey_params' in bound.keys():
-        for key in bound['nonkey_params']:
+    # `exclude` attribute.
+    if hasattr(func, 'exclude'):
+        for key in func.exclude:
             bound.pop(key)
-        bound.pop('nonkey_params')
     
     # Return an FunctionData object representing the function and chosen
     # parameters.
     return FunctionData(func.__name__, **bound)
- 
-
-
         
