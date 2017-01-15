@@ -1,32 +1,3 @@
-
-class FunctionData:
-    """
-    Stores information about functions and their parameters.
-
-    Attributes
-    ----------
-    name : str
-        The name of a function or method.
-
-    params : dict
-        The parameters of the function or method who's name is held by
-        'name' which should be used when that function is called.
-    
-    """
-    
-    __slots__ = ['name', 'params']    
-    
-    def __init__(self, name, **kwargs):
-        self.name = name
-        self.params = kwargs
-        
-    def __repr__(self):
-        return ("<FunctionData, name={}"
-                ", params={}>").format(self.name, self.params)
-        
-    def __str__(self):
-        return ("<FunctionData, name = {}"
-                ", params = {}>").format(self.name, self.params)
         
 class GATools:
     """
