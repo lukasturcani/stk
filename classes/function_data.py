@@ -35,7 +35,7 @@ class FunctionData:
         return len(self.params.items())        
         
     def __str__(self):
-        s = ", ".join("{}={}".format(key, repr(value)) for key, value in self.params.items())
-        return "FunctionData({}, ".format(self.name) + s + ")"
+        s = ", ".join("{}={:!r}".format(key, value) for key, value in self.params.items())
+        return "FunctionData({:!r}, ".format(self.name) + s + ")"
     def __repr__(self):
         return str(self)
