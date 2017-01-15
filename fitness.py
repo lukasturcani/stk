@@ -269,8 +269,9 @@ def random_fitness_tuple(macro_mol):
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Positive Energy per Bond ', 
                 'Negative Energy per Bond ')
-def cage(macro_mol, target_cavity, target_window=None, energy_params=
-         { 'key' : FunctionData('rdkit', forcefield='uff') }):
+def cage(macro_mol, target_cavity, target_window=None, 
+         pseudoformation_params=
+         { 'func' : FunctionData('rdkit', forcefield='uff') }):
     """
     Calculates the fitness of a cage.
     
@@ -306,8 +307,8 @@ def cage(macro_mol, target_cavity, target_window=None, energy_params=
         The desired diameter of the largest window of the cage. If 
         ``None`` then `target_cavity` is used.
         
-    energy_params : dict (default = 
-                    { 'key' : FunctionData('rdkit', forcefield='uff') })
+    pseudoformation_params : dict (default = 
+                   { 'func' : FunctionData('rdkit', forcefield='uff') })
                                 
         This fitness function calculates the formation energy using the
         ``Energy.pseudoformation()`` method. This parameter defines the
