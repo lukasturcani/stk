@@ -2,7 +2,7 @@ from types import ModuleType
 import sys
 import re
 
-from . import FunctionData
+from ..function_data import FunctionData
 from ..topology import *
 from ..population import Population
 from .selection import Selection
@@ -12,7 +12,7 @@ from .normalization import Normalization
 from ..energy import Energy
 from ...optimization import optimization
 from ... import fitness
-from .containers import GATools
+from .ga_tools import GATools
 
 class GAInput:
     """
