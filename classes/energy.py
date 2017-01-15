@@ -277,7 +277,7 @@ class Energy(metaclass=EMeta):
         self.values = {}
     
     @exclude('force_e_calc')
-    def formation(self, key, products, 
+    def formation(self, func, products, 
                   building_blocks=None, force_e_calc=False):
         """
         Calculates the formation energy.
@@ -289,7 +289,7 @@ class Energy(metaclass=EMeta):
         
         Parameters
         ----------
-        key : FunctionData
+        func : FunctionData
             A FunctionData object which describes the method of the 
             ``Energy`` class used to calculate the energies of the
             various molecules. For example:
@@ -316,40 +316,39 @@ class Energy(metaclass=EMeta):
             chosen forcefield/method. If ``False`` the energy is only
             calculated if the value has not already been foud.
         
-        Modifies
-        --------
-        self.values : dict
-            Adds an entry to this dictionary.          
-        
         Returns
         -------
         float
-            The formation energy. Note that this value is also stored
-            in the dictionary `self.values`.
+            The formation energy.
         
         """
+        
+        # Get the function used to calculate the energies.
+        efunc = getattr(self, func.name)
+        # Get the key of the function used to calculate the energies.
+        fkey = func_key(efunc, **func.params)        
         
         # Recalculate energies if requested.
         if force_e_calc:
             for _, mol in products:
-                getattr(mol.energy, key.name)(**key.params)
+                getattr(mol.energy, func.name)(**func.params)
         
         # Get the total energy of the products.
         e_products = 0
         for n, mol in products:
             # If the energy has not been calculated already, calculate
             # it now.
-            if key not in mol.energy.values.keys():
-                getattr(mol.energy, key.name)(**key.params)
+            if fkey not in mol.energy.values.keys():
+                getattr(mol.energy, func.name)(**func.params)
             
-            e_products += n * mol.energy.values[key]
+            e_products += n * mol.energy.values[fkey]
         
-        eng = self.pseudoformation(key, building_blocks, force_e_calc) 
+        eng = self.pseudoformation(func, building_blocks, force_e_calc) 
         eng -= e_products       
         return eng
 
     @exclude('force_e_calc')
-    def pseudoformation(self, key, 
+    def pseudoformation(self, func, 
                         building_blocks=None,  force_e_calc=False):
         """
         Calculates the formation energy, sans other products.
@@ -359,11 +358,12 @@ class Energy(metaclass=EMeta):
         
         Parameters
         ----------
-        key : tuple
-            The first member of the tuple is a string holding the name 
-            of a method used to calculate energies. For exmaple 'rdkit'
-            or 'macromodel'. The remaning elements in the tuple are the
-            parameters that the user wishes to pass to the function.
+        func : FunctionData
+            A FunctionData object which describes the method of the 
+            ``Energy`` class used to calculate the energies of the
+            various molecules. For example:
+                
+                FunctionData('rdkit', forcefield='uff')
 
         building_blocks : tuple (default = None)
             This argument should be a tuple of the form 
@@ -380,46 +380,42 @@ class Energy(metaclass=EMeta):
             chosen forcefield/method. If ``False`` the energy is only
             calculated if the value has not already been foud.        
         
-        Modifies
-        --------
-        self.values : dict
-            Adds an entry to this dictionary. The key is a tuple of the
-            form ('formation', key[0], key[1]). The value is the 
-            calculated formation energy sans products (pseudoformation).            
-        
         Returns
         -------
         float
-            The pseudoformation energy. Note that this value is also 
-            stored in the dictionary `self.values`.
+            The pseudoformation energy.
         
         """
+
+        # Get the function used to calculate the energies.
+        efunc = getattr(self, func.name)
+        # Get the key of the function used to calculate the energies.
+        fkey = func_key(efunc, **func.params) 
         
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in 
                               self.molecule.topology.bb_counter.items())
         
-        func_name, *params = key
-        
         # Recalculate energies if requested.
         if force_e_calc:
             for _, mol in building_blocks:
-                getattr(mol.energy, func_name)(*params)
+                getattr(mol.energy, func.name)(**func.params)
         
-            getattr(self, func_name)(*params)
+            getattr(self, func.name)(**func.params)
 
-        # Calculate the energy of building blocks and products using the
-        # chosen force field, if it has not been found already.
+        # Sum the energy of building blocks under the chosen forcefield.
         e_reactants = 0
         for n, mol in building_blocks:
-            if (func_name, params[0]) not in mol.energy.values.keys():
-                getattr(mol.energy, func_name)(*params)
+            # If the calculation has not been done already, perform it.
+            if fkey not in mol.energy.values.keys():
+                getattr(mol.energy, func.name)(**func.params)
             
-            e_reactants += n * mol.energy.values[(func_name, params[0])]
+            e_reactants += n * mol.energy.values[fkey]
         
-        e_products = (self.values[(func_name, params[0])] if 
-                    (func_name, params[0]) in self.values.keys() else
-                    getattr(self, func_name)(*params))
+        # Get the energy of `self.molecule`. The only product whose 
+        # energy matters in pseudoformation.
+        e_products = (self.values[fkey] if fkey in self.values.keys() 
+                      else getattr(self, func.name)(**func.params))
 
         eng = e_reactants - e_products       
         return eng        
@@ -452,7 +448,8 @@ class Energy(metaclass=EMeta):
             self.molecule.prist_mol.UpdatePropertyCache()
             ff = ac.UFFGetMoleculeForceField(self.molecule.prist_mol)
         if forcefield == 'mmff':
-            chem.GetSSSR(self.molecule.prist_mol)      
+            chem.GetSSSR(self.molecule.prist_mol)
+            self.molecule.prist_mol.UpdatePropertyCache()
             ff = ac.MMFFGetMoleculeForceField(self.molecule.prist_mol,
                   ac.MMFFGetMoleculeProperties(self.molecule.prist_mol))
 
@@ -566,7 +563,7 @@ def e_logger(func, obj):
         
         # Next create FunctionData object to store the values of the
         # parameters used to to run that calculation.
-        key = call_sig(func, self, *args, **kwargs)
+        key = func_key(func, self, *args, **kwargs)
         
         # Update the `values` dictionary with the results of the 
         # calculation.
@@ -578,19 +575,20 @@ def e_logger(func, obj):
     # method and return.
     return MethodType(inner, obj)
 
-def call_sig(func, *args, **kwargs):
+def func_key(func, *args, **kwargs):
     
     fsig = sig(func)
-    # Get a dictioanary of all the supplied parameters.
+    # Get a dictionary of all the supplied parameters.
     bound = dict(fsig.bind_partial(*args, **kwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key : value.default for key,value in 
                dict(fsig.parameters).items() if key not in bound.keys()}
                
     # Combine the two sets of parameters and get rid of the `self` 
-    # parameter.
+    # parameter, if present.
     bound.update(default)
-    bound.pop('self')
+    if 'self' in bound.keys():
+        bound.pop('self')
     # Remove any parameters that should not form key, listed in the 
     # `exclude` attribute.
     if hasattr(func, 'exclude'):
@@ -600,4 +598,4 @@ def call_sig(func, *args, **kwargs):
     # Return an FunctionData object representing the function and chosen
     # parameters.
     return FunctionData(func.__name__, **bound)
-        
+    
