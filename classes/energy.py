@@ -10,7 +10,12 @@ external software to perform the calculations needs to be added.
 In order to add a new function which calculates the energy, just add it 
 as a method to the ``Energy`` class. There really aren't any 
 requirements beyond this, just make sure the energy value is what the 
-method returns.
+method returns. 
+
+If the energy method does not fit neatly into a single method, feel free 
+to split it up. Make sure sure that any helper methods are private, ie 
+that their names start with a leading underscore. Only the main method
+which the user will use should be public. 
 
 To calculate the energy of some ``Molecule`` object the only thing that
 is needed is calling one of the ``Energy`` methods:
@@ -133,10 +138,45 @@ from inspect import signature as sig
 from .function_data import FunctionData
 
 class EMethod:
+    """
+    A descriptor for methods of the ``Energy`` class.
+    
+    Attributes
+    ----------
+    func : function
+        The method which the descriptor acts as a getter for.
+    
+    """
+    
     def __init__(self, func):
         self.func = func
         
     def __get__(self, obj, cls):
+        """
+        Returns a modified `self.func`.
+        
+        Attributes
+        ----------
+        obj : object
+            The object to which the method in `self.func` should be 
+            bound.
+            
+        cls : object
+            The class of `obj`.
+        
+        Returns
+        -------
+        BoundMethod
+            A decorated version of the method held in `self.func`. The 
+            difference is that when calling the method  now, it will 
+            automatically update the `values` attribute of `obj`.
+            
+        self : EMethod
+            If the method in `self.func` is called as a class attribute
+            rather than an instance attribute, return the descriptor.
+        
+        """
+        
         
         # If the Energy method is accessed as a class attribute return
         # the descriptor.
@@ -151,8 +191,28 @@ class EMethod:
         return e_logger(self.func, obj)
 
 class EMeta(type):
+    """
+    A metaclass for ``Energy``.    
+    
+    In conjuction with the EMethod descriptor and the e_logger decorator
+    this function allows methods to automatically update the `values`
+    attribute of their Energy instance without explicitly being told to
+    do so.
+    
+    Basically this metaclass turns all methods of the Energy class into
+    descriptors of the EMethod class. These descriptors return a 
+    decorated version of the original method defined in the class. The 
+    method is decorated with the ``e_logger()`` decorator. Calling this 
+    decorated method makes it automatically update the `values` 
+    dictionary of the object which used the method.
+    
+    """
     
     def __new__(cls, cls_name, bases, cls_dict):
+        """
+        Turns all the public methods in `cls` to EMethod descriptors.
+        
+        """
         
         # Find all the methods defined in the class `cls` and replace
         # them with an ``Emethod`` descriptor.
@@ -168,6 +228,24 @@ class EMeta(type):
         return type.__new__(cls, cls_name, bases, cls_dict)
 
 def exclude(*args):
+    """
+    A decorator to add the `exclude` attribute to methods.
+
+    Paremeters
+    ----------
+    args :  tuple of strings
+        Holds the names parameters which are not to be used as part of
+        the key identifying the energy calculation run.
+        
+    Returns
+    -------
+    function
+        The function which has had the `exclude` attribute added. This
+        is a list  holding the names of parameters of the function
+        which are not used for identifying energy calculations.
+    
+    """
+
     
     def inner(func):
         func.exclude = args
@@ -177,10 +255,10 @@ def exclude(*args):
 
 class Energy(metaclass=EMeta):
     """
-    Handles all things related to a ``Molecule``'s energy.
+    Handles all things related to a molecules energy.
 
     An instance of this class will be placed in the `energy` attribute
-    of a ``Molecule`` instance.    
+    of each ``Molecule`` instance.    
 
     Attributes
     ----------
@@ -188,7 +266,7 @@ class Energy(metaclass=EMeta):
         The energetic information held by an instance of ``Energy`` 
         concerns the molecule held in this attribute.
     
-    values : dict
+    values : dict of FunctionData instances
         The keys in the dict code for the function and parameters which
         were used to calculate the energy. The values are the energies.
 
@@ -211,11 +289,12 @@ class Energy(metaclass=EMeta):
         
         Parameters
         ----------
-        key : tuple
-            The first member of the tuple is a string holding the name 
-            of a method used to calculate energies. For exmaple 'rdkit'
-            or 'macromodel'. The remaning elements in the tuple are the
-            parameters that the user wishes to pass to the function.
+        key : FunctionData
+            A FunctionData object which describes the method of the 
+            ``Energy`` class used to calculate the energies of the
+            various molecules. For example:
+                
+                FunctionData('rdkit', forcefield='uff')
             
         products : tuple of form (float, Molecule)
             This tuple holds the molecules produced in addition to 
@@ -240,9 +319,7 @@ class Energy(metaclass=EMeta):
         Modifies
         --------
         self.values : dict
-            Adds an entry to this dictionary. The key is a tuple of the
-            form ('formation', key[0], key[1]). The value is the 
-            calculated formation energy.            
+            Adds an entry to this dictionary.          
         
         Returns
         -------
@@ -251,20 +328,21 @@ class Energy(metaclass=EMeta):
             in the dictionary `self.values`.
         
         """
-
-        func_name, *params = key
         
         # Recalculate energies if requested.
         if force_e_calc:
             for _, mol in products:
-                getattr(mol.energy, func_name)(*params)
+                getattr(mol.energy, key.name)(**key.params)
         
+        # Get the total energy of the products.
         e_products = 0
         for n, mol in products:
-            if (func_name, params[0]) not in mol.energy.values.keys():
-                getattr(mol.energy, func_name)(*params)
+            # If the energy has not been calculated already, calculate
+            # it now.
+            if key not in mol.energy.values.keys():
+                getattr(mol.energy, key.name)(**key.params)
             
-            e_products += n * mol.energy.values[(func_name, params[0])]
+            e_products += n * mol.energy.values[key]
         
         eng = self.pseudoformation(key, building_blocks, force_e_calc) 
         eng -= e_products       

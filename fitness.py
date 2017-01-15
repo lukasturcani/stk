@@ -94,6 +94,7 @@ import multiprocessing as mp
 import warnings
 from collections import Counter
 
+from .classes.function_data import FunctionData
 from .classes.exception import MacroMolError
 from .classes.molecular import MacroMolecule, StructUnit, Energy
 from . import optimization
@@ -268,8 +269,8 @@ def random_fitness_tuple(macro_mol):
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Positive Energy per Bond ', 
                 'Negative Energy per Bond ')
-def cage(macro_mol, target_cavity, target_window=None, 
-         energy_params={'key':('rdkit', 'uff')}):
+def cage(macro_mol, target_cavity, target_window=None, energy_params=
+         { 'key' : FunctionData('rdkit', forcefield='uff') }):
     """
     Calculates the fitness of a cage.
     
@@ -305,19 +306,22 @@ def cage(macro_mol, target_cavity, target_window=None,
         The desired diameter of the largest window of the cage. If 
         ``None`` then `target_cavity` is used.
         
-    energy_params : dict (default = {'key':('rdkit', 'uff')})
-        The formation energy must be calculated by this fitness 
-        function. This is done by the  ``Energy.pseudoformation()`` 
-        function. `energy_params` is a dictionary which has the names
-        of Energy.pseudoformation() arguments as keys and the values
-        which are to be passed to those arguments as values
+    energy_params : dict (default = 
+                    { 'key' : FunctionData('rdkit', forcefield='uff') })
+                                
+        This fitness function calculates the formation energy using the
+        ``Energy.pseudoformation()`` method. This parameter defines the
+        arguments passed to this method via a dictionary. The name of 
+        the argument is the key and the value of the argument is the
+        value.
         
         Default initialized arguments of Energy.pseudoformation() only 
         need to be specified in `energy_params` if the user wishes to
         change the default value.
         
-        To see the docstring of `Energy.pseudoformation()` using the
-        `-h` option, try:
+        To see what arguments the `Energy.pseudoformation()` method
+        requires, try using the  `-h` option:
+
             python -m mmea -h energy
     
     Modifies
