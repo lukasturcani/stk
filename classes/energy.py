@@ -57,6 +57,8 @@ from types import MethodType
 from functools import wraps
 from inspect import signature as sig
 
+from .ga.cotainers import FunctionData
+
 class EMethod:
     def __init__(self, func):
         self.func = func
@@ -116,7 +118,8 @@ class Energy(metaclass=EMeta):
         self.values = {}
         
     def formation(self, key, products, 
-                  building_blocks=None, force_e_calc=False):
+                  building_blocks=None, force_e_calc=False,
+                  nonkey_params=['force_e_calc']):
         """
         Calculates the formation energy.
         
@@ -187,7 +190,8 @@ class Energy(metaclass=EMeta):
         return eng
 
     def pseudoformation(self, key, 
-                        building_blocks=None, force_e_calc=False):
+                        building_blocks=None,  force_e_calc=False, 
+                        nonkey_params=['force_e_calc']):
         """
         Calculates the formation energy, sans other products.
 
@@ -296,7 +300,8 @@ class Energy(metaclass=EMeta):
         eng = ff.CalcEnergy()        
         return eng
         
-    def macromodel(self, forcefield, macromodel_path):
+    def macromodel(self, forcefield, macromodel_path, 
+                         nonkey_params=['macromodel_path']):
         """
         Calculates the energy of `self.molecule` using macromodel.
 
@@ -400,10 +405,9 @@ def e_logger(func, obj):
         # First get the result of the energy calculation.
         result = func(self, *args, **kwargs)
         
-        # Next create EnergyKey object to store the values of the
+        # Next create FunctionData object to store the values of the
         # parameters used to to run that calculation.
-        fsig = sig(func)
-        key = call_sig(func.__name__, fsig, self, *args, **kwargs)
+        key = call_sig(func, self, *args, **kwargs)
         
         # Update the `values` dictionary with the results of the 
         # calculation.
@@ -415,8 +419,9 @@ def e_logger(func, obj):
     # method and return.
     return MethodType(inner, obj)
 
-def call_sig(name, fsig, *args, **kwargs):
+def call_sig(func, *args, **kwargs):
     
+    fsig = sig(func)
     # Get a dictioanary of all the supplied parameters.
     bound = dict(fsig.bind_partial(*args, **kwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
@@ -427,33 +432,17 @@ def call_sig(name, fsig, *args, **kwargs):
     # parameter.
     bound.update(default)
     bound.pop('self')
+    # Remove any parameters that should not form key, listed in the 
+    # `nonkey_params` parameter.
+    if 'nonkey_params' in bound.keys():
+        for key in bound['nonkey_params']:
+            bound.pop(key)
+        bound.pop('nonkey_params')
     
-    # Return an EnergyKey object representing the function and chosen
+    # Return an FunctionData object representing the function and chosen
     # parameters.
-    return EnergyKey(name, bound)
+    return FunctionData(func.__name__, **bound)
  
-class EnergyKey:
-    def __init__(self, name, sig_dict):
-        self.dict = sig_dict
-        self.name = name
-        
-    def __hash__(self):
-        return 1
 
-    def __eq__(self, other):
-        
-        same_length = len(self) == len(other)
-        same_items = all(x in other.dict.items() for x in self.dict.items())        
-        same_name = self.name == other.name        
-        
-        return same_length and same_items and same_name
-        
-    def __len__(self):
-        return len(self.dict.items())        
-        
-    def __str__(self):
-        s = ", ".join("{}={}".format(key, repr(value)) for key, value in self.dict.items())
-        return "EnergyKey({}, ".format(self.name) + s + ")"
-    def __repr__(self):
-        return str(self)
+
         
