@@ -8,8 +8,9 @@ will need to be added. For example if support for using some external
 software to do the calculations is needed.
 
 In order to add a new function which calculates the energy, just add it 
-as a method to the ``Energy`` class. There really aren't really any 
-requirements beyond this.
+as a method to the ``Energy`` class. There really aren't any 
+requirements beyond this, just make sure the energy value is what the 
+method returns.
 
 To calculate the energy of some ``Molecule`` object the only thing that
 is needed is calling one of the ``Energy`` methods:
@@ -21,19 +22,30 @@ Here the `Energy.rdkit()` method was used as an example and `molecule`
 is just some  ``Molecule`` instance. (Each ``Molecule`` object has an 
 ``Energy`` instance in its `energy` attribute.)
 
-Each ``Energy`` instance has a `values` attribute which stores the 
+Each ``Energy`` instance also has a `values` attribute which stores the 
 result of previous calculations. Using the molecule from the previous 
 example:
 
-    >>>  molecule.values
-    OUT: {('rdkit', 'uff') : 16.501}
+    >>>  molecule.energy.values
+    OUT: {('rdkit', {'forcefield' : 'uff'}) : 16.501}
+
+IE this indicates that the `rdkit` method was called with the
+`forcefield` argument set to 'uff'.    
     
-The methods themselves do not need to add the data into the `values`
-dictionary. Calling any method of the class updates the dictionary
-automatically. 
+Calling any method of the ``Energy`` class updates the dictionary 
+automatically. When adding a new method to the class, no mechanism for
+updating the dictionary needs to be provided. Writing the method within
+the class is enough for it to update the dictionary when called.
+
+Make use of this dictionary instead of running the same calculation 
+repeatedly.
+
+The automatic updating of the dictionary is  achieved by the ``EMeta`` 
+metaclass, ``EMethod`` descriptor and ``e_logger`` decorator. You do not 
+need to worry about these, but information about how they work is 
+provided in the docstring of ``EMeta``. 
 
 """
-
 
 import os
 import rdkit.Chem as chem
@@ -41,27 +53,46 @@ import rdkit.Chem.AllChem as ac
 import subprocess as sp
 import shutil
 import uuid
+from types import MethodType
+from functools import wraps
+from inspect import signature as sig
 
-class ValuesDescriptor:
-    """
-    This class does the magic of automatically updating `values`...
-
-    ... when an ``Energy`` method is called.    
-    
-    """
-
-    
-    def __init__(self):
-        ...
+class EMethod:
+    def __init__(self, func):
+        self.func = func
         
     def __get__(self, obj, cls):
-        ...
         
-    def __set__(self, obj, cls):
-        ...
+        # If the Energy method is accessed as a class attribute return
+        # the descriptor.
+        if obj is None:
+            return self
+            
+        # When trying to access the Energy method as an instance 
+        # attribute returned a modified version of the method. The
+        # method is modified so that after the method returns a value,
+        # it is stored in the `values` dictionary of the Energy 
+        # instance.
+        return e_logger(self.func, obj)
 
+class EMeta(type):
+    
+    def __new__(cls, cls_name, bases, cls_dict):
+        
+        # Find all the methods defined in the class `cls` and replace
+        # them with an ``Emethod`` descriptor.
+        for name, func in cls_dict.items():
+            
+            # Don't replace any private methods.
+            if name.startswith('_') or not callable(func):
+                continue
+            
+            # Replace method with descriptor.
+            cls_dict[name] = EMethod(func)
+        
+        return type.__new__(cls, cls_name, bases, cls_dict)
 
-class Energy:
+class Energy(metaclass=EMeta):
     """
     Handles all things related to a ``Molecule``'s energy.
 
@@ -152,8 +183,7 @@ class Energy:
             e_products += n * mol.energy.values[(func_name, params[0])]
         
         eng = self.pseudoformation(key, building_blocks, force_e_calc) 
-        eng -= e_products
-        self.values[('formation', func_name, params[0])] = eng         
+        eng -= e_products       
         return eng
 
     def pseudoformation(self, key, 
@@ -228,8 +258,7 @@ class Energy:
                     (func_name, params[0]) in self.values.keys() else
                     getattr(self, func_name)(*params))
 
-        eng = e_reactants - e_products
-        self.values[('pseudoformation', func_name, params[0])] = eng         
+        eng = e_reactants - e_products       
         return eng        
 
     def rdkit(self, forcefield):
@@ -265,7 +294,6 @@ class Energy:
                   ac.MMFFGetMoleculeProperties(self.molecule.prist_mol))
 
         eng = ff.CalcEnergy()        
-        self.values[('rdkit', forcefield)] = eng
         return eng
         
     def macromodel(self, forcefield, macromodel_path):
@@ -356,7 +384,6 @@ class Energy:
                 if "                   Total Energy =" in line:
                     eng = float(line.split()[-2].replace("=", ""))
     
-        self.values[('macromodel', forcefield)] = eng
         
         # Clean up temporary files.
         for filename in os.listdir(os.path.split(tmp_file)[0]):
@@ -364,3 +391,69 @@ class Energy:
                 os.remove(filename)
         
         return eng
+       
+def e_logger(func, obj):
+    
+    @wraps(func)
+    def inner(self, *args, **kwargs):
+        
+        # First get the result of the energy calculation.
+        result = func(self, *args, **kwargs)
+        
+        # Next create EnergyKey object to store the values of the
+        # parameters used to to run that calculation.
+        fsig = sig(func)
+        key = call_sig(func.__name__, fsig, self, *args, **kwargs)
+        
+        # Update the `values` dictionary with the results of the 
+        # calculation.
+        obj.values.update({key:result})
+        # Return the result.        
+        return result
+
+    # Make sure that the decorated function behaves like a typical 
+    # method and return.
+    return MethodType(inner, obj)
+
+def call_sig(name, fsig, *args, **kwargs):
+    
+    # Get a dictioanary of all the supplied parameters.
+    bound = dict(fsig.bind_partial(*args, **kwargs).arguments)
+    # Get a dictionary of all the default initialized parameters.
+    default = {key : value.default for key,value in 
+               dict(fsig.parameters).items() if key not in bound.keys()}
+               
+    # Combine the two sets of parameters and get rid of the `self` 
+    # parameter.
+    bound.update(default)
+    bound.pop('self')
+    
+    # Return an EnergyKey object representing the function and chosen
+    # parameters.
+    return EnergyKey(name, bound)
+ 
+class EnergyKey:
+    def __init__(self, name, sig_dict):
+        self.dict = sig_dict
+        self.name = name
+        
+    def __hash__(self):
+        return 1
+
+    def __eq__(self, other):
+        
+        same_length = len(self) == len(other)
+        same_items = all(x in other.dict.items() for x in self.dict.items())        
+        same_name = self.name == other.name        
+        
+        return same_length and same_items and same_name
+        
+    def __len__(self):
+        return len(self.dict.items())        
+        
+    def __str__(self):
+        s = ", ".join("{}={}".format(key, repr(value)) for key, value in self.dict.items())
+        return "EnergyKey({}, ".format(self.name) + s + ")"
+    def __repr__(self):
+        return str(self)
+        
