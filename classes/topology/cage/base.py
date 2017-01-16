@@ -29,6 +29,92 @@ class CageTopology(Topology):
     
     """
 
+    def place_mols(self):
+        """
+        Places all building block molecules on correct coordinates.
+
+        The building block molecules are placed in their appropriate 
+        positions based on the topology. It does not join them. 
+
+        
+        Modifies
+        --------
+        self.macro_mol.mol
+            An rdkit instance of the macromolecule with disconnected
+            building blocks is placed in this attribute.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        self.macro_mol.mol = chem.Mol()
+        
+        # Get the StructUnit instances of the building blocks.
+        bb1, bb2 = self.macro_mol.building_blocks
+        # Get the number of functional groups in each building block.
+        n_fg1 = len(bb1.functional_group_atoms())
+        n_fg2 = len(bb2.functional_group_atoms())
+        
+        # Depending on the number of functional groups, assigned a 
+        # building block to be either a linker or a building-block*. 
+        if n_fg1 < n_fg2:
+            lk = bb1
+            n_lk = n_fg1
+            bb = bb2
+            n_bb = n_fg2
+        else:
+            lk = bb2
+            n_lk = n_fg2
+            bb = bb1
+            n_bb = n_fg1
+        
+        # This loop places all building-blocks* on the points at 
+        # `positions_A`. It then pairs all atoms which form a new bond
+        # with the positions to which they will be bonding. It also
+        # counts the nubmer of building-blocks* which make up the 
+        # structure.
+        for position in self.positions_A:
+            self.macro_mol.mol = chem.CombineMols(
+                                        self.macro_mol.mol, 
+                                        position.place_mol(bb))
+            # Update the counter each time a building-block* is added.
+            self.bb_counter.update([bb])                            
+            
+            # Get ids of atoms which form new bonds.
+            bonder_ids = deque(maxlen=n_bb)
+            for atom in self.macro_mol.mol.GetAtoms():
+                if (atom.HasProp('on_react') and 
+                                atom.GetProp('on_react') == 'bond'):
+                    bonder_ids.append(atom.GetIdx())
+            
+            # Save the ids of atoms which form new bonds and pair them
+            # up with positions.
+            position.bonder_ids = sorted(bonder_ids)
+            self.pair_bonders_with_positions(position)
+
+        # This loop places all linkers on the points at `positions_B`. 
+        # It then saves all atoms which form a new bond to the position
+        # they are found at. It also counts the number of linkers which 
+        # make up the structure.
+        for position in self.positions_B:
+            self.macro_mol.mol = chem.CombineMols(
+                                        self.macro_mol.mol, 
+                                        position.place_mol(lk))
+            # Update the counter each time a linker is added.
+            self.bb_counter.update([lk])
+            
+            # Get ids of atoms which form new bonds.
+            bonder_ids = deque(maxlen=n_lk)
+            for atom in self.macro_mol.mol.GetAtoms():
+                if (atom.HasProp('on_react') and 
+                                atom.GetProp('on_react') == 'bond'):
+                    bonder_ids.append(atom.GetIdx())
+                    
+            # Save the ids of atoms which form new bonds. 
+            position.bonder_ids = list(bonder_ids)
+
     @property
     def windows(self):
         """

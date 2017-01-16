@@ -1430,9 +1430,7 @@ class StructUnit(Molecule, metaclass=Cached):
         -------
         None : NoneType
 
-        """        
-            
-         
+        """
          
         # Give all atoms in functional groups the tag 'fg' and set its
         # value to the name of the functional group. 
@@ -1440,10 +1438,21 @@ class StructUnit(Molecule, metaclass=Cached):
             atom = self.mol.GetAtomWithIdx(atom_id)
             atom.SetProp('fg', self.func_grp.name)
 
-        # Get the number of functional groups.
-        nfgs = len(self.functional_group_atoms())
-        
-        bond_atoms = chem.MolFromSmarts(self.func_grp.target_smarts)
+        # Give all atoms which form bonds during reactions the tag
+        # 'on_react' and set its value to 'bond'.
+        bond_mol = chem.MolFromSmarts(self.func_grp.target_smarts)
+        bond_atoms = self.mol.GetSubstructMatches(bond_mol)
+        for atom_id in flatten(bond_atoms):
+            atom = self.mol.GetAtomWithIdx(atom_id)
+            atom.SetProp('on_react', 'bond')
+
+        # Give all atoms which form bonds during reactions the tag
+        # 'on_react' and set its value to 'del'.            
+        del_mol = chem.MolFromSmarts(self.func_grp.del_smarts)
+        del_atoms = self.mol.GetSubstructMatches(del_mol)
+        for atom_id in flatten(del_atoms):
+            atom = self.mol.GetAtomWithIdx(atom_id)
+            atom.SetProp('on_react', 'del')       
 
     def _set_heavy_mol_orientation(self, start, end):
         """
