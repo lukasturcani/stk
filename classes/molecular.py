@@ -14,7 +14,7 @@ from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis)
-from .fg_info import FGInfo
+from .fg_info import functional_groups
 from .exception import MolError
 from .energy import Energy
 
@@ -1360,235 +1360,90 @@ class StructUnit(Molecule, metaclass=Cached):
                   '.pdb' : partial(chem.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
     
-    def __init__(self, prist_mol_file, minimal=False):
+    def __init__(self, mol_file):
         """
         Initializes a ``StructUnit`` instance.
         
         Parameters
         ----------
-        prist_mol_file : str
+        mol_file : str
             The full path of the molecular structure file holding the 
             building block.
             
-        minimal : bool (default = False)
-            If ``True`` the full initialization is not carried out. It
-            stops the initialization before the functional groups in the
-            molecule are replaced by heavy atoms.
-            
         """
-        
-        # Heavy versions of ``StructUnit`` instances will be placed
-        # in a folder named ``HEAVY``. This folder is placed in the 
-        # current working directory. The iterator checks to see if the
-        # folder already exists. If not, it returns ``False`` instead
-        # of the folder name.
-        heavy_dir = next((name for name in os.listdir(os.getcwd()) if 
-                        os.path.isdir(name) and "HEAVY" == name), False)
-        # If ``HEAVY`` folder not created yet, make it.
-        if not heavy_dir:        
-            os.mkdir("HEAVY")
  
-        self.prist_mol_file = prist_mol_file
-        _, ext = os.path.splitext(prist_mol_file)
+        self.mol_file = mol_file
+        _, ext = os.path.splitext(mol_file)
 
         if ext not in self.init_funcs:
             raise TypeError(
             'Unable to initialize from "{}" files.'.format(ext))
                                      
-        self.prist_mol = self.init_funcs[ext](prist_mol_file)
+        self.mol = self.init_funcs[ext](mol_file)
         self.energy = Energy(self)
         self.optimized = False        
-
-        # Check for minimal initialization.
-        if minimal:
-            return
         
         # Define a generator which yields an ``FGInfo`` instance from
-        # the `FGInfo.functional_group_list`. The yielded ``FGInfo``
-        # instance represents the functional group found on the pristine
-        # molecule used for initialization. The generator determines 
-        # the functional group of the molecule from the path of its 
-        # ``.mol`` file. 
+        # `functional_groups`. The yielded ``FGInfo``instance represents 
+        # the functional group of the molecule which will undergo bond
+        # formation. The generator determines the functional group of 
+        # the molecule from the path of of the structure file. 
         
-        # The database of precursors should be organized such that any 
-        # given ``.mol`` file has the name of its functional group in
-        # its path. Ideally, this will happen because the ``.mol`` file
-        # is in a folder named after the functional group the molecule 
-        # in the ``.mol`` file contains. This means each ``.mol`` file 
-        # should have the name of only one functional group in its path. 
-        # If this is not the case, the generator will return the 
-        # functional group which appears first in 
-        # `FGInfo.functional_group_list`.
+        # The database of precursors should be organized so that any 
+        # given structure file has the name of its functional group in
+        # its path. Each file should have the name of only one 
+        # functional group in its path. If this is not the case, the 
+        # generator will return the functional group which appears first 
+        # in `functional_groups`.
         
         # Calling the ``next`` function on this generator causes it to
         # yield the first (and what should be the only) result. The
         # generator will return ``None`` if it does not find the name of
-        # a functional group in the path of the ``.mol`` file.
-        self.func_grp = next((x for x in 
-                                FGInfo.functional_group_list if 
-                                x.name in prist_mol_file), None)
-        self.heavy_ids = []        
+        # a functional group in the path.
+        self.func_grp = next((x for x in functional_groups if 
+                                x.name in mol_file), None)      
         
-        # Calling this function generates all the attributes assciated
-        # with the molecule the functional group has been subtituted
-        # with heavy atoms.
-        self._generate_heavy_attrs()
+        # Calling this function labels the atoms in the rdkit molecule
+        # as either atoms which form a bond during reactions or atoms
+        # which get removed.
+        self._tag_atoms()   
 
-    def _delete_tag_ids(self, heavy_atom):
+    def _tag_atoms(self):
         """
-        Returns the ids of neighbor atoms tagged for deletion.
-        
-        These are neighbors to `heavy_atom`.
+        Adds bonding and deletion tags to atoms.
 
-        Parameters
-        ----------
-        heavy_atom : rdkit.Chem.rdchem.Atom
-            The heavy atom who's neighbors should be deleted.
-            
-        Returns
-        -------
-        list of ints
-            The ids of neighbor atoms which have been tagged for
-            deletion.
+        All atoms which form the functional group of the molecule have 
+        the property 'fg' added. Its value is set to the name of the
+        functional group. 
         
-        """
-        
-        heavy_id = heavy_atom.GetIdx()
-        
-        del_ids = []
-        
-        # For each deletion tag, go through all the neighors that
-        # `heavy_atom` has. If the atom's element and bond type matches
-        # the deletion tag, add the atom's id to the ``del_ids`` list.        
-        for del_atom in self.func_grp.del_tags:
-            for n in heavy_atom.GetNeighbors():
-                n_id = n.GetIdx()
-
-                bond = self.heavy_mol.GetBondBetweenAtoms(heavy_id, 
-                                                          n_id)
-                bond_type = bond.GetBondType()
-
-                if (n.GetAtomicNum() == del_atom.atomic_num and
-                    bond_type == del_atom.bond_type and
-                    n_id not in del_ids):
-                    del_ids.append(n_id)
-                    break
-        
-        return del_ids
-
-    def _generate_heavy_attrs(self):
-        """
-        Adds attributes associated with a substituted functional group.
-        
-        This function is private because it should not be used outside 
-        of the initializer.
-        
-        The function creates rdkit molecule where all of the functional
-        group atoms have been replaced by the desired atom as indicated
-        in the ``FGInfo`` instance of `self`. It also creates ``.mol``
-        file holding this molecule and a ``SMILES`` string representing
-        it.
-
-        Modifies
-        --------
-        self : StructUnit
-            Adds the `heavy_mol`, `heavy_mol_file` and `heavy_smiles`
-            attributes to ``self``. It also adds the ids of heavy atoms
-            to `heavy_ids` by calling the `_make_atoms_heavy_in_heavy`
-            method.
-        
-        Returns
-        -------
-        None : NoneType                
-
-        """
-        
-        # In essence, this function first finds all atoms in the 
-        # molecule which form a functional group. It then switches the 
-        # target atoms in the functional groups for heavy atoms and
-        # deletes any tagged for deletion. This new molecule is then 
-        # stored in the ``StructUnit`` instance in the form of an 
-        # ``rdkit.Chem.rdchem.Mol``, a SMILES string and a ``.mol`` file 
-        # path.
-        
-        # First create a copy of the ``rdkit.Chem.rdchem.Mol`` instance
-        # representing the pristine molecule. This is so that after 
-        # any changes are made, the pristine molecule's data is not 
-        # corrupted. This second copy which will turn into the 
-        # substituted ``rdkit.Chem.rdchem.Mol`` will be operated on.
-        self.heavy_mol = chem.Mol(self.prist_mol)      
-
-        # Subtitutes the relevant functional group atoms in `heavy_mol`
-        # for heavy atoms and deletes Hydrogen atoms of the functional
-        # group as well as any other atoms tagged for deletion.
-        self._make_atoms_heavy()
-
-        # Change the pristine ``.mol`` file name to include the word
-        # ``HEAVY_`` at the end. This generates the name of the 
-        # substituted version of the ``.mol`` file.
-        heavy_file_name = list(os.path.splitext(self.prist_mol_file))
-        heavy_file_name.insert(1,'HEAVY')
-        heavy_file_name.insert(2, self.func_grp.name)
-        self.heavy_mol_file = '_'.join(heavy_file_name)
-        self.heavy_mol_file = os.path.split(self.heavy_mol_file)[1]
-        self.heavy_mol_file = os.path.join(os.getcwd(), "HEAVY", 
-                                           self.heavy_mol_file)
-        self.write_mol_file('heavy')      
-
-    def _make_atoms_heavy(self):
-        """
-        Converts functional group in `heavy_mol` to substituted version.
-
-        The function changes the element of the central atom of the
-        functional group and deletes any hydrogen atoms in the
-        functional group. It also deletes any atoms in the functional
-        group that have been tagged for deletion.        
+        The atom which forms bonds during reactions has the property
+        called 'on_react' added and set to 'bond'. Atoms which are 
+        deleted during reactions have the same property set to 'del'.
         
         Modifies
         --------
-        heavy_mol : rdkit.Chem.rdchem.Mol
-            The rdkit molecule has atoms removed and converted to 
-            different elements, as described in the docstring.
-
-        heavy_ids : list
-            Adds the ids of heavy atoms to this list.
+        prist_mol : rdkit.Chem.rdchem.Mol
+            The atoms in this rdkit molecule have the properties 'fg'
+            and 'on_react' added, in accordance with the docstring.
 
         Returns
         -------
         None : NoneType
 
         """        
+            
          
-        # Go through all atom ids corresponding to a functional group
-        # atoms. If the element of the atom corresponds to the atom
-        # which must be substituted, do so. For each substituted atom
-        # check if any of its neighbors are tagged for deletion and
-        # tag all the neighboring Hydrogen atoms for deletion. An atom
-        # tagged for deletion will have its id added to ``del_ids``.
-        del_ids = []
-        for atom_id in flatten(self.find_functional_group_atoms()):
-            atom = self.heavy_mol.GetAtomWithIdx(atom_id)
-            if atom.GetAtomicNum() == self.func_grp.target_atomic_num:            
-                atom.SetAtomicNum(self.func_grp.heavy_atomic_num)
-                
-                del_ids.extend(self._delete_tag_ids(atom))
-                for n in atom.GetNeighbors():
-                    if n.GetAtomicNum() == 1:
-                        del_ids.append(n.GetIdx())
+         
+        # Give all atoms in functional groups the tag 'fg' and set its
+        # value to the name of the functional group. 
+        for atom_id in flatten(self.functional_group_atoms()):
+            atom = self.mol.GetAtomWithIdx(atom_id)
+            atom.SetProp('fg', self.func_grp.name)
 
-        # Make an EditableMol and delete all of its atoms which have
-        # been tagged for deletion. Delete ids with larger ids first to
-        # prevent rdkit from raising range errors.      
-        editable_mol = chem.EditableMol(self.heavy_mol)
-        for del_id in sorted(del_ids, reverse=True):
-            editable_mol.RemoveAtom(del_id)
-               
-        self.heavy_mol = editable_mol.GetMol()
+        # Get the number of functional groups.
+        nfgs = len(self.functional_group_atoms())
         
-        # Take note of heavy atom ids.
-        for atom in self.heavy_mol.GetAtoms():
-            if atom.GetAtomicNum() == self.func_grp.heavy_atomic_num:
-                self.heavy_ids.append(atom.GetIdx())
+        bond_atoms = chem.MolFromSmarts(self.func_grp.target_smarts)
 
     def _set_heavy_mol_orientation(self, start, end):
         """
@@ -1697,7 +1552,7 @@ class StructUnit(Molecule, metaclass=Cached):
         return normalize_vector(self.centroid('heavy') - 
                                 self.heavy_atom_centroid())
 
-    def find_functional_group_atoms(self):
+    def functional_group_atoms(self):
         """
         Returns a container of atom ids of atoms in functional groups.
 
