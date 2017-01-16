@@ -115,9 +115,53 @@ rather than:
     >>>  molecule.energy.values[key]
     OUT: 200
 
+Sometimes even this isn't enough to get the key to look exactly the way
+we want. For exmple:
+
+    @exclude('force_e_calc')
+    def formation(self, func, products, 
+                  building_blocks=None, force_e_calc=False):
+
+The `func` parameter of this function is a FunctionData instance, which
+holds data for one of the other ``Energy`` functions. This includes 
+all data the function requires to run, even software directories if
+needed. As a result, the key when running this function may look like 
+this:
+
+    FunctionData('pseudoformation', building_blocks=None, 
+                 func=FunctionData('macromodel', forcefield=16, 
+                macromodel_path='C:\\Program Files\\Schrodinger2016-3'))
+    
+Notice that the path of the macromodel installation was kept nested in 
+the key of the ``Energy.formation()`` function. This is undesirable. To 
+make this work properly, a completely custom mechanism for making the 
+key of the ``Energy.formation()`` is necessary. To do this, define a 
+function in this module. For example:
+
+    def formation_key(fargs, fkwargs):
+        ...
+        
+And set the `key` attribute of the energy function to the newly defined 
+function: 
+    
+    Energy.formation.key = formation_key
+    
+The `fargs` and `fkwargs` arguments are the arguments and keyword 
+arguments with which ``Energy.formation()`` was called (including 
+`self`). The ``formation_key()`` function should return a FunctionData 
+instance which will act as the key. In our case the function was defined 
+so that the key is:
+
+    FunctionData('formation', products=[], building_blocks=None, 
+                 func=FunctionData('macromodel', forcefield=16))
+
+Sidenote1
+---------
 Make sure to use the `values` dictionary instead of running the same 
 calculation repeatedly.
 
+Sidenote2
+---------
 The automatic updating of the dictionary is  achieved by the ``EMeta`` 
 metaclass, ``EMethod`` descriptor and ``e_logger`` decorator. You do not 
 need to worry about these, but information about how they work is 
@@ -171,17 +215,18 @@ class EMethod:
             difference is that when calling the method  now, it will 
             automatically update the `values` attribute of `obj`.
             
-        self : EMethod
+        self.func : function
             If the method in `self.func` is called as a class attribute
-            rather than an instance attribute, return the descriptor.
+            rather than an instance attribute, return it instead of the
+            descriptor.
         
         """
         
         
         # If the Energy method is accessed as a class attribute return
-        # the descriptor.
+        # the unbound method.
         if obj is None:
-            return self
+            return self.func
             
         # When trying to access the Energy method as an instance 
         # attribute returned a modified version of the method. The
@@ -226,6 +271,102 @@ class EMeta(type):
             cls_dict[name] = EMethod(func)
         
         return type.__new__(cls, cls_name, bases, cls_dict)
+
+def e_logger(func, obj):
+    """
+    Turns `func` into a version which updates the `values` dictionary.
+
+    Parameters
+    ----------
+    func : function
+
+    obj : Energy
+        The Energy object on which the method `func` was called.
+        
+    Returns
+    -------
+    MethodType
+        The function `func` bound to `obj` and modified so that when
+        called the results update the `values` dictionary of `obj`.
+    
+    """
+    
+    @wraps(func)
+    def inner(self, *args, **kwargs):
+        
+        # First get the result of the energy calculation.
+        result = func(self, *args, **kwargs)
+        
+        # Next create FunctionData object to store the values of the
+        # parameters used to to run that calculation.
+        key = func_key(func, (self,)+args, kwargs)
+        
+        # Update the `values` dictionary with the results of the 
+        # calculation.
+        obj.values.update({key:result})
+        # Return the result.        
+        return result
+
+    # Make sure that the decorated function behaves like a typical 
+    # method and return.
+    return MethodType(inner, obj)
+
+def func_key(func, fargs=None, fkwargs=None):
+    """
+    Returns the key used in the `values` dictionary for `func`.
+    
+    Parameters
+    ----------
+    func : function
+        The function whose results are to be stored in the `values`
+        dictionary.
+    
+    fargs : tuple (default = None)
+        The arguments passed to `func`.
+
+    fkwargs : dict (default = None)
+        The keyword arguments passed to `func`.
+        
+    Returns
+    -------
+    FunctionData
+        The FunctionData object representing the key when `func` is 
+        called with the arguments `fargs` and keyword arguments 
+        `fkwargs`.
+    
+    """
+    
+    if fargs is None:
+        fargs = []
+    if fkwargs is None:
+        fkwargs = []
+    
+    # Check if the function has a `key` attribute. If it does use this
+    # to get its key rather than the general purpose code written here.
+    if hasattr(getattr(Energy, func.__name__, False), 'key'):
+        return getattr(Energy, func.__name__).key(fargs, fkwargs)
+    
+    fsig = sig(func)
+    # Get a dictionary of all the supplied parameters.
+    bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
+    # Get a dictionary of all the default initialized parameters.
+    default = {key : value.default for key,value in 
+               dict(fsig.parameters).items() if key not in bound.keys()}
+               
+    # Combine the two sets of parameters and get rid of the `self` 
+    # parameter, if present.
+    bound.update(default)
+    if 'self' in bound.keys():
+        bound.pop('self')
+    # Remove any parameters that should not form key, listed in the 
+    # `exclude` attribute.
+    if hasattr(func, 'exclude'):
+        for key in func.exclude:
+            bound.pop(key)
+    
+    # Return an FunctionData object representing the function and chosen
+    # parameters.
+    return FunctionData(func.__name__, **bound)
 
 def exclude(*args):
     """
@@ -326,7 +467,7 @@ class Energy(metaclass=EMeta):
         # Get the function used to calculate the energies.
         efunc = getattr(self, func.name)
         # Get the key of the function used to calculate the energies.
-        fkey = func_key(efunc, **func.params)        
+        fkey = func_key(efunc, None, func.params)        
         
         # Recalculate energies if requested.
         if force_e_calc:
@@ -347,7 +488,6 @@ class Energy(metaclass=EMeta):
         eng -= e_products       
         return eng
 
-    @exclude('force_e_calc')
     def pseudoformation(self, func, 
                         building_blocks=None,  force_e_calc=False):
         """
@@ -390,7 +530,7 @@ class Energy(metaclass=EMeta):
         # Get the function used to calculate the energies.
         efunc = getattr(self, func.name)
         # Get the key of the function used to calculate the energies.
-        fkey = func_key(efunc, **func.params) 
+        fkey = func_key(efunc, None, func.params) 
         
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in 
@@ -474,19 +614,11 @@ class Energy(metaclass=EMeta):
             machine. For example, in a default Microsoft installation 
             the folder will probably be something like
             ``C:\Program Files\Schrodinger2016-2``.
- 
-        Modifies
-        --------
-        self.values : dict
-            Adds an entry to this dictionary. The key is a tuple of the
-            form ('macromodel', `forcefield`). The value is the 
-            caculated energy.
             
         Returns 
         -------
         float
-            The calculated energy. Note that this value is also stored
-            in the dictionary `self.values`.
+            The calculated energy.
         
         """
         
@@ -552,34 +684,32 @@ class Energy(metaclass=EMeta):
                 os.remove(filename)
         
         return eng
-       
-def e_logger(func, obj):
-    
-    @wraps(func)
-    def inner(self, *args, **kwargs):
-        
-        # First get the result of the energy calculation.
-        result = func(self, *args, **kwargs)
-        
-        # Next create FunctionData object to store the values of the
-        # parameters used to to run that calculation.
-        key = func_key(func, self, *args, **kwargs)
-        
-        # Update the `values` dictionary with the results of the 
-        # calculation.
-        obj.values.update({key:result})
-        # Return the result.        
-        return result
 
-    # Make sure that the decorated function behaves like a typical 
-    # method and return.
-    return MethodType(inner, obj)
-
-def func_key(func, *args, **kwargs):
+def formation_key(fargs, fkwargs):
+    """
+    Generates the key of the `formation()` method in the `values` dict.
     
-    fsig = sig(func)
+    Parameters
+    ----------
+    fargs : tuple
+        The arguments with which Energy.formation() was called.
+        
+    fkwargs : dict
+        The keyword arguments with which Energy.formation() was called.
+        
+    Returns
+    -------
+    FunctionData
+        The FunctionData object representing the key when `formation()` 
+        is called with the arguments `fargs` and keyword arguments 
+        `fkwargs`.    
+    
+    """
+    
+    fsig = sig(Energy.formation)
+
     # Get a dictionary of all the supplied parameters.
-    bound = dict(fsig.bind_partial(*args, **kwargs).arguments)
+    bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key : value.default for key,value in 
                dict(fsig.parameters).items() if key not in bound.keys()}
@@ -589,13 +719,71 @@ def func_key(func, *args, **kwargs):
     bound.update(default)
     if 'self' in bound.keys():
         bound.pop('self')
-    # Remove any parameters that should not form key, listed in the 
-    # `exclude` attribute.
-    if hasattr(func, 'exclude'):
-        for key in func.exclude:
-            bound.pop(key)
-    
+
+    # Replace the energy function to be used with the key of the 
+    # energy function to be used.
+    efuncdata = bound['func']
+    efunc = getattr(Energy, efuncdata.name)
+    bound['func'] = func_key(efunc, None, efuncdata.params)
+
+    # Don't want this paramter in the key as it doenst affect the
+    # result.
+    bound.pop('force_e_calc')
+
     # Return an FunctionData object representing the function and chosen
     # parameters.
-    return FunctionData(func.__name__, **bound)
+    return FunctionData('formation', **bound)
+
+Energy.formation.key = formation_key
+
+def pseudoformation_key(fargs, fkwargs):
+    """
+    Generates key of the `pseudoformation()` method in `values` dict.
     
+    Parameters
+    ----------
+    fargs : tuple
+        The arguments with which Energy.pseudoformation() was called.
+        
+    fkwargs : dict
+        The keyword arguments with which Energy.pseudoformation() was 
+        called.
+        
+    Returns
+    -------
+    FunctionData
+        The FunctionData object representing the key when 
+        `pseudoformation()` is called with the arguments `fargs` and 
+        keyword arguments `fkwargs`.    
+    
+    """
+    
+    fsig = sig(Energy.pseudoformation)
+
+    # Get a dictionary of all the supplied parameters.
+    bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
+    # Get a dictionary of all the default initialized parameters.
+    default = {key : value.default for key,value in 
+               dict(fsig.parameters).items() if key not in bound.keys()}
+               
+    # Combine the two sets of parameters and get rid of the `self` 
+    # parameter, if present.
+    bound.update(default)
+    if 'self' in bound.keys():
+        bound.pop('self')
+
+    # Replace the energy function to be used with the key of the 
+    # energy function to be used.
+    efuncdata = bound['func']
+    efunc = getattr(Energy, efuncdata.name)
+    bound['func'] = func_key(efunc, None, efuncdata.params)
+    
+    # Don't want this paramter in the key as it doenst affect the
+    # result.
+    bound.pop('force_e_calc')
+
+    # Return an FunctionData object representing the function and chosen
+    # parameters.
+    return FunctionData('pseudoformation', **bound)
+
+Energy.pseudoformation.key = pseudoformation_key
