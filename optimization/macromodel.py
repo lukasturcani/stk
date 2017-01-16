@@ -7,7 +7,7 @@ import warnings
 import psutil
 import re
 
-from ..classes.exception import MacroMolError
+from ..classes.exception import MolError
 from ..classes.fg_info import FGInfo
 from ..convenience_tools import MAEExtractor
 
@@ -114,21 +114,21 @@ def macromodel_opt(macro_mol, force_field=16,
         return macro_mol 
 
     except _ConversionError as ex:
-        MacroMolError(ex, macro_mol, '`structconvert` failed.')
+        MolError(ex, macro_mol, '`structconvert` failed.')
         return macro_mol        
 
     except _PathError as ex:
-        MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
+        MolError(ex, macro_mol, 'Wrong MacroModel path.')
         return macro_mol
 
     except _OptimizationError as ex:
-        MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
+        MolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
     except _ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field == 14:
-            MacroMolError(Exception(), macro_mol, 
+            MolError(Exception(), macro_mol, 
                           'Both force fields failed.')
             return macro_mol
             
@@ -148,12 +148,12 @@ def macromodel_opt(macro_mol, force_field=16,
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md) 
         else:
-            MacroMolError(ex, macro_mol, ('A viable Lewis'
+            MolError(ex, macro_mol, ('A viable Lewis'
                                        ' structure was not generated.'))
             return macro_mol
 
     except Exception as ex:
-        MacroMolError(ex, macro_mol, ('Uncategorized '
+        MolError(ex, macro_mol, ('Uncategorized '
                       'exception during `macromodel_opt`.'))
         return macro_mol
        
@@ -176,21 +176,21 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
         macro_mol.update_from_mae(conformer_mae) 
 
     except _ConversionError as ex:
-        MacroMolError(ex, macro_mol, '`structconvert` failed.')
+        MolError(ex, macro_mol, '`structconvert` failed.')
         return macro_mol
 
     except _PathError as ex:
-        MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
+        MolError(ex, macro_mol, 'Wrong MacroModel path.')
         return macro_mol
 
     except _OptimizationError as ex:
-        MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
+        MolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
     except _ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field == 14:
-            MacroMolError(Exception(), macro_mol, 
+            MolError(Exception(), macro_mol, 
                           'Both force fields failed.')
             return macro_mol
             
@@ -212,12 +212,12 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
                                  temp=temp, confs=confs, 
                                  eq_time=eq_time, sim_time=sim_time) 
         else:
-            MacroMolError(ex, macro_mol, ('A viable Lewis'
+            MolError(ex, macro_mol, ('A viable Lewis'
                                        ' structure was not generated.'))
             return macro_mol
         
     except Exception as ex:
-        MacroMolError(ex, macro_mol, ('Uncategorized'
+        MolError(ex, macro_mol, ('Uncategorized'
                        ' exception during `macromodel_md_opt`.'))
         return macro_mol
     
@@ -315,21 +315,21 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         return macro_mol
 
     except _ConversionError as ex:
-        MacroMolError(ex, macro_mol, '`structconvert` failed.')
+        MolError(ex, macro_mol, '`structconvert` failed.')
         return macro_mol        
 
     except _PathError as ex:
-        MacroMolError(ex, macro_mol, 'Wrong MacroModel path.')
+        MolError(ex, macro_mol, 'Wrong MacroModel path.')
         return macro_mol
 
     except _OptimizationError as ex:
-        MacroMolError(ex, macro_mol, 'Optimization by `bmin` failed.')
+        MolError(ex, macro_mol, 'Optimization by `bmin` failed.')
         return macro_mol
 
     except _ForceFieldError as ex:        
         # If OPLS_2005 has been tried already - record an exception.
         if force_field==14:
-            MacroMolError(Exception(), macro_mol, 
+            MolError(Exception(), macro_mol, 
                           'Both force fields failed.')
             return macro_mol
             
@@ -349,12 +349,12 @@ def macromodel_cage_opt(macro_mol, force_field=16,
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md) 
         else:
-            MacroMolError(ex, macro_mol, ('A viable Lewis'
+            MolError(ex, macro_mol, ('A viable Lewis'
                                        ' structure was not generated.'))
             return macro_mol
 
     except Exception as ex:
-        MacroMolError(ex, macro_mol, ('Uncategorized '
+        MolError(ex, macro_mol, ('Uncategorized '
                       'exception during `macromodel_cage_opt`.'))
         return macro_mol
 
