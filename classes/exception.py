@@ -1,3 +1,8 @@
+"""
+A module for defining MMEA's exceptions.
+
+"""
+
 import os
 import traceback
 
