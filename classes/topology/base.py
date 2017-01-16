@@ -1,11 +1,11 @@
 import numpy as np
 import itertools
-from collections import deque, Counter
+from collections import Counter
 import rdkit
 import rdkit.Chem as chem
 from scipy.spatial.distance import euclidean
 
-from ..molecular import FGInfo
+from ..fg_info import double_bond_combs
 from ...convenience_tools import (centroid, vector_theta,
                                       rotation_matrix_arbitrary_axis,
                                       normalize_vector)       
@@ -27,26 +27,23 @@ class Vertex:
         This list holds the Edge or Vertex instances which represent the 
         edges or vertices connected to the `self` vertex.
     
-    heavy_ids : list of ints
-        This list holds the ids of the heavy atoms which belong to the
-        building block placed on a particular vertex. The ids correspond
-        to the id of the heavy atoms in the cage molecule. This means
-        they correspond to the ids of atoms in the `heavy_mol` attribute
-        of a ``Cage`` instance.
+    bonder_ids : list of ints
+        This list holds the ids of atoms which belong to the building 
+        block placed on the vertex and will form bonds.
     
-    atom_position_pairs : list of tuples of form (int, Edge/Vertex)
-        Each heavy atom on a vertex is paired to a specific vertex or 
+    atom_position_pairs : list of tuples of form (int, Vertex)
+        Each atom which  is paired to a neighboring vertex or 
         edge first. Only after this is the atom - atom pairing 
         performed. The atom - edge/vertex pairing is stored here. The
-        int represents the id of the heavy atom.
+        int represents the id of the atom.
         
     distances : list of tuples of form (float, int, int)
-        After a heavy atoms have been associated with vertices to which
+        After bonder atoms have been associated with vertices to which
         they join, the idividual atoms are paired up. To do this the 
-        distance between every heavy atom on the paired vertex and the
-        heavy atom which is paired to the vertex is found. This
+        distance between every bonder atom on the paired vertex and the
+        bonder atom which is paired to the vertex is found. This
         information is stored here where float is the distance, the
-        first int is the heavy atom and the second int is the heavy
+        first int is the bonder atom and the second int is the bonder
         atom on the vertex paired to the first atom.
     
     """ 
@@ -54,7 +51,7 @@ class Vertex:
     def __init__(self, x, y, z):
         self.coord = np.array([x,y,z])
         self.connected = []
-        self.heavy_ids = []
+        self.bonder_ids = []
         self.atom_position_pairs = []
         self.distances = []
         
@@ -71,17 +68,17 @@ class Vertex:
         Places a building-block* on the coords of the vertex.
         
         The orientation of the building-block* is aligned with 2
-        parameters. Firstly the normal of the plane of heavy atoms of
+        parameters. Firstly the normal of the plane of bonder atoms of
         the building-block* is aligned with the normal of the plane
         formed by the edges connected to the vertex. Because the normal
-        of the plane of heavy atoms always points in the direction of
+        of the plane of bonder atoms always points in the direction of
         the building_block*'s centroid, this alignment causes the bulk
         of the building-block* molecule to point away from the center
         of the cage.
         
-        Secondly, the building-block* is rotated so that a heavy atom is 
-        aligned perfectly with an edge. This reduces the rms distance
-        between the edges and heavy atoms to some extent.                
+        Secondly, the building-block* is rotated so that a bonder atom 
+        is aligned perfectly with an edge. This reduces the rms distance
+        between the edges and bonder atoms to some extent.                
         
         Parameters
         ----------
@@ -90,7 +87,7 @@ class Vertex:
         
         Modifies
         --------
-        building_block.heavy_mol : rdkit.Chem.rdchem.Mol
+        building_block.mol : rdkit.Chem.rdchem.Mol
             The conformer of the rdkit instance in this attribute is 
             modified as per the description in the docstring.
             
@@ -452,12 +449,7 @@ class Topology:
         
     def build(self):
         """
-        Creates rdkit instances of heavy and pristine macromolecules.
-        
-        This function also places the created rdkit instances in the
-        `prist_mol` and `heavy_mol` attributes of `self.macro_mol`.
-        `self.macro_mol` is the ``MacroMolecule`` instance holding the 
-        ``Topology`` instance carrying out `build`.
+        Assembles rdkit instances of the macromolecules.
         
         To carry out `build` an instance of a class derived from 
         ``Topology`` must be used. This is because instances of such
@@ -470,63 +462,65 @@ class Topology:
         
         Modifies
         --------
-        self.macro_molecule.heavy_mol
-            Adds an rdkit instance of the heavy assembled molecule to 
-            this attribute.
-            
-        self.macro_molecule.prist_mol
-            Adds an rdkit instance of the pristine assembled molecule to
-            this attribute.
+        self.macro_mol.mol
+            Adds an rdkit instance of the assembled molecule into this 
+            attribute.
             
         self.bonds_made : int
             This counter is updated with each bond made during assembly.            
             
         self.bb_counter : Counter
-            The counter is updated with each building block molecule
-            placed.                        
+            The counter is updated with the number of building blocks of
+            each StructUnit that make up the MacroMolecule.               
             
         Returns
         -------
         None : NoneType
         
         """
-        
-        # This function places the individual building block molecules
-        # into a single rdkit molecule instance. These molecules should 
-        # be placed on a given set of vertices or edges, depending on 
-        # the topology desired. Bonds are then created between the 
-        # placed molecules. This is done using the heavy atoms as 
-        # identifiers. As a result, this creates the heavy atom s
-        # substituted version of the macromolecule. To produce the 
-        # pristine verion of the molecule, `final_sub` is called which 
-        # replaces the heavy atoms with their pristine counterparts / 
-        # functional groups.
+
         self.place_mols()
-        self.join_mols()      
-        self.final_sub()
+        self.join_mols()
 
     def join_mols(self):
+        """
+        Joins up the separate building blocks which form the molecule.
+
+        Modifies
+        --------
+        self.macro_mol : rdkit.Chem.rdchem.Mol
+            Joins up the separate building blocks in this macromolecule.
+
+        Returns
+        -------
+        None : NoneType    
         
-        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
+        """
         
+        editable_mol = chem.EditableMol(self.macro_mol.mol)
+        
+        # This loop finds all the distances between an atom paired with
+        # a postion and all other atoms at the paired position.
         for position in self.positions_A:
             for atom_id, vertex in position.atom_position_pairs:
-                # Get all the distances between the atom and the heavy
-                # atoms on the vertex. Store this information on the 
-                # vertex.
-                for atom2_id in vertex.heavy_ids:
-                    distance = self.macro_mol.atom_distance('heavy', 
-                                                            atom_id, 
+                # Get all the distances between the atom and the other
+                # bonding atoms on the vertex. Store this information on 
+                # the vertex.
+                for atom2_id in vertex.bonder_ids:
+                    distance = self.macro_mol.atom_distance(atom_id, 
                                                             atom2_id)
                     position.distances.append((distance, 
                                              atom_id, atom2_id))
 
+        # This loop creates bonds between atoms at two different
+        # positions so that each atom only bonds once and so that the
+        # total length of all bonds made is minimzed.   
         paired = set()        
         for position in self.positions_A:
             for _, atom1_id, atom2_id in sorted(position.distances):
                 if atom1_id in paired or atom2_id in paired:
                     continue            
-
+                
                 bond_type = self.determine_bond_type(atom1_id, atom2_id)
                 # Add the bond.                
                 editable_mol.AddBond(atom1_id, atom2_id, bond_type)
@@ -534,44 +528,7 @@ class Topology:
                 paired.add(atom1_id)
                 paired.add(atom2_id)
                 
-        self.macro_mol.heavy_mol = editable_mol.GetMol()           
-
-    def final_sub(self):
-        """
-        Replaces heavy atoms with functional group atoms they represent.        
-        
-        Once a heavy cage has been assembled the pristine macromolecule 
-        is formed by replacing the heavy atoms and adding Hydrogens 
-        where appropriate.
-        
-        Modifies
-        --------
-        self.macro_molecule.prist_mol
-            Creates this attribute. It holds the rdkit instances of the
-            assembled pristine macromolecule.
-        
-        Returns
-        -------
-        None : NoneType
-        
-        """
-        
-        self.macro_mol.prist_mol = chem.Mol(self.macro_mol.heavy_mol)
-        
-        for atom in self.macro_mol.prist_mol.GetAtoms():
-            atomic_num = atom.GetAtomicNum()
-            if atomic_num in FGInfo.heavy_atomic_nums:
-                target_atomic_num = next(x.target_atomic_num for x in 
-                                    FGInfo.functional_group_list if 
-                                    x.heavy_atomic_num == atomic_num)                
-                atom.SetAtomicNum(target_atomic_num)
-                atom.UpdatePropertyCache()
-        
-        # Updating the property cache recalculates valencies. This means
-        # Hydrogen atoms are added in places where they are missing.
-        self.macro_mol.prist_mol.UpdatePropertyCache()
-        self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol,
-                                              addCoords=True)        
+        self.macro_mol.mol = editable_mol.GetMol()    
 
     def pair_bonders_with_positions(self, vertex):
         """
@@ -636,7 +593,7 @@ class Topology:
         Returns the bond order to be formed between the atoms.
         
         Some atoms will need to have a double bond created between them.
-        This is defined in the `FGInfo.double_bond_combs` list. If the
+        This is defined in the `double_bond_combs` list. If the
         atom ids provided as paramters belong to atoms of elements
         found in this list, the rdkit double bond type will be returned.
         If not the rdkit single bond type will be returned. These types
@@ -654,38 +611,29 @@ class Topology:
         -------
         rdkit.Chem.rdchem.BondType.SINGLE
             If the combination of heavy atoms passed as arguments is not 
-            in `FGInfo.double_bond_combs`.
+            in `double_bond_combs`.
         
         rdkit.Chem.rdchem.BondType.DOUBLE
             If the combination of heavy atoms passed as arguments is in
-            `FGInfo.double_bond_combs`.
+            `double_bond_combs`.
             
         """
         
-        # Get the atomic numbers of the of the atoms whose atom ids were
-        # supplied as arguments. Then use `FGInfo.functional_group_list`
-        # attribute to find the atomic symbols. If the atomic symbols
-        # for ma tuple in `FGInfo.double_bond_combs` return a rdkit 
-        # double bond type. If they do not, return a rdkit single bond 
-        # type.
+        # Get the functional groups of the of the atoms whose atom ids 
+        # were supplied as arguments. If the groups form a tuple in 
+        # `double_bond_combs` return a rdkit double bond type. If they 
+        # do not, return a rdkit single bond type.
         
-        atom1 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom1_id)
-        atom1_atomic_n = atom1.GetAtomicNum()
-        atom2 = self.macro_mol.heavy_mol.GetAtomWithIdx(atom2_id)
-        atom2_atomic_n = atom2.GetAtomicNum()
+        atom1 = self.macro_mol.mol.GetAtomWithIdx(atom1_id)
+        atom1_grp = atom1.GetProp('fg')
+        atom2 = self.macro_mol.mol.GetAtomWithIdx(atom2_id)
+        atom2_grp= atom2.GetProp('fg')      
         
-        atom1_symbol = next(x.heavy_symbol for x in 
-                            FGInfo.functional_group_list if 
-                            atom1_atomic_n == x.heavy_atomic_num)
-        atom2_symbol = next(x.heavy_symbol for x in 
-                            FGInfo.functional_group_list if 
-                            atom2_atomic_n == x.heavy_atomic_num)        
+        double_bond_present = ((atom1_grp, atom2_grp) == tup or 
+                               (atom2_grp, atom1_grp) == tup for 
+                               tup in double_bond_combs)
         
-        double_bond_present = ((atom1_symbol, atom2_symbol) == tup or 
-                               (atom2_symbol, atom1_symbol) == tup for 
-                               tup in FGInfo.double_bond_combs)
-        
-        if True in double_bond_present:
+        if any(double_bond_present):
             return rdkit.Chem.rdchem.BondType.DOUBLE
         else:
             return rdkit.Chem.rdchem.BondType.SINGLE

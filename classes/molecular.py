@@ -1380,6 +1380,7 @@ class StructUnit(Molecule, metaclass=Cached):
             'Unable to initialize from "{}" files.'.format(ext))
                                      
         self.mol = self.init_funcs[ext](mol_file)
+        self.bonder_ids = []
         self.energy = Energy(self)
         self.optimized = False        
         
@@ -1425,6 +1426,9 @@ class StructUnit(Molecule, metaclass=Cached):
         prist_mol : rdkit.Chem.rdchem.Mol
             The atoms in this rdkit molecule have the properties 'fg'
             and 'on_react' added, in accordance with the docstring.
+                
+        bonder_ids : list of ints
+            Adds the ids of bonder atoms to this list.
 
         Returns
         -------
@@ -1439,12 +1443,14 @@ class StructUnit(Molecule, metaclass=Cached):
             atom.SetProp('fg', self.func_grp.name)
 
         # Give all atoms which form bonds during reactions the tag
-        # 'on_react' and set its value to 'bond'.
+        # 'on_react' and set its value to 'bond'. Add their ids to 
+        # `bonder_ids`.
         bond_mol = chem.MolFromSmarts(self.func_grp.target_smarts)
         bond_atoms = self.mol.GetSubstructMatches(bond_mol)
         for atom_id in flatten(bond_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
             atom.SetProp('on_react', 'bond')
+            self.bonder_ids.append(atom_id)
 
         # Give all atoms which form bonds during reactions the tag
         # 'on_react' and set its value to 'del'.            
@@ -1454,31 +1460,31 @@ class StructUnit(Molecule, metaclass=Cached):
             atom = self.mol.GetAtomWithIdx(atom_id)
             atom.SetProp('on_react', 'del')       
 
-    def _set_heavy_mol_orientation(self, start, end):
+    def _set_orientation2(self, start, end):
         """
         Rotates from `start` to `end`.
         
         Given two direction vectors, `start` and `end`, this method
         applies the rotation required to transform `start` to `end` on 
-        the heavy molecule. The rotation occurs about the centroid
-        of the heavy atoms. 
+        the molecule. The rotation occurs about the centroid
+        of the bonder atoms. 
         
         For example, if the `start` and `end` vectors
         are 45 degrees apart, a 45 degree rotation will be applied to
-        heavy molecule. The rotation will be along the appropriate axis.
+        the molecule. The rotation will be along the appropriate axis.
         
         This method will likely have counterparts in derived classes of 
         ``StructUnit``. The counterparts will probably use a default
         `start` vector and will not be private.  This prevents 
         overwriting and means both versions of the function will be 
-        available. For example, the ``Linker`` class will have the
+        available. For example, the ``StructUnit2`` class will have the
         default `start` vector as the direction vector between the 2
-        heavy atoms. This means that running the function on a 
-        ``Linker`` instance will align the heavy atoms with the vector
+        bonder atoms. This means that running the function on a 
+        StructUnit2 instance will align the bonder atoms with the vector
         `end`.
 
-        On the other hand, the ``BuildingBlock`` class will use the 
-        normal to the plane formed by the heavy atoms as the `start`
+        On the other hand, the ``StructUnit3`` class will use the 
+        normal to the plane formed by the bonder atoms as the `start`
         vector. This means that in ``BuildingBlock`` molecules the
         normal to the plane will be aligned with `end` when the method
         is run.
@@ -1490,9 +1496,6 @@ class StructUnit(Molecule, metaclass=Cached):
         vector can be virtually anything. This means that any geomteric 
         feature of the molecule can be easily aligned with any arbitrary 
         direction.
-
-        This method modifies the rdkit molecule in `heavy_mol`. It also
-        returns of a copy of this rdkit molecule.
         
         Parameters
         ----------
@@ -1502,20 +1505,20 @@ class StructUnit(Molecule, metaclass=Cached):
         
         end : numpy.array
             This array holds the directional vector along which the 
-            heavy atoms in the linker should be placed.
+            `start` vector is aligned.
             
         Modifies
         --------
-        heavy_mol : rdkit.Chem.rdchem.Mol   
+        mol : rdkit.Chem.rdchem.Mol   
             The conformer in this rdkit instance is changed due to
-            rotation of the molecule about the centroid of the heavy
+            rotation of the molecule about the centroid of the bonder
             atoms.
         
         Returns
         -------
         rdkit.Chem.rdchem.Mol
             An rdkit molecule instance of the rotated molecule. This is 
-            a copy of the rdkit molecule in `heavy_mol`.
+            a copy of the rdkit molecule in `mol`.
         
         """
         
@@ -1523,22 +1526,22 @@ class StructUnit(Molecule, metaclass=Cached):
         start = normalize_vector(start)
         end = normalize_vector(end)
         
-        # Record the position of the molecule then translate the heavy
+        # Record the position of the molecule then translate the bonder
         # atom centroid to the origin. This is so that the rotation
         # occurs about this point.
-        og_center = self.heavy_atom_centroid()
-        self.set_heavy_atom_centroid(np.array([0,0,0])) 
+        og_center = self.bonder_atom_centroid()
+        self.set_bonder_atom_centroid(np.array([0,0,0])) 
         
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
         
         # Apply the rotation matrix to the atomic positions to yield the
         # new atomic positions.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix('heavy'))
+        new_pos_mat = np.dot(rot_mat, self.position_matrix())
 
-        # Set the positions in the heavy rdkit molecule.
-        self.set_position_from_matrix('heavy', new_pos_mat)
-        self.set_heavy_atom_centroid(og_center)
+        # Set the positions in the rdkit molecule.
+        self.set_position_from_matrix(new_pos_mat)
+        self.set_bonder_atom_centroid(og_center)
 
         return chem.Mol(self.heavy_mol)
 
@@ -1594,11 +1597,12 @@ class StructUnit(Molecule, metaclass=Cached):
         # atom ids of those atoms.
         return self.prist_mol.GetSubstructMatches(func_grp_mol)        
 
-    def heavy_atom_centroid(self):
+    def bonder_atom_centroid(self):
         """
-        Returns the centroid of the heavy atoms.
+        Returns the centroid of the bonder atoms.
 
-        This is the centroid if only the heavy atoms are considered.
+        This is the centroid if only the atoms which form bonds
+        during assembly of macromolecules are considered.
 
         Returns
         -------
@@ -1607,8 +1611,7 @@ class StructUnit(Molecule, metaclass=Cached):
         
         """
 
-        centroid = sum(self.atom_coords('heavy', x) for x in 
-                                                        self.heavy_ids) 
+        centroid = sum(self.atom_coords(x) for x in self.bonder_ids) 
         return np.divide(centroid, len(self.heavy_ids))
 
     def rotate2(self, theta, axis):
