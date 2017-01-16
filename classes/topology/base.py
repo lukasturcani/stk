@@ -505,71 +505,6 @@ class Topology:
         self.join_mols()      
         self.final_sub()
 
-    def place_mols(self):
-        """
-        Places all building block molecules on correct coordinates.
-
-        The building block molecules are placed in their appropriate 
-        positions based on the topology. This means that the 
-        building-blocks* are placed on vertices and linkers on edges.
-        This function only places the molecules, it does not join them. 
-        It saves the structure a rdkit molecule instance for later use. 
-        This rdkit instace is placed in the `heavy_mol` attribute of the 
-        ``Cage`` instance the topology is describing.
-        
-        Modifies
-        --------
-        self.macro_mol.heavy_mol
-            Places an rdkit instance with disconnected building blocks
-            placed on edges and vertices in this attribute.    
-        
-        """
-        
-        self.macro_mol.heavy_mol = chem.Mol()
-        
-        bb1 = self.macro_mol.building_blocks[0]
-        bb2 = self.macro_mol.building_blocks[1] 
-        n_fg1 = len(bb1.find_functional_group_atoms())
-        n_fg2 = len(bb2.find_functional_group_atoms())
-        
-        if n_fg1 < n_fg2:
-            lk = bb1
-            n_lk = n_fg1
-            bb = bb2
-            n_bb = n_fg2
-        else:
-            lk = bb2
-            n_lk = n_fg2
-            bb = bb1
-            n_bb = n_fg1
-        
-        for position in self.positions_A:
-            self.macro_mol.heavy_mol = chem.CombineMols(
-                                        self.macro_mol.heavy_mol, 
-                                        position.place_mol(bb))
-            self.bb_counter.update([bb])                            
-            
-            heavy_ids = deque(maxlen=n_bb)
-            for atom in self.macro_mol.heavy_mol.GetAtoms():
-                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
-                    heavy_ids.append(atom.GetIdx())
-            
-            position.heavy_ids = sorted(heavy_ids)
-            self.pair_heavy_ids_with_connected(position)
-
-        for position in self.positions_B:
-            self.macro_mol.heavy_mol = chem.CombineMols(
-                                        self.macro_mol.heavy_mol, 
-                                        position.place_mol(lk))
-            self.bb_counter.update([lk])
-            
-            heavy_ids = deque(maxlen=n_lk)
-            for atom in self.macro_mol.heavy_mol.GetAtoms():
-                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
-                    heavy_ids.append(atom.GetIdx())
-            
-            position.heavy_ids = list(heavy_ids)
-
     def join_mols(self):
         
         editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
@@ -638,25 +573,62 @@ class Topology:
         self.macro_mol.prist_mol = chem.AddHs(self.macro_mol.prist_mol,
                                               addCoords=True)        
 
-    def pair_heavy_ids_with_connected(self, vertex):
-        vertex.atom_position_pairs = []        
-        distances = []
-        for heavy_id in vertex.heavy_ids:
-            for position in vertex.connected:
-                atom_coord = self.macro_mol.atom_coords('heavy', 
-                                                        heavy_id)
-                
-                distance = euclidean(atom_coord, position.coord)
-                distances.append((distance, heavy_id, position))
+    def pair_bonders_with_positions(self, vertex):
+        """
+        Matches atoms with the closest building block position.
         
+        After a building block is placed on a position, each atom
+        which forms a bond must be paired with the location of the 
+        building block to which it bonds. This function matches atoms
+        and positions so that each is only present in one pairing and so
+        that the total distance of the pairings is minimized.
+
+        Parameters
+        ----------
+        vertex : Vertex
+            The position at which all the atoms being paired are 
+            located.
+
+        Modifies
+        --------
+        vertex.atom_position_pairs : list of tuples of (int, Vertex)
+            Adds a tuples to this list represnting the id of the atom
+            and position which were paired.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+
+        # This loop looks at each atom which forms a new bond and all
+        # the positions (not atoms) to which it may end up bonding. It
+        # finds the distances of all the options.
+        distances = []
+        for bonder_id in vertex.bonder_ids:
+            atom_coord = self.macro_mol.atom_coords(bonder_id)
+            for position in vertex.connected:                
+                distance = euclidean(atom_coord, position.coord)
+                distances.append((distance, bonder_id, position))
+ 
+        # Sort the pairings of atoms with potential bonding position,
+        # smallest first. 
         distances.sort()
+        
+        # This loop looks at all the potential pairings of atoms to
+        # positions. It pairs the shortest combinations of atoms and
+        # positions, making sure that each atom and position is only
+        # paired once. The pairings are saved to the `
+        # atom_positions_pairs` attribute of the position on which all
+        # the bonder atoms are placed.
         paired_pos = set()
         paired_ids = set()
-        for _, heavy_id, pos in distances:
-            if heavy_id in paired_ids or pos in paired_pos:
+        vertex.atom_position_pairs = []
+        for _, bonder_id, pos in distances:
+            if bonder_id in paired_ids or pos in paired_pos:
                 continue
-            vertex.atom_position_pairs.append((heavy_id, pos))
-            paired_ids.add(heavy_id)
+            vertex.atom_position_pairs.append((bonder_id, pos))
+            paired_ids.add(bonder_id)
             paired_pos.add(pos)
 
     def determine_bond_type(self, atom1_id, atom2_id):
