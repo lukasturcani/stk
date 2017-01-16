@@ -27,7 +27,7 @@ import sys
 
 from ..population import Population
 from ..molecular import StructUnit3, Cage
-from ..exception import MacroMolError
+from ..exception import MolError
 from ...plotting import plot_counter
 
 class Mutation:
@@ -149,7 +149,7 @@ class Mutation:
                     break
 
             except Exception as ex:
-                MacroMolError(ex, parent, ('Error during mutation'
+                MolError(ex, parent, ('Error during mutation'
                     ' with {}.').format(func.__name__))
 
         mutant_pop -= population
