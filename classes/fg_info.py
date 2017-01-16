@@ -1,3 +1,27 @@
+"""
+A module for the FGInfo class.
+
+Extending MMEA: Adding  more functional groups.
+-----------------------------------------------
+
+If MMEA is to incorporate a new functional group, a new ``FGInfo`` 
+instance should be added to the `functional_group_list` class attribute 
+of the ``FGInfo`` class. 
+
+Adding a new ``FGInfo`` instace to `functional_group_list` will allow 
+the ``Topology.join_mols()`` method to connect this functional group to 
+(all) others during assembly. Nothing except adding this instance should 
+be necessary in order to incorporate new functional groups.
+
+If this new functional group is to connect to another functional group 
+with a double bond during assembly, the symbols of the heavy atoms of 
+both functional groups should be added to the `double_bond_combs` class 
+attribute. The order in which the heavy symbols are placed in the tuple 
+does not matter. Again, this is all that needs to be done for MMEA to 
+create double bonds between functional groups.  
+
+"""
+
 from collections import namedtuple
 
 from ..convenience_tools import bond_dict
@@ -7,24 +31,8 @@ class FGInfo:
     Contains key information for functional group substitutions.
     
     The point of this class is to register which atoms are substituted
-    for which, when an atom in a functional group is substituted with a 
-    heavy metal atom. If MMEA is to incorporate a new functional group, 
-    a new ``FGInfo`` instance should be added to the 
-    `functional_group_list` class attribute of ``FGInfo``. 
-    
-    Adding a new ``FGInfo`` instace to `functional_group_list` will 
-    allow the `Topology.join_mols` method to connect this functional 
-    group to (all) others during assembly. Nothing except adding this
-    instance should need to be done in order to incorporate new 
-    functional groups.
-    
-    If this new functional group is to connect to another functional 
-    group with a double bond during assembly, the symbols of the heavy 
-    atoms of both functional groups should be added to the 
-    `double_bond_combs` class attribute. The order in which the heavy 
-    symbols are placed in the tuple does not matter. Again, this is all
-    that needs to be done for MMEA to create double bonds between
-    certain functional groups.  
+    for which, a functional group is substituted with for a heavy metal 
+    atom. 
     
     Class attributes
     ----------------
@@ -33,11 +41,10 @@ class FGInfo:
         functional group is to be used by MMEA, a new ``FGInfo`` 
         instance must be added to this list.
         
-    double_bond_combs : list of tuples of strings
+    double_bond_combs : list of tuples of (str, str)
         When assembly is carried out, if the heavy atoms being joined
-        form a tuple in this list, they will be joined with a double
-        rather than single bond. If a single bond is desired there is no
-        need to change this variable.
+        are in a tuple in this list, they will be joined with a double
+        instead of a single bond.
         
     heavy_symbols : set of str
         A set of all the heavy symbols used by ``FGInfo`` instances in 
@@ -47,7 +54,7 @@ class FGInfo:
     heavy_atomic_nums : set of ints
         A set of all atomic numbers of heavy atoms used by ``FGInfo``
         instances in MMEA. This set updates itself automatically. There
-        is no need to modify it when chagnes are made to any part of
+        is no need to modify it when changes are made to any part of
         MMEA.
 
     Attributes
@@ -61,7 +68,7 @@ class FGInfo:
         
     del_tags : list of DelAtom instances
         Every member of this list represents an atom on the functional
-        group which should be deleted during assembly. One atom in each
+        group which should be deleted during assembly. One atom in the
         functional group is removed for each list member.
     
     target_atomic_num : int
