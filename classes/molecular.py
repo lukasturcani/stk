@@ -15,7 +15,7 @@ from ..convenience_tools import (flatten, periodic_table,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis)
 from .fg_info import FGInfo
-from .exception import MacroMolError
+from .exception import MolError
 from .energy import Energy
 
 class CachedMacroMol(type):
@@ -2290,7 +2290,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             self.prist_mol = chem.Mol()
             self.prist_mol_file = prist_mol_file
             self.topology_args = topology_args
-            MacroMolError(ex, self, 'During initialization.')
+            MolError(ex, self, 'During initialization.')
 
     def _std_init(self, building_blocks, topology, prist_mol_file, 
                  topology_args):
