@@ -95,7 +95,7 @@ import warnings
 from collections import Counter
 
 from .classes.function_data import FunctionData
-from .classes.exception import MacroMolError
+from .classes.exception import MolError
 from .classes.molecular import MacroMolecule, StructUnit, Energy
 from . import optimization
 from .convenience_tools import (rotation_matrix_arbitrary_axis, 
@@ -163,7 +163,7 @@ def _calc_fitness_serial(func_data, population):
             func(macro_mol, **func_data.params)
                 
         except Exception as ex:
-            MacroMolError(ex, macro_mol, 'During fitness calculation.')
+            MolError(ex, macro_mol, 'During fitness calculation.')
 
 
 def _param_labels(*labels):
@@ -403,7 +403,7 @@ def cage(macro_mol, target_cavity, target_window=None,
     except Exception as ex:
         # Prevents the error from being raised, but records it in 
         # ``failures.txt``.
-        MacroMolError(ex, macro_mol, "During fitness calculation")
+        MolError(ex, macro_mol, "During fitness calculation")
         return macro_mol
 
 @_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
@@ -707,7 +707,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         return macro_mol
         
     except Exception as ex:
-        MacroMolError(ex, macro_mol, "During fitness calculation.")
+        MolError(ex, macro_mol, "During fitness calculation.")
         return macro_mol
     
 

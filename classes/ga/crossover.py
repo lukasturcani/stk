@@ -26,7 +26,7 @@ from collections import Counter
 
 from ..population import Population
 from ..molecular import Cage
-from ..exception import MacroMolError
+from ..exception import MolError
 from ...plotting import plot_counter
 
 class Crossover:
@@ -140,7 +140,7 @@ class Crossover:
                     break
             except Exception as ex:
                 for i, parent in enumerate(parents):
-                    MacroMolError(ex, parent, 
+                    MolError(ex, parent, 
                     'Error during crossover. Parent {0}.'.format(i))                
                 
         # Make sure that only original molecules are left in the 
