@@ -7,7 +7,7 @@ Extending MMEA: Adding  more functional groups.
 If MMEA is to incorporate a new functional group, a new ``FGInfo`` 
 instance should be added to the `functional_groups` list. 
 
-Adding a new ``FGInfo`` instace to `functional_groups` will allow the
+Adding a new ``FGInfo`` instance to `functional_groups` will allow the
 ``Topology.join_mols()`` method to connect this functional group to 
 (all) others during assembly. Nothing except adding this instance should 
 be necessary in order to incorporate new functional groups.
@@ -20,8 +20,6 @@ that needs to be done for MMEA to create double bonds between given
 functional groups.  
 
 """
-
-from ..convenience_tools import bond_dict
 
 class FGInfo:
     """
@@ -44,8 +42,8 @@ class FGInfo:
         which forms bonds during reactions.        
         
     del_smarts : str
-        A SMARTS string, which match the atoms removed the functional 
-        group reacts.
+        A SMARTS string, which matches the atoms removed when the 
+        functional group reacts.
     
     """
     
