@@ -906,7 +906,7 @@ class StructUnit(Molecule, metaclass=Cached):
         centroid = sum(self.atom_coords(x) for x in self.bonder_ids) 
         return np.divide(centroid, len(self.bonder_ids))
 
-    def bonder_dir_vectors(self):
+    def bonder_direction_vectors(self):
         """
         Yields the direction vectors between all pairs of bonder atoms.
                 
@@ -1287,7 +1287,7 @@ class StructUnit2(StructUnit):
         
         """
         
-        *_, start = next(self.bonder_dir_vectors())
+        *_, start = next(self.bonder_direction_vectors())
         return self._set_orientation2(start, end)
         
     def minimize_theta(self, vector, axis, step=0.17):
@@ -1404,11 +1404,11 @@ class StructUnit3(StructUnit):
         
         """
         
-        if sum(1 for _ in self.bonder_dir_vectors()) < 2:
+        if sum(1 for _ in self.bonder_direction_vectors()) < 2:
             raise ValueError(("StructUnit3 molecule "
                              "has fewer than 3 functional groups."))
         
-        vgen = (v for *_, v in self.bonder_dir_vectors())
+        vgen = (v for *_, v in self.bonder_direction_vectors())
         v1, v2 = it.islice(vgen, 2)
     
         normal_v = normalize_vector(np.cross(v1, v2))

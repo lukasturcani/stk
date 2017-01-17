@@ -105,15 +105,6 @@ class Topology:
         """
         Assembles rdkit instances of the macromolecules.
         
-        To carry out `build` an instance of a class derived from 
-        ``Topology`` must be used. This is because instances of such
-        classes define a `pair_up` attribute during initialization.
-        (This should be done by default, not passed as an argument to
-        the initializer.) The `pair_up` attribute holds the pair up 
-        function defined within ``Topology``, which should be used by
-        `build`. (`pair_up` is used within the `join_mols` subroutine of
-        `build`.)
-        
         Modifies
         --------
         self.macro_mol.mol
@@ -135,7 +126,27 @@ class Topology:
 
         self.place_mols()
         self.join_mols()
-
+        self.del_atoms()
+    
+    def del_atoms(self):
+        """
+        Deletes the atoms which are lost during assembly.    
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        mol = chem.EditableMol(self.macro_mol.mol)
+        # Delete atoms with largest id last, so that when deleting later
+        # atoms their ids do not change.
+        for atom in reversed(self.macro_mol.mol.GetAtoms()):
+            if atom.HasProp('del'):
+                mol.RemoveAtom(atom.GetIdx())
+                
+        self.macro_mol.mol = mol.GetMol()
+    
     def determine_bond_type(self, atom1_id, atom2_id):
         """
         Returns the bond order to be formed between the atoms.
@@ -158,11 +169,11 @@ class Topology:
         Returns
         -------
         rdkit.Chem.rdchem.BondType.SINGLE
-            If the combination of heavy atoms passed as arguments is not 
+            If the combination of bonder atoms passed as arguments is not 
             in `double_bond_combs`.
         
         rdkit.Chem.rdchem.BondType.DOUBLE
-            If the combination of heavy atoms passed as arguments is in
+            If the combination of bonder atoms passed as arguments is in
             `double_bond_combs`.
             
         """
