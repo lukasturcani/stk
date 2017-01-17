@@ -1,4 +1,4 @@
-import os
+from os.path import join
 import rdkit
 import numpy as np
 import pickle
@@ -10,13 +10,8 @@ from ...classes import StructUnit, FGInfo
 from ...convenience_functions import (flatten, normalize_vector,
                                      vector_theta)
 
-obj_file_name = os.path.join('data', 'struct_unit',
-                             'struct_unit_test_obj')
-# Non-modifying tests can use the struct_unit instance below to save
-# time on initialization.
-with open(obj_file_name, 'rb') as dump_file:
-    struct_unit = pickle.load(dump_file)
-    
+data_dir = join('data', 'molecule', 'molecule.mol')
+mol = StructUnit(data_dir)
 
 def test_bonder_atom_position_matrix():
     """
