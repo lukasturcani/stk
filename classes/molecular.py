@@ -981,7 +981,7 @@ class StructUnit(Molecule, metaclass=Cached):
         # Calling this function labels the atoms in the rdkit molecule
         # as either atoms which form a bond during reactions or atoms
         # which get removed.
-        self._tag_atoms()   
+        self.tag_atoms()   
 
     def all_bonder_distances(self):
         """
@@ -1295,7 +1295,7 @@ class StructUnit(Molecule, metaclass=Cached):
         
         return sorted(mols, reverse=True)
 
-    def _tag_atoms(self):
+    def tag_atoms(self):
         """
         Adds bonding and deletion tags to atoms.
 
@@ -1346,6 +1346,32 @@ class StructUnit(Molecule, metaclass=Cached):
             atom = self.mol.GetAtomWithIdx(atom_id)
             atom.SetProp('del', '1')       
 
+    def untag_atoms(self):
+        """
+        Removes the tags added by ``tag_atoms()``.
+        
+        Modifies
+        --------
+        mol : rdkit.Chem.rdchem.Mol
+            The atoms in this rdkit molecule have the properties 'fg',
+            'bonder' and 'del' removed.
+                
+        bonder_ids : list of ints
+            This list is set to [].      
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        self.bonder_ids = []
+        
+        for atom in self.mol.GetAtoms():
+            atom.ClearProp('fg')
+            atom.ClearProp('bonder')
+            atom.ClearProp('del')
+            
 
     def __eq__(self, other):
         return self.file == other.file

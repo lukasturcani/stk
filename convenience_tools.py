@@ -664,8 +664,7 @@ class MAEExtractor:
     
     def __init__(self, macro_mol):
         
-        self.maegz_path = macro_mol.prist_mol_file.replace('.mol', 
-                                                           "-out.maegz")
+        self.maegz_path = macro_mol.file.replace('.mol', "-out.maegz")
         self.macro_mol = macro_mol
         self.maegz_to_mae()
         self.extract_conformer()
@@ -676,8 +675,7 @@ class MAEExtractor:
         
         """
         
-        print("Extracting conformer - {}.".format(
-                                        self.macro_mol.prist_mol_file))        
+        print("Extracting conformer - {}.".format(self.macro_mol.file))        
                 
         # Get the id of the lowest energy conformer.
         num = self.lowest_energy_conformer()        
