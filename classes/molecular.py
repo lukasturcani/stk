@@ -1,6 +1,10 @@
 """
 Defines classes which describe molecules.
 
+Extending MMEA: Adding support for new macromolecules.
+------------------------------------------------------
+
+
     The StructUnit class is intended to be inherited from. As mentioned 
     before, StructUnit is a general building block. If one wants to 
     represent a specific building block, such as the monomer of some
@@ -1456,7 +1460,7 @@ class StructUnit3(StructUnit):
 @total_ordering
 class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     """
-    A class for MMEA assembled macromolecules.
+    A class for assembled macromolecules.
     
     The goal of this class is to represent an individual used by the GA.
     As such, it holds attributes that are to be expected for this
@@ -1481,37 +1485,13 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     held by a ``Topology`` instance in the topology attribute. There is
     a notable exception to this however. This happens when retrieving 
     topological information directly from rdkit molecule instances 
-    representing the macromolecule. Examples include the 
-    information about atomic coordinates is stored in the rdkit molecule 
-    instances, which are stored directly by this class.
+    of the macromolecule. Examples include the information about atomic 
+    coordinates, which can be access with the ``atom_coords()`` method.
     
     It should also be noted that only a single copy of each 
     ``StructUnit`` instance representing a specific building block needs
     to be held. How many of such building blocks are need to assemble
-    the cage is the handled by the ``Topology`` class, which only needs
-    a single copy of each building block to work with.    
-    
-    If new inormation associated with macromolecules, but not directly 
-    concerning them as a whole, is to be added at some point in the 
-    future, and that information can be grouped together in a logical 
-    category, a new class should be created to store and manipulate this 
-    data. It should not be given to the macromolecule directly. 
-    Alternatively if more information to do with one of the already 
-    categories, it should be added there. The attribute 
-    `building_blocks` and its composing ``StructUnit`` instaces are an
-    example of this approach.
-    
-    However information dealing with the cage as a whole can be added
-    directly to attributes of this class. You can see examples of such 
-    attributes below. Simple identifiers such as ``.mol`` files and 
-    ``SMILES`` strings do not benefit from being grouped together. 
-    (Unless they pertain to specific substructures within the cages such 
-    as linkers and building-blocks* - as mentioned before.) Topology is 
-    an exception to this because despite applying to the cage as a 
-    whole, it a complex aspect with its own functions and data. 
-    
-    The goal is simplicity. Having too many categories causes unneeded
-    complexity as does having too few.
+    the molecule is the handled by the ``Topology`` class.
     
     This class is not intended to be used directly but should be 
     inherited by subclasses representing specific macromolecules. The
@@ -1531,21 +1511,15 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     building blocks, can compare equal if they happen to have the same 
     fitness. The operator is not to be used to check if one 
     macromolecule is the same structurally as another. To do this check 
-    use the `same` method. This method may be overwritten in derived 
+    use the ``same()`` method. This method may be overwritten in derived 
     classes, as necessary. In addition the ``is`` operator is 
     implemented as is default in Python. It compares whether two objects 
-    are in the same location n memory. Because the ``MacroMolecule`` 
+    are in the same location in memory. Because the ``MacroMolecule`` 
     class is cached the ``is`` operator could in principle be used 
     instead of the `same` method (including in derived classes). 
     However, this is not intended use and is not guuranteed to work in 
     future implementations. If caching stops being implemented such code 
     would break.
-    
-    Optimization of structures of ``MacroMolecule`` instances is not
-    done by this class. This is because in order to run optimization
-    functions in parallel, they cannot be defined as methods. As a
-    result optimizations are implemented functionally in the
-    ``optimization.py`` module.
 
     Attributes
     ----------
@@ -1695,17 +1669,18 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         Returns
         -------
         bool
-            Returns ``True`` if the building-block*, linker and 
-            topology of the cages are all the same.
+            Returns ``True`` if the building blocks and topology of the 
+            macromolecules are all the same.
         
         """
         
         # Compare the building blocks and topology making up the 
-        # macromolecule. If these are the same then the cages have the 
-        # same structure.
+        # macromolecule. If these are the same then the molecules have 
+        # the same structure.
         return (self.building_blocks == other.building_blocks and 
-                                    self.topology == other.topology)
-
+                type(self.topology) == type(other.topology) and
+                self.topology_args == other.topology_args)
+        
     def update_cache(self):
         """
         Updates the caching dictionary so that it contains `self`.
@@ -1771,18 +1746,6 @@ class Cage(MacroMolecule):
     """
     Used to represent molecular cages.
     
-    Attributes
-    ----------
-    In addtion to those described in MacroMolecule, this class the
-    following attributes.
-    
-    unscaled_fitness_vars : numpy.array
-        An array holding the values of various contributions to the
-        fitness of a cage, before they are scaled by the population
-        averages. This attribute is created and modified the by the
-        ``cage`` fitness function. See its documentation for more
-        details.
-    
     """
 
     @classmethod
@@ -1790,13 +1753,14 @@ class Cage(MacroMolecule):
         bb = StructUnit3(bb_file)        
         
         while True:
-            lk_file = np.random.choice(os.listdir(lk_db))
-            if lk_file.endswith(".mol"):
+            try:
+                lk_file = np.random.choice(os.listdir(lk_db))
+                lk_file = os.path.join(lk_db, lk_file)
+                lk = StructUnit2(lk_file)
                 break
+            except TypeError:
+                continue
             
-        lk_file = os.path.join(lk_db, lk_file)
-        lk = StructUnit2(lk_file)
-        
         topology = np.random.choice(topologies)        
         
         return cls((bb, lk), topology, file)
