@@ -1,18 +1,125 @@
 """
 Defines classes which describe molecules.
 
-Extending MMEA: Adding support for new macromolecules.
-------------------------------------------------------
+There are a couple of major classes defined here. The most important
+ones are ``StructUnit`` and ``MacroMolecule``. Here is an overview of
+their role/interaction. This is followed by a step-by-step guide to
+macromolecular assembly.
 
+The StructUnit class represents the monomers that make up 
+macromolecules. These are commonly refered to as ``building blocks`` in
+the documentation. The class holds information concerning only a single
+building block molecule. Such as the number of atoms and bonds it may
+have. It also has information about the functoinal groups present on
+the building block molecule (FGInfo class defined in 
+/mmea/classes/fg_info.py). The class also allows manipulation of the 
+lone building block molecule, such as rotations and translations.
 
-    The StructUnit class is intended to be inherited from. As mentioned 
-    before, StructUnit is a general building block. If one wants to 
-    represent a specific building block, such as the monomer of some
-    specific polymer, new class should be created. This new class will 
-    inherit StructUnit. In this way, any operations which apply 
-    generally to building blocks can be stored here and any which apply 
-    specifically to one kind of building block can be placed within its 
-    own class.
+The StructUnit class should be inherited as necessary. For example
+StructUnit2 adds manipulations relavant to molecules with 2 functional
+groups. The StructUnit3 class adds manipulations relavant to 3 or more
+functional groups. If you have a monomer which needs specific 
+information or manipulations, give it its own class.
+
+The MacroMolecule class represents an assembled macromolecule. It
+requires at least 2 basic pieces of information: which monomers are
+used to assemble the macromolecule and what is the topology/structure
+of the macromolecule.
+
+The MacroMolecule holds in its `building_blocks` attribute a list of 
+StructUnit (or derived classes) instances. These represent the 
+monomers which form the macromolecule. Only one StructUnit instance per
+monomer type is held. So if 4 of one type of monomer and 2 of another 
+type of monomer form a macromolecule, only 2 StructUnit instances are in
+`building_blocks`.
+
+In its `topology` attribute a MacroMolecule holds a ``Topology` child 
+class instance. This instance is responsible for assembling the 
+macromolecule from the building blocks. The building should happen in 
+the ``__init__()`` method of the MacroMolecule via the Topology 
+instance's ``build()`` method. The ``build()`` method should place the
+assembled macromoleclue in the `mol` attribute of the MacroMolecule 
+instance.
+
+The StructUnit class labels atoms in the functional groups of the 
+building blocks as either ``bonder`` or ``del`` (see its documentation).
+This tells the Topology intance which atoms form bonds and which are
+removed during assembly.
+
+No need to worry about the metaclasses.
+
+-------------------------------------------------------
+A more detailed description of macromolecular assembly.
+-------------------------------------------------------
+This is a step-by-step guide of how macromolecular assembly is carried 
+out and what the classes do.
+
+First you create StructUnit instances of the building blocks which make 
+up the macromolecule. The StructUnit instances are initialized using
+paths to their molecular structure files. Initializing StructUnit 
+instances does a couple of things:
+    
+    1) Initialize an rdkit instance from the structure file.
+    2) Scan the path of the structure file for the name of a functional
+       functional group.
+
+What functional groups are recognized by MMEA?
+The module ``/mmea/classes/fg_info.py`` defines a class called FGInfo.
+Instances of this class are held in the list `function_groups` (also in 
+that module). If you put an instance of FGInfo in that list, it will be
+recognized.
+
+    3) Using the FGInfo instance of the functional group found in the
+       path, tag atom in the building block as either 'bonder' or 'del'.
+       'bonder' signifies that the atoms form bond during macromolecular
+       assembly, while 'del' means they are deleted. Note that only
+       one functional group per building block molecule is tagged. For
+       example, all 20 amine functional groups in a molecule will be
+       tagged but none of the 10 aldehyde functional groups if 'amine'
+       was in the path of the bulding block file.
+       
+    4) Provide the instances of the StructUnits to the MacroMolecule
+       initializer along with a Topology class.
+       
+    5) Make an instance of the topology class in the MacroMolecule 
+      initializer.
+      
+    6) Run the ``build()`` method of the Topology class in the 
+       MacroMolecule initializer.
+       
+    7) The ``build()`` will vary depending on the Topology class. 
+       However the basic structure is the same (steps 8 - 10).
+       
+    8) Combine the building block ridkit molecules into a single rdkit 
+       molecule. Make sure that the building blocks are arranged in the 
+       shape of the macromolecule. All the manipulations available via
+       the StructUnit class are useful here to make sure all the 
+       building blocks are orientated corrected when forming the 
+       macromolecule.
+       
+    9) Create bonds between all the disjoined building block molecules.
+       This is where the tagging done by StructUnit is needed.
+       
+   10) Delete all the atoms tagged for deletion.
+
+After all this you should have a rdkit instance of the macromolecule
+which should be placed in the `mol` attribute of the MacroMolecule
+intance.
+
+Extending MMEA: Adding new macromolecules.
+------------------------------------------
+
+To add new macromolecules create a new class which inherits 
+``MacroMolecule``. The initializer of ``MacroMolecule`` can be used or
+a custom one may be used. However, all the same attributes must be 
+defined.
+
+If you're adding a new class of macromolecules, it quite likely you want
+to add a new ``Topology`` class. See the docstring of the
+/mmea/classes/topology/base.py module for guidance on adding these.
+The topology class does the assembly of the macromolecule from the 
+building blocks. The assembled macromolecule instance is then held by 
+the macromolecular class.
 
 """
 
@@ -773,6 +880,9 @@ class StructUnit(Molecule, metaclass=Cached):
     The goal of this class is to conveniently store information about, 
     and perform operations on, single instances of macromolecular 
     building blocks.
+    
+    An important part of this class is labelling atoms in functional
+    groups. 
 
     This class should only deal with issues that concern a single 
     building block in and of itself.    
