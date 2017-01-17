@@ -75,9 +75,9 @@ def macromodel_opt(macro_mol, force_field=16,
         rdkit molecule with an optimized structure.
     
     macro_mol.file's content
-        The content of the ``.mol`` file located at 
-        `macro_mol.file`, is changed so that it holds the structure of 
-        the optimized molecule.
+        The content of the structure file located at `macro_mol.file`, 
+        is changed so that it holds the structure of the optimized 
+        molecule.
     
     macro_mol.optimized
         After the optimization, this attribute is set to ``True``.
@@ -107,7 +107,7 @@ def macromodel_opt(macro_mol, force_field=16,
         # Run the optimization.
         _run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and 
-        # convert it to a ``.mol2`` file.
+        # convert it to a ``.mae`` file.
         _convert_maegz_to_mae(macro_mol, macromodel_path)
         macro_mol.update_from_mae() 
 
@@ -269,9 +269,9 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         rdkit molecule with an optimized structure.
     
     macro_mol.file's content
-        The content of the ``.mol`` file located at 
-        `macro_mol.file`, is changed so that it holds the structure of 
-        the optimized molecule.
+        The content of the structure file located at `macro_mol.file`, 
+        is changed so that it holds the structure of the optimized 
+        molecule.
     
     macro_mol.optimized
         After a successful optimization, this attribute is set to 
@@ -302,7 +302,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         # Run the optimization.
         _run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and 
-        # convert it to a ``.mol2`` file.
+        # convert it to a ``.mae`` file.
         _convert_maegz_to_mae(macro_mol, macromodel_path)
         macro_mol.update_from_mae() 
 
@@ -371,8 +371,8 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
     # ``subprocess.Popen``. The command is the full path of the ``bmin``
     # program. ``bmin`` is located in the Schrodinger installation
     # folder.
-    file_root = macro_mol.file.replace(".mol", "")
-    log_file = macro_mol.file.replace(".mol", ".log")
+    file_root, ext = os.path.splitext(macro_mol.file)
+    log_file = file_root + '.log'
     opt_app = os.path.join(macromodel_path, "bmin")
     # The first member of the list is the command, the following ones
     # are any additional arguments.
@@ -421,14 +421,14 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
         return _run_bmin(macro_mol, macromodel_path)
 
     # Make sure the .maegz file created by the optimization is present.
-    maegz = macro_mol.file.replace('.mol', '-out.maegz')
+    maegz = file_root +  '-out.maegz'
     _wait_for_file(maegz)
     if not os.path.exists(log_file) or not os.path.exists(maegz):
         raise _OptimizationError(('The .log and/or .maegz '
                      'files were not created by the optimization.'))
         
 def _kill_bmin(macro_mol, macromodel_path):
-    name = macro_mol.file.replace('.mol', '')
+    name, ext = os.path.splitext(macro_mol.file)
     name = re.split(r'\\|/', name)[-1]
     app = os.path.join(macromodel_path, 'jobcontrol')
     cmd = [app, '-stop', name]
@@ -454,8 +454,9 @@ def _kill_bmin(macro_mol, macromodel_path):
             break
                  
 def _run_applyhtreat(macro_mol, macromodel_path):
-    mae = macro_mol.file.replace('.mol', '.mae')
-    mae_out = mae.replace('.mae', '_htreated.mae')
+    name, ext = os.path.splitext(macro_mol.file)
+    mae = name + '.mae'
+    mae_out = name + '_htreated.mae'
     _create_mae(macro_mol, macromodel_path)
     
     app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
@@ -583,11 +584,12 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 " ").format(force_field)
 
     # Create a path for the ``.com`` file. It is the same as that of the
-    # ``.mol`` file but with a ``.com`` extension. Get the path of the
-    # ``.mae`` file and the output file in the same way. 
-    com_file = macro_mol.file.replace(".mol", ".com")
-    mae = macro_mol.file.replace(".mol", ".mae")
-    output = macro_mol.file.replace(".mol", "-out.maegz")
+    # structure file but with a ``.com`` extension. Get the path of the
+    # ``.mae`` file and the output file in the same way.
+    name, ext = os.path.splitext(macro_mol.file)
+    com_file = name + '.com'
+    mae = name + '.mae'
+    output = name + '-out.maegz'
     
     # This function adds all the lines which fix bond distances and 
     # angles into ``main_string``.
@@ -634,9 +636,10 @@ def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, 
     main_string = main_string.format(force_field=force_field, temp=temp, 
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
 
-    com_file = macro_mol.file.replace(".mol", ".com")
-    mae = macro_mol.file.replace(".mol", ".mae")
-    output = macro_mol.file.replace(".mol", "-out.maegz")
+    name, ext = os.path.splitext(macro_mol.file)
+    com_file = name + '.com'
+    mae = name + '.mae'
+    output = name + '-out.maegz'
 
     # Generate the com file containing the info for the run
     with open(com_file, "w") as com:
@@ -667,7 +670,7 @@ def _create_mae(macro_mol, macromodel_path):
     --------
     This function creates a new ``.mae`` file from the structure file in
     `macro_mol.file`. This new file is placed in the same
-    folder as the ``.mol`` file and has the same name. Only the 
+    folder as the original file and has the same name. Only the 
     extensions are different.
 
     Returns
@@ -707,9 +710,8 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
     
     Modifies
     --------    
-    This function creates a new ``.mol2`` file from the optimized 
-    ``.mae`` file. This new file is placed in the same folder as the 
-    ``.mae`` file.
+    This function creates a new ``.mae`` file from a ``.maegz`` file. 
+    This new file is placed in the same folder as the ``.maegz`` file.
     
     Returns
     -------
@@ -727,10 +729,11 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
 
     print('Converting .maegz to .mae - {}.'.format(macro_mol.file))
 
+    name, ext = os.path.splitext(macro_mol.file)
     # ``out`` is the full path of the optimized ``.mae`` file.
-    maegz = macro_mol.file.replace(".mol", "-out.maegz")      
+    maegz = name + '-out.maegz'      
     # Replace extensions to get the names of the various files.
-    mae = macro_mol.file.replace(".mol", ".mae")
+    mae = name + '.mae'
     return _structconvert(maegz, mae, macromodel_path)
     
 def _structconvert(iname, oname, macromodel_path):
