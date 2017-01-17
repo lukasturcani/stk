@@ -13,7 +13,7 @@ from functools import partial
 from multiprocessing import Pool
 import itertools as it
 
-from .classes import StructUnit, FGInfo, Population
+from .classes import StructUnit, FGInfo, Population, functional_groups
 from .optimization import *
 
 def redump_pop(*folders, ofolder, cls):
@@ -98,15 +98,15 @@ def fg_prune(ifolder, fg, fg_num):
         path = os.path.join(ifolder, file_name)
         # Make a StructUnit object and substitute the functional group
         # of type `fg`.
-        mol = StructUnit(path, minimal=True)
-        mol.func_grp = next((x for x in 
-                             FGInfo.functional_group_list if 
+        mol = StructUnit(path)
+        mol.untag_atoms()
+        mol.func_grp = next((x for x in functional_groups if 
                              x.name == fg), None)
-        mol.heavy_ids = []
-        mol._generate_heavy_attrs()
+        
+        mol.tag_atoms()
         
         # Check that the correct number is present.
-        if len(mol.find_functional_group_atoms()) != fg_num:
+        if len(mol.functional_group_atoms()) != fg_num:
             print('Deleting {}.'.format(path))
             os.remove(path)
 
@@ -138,23 +138,23 @@ def fg_distance_prune(folder, fg, ext):
 
         # Make a StructUnit object and substitute the functional group
         # of type `fg`.
-        mol = StructUnit(path, minimal=True)
-        mol.func_grp = next((x for x in 
-                             FGInfo.functional_group_list if 
-                             x.name == fg), None)        
-        mol.heavy_ids = []
-        mol._generate_heavy_attrs()
+        mol = StructUnit(path)
+        mol.untag_atoms()
         
+        mol.func_grp = next((x for x in functional_groups if 
+                             x.name == fg), None)        
+
+        mol.tag_atoms()
 
         # Make a mathematical graph of the molecule. Useful for finding
         # the separation between nodes (atoms).
-        g = mol.graph('heavy')
-        # Each heavy atom can act as either a start or end node on a 
+        g = mol.graph()
+        # Each bonder atom can act as either a start or end node on a 
         # graph. Find the seperations between such nodes. If the
         # separation is 3 this means there is only one nodes between
         # the start and end nodes. As a result the functional groups 
         # are separated by 1 atom and should be deleted.
-        for start, end in it.combinations(mol.heavy_ids, 2):
+        for start, end in it.combinations(mol.bonder_ids, 2):
             if nx.shortest_path_length(g, start, end) < 3:
                 print('Removing {}.'.format(path))
                 os.remove(path)
@@ -192,7 +192,7 @@ def substruct_prune(folder, ext, substruct):
         path = os.path.join(folder, file_name)
         mol = StructUnit(path, minimal=True)
         # Check for substruct and delete as appropriate.
-        if mol.prist_mol.HasSubstructMatch(substruct_mol):
+        if mol.mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
 
