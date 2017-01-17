@@ -1,5 +1,5 @@
-from .base import CageTopology
-from ..base import Vertex
+from .base import CageTopology, Vertex
+
 
 class SixPlusEight(CageTopology):
     

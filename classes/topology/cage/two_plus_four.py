@@ -1,7 +1,6 @@
 import numpy as np
 
-from .base import CageTopology
-from ..base import Vertex, Edge
+from .base import CageTopology,  Vertex, Edge
 
 class TwoPlusFour(CageTopology):
     positions_A = [Vertex(0,0,-10), Vertex(0,0,10)]
