@@ -178,7 +178,9 @@ class CachedMacroMol(type):
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            obj.dump(obj.file.replace('.mol', '.dmp'))
+            
+            dmp_file = os.path.splitext(obj.file)[0] + '.dmp'
+            obj.dump(dmp_file)
             self._cache[key] = obj            
             return obj
 
