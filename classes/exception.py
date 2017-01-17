@@ -100,7 +100,7 @@ class MolError(Exception):
             
             f.write('\nnote = {}\n'.format(self.notes))
 
-            f.write('prist_mol_file = {}\n'.format(mol.prist_mol_file))
+            f.write('file = {}\n'.format(mol.file))
             
             if hasattr(mol, 'building_blocks'):       
                 f.write('building blocks = {}\n'.format(
