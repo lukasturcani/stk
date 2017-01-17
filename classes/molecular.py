@@ -119,7 +119,7 @@ class Molecule:
     mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance representing the molecule.
         
-    mol_file : str
+    file : str
         The full path of the molecular structure file of the molecule.
         
     energy : Energy
@@ -153,38 +153,6 @@ class Molecule:
             atom_id = atom.GetIdx()
             atom_position = conformer.GetAtomPosition(atom_id)
             yield atom_id, np.array([*atom_position]) 
-
-    def all_bonder_atom_distances(self):
-        """
-        Yield distances between all pairs of bonder atoms.
-        
-        All distances are only yielded once. This means that if the 
-        distance between atoms with ids ``1`` and ``2``is yielded as
-        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be 
-        yielded.
-        
-        Yields
-        ------
-        tuple of form (scipy.double, int, int)
-            This tuple holds the distance between two bonder atoms. The 
-            first element is the distance and the next two are the 
-            relevant atom ids.
-
-        """
-                
-        # Iterate through each pair of atoms - do not allow 
-        # recombinations.
-        for atom1, atom2 in it.combinations(self.mol.GetAtoms(), 2):
- 
-            # Only yield if both atoms are bonders. 
-            if atom1.HasProp('bonder') and atom2.HasProp('bonder'):            
-                
-                # Get the atom ids, use them to calculate the distance
-                # and yield the resulting data.
-                atom1_id = atom1.GetIdx()
-                atom2_id = atom2.GetIdx()
-                yield (self.atom_distance(atom1_id, atom2_id), 
-                                                   atom1_id, atom2_id)
 
     def atom_coords(self, atom_id):
         """
@@ -532,11 +500,7 @@ class Molecule:
         Set atomic positions of the molecule to those in `pos_mat`.
         
         Parameters
-        ----------
-        mol_type : str (allowed values = 'heavy' or 'prist')
-            A string which defines whether the pristine or heavy
-            molecule is used.       
-        
+        ----------            
         pos_mat : numpy.array
             The matrix holds the coordinates on which the atoms of the 
             molecule should be placed.         
@@ -636,7 +600,7 @@ class Molecule:
         
         The molecule can be updated from a random .mae file held
         anywhere. Alterntatively, if no path is specified it is assumed
-        the .mae file has the same path and name as `mol_file` only with 
+        the .mae file has the same path and name as `file` only with 
         the extension replaced with .mae.
         
         Parameters
@@ -644,7 +608,7 @@ class Molecule:
         mae_path : str (default = None)
             The full path of the .mae file from which the attributes
             should be updated. If ``None`` the .mae file is assumed to
-            have the same path and name as `mol_file` only with the
+            have the same path and name as `file` only with the
             extension replaced with .mae.
         
         Modifies
@@ -653,7 +617,7 @@ class Molecule:
             The rdkit molecule held in this attribute is changed so that
             it matches the moleclue held in the .mae file.
             
-        self.mol_file's content
+        self.file's content
             The content in this file is changed to match the content in
             the .mae file.
             
@@ -664,16 +628,16 @@ class Molecule:
         """
         
         if mae_path is None:
-            mae_path = os.path.splitext(self.mol_file)[0] + '.mae'
+            mae_path = os.path.splitext(self.file)[0] + '.mae'
         
-        self.prist_mol = mol_from_mae_file(mae_path)
+        self.mol = mol_from_mae_file(mae_path)
         self.write()
 
     def write(self, path=None):
         """
         Writes a molecular structure file of the macromolecule.
 
-        The molecule is written to the location in the `mol_file` 
+        The molecule is written to the location in the `file` 
         attribute. The function uses the structure of the rdkit molecule 
         held in `mol` and as the basis for what is written to the file.
 
@@ -685,12 +649,11 @@ class Molecule:
         ----------            
         path : str (default = None)
             If the file is to be written to a directory other than
-            the one in `mol_file` or `mol_file`, it should be written 
-            here.
+            the one in `file`, it should be written here.
         
         Modifies
         --------
-        mol_file's content
+        file's content
             The conetent in this file will be replaced with the current
             structure of the molecule.
                 
@@ -700,13 +663,13 @@ class Molecule:
         
         """
 
-        write_funcs = {'.mol' : self.write_mdl_mol_file, 
-                       '.pdb' : chem.MolToPDBFile}
+        write_funcs = {'.mol' : self._write_mdl_mol_file, 
+                       '.pdb' : partial(chem.MolToPDBFile, self.mol)}
                        
         if path is None:
-            path = self.mol_file
+            path = self.file
         
-        _, ext = os.path.split(path)
+        _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
         write_func(path)
 
@@ -1186,6 +1149,38 @@ class StructUnit(Molecule, metaclass=Cached):
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)
+
+    def all_bonder_atom_distances(self):
+        """
+        Yield distances between all pairs of bonder atoms.
+        
+        All distances are only yielded once. This means that if the 
+        distance between atoms with ids ``1`` and ``2``is yielded as
+        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be 
+        yielded.
+        
+        Yields
+        ------
+        tuple of form (scipy.double, int, int)
+            This tuple holds the distance between two bonder atoms. The 
+            first element is the distance and the next two are the 
+            relevant atom ids.
+
+        """
+                
+        # Iterate through each pair of atoms - do not allow 
+        # recombinations.
+        for atom1, atom2 in it.combinations(self.mol.GetAtoms(), 2):
+ 
+            # Only yield if both atoms are bonders. 
+            if atom1.HasProp('bonder') and atom2.HasProp('bonder'):            
+                
+                # Get the atom ids, use them to calculate the distance
+                # and yield the resulting data.
+                atom1_id = atom1.GetIdx()
+                atom2_id = atom2.GetIdx()
+                yield (self.atom_distance(atom1_id, atom2_id), 
+                                                   atom1_id, atom2_id)
 
     def bonder_direction_vector_atoms(self):
         """
