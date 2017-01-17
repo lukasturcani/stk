@@ -789,7 +789,7 @@ class Molecule:
         """
 
         write_funcs = {'.mol' : self._write_mdl_mol_file, 
-                       '.pdb' : partial(chem.MolToPDBFile, self.mol)}
+                       '.pdb' : self._write_pdb_file}
                        
         if path is None:
             path = self.file
@@ -819,6 +819,7 @@ class Molecule:
         None : NoneType
         
         """
+        
         main_string = ("\n"
                        "     RDKit          3D\n"
                        "\n"
@@ -870,6 +871,47 @@ class Molecule:
         with open(path, 'w') as f:
             f.write(main_string)
 
+    def _write_pdb_file(self, path):
+        """
+        Writes a .pdb file of the molecule
+
+        This function should not be used directly, only via the 
+        ``write()`` method.
+
+        Parameters
+        ----------
+        path : str
+            The full path to which to the file should be written.
+            
+        Modifies
+        --------
+        A file is created/ changed at `path`.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # First write the file using rdkit.
+        chem.MolToPDBFile(self.mol, self.file)
+    
+        # Edit the file because rkdit does poor atom labelling.
+        new_content = ''
+        with open(self.file, 'r') as pdb:
+            for line in pdb:
+                if 'HETATM' in line:
+                    words = line.split()
+                    lbl_word = words[2]
+                    rpl_word = words[-1]
+                    rpl_word += " "*(len(lbl_word)-len(rpl_word))
+                    line = line.replace(lbl_word, rpl_word)
+
+                new_content += line
+                
+        with open(self.file, 'w') as pdb:
+            pdb.write(new_content)
+            
 @total_ordering        
 class StructUnit(Molecule, metaclass=Cached):
     """
