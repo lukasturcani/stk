@@ -1,8 +1,7 @@
 import numpy as np
 import rdkit.Chem as chem
 
-from .base import VertexOnlyCageTopology
-from ..base import Vertex
+from .base import VertexOnlyCageTopology,  Vertex
 
 class OnePlusOne(VertexOnlyCageTopology):
     positions_A = [Vertex(25,0,0),
