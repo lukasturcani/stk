@@ -1,3 +1,8 @@
+"""
+Defines classes which deal with input.
+
+"""
+
 from types import ModuleType
 import sys
 import re

@@ -1,8 +1,8 @@
 """
 Defines crossover operations via the ``Crossover`` class.
 
-Extending MMEA: Adding crossover functions
-------------------------------------------
+Extending MMEA: Adding crossover functions.
+-------------------------------------------
 If a new crossover operation is to be added to MMEA it should be added
 as a method in the ``Crossover`` class defined in this module. The only
 requirements are that the first two arguments are ``macro_mol1`` and
