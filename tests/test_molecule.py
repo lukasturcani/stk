@@ -6,7 +6,7 @@ from scipy.spatial.distance import euclidean
 
 
 from ..classes import Molecule
-from ..convenience_tools import periodic_table, vector_theta
+from ..convenience_tools import periodic_table
 
 data_dir = join('data', 'molecule')
 
