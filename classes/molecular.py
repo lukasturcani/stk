@@ -108,7 +108,6 @@ intance.
 
 Extending MMEA: Adding new macromolecules.
 ------------------------------------------
-
 To add new macromolecules create a new class which inherits 
 ``MacroMolecule``. The initializer of ``MacroMolecule`` can be used or
 a custom one may be used. However, all the same attributes must be 

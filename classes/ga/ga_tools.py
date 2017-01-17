@@ -1,3 +1,7 @@
+"""
+Defines the GATools class.
+
+"""
         
 class GATools:
     """
