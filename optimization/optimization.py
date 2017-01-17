@@ -78,8 +78,8 @@ def _optimize_all(func_data, population):
     MacroMolecule's ``.mol`` files
         This function optimizes the structures of all the 
         ``MacroMolecule`` instances held in `population`. This means
-        that their pristine ``.mol`` files are modified to their 
-        optimized structures. However, because all instances are cloned
+        that their structure files are modified to their optimized 
+        structures. However, because all instances are cloned
         any values in the original instance's attributes are unchanged.
         The file's contents are changed because they are written on the
         hard disk, which can be clones of the python interpreter.
@@ -142,10 +142,9 @@ def _optimize_all_serial(func_data, population):
     MacroMolecule
         This function optimizes the structures of all the 
         ``MacroMolecule`` instances held in `population`. This means
-        that their pristine ``.mol`` files are modified to their 
-        optimized structures. However, only the content of these files
-        is changed. The value of the `prist_mol_file` attributes remain 
-        the same. 
+        that their structure files are modified to their optimized 
+        structures. However, only the content of these files is changed. 
+        The value of the `file` attributes remain the same. 
     
     Returns
     -------
@@ -167,7 +166,7 @@ def _optimize_all_serial(func_data, population):
     
 def rdkit_optimization(macro_mol):
     """
-    Optimizes the structure of the pristine molecule using rdkit.
+    Optimizes the structure of the molecule using rdkit.
     
     Parameters
     ----------
@@ -176,15 +175,15 @@ def rdkit_optimization(macro_mol):
         
     Modifies
     --------
-    macro_mol.prist_mol
+    macro_mol.mol
         The rdkit molecule held in this attribute has it's structure
         changed as a result of the optimization. This means the
         ``Conformer`` instance held by the rdkit molecule is changed.
     
-    macro_mol.prist_mol_file's content
-        The content of the ``.mol`` file located at 
-        `macro_mol.prist_mol_file`, is changed so that it holds the
-        structure of the optimized rdkit molecule.
+    macro_mol.file's content
+        The content of the structure file located at 
+        `macro_mol.file`, is changed so that it holds the structure of 
+        the optimized rdkit molecule.
     
     macro_mol.optimized
         After a successful optimization, this attribute is set to 
@@ -202,15 +201,15 @@ def rdkit_optimization(macro_mol):
     
     # If `macro_mol` is already optmized, return.
     if macro_mol.optimized:
-        print('Skipping {0}.'.format(macro_mol.prist_mol_file))   
+        print('Skipping {0}.'.format(macro_mol.file))   
         return macro_mol
         
-    # Sanitize then optimize the rdkit molecule in `prist_mol`.
-    chem.SanitizeMol(macro_mol.prist_mol)
-    ac.MMFFOptimizeMolecule(macro_mol.prist_mol)
+    # Sanitize then optimize the rdkit molecule.
+    chem.SanitizeMol(macro_mol.mol)
+    ac.MMFFOptimizeMolecule(macro_mol.mol)
     
     # Update the content of the ``.mol`` file.
-    chem.MolToMolFile(macro_mol.prist_mol, macro_mol.prist_mol_file,
+    chem.MolToMolFile(macro_mol.mol, macro_mol.file,
                       includeStereo=True, kekulize=False,
                       forceV3000=True)
     
@@ -243,9 +242,9 @@ def do_not_optimize(macro_mol):
     """
     
     if macro_mol.optimized:
-        print('Skipping', macro_mol.prist_mol_file)
+        print('Skipping', macro_mol.file)
         return macro_mol
     
-    print('Optimizing', macro_mol.prist_mol_file)
+    print('Optimizing', macro_mol.file)
     macro_mol.optimized = True   
     return macro_mol   
