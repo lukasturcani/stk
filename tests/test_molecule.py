@@ -8,10 +8,10 @@ from scipy.spatial.distance import euclidean
 from ..classes import Molecule
 from ..convenience_tools import periodic_table
 
-data_dir = join('data', 'struct_unit')
+data_dir = join('data', 'molecule')
 
 mol = Molecule.__new__(Molecule)
-mol.mol = chem.MolFromMolFile(join(data_dir, 'amine.mol'),
+mol.mol = chem.MolFromMolFile(join(data_dir, 'molecule.mol'),
                                     removeHs=False, sanitize=False)
 og = mol.position_matrix()
 def test_all_atom_coords():
