@@ -68,7 +68,7 @@ class CachedMacroMol(type):
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            obj.dump(obj.prist_mol_file.replace('.mol', '.dmp'))
+            obj.dump(obj.file.replace('.mol', '.dmp'))
             self._cache[key] = obj            
             return obj
 
@@ -906,9 +906,9 @@ class StructUnit(Molecule, metaclass=Cached):
         centroid = sum(self.atom_coords(x) for x in self.bonder_ids) 
         return np.divide(centroid, len(self.bonder_ids))
 
-    def bonder_direction_vectors(self):
+    def bonder_dir_vectors(self):
         """
-        Yields the direction vectors between all pairs of heavy atoms.
+        Yields the direction vectors between all pairs of bonder atoms.
                 
         The yielded vector is normalized. If a pair (1,2) is yielded, 
         the pair (2,1) will not be.
@@ -961,7 +961,7 @@ class StructUnit(Molecule, metaclass=Cached):
         -------
         numpy.array
             The normalized direction vector running from the centroid of
-            the heavy atoms to the molecular centroid.
+            the bonder atoms to the molecular centroid.
         
         """
     
@@ -987,9 +987,9 @@ class StructUnit(Molecule, metaclass=Cached):
         # the functional group of the molecule.        
         func_grp_mol = chem.MolFromSmarts(self.func_grp.fg_smarts)
         
-        # Do a substructure search on the the molecule in `prist_mol`
-        # to find which atoms match the functional group. Return the
-        # atom ids of those atoms.
+        # Do a substructure search on the the molecule in `mol` to find
+        # which atoms match the functional group. Return the atom ids of
+        # those atoms.
         return self.mol.GetSubstructMatches(func_grp_mol)        
 
     def rotate2(self, theta, axis):
@@ -1030,7 +1030,7 @@ class StructUnit(Molecule, metaclass=Cached):
         # Set the atomic positions to the new coordinates.
         self.set_position_from_matrix(new_pos_mat)
         # Return the centroid to its original position.
-        self.set_heavy_atom_centroid(og_position)
+        self.set_bonder_centroid(og_position)
 
     def set_bonder_centroid(self, position):
         """
@@ -1235,21 +1235,21 @@ class StructUnit(Molecule, metaclass=Cached):
 
 
     def __eq__(self, other):
-        return self.prist_mol_file == other.prist_mol_file
+        return self.file == other.file
         
     def __lt__(self, other):
-        return self.prist_mol_file < other.prist_mol_file
+        return self.file < other.file
         
     def __hash__(self):
         return id(self)
     
     def __str__(self):
-        return self.prist_mol_file
+        return self.file
     
     def __repr__(self):
         repr_ =  "{0!r}".format(type(self))
         repr_ = repr_.replace(">", 
-        ", prist_mol_file={0.prist_mol_file!r}>".format(self))
+        ", file={0.file!r}>".format(self))
         repr_ = repr_.replace("class ", "class=")
         return repr_
   
@@ -1287,7 +1287,7 @@ class StructUnit2(StructUnit):
         
         """
         
-        *_, start = next(self.bonder_vectors())
+        *_, start = next(self.bonder_dir_vectors())
         return self._set_orientation2(start, end)
         
     def minimize_theta(self, vector, axis, step=0.17):
@@ -1404,11 +1404,12 @@ class StructUnit3(StructUnit):
         
         """
         
-        if sum(1 for _ in self.bonder_direction_vectors()) < 2:
+        if sum(1 for _ in self.bonder_dir_vectors()) < 2:
             raise ValueError(("StructUnit3 molecule "
                              "has fewer than 3 functional groups."))
         
-        v1, v2 = it.islice(self.bonder_direction_vectors(), 2)
+        vgen = (v for *_, v in self.bonder_dir_vectors())
+        v1, v2 = it.islice(vgen, 2)
     
         normal_v = normalize_vector(np.cross(v1, v2))
         
@@ -1674,8 +1675,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         
         self.topology = topology(self, **topology_args)
         # Ask the ``Topology`` instance to assemble/build the cage. This
-        # creates the cage's ``.mol`` file all  the building blocks and
-        # linkers joined up. Both the substituted and pristine versions.      
+        # creates the cage's structure file with all the building blocks 
+        # and linkers joined up.     
         self.topology.build()
 
         # Write the structure file of the assembled molecule.
@@ -1735,7 +1736,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     def __str__(self):
         return str({key: value for key, value in 
                                     self.__dict__.items() if 
-                                    key in {'prist_mol_file', 
+                                    key in {'file', 
                                             'topology',
                                             'fitness',
                                             'optimized'}}) + "\n"
@@ -1785,7 +1786,7 @@ class Cage(MacroMolecule):
     """
 
     @classmethod
-    def init_fixed_bb(cls, bb_file, lk_db, topologies, prist_mol_file):
+    def init_fixed_bb(cls, bb_file, lk_db, topologies, file):
         bb = StructUnit3(bb_file)        
         
         while True:
@@ -1798,10 +1799,10 @@ class Cage(MacroMolecule):
         
         topology = np.random.choice(topologies)        
         
-        return cls((bb, lk), topology, prist_mol_file)
+        return cls((bb, lk), topology, file)
   
     @classmethod
-    def init_random(cls, bb_db, lk_db, topologies, prist_mol_file):
+    def init_random(cls, bb_db, lk_db, topologies, file):
         """
         Makes ``Cage`` from random building blocks and topology.
         
@@ -1813,7 +1814,7 @@ class Cage(MacroMolecule):
         
         topologies : list of ``Topology`` child classes.
         
-        prist_mol_file : str
+        file : str
         
         """
         
@@ -1833,7 +1834,7 @@ class Cage(MacroMolecule):
                 lk_file = os.path.join(lk_db, lk_file)
                 lk = StructUnit(lk_file)
                 
-                if len(lk.heavy_ids) >= 3:
+                if len(lk.bonder_ids) >= 3:
                     lk = StructUnit3(lk_file)
                 else:
                     lk = StructUnit2(lk_file)
@@ -1844,7 +1845,7 @@ class Cage(MacroMolecule):
                 continue
         
         topology = np.random.choice(topologies)
-        return cls((bb, lk), topology, prist_mol_file)
+        return cls((bb, lk), topology, file)
 
 class Polymer(MacroMolecule):
     """
