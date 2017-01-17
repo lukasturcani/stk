@@ -1,3 +1,8 @@
+"""
+Defines the Population class.
+
+"""
+
 import itertools
 import os
 import numpy as np

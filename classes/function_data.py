@@ -1,3 +1,7 @@
+"""
+Defines the FunctionData class.
+
+"""
 
 class FunctionData:
     """
@@ -10,7 +14,7 @@ class FunctionData:
 
     params : dict
         The parameters of the function or method who's name is held by
-        'name' which should be used when that function is called.
+        `name`.
     
     """
     
