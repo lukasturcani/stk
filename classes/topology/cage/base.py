@@ -135,7 +135,7 @@ class Vertex:
         # Flush the list of data from previous molecules.
         self.distances = []
       
-        # The method first aligns the normal of the heavy atom plane to
+        # The method first aligns the normal of the bonder atom plane to
         # the normal of the edge plane. This means the bulk of the 
         # building block is always pointed away from the center of the
         # molecule.
@@ -150,10 +150,10 @@ class Vertex:
         #   3) Rotate the building block by some amount `theta`, so
         #      so that one of the bonder atoms is perfectly aligned with
         #      one of the edges. The axis of rotation is the normal to 
-        #      the plane of heavy atoms.
+        #      the plane of bonder atoms.
         # 
         # The rotation is carried out via matrices. This means a
-        # coordinate matrix of atoms in the heavy molecule is generated
+        # coordinate matrix of atoms in the molecule is generated
         # and modified.
         
         # Set the centroid of the bonder atoms to the origin.
@@ -368,7 +368,7 @@ class Edge(Vertex):
         # Flush the lists from data of previous molecules.
         self.distances = []
         
-        # First the centroid of the heavy atoms is placed on the
+        # First the centroid of the bonder atoms is placed on the
         # position of the edge, then the direction of the linker is 
         # aligned with the direction of the edge.
         linker.set_bonder_centroid(self.coord)
@@ -726,7 +726,7 @@ class VertexOnlyCageTopology(CageTopology):
         
     def place_mols(self):
         
-        self.macro_mol.heavy_mol = chem.Mol()        
+        self.macro_mol.mol = chem.Mol()        
         
         if self.random_placement:
             return self.place_mols_random()
@@ -735,20 +735,20 @@ class VertexOnlyCageTopology(CageTopology):
     def place_mols_random(self):
         for position in self.positions_A:
             bb = np.random.choice(self.macro_mol.building_blocks)
-            n_bb = len(bb.find_functional_group_atoms())
+            n_bb = len(bb.functional_group_atoms())
             
-            self.macro_mol.heavy_mol = chem.CombineMols(
-                                        self.macro_mol.heavy_mol,
+            self.macro_mol.mol = chem.CombineMols(
+                                        self.macro_mol.mol,
                                         position.place_mol(bb))
             self.bb_counter.update([bb])                                        
                                         
-            heavy_ids = deque(maxlen=n_bb)
-            for atom in self.macro_mol.heavy_mol.GetAtoms():
-                if atom.GetAtomicNum() in FGInfo.heavy_atomic_nums:
-                    heavy_ids.append(atom.GetIdx())
+            bonder_ids = deque(maxlen=n_bb)
+            for atom in self.macro_mol.mol.GetAtoms():
+                if atom.HasProp('bonder'):
+                    bonder_ids.append(atom.GetIdx())
             
-            position.heavy_ids = sorted(heavy_ids)
-            self.pair_heavy_ids_with_connected(position)
+            position.bonder_ids = sorted(bonder_ids)
+            self.pair_bonders_with_positions(position)
 
     @classmethod
     def connect(cls):
