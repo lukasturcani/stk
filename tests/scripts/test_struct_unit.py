@@ -16,7 +16,41 @@ obj_file_name = os.path.join('data', 'struct_unit',
 # time on initialization.
 with open(obj_file_name, 'rb') as dump_file:
     struct_unit = pickle.load(dump_file)
+    
 
+def test_bonder_atom_position_matrix():
+    """
+    Tests the output of `bonder_atom_position` matrix.
+    
+    """
+    
+    # For every heavy atom id, get the column in the 
+    # heavy_atom_position_matrix which holds its coords. Check that
+    # these coords are the same as those held in the heavy confomer.    
+    
+    conf = mol.heavy_mol.GetConformer()
+    pos_mat = mol.heavy_atom_position_matrix()    
+    
+    for atom_id in mol.heavy_ids:
+        coord = np.array(conf.GetAtomPosition(atom_id))      
+        
+        column_i = mol.heavy_ids.index(atom_id)
+        column = pos_mat.T[column_i]
+        
+        assert np.allclose(coord, column, atol=1e-8)    
+    
+def test_all_bonder_atom_distances():
+    """
+    Tests `all_bonder_atom_distances`.
+    
+    """
+
+    # Check that the correct number of distances is found.
+    assert sum(1 for _ in mol.all_heavy_atom_distances()) == 6
+    
+    s = sum(x for x, *_ in mol.all_heavy_atom_distances())
+    assert round(s) == 33
+    
 
 def test_caching():
     

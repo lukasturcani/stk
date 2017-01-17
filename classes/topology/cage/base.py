@@ -7,7 +7,7 @@ import rdkit.Chem as chem
 from ..base import Topology
 from ....convenience_tools import atom_vdw_radii
 from ....pyWindow import window_sizes
-from ...molecular import FGInfo
+from ...fg_info import FGInfo
 
 class WindowError(Exception):
     def __init__(self, message):
