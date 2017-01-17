@@ -870,27 +870,6 @@ class StructUnit(Molecule, metaclass=Cached):
         # which get removed.
         self._tag_atoms()   
 
-    def bonder_position_matrix(self):
-        """
-        Returns a matrix holding the positions of bonder atoms.
-
-        Returns
-        -------
-        numpy.matrix
-            The matrix is 3 x n. Each column holds the x, y and z
-            coordinates of a bonder atom. The index of the column 
-            corresponds to the index of the atom id in `bonder_ids`.    
-        
-        """
-        
-        pos_array = np.array([])
-
-        for atom_id in self.bonder_ids:
-            pos_vect = np.array([*self.atom_coords(atom_id)])
-            pos_array = np.append(pos_array, pos_vect)
-
-        return np.matrix(pos_array.reshape(-1,3).T)
-
     def all_bonder_distances(self):
         """
         Yield distances between all pairs of bonder atoms.
@@ -902,26 +881,30 @@ class StructUnit(Molecule, metaclass=Cached):
         
         Yields
         ------
-        tuple of form (scipy.double, int, int)
-            This tuple holds the distance between two bonder atoms. The 
-            first element is the distance and the next two are the 
-            relevant atom ids.
+        tuple of form (int, int, scipy.double)
+            The ints represnt the atoms ids and the double is their 
+            distance.
 
         """
                 
         # Iterate through each pair of atoms - do not allow 
         # recombinations.
-        for atom1, atom2 in it.combinations(self.mol.GetAtoms(), 2):
- 
-            # Only yield if both atoms are bonders. 
-            if atom1.HasProp('bonder') and atom2.HasProp('bonder'):            
-                
-                # Get the atom ids, use them to calculate the distance
-                # and yield the resulting data.
-                atom1_id = atom1.GetIdx()
-                atom2_id = atom2.GetIdx()
-                yield (self.atom_distance(atom1_id, atom2_id), 
-                                                   atom1_id, atom2_id)
+        for atom1, atom2 in it.combinations(self.bonder_ids, 2):
+                yield (atom1, atom2, self.atom_distance(atom1, atom2))
+
+    def bonder_centroid(self):
+        """
+        Returns the centroid of the bonder atoms.
+
+        Returns
+        -------
+        numpy.array
+            A numpy array holding the midpoint of the bonder atoms.
+        
+        """
+
+        centroid = sum(self.atom_coords(x) for x in self.bonder_ids) 
+        return np.divide(centroid, len(self.bonder_ids))
 
     def bonder_direction_vectors(self):
         """
@@ -944,6 +927,27 @@ class StructUnit(Molecule, metaclass=Cached):
             p2 = self.atom_coords(atom2_id)
         
             yield atom2_id, atom1_id, normalize_vector(p1-p2)
+
+    def bonder_position_matrix(self):
+        """
+        Returns a matrix holding the positions of bonder atoms.
+
+        Returns
+        -------
+        numpy.matrix
+            The matrix is 3 x n. Each column holds the x, y and z
+            coordinates of a bonder atom. The index of the column 
+            corresponds to the index of the atom id in `bonder_ids`.    
+        
+        """
+        
+        pos_array = np.array([])
+
+        for atom_id in self.bonder_ids:
+            pos_vect = np.array([*self.atom_coords(atom_id)])
+            pos_array = np.append(pos_array, pos_vect)
+
+        return np.matrix(pos_array.reshape(-1,3).T)
 
     def centroid_centroid_dir_vector(self):
         """
@@ -981,26 +985,12 @@ class StructUnit(Molecule, metaclass=Cached):
         
         # Generate a ``rdkit.Chem.rdchem.Mol`` instance which represents
         # the functional group of the molecule.        
-        func_grp_mol = chem.MolFromSmarts(self.func_grp.smarts_start)
+        func_grp_mol = chem.MolFromSmarts(self.func_grp.fg_smarts)
         
         # Do a substructure search on the the molecule in `prist_mol`
         # to find which atoms match the functional group. Return the
         # atom ids of those atoms.
-        return self.prist_mol.GetSubstructMatches(func_grp_mol)        
-
-    def bonder_centroid(self):
-        """
-        Returns the centroid of the bonder atoms.
-
-        Returns
-        -------
-        numpy.array
-            A numpy array holding the midpoint of the bonder atoms.
-        
-        """
-
-        centroid = sum(self.atom_coords(x) for x in self.bonder_ids) 
-        return np.divide(centroid, len(self.heavy_ids))
+        return self.mol.GetSubstructMatches(func_grp_mol)        
 
     def rotate2(self, theta, axis):
         """
@@ -1576,23 +1566,15 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         This attribue holds the initializer arguments for the topology 
         instance. This is stored so that exceptions can print all
         values required to make an identical copy of a ``MacroMolecule``
-        instance..
+        instance.
 
-    prist_mol_file : str
-        The full path of the ``.mol`` file holding the pristine version
-        of the macromolecule.
-
-    prist_mol : rdkit.Chem.rdchem.Mol
-        An rdkit molecule instance representing the macromolecule.
-        
-    heavy_mol_file : str
-        The full path of the ``.mol`` file holding the substituted
-        version of the macromolecule.
-
-    heavy_mol : rdkit.Chem.rdchem.Mol
-        A rdkit molecule instance holding the substituted version of the
+    file : str
+        The full path of the molecule structure file holding the 
         macromolecule.
 
+    mol : rdkit.Chem.rdchem.Mol
+        An rdkit instance representing the macromolecule.
+        
     optimized : bool (default = False)
         This is a flag to indicate if a molecule has been previously
         optimized. Optimization functions set this flag to ``True``
@@ -1611,7 +1593,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         assign to the attribute `unscaled_fitness` while normalization
         function will assign to `fitness`.
         
-    unscaled_fitness = float or array (default = None)
+    unscaled_fitness : object (default = None)
         Fitness functions which couple with scaling or normalization 
         functions assign fitness values into this attribute.
         
@@ -1632,17 +1614,14 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     
     """
 
-    def __init__(self, building_blocks, topology, prist_mol_file, 
+    def __init__(self, building_blocks, topology, file, 
                  topology_args=None):
         """
         Initialize a ``MacroMolecule`` instance.
         
-        The initialization is exectued inside a try block. This allows
-        error handling for cases where cage initialization failed for
-        some reason. In this case, when an exception occurs during
-        initialization all the parameters which were provided to the 
-        initializer are saved to a file ``failures.txt`` which should
-        be located in the same directory as the ``output`` folder.
+        When an exception occurs during initialization, all parameters 
+        which were provided to the initializer are saved to a file 
+        ``failures.txt`` which is in the ``output`` folder.
         
         Parameters
         ---------
@@ -1655,8 +1634,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             Such classes are defined in the topology module. The class 
             will be a child class which inherits ``Topology``.
         
-        prist_mol_file : str
-            The full path of the ``.mol`` file where the macromolecule
+        file : str
+            The full path of the structure file where the macromolecule
             will be stored.
             
         topology_args : list (default = None)
@@ -1666,18 +1645,18 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         """
         
         try:
-            self._std_init(building_blocks, topology, prist_mol_file, 
-                                 topology_args)
+            self._std_init(building_blocks, 
+                           topology, file, topology_args)
             
         except Exception as ex:
             self.building_blocks = building_blocks
             self.topology = topology
-            self.prist_mol = chem.Mol()
-            self.prist_mol_file = prist_mol_file
+            self.mol = chem.Mol()
+            self.file = file
             self.topology_args = topology_args
             MolError(ex, self, 'During initialization.')
 
-    def _std_init(self, building_blocks, topology, prist_mol_file, 
+    def _std_init(self, building_blocks, topology, file, 
                  topology_args):
             
         if topology_args is None:
@@ -1690,9 +1669,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         self.progress_params = None
         self.building_blocks = tuple(building_blocks)
         self.topology_args = topology_args
-        self.prist_mol_file = prist_mol_file    
-        self.heavy_mol_file = prist_mol_file.replace('.mol', 
-                                                     '_HEAVY.mol')        
+        self.file = file         
         self.energy = Energy(self)  
         
         self.topology = topology(self, **topology_args)
@@ -1701,9 +1678,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         # linkers joined up. Both the substituted and pristine versions.      
         self.topology.build()
 
-        # Write the ``.mol`` files.
-        self.write_mol_file('prist')
-        self.write_mol_file('heavy')
+        # Write the structure file of the assembled molecule.
+        self.write()
 
     def same(self, other):
         """
