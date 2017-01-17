@@ -169,7 +169,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molecule.    
-        _create_mae(macro_mol, macromodel_path)        
+        _create_mae(macro_mol, macromodel_path)     
         # Generate the ``.com`` file for the MacroModel MD run.
         _generate_md_com(macro_mol, force_field=force_field, temp=temp, 
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
