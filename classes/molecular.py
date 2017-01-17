@@ -338,7 +338,7 @@ class Molecule:
     @staticmethod
     def load(file_name):
         """
-        Initializes a MacroMolecule from one dumped to a file.
+        Initializes a Molecule from one pickled and dumped to a file.
         
         Parameters
         ----------
@@ -347,8 +347,8 @@ class Molecule:
             
         Returns
         -------
-        MacroMolecule
-            The macromolecule stored in the dump file.
+        Molecule
+            The molecule stored in the dump file.
             
         """
         
@@ -364,8 +364,7 @@ class Molecule:
         numpy.matrix
             The matrix is 3 x n. Each column holds the x, y and z
             coordinates of an atom. The index of the column corresponds
-            to the id of the atom in the rdkit molecule whose 
-            coordinates it holds.
+            to the id of the atom in the molecule.
 
         """
 
@@ -1224,7 +1223,7 @@ class StructUnit(Molecule, metaclass=Cached):
         
         """
         
-        for atom1_id, atom2_id in itertools.combinations(self.heavy_ids, 
+        for atom1_id, atom2_id in it.combinations(self.heavy_ids, 
                                                                      2):
             p1 = self.atom_coords('heavy', atom1_id)
             p2 = self.atom_coords('heavy', atom2_id)
@@ -1585,7 +1584,7 @@ class StructUnit3(StructUnit):
             raise ValueError(("StructUnit3 molecule "
                              "has fewer than 3 functional groups."))
         
-        v1, v2 = itertools.islice(self.heavy_direction_vectors(), 2)
+        v1, v2 = it.islice(self.heavy_direction_vectors(), 2)
     
         normal_v = normalize_vector(np.cross(v1, v2))
         
