@@ -663,8 +663,9 @@ class MAEExtractor:
     """
     
     def __init__(self, macro_mol):
-        
-        self.maegz_path = macro_mol.file.replace('.mol', "-out.maegz")
+
+        name, ext = os.path.splitext(macro_mol.file)     
+        self.maegz_path = name + '-out.maegz'
         self.macro_mol = macro_mol
         self.maegz_to_mae()
         self.extract_conformer()
