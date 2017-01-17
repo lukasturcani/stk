@@ -603,7 +603,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         # If the cage already has a fitness value, don't run the
         # calculation again.
         if macro_mol.unscaled_fitness:
-            print('Skipping {0}'.format(macro_mol.prist_mol_file))
+            print('Skipping {0}'.format(macro_mol.file))
             return macro_mol
            
         # Make a copy version of `macro_mol` which is unoptimizted.
@@ -612,7 +612,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         
         
         # Create an instance of the target molecule as a ``StructUnit``.
-        target = StructUnit(target_mol_file, minimal=True)        
+        target = StructUnit(target_mol_file)        
     
         # This function creates a new molecule holding both the target
         # and the cage centered at the origin. It then calculates the 
@@ -632,10 +632,10 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
             # is loaded into a ``MacroMolecule`` instance and its .mol 
             # file is written to the disk.
             mm_complex = MacroMolecule.__new__(MacroMolecule)
-            mm_complex.prist_mol = complex_
-            mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
+            mm_complex.mol = complex_
+            mm_complex.file = macro_mol.file.replace(
                                 '.mol', '_COMPLEX_{0}.mol'.format(i))
-            mm_complex.write_mol_file('prist')
+            mm_complex.write()
             mm_complex.optimized = False
             mm_complex.energy = Energy(mm_complex)
             optimization.macromodel_opt(mm_complex, no_fix=True,
@@ -665,12 +665,12 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
             pos_be = 0
             neg_be = abs(binding_energy)
 
-        frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.prist_mol, 
+        frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.mol, 
                                         asMols=True,
                                         sanitizeFrags=False)
                                       
         cage_counter = Counter(x.GetAtomicNum() for x in 
-                                macro_mol.prist_mol.GetAtoms())
+                                macro_mol.mol.GetAtoms())
         frag_counters = [(frag1, Counter(x.GetAtomicNum() for x in 
                                 frag1.GetAtoms())),
 
@@ -681,11 +681,11 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                             counter == cage_counter)
         
         cmplx_cage = MacroMolecule.__new__(MacroMolecule)
-        cmplx_cage.prist_mol = cmplx_cage_mol
+        cmplx_cage.mol = cmplx_cage_mol
         cmplx_cage.topology = type(macro_mol.topology)(cmplx_cage)
-        cmplx_cage.prist_mol_file = macro_mol.prist_mol_file.replace(
+        cmplx_cage.file = macro_mol.file.replace(
                          '.mol', '_COMPLEX_{0}_no_target.mol'.format(i))
-        cmplx_cage.write_mol_file('prist')
+        cmplx_cage.write()
         
     
         if cmplx_cage.topology.window_difference() is not None:             
@@ -737,11 +737,11 @@ def _generate_complexes(macro_mol, target, number=1):
     """
 
     # First place both the target and cage at the origin.
-    macro_mol.set_position('prist', [0,0,0])
-    target.set_position('prist', [0,0,0])
+    macro_mol.set_position([0,0,0])
+    target.set_position([0,0,0])
     
     # Get the position matrix of the target molecule.        
-    og_pos_mat = target.position_matrix('prist')
+    og_pos_mat = target.position_matrix()
     
     # Carry out every rotation and yield a complex for each case.
     for i in range(number):
@@ -759,9 +759,9 @@ def _generate_complexes(macro_mol, target, number=1):
         new_pos_mat = np.dot(rot_mat2, new_pos_mat)
         new_pos_mat = np.dot(rot_mat3, new_pos_mat)
         
-        rot_target.set_position_from_matrix('prist', new_pos_mat)
+        rot_target.set_position_from_matrix(new_pos_mat)
         
-        yield chem.CombineMols(macro_mol.prist_mol, rot_target.prist_mol)
+        yield chem.CombineMols(macro_mol.mol, rot_target.mol)
     
 def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """
@@ -790,22 +790,21 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """
     
     
-    macro_mol.set_position('prist', [0,0,0])
-    c60.set_position('prist', [0,0,0])
+    macro_mol.set_position([0,0,0])
+    c60.set_position([0,0,0])
     
     # Step 1: Align the 5 membered ring with the z-axis.
     
     # Find a the ids of atoms in a membered ring.
-    g = c60.graph('prist')
+    g = c60.graph()
     ids = next(x for x in nx.cycle_basis(g) if len(x) == 5)
     # Place the coordinates of those atoms in a matrix.
-    ring_matrix = np.matrix(
-                        [c60.atom_coords('prist', id_) for id_ in ids])
+    ring_matrix = np.matrix([c60.atom_coords(id_) for id_ in ids])
 
     # Get the centroid of the ring.    
     ring_centroid = matrix_centroid(ring_matrix)
     # Align the centroid of the ring with the z-axis.
-    c60.set_orientation('prist', ring_centroid, [0,0,1])
+    c60.set_orientation(ring_centroid, [0,0,1])
     aligned_c60 = copy.deepcopy(c60)
     
     # Step 2: Get the rotation angles and apply the rotations. Yield 
@@ -818,9 +817,9 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     for angle5 in angles5fold:
         for angle2 in angles2fold:
             buckyball = copy.deepcopy(aligned_c60)
-            buckyball.rotate('prist', angle5, [0,0,1])
-            buckyball.rotate('prist', angle2, [0,1,0])
-            yield chem.CombineMols(macro_mol.prist_mol, buckyball.prist_mol)
+            buckyball.rotate(angle5, [0,0,1])
+            buckyball.rotate(angle2, [0,1,0])
+            yield chem.CombineMols(macro_mol.mol, buckyball.mol)
 
     
     
