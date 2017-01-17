@@ -53,7 +53,7 @@ def _optimize_all(func_data, population):
 
     The parallel optimization creates cloned instances of the 
     population's members. It is these that are optimized. This means 
-    that the ``.mol`` files are changed but any instance attributes 
+    that the structure files are changed but any instance attributes 
     are not.
 
     To deal with this, optimization functions should return the 
@@ -75,7 +75,7 @@ def _optimize_all(func_data, population):
         
     Modifies
     --------
-    MacroMolecule's ``.mol`` files
+    MacroMolecule's structure files
         This function optimizes the structures of all the 
         ``MacroMolecule`` instances held in `population`. This means
         that their structure files are modified to their optimized 
@@ -208,10 +208,8 @@ def rdkit_optimization(macro_mol):
     chem.SanitizeMol(macro_mol.mol)
     ac.MMFFOptimizeMolecule(macro_mol.mol)
     
-    # Update the content of the ``.mol`` file.
-    chem.MolToMolFile(macro_mol.mol, macro_mol.file,
-                      includeStereo=True, kekulize=False,
-                      forceV3000=True)
+    # Update the content of the structure file.
+    macro_mol.write()
     
     macro_mol.optimized = True   
     return macro_mol
