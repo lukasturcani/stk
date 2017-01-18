@@ -1025,7 +1025,8 @@ class StructUnit(Molecule, metaclass=Cached):
         # Calling this function labels the atoms in the rdkit molecule
         # as either atoms which form a bond during reactions or atoms
         # which get removed.
-        self.tag_atoms()   
+        if self.func_grp:
+            self.tag_atoms()   
 
     def all_bonder_distances(self):
         """
@@ -1365,7 +1366,10 @@ class StructUnit(Molecule, metaclass=Cached):
         None : NoneType
 
         """
-         
+        
+        # Clear this list in case the method is being rerun.
+        self.bonder_ids = []
+        
         # Give all atoms in functional groups the tag 'fg' and set its
         # value to the name of the functional group. 
         for atom_id in flatten(self.functional_group_atoms()):
