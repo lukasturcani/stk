@@ -206,9 +206,9 @@ class Crossover:
                         macro_mol1.topology.bb_counter.keys()))
         
         _, c2_lk = max(zip(macro_mol2.topology.bb_counter.values(),
-                        macro_mol1.topology.bb_counter.keys()))
+                        macro_mol2.topology.bb_counter.keys()))
         _, c2_bb = min(zip(macro_mol2.topology.bb_counter.values(),
-                        macro_mol1.topology.bb_counter.keys()))
+                        macro_mol2.topology.bb_counter.keys()))
         
         # Get all the topologies. A set automatically removes 
         # duplicates.

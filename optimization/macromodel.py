@@ -866,7 +866,8 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
         atom1 = bond.GetBeginAtom() 
         atom2 = bond.GetEndAtom()
         
-        if atom1.HasProp('bonder') and atom2.HasProp('bonder'):
+        if (atom1.GetIdx() in macro_mol.topology.bonder_ids and 
+            atom2.GetIdx() in macro_mol.topology.bonder_ids):
             continue
         
         atom1_id = atom1.GetIdx() 
@@ -946,13 +947,10 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     # This means that there will be some bond angles which consist of 2
     # bonds not added during assembly which will not be fixed. However,
     # it is assumed that the effect of this will be minimal.
-    for atom1_id, atom2_id, atom3_id in ba_atoms:
-        atom1 = macro_mol.mol.GetAtomWithIdx(atom1_id)
-        atom2 = macro_mol.mol.GetAtomWithIdx(atom2_id)
-        atom3 = macro_mol.mol.GetAtomWithIdx(atom3_id)
-        
-        if (atom1.HasProp('bonder') or atom2.HasProp('bonder') or
-            atom3.HasProp('bonder')):
+    for atom1_id, atom2_id, atom3_id in ba_atoms:        
+        if (atom1_id in macro_mol.topology.bonder_ids or 
+            atom2_id in macro_mol.topology.bonder_ids or
+            atom3_id in macro_mol.topology.bonder_ids):
             continue
         
         ba = ac.GetAngleDeg(conf, atom1_id, atom2_id, atom3_id)
@@ -1029,13 +1027,10 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     # be fixed. However, it is assumed that the effect of this will be 
     # minimal.    
     for atom1_id, atom2_id, atom3_id, atom4_id in ta_atoms:
-        atom1 = macro_mol.mol.GetAtomWithIdx(atom1_id)
-        atom2 = macro_mol.mol.GetAtomWithIdx(atom2_id)
-        atom3 = macro_mol.mol.GetAtomWithIdx(atom3_id)
-        atom4 = macro_mol.mol.GetAtomWithIdx(atom4_id)
-        
-        if (atom1.HasProp('bonder') or atom2.HasProp('bonder') or
-            atom3.HasProp('bonder') or atom4.HasProp('bonder')):
+        if (atom1_id in macro_mol.topology.bonder_ids or
+            atom2_id in macro_mol.topology.bonder_ids or
+            atom3_id in macro_mol.topology.bonder_ids or
+            atom4_id in macro_mol.topology.bonder_ids):
             continue
         
         ta = ac.GetDihedralDeg(conf, atom1_id, atom2_id, 
