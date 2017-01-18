@@ -87,11 +87,11 @@ class MolError(Exception):
         # not exist (like when using MMEA as a library) place the
         # ``failures.txt`` in the same folder as ``MMEA``.
         cwd = os.getcwd().split('output')[0]
-        if 'output' in os.listdir(cwd):
+        if 'output' in os.getcwd():
             name = os.path.join(cwd, 'output', 'failures.txt')
         else:
             name = os.path.join(cwd, 'failures.txt')
-        
+
         with open(name, 'a') as f:
             f.write("{} - {}\n\n".format(type(self.ex).__name__, 
                                             self.ex))
@@ -110,7 +110,7 @@ class MolError(Exception):
                
                 f.write('topology_args = {}\n'.format(
                                                      mol.topology_args))    
-                             
+            f.write('\n'+'='*240)                 
             f.write('\n\n\n')                             
                              
 class PopulationSizeError(Exception):

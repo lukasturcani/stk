@@ -124,6 +124,12 @@ class Topology:
         
         """
 
+        # When running ``build()`` in parallel, the atom tags are
+        # cleared by the multiprocessing module. Make sure to readd the
+        # tags before running ``build()``.
+        for bb in self.macro_mol.building_blocks:
+            bb.tag_atoms()
+        
         self.place_mols()
         self.join_mols()
         self.del_atoms()
