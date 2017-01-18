@@ -263,7 +263,7 @@ class GAInput:
                         setattr(self, kw, func_data)
                         continue
     
-                    kw, val = raw_line.split("=")                
+                    kw, val = raw_line.split("=", 1)                
                     setattr(self, kw, eval(val))
                 except:
                     print(("\n\n\nERROR: Something is wrong with the"
@@ -312,7 +312,7 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            p_name, p_vals = param.split("=")                
+            p_name, p_vals = param.split("=", 1)                
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
