@@ -66,13 +66,9 @@ def run():
             ga_input.pop_size = len(pop)
             
             for mem in pop:
-                prist_name = os.path.basename(mem.prist_mol_file)
-                heavy_name = os.path.basename(mem.heavy_mol_file)
+                name = os.path.basename(mem.file)
                 
-                mem.prist_mol_file = os.path.join(os.getcwd(), 
-                                                    prist_name)
-                mem.heavy_mol_file = os.path.join(os.getcwd(), 
-                                                    heavy_name)
+                mem.file = os.path.join(os.getcwd(), name)
             
             pop.write(os.getcwd())
             
@@ -98,7 +94,7 @@ def run():
 
     # Print the scaled and unscaled fitness values.
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.prist_mol_file)
+        print(macro_mol.file)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
         print('\n')
 
@@ -160,7 +156,7 @@ def run():
                 
         # Print the scaled and unscaled fitness values.        
         for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.prist_mol_file)
+            print(macro_mol.file)
             print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
             print('\n')
     
@@ -258,8 +254,8 @@ def compare():
         # calculations. Also update the file name with the new 
         # directory.
         for ind in sp:
-            _, name = os.path.split(ind.prist_mol_file)
-            ind.prist_mol_file = os.path.join(sp_dir, name)
+            _, name = os.path.split(ind.file)
+            ind.file = os.path.join(sp_dir, name)
             ind.unscaled_fitness = None
             ind.fitness_fail = True
             ind.fitness = None
@@ -282,7 +278,7 @@ def compare():
 
     # Print the scaled and unscaled fitness values. 
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.prist_mol_file)
+        print(macro_mol.file)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
         print('\n')
 
