@@ -517,11 +517,11 @@ class CageTopology(Topology):
         
         """
         
-        center_of_mass = self.macro_mol.center_of_mass('prist')
+        center_of_mass = self.macro_mol.center_of_mass()
         min_dist = min((euclidean(coord, center_of_mass) -
-        atom_vdw_radii[self.macro_mol.atom_symbol('prist', atom_id)]) 
+        atom_vdw_radii[self.macro_mol.atom_symbol(atom_id)]) 
                            for atom_id, coord in 
-                               self.macro_mol.all_atom_coords('prist'))
+                               self.macro_mol.all_atom_coords())
         return 2 * abs(min_dist)  
 
     def place_mols(self):
@@ -702,7 +702,7 @@ class CageTopology(Topology):
         
         """
         
-        all_windows = window_sizes(self.macro_mol.prist_mol_file)
+        all_windows = window_sizes(self.macro_mol.file)
 
         # If pyWindow failed, return ``None``.
         if all_windows is None:          
