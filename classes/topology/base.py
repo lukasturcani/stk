@@ -93,13 +93,17 @@ class Topology:
         used during assembly. The ``StructUnit`` instance acts as the
         counter key.
         
+    bonder_ids : set of ints
+        Tagging on atoms is lost when using the multiprocessing module.
+        The bonder ids are stored here as a backup.
         
     """
     
     def __init__(self, macro_mol):
         self.macro_mol = macro_mol
         self.bonds_made = 0
-        self.bb_counter = Counter()         
+        self.bb_counter = Counter()       
+        self.bonder_ids = []
         
     def build(self):
         """
@@ -133,6 +137,7 @@ class Topology:
         self.place_mols()
         self.join_mols()
         self.del_atoms()
+        self.save_bonders()
     
     def del_atoms(self):
         """
@@ -203,3 +208,23 @@ class Topology:
         else:
             return rdkit.Chem.rdchem.BondType.SINGLE
 
+    def save_bonders(self):
+        """
+        Adds atoms tagged with 'bonder' to `bonder_ids`.
+
+        Modifies
+        --------
+        bonder_ids : set of ints
+            Updates this list with the ids of atoms tagged 'bonder'.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # Clear the set in case the method is run twice.
+        self.bonder_ids = set()
+        for atom in self.macro_mol.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                self.bonder_ids.add(atom.GetIdx())
