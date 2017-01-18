@@ -608,7 +608,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
            
         # Make a copy version of `macro_mol` which is unoptimizted.
         unopt_macro_mol = copy.deepcopy(macro_mol)
-        unopt_macro_mol.topology.final_sub()
+        unopt_macro_mol.topology.build()
         
         
         # Create an instance of the target molecule as a ``StructUnit``.
@@ -655,8 +655,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                         x.energy.macromodel(16, macromodel_path))                        
     
         binding_energy = (
-                    min_eng_cmplx.energy.values[('macromodel', 16)] - 
-                        energy_separate)
+                    min_eng_cmplx.energy.values[
+        FunctionData('macromodel', forcefield=16)] - energy_separate)
             
         if binding_energy > 0:
             pos_be = binding_energy

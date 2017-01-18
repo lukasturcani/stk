@@ -30,6 +30,9 @@ from ..molecular import StructUnit3, Cage
 from ..exception import MolError
 from ...plotting import plot_counter
 
+class MutationError(Exception):
+    ...
+
 class Mutation:
     """
     Carries out mutations operations on a population.
@@ -203,12 +206,12 @@ class Mutation:
                 continue        
 
         if len(og_bb.bonder_ids) != len(bb.bonder_ids):
-            print(('\n\nMUTATION ERROR: Replacement building block does'
+            raise MutationError(
+                ('\n\nMUTATION ERROR: Replacement building block does'
                    ' not have the same number of functional groups as '
                    'the original building block.\n\nOriginal building '
                   'block:\n\n{}\n\nReplacement building block:\n\n'
                   '{}\n\n').format(og_bb.file, bb.file))
-            sys.exit()
             
         return Cage((bb, lk), type(macro_mol.topology),
             os.path.join(os.getcwd(), self.name.format(self.n_calls)))
@@ -253,9 +256,10 @@ class Mutation:
             
             except TypeError:
                 continue
-            
+        
         if len(og_lk.bonder_ids) != len(lk.bonder_ids):
-            print(('\n\nMUTATION ERROR: Replacement linker does not'
+            raise MutationError(
+                 ('\n\nMUTATION ERROR: Replacement linker does not'
                   ' have the same number of functional groups as the'
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
                   'Replacement linker:\n\n{}\n\n').format(og_lk.file, 
@@ -360,7 +364,8 @@ class Mutation:
         new_bb = StructUnit3(sim_mols[cur_index][-1])
         
         if len(og_bb.bonder_ids) != len(new_bb.bonder_ids):
-            print(('\n\nMUTATION ERROR: Replacement building block does'
+            raise MutationError(
+                  ('\n\nMUTATION ERROR: Replacement building block does'
                    ' not have the same number of functional groups as '
                    'the original building block.\n\nOriginal building '
                   'block:\n\n{}\n\nReplacement building block:\n\n'
@@ -436,7 +441,8 @@ class Mutation:
         new_lk = lk_type(sim_mols[cur_index][-1])
         
         if len(og_lk.bonder_ids) != len(new_lk.bonder_ids):
-            print(('\n\nMUTATION ERROR: Replacement linker does not'
+            raise MutationError(
+                 ('\n\nMUTATION ERROR: Replacement linker does not'
                   ' have the same number of functional groups as the'
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
                   'Replacement linker:\n\n{}\n\n').format(og_lk.file, 
