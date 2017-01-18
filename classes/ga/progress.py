@@ -5,6 +5,7 @@ Defines the GAProgress class.
 
 import numpy as np
 from operator import attrgetter
+import copy
 
 from ..population import Population
 
@@ -57,6 +58,13 @@ class GAProgress:
         This population holds each generations Population instance as 
         one of its subpopulations.
         
+    hist : list of GAProgress instances
+        Using the ``normalization()`` method overwrites the values of
+        the `means`, `mins` and `maxs` attributes.  In order to keep
+        the old values, each time this method is run, a copy of the 
+        GAProgress instances with the old values is saved in this
+        attribute.
+        
     """
     
     def __init__(self):
@@ -65,6 +73,7 @@ class GAProgress:
         self.mins = []
         self.maxs = []
         self.pops = Population()
+        self.hist = []
 
     def update(self, pop):
         """
@@ -123,6 +132,10 @@ class GAProgress:
         
         Modifies
         --------
+        hist : list of GAProgress instances
+            A copy of the GAProgress instance before the normalization
+            is placed here.
+        
         means : kist of floats
             The means now reflect the fitness values of each
             subpopulation in `pops`.
@@ -140,6 +153,8 @@ class GAProgress:
         None : NoneType
         
         """
+        
+        self.hist.append(copy.deepcopy(self))        
         
         norm_func(self.pops)
         
