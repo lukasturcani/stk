@@ -271,7 +271,7 @@ def random_fitness_tuple(macro_mol):
                 'Negative Energy per Bond ')
 def cage(macro_mol, target_cavity, target_window=None, 
          pseudoformation_params=
-         { 'func' : FunctionData('rdkit', forcefield='uff') }):
+         { 'energy_func' : FunctionData('rdkit', forcefield='uff') }):
     """
     Calculates the fitness of a cage.
     
@@ -308,7 +308,7 @@ def cage(macro_mol, target_cavity, target_window=None,
         ``None`` then `target_cavity` is used.
         
     pseudoformation_params : dict (default = 
-                   { 'func' : FunctionData('rdkit', forcefield='uff') })
+            { 'energy_func' : FunctionData('rdkit', forcefield='uff') })
                                 
         This fitness function calculates the formation energy using the
         ``Energy.pseudoformation()`` method. This parameter defines the
@@ -376,7 +376,8 @@ def cage(macro_mol, target_cavity, target_window=None,
             asymmetry = None
 
         print('\n\nCalculating complex energies.\n')    
-        e_per_bond = macro_mol.energy.pseudoformation(**energy_params)
+        e_per_bond = macro_mol.energy.pseudoformation(
+                                               **pseudoformation_params)
         e_per_bond /= macro_mol.topology.bonds_made
     
         if e_per_bond < 0:
