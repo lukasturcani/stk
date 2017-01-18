@@ -1,5 +1,6 @@
 import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
+import pickle
 
 from .classes import (Population, GATools, GAProgress,
                       GAInput, InputHelp, Normalization)
@@ -190,6 +191,11 @@ def run():
         plot.epp(progress, os.path.join(root_dir, 'epp.png'),
                  ga_input.fitness_func, 
                  pop.ga_tools.normalization.scaling_func)
+    
+    os.chdir(root_dir)
+    # Dump the GAProgress instance.
+    with open('progress.dmp', 'wb') as dump_file:
+        pickle.dump(progress, dump_file)
     
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
