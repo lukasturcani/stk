@@ -4,9 +4,8 @@ A module for defining plotting functions.
 """
 
 import os
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import numpy as np
 
 from .fitness import *
@@ -24,11 +23,11 @@ def epp(progress, plot_name, fitness_func=None, norm_func=None):
         saved. Values may be attached to the end of this name if
         multiple plots are plotted.
         
-    fitness_func : FunctionData (default=None)
+    fitness_func : FunctionData (default = None)
         The FunctionData instance of the fitness function used to 
         calculate the `progress_params` saved in `progress`.
         
-    norm_func : callable (default=None)
+    norm_func : callable (default = None)
         The normalization function used to recalculate all the fitness
         values found in `progress`.
     
