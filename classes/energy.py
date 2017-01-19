@@ -181,6 +181,14 @@ from inspect import signature as sig
 
 from .function_data import FunctionData
 
+class _EnergyError(Exception):
+    """
+    A class for errors in Energy methods.
+    
+    """
+
+    ...
+
 class EMethod:
     """
     A descriptor for methods of the ``Energy`` class.
@@ -621,6 +629,13 @@ class Energy(metaclass=EMeta):
         -------
         float
             The calculated energy.
+            
+        Raises
+        ------
+        _EnergyError : Exception
+            This exception is raised if no energy value if found in the
+            MacroModel calculation's .log file. Likely due to a
+            forcefield error.
         
         """
         
@@ -684,8 +699,10 @@ class Energy(metaclass=EMeta):
         for filename in os.listdir(os.path.split(tmp_file)[0]):
             if str(r_int) in filename:
                 os.remove(filename)
-        
-        return eng
+        try:
+            return eng
+        except UnboundLocalError:
+            raise _EnergyError('MacroModel energy calculation failed.')
 
 def formation_key(fargs, fkwargs):
     """
