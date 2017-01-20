@@ -1,8 +1,19 @@
+"""
+Defines cage topologies from di and 4 functionalised building blocks.
+
+"""
+
+
 import numpy as np
 
 from .base import _CageTopology,  Vertex, Edge
 
 class TwoPlusFour(_CageTopology):
+    """
+    Sandwich cage topology from 2 and 4 functionalized building blocks.    
+    
+    """
+    
     positions_A = [Vertex(0,0,-10), Vertex(0,0,10)]
     alpha, beta = positions_A
     beta.edge_plane_normal = lambda alpha=alpha: np.multiply(
@@ -24,6 +35,10 @@ class TwoPlusFour(_CageTopology):
     n_window_types = 1
 
 class ThreePlusSix(_CageTopology):
+    """
+    A cage topology from 2 and 4 functionalized building blocks.
+    
+    """
 
     positions_A = [Vertex(-20,-10*np.sqrt(3),0), 
                 Vertex(20,-10*np.sqrt(3),0),
@@ -49,6 +64,11 @@ class ThreePlusSix(_CageTopology):
     n_window_types = 2
 
 class FourPlusEight(_CageTopology):
+    """
+    A cage topology from 2 and 4 functionalized building blocks.
+    
+    """
+    
     positions_A = [Vertex(-10,-10,0), 
                 Vertex(-10,10,0),
                 Vertex(10,-10,0),
@@ -76,6 +96,11 @@ class FourPlusEight(_CageTopology):
     n_window_types = 2
 
 class SixPlusTwelve(_CageTopology):
+    """
+    A cage topology from 2 and 4 functionalized building blocks.
+    
+    """
+    
     positions_A = [Vertex(-50,-50,0), 
                 Vertex(-50,50,0),
                 Vertex(50,-50,0),
@@ -102,6 +127,11 @@ class SixPlusTwelve(_CageTopology):
     n_window_types = 1   
     
 class TenPlusTwenty(_CageTopology):
+    """
+    A cage topology from 2 and 4 functionalized building blocks.
+    
+    """
+    
     positions_A = [Vertex(-50, 50, -50), 
                 Vertex(-50, -50, -50), 
                 Vertex(50, 50, -50), 
