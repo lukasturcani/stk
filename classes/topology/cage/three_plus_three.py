@@ -1,9 +1,9 @@
 import numpy as np
 import rdkit.Chem as chem
 
-from .base import VertexOnlyCageTopology,  Vertex
+from .base import _VertexOnlyCageTopology,  Vertex
 
-class OnePlusOne(VertexOnlyCageTopology):
+class OnePlusOne(_VertexOnlyCageTopology):
     positions_A = [Vertex(25,0,0),
                    Vertex(-25,0,0)]
     a,b = positions_A
@@ -56,7 +56,7 @@ class OnePlusOne(VertexOnlyCageTopology):
                 
         self.macro_mol.mol = editable_mol.GetMol()     
 
-class TwoPlusTwo(VertexOnlyCageTopology):
+class TwoPlusTwo(_VertexOnlyCageTopology):
     positions_A = [Vertex(50,0,-50/np.sqrt(2)), 
                 Vertex(-50,0,-50/np.sqrt(2)), 
                 Vertex(0,50,50/np.sqrt(2)), 
@@ -76,7 +76,7 @@ class TwoPlusTwo(VertexOnlyCageTopology):
     n_windows = 4
     n_window_types = 1
                    
-class FourPlusFour(VertexOnlyCageTopology):
+class FourPlusFour(_VertexOnlyCageTopology):
     positions_A = [Vertex(-50, 50, -50), 
                 Vertex(-50, -50, -50), 
                 Vertex(50, 50, -50), 
