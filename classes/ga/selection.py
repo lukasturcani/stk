@@ -95,13 +95,6 @@ class Selection:
     method name and the appropriate parameter values is passed to
     the initializer of ``Selection``.
     
-    Selection algorithms added as methods to this class only need to be 
-    within the class but do not need access to the instance of the 
-    class, the `self` parameter of methods is not needed. This means the 
-    selection methods can be decorated with ``staticmethod``. In the 
-    cases where access to the class or instance is necessary, 
-    ``classmethod`` or no decorator should be used as appropriate.
-    
     Selection algorithms are to be implemented as generators. Selection 
     algorithms which produce parents pools must yield a tuple of
     ``MacroMolecule`` instances. Selection algorithms should be grouped
@@ -287,9 +280,8 @@ class Selection:
 
         for ind in sorted(population, reverse=True):
             yield ind
-    
-    @classmethod    
-    def roulette(cls, population, elitism=False, 
+      
+    def roulette(self, population, elitism=False, 
                  truncation=False, duplicates=False,
                  carrot_and_stick_elitism=False):
         """
@@ -359,7 +351,7 @@ class Selection:
               
         elite_pop = []
         if elitism:
-            elite_pop = cls._elites(pop, elitism)
+            elite_pop = self._elites(pop, elitism)
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
@@ -367,7 +359,7 @@ class Selection:
 
         if carrot_and_stick_elitism:
             norm_func = population.ga_tools.input.normalization_func
-            cs_elites = cls._carrot_and_stick_elites(
+            cs_elites = self._carrot_and_stick_elites(
                                pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
@@ -394,8 +386,7 @@ class Selection:
                                         p=weights, replace=False):
                 yield ind
 
-    @classmethod
-    def deterministic_sampling(cls, population, elitism=False, 
+    def deterministic_sampling(self, population, elitism=False, 
                                truncation=False, duplicates=False,
                                carrot_and_stick_elitism=False):
         """
@@ -471,7 +462,7 @@ class Selection:
         
         elite_pop = []
         if elitism:
-            elite_pop = cls._elites(pop, elitism)
+            elite_pop = self._elites(pop, elitism)
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
@@ -479,7 +470,7 @@ class Selection:
 
         if carrot_and_stick_elitism:
             norm_func = population.ga_tools.input.normalization_func
-            cs_elites = cls._carrot_and_stick_elites(
+            cs_elites = self._carrot_and_stick_elites(
                                pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
@@ -512,8 +503,7 @@ class Selection:
             for x in pop:   
                 yield x
 
-    @classmethod
-    def stochastic_sampling(cls, population, elitism=False, 
+    def stochastic_sampling(self, population, elitism=False, 
                             truncation=False, duplicates=False,
                             use_rank=False,
                             carrot_and_stick_elitism=False):
@@ -603,7 +593,7 @@ class Selection:
             
         elite_pop = []
         if elitism:
-            elite_pop = cls._elites(pop, elitism)
+            elite_pop = self._elites(pop, elitism)
             for ind in elite_pop:
                 yield ind
                 if not duplicates:
@@ -611,7 +601,7 @@ class Selection:
 
         if carrot_and_stick_elitism:
             norm_func = population.ga_tools.input.normalization_func
-            cs_elites = cls._carrot_and_stick_elites(
+            cs_elites = self._carrot_and_stick_elites(
                                pop, carrot_and_stick_elitism, norm_func)
             elite_pop.extend(cs_elites)
             for ind in cs_elites:
@@ -716,8 +706,7 @@ class Selection:
         for mol1, mol2 in itertools.combinations(population, 2):
             yield mol1, mol2 
     
-    @classmethod
-    def crossover_all_combinations_n_fittest(cls, population, n):
+    def crossover_all_combinations_n_fittest(self, population, n):
         """
         Yields all pairings of the `n` fittest individuals.
 
@@ -734,7 +723,7 @@ class Selection:
         
         """
         
-        n_fittest = itertools.islice(cls.fittest(population), n)
+        n_fittest = itertools.islice(self.fittest(population), n)
         for ind1, ind2 in itertools.combinations(n_fittest, 2):
             yield ind1, ind2
     
