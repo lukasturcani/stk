@@ -1,7 +1,7 @@
-from .base import CageTopology, Vertex
+from .base import _CageTopology, Vertex
 
 
-class SixPlusEight(CageTopology):
+class SixPlusEight(_CageTopology):
     
     positions_A = [Vertex(-50, 50, 0), 
                     Vertex(-50, -50, 0), 
