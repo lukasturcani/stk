@@ -1,9 +1,18 @@
+"""
+Defines cage topologies from 2 and 3 functionalized building blocks.
+
+"""
+
 import numpy as np
 import itertools
 
 from .base import _CageTopology, Vertex, Edge
 
 class TwoPlusThree(_CageTopology):
+    """
+    A cage topology from 2 and 3 functionalized building blocks.    
+    
+    """
     positions_A = [Vertex(0,0,20), Vertex(0,0,-20)]
     a,b = positions_A
     
@@ -58,6 +67,10 @@ class FourPlusSix(_CageTopology):
     n_window_types = 1
 
 class SixPlusNine(_CageTopology):
+    """
+    A cage topology from 2 and 3 functionalized building blocks.    
+    
+    """
     
     # source: http://eusebeia.dyndns.org/4d/prism3
     positions_A = [Vertex(-50,-50/np.sqrt(3),-50), 
@@ -84,7 +97,7 @@ class SixPlusNine(_CageTopology):
 
 class EightPlusTwelve(_CageTopology):
     """
-    Defines a square-like topology.    
+    A square topology from 2 and 3 functionalized building blocks.    
     
     """
     
@@ -120,6 +133,11 @@ class EightPlusTwelve(_CageTopology):
     n_window_types = 1
 
 class Dodecahedron(_CageTopology):
+    """
+    A dodecahedron cage from 2 and 3 functionalized building blocks.
+    
+    """
+    
     
     # Source: http://tinyurl.com/h2dl949
     phi = (1 + np.sqrt(5))/2
