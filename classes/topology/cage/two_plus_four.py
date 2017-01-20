@@ -1,8 +1,8 @@
 import numpy as np
 
-from .base import CageTopology,  Vertex, Edge
+from .base import _CageTopology,  Vertex, Edge
 
-class TwoPlusFour(CageTopology):
+class TwoPlusFour(_CageTopology):
     positions_A = [Vertex(0,0,-10), Vertex(0,0,10)]
     alpha, beta = positions_A
     beta.edge_plane_normal = lambda alpha=alpha: np.multiply(
@@ -23,7 +23,7 @@ class TwoPlusFour(CageTopology):
     n_windows = 4
     n_window_types = 1
 
-class ThreePlusSix(CageTopology):
+class ThreePlusSix(_CageTopology):
 
     positions_A = [Vertex(-20,-10*np.sqrt(3),0), 
                 Vertex(20,-10*np.sqrt(3),0),
@@ -48,7 +48,7 @@ class ThreePlusSix(CageTopology):
     n_windows = 5
     n_window_types = 2
 
-class FourPlusEight(CageTopology):
+class FourPlusEight(_CageTopology):
     positions_A = [Vertex(-10,-10,0), 
                 Vertex(-10,10,0),
                 Vertex(10,-10,0),
@@ -75,7 +75,7 @@ class FourPlusEight(CageTopology):
     n_windows = 6
     n_window_types = 2
 
-class SixPlusTwelve(CageTopology):
+class SixPlusTwelve(_CageTopology):
     positions_A = [Vertex(-50,-50,0), 
                 Vertex(-50,50,0),
                 Vertex(50,-50,0),
@@ -101,7 +101,7 @@ class SixPlusTwelve(CageTopology):
     n_windows = 8
     n_window_types = 1   
     
-class TenPlusTwenty(CageTopology):
+class TenPlusTwenty(_CageTopology):
     positions_A = [Vertex(-50, 50, -50), 
                 Vertex(-50, -50, -50), 
                 Vertex(50, 50, -50), 
