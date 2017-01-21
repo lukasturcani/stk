@@ -1,8 +1,8 @@
 """
 Defines crossover operations via the ``Crossover`` class.
 
-Extending MMEA: Adding crossover functions
-------------------------------------------
+Extending MMEA: Adding crossover functions.
+-------------------------------------------
 If a new crossover operation is to be added to MMEA it should be added
 as a method in the ``Crossover`` class defined in this module. The only
 requirements are that the first two arguments are ``macro_mol1`` and
@@ -26,8 +26,8 @@ from collections import Counter
 
 from ..population import Population
 from ..molecular import Cage
-from ..exception import MacroMolError
-from ...convenience_tools import plot_counter
+from ..exception import MolError
+from ...plotting import plot_counter
 
 class Crossover:
     """
@@ -140,7 +140,7 @@ class Crossover:
                     break
             except Exception as ex:
                 for i, parent in enumerate(parents):
-                    MacroMolError(ex, parent, 
+                    MolError(ex, parent, 
                     'Error during crossover. Parent {0}.'.format(i))                
                 
         # Make sure that only original molecules are left in the 
@@ -206,9 +206,9 @@ class Crossover:
                         macro_mol1.topology.bb_counter.keys()))
         
         _, c2_lk = max(zip(macro_mol2.topology.bb_counter.values(),
-                        macro_mol1.topology.bb_counter.keys()))
+                        macro_mol2.topology.bb_counter.keys()))
         _, c2_bb = min(zip(macro_mol2.topology.bb_counter.values(),
-                        macro_mol1.topology.bb_counter.keys()))
+                        macro_mol2.topology.bb_counter.keys()))
         
         # Get all the topologies. A set automatically removes 
         # duplicates.

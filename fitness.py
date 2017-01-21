@@ -12,16 +12,27 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input 
 file. 
 
-Fitness functions should return the `macro_mol` instance they took as
-an argument. Within the fitness function itself the attribute 
-`macro_mol.fitness` should have the fitness value calculated by the 
-function placed into it. This ensures that the functions can be 
-parallelized.
+In order for fitness functions to be parallelizable, 2 requirements must
+be met. First, fitness function's return value should be the `macro_mol` 
+instance they took as an argument. Second, the entire fitness function
+should be encapsulated in a ``try/except`` block. See the `cage()`
+function for an example.
 
-A scaling function can be defined in ``scaling.py`` if some sort of 
-normalization of fitness values across the population is required. This 
-is completely optional. Fitness functions should be atomic and depend
-only on the individual whose fitness they are calculating.
+The simplest fitness functions will only need to assign a value to the 
+`fitness` attribute of the `macro_mol` and set its `fitness_fail` 
+attribute to ``False`` if that assignment was successful. The value
+calculated for `fitness` must be between 0 (exclusive) and infinity.  
+
+More complicated fitness functions can be designed by assigning to the
+`unscaled_fitness` attribute of `macro_mol`. In these cases, the 
+fitness function assignes to the `unscaled_fitness` attribute. This
+value is then used by a normalization function to calculate the fitness
+value. Note that in these cases the normalization function assignes to
+the `fitness` attribute, not the fitness function itself. 
+
+In these cases any value or object can be placed in `unscaled_fitness`,
+as long as normalization function which knows how to convert that data
+into a fitness value is used together with the fitness function.
 
 A fitness function may be complex and may not fit neatly into a single 
 function. For example, the ``cage_target()`` fitness function needs to 
@@ -30,6 +41,47 @@ before outputting a fitness value. This is fine. Define helper functions
 such as ``_generate_complexes()`` within this module but make sure they 
 are private. This means that names of helper functions begin with a 
 leading underscore. 
+
+A note on plotting.
+-------------------
+As mentioned before some fitness functions may be complex and as a
+result manipulate all sorts of data. Typically, in order to measure the
+progress of a GA, the fitness values in the population are tracked 
+across generations. However, let's say that some hypothetical fitness 
+function also calculates the energies of molecules. It may be quite 
+interesting plot the evolution of energies across generations too. If 
+this is the case the fitness function may assign to the 
+`progress_params` attribute of `macro_mol`: 
+
+    macro_mol.progress_params = [mol_energy]
+    
+Now a plot showing the change in `mol_energy` across generations will be 
+made too, along with the plot showing the changes in fitness.
+
+What if two things are needed to be kept track of?
+
+    macro_mol.progress_params = [mol_energy, mol_radius]
+    
+Great, now a progress plot for each of the variables will be made.
+
+How will the y axes be labelled in each plot?
+The decorator `_param_labels()` exists for this.
+
+Let's create a basic outline of a some fitness function:
+
+    @_param_labels('Molecule Energy / J mol-1', 'Molecule Radius / m-9')
+    def this_is_the_fitness_function(macro_mol, some_param):
+        ...
+        calculate_stuff()
+        ...
+        macro_mol.progress_params = [mol_energy, mol_radius]
+        ...
+        macro_mol.fitness_fail = False
+        return macro_mol
+
+If this function is used in the GA, a progress plot will be made for 
+each of the `progress_params` and they will have their y-axes labelled
+'Molecule Energy / J mol-1' and 'Molecule Radius / m-9', respectively.
 
 """
 
@@ -42,7 +94,8 @@ import multiprocessing as mp
 import warnings
 from collections import Counter
 
-from .classes.exception import MacroMolError
+from .classes.function_data import FunctionData
+from .classes.exception import MolError
 from .classes.molecular import MacroMolecule, StructUnit, Energy
 from . import optimization
 from .convenience_tools import (rotation_matrix_arbitrary_axis, 
@@ -110,28 +163,15 @@ def _calc_fitness_serial(func_data, population):
             func(macro_mol, **func_data.params)
                 
         except Exception as ex:
-            MacroMolError(ex, macro_mol, 'During fitness calculation.')
+            MolError(ex, macro_mol, 'During fitness calculation.')
 
 
 def _param_labels(*labels):
     """
-    Adds `param_labels` attribute to a fitness function.
+    Adds the `param_labels` attribute to a fitness function.
     
-    Fitness functions which undergo the scaling procedure have an EPP 
-    graph plotted for each attribute used to calculate total fitness. 
-    For example, if the ``cage`` fitness function was used
-    during the GA run 5 graphs would be plotted at the end of the run.
-    One for each unscaled ``var`` (see ``cage`` documentation for more 
-    details). This plotting is done by the ``GAProgress`` class. 
-    
-    In order for the ``GAProgress`` class to produce decent graphs, 
-    which means that each graph has the y-axis and title labeled with 
-    the name of the ``var`` plotted, it needs to know what each ``var`` 
-    should be called.
-    
-    This is done by adding a `param_labels` attribute to the fitness
-    function. The ``GAProgress`` class acccesses this attribute during
-    plotting and uses it to set the y-axis / title.
+    The point of this decorator is described in the module level
+    docstring.
     
     Parameters
     ----------
@@ -230,7 +270,8 @@ def random_fitness_tuple(macro_mol):
                 'Asymmetry ', 'Positive Energy per Bond ', 
                 'Negative Energy per Bond ')
 def cage(macro_mol, target_cavity, target_window=None, 
-         energy_params={'key':('rdkit', 'uff')}):
+         pseudoformation_params=
+         { 'energy_func' : FunctionData('rdkit', forcefield='uff') }):
     """
     Calculates the fitness of a cage.
     
@@ -260,15 +301,29 @@ def cage(macro_mol, target_cavity, target_window=None,
         The cage whose fitness is to be calculated.
         
     target_cavity : float
-        The desried diameter of the cage's pore.
+        The desired diameter of the cage's pore.
 
     target_window : float (default = None)
         The desired diameter of the largest window of the cage. If 
         ``None`` then `target_cavity` is used.
         
-    energy_params : dict (default = {'key':('rdkit', 'uff')})
-        A dictionary holding the name arguments and values for the 
-        ``Energy.pseudoformation()`` function.
+    pseudoformation_params : dict (default = 
+            { 'energy_func' : FunctionData('rdkit', forcefield='uff') })
+                                
+        This fitness function calculates the formation energy using the
+        ``Energy.pseudoformation()`` method. This parameter defines the
+        arguments passed to this method via a dictionary. The name of 
+        the argument is the key and the value of the argument is the
+        value.
+        
+        Default initialized arguments of Energy.pseudoformation() only 
+        need to be specified in `energy_params` if the user wishes to
+        change the default value.
+        
+        To see what arguments the `Energy.pseudoformation()` method
+        requires, try using the  `-h` option:
+
+            python -m mmea -h energy
     
     Modifies
     --------
@@ -321,7 +376,8 @@ def cage(macro_mol, target_cavity, target_window=None,
             asymmetry = None
 
         print('\n\nCalculating complex energies.\n')    
-        e_per_bond = macro_mol.energy.pseudoformation(**energy_params)
+        e_per_bond = macro_mol.energy.pseudoformation(
+                                               **pseudoformation_params)
         e_per_bond /= macro_mol.topology.bonds_made
     
         if e_per_bond < 0:
@@ -343,12 +399,12 @@ def cage(macro_mol, target_cavity, target_window=None,
                         (asymmetry if asymmetry is not None else 0),
                         pe_per_bond]))
         
-          
-        
         return macro_mol
 
     except Exception as ex:
-        MacroMolError(ex, macro_mol, "During fitness calculation")
+        # Prevents the error from being raised, but records it in 
+        # ``failures.txt``.
+        MolError(ex, macro_mol, "During fitness calculation")
         return macro_mol
 
 @_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
@@ -411,7 +467,7 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
     """
 
     return _cage_target(macro_mol, target_mol_file, macromodel_path,
-                        _generate_complexes, rotations, md=md)
+                        _generate_complexes, rotations+1, md=md)
 
 @_param_labels('Negative Binding Energy', 'Positive Binding Energy', 
                'Asymmetry') 
@@ -548,16 +604,16 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         # If the cage already has a fitness value, don't run the
         # calculation again.
         if macro_mol.unscaled_fitness:
-            print('Skipping {0}'.format(macro_mol.prist_mol_file))
+            print('Skipping {0}'.format(macro_mol.file))
             return macro_mol
            
         # Make a copy version of `macro_mol` which is unoptimizted.
         unopt_macro_mol = copy.deepcopy(macro_mol)
-        unopt_macro_mol.topology.final_sub()
+        unopt_macro_mol.topology.build()
         
         
         # Create an instance of the target molecule as a ``StructUnit``.
-        target = StructUnit(target_mol_file, minimal=True)        
+        target = StructUnit(target_mol_file)        
     
         # This function creates a new molecule holding both the target
         # and the cage centered at the origin. It then calculates the 
@@ -577,10 +633,10 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
             # is loaded into a ``MacroMolecule`` instance and its .mol 
             # file is written to the disk.
             mm_complex = MacroMolecule.__new__(MacroMolecule)
-            mm_complex.prist_mol = complex_
-            mm_complex.prist_mol_file = macro_mol.prist_mol_file.replace(
+            mm_complex.mol = complex_
+            mm_complex.file = macro_mol.file.replace(
                                 '.mol', '_COMPLEX_{0}.mol'.format(i))
-            mm_complex.write_mol_file('prist')
+            mm_complex.write()
             mm_complex.optimized = False
             mm_complex.energy = Energy(mm_complex)
             optimization.macromodel_opt(mm_complex, no_fix=True,
@@ -600,8 +656,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                         x.energy.macromodel(16, macromodel_path))                        
     
         binding_energy = (
-                    min_eng_cmplx.energy.values[('macromodel', 16)] - 
-                        energy_separate)
+                    min_eng_cmplx.energy.values[
+        FunctionData('macromodel', forcefield=16)] - energy_separate)
             
         if binding_energy > 0:
             pos_be = binding_energy
@@ -610,12 +666,12 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
             pos_be = 0
             neg_be = abs(binding_energy)
 
-        frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.prist_mol, 
+        frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.mol, 
                                         asMols=True,
                                         sanitizeFrags=False)
                                       
         cage_counter = Counter(x.GetAtomicNum() for x in 
-                                macro_mol.prist_mol.GetAtoms())
+                                macro_mol.mol.GetAtoms())
         frag_counters = [(frag1, Counter(x.GetAtomicNum() for x in 
                                 frag1.GetAtoms())),
 
@@ -626,11 +682,11 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                             counter == cage_counter)
         
         cmplx_cage = MacroMolecule.__new__(MacroMolecule)
-        cmplx_cage.prist_mol = cmplx_cage_mol
+        cmplx_cage.mol = cmplx_cage_mol
         cmplx_cage.topology = type(macro_mol.topology)(cmplx_cage)
-        cmplx_cage.prist_mol_file = macro_mol.prist_mol_file.replace(
+        cmplx_cage.file = macro_mol.file.replace(
                          '.mol', '_COMPLEX_{0}_no_target.mol'.format(i))
-        cmplx_cage.write_mol_file('prist')
+        cmplx_cage.write()
         
     
         if cmplx_cage.topology.window_difference() is not None:             
@@ -652,7 +708,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         return macro_mol
         
     except Exception as ex:
-        MacroMolError(ex, macro_mol, "During fitness calculation.")
+        MolError(ex, macro_mol, "During fitness calculation.")
         return macro_mol
     
 
@@ -682,11 +738,11 @@ def _generate_complexes(macro_mol, target, number=1):
     """
 
     # First place both the target and cage at the origin.
-    macro_mol.set_position('prist', [0,0,0])
-    target.set_position('prist', [0,0,0])
+    macro_mol.set_position([0,0,0])
+    target.set_position([0,0,0])
     
     # Get the position matrix of the target molecule.        
-    og_pos_mat = target.position_matrix('prist')
+    og_pos_mat = target.position_matrix()
     
     # Carry out every rotation and yield a complex for each case.
     for i in range(number):
@@ -704,9 +760,9 @@ def _generate_complexes(macro_mol, target, number=1):
         new_pos_mat = np.dot(rot_mat2, new_pos_mat)
         new_pos_mat = np.dot(rot_mat3, new_pos_mat)
         
-        rot_target.set_position_from_matrix('prist', new_pos_mat)
+        rot_target.set_position_from_matrix(new_pos_mat)
         
-        yield chem.CombineMols(macro_mol.prist_mol, rot_target.prist_mol)
+        yield chem.CombineMols(macro_mol.mol, rot_target.mol)
     
 def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """
@@ -735,22 +791,21 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """
     
     
-    macro_mol.set_position('prist', [0,0,0])
-    c60.set_position('prist', [0,0,0])
+    macro_mol.set_position([0,0,0])
+    c60.set_position([0,0,0])
     
     # Step 1: Align the 5 membered ring with the z-axis.
     
     # Find a the ids of atoms in a membered ring.
-    g = c60.graph('prist')
+    g = c60.graph()
     ids = next(x for x in nx.cycle_basis(g) if len(x) == 5)
     # Place the coordinates of those atoms in a matrix.
-    ring_matrix = np.matrix(
-                        [c60.atom_coords('prist', id_) for id_ in ids])
+    ring_matrix = np.matrix([c60.atom_coords(id_) for id_ in ids])
 
     # Get the centroid of the ring.    
     ring_centroid = matrix_centroid(ring_matrix)
     # Align the centroid of the ring with the z-axis.
-    c60.set_orientation('prist', ring_centroid, [0,0,1])
+    c60.set_orientation(ring_centroid, [0,0,1])
     aligned_c60 = copy.deepcopy(c60)
     
     # Step 2: Get the rotation angles and apply the rotations. Yield 
@@ -763,9 +818,9 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     for angle5 in angles5fold:
         for angle2 in angles2fold:
             buckyball = copy.deepcopy(aligned_c60)
-            buckyball.rotate('prist', angle5, [0,0,1])
-            buckyball.rotate('prist', angle2, [0,1,0])
-            yield chem.CombineMols(macro_mol.prist_mol, buckyball.prist_mol)
+            buckyball.rotate(angle5, [0,0,1])
+            buckyball.rotate(angle2, [0,1,0])
+            yield chem.CombineMols(macro_mol.mol, buckyball.mol)
 
     
     
