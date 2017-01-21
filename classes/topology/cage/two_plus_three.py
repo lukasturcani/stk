@@ -1,8 +1,7 @@
 import numpy as np
 import itertools
 
-from .base import CageTopology
-from ..base import Vertex, Edge
+from .base import CageTopology, Vertex, Edge
 
 class TwoPlusThree(CageTopology):
     positions_A = [Vertex(0,0,20), Vertex(0,0,-20)]

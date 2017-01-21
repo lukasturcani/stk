@@ -1,17 +1,23 @@
+"""
+Defines classes which deal with input.
+
+"""
+
 from types import ModuleType
 import sys
 import re
 
-from . import FunctionData
+from ..function_data import FunctionData
 from ..topology import *
 from ..population import Population
 from .selection import Selection
 from .crossover import Crossover
 from .mutation import Mutation
 from .normalization import Normalization
+from ..energy import Energy
 from ...optimization import optimization
 from ... import fitness
-from .containers import GATools
+from .ga_tools import GATools
 
 class GAInput:
     """
@@ -257,7 +263,7 @@ class GAInput:
                         setattr(self, kw, func_data)
                         continue
     
-                    kw, val = raw_line.split("=")                
+                    kw, val = raw_line.split("=", 1)                
                     setattr(self, kw, eval(val))
                 except:
                     print(("\n\n\nERROR: Something is wrong with the"
@@ -306,7 +312,7 @@ class GAInput:
         # Go through each parameter name-value pair in `line` and get 
         # each separately by splitting at the ``=`` symbol.   
         for param in params:
-            p_name, p_vals = param.split("=")                
+            p_name, p_vals = param.split("=", 1)                
             param_dict[p_name] = eval(p_vals)
             
         return FunctionData(name, **param_dict)
@@ -460,7 +466,11 @@ class InputHelp:
                                  
                'normalization_func' :  (func for name, func in 
                                         Normalization.__dict__.items()
-                                        if not name.startswith('_'))
+                                        if not name.startswith('_')),
+                                            
+                'energy' : (func for name, func in 
+                                    Energy.__dict__.items() if not
+                                    name.startswith('_'))
                }
         
     

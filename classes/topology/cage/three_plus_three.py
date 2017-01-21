@@ -1,8 +1,7 @@
 import numpy as np
 import rdkit.Chem as chem
 
-from .base import VertexOnlyCageTopology
-from ..base import Vertex
+from .base import VertexOnlyCageTopology,  Vertex
 
 class OnePlusOne(VertexOnlyCageTopology):
     positions_A = [Vertex(25,0,0),
@@ -21,23 +20,22 @@ class OnePlusOne(VertexOnlyCageTopology):
     
     def join_mols(self):
         
-        editable_mol = chem.EditableMol(self.macro_mol.heavy_mol)
+        editable_mol = chem.EditableMol(self.macro_mol.mol)
         
         for position in self.positions_A:
             other_position = next(x for x in self.positions_A if 
                                 x is not position)
             
             position.atom_position_pairs = [(atom, other_position) for 
-                                    atom in position.heavy_ids]
+                                    atom in position.bonder_ids]
             
             
             for atom_id, vertex in position.atom_position_pairs:
-                # Get all the distances between the atom and the heavy
+                # Get all the distances between the atom and the bonder
                 # atoms on the vertex. Store this information on the 
                 # vertex.
-                for atom2_id in vertex.heavy_ids:
-                    distance = self.macro_mol.atom_distance('heavy', 
-                                                            atom_id, 
+                for atom2_id in vertex.bonder_ids:
+                    distance = self.macro_mol.atom_distance(atom_id, 
                                                             atom2_id)
                     position.distances.append((distance, 
                                              atom_id, atom2_id))
@@ -56,7 +54,7 @@ class OnePlusOne(VertexOnlyCageTopology):
                 paired.add(atom1_id)
                 paired.add(atom2_id)
                 
-        self.macro_mol.heavy_mol = editable_mol.GetMol()     
+        self.macro_mol.mol = editable_mol.GetMol()     
 
 class TwoPlusTwo(VertexOnlyCageTopology):
     positions_A = [Vertex(50,0,-50/np.sqrt(2)), 

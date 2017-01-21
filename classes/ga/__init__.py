@@ -1,4 +1,4 @@
-from .containers import GATools, FunctionData
+from .ga_tools import GATools
 from .selection import Selection
 from .crossover import Crossover
 from .mutation import Mutation
