@@ -1,3 +1,8 @@
+"""
+Defines the Population class.
+
+"""
+
 import itertools
 import os
 import numpy as np
@@ -6,8 +11,8 @@ from collections import Counter
 
 from .molecular import MacroMolecule, Cage
 from .ga import GATools
-from .plotter import Plotter
-from ..convenience_tools import dedupe, plot_counter
+from ..convenience_tools import dedupe
+from ..plotting import plot_counter
 from ..optimization.optimization import _optimize_all, _optimize_all_serial
 from ..fitness import _calc_fitness, _calc_fitness_serial
 
@@ -65,10 +70,6 @@ class Population:
         An instance of the ``GATools`` class. Calls to preform GA
         operations on the ``Population`` instance are delegated
         to this attribute.
-        
-    plot : Plotter
-        This attribute holds an instance of the ``Plotter`` class. It 
-        makes all plots required to visualize the population's data.
 
     """
 
@@ -104,7 +105,6 @@ class Population:
         self.populations = []
         self.members = []
         self.ga_tools = GATools.init_empty()
-        self.plot = Plotter(self)
 
         # Determine type of supplied arguments and place in the
         # appropriate attribute.  ``Population`` types added to
@@ -573,13 +573,14 @@ class Population:
             os.mkdir(dir_path)
 
         for member in self:
-            member.write_mol_file('prist', dir_path)
 
-
-            base_name = os.path.split(member.prist_mol_file)[1]
-            base_name = base_name.replace('.mol', '.dmp')
-            dump_file = os.path.join(dir_path, base_name)
-
+            name = os.path.split(member.file)[1]
+            
+            struct_file = os.path.join(dir_path, name)
+            member.write(struct_file)
+            
+            dump_file = os.path.splitext(name)[0] + '.dmp'
+            dump_file = os.path.join(dir_path, dump_file)
             member.dump(dump_file)
 
     def optimize_population(self):
@@ -674,37 +675,6 @@ class Population:
 
         with open(file_name, 'wb') as dump_file:
             pickle.dump(self, dump_file)
-
-    def progress_update(self, pop_path=None):
-        """
-        Updates the values in the ``GAProgress`` instance.
-
-        The ``GAProgress`` instance is held by the attribute
-        `ga_tools.progress`. It keeps track of historical fitness
-        values of the population. This is necessary when plotting the
-        evolutionary progress plot.
-
-        This function just delegates the call to the `update` method in
-        the ``GAProgress`` class.
-
-        Parameters
-        ----------
-        pop_path : str (default = None)
-            If the user wants to keep track of past populations, the 
-            path of the dump file of the population can be here.
-
-        Modifies
-        --------
-        ga_tools.progress : GAProgress
-            See documentation of ``update()`` in GAProgess class.
-            
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        self.ga_tools.progress.update(self, pop_path)
 
     def __iter__(self):
         """

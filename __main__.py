@@ -1,16 +1,26 @@
 import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
+import pickle
 
-from .classes import (Population, GATools, 
+from .classes import (Population, GATools, GAProgress,
                       GAInput, InputHelp, Normalization)
 from .classes.exception import PopulationSizeError
 from .convenience_tools import (time_it, tar_output, 
                                 archive_output, kill_macromodel)
+from . import plotting as plot
 
 def print_info(info):
+    """
+    Prints `info` and underlines it.    
+    
+    """
     print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')    
 
 def run():
+    """
+    Runs the GA.
+    
+    """
     
     # Save the current directory as the `launch_dir`.
     launch_dir = os.getcwd()
@@ -39,7 +49,9 @@ def run():
     # ``GAInput`` instance. Info about input file structure is 
     # documented in ``GAInput`` docstring.
     ga_input = GAInput(os.path.basename(sys.argv[1]))
-
+    # Make a GAProgress object to keep track of progress.
+    progress = GAProgress()
+    
     # Generate and optimize an initial population.
     os.mkdir('initial')
     os.chdir('initial')    
@@ -55,13 +67,9 @@ def run():
             ga_input.pop_size = len(pop)
             
             for mem in pop:
-                prist_name = os.path.basename(mem.prist_mol_file)
-                heavy_name = os.path.basename(mem.heavy_mol_file)
+                name = os.path.basename(mem.file)
                 
-                mem.prist_mol_file = os.path.join(os.getcwd(), 
-                                                    prist_name)
-                mem.heavy_mol_file = os.path.join(os.getcwd(), 
-                                                    heavy_name)
+                mem.file = os.path.join(os.getcwd(), name)
             
             pop.write(os.getcwd())
             
@@ -78,22 +86,24 @@ def run():
         print_info('Calculating the fitness of population members.')
         pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
 
+    # Only try to run a normalization function if one was defined in the
+    # input file.
     if pop.ga_tools.normalization:
         with time_it():
             print_info('Normalizing fitness values.')
             pop.normalize_fitness_values()
 
+    # Print the scaled and unscaled fitness values.
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.prist_mol_file)
+        print(macro_mol.file)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
         print('\n')
 
     # Save the min, max and mean values of the population.  
     with time_it():
-        dump_path = os.path.join(os.getcwd(), 'pop_dump')
-        pop.dump(dump_path)
+        pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         print_info('Recording progress.')
-        pop.progress_update(dump_path)   
+        progress.update(pop)   
             
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):        
@@ -138,13 +148,16 @@ def run():
             pop = Population(pop.ga_tools, 
                              *pop.calculate_member_fitness())
 
+        # Only try to run a normalization function if one was defined in 
+        # the input file.
         if pop.ga_tools.normalization:
             with time_it():
                 print_info('Normalizing fitness values.')
                 pop.normalize_fitness_values()
                 
+        # Print the scaled and unscaled fitness values.        
         for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.prist_mol_file)
+            print(macro_mol.file)
             print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
             print('\n')
     
@@ -160,13 +173,12 @@ def run():
             os.mkdir('selected')
             os.chdir('selected')
             pop.write(os.getcwd())
-            dump_path = os.path.join(os.getcwd(), 'pop_dump')
-            pop.dump(dump_path)
+            pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         
         # Save the min, max and mean values of the population.  
         with time_it():
             print_info('Recording progress.')
-            pop.progress_update(dump_path)        
+            progress.update(pop)        
         
     # Running MacroModel optimizations sometimes leaves applications 
     # open. This closes them. If this is not done, directories may not 
@@ -174,7 +186,16 @@ def run():
     kill_macromodel()
     
     # Plot the results of the GA run.
-    pop.plot.epp(os.path.join(root_dir, 'epp.png'))
+    with time_it():
+        print_info('Plotting EPP.')
+        plot.epp(progress, os.path.join(root_dir, 'epp.png'),
+                 ga_input.fitness_func, 
+                 pop.ga_tools.normalization.scaling_func)
+    
+    os.chdir(root_dir)
+    # Dump the GAProgress instance.
+    with open('progress.dmp', 'wb') as dump_file:
+        pickle.dump(progress, dump_file)
     
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
@@ -186,9 +207,19 @@ def run():
         archive_output()
     
 def helper():
+    """
+    Takes care of the -h option.
+    
+    """
+    
     InputHelp(sys.argv[-1])
 
 def compare():
+    """
+    Takes care of the -c option.    
+    
+    """
+    
     launch_dir = os.getcwd()
     
     # If an output folder of MMEA exists, archive it. This moves any
@@ -210,7 +241,7 @@ def compare():
     # Create the encapsulating population.
     pop = Population()
     # Load the fitness and normalization functions into the population.
-    pop.ga_tools.ga_input = inp
+    pop.ga_tools.input = inp
     pop.ga_tools.fitness = inp.fitness_func
     pop.ga_tools.normalization = (
                             Normalization(inp.normalization_func) if 
@@ -229,26 +260,31 @@ def compare():
         # calculations. Also update the file name with the new 
         # directory.
         for ind in sp:
-            _, name = os.path.split(ind.prist_mol_file)
-            ind.prist_mol_file = os.path.join(sp_dir, name)
+            _, name = os.path.split(ind.file)
+            ind.file = os.path.join(sp_dir, name)
             ind.unscaled_fitness = None
             ind.fitness_fail = True
             ind.fitness = None
             ind.progress_params = None
-            
+
         sp.write(sp_dir)
+        
+        # Calculation of fitness is done here, not in the overall pop, 
+        # to maintain structure.
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
-        sp.progress_update()
         pop.add_subpopulation(sp)
-    
+        
+    # Only try to run a normalization function if one was defined in the
+    # input file.    
     if inp.normalization_func:
         pop.normalize_fitness_values()
-        pop.plot.progress_params('param_comparison.png')
+        plot.progress_params(pop, 'param_comparison.png')
     
-    pop.plot.subpopulations('fitness_comparison.png')
+    plot.subpopulations(pop, 'fitness_comparison.png')
 
+    # Print the scaled and unscaled fitness values. 
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.prist_mol_file)
+        print(macro_mol.file)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
         print('\n')
 

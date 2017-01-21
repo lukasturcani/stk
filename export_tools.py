@@ -1,44 +1,22 @@
+"""
+Defines functions only useful when using MMEA as a library.
+
+The functions here are not for use when running the GA.
+
+"""
+
 import os
 import glob
 import networkx as nx
 import rdkit.Chem as chem
-import rdkit.Chem.AllChem as ac
 from functools import partial
 from multiprocessing import Pool
 import itertools as it
 
-from .classes import StructUnit, FGInfo, Population, Cage
-from .convenience_tools import MolFileError
+from .classes import StructUnit, FGInfo, Population, functional_groups
 from .optimization import *
 
-def assign_keys(population):
-    """
-    Some old Cage .dmp files do not have `key` attribute so give it.
-
-    Parameters
-    ----------
-    population : Population
-        Assigns the `key` attribute to every MacroMolecule in this 
-        population.
-
-    Modifies
-    --------
-    population
-        All the MacroMolecule instances in this Population instance
-        have the `key` attribute assigned.
-        
-    Returns
-    -------
-    None : NoneType
-    
-    """
-    
-    for mem in population:
-        mem.key = (str([mem.building_blocks, type(mem.topology)]) + 
-                    str(mem.topology_args))
-    
-
-def redump_pop(*folders, ofolder):
+def redump_pop(*folders, ofolder, cls):
     """
     Collects all the MacroMolecule .dmp files and creates a dump file.
     
@@ -54,6 +32,9 @@ def redump_pop(*folders, ofolder):
         
     ofolder : str
         The folder in which the dump file should be placed. 
+        
+    cls : MacroMolecule child class
+        The class to which the .dmp files belong.
     
     Modifies
     --------
@@ -66,15 +47,15 @@ def redump_pop(*folders, ofolder):
     
     """
     
+    # Collect the paths of all the .dmp files.
     cage_paths = []
     for folder in folders:
         s = os.path.join(folder, '*.dmp')
         cage_paths.extend(glob.glob(s))
     
-    pop = Population(*(Cage.load(x) for x in cage_paths))
-
-    assign_keys(pop)      
-    
+    # Make a population holding all the MacroMolecule objects and dump
+    # it.
+    pop = Population(*(cls.load(x) for x in cage_paths))   
     pop.dump(os.path.join(ofolder, 'pop_dump'))
 
 def fg_prune(ifolder, fg, fg_num):
@@ -96,7 +77,11 @@ def fg_prune(ifolder, fg, fg_num):
         
     fg_num : int
         The number of functional groups of type `fg` which the molecule
-        must have in order to be copied.
+        must have in order to not be deleted.
+        
+    ext : str
+        The extension of the molecular structure files in `ifolder`.
+        All other files are skipped.
         
     Returns
     -------
@@ -104,57 +89,78 @@ def fg_prune(ifolder, fg, fg_num):
         
     """
     
+    # Go through all the files in `ifolder` if they do not have the 
+    # file extension `ext` go to the next file. 
     for file_name in os.listdir(ifolder):
-        if not file_name.endswith('.mol'):
+        if not file_name.endswith(ext):
             continue
+        
         path = os.path.join(ifolder, file_name)
-        mol = StructUnit(path, minimal=True)
-    
-        mol.func_grp = next((x for x in 
-                                FGInfo.functional_group_list if 
-                                x.name == fg), None)
-        mol.heavy_ids = []
-        mol._generate_heavy_attrs()
-        if len(mol.find_functional_group_atoms()) != fg_num:
+        # Make a StructUnit object and substitute the functional group
+        # of type `fg`.
+        mol = StructUnit(path)
+        mol.untag_atoms()
+        mol.func_grp = next((x for x in functional_groups if 
+                             x.name == fg), None)
+        
+        mol.tag_atoms()
+        
+        # Check that the correct number is present.
+        if len(mol.functional_group_atoms()) != fg_num:
             print('Deleting {}.'.format(path))
             os.remove(path)
 
-def fg_distance_prune(folder, fg):
+def fg_distance_prune(folder, fg, ext):
     """
     Deletes molecules with functional groups seperated by 1 atom.
     
     Parameters
     ----------
     folder : str
-        The full path of the folder which holdes the molecules in a
-        V3000 .mol format. The .mol files are removed from this folder.
+        The full path of the folder which holdes the molecules. The 
+        files are removed from this folder.
         
     fg : str
         The name of the functional group.
+        
+    ext : str
+        The file extension of the structure files in `folder`. All
+        other files are skipped.
     
     """
-    
+
+    # Go through all the files in `ifolder` if they do not have the 
+    # file extension `ext` go to the next file.     
     for file_name in os.listdir(folder):
         path = os.path.join(folder, file_name)
-        if not file_name.endswith('.mol2'):
+        if not file_name.endswith(ext):
             continue
 
-        mol = StructUnit(path, minimal=True)
-
-        mol.func_grp = next((x for x in 
-                                FGInfo.functional_group_list if 
-                                x.name == fg), None)
+        # Make a StructUnit object and substitute the functional group
+        # of type `fg`.
+        mol = StructUnit(path)
+        mol.untag_atoms()
         
-        mol.heavy_ids = []
-        mol._generate_heavy_attrs()
-        g = mol.graph('heavy')
-        for start, end in it.combinations(mol.heavy_ids, 2):
+        mol.func_grp = next((x for x in functional_groups if 
+                             x.name == fg), None)        
+
+        mol.tag_atoms()
+
+        # Make a mathematical graph of the molecule. Useful for finding
+        # the separation between nodes (atoms).
+        g = mol.graph()
+        # Each bonder atom can act as either a start or end node on a 
+        # graph. Find the seperations between such nodes. If the
+        # separation is 3 this means there is only one nodes between
+        # the start and end nodes. As a result the functional groups 
+        # are separated by 1 atom and should be deleted.
+        for start, end in it.combinations(mol.bonder_ids, 2):
             if nx.shortest_path_length(g, start, end) < 3:
                 print('Removing {}.'.format(path))
                 os.remove(path)
                 break
 
-def substruct_prune(folder, substruct):
+def substruct_prune(folder, ext, substruct):
     """
     Deletes molecules which contain the substructure `substruct`.
     
@@ -162,152 +168,89 @@ def substruct_prune(folder, substruct):
     ----------
     folder : str
         The full path of the folder from which the files are checked for
-        substructure and deleted.
+        the substructure and deleted.
         
+    ext : str
+        The extension of the structure files in `folder`. All other 
+        files are skipped.
+    
     substruct : str
-        The smarts string of the substructure, which if present in a 
+        The SMARTS string of the substructure, which if present in a 
         molecule causes it to be deleted from `folder`.
     
     """
     
+    # Create a rdkit molecule of the substructure.
     substruct_mol = chem.MolFromSmarts(substruct)
+    # Go through all the files in `ifolder` if they do not have the 
+    # file extension `ext` go to the next file.   
     for file_name in os.listdir(folder):
-        if not file_name.endswith('.mol2'):
+        if not file_name.endswith(ext):
             continue
+        
+        # Make a molecule from the file.
         path = os.path.join(folder, file_name)
-        mol = chem.MolFromMol2File(path, sanitize=False, removeHs=False)
-        if mol.HasSubstructMatch(substruct_mol):
+        mol = StructUnit(path, minimal=True)
+        # Check for substruct and delete as appropriate.
+        if mol.mol.HasSubstructMatch(substruct_mol):
             print('Removing {}.'.format(path))
             os.remove(path)
 
-def nonamine_groups(group_tuples, mol):
-    invalid_groups = []
-    for group in group_tuples:
-        n = next(mol.GetAtomWithIdx(x) for x in group if 
-                    mol.GetAtomWithIdx(x).GetAtomicNum() == 7)
-        non_Hs_neighbors = 0
-        for neighbor in n.GetNeighbors():
-            if neighbor.GetAtomicNum() != 1:
-                non_Hs_neighbors += 1
+def optimize_folder(folder, macromodel_path,
+                    timeout=False, temp=300, 
+                    confs=500, eq_time=50, sim_time=500):
+    """
+    Optimizes all molecules found in `folder`.    
+    
+    Parameters
+    ----------
+    folder : str
+        The full path of the folder which holds .mol file for
+        optimization.
         
-        if non_Hs_neighbors > 1:
-            invalid_groups.append(group)
+    macromodel_path : str
+        The full path to the Schrodinger home directory.
         
-    return invalid_groups
-            
-def categorize(mol2block, filename, output_dir):
-
-    try:
-        fgs = [chem.MolFromSmarts('C(=O)N([H])[H]'),
-               chem.MolFromSmarts('C(=O)[H]'),
-               chem.MolFromSmarts('[N]([H])[H]')]
-               
-
-        dirs = ['amines2f', 'amines3f', 'amines4f',
-                'aldehydes2f', 'aldehydes3f', 'aldehydes4f']
-
-        mol = chem.MolFromMol2Block(mol2block, sanitize=False,
-                                    removeHs=False)
+    timeout : float (default=False)
+        The seconds before the optimization is cancalled. If ``False``
+        it will run until completion.
         
-        amide_matches = mol.GetSubstructMatches(fgs[0])
-        if len(amide_matches) > 0:
-            return 
-            
-        aldehyde_matches = mol.GetSubstructMatches(fgs[1])
-        amine_matches = mol.GetSubstructMatches(fgs[2])
-        remove = nonamine_groups(amine_matches, mol)
-        amine_matches = [x for x in amine_matches if 
-                         x not in remove]
+    temp : float (default=300)
+        The temperature (K) of the MD conformer search.
         
-        non0 = sum(1 for x in [amide_matches, aldehyde_matches,
-                               amine_matches]
-                        if len(x) > 0)
+    confs : float (default=500)
+        The number of conformers sampled during the MD conformer search.
         
-        if non0 > 1 or non0 == 0:
-            return
+    eq_time : float (default=50)
+        The equilibration time before the MD conformer search.
         
-            
-        fg, fg_n = next((name, str(len(x))) for name, x in  [('amines', amine_matches), 
-                                        ('aldehydes', aldehyde_matches)]
-                     if len(x) > 0)
+    sim_time : float (default=500)
+        The simulation time of the MD conformer search.    
         
-
-        
-        folder = next((x for x in dirs if fg_n in x and fg in x), None)
-        if folder is not None:
-            oname = os.path.join(output_dir,folder,filename)
-            with open(oname, 'w') as f:
-                f.write(mol2block)
-
-    except:
-
-        with open('/home/lukas/database/fails{}.mol2'.format(filename[0]), 'a') as f:
-            f.write(mol2block)
-
-def mol_file_iter(mol_file):
-    mol_block = ''
-    for line in mol_file:
-        if 'ROOT' not in line:
-            mol_block += line
-        else:
-            mol_block += line
-            yield mol_block
-            mol_block = ''
-        
-def categorize_folder(ifolder, ofolder):
-    for n1, filename in enumerate(os.listdir(ifolder)):
-        print(n1)
-        with open(os.path.join(ifolder,filename), 'r') as f:
-            for n2, mol_block in enumerate(mol_file_iter(f)):
-                fn = "{}_{}.mol2".format(n1,n2)
-                categorize(mol_block, fn, ofolder)
-
-
-
-        
-def neutralize(path, output_dir, macromodel_path):
-    try:
-        m = chem.MolFromMol2File(path)
-        if m is None:
-            new_path = path.replace('.mol2', '.mol')
-            structconvert(path, new_path, macromodel_path)
-            m = chem.MolFromMolFile(new_path, sanitize=False)
-        
-        m = chem.RemoveHs(m)         
-        name = os.path.basename(path).replace(".mol2", ".mol")
-        b = chem.MolToMolBlock(m, forceV3000=True, kekulize=False)
-        b = b.replace("CHG=-1", "").replace("CHG=1", "")
-        with open(os.path.join(output_dir, name), 'w') as mf:
-            mf.write(b)
-        
-        return (0, None)
-    except ValueError as ex:
-        return (1,path)
-
-    except Exception as ex:
-        print('{} failed with exception {}.'.format(path, ex))
-        return (2,path)
-
-def optimize_folder(path, macromodel_path):
+    Returns
+    -------
+    None : NoneType
+    
+    """
     
     # First make a list holding all macromolecule objects to be 
-    # optimzied. Because the objects need to be initialized from a .mol
+    # optimized. Because the objects need to be initialized from a .mol
     # file a StructUnit instance not a MacroMolecule instance is used.
     # minimal = True, because it is all that is needed to run 
     # optimziations, plus you want to avoid doing functional group
     # substitutions.
+    
+    # Get the names of all the .mol files.
     names = [os.path.join(path, file_name) for file_name in 
-             os.listdir(path) if file_name.endswith(".mol")]    
+             os.listdir(path) if file_name.endswith(".mol")] 
+    # Make the StructUnit instances from the .mol files.
     macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
                                                                   names]
 
-    # .mol files often get moved around. Make sure the `prist_mol_file`
-    # attribute is updated to account for this.
-    for name, macro_mol in zip(names, macro_mols):
-        macro_mol.prist_mol_file = name
-
+    # Run the opt.
     md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
-        timeout=False, temp=300, confs=500, eq_time=50, sim_time=500)    
+        timeout=timeout, temp=temp, confs=confs, 
+        eq_time=eq_time, sim_time=sim_time)    
     
     with Pool() as p:
         p.map(md_opt, macro_mols)
