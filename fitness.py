@@ -116,7 +116,9 @@ def _calc_fitness(func_data, population):
         
     Returns
     -------
-    None : NoneType    
+    list
+        The members of `population` which have had their fitness
+        calculated.
     
     """
 
