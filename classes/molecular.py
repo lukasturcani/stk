@@ -1858,7 +1858,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         """
         Check if the `other` instance has the same molecular structure.
         
-        Parameters
+        Parameterss.getcwd()
         ----------
         other : MacroMolecule
             The ``MacroMolecule`` instance you are checking has the same 
@@ -1935,6 +1935,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             cage = cls.__new__(cls)        
             cage.building_blocks = (bb_str, lk_str)
             cage.topology = topology_str
+            cage.topology_args = {'a' : 1}
             cage.fitness = 3.14
             MacroMolecule._cache[key] = cage
             return cage
