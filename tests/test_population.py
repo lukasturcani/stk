@@ -1,13 +1,7 @@
 import pytest
 from collections import Counter
-import shutil
-import os
 
-
-from ...classes import (Population, Cage, GATools, StructUnit2,
-                        StructUnit3, MacroMolecule)
-                        
-from ...classes.topology import FourPlusSix, EightPlusTwelve, SixPlusNine
+from ..classes import Population, Cage, GATools, MacroMolecule
 
 def generate_population(offset=False):
     """
@@ -19,7 +13,7 @@ def generate_population(offset=False):
     
     #Generate a bunch of cages.
     if offset:
-        cages = [Cage.testing_init(values[x], values[x], values[x+1]) 
+        cages = [Cage.testing_init(values[x+1], values[x], values[x]) 
                                                 for x in range(0,22)]
     if not offset:
         cages = [Cage.testing_init(values[x], values[x], values[x]) 
@@ -58,13 +52,6 @@ def test_init():
     Population(Cage.__new__(Cage), Cage.__new__(Cage),
                Population.__new__(Population), Cage.__new__(Cage), 
                Population.__new__(Population))
-    
-    # Multiple ``GATools`` instances. Invalid, should raise TypeError.           
-    with pytest.raises(TypeError):
-       Population(Cage.__new__(Cage), Cage.__new__(Cage), 
-                  Population.__new__(Population), Cage.__new__(Cage),
-                  Population.__new__(Population), 
-                  GATools.__new__(GATools), GATools.__new__(GATools))
                   
     # Non ``GATools``, ``Cage`` or ``Population`` instance used for
     # initialization (``int``). Invalid, should raise TypeError.
@@ -73,88 +60,6 @@ def test_init():
                    Population.__new__(Population), Cage.__new__(Cage),
                    Population.__new__(Population), 
                    GATools.__new__(GATools), 12)
-
-    # Due to a technicality (see __init__ source code) any number of 
-    # ``None`` type arguments can be supplied. Valid, should pass.
-    Population(*[None for x in range(0,10)])
-
-def test_init_fixed_bb_cages():
-    """
-    Tests `init_fixed_bb_cages.
-    
-    """
-    
-    bb_file = os.path.join('data', 'population', 'bb_amine.mol')
-    lk_db = os.path.join('data', 'population', 'lk_db')
-    topologies = [FourPlusSix, EightPlusTwelve, SixPlusNine]
-    size = 10
-    
-    pop = Population.init_fixed_bb_cages(bb_file, lk_db, topologies,
-                                         size, None)    
-    
-    # Count the topologies, there should be more than one as they are
-    # selected randomly.
-    tops = [type(x.topology) for x in pop]
-    count = Counter(tops)
-    assert len(count.values()) > 1
-    
-    # Check that all the BuildingBlock molecules are the same.
-    bb_check = next(b for b in pop[0].building_blocks if 
-                                        isinstance(b, StructUnit3))
-    lks = [] 
-    bbs = []                                   
-    for x in pop:
-        x_bb = next(b for b in x.building_blocks if 
-                                        isinstance(b, StructUnit3))
-        x_lk = next(b for b in x.building_blocks if 
-                                        isinstance(b, StructUnit2))
-        lks.append(x_lk)
-        bbs.append(x_bb)
-        assert x_bb is bb_check
-
-    count = Counter(bbs)
-    assert len(count.values()) == 1
-    
-    # Check that there are multiple Linker molecules.
-    count = Counter(lks)
-    assert len(count.values()) > 1
-    
-      
-     
-def test_all_members():
-    """
-    Check that all members, direct and in subpopulations, are returned.
-
-    """    
-    
-    # Generate a bunch of cages.
-    cages = [Cage.testing_init(x,'a','b') for x in range(0,22)]    
-        
-    # Generate a couple of ``Populations`` to be used as subpopulations.
-    sub1 = Population(*cages[0:4])
-    sub2 = Population(*cages[4:9])
-    sub3 = Population(*cages[9:14])
-    sub4 = Population(*cages[14:19])                      
-      
-    # Place subpopulations in one another.
-    sub1.populations.append(sub3)
-    sub2.populations.append(sub4)
-    
-    # Initialize main population from subpopulations and cages.
-    main = Population(sub1, sub2, *cages[-3:])
-
-    # Place the results of ``all_members`` into a list.
-    all_members = Population(*[cage for cage in main.all_members()])
-
-    # Check that each generated cage is in `all_members`. Should pass.
-    assert all(cage in all_members for cage in cages)  
-    
-    # Add a cage to `cages`. Now there should be a cage in `cages`, not 
-    # present in main. Should fail.
-    cages.append(Cage.testing_init('alpha', 'beta', 'gamma'))
-     
-    with pytest.raises(AssertionError):
-        assert all(cage in all_members for cage in cages)
         
 def test_add_members_duplicates():
     """
@@ -245,6 +150,54 @@ def test_add_subpopulation():
     pop1.add_subpopulation(pop2)
     assert pop2 in pop1.populations    
 
+def test_all_members():
+    """
+    Check that all members, direct and in subpopulations, are returned.
+
+    """    
+    
+    # Generate a bunch of cages.
+    cages = [Cage.testing_init(x,'a','b') for x in range(0,22)]    
+        
+    # Generate a couple of ``Populations`` to be used as subpopulations.
+    sub1 = Population(*cages[0:4])
+    sub2 = Population(*cages[4:9])
+    sub3 = Population(*cages[9:14])
+    sub4 = Population(*cages[14:19])                      
+      
+    # Place subpopulations in one another.
+    sub1.populations.append(sub3)
+    sub2.populations.append(sub4)
+    
+    # Initialize main population from subpopulations and cages.
+    main = Population(sub1, sub2, *cages[-3:])
+
+    # Place the results of ``all_members`` into a list.
+    all_members = Population(*[cage for cage in main.all_members()])
+
+    # Check that each generated cage is in `all_members`. Should pass.
+    assert all(cage in all_members for cage in cages)  
+    
+    # Add a cage to `cages`. Now there should be a cage in `cages`, not 
+    # present in main. Should fail.
+    cages.append(Cage.testing_init('alpha', 'beta', 'gamma'))
+     
+    with pytest.raises(AssertionError):
+        assert all(cage in all_members for cage in cages)    
+
+def test_mean():
+    pop = generate_population()
+    
+    for i, mem in enumerate(pop):
+        mem.fitness = i
+        mem.unscaled_fitness = [i, 2*i, 3*i, 4*i]
+    
+    avgf = pop.mean(lambda x : x.fitness)
+    avguf = pop.mean(lambda x : x.unscaled_fitness)
+    
+    
+    
+        
 def test_remove_duplicates_between_subpops():
     """
     Ensure that duplicates are correctly removed from a population.    
@@ -274,7 +227,7 @@ def test_remove_duplicates_between_subpops():
     assert main.populations[0].populations
     assert main.populations[0].populations[0].populations
     subsubsubpop = main.populations[0].populations[0].populations[0]
-    assert not subsubsubpop.populations
+    assert not subsubsubpop.populations    
     
 def test_remove_duplicates_not_between_subpops():
     """
@@ -326,9 +279,6 @@ def test_remove_duplicates_not_between_subpops():
     assert subpop1.populations[0].populations
     assert subpop1.populations[0].populations[0].members
     assert not subpop1.populations[0].populations[0].populations
-
-def test_mean():
-    pass
     
 def test_getitem():
     """
