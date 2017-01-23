@@ -138,13 +138,7 @@ def fg_distance_prune(folder, fg, ext):
 
         # Make a StructUnit object and substitute the functional group
         # of type `fg`.
-        mol = StructUnit(path)
-        mol.untag_atoms()
-        
-        mol.func_grp = next((x for x in functional_groups if 
-                             x.name == fg), None)        
-
-        mol.tag_atoms()
+        mol = StructUnit(path, fg)
 
         # Make a mathematical graph of the molecule. Useful for finding
         # the separation between nodes (atoms).
