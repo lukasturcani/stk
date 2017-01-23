@@ -982,7 +982,7 @@ class StructUnit(Molecule, metaclass=Cached):
                   '.pdb' : partial(chem.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
     
-    def __init__(self, file):
+    def __init__(self, file, functional_group=None):
         """
         Initializes a ``StructUnit`` instance.
         
@@ -991,6 +991,13 @@ class StructUnit(Molecule, metaclass=Cached):
         file : str
             The full path of the molecular structure file holding the 
             building block.
+            
+        functional_group : str (default = None)
+            The name of the functional group which is to have atoms
+            tagged. If ``None``, a functional group name found in the 
+            path `file`  is used. If no functional group is provided 
+            to this parameter and the name of one is not present in 
+            `file`, no tagging is done.
             
         """
  
@@ -1019,12 +1026,16 @@ class StructUnit(Molecule, metaclass=Cached):
         # generator will return the functional group which appears first 
         # in `functional_groups`.
         
-        # Calling the ``next`` function on this generator causes it to
-        # yield the first (and what should be the only) result. The
-        # generator will return ``None`` if it does not find the name of
-        # a functional group in the path.
-        self.func_grp = next((x for x in functional_groups if 
-                                x.name in file), None)      
+
+        # Assign the FGInfo instance from `functional_groups` which
+        # describes the functional group provided in `functional_group`
+        # or is found in the path name.
+        if functional_group:
+            self.func_grp = next((x for x in functional_groups if 
+                                  x.name == functional_group), None) 
+        else:         
+            self.func_grp = next((x for x in functional_groups if 
+                                  x.name in file), None)      
         
         # Calling this function labels the atoms in the rdkit molecule
         # as either atoms which form a bond during reactions or atoms
