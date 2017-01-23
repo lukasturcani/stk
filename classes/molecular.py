@@ -970,7 +970,11 @@ class StructUnit(Molecule, metaclass=Cached):
     """
 
     init_funcs = {'.mol' : partial(chem.MolFromMolFile, 
+                                   sanitize=False, removeHs=False),
+                  
+                  '.sdf' : partial(chem.MolFromMolFile, 
                                    sanitize=False, removeHs=False), 
+                                   
                   '.mol2' : partial(chem.MolFromMol2File, 
                                  sanitize=False, removeHs=False),
                   '.mae' : mol_from_mae_file,
