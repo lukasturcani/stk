@@ -1912,7 +1912,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
                                     key in {'file', 
                                             'topology',
                                             'fitness',
-                                            'optimized'}}) + "\n"
+                                            'optimized',
+                                            'building_blocks'}}) + "\n"
     
     def __repr__(self):
         return str(self)
