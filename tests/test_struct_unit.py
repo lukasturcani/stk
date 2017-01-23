@@ -11,6 +11,14 @@ data_dir = join('data', 'struct_unit', 'amine.mol')
 mol = StructUnit(data_dir)
 conf = mol.mol.GetConformer()
 
+def test_init():
+    f = join('data', 'struct_unit', 'amine2.mol2')
+    mol2 = StructUnit(f)
+    mol3 = StructUnit(f, 'aldehyde')
+    print(mol2.func_grp.name)
+    assert len(mol2.functional_group_atoms()) == 3
+    assert len(mol3.functional_group_atoms()) == 2
+
 def test_all_bonder_distances():
     conf_ds = []
     for a1, a2 in it.combinations(mol.bonder_ids, 2):
@@ -71,3 +79,10 @@ def test_set_bonder_centroid():
     mol.set_bonder_centroid([1,2,3])
     assert np.allclose(mol.bonder_centroid(), [1,2,3], atol=1e-8)
     mol.set_bonder_centroid(og)
+
+def test_untag_atoms():
+    f = join('data', 'struct_unit', 'amine2.mol2')
+    mol2 = StructUnit(f)
+    mol2.untag_atoms()
+    for atom in mol2.mol.GetAtoms():
+        assert not atom.HasProp('fg')
