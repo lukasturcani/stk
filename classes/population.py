@@ -13,7 +13,8 @@ from .molecular import MacroMolecule, Cage
 from .ga import GATools
 from ..convenience_tools import dedupe
 from ..plotting import plot_counter
-from ..optimization.optimization import _optimize_all, _optimize_all_serial
+from ..optimization.optimization import (_optimize_all, 
+                                        _optimize_all_serial)
 from ..fitness import _calc_fitness, _calc_fitness_serial
 
 class Population:
@@ -206,66 +207,6 @@ class Population:
                         for x in range(size))
         return cls(*cage_gen, ga_tools)
 
-    @staticmethod
-    def load(file_name, ga_tools=None):
-        """
-        Initializes a Population from one dumped to a file with pickle.
-
-        Parameters
-        ----------
-        file_name : str
-            The full path of the file holding the dumped population.
-
-        ga_tools : GATools (default = None)
-            A GATools instance to be used by the loaded population. If
-            ``None`` the ``GATools`` instance of the loaded population
-            is used.
-
-        Returns
-        -------
-        Population
-            The population stored in the dump file.
-
-        """
-
-        # Read the pickle file, load it into the `pop` variable. If
-        # `ga_tools` parameter was supplied, place it into the
-        # `ga_tools` attribute of `pop`.
-        with open(file_name, 'rb') as dump_file:
-            pop = pickle.load(dump_file)
-            if ga_tools is not None:
-                pop.ga_tools = ga_tools
-
-            # Make sure the the cache is updated with the loaded
-            # population.
-            for member in pop:
-                member.update_cache()
-
-            return pop
-
-    def all_members(self):
-        """
-        Yields all members in the population and its subpopulations.
-
-        Yields
-        ------
-        MacroMolecule
-            The next ``MacroMolecule`` instance held within the
-            population or its subpopulations.
-
-        """
-
-        # Go through `members` attribute and yield ``MacroMolecule``
-        # instances held within one by one.
-        for ind in self.members:
-            yield ind
-
-        # Go thorugh `populations` attribute and for each ``Population``
-        # instance within, yield ``MacroMolecule`` instances from its
-        # `all_members` generator.
-        for pop in self.populations:
-            yield from pop.all_members()
-
     def add_members(self, population, duplicates=False):
         """
         Adds ``MacroMolecule`` instances into `members`.
@@ -339,8 +280,262 @@ class Population:
 
         """
 
-        self.populations.append(population)
+        self.populations.append(population)                
 
+    def all_members(self):
+        """
+        Yields all members in the population and its subpopulations.
+
+        Yields
+        ------
+        MacroMolecule
+            The next ``MacroMolecule`` instance held within the
+            population or its subpopulations.
+
+        """
+
+        # Go through `members` attribute and yield ``MacroMolecule``
+        # instances held within one by one.
+        for ind in self.members:
+            yield ind
+
+        # Go thorugh `populations` attribute and for each ``Population``
+        # instance within, yield ``MacroMolecule`` instances from its
+        # `all_members` generator.
+        for pop in self.populations:
+            yield from pop.all_members()
+
+    def calculate_member_fitness(self):
+        """
+        Applies the fitness function on all members.
+        
+        Returns
+        -------
+        list
+            The a copy of the members in `self` with the fitness
+            calculated.
+        
+        
+        """
+        
+        return _calc_fitness(self.ga_tools.fitness, self)            
+
+    def dump(self, file_name):
+        """
+        Write the population object to a file.
+
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file to which the population should
+            be written.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        with open(file_name, 'wb') as dump_file:
+            pickle.dump(self, dump_file)
+
+    def gen_mutants(self):
+        """
+        Returns a population of mutant ``MacroMolecule`` instances.
+
+        This is a GA operation and as a result this method merely
+        delegates the request to the ``Mutation`` instance held in the
+        `ga_tools` attribute.
+
+        Returns
+        -------
+        Population
+            A population holding mutants created by mutating contained
+            ``MacroMolecule`` instances.
+
+        """
+
+        return self.ga_tools.mutation(self)
+
+    def gen_next_gen(self, pop_size):
+        """
+        Returns a population hodling the next generation of structures.
+
+        This function also creates a .png plot of the selection
+        distribution.
+
+        Parameters
+        ----------
+        pop_size : int
+            The size of the next generation.
+
+        Returns
+        -------
+        Population
+            A population holding the next generation of individuals.
+
+        """
+
+        new_gen = Population(self.ga_tools)
+        counter = Counter()
+        for member in self.select('generational'):
+            counter.update([member])
+            new_gen.add_members([member])
+            if len(new_gen) == pop_size:
+                break
+        for member in self:
+            if member not in counter.keys():
+                counter.update({member : 0})
+
+        plot_counter(counter, os.path.join(os.getcwd(),
+                                           'gen_select.png'))
+        return new_gen
+
+    def gen_offspring(self):
+        """
+        Returns a population of offspring ``MacroMolecule`` instances.
+
+        This is a GA operation and as a result this method merely
+        delegates the request to the ``Crossover`` instance held in the
+        `ga_tools` attribute. The ``Crossover`` instance takes care of
+        selecting parents and combining them to form offspring. The
+        ``Crossover`` instance delegates the selection to the 
+        ``Selection`` instance as would be expected. The request to 
+        perform crossovers is done by calling the ``Crossover`` instance 
+        with the population as the argument. Calling of the 
+        ``Crossover``instance returns a ``Population`` instance holding 
+        the generated offspring. All details regarding the crossover 
+        procedure are handled by the ``Crossover`` instance.
+
+        For more details about how crossover is implemented see the
+        ``Crossover`` class documentation.
+
+        Returns
+        -------
+        Population
+            A population holding offspring created by crossing contained
+            the ``MacroMolecule`` instances.
+
+        """
+
+        return self.ga_tools.crossover(self)
+            
+    @staticmethod
+    def load(file_name, ga_tools=None):
+        """
+        Initializes a Population from one dumped to a file with pickle.
+
+        Parameters
+        ----------
+        file_name : str
+            The full path of the file holding the dumped population.
+
+        ga_tools : GATools (default = None)
+            A GATools instance to be used by the loaded population. If
+            ``None`` the ``GATools`` instance of the loaded population
+            is used.
+
+        Returns
+        -------
+        Population
+            The population stored in the dump file.
+
+        """
+
+        # Read the pickle file, load it into the `pop` variable. If
+        # `ga_tools` parameter was supplied, place it into the
+        # `ga_tools` attribute of `pop`.
+        with open(file_name, 'rb') as dump_file:
+            pop = pickle.load(dump_file)
+            if ga_tools is not None:
+                pop.ga_tools = ga_tools
+
+            # Make sure the the cache is updated with the loaded
+            # population.
+            for member in pop:
+                member.update_cache()
+
+            return pop
+
+    def mean(self, key):
+        """
+        Calculates the mean given a key.
+
+        This method applies key(member) on every member of the 
+        population and returns the mean of returned values.
+
+        For example, if the mean value of the attribute `cavity_size`
+        was desired:
+            
+            population.mean(
+                    lambda macro_mol : macro_mol.topology.cavity_size())
+
+        Parameters
+        ----------
+        key : function
+            A function which should take a MacroMolecule instance as its
+            argument and return a value.
+
+        Returns
+        -------
+        float
+            The mean of the values returned by the function `key` when 
+            its applied to all members of the population.
+
+        """
+
+        return np.mean([key(member) for member in self], axis=0)  
+
+    def normalize_fitness_values(self):
+        """
+        Applies the normalization function.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        return self.ga_tools.normalization(self)         
+
+    def optimize_population(self):
+        """
+        Optimizes all the members of the population.
+
+        This function should invoke either the ``optimize_all()`` or
+        ``optimize_all_serial()`` functions. ``optimize_all()``
+        optimizes all members of the population in parallel.
+        ``optimize_all_serial()`` does them serially. Probably best not
+        to use the serial version unless debugging.
+
+        The parallel optimization creates cloned instances of the
+        population's members. It is these that are optimized. This means
+        that the ``.mol`` files are changed but any instance attributes
+        are not. See ``optimize_all()`` function documentation in
+        ``optimization.py`` for more details.
+
+        Modifies
+        --------
+        MacroMolecule
+            This function replaces the pristine rdkit molecule instances
+            with optimizes versions. It also replaces the content of the
+            pristine ``.mol`` files with pristine structures.
+
+        Returns
+        -------
+        iterator of MacroMolecule objects
+            If a parallel optimization was chosen, this iterator yields
+            the ``MacroMolecule`` objects that have had their attributes
+            changed as a result of the optimization. They are modified
+            clones of the original population's macromolecules.
+
+            If a serial optimization is done the iterator does not yield
+            clones.
+
+        """
+
+        return _optimize_all(self.ga_tools.optimization, self)
+        
     def remove_duplicates(self, between_subpops=True, top_seen=None):
         """
         Removes duplicates from a population while preserving structure.
@@ -468,88 +663,6 @@ class Population:
 
         return self.ga_tools.selection(self, type_)
 
-    def gen_offspring(self):
-        """
-        Returns a population of offspring ``MacroMolecule`` instances.
-
-        This is a GA operation and as a result this method merely
-        delegates the request to the ``Crossover`` instance held in the
-        `ga_tools` attribute. The ``Crossover`` instance takes care of
-        selecting parents and combining them to form offspring. The
-        ``Crossover`` instance delegates the selection to the 
-        ``Selection`` instance as would be expected. The request to 
-        perform crossovers is done by calling the ``Crossover`` instance 
-        with the population as the argument. Calling of the 
-        ``Crossover``instance returns a ``Population`` instance holding 
-        the generated offspring. All details regarding the crossover 
-        procedure are handled by the ``Crossover`` instance.
-
-        For more details about how crossover is implemented see the
-        ``Crossover`` class documentation.
-
-        Returns
-        -------
-        Population
-            A population holding offspring created by crossing contained
-            the ``MacroMolecule`` instances.
-
-        """
-
-        return self.ga_tools.crossover(self)
-
-    def gen_mutants(self):
-        """
-        Returns a population of mutant ``MacroMolecule`` instances.
-
-        This is a GA operation and as a result this method merely
-        delegates the request to the ``Mutation`` instance held in the
-        `ga_tools` attribute.
-
-        Returns
-        -------
-        Population
-            A population holding mutants created by mutating contained
-            ``MacroMolecule`` instances.
-
-        """
-
-        return self.ga_tools.mutation(self)
-
-    def gen_next_gen(self, pop_size):
-        """
-        Returns a population hodling the next generation of structures.
-
-        This function also creates a .png plot of the selection
-        distribution.
-
-        Parameters
-        ----------
-        pop_size : int
-            The size of the next generation.
-
-        Returns
-        -------
-        Population
-            A population holding the next generation of individuals.
-
-        """
-
-        new_gen = Population(self.ga_tools)
-        counter = Counter()
-        for member in self.select('generational'):
-            counter.update([member])
-            new_gen.add_members([member])
-            if len(new_gen) == pop_size:
-                break
-        for member in self:
-            if member not in counter.keys():
-                counter.update({member : 0})
-
-        plot_counter(counter, os.path.join(os.getcwd(),
-                                           'gen_select.png'))
-        return new_gen
-
-
     def write(self, dir_path):
         """
         Writes the ``.mol`` files of members to a directory.
@@ -582,100 +695,7 @@ class Population:
             dump_file = os.path.splitext(name)[0] + '.dmp'
             dump_file = os.path.join(dir_path, dump_file)
             member.dump(dump_file)
-
-    def optimize_population(self):
-        """
-        Optimizes all the members of the population.
-
-        This function should invoke either the ``optimize_all()`` or
-        ``optimize_all_serial()`` functions. ``optimize_all()``
-        optimizes all members of the population in parallel.
-        ``optimize_all_serial()`` does them serially. Probably best not
-        to use the serial version unless debugging.
-
-        The parallel optimization creates cloned instances of the
-        population's members. It is these that are optimized. This means
-        that the ``.mol`` files are changed but any instance attributes
-        are not. See ``optimize_all()`` function documentation in
-        ``optimization.py`` for more details.
-
-        Modifies
-        --------
-        MacroMolecule
-            This function replaces the pristine rdkit molecule instances
-            with optimizes versions. It also replaces the content of the
-            pristine ``.mol`` files with pristine structures.
-
-        Returns
-        -------
-        iterator of MacroMolecule objects
-            If a parallel optimization was chosen, this iterator yields
-            the ``MacroMolecule`` objects that have had their attributes
-            changed as a result of the optimization. They are modified
-            clones of the original population's macromolecules.
-
-            If a serial optimization is done the iterator does not yield
-            clones.
-
-        """
-
-        return _optimize_all(self.ga_tools.optimization, self)
-
-    def calculate_member_fitness(self):
-        return _calc_fitness(self.ga_tools.fitness, self)
         
-    def normalize_fitness_values(self):
-        return self.ga_tools.normalization(self)
-
-    def mean(self, key):
-        """
-        Calculates the mean given a key.
-
-        This method applies key(member) on every member of the 
-        population and returns the mean of returned values.
-
-        For example, if the mean value of the attribute `cavity_size`
-        was desired:
-            
-            population.mean(
-                    lambda macro_mol : macro_mol.topology.cavity_size())
-
-        Parameters
-        ----------
-        key : function
-            A function which should take a MacroMolecule instance as its
-            argument and return a value.
-
-        Returns
-        -------
-        float
-            The mean of the values returned by the function `key` when 
-            its applied to all members of the population.
-
-        """
-
-        return np.mean([key(member) for member in self], axis=0)        
-        
-
-    def dump(self, file_name):
-        """
-        Write the population object to a file.
-
-        Parameters
-        ----------
-        file_name : str
-            The full path of the file to which the population should
-            be written.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        with open(file_name, 'wb') as dump_file:
-            pickle.dump(self, dump_file)
-
     def __iter__(self):
         """
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.
