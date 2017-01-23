@@ -1,8 +1,5 @@
 **/__pycache__/
 
-tests/HEAVY/
-tests/*.mol
-tests/*.dmp
 **/.cache
 *.ipynb_checkpoints
 
