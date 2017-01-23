@@ -1,5 +1,6 @@
 import pytest
 from collections import Counter
+import numpy as np
 
 from ..classes import Population, Cage, GATools, MacroMolecule
 
@@ -194,9 +195,10 @@ def test_mean():
     
     avgf = pop.mean(lambda x : x.fitness)
     avguf = pop.mean(lambda x : x.unscaled_fitness)
+    m = np.matrix([x.unscaled_fitness for x in pop])
     
-    
-    
+    assert np.mean([x.fitness for x in pop]) == avgf
+    assert np.allclose(np.mean(m, axis=0), avguf, atol=1e-8)
         
 def test_remove_duplicates_between_subpops():
     """
