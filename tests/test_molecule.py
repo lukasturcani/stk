@@ -167,3 +167,12 @@ def test_shift():
         pos = conf.GetAtomPosition(atomid)
         should_be = mol.atom_coords(atomid) + s
         assert np.allclose(should_be, pos,atol=1e-8)
+        
+def test_update_from_mae():
+    mol = Molecule.__new__(Molecule)
+    mol.mol = chem.MolFromMolFile(join(data_dir, 'molecule.mol'),
+                                        removeHs=False, sanitize=False)
+    
+    mol.update_from_mae()
+    assert mol.mol.GetNumAtoms() == 272
+    assert mol.mol.GetNumBonds() == 272
