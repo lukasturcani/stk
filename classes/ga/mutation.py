@@ -24,6 +24,7 @@ import os
 import numpy as np
 from collections import Counter
 import sys
+from copy import deepcopy
 
 from ..population import Population
 from ..molecular import StructUnit3, Cage
@@ -152,7 +153,7 @@ class Mutation:
                     break
 
             except Exception as ex:
-                MolError(ex, parent, ('Error during mutation'
+                MolError(ex, deepcopy(parent), ('Error during mutation'
                     ' with {}.').format(func.__name__))
 
         mutant_pop -= population
