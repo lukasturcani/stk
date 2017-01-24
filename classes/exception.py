@@ -55,18 +55,10 @@ class MolError(Exception):
     notes : str
         Any additional comments about the exception. For example, where
         it is being raised.
-    
+        
     """
     
-    def __init__(self, ex, mol, notes):
-        # If a mol caused a ``MolError`` it should not be used by the 
-        # GA. To ensure it is skipped by the optimization and fitness 
-        # functions, set these attributes for `mol`.
-        mol.optimized = True
-        mol.fitness = 1e-4
-        mol.unscaled_fitness = 1e-4
-        mol.fitness_fail = True
-        
+    def __init__(self, ex, mol, notes):        
         self.ex = ex
         self.notes = notes
         self.write_to_file(mol)

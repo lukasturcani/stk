@@ -1827,6 +1827,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             self.mol = chem.Mol()
             self.file = file
             self.topology_args = topology_args
+            self.fail()
             MolError(ex, self, 'During initialization.')
 
     def _std_init(self, building_blocks, topology, file, 
@@ -1854,6 +1855,35 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         # Write the structure file of the assembled molecule.
         self.write()
 
+    def fail(self):
+        """
+        Sets attributes to indicate a failed molecule.
+        
+        Modifies
+        --------
+        optimized : bool
+            Changed to ``True``.
+        
+        fitness : float
+            Changed to 1e-4.
+        
+        unscaled_fitness : float
+            Changed to 1e-4.
+        
+        fitness_fail : bool
+            Changed to ``True``.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        self.optimized = True
+        self.fitness = 1e-4
+        self.unscaled_fitness = 1e-4
+        self.fitness_fail = True       
+        
     def same(self, other):
         """
         Check if the `other` instance has the same molecular structure.
