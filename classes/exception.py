@@ -14,7 +14,7 @@ class MolError(Exception):
     error can originate when rkdit is trying to assembly a molucue, 
     sanitize it or manipulate it in some othe way. Equally, 
     optimizations may go wrong for one reason or another and raise an
-    error. This is good, as problems should be identified, not ignored.
+    error.
     
     However, errors raised by rdkit are not as useful as one would hope. 
     The error gets raised but the user is not told which ``Molecule`` 
