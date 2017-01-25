@@ -1,40 +1,13 @@
 import numpy as np
-import os
-import pickle
+from os.path import join
 
-from ...convenience_functions import normalize_vector, vector_theta
+from ..convenience_tools import normalize_vector
+from ..classes import StructUnit2
 
-mol_file = os.path.join('data', 'linker', 'linker_test_obj')
+mol_file = join('data', 'struct_unit2', 'amine.mol2')
 
-with open(mol_file, 'rb') as dump_file:
-    lk = pickle.load(dump_file)
-
-def test_set_heavy_mol_orientation():
-    """
-    Tests `set_heavy_mol_orientation`.
-    
-    """
-    
-    # Set it and check it.       
-    lk.set_heavy_mol_orientation([1,2,3])
-    assert np.allclose(next(lk.heavy_direction_vectors()),
-                       normalize_vector([1,2,3]),
-                       atol=1e-8)
-                       
-def test_minimize_theta():
-    """
-    Tests `minimize_theta`.
-        
-    """
-
-    with open(mol_file, 'rb') as dump_file:
-        lk = pickle.load(dump_file)      
-    
-    vector = [1,1,1]
-    
-    dir_vector = next(lk.heavy_direction_vectors())
-    og_theta = vector_theta(vector, dir_vector)  
-    lk.minimize_theta(vector, [0,0,1])
-    dir_vector = next(lk.heavy_direction_vectors())
-    new_theta = vector_theta(vector, dir_vector)
-    assert new_theta < og_theta
+def test_set_orientation2():
+    mol = StructUnit2(mol_file)
+    mol.set_orientation2([1,2,3])
+    assert np.allclose(next(mol.bonder_direction_vectors())[-1], 
+                           normalize_vector([1,2,3]), atol=1e-8)

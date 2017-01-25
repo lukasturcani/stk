@@ -36,43 +36,43 @@ Using an example, the format and structure of input files is explained in sectio
 \subsection{Format and structure.}
 \label{input_files_format_and_structure}
 
-The input file consists of a sequence of commands. Each command defines a variable or a function used by MMEA. If the command defines a function used by MMEA it must also define any parameters necessary to use the function. It does not have to define any default initialized parameters, though it may if desired. A command terminates with the ``\$`` symbol. This means that 
+The input file consists of a sequence of commands. Each command defines a variable or a function used by MMEA. If the command defines a function used by MMEA it must also define any parameters necessary to use the function. It does not have to define any default initialized parameters, though it may if desired. Commands can be written across multiple lines and terminate when the last parameter is defined. This means that 
 \begin{Verbatim}
 generational_select_func; 
 stochastic_sampling; 
-use_rank=True$
+use_rank=True
 \end{Verbatim}
 and
 \begin{Verbatim}
-generational_select_func; stochastic_sampling; use_rank=True$
+generational_select_func; stochastic_sampling; use_rank=True
 \end{Verbatim}
-define the same command.
+define the same command. Notice there is no semicolon at the end of a command, it is only used to separate the parameters.
 
-Any lines consisting of only whitespace or beginning with ``\#" are ignored. This is used to create comments in the input file and allows division of it into sections. All commands terminate with a ``\$" symbol. This means that both define the same command. 
+Any lines consisting of only whitespace or beginning with ``\#" are ignored.
 
 There are two kinds of command in the input file. The first kind has the form
 \begin{verbatim}
-keyword; function_name; param1=val1; param2=val2; param3=val3$
+keyword; function_name; param1=val1; param2=val2; param3=val3
 \end{verbatim}
 For example, 
 \begin{verbatim}
-generational_select_func; stochastic_sampling; use_rank=True$
+generational_select_func; stochastic_sampling; use_rank=True
 \end{verbatim}
 This means that the keyword is ``generational\_select\_func", the function name is ``stochastic\_sampling", parameter 1's name is ``use\_rank" and its value is ``True". As you can see, in this there is only 1 parameter name-value pair.
 
-Commands with this format define functions used by MMEA. It is called the ``function definition format". The function will correspond to the various GA operations, such as crossover, mutation and selection or to things like the fitness function or optimization function (which optimizes the molecular geometry). The words which make up the command are separated by a semicolon. Recall that the last word of a command is not followed by a semicolon but with a ``\$". 
+Commands with this format define functions used by MMEA. It is called the ``function definition format". The function will correspond to the various GA operations, such as crossover, mutation and selection or to things like the fitness function or optimization function (which optimizes the geometry of molecules created by MMEA). The words which make up the command are separated by a semicolon. Recall that the last word of a command is not followed by a semicolon. 
 
 The keyword defines which GA operation the command describes. For example, in the command above the keyword ``generational\_select\_func" signifies that the command defines which function is to be used for selecting members of the next generation. The keyword in the command
 \begin{verbatim}
-parent_select_func; crossover_roulette$
+parent_select_func; crossover_roulette
 \end{verbatim} 
 is ``parent\_select\_func", which signifies that the command defines the function used for selecting parents for crossover. A list of valid keywords is described in section \ref{list and explanation of valid keywords.}.
 
-The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MMEA. For example, if the keyword is ``generational\_select\_func" then ``stochastic\_sampling" or ``roulette" are both valid values for ``function\_name", because the module ``selection.py" within MMEA defines functions with these names. Indeed, any function defined within this module can be used as the selection function. Finding valid values for keywords without looking at the source code is described in section \ref{Finding available functions and their arguments.}.
+The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MMEA. For example, if the keyword is ``generational\_select\_func" then ``stochastic\_sampling" or ``roulette" are both valid values for ``function\_name", because the module ``selection.py" within MMEA defines functions with these names. Indeed, any function defined within this module can be used as the selection function. Finding valid function names without looking at the source code is described in section \ref{Finding available functions and their arguments.}.
 
-Finally, in the command above ``param1" and ``val1" correspond to ``use\_rank" and ``True", respectively. As mentioned before ``stochastic\_sampling" is the name of a function defined within the ``selection.py" module. As is usual for Python functions, it takes arguments. Looking at ``stochastic\_sampling()" within ``selection.py" it can be seen that its arguments are ``cls" and ``population" and its keyword arguments are ``elitism" (defaults to ``False"), ``truncation" (defaults to ``False"), ``duplicates" (defaults to ``False") and ``use\_rank" (defaults to ``False").
+Finally, in the command above ``param1" and ``val1" correspond to ``use\_rank" and ``True", respectively. As mentioned before ``stochastic\_sampling" is the name of a function defined within the ``selection.py" module. As is usual for Python functions, it takes arguments. Looking at ``stochastic\_sampling()" within ``selection.py" it can be seen that its arguments are ``self" and ``population" and its keyword arguments are ``elitism" (defaults to ``False"), ``truncation" (defaults to ``False"), ``duplicates" (defaults to ``False") and ``use\_rank" (defaults to ``False").
 
-In the case of selection functions the first two arguments (``cls" and ``population") are dealt with automatically by MMEA. If the user wants to use one of the selection functions they have to provide values to any of the remaining arguments in the form ``param1=val1". The order in which they are given in the input file does not matter. If the user wants to change the default values of any of the function's keyword arguments, they may add them to the command using the same notation. Keyword arguments otherwise do not have to be provided in the input script and will be default initialized to whatever is defined within the source code of MMEA. All of this holds true for other functions defined in the input file, not just selection functions. How a user can easily view what functions and parameters are available, as well as what they mean, is addressed in section \ref{input_files_valid_parameters}.
+In the case of selection functions the first two arguments (``self" and ``population") are dealt with automatically by MMEA. If the user wants to use one of the selection functions they have to provide values to any of the remaining arguments in the form ``param1=val1". The order in which they are given in the input file does not matter. If the user wants to change the default values of any of the function's keyword arguments, they may add them to the command. Otherwise, keyword arguments do not have to be provided in the input file and will be default initialized to whatever is defined within the source code of MMEA. All of this holds true for other functions defined in the input file, not just selection functions. How a user can easily view what functions and parameters are available, as well as what they mean, is addressed in section \ref{input_files_valid_parameters}.
 
 When the user provides the value of a parameter, it must reflect its type. For example if a parameter wanted an a list of numbers then
 \begin{verbatim}
@@ -90,13 +90,13 @@ In essence it must be provided as valid Python syntax.
 
 All keywords should be defined in the input file once. The exception to this is ``mutation\_func". It is quite possible that during a GA run the user's wishes to use multiple mutation operations. As a result it is perfectly reasonable to include multiple commands with the keyword  ``mutation\_func". When this is done, the user must also include the line 
 \begin{verbatim}
-mutation_weights=[0.1, 0.45,0.45]$
+mutation_weights=[0.1, 0.45,0.45]
 \end{verbatim}
 This line tells MMEA that when a mutation is to be performed it should select the first mutation function defined in the input file with a 0.1 probability and the second and third mutation functions defined in the input file with a 0.45 probability. The probabilities can of course be modified by the user. The only requirements are that the probabilities sum to 1 and that the number of elements in the array and the number of mutation functions defined in the input file is the same.
 
 There is a second kind of non-comment line in the input file of MMEA. These lines have the form
 \begin{verbatim}
-keyword=val$
+keyword=val
 \end{verbatim}
 As you can see, these are much simpler. They define basic constants relevant to the GA. As a result, this is called the ``constant definition format". This includes things like population size, number of crossovers carried out during each generation and so on. It is merely the keyword, a ``=" and the value. No spaces. Valid keywords for these lines are discussed in section \ref{input_files_valid_parameters}.
 
@@ -135,7 +135,10 @@ The keywords are:
 \textbf{opt\_func} - \textit{function definition format} - \textbf{macro\_mol} - The function which optimizes the geometry of the molecules.
 \\
 \\
-\textbf{fitness\_func} - \textit{function definition format} - \textbf{macro\_mol, population} - The function which calculates fitness.
+\textbf{fitness\_func} - \textit{function definition format} - \textbf{macro\_mol} - The function which calculates fitness.
+\\
+\\
+\textbf{normalization\_func} - \textit{function definition format} - \textbf{population} - The function which normalizes fitness values. This keyword is optional.
 \\
 \\
 \textbf{num\_generations} - \textit{constant definition format} - The number of generations which MMEA will create.
@@ -144,15 +147,15 @@ The keywords are:
 \textbf{num\_mutations} - \textit{constant definition format} - The number of mutations MMEA will carry out each generation.
 \\
 \\
-\textbf{num\_crosses} - \textit{constant definition format} - The number of crossover operations MMEA will carry out each generation.
+\textbf{num\_crossovers} - \textit{constant definition format} - The number of crossover operations MMEA will carry out each generation.
 \\
 \\
 \textbf{pop\_size} - \textit{constant definition format} - The size of the population.
 \\
 \\
-\textbf{mutation\_weights} - \textit{constant definition format} - The probability with which each mutation function defined in the input file will be used when a mutation operation is performed. Note that the form of this constant is an array. For example
+\textbf{mutation\_weights} - \textit{constant definition format} - The probability with which each mutation function defined in the input file will be used when a mutation operation is performed. Note that the form of this constant is a list. For example
 \begin{verbatim}
-mutation_weights=[0.1, 0.45,0.45]$
+mutation_weights=[0.1, 0.45,0.45]
 \end{verbatim}
 
 \subsubsection{Finding available functions and their arguments.}
@@ -163,7 +166,7 @@ Run the command
 \begin{verbatim}
 python -m MMEA -h keyword
 \end{verbatim}
-where keyword is one of the valid function definition keywords defined in section \ref{list and explanation of valid keywords.}.
+where keyword is one of the valid function definition keywords defined in section \ref{list and explanation of valid keywords.} or ``energy" and ``topology". ``energy" lists the functions available for energy calculations while the ``topology" lists the macromolecules MMEA can construct. These values are often used as parameters in functions.
 
 \includegraphics[scale=1]{console1}
 
