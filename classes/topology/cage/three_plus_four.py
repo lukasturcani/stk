@@ -1,7 +1,15 @@
-from .base import CageTopology, Vertex
+"""
+Defines cage topologies from building blocks of 3 and 4 func groups. 
 
+"""
 
-class SixPlusEight(CageTopology):
+from .base import _CageTopology, Vertex
+
+class SixPlusEight(_CageTopology):
+    """
+    A cage topology of 3 and 4 functional group building blocks.
+    
+    """
     
     positions_A = [Vertex(-50, 50, 0), 
                     Vertex(-50, -50, 0), 

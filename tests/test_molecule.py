@@ -9,10 +9,10 @@ from ..classes import Molecule
 from ..convenience_tools import periodic_table
 
 data_dir = join('data', 'molecule')
-
+f = join(data_dir, 'molecule.mol')
 mol = Molecule.__new__(Molecule)
-mol.mol = chem.MolFromMolFile(join(data_dir, 'molecule.mol'),
-                                    removeHs=False, sanitize=False)
+mol.mol = chem.MolFromMolFile(f, removeHs=False, sanitize=False)
+mol.file = f
 og = mol.position_matrix()
 def test_all_atom_coords():
     """
@@ -111,7 +111,9 @@ def test_centroid_functions():
                                mol.centroid(), atol=1e-8)
         assert np.allclose(new_pos, mol.centroid(), 
                            atol = 1e-8)
-                           
+        
+        mol.set_position_from_matrix(og)
+        
     except Exception as ex:
         mol.set_position_from_matrix(og)
         raise ex
@@ -153,7 +155,9 @@ def test_set_position_from_matrix():
                                         range(mol.mol.GetNumAtoms())])
         mol.set_position_from_matrix(new_pos_mat.T)
         for _, atom_coord in mol.all_atom_coords():
-            assert np.allclose(atom_coord, [0,0,0], atol=1e-8) 
+            assert np.allclose(atom_coord, [0,0,0], atol=1e-8)
+            
+        mol.set_position_from_matrix(og)
     except Exception as ex:
         mol.set_position_from_matrix(og)
         raise ex
@@ -167,3 +171,19 @@ def test_shift():
         pos = conf.GetAtomPosition(atomid)
         should_be = mol.atom_coords(atomid) + s
         assert np.allclose(should_be, pos,atol=1e-8)
+        
+    mol.set_position_from_matrix(og)
+        
+def test_update_from_mae():
+    try:
+        mol2 = Molecule.__new__(Molecule)
+        mol2.mol = chem.MolFromMolFile(f, removeHs=False, 
+                                          sanitize=False)
+        mol2.file = f
+        mol2.update_from_mae()
+        assert mol2.mol.GetNumAtoms() == 272
+        assert mol2.mol.GetNumBonds() == 288
+        mol.write()
+    except Exception as ex:
+        mol.write()
+        raise ex

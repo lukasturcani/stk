@@ -381,7 +381,7 @@ class Edge(Vertex):
         
         return linker.mol
 
-class CageTopology(Topology):
+class _CageTopology(Topology):
     """
     A topology class which cage topologies should inherit.
         
@@ -716,7 +716,7 @@ class CageTopology(Topology):
                 
         return all_windows  
         
-class VertexOnlyCageTopology(CageTopology): 
+class _VertexOnlyCageTopology(_CageTopology): 
     
     def __init__(self, macro_mol, random_placement=True):
         Topology.__init__(self, macro_mol)
