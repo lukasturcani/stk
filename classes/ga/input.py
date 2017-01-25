@@ -6,9 +6,11 @@ Defines classes which deal with input.
 from types import ModuleType
 import sys
 import re
+from inspect import getmro
 
 from ..function_data import FunctionData
 from ..topology import *
+from .. import topology
 from ..population import Population
 from .selection import Selection
 from .crossover import Crossover
@@ -470,7 +472,13 @@ class InputHelp:
                                             
                 'energy' : (func for name, func in 
                                     Energy.__dict__.items() if not
-                                    name.startswith('_'))
+                                    name.startswith('_')),
+                                    
+                'topology' : (cls for name, cls in 
+                              topology.__dict__.items() if
+                              not name.startswith('_') and
+                              not isinstance(cls, ModuleType) and 
+                              topology.base.Topology in getmro(cls))
                }
         
     

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.1.28)  10 DEC 2016 22:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2016.1.28)  20 JAN 2017 17:23
 entering extended mode
 **./users_guide.tex
 (users_guide.tex
@@ -330,77 +330,82 @@ Overfull \hbox (11.52238pt too wide) in paragraph at lines 61--62
  []
 
 [3] [4]
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 108--154
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 108--157
 
  []
 
@@ -408,36 +413,36 @@ Underfull \hbox (badness 10000) in paragraph at lines 108--154
 File: pictures/console1.png Graphic file (type png)
 
 <use pictures/console1.png>
-Package pdftex.def Info: pictures/console1.png used on input line 168.
+Package pdftex.def Info: pictures/console1.png used on input line 171.
 (pdftex.def)             Requested size: 439.64142pt x 24.84274pt.
 
 <pictures/console2.png, id=109, 724.95844pt x 445.665pt>
 File: pictures/console2.png Graphic file (type png)
 
 <use pictures/console2.png>
-Package pdftex.def Info: pictures/console2.png used on input line 172.
+Package pdftex.def Info: pictures/console2.png used on input line 175.
 (pdftex.def)             Requested size: 507.46745pt x 311.96336pt.
 
-Overfull \hbox (1.57745pt too wide) in paragraph at lines 172--173
+Overfull \hbox (1.57745pt too wide) in paragraph at lines 175--176
 [][] 
  []
 
 [6 <./pictures/console1.png>]
-Overfull \hbox (41.74152pt too wide) in paragraph at lines 174--175
+Overfull \hbox (41.74152pt too wide) in paragraph at lines 177--178
 []\OT1/cmr/m/n/12 In this ex-am-ple, the key-word ``crossover[]func" was used a
 nd the only avail-able func-tion was ``bb[]lk[]exchange"
  []
 
 [7 <./pictures/console2.png>] [8]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 291.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 294.
  [9] [10]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 291.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 294.
  (users_guide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 291.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 291.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 294.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 294.
 Package rerunfilecheck Info: File `users_guide.out' has not changed.
 (rerunfilecheck)             Checksum: A63BA84090B6D4FA8990DA345727E1CE;829.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 291.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 294.
  ) 
 Here is how much of TeX's memory you used:
  6290 strings out of 493634
@@ -446,14 +451,14 @@ Here is how much of TeX's memory you used:
  9618 multiletter control sequences out of 15000+200000
  9324 words of font info for 33 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 29i,6n,32p,959b,454s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 29i,6n,32p,935b,454s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Fil
 es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX
  2.9/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX 2.9/fonts
 /type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
 ublic/amsfonts/cm/cmtt12.pfb>
-Output written on users_guide.pdf (11 pages, 133511 bytes).
+Output written on users_guide.pdf (11 pages, 133128 bytes).
 PDF statistics:
  160 PDF objects out of 1000 (max. 8388607)
  25 named destinations out of 1000 (max. 500000)

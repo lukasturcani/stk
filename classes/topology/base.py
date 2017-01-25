@@ -1,3 +1,13 @@
+"""
+Defines the base ``Topology`` type.
+
+
+
+
+"""
+
+
+
 from collections import Counter
 import rdkit
 import rdkit.Chem as chem
