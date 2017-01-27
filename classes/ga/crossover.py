@@ -23,7 +23,6 @@ start with a leading underscore.
 
 import os
 from collections import Counter
-from copy import deepcopy
 
 from ..population import Population
 from ..molecular import Cage
@@ -141,7 +140,7 @@ class Crossover:
                     break
             except Exception as ex:
                 for i, parent in enumerate(parents):
-                    MolError(ex, deepcopy(parent), 
+                    MolError(ex, parent, 
                     'Error during crossover. Parent {0}.'.format(i))                
                 
         # Make sure that only original molecules are left in the 
