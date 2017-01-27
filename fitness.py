@@ -165,6 +165,7 @@ def _calc_fitness_serial(func_data, population):
             func(macro_mol, **func_data.params)
                 
         except Exception as ex:
+            macro_mol.fail()
             MolError(ex, macro_mol, 'During fitness calculation.')
 
 
@@ -406,6 +407,7 @@ def cage(macro_mol, target_cavity, target_window=None,
     except Exception as ex:
         # Prevents the error from being raised, but records it in 
         # ``failures.txt``.
+        macro_mol.fail()
         MolError(ex, macro_mol, "During fitness calculation")
         return macro_mol
 
@@ -710,6 +712,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         return macro_mol
         
     except Exception as ex:
+        macro_mol.fail()
         MolError(ex, macro_mol, "During fitness calculation.")
         return macro_mol
     
