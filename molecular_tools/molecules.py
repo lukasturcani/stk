@@ -60,18 +60,18 @@ up the macromolecule:
     bb = StructUnit('/path/to/struct/file.mol2')
 
 The StructUnit instances are initialized using paths of molecular 
-structure files. Initializing StructUnit instances does a couple of 
-things:
+structure files. (Initializing a StructUnit automatically completes 
+steps 1 to 4.)
     
-    1) Places an rdkit instance of the molecule into the `mol` attribute
+    1) Place an rdkit instance of the molecule into the `mol` attribute
        of the StructUnit.
-    2) Scans the path of the structure file for the name of a functional
+    2) Scan the path of the structure file for the name of a functional
        group. (Alternatively the name of a functional group can be
        supplied to the initializer).
 
 What functional groups are recognized by MMEA?
 The module ``/mmea/molecular_tools/fg_info.py`` defines a class called 
-FGInfo. Instances of this class are held in the list `function_groups` 
+FGInfo. Instances of this class are held in the list `functional_groups` 
 (also in that module). If you put an FGInfo instance in that list, the 
 functional group will be recognized.
 
