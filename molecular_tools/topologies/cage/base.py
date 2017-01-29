@@ -397,12 +397,23 @@ class _CageTopology(Topology):
     pair_up : function object (default = pair_up_edges_with_vertices)
         This is the function which pairs up molecules placed using the
         ``Vertex`` and ``Edge`` classes. This should be how cage
-        topologies should be defined.    
+        topologies should be defined.
+        
+    alignment : list of ints (default = None)
+        This is an optional argument. If supplied the number of
+        elements in this list must be equal to the number of vertices
+        in the cage. When cages are built one of the bonder atoms is 
+        aligned with an edge during placement. The int indicates which
+        bonder atom is aligned. The int corresponds to an index in
+        `bonder_ids`.
     
     """
 
     def __init__(self, macro_mol, alignment=None):
         super().__init__(macro_mol)
+        if alignment is None:
+            alignment = [0 for _ in self.positions_A]
+            
         self.alignment = alignment
 
     def join_mols(self):
