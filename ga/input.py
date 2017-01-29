@@ -17,10 +17,10 @@ from .population import Population
 from .normalization import Normalization
 
 from ..convenience_tools import FunctionData
-from ..molecular_tools import topologies
-from ..molecular_tools.topologies import *
-from ..molecular_tools import Energy
-from ..molecular_tools.optimization import optimization
+from ..molecular import topologies
+from ..molecular.topologies import *
+from ..molecular import Energy
+from ..molecular.optimization import optimization
 
 
 

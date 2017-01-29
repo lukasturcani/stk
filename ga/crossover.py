@@ -27,7 +27,7 @@ from collections import Counter
 from .population import Population
 from .plotting import plot_counter
 from ..convenience_tools import MolError
-from ..molecular_tools.molecules import Cage
+from ..molecular.molecules import Cage
 
 class Crossover:
     """

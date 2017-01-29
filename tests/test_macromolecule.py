@@ -1,4 +1,4 @@
-from ..molecular_tools import MacroMolecule
+from ..molecular import MacroMolecule
 
 def test_same():
     """

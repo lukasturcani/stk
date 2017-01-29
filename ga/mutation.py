@@ -28,7 +28,7 @@ import sys
 from .population import Population
 from .plotting import plot_counter
 from ..convenience_tools import MolError
-from ..molecular_tools import StructUnit3, Cage
+from ..molecular import StructUnit3, Cage
 
 
 class MutationError(Exception):
