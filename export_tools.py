@@ -14,8 +14,8 @@ from multiprocessing import Pool
 import itertools as it
 
 from .ga import Population
-from .molecular_tools import (StructUnit, functional_groups)
-from .molecular_tools.optimization import *
+from .molecular import (StructUnit, functional_groups)
+from .molecular.optimization import *
 
 def fg_prune(ifolder, fg, fg_num, ext):
     """
