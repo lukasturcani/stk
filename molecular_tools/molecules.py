@@ -134,12 +134,11 @@ import networkx as nx
 from scipy.spatial.distance import euclidean
 import pickle
 
-from ..convenience_tools import (flatten, periodic_table, 
+from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis)
 from .fg_info import functional_groups
-from .exception import MolError
 from .energy import Energy
 
 class CachedMacroMol(type):
