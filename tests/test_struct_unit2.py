@@ -2,7 +2,7 @@ import numpy as np
 from os.path import join
 
 from ..convenience_tools import normalize_vector
-from ..classes import StructUnit2
+from ..molecular_tools import StructUnit2
 
 mol_file = join('data', 'struct_unit2', 'amine.mol2')
 
