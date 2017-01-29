@@ -98,7 +98,7 @@ from ..convenience_tools import (matrix_centroid,
                                  FunctionData, MolError, 
                                  rotation_matrix_arbitrary_axis)
                                 
-from ..molecular_tools import (MacroMolecule, 
+from ..molecular import (MacroMolecule, 
                                StructUnit, Energy, optimization)
 
 def _calc_fitness(func_data, population):

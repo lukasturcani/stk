@@ -13,9 +13,9 @@ from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..molecular_tools import (MacroMolecule, Cage, 
+from ..molecular import (MacroMolecule, Cage, 
                                StructUnit, StructUnit2, StructUnit3)
-from ..molecular_tools.optimization.optimization import (_optimize_all, 
+from ..molecular.optimization.optimization import (_optimize_all, 
                                         _optimize_all_serial)
 
 class Population:
