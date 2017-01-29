@@ -473,7 +473,7 @@ class InputHelp:
                                         Normalization.__dict__.items()
                                         if not name.startswith('_')),
                                             
-                'energy' : (func for name, func in 
+                'energy' : (getattr(Energy, name) for name, func in 
                                     Energy.__dict__.items() if not
                                     name.startswith('_')),
                                     
