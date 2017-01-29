@@ -4,7 +4,7 @@ import itertools as it
 from scipy.spatial.distance import euclidean
 import rdkit.Chem as chem
 
-from ..classes import StructUnit
+from ..molecular_tools import StructUnit
 from ..convenience_tools import normalize_vector
 
 data_dir = join('data', 'struct_unit', 'amine.mol')
