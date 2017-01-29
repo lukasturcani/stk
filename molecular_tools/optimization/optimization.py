@@ -30,6 +30,7 @@ import rdkit.Chem as chem
 import multiprocessing as mp
 from functools import partial
 
+from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt, 
                          macromodel_cage_opt, macromodel_md_opt)
 
@@ -198,21 +199,27 @@ def rdkit_optimization(macro_mol):
         more details.
     
     """
+
+    try:    
     
-    # If `macro_mol` is already optmized, return.
-    if macro_mol.optimized:
-        print('Skipping {0}.'.format(macro_mol.file))   
-        return macro_mol
+        # If `macro_mol` is already optmized, return.
+        if macro_mol.optimized:
+            print('Skipping {0}.'.format(macro_mol.file))   
+            return macro_mol
+            
+        # Sanitize then optimize the rdkit molecule.
+        chem.SanitizeMol(macro_mol.mol)
+        ac.MMFFOptimizeMolecule(macro_mol.mol)
         
-    # Sanitize then optimize the rdkit molecule.
-    chem.SanitizeMol(macro_mol.mol)
-    ac.MMFFOptimizeMolecule(macro_mol.mol)
+        # Update the content of the structure file.
+        macro_mol.write()
+        
+        macro_mol.optimized = True   
+        return macro_mol
     
-    # Update the content of the structure file.
-    macro_mol.write()
-    
-    macro_mol.optimized = True   
-    return macro_mol
+    except Exception as ex:
+        macro_mol.fail()
+        MolError(ex, macro_mol, 'Error during rdkit_optimization().')
     
 def do_not_optimize(macro_mol):
     """
