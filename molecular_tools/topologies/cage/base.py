@@ -95,7 +95,7 @@ class Vertex:
             v.connected.append(obj)
         return obj
         
-    def place_mol(self, building_block):
+    def place_mol(self, building_block, aligner=0):
         """
         Places a StructUnit3 building block on the coords of the vertex.
         
@@ -116,6 +116,10 @@ class Vertex:
         ----------
         building_block : StructUnit3
             The building block molecule to be placed on a vertex.
+        
+        aligner : int (default = 0)
+            The index of the atom within `bonder_ids` which is to be
+            aligned with an edge.
         
         Modifies
         --------
@@ -160,7 +164,7 @@ class Vertex:
         # Get the coordinate of the atom which is to be aligned with an
         # edge.
         atom_coord = building_block.atom_coords(
-                                            building_block.bonder_ids[0])
+                                     building_block.bonder_ids[aligner])
 
         # Get the coordinates of all the edges and translate the 
         # centroid to the origin.
@@ -397,6 +401,9 @@ class _CageTopology(Topology):
     
     """
 
+    def __init__(self, macro_mol, alignment=None):
+        super().__init__(macro_mol)
+        self.alignment = alignment
 
     def join_mols(self):
         """
