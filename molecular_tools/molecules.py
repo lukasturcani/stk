@@ -73,7 +73,7 @@ What functional groups are recognized by MMEA?
 The module ``/mmea/molecular_tools/fg_info.py`` defines a class called 
 FGInfo. Instances of this class are held in the list `function_groups` 
 (also in that module). If you put an FGInfo instance in that list, the 
-functional group will be recoginzed.
+functional group will be recognized.
 
     3) Place the FGInfo instance of the functional group in the
        `func_grp` attribute of the StructUnit.
