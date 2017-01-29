@@ -5,7 +5,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 
 
-from ..molecular_tools import Molecule
+from ..molecular import Molecule
 from ..convenience_tools import periodic_table
 
 data_dir = join('data', 'molecule')
