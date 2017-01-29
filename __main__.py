@@ -2,12 +2,12 @@ import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
 import pickle
 
-from .classes import (Population, GATools, GAProgress,
+from .ga import (Population, GATools, GAProgress,
                       GAInput, InputHelp, Normalization)
-from .classes.exception import PopulationSizeError
 from .convenience_tools import (time_it, tar_output, 
+                                PopulationSizeError,
                                 archive_output, kill_macromodel)
-from . import plotting as plot
+import ga.plotting as plot
 
 def print_info(info):
     """
