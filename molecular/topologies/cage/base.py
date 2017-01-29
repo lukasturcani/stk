@@ -339,7 +339,7 @@ class Edge(Vertex):
         v2.connected.append(self)
         
         
-    def place_mol(self, linker):
+    def place_mol(self, linker, flip=True):
         """
         Places a linker molecule on the coordinates of an edge.
         
@@ -352,6 +352,11 @@ class Edge(Vertex):
         linker : StructUnit2
             The linker which is to be placed and orientated as described
             in the docstring.
+            
+        flip : bool (default = True)
+            If ``True`` the linker has a 50% chance of being rotated
+            so that its direction vector runs in the opposite direction
+            to the edge's direction vector.
         
         Modifies
         --------
@@ -376,8 +381,13 @@ class Edge(Vertex):
         # aligned with the direction of the edge.
         linker.set_bonder_centroid(self.coord)
         
-        flip = np.random.choice([1,-1])                
-        linker.set_orientation2(np.multiply(self.direction, flip))
+        # If `flip` is ``True`` the linker rotated at randomly chosen 
+        # to align either with the edge direction vector or its opposite
+        # direction.
+        f = 1
+        if flip:
+            f = np.random.choice([1,-1])                
+        linker.set_orientation2(np.multiply(self.direction, f))
 
         # Ensure the centroid of the linker is placed on the outside of 
         # the cage.
@@ -399,21 +409,19 @@ class _CageTopology(Topology):
         ``Vertex`` and ``Edge`` classes. This should be how cage
         topologies should be defined.
         
-    alignment : list of ints (default = None)
-        This is an optional argument. If supplied the number of
-        elements in this list must be equal to the number of vertices
+    alignment : list of ints or None
+        This length of this list must be equal to the number of vertices
         in the cage. When cages are built one of the bonder atoms is 
         aligned with an edge during placement. The int indicates which
         bonder atom is aligned. The int corresponds to an index in
         `bonder_ids`.
+
+        If ``None`` the first atom in `bonder_ids` is always aligned.
     
     """
 
     def __init__(self, macro_mol, alignment=None):
         super().__init__(macro_mol)
-        if alignment is None:
-            alignment = [0 for _ in self.positions_A]
-            
         self.alignment = alignment
 
     def join_mols(self):
@@ -587,10 +595,13 @@ class _CageTopology(Topology):
         # counts the nubmer of building-blocks* which make up the 
         # structure.
         for i, position in enumerate(self.positions_A):
-            self.macro_mol.mol = chem.CombineMols(
-                                        self.macro_mol.mol, 
-                                        position.place_mol(bb, 
-                                                     self.alignment[i]))
+            
+            # Get the id of atom which to be aligned with an edge.
+            aligner = 0 if self.alignment is None else self.alignment[i]
+            # Position the molecule on the vertex.
+            bb_mol = position.place_mol(bb, aligner)
+            self.macro_mol.mol = chem.CombineMols(self.macro_mol.mol, 
+                                                  bb_mol)
             # Update the counter each time a building-block* is added.
             self.bb_counter.update([bb])                            
             
@@ -610,9 +621,24 @@ class _CageTopology(Topology):
         # they are found at. It also counts the number of linkers which 
         # make up the structure.
         for position in self.positions_B:
-            self.macro_mol.mol = chem.CombineMols(
-                                        self.macro_mol.mol, 
-                                        position.place_mol(lk))
+            
+            # Here `place_mol` can either belong to an Edge object
+            # or a Vertex object. `self.alignment` can be either 
+            # ``None`` or a list of ints. If it is ``None`` it means 
+            # that a linker placed on the Edge should be flipped at 
+            # random. This means the second argument should be 1 to 
+            # turn on the flipping. If its ``None`` and `place_mol` 
+            # belongs to a Vertex it just means the second bonder atom 
+            # gets aligned. This has no practical effect. By default
+            # the first bonder atom gets aligned, but this has no
+            # objective benefit.
+            
+            # If `self.alignment` is a list of ints it means that
+            # flipping should be turned off for edges and that the 0th
+            # atom will get aligned if the position is a Vertex.
+            lk_mol = position.place_mol(lk, int(not self.alignment))
+            self.macro_mol.mol = chem.CombineMols(self.macro_mol.mol, 
+                                                  lk_mol)
             # Update the counter each time a linker is added.
             self.bb_counter.update([lk])
             
