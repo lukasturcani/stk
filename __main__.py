@@ -7,7 +7,7 @@ from .ga import (Population, GATools, GAProgress,
 from .convenience_tools import (time_it, tar_output, 
                                 PopulationSizeError,
                                 archive_output, kill_macromodel)
-import ga.plotting as plot
+from .ga import plotting as plot
 
 def print_info(info):
     """
