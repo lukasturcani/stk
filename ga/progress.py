@@ -7,7 +7,7 @@ import numpy as np
 from operator import attrgetter
 import copy
 
-from ..population import Population
+from .population import Population
 
 
 class GAProgress:

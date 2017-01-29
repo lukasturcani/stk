@@ -9,13 +9,13 @@ import numpy as np
 import pickle
 from collections import Counter
 
-from .molecular import MacroMolecule, Cage
-from .ga import GATools
+from .fitness import _calc_fitness, _calc_fitness_serial
+from .plotting import plot_counter
+from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..plotting import plot_counter
-from ..optimization.optimization import (_optimize_all, 
+from ..molecular_tools import MacroMolecule, Cage
+from ..molecular_tools.optimization.optimization import (_optimize_all, 
                                         _optimize_all_serial)
-from ..fitness import _calc_fitness, _calc_fitness_serial
 
 class Population:
     """
