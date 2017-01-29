@@ -575,10 +575,11 @@ class _CageTopology(Topology):
         # with the positions to which they will be bonding. It also
         # counts the nubmer of building-blocks* which make up the 
         # structure.
-        for position in self.positions_A:
+        for i, position in enumerate(self.positions_A):
             self.macro_mol.mol = chem.CombineMols(
                                         self.macro_mol.mol, 
-                                        position.place_mol(bb))
+                                        position.place_mol(bb, 
+                                                     self.alignment[i]))
             # Update the counter each time a building-block* is added.
             self.bb_counter.update([bb])                            
             
