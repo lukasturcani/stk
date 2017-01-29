@@ -1815,7 +1815,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             The full path of the structure file where the macromolecule
             will be stored.
             
-        topology_args : list (default = None)
+        topology_args : dict (default = None)
             Any additional arguments needed to initialize the topology
             class supplied in the `topology` argument.
             
