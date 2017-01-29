@@ -2,7 +2,8 @@ import pytest
 from collections import Counter
 import numpy as np
 
-from ..classes import Population, Cage, GATools, MacroMolecule
+from ..molecular_tools import Cage, MacroMolecule
+from ..ga import Population, GATools
 
 def generate_population(offset=False):
     """
