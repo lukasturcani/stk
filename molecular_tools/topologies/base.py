@@ -11,10 +11,8 @@ Defines the base ``Topology`` type.
 from collections import Counter
 import rdkit
 import rdkit.Chem as chem
-from scipy.spatial.distance import euclidean
 
 from ..fg_info import double_bond_combs
-
 
 class Topology:
     """
