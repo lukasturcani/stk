@@ -161,8 +161,7 @@ def optimize_folder(folder, macromodel_path,
     names = [os.path.join(folder, file_name) for file_name in 
              os.listdir(folder) if file_name.endswith(".mol")] 
     # Make the StructUnit instances from the .mol files.
-    macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
-                                                                  names]
+    macro_mols = [StructUnit(file_path) for file_path in  names]
 
     # Run the opt.
     md_opt = partial(macromodel_md_opt, macromodel_path=macromodel_path, 
