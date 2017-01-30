@@ -36,10 +36,10 @@ Using an example, the format and structure of input files is explained in sectio
 \subsection{Format and structure.}
 \label{input_files_format_and_structure}
 
-The input file consists of a sequence of commands. Each command defines a variable or a function used by MMEA. If the command defines a function used by MMEA it must also define any parameters necessary to use the function. It does not have to define any default initialized parameters, though it may if desired. Commands can be written across multiple lines and terminate when the last parameter is defined. This means that 
+The input file consists of a sequence of commands. Each command defines a variable or a function used by MMEA. If the command defines a function used by MMEA it must also define any parameters necessary to use the function. It does not have to define any default initialized parameters, though it may if desired. Commands can be written across multiple lines and terminate when the last parameter is defined. This means that
 \begin{Verbatim}
-generational_select_func; 
-stochastic_sampling; 
+generational_select_func;
+stochastic_sampling;
 use_rank=True
 \end{Verbatim}
 and
@@ -54,18 +54,18 @@ There are two kinds of command in the input file. The first kind has the form
 \begin{verbatim}
 keyword; function_name; param1=val1; param2=val2; param3=val3
 \end{verbatim}
-For example, 
+For example,
 \begin{verbatim}
 generational_select_func; stochastic_sampling; use_rank=True
 \end{verbatim}
 This means that the keyword is ``generational\_select\_func", the function name is ``stochastic\_sampling", parameter 1's name is ``use\_rank" and its value is ``True". As you can see, in this there is only 1 parameter name-value pair.
 
-Commands with this format define functions used by MMEA. It is called the ``function definition format". The function will correspond to the various GA operations, such as crossover, mutation and selection or to things like the fitness function or optimization function (which optimizes the geometry of molecules created by MMEA). The words which make up the command are separated by a semicolon. Recall that the last word of a command is not followed by a semicolon. 
+Commands with this format define functions used by MMEA. It is called the ``function definition format". The function will correspond to the various GA operations, such as crossover, mutation and selection or to things like the fitness function or optimization function (which optimizes the geometry of molecules created by MMEA). The words which make up the command are separated by a semicolon. Recall that the last word of a command is not followed by a semicolon.
 
 The keyword defines which GA operation the command describes. For example, in the command above the keyword ``generational\_select\_func" signifies that the command defines which function is to be used for selecting members of the next generation. The keyword in the command
 \begin{verbatim}
 parent_select_func; crossover_roulette
-\end{verbatim} 
+\end{verbatim}
 is ``parent\_select\_func", which signifies that the command defines the function used for selecting parents for crossover. A list of valid keywords is described in section \ref{list and explanation of valid keywords.}.
 
 The parameter ``function\_name" is the name of the function which is to carry out the role designated by the keyword. This must correspond to the name of a function defined within MMEA. For example, if the keyword is ``generational\_select\_func" then ``stochastic\_sampling" or ``roulette" are both valid values for ``function\_name", because the module ``selection.py" within MMEA defines functions with these names. Indeed, any function defined within this module can be used as the selection function. Finding valid function names without looking at the source code is described in section \ref{Finding available functions and their arguments.}.
@@ -88,7 +88,7 @@ param=some_mmea_function_name
 \end{verbatim}
 In essence it must be provided as valid Python syntax.
 
-All keywords should be defined in the input file once. The exception to this is ``mutation\_func". It is quite possible that during a GA run the user's wishes to use multiple mutation operations. As a result it is perfectly reasonable to include multiple commands with the keyword  ``mutation\_func". When this is done, the user must also include the line 
+All keywords should be defined in the input file once. The exception to this is ``mutation\_func". It is quite possible that during a GA run the user's wishes to use multiple mutation operations. As a result it is perfectly reasonable to include multiple commands with the keyword  ``mutation\_func". When this is done, the user must also include the line
 \begin{verbatim}
 mutation_weights=[0.1, 0.45,0.45]
 \end{verbatim}
@@ -160,9 +160,9 @@ mutation_weights=[0.1, 0.45,0.45]
 
 \subsubsection{Finding available functions and their arguments.}
 \label{Finding available functions and their arguments.}
-In order to find out what functions MMEA offers for a given keyword, using a console go into the directory containing MMEA. 
+In order to find out what functions MMEA offers for a given keyword, using a console go into the directory containing MMEA.
 
-Run the command 
+Run the command
 \begin{verbatim}
 python -m MMEA -h keyword
 \end{verbatim}
