@@ -3,6 +3,7 @@
 **/.cache
 *.ipynb_checkpoints
 
+# Ignore files generated when writing latex files.
 documentation/*/*.aux
 documentation/*/*.bbl
 documentation/*/*.blg
