@@ -66,6 +66,29 @@ class FourPlusSix(_CageTopology):
     n_windows = 4
     n_window_types = 1
 
+class FourPlusSix2(_CageTopology):
+    """
+    Defines the 4+6 topolgy which is not a tetrahedron.
+    
+    """   
+    
+    positions_A = [Vertex(100, 0 , 100),
+                   Vertex(-100, 0, 100),
+                   Vertex(100, 0, -100),
+                  Vertex(-100,0,-100)]
+
+    a,b,c,d = positions_A
+    
+    positions_B = [Edge(a,b), Edge(a,b),
+                   Edge(c,d), Edge(c,d),
+                   Edge(a,c), Edge(b,d)]
+
+    e1, e2, e3, e4, *_ = positions_B
+    e1.coord = np.array([0,-100,100])
+    e2.coord = np.array([0,100,100])
+    e3.coord = np.array([0,-100,-100])
+    e4.coord = np.array([0,100, -100])
+    
 class SixPlusNine(_CageTopology):
     """
     A cage topology from 2 and 3 functionalized building blocks.    

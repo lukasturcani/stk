@@ -3,36 +3,157 @@
   <head>
     <title>MMEA User's Guide</title>
     <meta name="author" content="Lukas Turcani">
+
+    <link rel="stylesheet" type="text/css"
+          href="https://fonts.googleapis.com/css?family=Roboto">
+    <style>
+
+    *{
+        background-color: #FAFAFA
+    }
+
+    h1,h2,h3,h4,h5,h6, p, code{
+        font-family: Roboto, sans-serif;
+        text-align: left;
+        margin-left: 25%;
+        margin-right: 25%;
+        font-size: 125%;
+        word-spacing: 0.35em;
+        line-height: 150%;
+        background-color: #FAFAFA
+    }
+
+    h1{
+        font-size: 200%;
+    }
+
+    code{
+        background-color: #F2F2F2
+        border-radius:;
+    }
+
+    </style>
+
+
   </head>
 
   <body>
-    <h1>Introduction</h1>
+    <h1 id="introduction">Introduction</h1>
     <p>
-      MMEA (MacroMolecular Evolutionary Algorithm) is a genetic algorithm (GA)
-      for chemistry. It aims to be as general as possible, being suitable for
-      use with any class of molecules. While it does not support all types of
-      molecules out of the box, it is designed to be easily extended. This is
-      made easier by being written in Python. For notes on how to extend MMEA
-      to a new class of molecules or add GA operations, see the developer's
-      guide.
+      MMEA (<b>M</b>acro<b>M</b>olecular <b>E</b>volutionary <b>A</b>lgorithm) is
+      a genetic algorithm (GA) for chemistry. It aims to be as general as
+      possible, being suitable for all kinds of molecules. While it cannot support
+      everything out of the box, it is designed to be easily extended. For notes
+      on how to extend MMEA, see the developer's guide.
     </p>
 
-    <h1>Installing MMEA</h1>
+    <h1 id="installing_mmea">Installing MMEA</h1>
+    <p>
+        Dunno yet.
+    </p>
 
-    <h1>Input Files</h1>
+    <h1 id="input_files">Input Files</h1>
     <p>
       To run MMEA you need to use an input file. These contain all the details
       required to start a GA calculation. Among other things, this may include
       things like which fitness function you want to use, the number of
-      generations MMEA should make and how big the population should be.
-    </p><p>
-      Using an example, the format and structure of input files is explained in
-      section \ref{input_files_format_and_structure}. A guide to finding out
-      what GA operations and tools are available is in section \ref{Finding
-      available functions and their arguments.}. Examples of input files and
-      accompanied explanations of what each line does are provided in
-      section \ref{examples}.
+      generations MMEA should make and how big the population should be. Have
+      a quick look at the example input file below, no need to understand
+      anything just yet.
     </p>
+
+    <code>
+        ##################################################################################<br>
+        # Population initialization function.<br>
+        ##################################################################################<br>
+<br>
+        init_func; init_random_cages;<br>
+        bb_db="/home/username/aldehydes_3f";<br>
+        lk_db="/home/username/amines_2f";<br>
+        topologies=[FourPlusSix, EightPlusTwelve]<br>
+<br>
+        ##################################################################################<br>
+        # Selection function for selecting the next generation.<br>
+        ##################################################################################<br>
+<br>
+        generational_select_func; stochastic_sampling; use_rank=True<br>
+<br>
+        ##################################################################################<br>
+        # Selection function for selecting parents.<br>
+        ##################################################################################<br>
+<br>
+        parent_select_func; crossover_roulette<br>
+<br>
+        ##################################################################################<br>
+        # Selection function for selecting molecules for mutation.<br>
+        ##################################################################################<br>
+<br>
+        mutant_select_func; stochastic_sampling; duplicates=True<br>
+<br>
+        ##################################################################################<br>
+        # Crossover function.<br>
+        ##################################################################################<br>
+<br>
+        crossover_func; bb_lk_exchange<br>
+<br>
+        ##################################################################################<br>
+        # Mutation function 1.<br>
+        ##################################################################################<br>
+<br>
+        mutation_func; similar_bb;<br>
+        database="/home/username/aldehydes_3f"<br>
+<br>
+        ##################################################################################<br>
+        # Mutation function 2.<br>
+        ##################################################################################<br>
+<br>
+        mutation_func; similar_lk;<br>
+        database="/home/username/amines_2f"<br>
+<br>
+        ##################################################################################<br>
+        # When carrying mutations, chance that a given mutation function will be used.<br>
+        ##################################################################################<br>
+<br>
+        mutation_weights=[1/2,1/2]<br>
+<br>
+        ##################################################################################<br>
+        # Optimization function.<br>
+        ##################################################################################<br>
+<br>
+        opt_func; macromodel_cage_opt;<br>
+        macromodel_path="/home/username/program_files/schrodinger2016-3"<br>
+<br>
+        ##################################################################################<br>
+        # Fitness function.<br>
+        ##################################################################################<br>
+<br>
+        fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
+        energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}<br>
+<br>
+        ##################################################################################<br>
+        # Number of generations to create.<br>
+        ##################################################################################<br>
+<br>
+        num_generations=10<br>
+<br>
+        ##################################################################################<br>
+        # Number of mutation operations to perform each generation.<br>
+        ##################################################################################<br>
+<br>
+        num_mutations=10<br>
+<br>
+        ##################################################################################<br>
+        # Number of crossover operations to perform each generation.<br>
+        ##################################################################################<br>
+<br>
+        num_crossovers=15<br>
+<br>
+        ##################################################################################<br>
+        # Size of the population.<br>
+        ##################################################################################<br>
+<br>
+        pop_size=20<br>
+    </code>
 
     <h2>Format and structure.</h2>
     <p>
