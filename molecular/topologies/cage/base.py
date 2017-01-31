@@ -4,7 +4,6 @@ from scipy.spatial.distance import euclidean
 import numpy as np
 import rdkit.Chem as chem 
 
-
 from ..base import Topology
 from ....convenience_tools import (centroid, vector_theta,
                                       rotation_matrix_arbitrary_axis,
@@ -589,6 +588,12 @@ class _CageTopology(Topology):
             bb = bb1
             n_bb = n_fg1
         
+        # Save the original orientations of the linker and building 
+        # block. This means that when orienation of molecules is done,
+        # the starting position is always the same. Ensures consistency.
+        lk_pos = lk.position_matrix()
+        bb_pos = bb.position_matrix()
+            
         # This loop places all building-blocks* on the points at 
         # `positions_A`. It then pairs all atoms which form a new bond
         # with the positions to which they will be bonding. It also
@@ -599,6 +604,7 @@ class _CageTopology(Topology):
             # Get the id of atom which to be aligned with an edge.
             aligner = 0 if self.alignment is None else self.alignment[i]
             # Position the molecule on the vertex.
+            bb.set_position_from_matrix(bb_pos)
             bb_mol = position.place_mol(bb, aligner)
             self.macro_mol.mol = chem.CombineMols(self.macro_mol.mol, 
                                                   bb_mol)
@@ -636,6 +642,7 @@ class _CageTopology(Topology):
             # If `self.alignment` is a list of ints it means that
             # flipping should be turned off for edges and that the 0th
             # atom will get aligned if the position is a Vertex.
+            lk.set_position_from_matrix(lk_pos)
             lk_mol = position.place_mol(lk, int(not self.alignment))
             self.macro_mol.mol = chem.CombineMols(self.macro_mol.mol, 
                                                   lk_mol)
