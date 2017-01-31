@@ -4,12 +4,11 @@
     <title>MMEA User's Guide</title>
     <meta name="author" content="Lukas Turcani">
 
-    <link rel="stylesheet" type="text/css"
-          href="https://fonts.googleapis.com/css?family=Roboto">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
     <style>
 
     *{
-        background-color: #FAFAFA
+        background-color: rgb(250,250,250);
     }
 
     h1,h2,h3,h4,h5,h6, p, code{
@@ -20,7 +19,7 @@
         font-size: 125%;
         word-spacing: 0.35em;
         line-height: 150%;
-        background-color: #FAFAFA
+        display: inline-block;
     }
 
     h1{
@@ -28,12 +27,27 @@
     }
 
     code{
-        background-color: #F2F2F2
-        border-radius:;
+        background-color: rgb(210,210,210);
+        border-radius: 20px;
+        display: block;
+        font-size: inherit;
+        padding: 1%;
+        margin: 0px;
+        margin-top: 1%;
+        margin-bottom: 1%;
+        display: block;
+        }
+
+    code.whole_file{
+        padding: 5%;
+    }
+
+    .value{
+        background-color: rgb(230,230,230);
+        font-weight: 300;
     }
 
     </style>
-
 
   </head>
 
@@ -59,238 +73,250 @@
       things like which fitness function you want to use, the number of
       generations MMEA should make and how big the population should be. Have
       a quick look at the example input file below, no need to understand
-      anything just yet.
-    </p>
-
-    <code>
-        ##################################################################################<br>
+      anything just yet.<br>
+      <code class="whole_file">
+        ####################################################################<br>
         # Population initialization function.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         init_func; init_random_cages;<br>
         bb_db="/home/username/aldehydes_3f";<br>
         lk_db="/home/username/amines_2f";<br>
         topologies=[FourPlusSix, EightPlusTwelve]<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Selection function for selecting the next generation.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         generational_select_func; stochastic_sampling; use_rank=True<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Selection function for selecting parents.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         parent_select_func; crossover_roulette<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Selection function for selecting molecules for mutation.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         mutant_select_func; stochastic_sampling; duplicates=True<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Crossover function.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         crossover_func; bb_lk_exchange<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Mutation function 1.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         mutation_func; similar_bb;<br>
         database="/home/username/aldehydes_3f"<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Mutation function 2.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         mutation_func; similar_lk;<br>
         database="/home/username/amines_2f"<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # When carrying mutations, chance that a given mutation function will be used.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         mutation_weights=[1/2,1/2]<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Optimization function.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         opt_func; macromodel_cage_opt;<br>
         macromodel_path="/home/username/program_files/schrodinger2016-3"<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Fitness function.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
         energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Number of generations to create.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         num_generations=10<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Number of mutation operations to perform each generation.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         num_mutations=10<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Number of crossover operations to perform each generation.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         num_crossovers=15<br>
 <br>
-        ##################################################################################<br>
+        ####################################################################<br>
         # Size of the population.<br>
-        ##################################################################################<br>
+        ####################################################################<br>
 <br>
         pop_size=20<br>
-    </code>
+      </code>
 
     <h2>Format and structure.</h2>
     <p>
         The input file consists of a sequence of commands. Each command defines
-        a variable or a function used by MMEA. If the command defines a function
-        used by MMEA it must also define any parameters necessary to use the
+        a variable or function used by MMEA. If the command defines a function
+        used by MMEA, it must also define any parameters necessary to use the
         function. It does not have to define any default initialized parameters,
-        though it may if desired. Commands can be written across multiple lines
+        though it may if desired.
+    </p><p>
+        Commands can be written across multiple lines
         and terminate when the last parameter is defined. This means that
-    </p>
-
     <code>
-          generational_select_func;
-          stochastic_sampling;
+          generational_select_func;<br>
+          stochastic_sampling;<br>
           use_rank=True
     </code>
-
-    <p>and</p>
-
+    and
     <code>
-          generational_select_func; stochastic_sampling; use_rank=True
+        mutant_select_func; stochastic_sampling; duplicates=True
     </code>
-
+    define the same command.
+    </p><p>
+    Any lines consiting of only whitespace or begging with
+    <span class="value">#</span> are ignored. This
+    can be useful for separating the input file into sections or explaining what
+    a command is doing. For example,
+    <code>
+        ####################################################################<br>
+        # Selection function for selecting molecules for mutation.<br>
+        ####################################################################<br>
+<br>
+        mutant_select_func; stochastic_sampling; duplicates=True
+    </code></p>
     <p>
-        define the same command. Notice there is no semicolon at the end of a
-        command, it is only used to separate the parameters.
-    </p><p>
-        Any lines consisting of only whitespace or beginning with ``\#" are
-        ignored.
-    </p><p>
         There are two kinds of command in the input file. The first kind has the
         form
-    </p>
-    <code>
+      <code>
             keyword; function_name; param1=val1; param2=val2; param3=val3
-    </code>
-    <p>
+      </code>
         For example,
-    </p>
-    <code>
+      <code>
             generational_select_func; stochastic_sampling; use_rank=True
-    </code>
-    <p>
-        This means that the keyword is ``generational\_select\_func", the
-        function name is ``stochastic\_sampling", parameter 1's name is
-        ``use\_rank" and its value is ``True". As you can see, in this there is
-        only 1 parameter name-value pair.
+      </code>
+        This means that the keyword is
+        <span class="value">generational_select_func</span>, the
+        function name is <span class="value">stochastic_sampling</span>,
+        parameter 1's name is <span class="value">use_rank</span> and its value
+        is <span class="value">True</span>. As you can see, in this case
+        there is only 1 parameter name-value pair. The words which
+        make up the command are separated by a semicolon. Notice that last
+        word of a command is not followed by one.
     </p><p>
-        Commands with this format define functions used by MMEA. It is called
-        the ``function definition format". The function will correspond to the
-        various GA operations, such as crossover, mutation and selection or to
+        Commands with this format define functions used by MMEA. As a result,
+        it is called the <b>function definition format</b>.
+        The function will correspond to the
+        various GA operations, such as crossover, mutation and selection, or to
         things like the fitness function or optimization function (which
-        optimizes the geometry of molecules created by MMEA). The words which
-        make up the command are separated by a semicolon. Recall that the last
-        word of a command is not followed by a semicolon.
+        optimizes the geometry of molecules created by MMEA).
     </p><p>
-        The keyword defines which GA operation the command describes. For
-        example, in the command above the keyword ``generational\_select\_func"
+        The keyword defines which GA operation the command describes. In the
+        command above the keyword
+        <span class="value">generational_select_func</span>
         signifies that the command defines which function is to be used for
         selecting members of the next generation. The keyword in the command
-    </p>
-    <code>
+      <code>
         parent_select_func; crossover_roulette
-    </code>
-    <p>
-        is ``parent\_select\_func", which signifies that the command defines the
+      </code>
+        is <span class="value">parent_select_func</span>, which signifies that
+        the command defines the
         function used for selecting parents for crossover. A list of valid
-        keywords is described in section \ref{list and explanation of valid
-        keywords.}.
+        keywords is described in a following section.
     </p><p>
-        The parameter ``function\_name" is the name of the function which is to
-        carry out the role designated by the keyword. This must correspond to
-        the name of a function defined within MMEA. For example, if the keyword
-        is ``generational\_select\_func" then ``stochastic\_sampling" or
-        ``roulette" are both valid values for ``function\_name", because the
-        module ``selection.py" within MMEA defines functions with these names.
-        Indeed, any function defined within this module can be used as the
-        selection function. Finding valid function names without looking at the
-        source code is described in section \ref{Finding available functions and
-        their arguments.}.
+        The parameter <span class="value">function_name</span> immediately
+        follows the keyword (not counting the semicolon of course). It is the name
+        of the function which carries out the role defined by the keyword. In
+        a GA there are many tools for the same job. For example, if you wanted to
+        select members of the next generation you could select the 4 with the
+        highest fitness. Alternatively, you could select 4 completely at random.
+        In both cases you fulfill the same role and would therefore use the
+        keyword
+        <span class="value">generational_select_func</span> but you use different
+        functions to do it, hence different values would go into the
+        <span class="value">function_name</span> parameter.
     </p><p>
-        Finally, in the command above ``param1" and ``val1" correspond to
-        ``use\_rank" and ``True", respectively. As mentioned before
-        ``stochastic\_sampling" is the name of a function defined within the
-        ``selection.py" module. As is usual for Python functions, it takes
-        arguments. Looking at ``stochastic\_sampling()" within ``selection.py"
-        it can be seen that its arguments are ``self" and ``population" and its
-        keyword arguments are ``elitism" (defaults to ``False"), ``truncation"
-        (defaults to ``False"), ``duplicates" (defaults to ``False") and
-        ``use\_rank" (defaults to ``False").
+        Unsurprisingly, <span class="value">function_name</span> must correspond to
+        the name of a function defined within MMEA. Not only that, but the
+        function must also fulfill the role designated by the keyword. For
+        example, if the keyword is
+        <span class="value">generational_select_func</span> then
+        <span class="value">fittest</span> and
+        <span class="value">roulette</span> are both valid values.
+        How MMEA can give you the names of and descriptions of valid functions
+        is described later in this guide.
     </p><p>
-        In the case of selection functions the first two arguments (``self" and
-        ``population") are dealt with automatically by MMEA. If the user wants
-        to use one of the selection functions they have to provide values to any
-        of the remaining arguments in the form ``param1=val1". The order in
-        which they are given in the input file does not matter. If the user
-        wants to change the default values of any of the function's keyword
-        arguments, they may add them to the command. Otherwise, keyword
-        arguments do not have to be provided in the input file and will be
-        default initialized to whatever is defined within the source code of
-        MMEA. All of this holds true for other functions defined in the input
-        file, not just selection functions. How a user can easily view what
-        functions and parameters are available, as well as what they mean, is
-        addressed in section \ref{input_files_valid_parameters}.
+        Coming back to the command outline,
+        <code>
+              keyword; function_name; param1=val1; param2=val2; param3=val3
+        </code>
+        there is one part which still needs to be discussed. The
+        <span class="value">param</span> and
+        <span class="value">val</span> fields. These form a tuple separated by
+        <span class="value">=</span> and no space. Individual
+        <span class="value">param=val</span> tuples are then sperated by
+        semicolons and can be placed on individual lines.
     </p><p>
-        When the user provides the value of a parameter, it must reflect its
-        type. For example if a parameter wanted an a list of numbers then
-    </p>
-    <code>
-        param=[1,2,3,4]
-    </code>
-    <p>
-        if it wanted a string,
-    </p>
-    <code>
-        param="this is a string"
-    </code>
-    <p>
-        or if it wanted a the name of a function or class defined within MMEA
-    </p>
-    <code>
-        param=some_mmea_function_name
-    </code>
-    <p>
-        In essence it must be provided as valid Python syntax.
+        As is relatively
+        normal for
+        functions, functions in MMEA take parameters. The names and number of
+        parameters will vary depending on the function. Some may take none.
+        Others may require you to input the values of some parameters and allow
+         you to omit others. When a function has a parameter that
+        it does not force you to define in the input file, it is <b> default
+        initialized</b>. This means that if you don't define the parameter
+        in the input file it defaults to some predetermined value. Once again,
+        if you want to know the valid parameters for a given function, a
+        description of how MMEA will give you this is given later.
+    </p><p>
+        Valid <span class="value">val</span> values depend on the parameter.
+        These must allows follow Python syntax. So if a parameter wants you to
+        input some numerical value,
+        <code>
+            some_keyword; some_function_name; some_param=1.2
+        </code>
+        would be perfectly fine. On the other hand, if a parameter wanted a
+        string,
+        <code>
+            some_keyword; some_function_name; some_param="this is a string"
+        </code>
+    </p><p>
+        What if a numpy array is desired or some user-defined type buried deep
+        within the source code?
+        <code>
+            some_keyword; some_function_name; some_param=np.array([12, 3, 4])
+        </code>
+        and
+        <code>
+            some_keyword; some_function_name; some_param=SomeUsrType(12.1, "asd")
+        </code>
+        would both work! As long as the parameter says it needs a give type,
+        you can safely enter it, as long as you stick to Python syntax. Note
+        that the order in which you give the parameters does not matter.
     </p><p>
         All keywords should be defined in the input file once. The exception to
-        this is ``mutation\_func". It is quite possible that during a GA run the
+        this is <span class="value">mutation_func</span>. It is quite possible that during a GA run the
         user's wishes to use multiple mutation operations. As a result it is
         perfectly reasonable to include multiple commands with the keyword
         ``mutation\_func". When this is done, the user must also include the
         line
-    </p>
     <code>
         mutation_weights=[0.1, 0.45,0.45]
     </code>
-    <p>
         This line tells MMEA that when a mutation is to be performed it should
         select the first mutation function defined in the input file with a 0.1
         probability and the second and third mutation functions defined in the
