@@ -777,10 +777,53 @@ crossover_func; bb_lk_exchange
     <span class="value">macromodel_path</span> which again points to the
     MacroModel installation directory. All this is doing is telling the fitness function
     to use a specific energy function when working out the molecular energies.
-    </p>
+</p><p class="wide">
+    The eleventh command,
+    <code>
+        num_generations=10
+    </code>
+    tells MMEA that it should stop after creating <span class="value">10</span> generations of molecules.
+
+</p><p class="wide">
+    The twelveth command,
+    <code>
+        num_mutations=10
+    </code>
+    tells MMEA that it should carry out <span class="value">10</span> mutation operations each generation.
+
+</p><p class="wide">
+    The thirteenth command,
+    <code>
+        num_crossovers=15
+    </code>
+    tells MMEA that it should carry out <span class="value">15</span> crossover operations each generation.
+</p><p class="wide">
+        The fourteenth command,
+        <code>
+            pop_size=20
+        </code>
+        tells MMEA that the population's size should be <span class="value">20</span>.
+</p>
         <h1>Running MMEA</h1>
     <h2>From the command line.</h2>
+    <p>
+    Using the console make sure you are in the directory containing MMEA (not in MMEA itself).
+    Run the command,
+    <code class="mmea_output">
+        python -m MMEA input_file
+    </code>
+
+    where <span class="value">input_file</span> is the path to your input file.
+</p>
+
     <h1>Output</h1>
+    <p>
+    While working MMEA will create a directory called <b>output</b>. Once the
+    GA has finished a new folder called <b>old_output</b> will be created and
+    your <b>output</b> folder will be placed inside. If you run multiple GA runs
+    each succesive <b>output</b> file will be placed in the <b>old_output</b>
+    folder and labelled from <b>0</b> upwards.
+</p>
     <h1>MMEA as a Library</h1>
   </body>
 </html>
