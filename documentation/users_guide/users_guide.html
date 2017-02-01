@@ -284,7 +284,7 @@
         description of how MMEA will give you this is given later.
     </p><p>
         Valid <span class="value">val</span> values depend on the parameter.
-        These must allows follow Python syntax. So if a parameter wants you to
+        These follow Python syntax. So if a parameter wants you to
         input some numerical value,
         <code>
             some_keyword; some_function_name; some_param=1.2
@@ -306,40 +306,39 @@
         </code>
         would both work! As long as the parameter says it needs a give type,
         you can safely enter it, as long as you stick to Python syntax. Note
-        that the order in which you give the parameters does not matter.
+        that the order in which you give the parameter-value tuples does not
+        matter.
     </p><p>
         All keywords should be defined in the input file once. The exception to
-        this is <span class="value">mutation_func</span>. It is quite possible that during a GA run the
-        user's wishes to use multiple mutation operations. As a result it is
+        this is <span class="value">mutation_func</span>. It is quite possible
+        that during a GA run the
+        user wishes to use multiple mutation operations. As a result it is
         perfectly reasonable to include multiple commands with the keyword
-        ``mutation\_func". When this is done, the user must also include the
-        line
-    <code>
-        mutation_weights=[0.1, 0.45,0.45]
-    </code>
+        <span class="value">mutation_func</span>. When this is done, the user
+        must also include the line
+      <code>
+        mutation_weights=[0.1, 0.45, 0.45]
+      </code>
         This line tells MMEA that when a mutation is to be performed it should
         select the first mutation function defined in the input file with a 0.1
         probability and the second and third mutation functions defined in the
         input file with a 0.45 probability. The probabilities can of course be
         modified by the user. The only requirements are that the probabilities
-        sum to 1 and that the number of elements in the array and the number of
+        sum to 1 and that the number of elements in the list and the number of
         mutation functions defined in the input file is the same.
     </p><p>
         There is a second kind of non-comment line in the input file of MMEA.
         These lines have the form
-    </p>
-    <code>
+      <code>
         keyword=val
-    </code>
-    <p>
+      </code>
         As you can see, these are much simpler. They define basic constants
-        relevant to the GA. As a result, this is called the ``constant
-        definition format". This includes things like population size, number of
-        crossovers carried out during each generation and so on. It is merely
-        the keyword, a ``=" and the value. No spaces. Valid keywords for these
-        lines are discussed in section \ref{input_files_valid_parameters}.
-    </p><p>
-
+        relevant to the GA. As a result, this is called the <b>constant
+        definition format</b>. This includes things like population size, number
+        of crossover operations carried out during each generation and so on. It
+        is merely the keyword, a <span class="value">=</span> and the value. No
+        spaces, no semicolons.
+    </p>
     <h2>Valid input values.</h2>
     <p>
         In order to prevent the need to continuously update this documentation
@@ -348,120 +347,82 @@
         to find out what functions they have at their disposal. This section
         also describes how MMEA can be made to output valid function names and
         parameters for each keyword.
+    </p>
+    <h3>List and explanation of valid keywords.</h3>
+
+    <p>
+        The keywords are given here with the following format<br><br>
+        <span class="value">keyword</span> - <b>line format</b> - <i>excluded_param1</i>, <i>excluded_param2</i> - Explantion of keyword.<br><br>
+        Excluded parameters are those that the function documentation may state
+        as required, but which do not need to be provided in the input file.
     </p><p>
 
-    <h2>List and explanation of valid keywords.</h2>
-
-    <p>
-        Here is a list of valid keywords, the type of line formatting the
-        keyword requires and which arguments do not need to be provided to the
-        functions. Recall in section \ref{input_files_format_and_structure} the
-        selection function did not require the ``population" argument to be
-        provided explictily in the input file. Other functions, such as
-        crossover functions do not require other parameters to be provided. The
-        format here is:
-    </p>
-    <p>
-\\
-\\
-\textbf{keyword} - \textit{line format} - \textbf{excluded\_param1, excluded\_param2} - Explantion of keyword.
-\\
-\\
-The keywords are:
-\\
-\\
-\textbf{init\_func} - \textit{function definition format} - \textbf{ga\_tools} - The function used to create the initial population.
-\\
-\\
-\textbf{generational\_select\_func} - \textit{function definition format} - \textbf{population} - The function used to select members of the next generation.
-\\
-\\
-\textbf{parent\_select\_func} - \textit{function definition format} - \textbf{population} - The function used to select parents for crossover.
-\\
-\\
-\textbf{mutant\_select\_func} - \textit{function definition format} - \textbf{population} - The function used to select individuals for mutation.
-\\
-\\
-\textbf{crossover\_func} - \textit{function definition format} - \textbf{marco\_mol1, macro\_mol2} - The function which carries out the crossover operation.
-\\
-\\
-\textbf{mutation\_func} - \textit{function definition format} - \textbf{macro\_mol} - The function which carries out the mutation operation.
-\\
-\\
-\textbf{opt\_func} - \textit{function definition format} - \textbf{macro\_mol} - The function which optimizes the geometry of the molecules.
-\\
-\\
-\textbf{fitness\_func} - \textit{function definition format} - \textbf{macro\_mol} - The function which calculates fitness.
-\\
-\\
-\textbf{normalization\_func} - \textit{function definition format} - \textbf{population} - The function which normalizes fitness values. This keyword is optional.
-\\
-\\
-\textbf{num\_generations} - \textit{constant definition format} - The number of generations which MMEA will create.
-\\
-\\
-\textbf{num\_mutations} - \textit{constant definition format} - The number of mutations MMEA will carry out each generation.
-\\
-\\
-\textbf{num\_crossovers} - \textit{constant definition format} - The number of crossover operations MMEA will carry out each generation.
-\\
-\\
-\textbf{pop\_size} - \textit{constant definition format} - The size of the population.
-\\
-\\
-\textbf{mutation\_weights} - \textit{constant definition format} - The probability with which each mutation function defined in the input file will be used when a mutation operation is performed. Note that the form of this constant is a list. For example
-    </p>
+The keywords are:<br><br>
+<span class="value">init_func</span> - <b>function definition format</b> - <i>ga_tools</i> - The function used to create the initial population.<br><br>
+<span class="value">generational_select_func</span> - <b>function definition format</b> -  <i>population</i> - The function used to select members of the next generation.<br><br>
+<span class="value">parent_select_func</span> - <b>function definition format</b> -  <i>population</i>  - The function used to select parents for crossover.<br><br>
+<span class="value">mutant_select_func</span> - <b>function definition format</b> -  <i>population</i>  - The function used to select individuals for mutation.<br><br>
+<span class="value">crossover_func</span>  - <b>function definition format</b> -  <i>marco_mol1</i> , <i>macro_mol2</i>  - The function which carries out the crossover operation.<br><br>
+<span class="value">mutation_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which carries out the mutation operation.<br><br>
+<span class="value">opt_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which optimizes the geometry of the molecules.<br><br>
+<span class="value">fitness_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which calculates fitness.<br><br>
+<span class="value">normalization_func</span>  - <b>function definition format</b> -  <i>population</i>  - The function which normalizes fitness values. This keyword is optional.<br><br>
+<span class="value">num_generations</span>  - <b>constant definition format</b> - The number of generations which MMEA will create.<br><br>
+<span class="value">num_mutations</span>  - <b>constant definition format</b> - The number of mutations MMEA will carry out each generation.<br><br>
+<span class="value">num_crossovers</span>  - <b>constant definition format</b> - The number of crossover operations MMEA will carry out each generation.<br><br>
+<span class="value">pop_size</span>  - <b>constant definition format</b> - The size of the population.<br><br>
+<span class="value">mutation_weights</span>  - <b>constant definition format</b> - The probability with which each mutation function defined in the input
+file will be used when a mutation operation is performed. Note that the form of this constant is a list. For example<br><br>
     <code>
-        mutation_weights=[0.1, 0.45,0.45]
+        mutation_weights=[0.1, 0.45, 0.45]
     </code>
-
+</p>
     <h3>Finding available functions and their arguments.</h3>
 
     <p>
         In order to find out what functions MMEA offers for a given keyword,
-        using a console go into the directory containing MMEA.<br>
+        using the console go into the directory containing MMEA.<br>
         Run the command
-    </p>
     <code>
         python -m MMEA -h keyword
     </code>
-    <p>
-        where keyword is one of the valid function definition keywords defined
-        in section \ref{list and explanation of valid keywords.} or ``energy"
-        and ``topology". ``energy" lists the functions available for energy
-        calculations while the ``topology" lists the macromolecules MMEA can
-        construct. These values are often used as parameters in functions.
+        where <span class="value">keyword</span> is one of the valid keywords defined
+        in the previous section or <span class="value">energy</span> or
+        <span class="value">topologies</span>. <span class="value">energy</span>
+        lists the functions available for energy
+        calculations while the <span class="value">topology</span> lists the
+        macromolecules MMEA can construct. These values are often used as
+        parameters in functions.
     </p>
-    <img src="figures/console1.png">
+
     <p>
         MMEA will then output a list of valid functions, their description, and
         a list of their parameters.
     </p>
-    <img src="figures/console2.png">
+
     <p>
-        In this example, the keyword ``crossover\_func" was used and the only
-        available function was ``bb\_lk\_exchange" Other keywords will have more
+        In this example, the keyword <span class="value">crossover_func</span> was
+        used and the only
+        available function was <span class="value">bb_lk_exchange</span>. Other
+        keywords will have more
         options available (and more may be added to this one). As you can see
-        the only parameters the function takes are macro\_mol1 and macro\_mol2.
-        As these are handled automatically by MMEA (\ref{list and explanation of
-        valid keywords.}) no parameters should be provided in the input
+        the only parameters the function takes are
+        <span class="value">macro_mol1</span> and <span class="value">macro_mol2</span>.
+        As these are handled automatically by MMEA (Recall the previous
+        section) no parameters should be provided in the input
         file. A valid line would look like
-    </p>
-    <code>
+      <code>
         crossover_func; bb_lk_exchange$
-    </code>
+      </code>
+  </p>
 
-    <h2>Examples</h2>
+    <h2>Example</h2>
 
     <p>
-        Here are example input files followed by a line by line explanation of
-        what they're doing.
-    </p>
+        Here is an example input file followed by a line by line explanation of
+        what it's doing.
 
-    <h2>Example 1</h2>
-
-
-    <code>
+    <code class="whole_file">
 ##################################################################################
 # Population initialization function.
 ##################################################################################
