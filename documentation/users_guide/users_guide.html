@@ -642,6 +642,13 @@ fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
 energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}<br>
 <br>
 ###################################################################<br>
+# Normalization function.<br>
+###################################################################<br>
+<br>
+normalization_func; carrots_and_sticks; carrot_coeffs=[1]; stick_coeffs=[1,1,1,1];<br>
+carrot_exponents=[1]; stick_exponents=[1,1,1,1]<br>
+<br>
+###################################################################<br>
 # Number of generations to create.<br>
 ###################################################################<br>
 <br>
@@ -777,28 +784,50 @@ crossover_func; bb_lk_exchange
     <span class="value">macromodel_path</span> which again points to the
     MacroModel installation directory. All this is doing is telling the fitness function
     to use a specific energy function when working out the molecular energies.
-</p><p class="wide">
+</p><p>
     The eleventh command,
+    <code>
+        normalization_func; carrots_and_sticks; carrot_coeffs=[1]; stick_coeffs=[1,1,1,1];<br>
+        carrot_exponents=[1]; stick_exponents=[1,1,1,1]
+    </code>
+    defines the normalization used for normalizing the fitness values
+    of the population. In this case the
+    <span class="value">carrots_and_sticks</span> function is used
+    for normalizing the values. What it does is explained in the
+    documentation (try the <span class="value">-h</span> option).
+</p><p>
+    The important point here is that some fitness functions may
+    require certain normalization functions for the GA to run
+    properly. In this case, <span class="value">cage</span>
+    always requires that <span class="value">carrots_and_sticks</span>
+    is defined in the input file. If a fitness function requires
+    a given normalizatoin function, it should be specified in its
+    documentation. The reverse is true as well. Some normalization
+    functions may need specific fitness functions to work properly. However
+    less restrive combinations may exist as well.
+
+</p><p class="wide">
+    The twelveth command,
     <code>
         num_generations=10
     </code>
     tells MMEA that it should stop after creating <span class="value">10</span> generations of molecules.
 
 </p><p class="wide">
-    The twelveth command,
+    The thirteenth command,
     <code>
         num_mutations=10
     </code>
     tells MMEA that it should carry out <span class="value">10</span> mutation operations each generation.
 
 </p><p class="wide">
-    The thirteenth command,
+    The fourteenth command,
     <code>
         num_crossovers=15
     </code>
     tells MMEA that it should carry out <span class="value">15</span> crossover operations each generation.
 </p><p class="wide">
-        The fourteenth command,
+        The fifteenth command,
         <code>
             pop_size=20
         </code>
