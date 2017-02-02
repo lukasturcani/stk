@@ -178,7 +178,12 @@ def run():
         # Save the min, max and mean values of the population.  
         with time_it():
             print_info('Recording progress.')
-            progress.update(pop)        
+            progress.update(pop)
+        
+        # If the user defined some premature exit function, check if the
+        # exit criterion has been fulfilled.
+        if pop.exit():
+            break
         
     # Running MacroModel optimizations sometimes leaves applications 
     # open. This closes them. If this is not done, directories may not 
