@@ -414,6 +414,19 @@ class Population:
         with open(file_name, 'wb') as dump_file:
             pickle.dump(self, dump_file)
 
+    def exit(self):
+        """
+        Checks the if the exit criterion has been satisfied.
+        
+        Returns
+        -------
+        bool
+            ``True`` if the exit criterion is satisfied, else ``False``.
+        
+        """
+        
+        return self.ga_tools.exit(self)
+            
     def gen_mutants(self):
         """
         Returns a population of mutant ``MacroMolecule`` instances.
