@@ -7,6 +7,9 @@ from types import ModuleType
 import sys
 import re
 from inspect import getmro
+# Unused but may be used in input files. So needs to be present here as
+# eval() is run parts of the input file. 
+import numpy as np
 
 from . import fitness
 from .crossover import Crossover
@@ -20,6 +23,7 @@ from .exit import Exit
 from ..convenience_tools import FunctionData
 from ..molecular import topologies
 from ..molecular.topologies import *
+from ..molecular.molecules import *
 from ..molecular import Energy
 from ..molecular.optimization import optimization
 
@@ -417,7 +421,8 @@ class GAInput:
     
         return GATools(self.selector(), self.crosser(), 
                        self.mutator(), self.normalizer(), 
-                       self.opt_func, self.fitness_func, self)
+                       self.opt_func, self.fitness_func, 
+                       self.exiter(), self)
         
     def __repr__(self):
         return "\n\n".join("{} : {}".format(key, value) for key, value in
