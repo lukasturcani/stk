@@ -94,12 +94,12 @@ import multiprocessing as mp
 import warnings
 from collections import Counter
 
-from .classes.function_data import FunctionData
-from .classes.exception import MolError
-from .classes.molecular import MacroMolecule, StructUnit, Energy
-from . import optimization
-from .convenience_tools import (rotation_matrix_arbitrary_axis, 
-                                matrix_centroid)
+from ..convenience_tools import (matrix_centroid,
+                                 FunctionData, MolError, 
+                                 rotation_matrix_arbitrary_axis)
+                                
+from ..molecular import (MacroMolecule, 
+                               StructUnit, Energy, optimization)
 
 def _calc_fitness(func_data, population):
     """

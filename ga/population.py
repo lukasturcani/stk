@@ -3,19 +3,20 @@ Defines the Population class.
 
 """
 
-import itertools
+import itertools as it
 import os
 import numpy as np
 import pickle
 from collections import Counter
 
-from .molecular import MacroMolecule, Cage
-from .ga import GATools
+from .fitness import _calc_fitness, _calc_fitness_serial
+from .plotting import plot_counter
+from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..plotting import plot_counter
-from ..optimization.optimization import (_optimize_all, 
+from ..molecular import (MacroMolecule, Cage, 
+                               StructUnit, StructUnit2, StructUnit3)
+from ..molecular.optimization.optimization import (_optimize_all, 
                                         _optimize_all_serial)
-from ..fitness import _calc_fitness, _calc_fitness_serial
 
 class Population:
     """
@@ -132,6 +133,69 @@ class Population:
                      " ``MacroMolecule`` and ``GATools`` types."), arg)
 
     @classmethod
+    def init_cage_isomers(cls, lk_file, bb_file, topology, ga_tools,
+                          lk_fg=None, bb_fg=None):
+        """
+        Creates a population holding all structural isomers of a cage.
+
+        Structural isomers here means that the building blocks are
+        rotated in position so that every possible bond combination with
+        linkers is formed.
+
+        Parameters
+        ----------
+        lk_file : str
+            The full path of the file holding the linker of the cage.
+
+        bb_file : str
+            The full path to the file holding the building block of the
+            cage.
+            
+        topology : Topology
+            The topology of the cage.
+        
+        ga_tools : GATools
+            The GATools instance to be used by created population.
+            
+        lk_fg : str (default = None)
+            The name of the linker's functional group. If ``None`` then
+            `lk_file` is checked for a name.
+            
+        bb_fg : str (default = None)
+            The name of the building block's functional group. If
+            ``None`` then `bb_file` is checked for a name.
+            
+        Returns
+        -------
+        Population
+            A population filled with isomers of a cage.
+            
+        """
+        
+        n = len(topology.positions_A)       
+        alignments = set()
+        
+        for x in it.combinations_with_replacement([0,1,2], n):
+            for y in it.permutations(x, n):
+                alignments.add(y)
+         
+        lk = StructUnit(lk_file, lk_fg)
+        if len(lk.functional_group_atoms()) > 2:
+            lk = StructUnit3(lk_file, lk_fg)
+        else:
+            lk = StructUnit2(lk_file, lk_fg)
+        
+        bb = StructUnit3(bb_file, bb_fg)        
+         
+        pop = cls(ga_tools)
+        for i, align in enumerate(alignments):
+            cage = Cage((lk, bb), topology, 
+                       'isomer_{}.mol'.format(i), {'alignment' : align})
+            pop.members.append(cage)
+            
+        return pop
+
+    @classmethod
     def init_random_cages(cls, bb_db, lk_db,
                           topologies, size, ga_tools):
         """
@@ -161,6 +225,11 @@ class Population:
 
         ga_tools : GATools
             The GATools instance to be used by created population.
+            
+        Returns
+        -------
+        Population
+            A population filled with random cages.
 
         """
 
@@ -198,7 +267,13 @@ class Population:
             The size of the population.
 
         ga_tools : GATools
-            The GATools instance to be used by created population.        
+            The GATools instance to be used by created population.
+            
+        Returns
+        -------
+        Population
+            A population of cages which all have the same building block
+            but different linkers.
         
         """
         
@@ -783,7 +858,7 @@ class Population:
         # have the same `ga_tools` attribute as original ``Population``
         # instance.
         if isinstance(key, slice):
-            mols = itertools.islice(self.all_members(),
+            mols = it.islice(self.all_members(),
                                      key.start, key.stop, key.step)
             return Population(*mols, self.ga_tools)
 

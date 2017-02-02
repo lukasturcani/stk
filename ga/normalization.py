@@ -131,14 +131,18 @@ class Normalization:
         
         After equation (2) the elements are rescaled again
         
-            (3) e = A*(e^a)
+            (3) Ne = A*(Se^a)
         
-        which means that
+        Here the ``Ne`` represents the parameter ``e`` after the second 
+        rescaling.
         
-            (4) sum(carrots) = A*(Sc1^a) + B*(Sc2^b) + C*(Sc3^b)
+        This means that the sums showin in equation (1) are
+        
+            (4) sum(carrots) = A*(Nc1^a) + B*(Nc2^b) + C*(Nc3^b)
             
-        (Where the parameters have been divided by the population average
-        already - hence the capital ``S`` in front of their names.)
+        The prefix ``N`` in front of c1, c1 and c3 means that the 
+        operations in equations (2) and (3) have been applied to the
+        parameters.
         
         So if you want c1 to be twice as important to fitness as c2
         set

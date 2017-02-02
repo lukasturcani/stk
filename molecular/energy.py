@@ -179,7 +179,7 @@ from types import MethodType
 from functools import wraps
 from inspect import signature as sig
 
-from .function_data import FunctionData
+from ..convenience_tools import FunctionData
 
 class _EnergyError(Exception):
     """

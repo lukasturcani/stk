@@ -8,18 +8,21 @@ import sys
 import re
 from inspect import getmro
 
-from ..function_data import FunctionData
-from ..topology import *
-from .. import topology
-from ..population import Population
-from .selection import Selection
+from . import fitness
 from .crossover import Crossover
-from .mutation import Mutation
-from .normalization import Normalization
-from ..energy import Energy
-from ...optimization import optimization
-from ... import fitness
 from .ga_tools import GATools
+from .selection import Selection
+from .mutation import Mutation
+from .population import Population
+from .normalization import Normalization
+
+from ..convenience_tools import FunctionData
+from ..molecular import topologies
+from ..molecular.topologies import *
+from ..molecular import Energy
+from ..molecular.optimization import optimization
+
+
 
 class GAInput:
     """
@@ -470,15 +473,15 @@ class InputHelp:
                                         Normalization.__dict__.items()
                                         if not name.startswith('_')),
                                             
-                'energy' : (func for name, func in 
+                'energy' : (getattr(Energy, name) for name, func in 
                                     Energy.__dict__.items() if not
                                     name.startswith('_')),
                                     
-                'topology' : (cls for name, cls in 
-                              topology.__dict__.items() if
+                'topologies' : (cls for name, cls in 
+                              topologies.__dict__.items() if
                               not name.startswith('_') and
                               not isinstance(cls, ModuleType) and 
-                              topology.base.Topology in getmro(cls))
+                              topologies.base.Topology in getmro(cls))
                }
         
     

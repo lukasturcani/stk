@@ -1,4 +1,4 @@
-from ..classes import MacroMolecule
+from ..molecular import MacroMolecule
 
 def test_same():
     """

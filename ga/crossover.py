@@ -24,10 +24,10 @@ start with a leading underscore.
 import os
 from collections import Counter
 
-from ..population import Population
-from ..molecular import Cage
-from ..exception import MolError
-from ...plotting import plot_counter
+from .population import Population
+from .plotting import plot_counter
+from ..convenience_tools import MolError
+from ..molecular.molecules import Cage
 
 class Crossover:
     """
