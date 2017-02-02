@@ -12,8 +12,7 @@ import warnings
 import psutil
 import re
 
-from ..classes.exception import MolError
-from ..convenience_tools import MAEExtractor
+from ...convenience_tools import MolError, MAEExtractor 
 
 class _ConversionError(Exception):
     def __init__(self, message):
