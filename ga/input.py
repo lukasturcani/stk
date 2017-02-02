@@ -15,6 +15,7 @@ from .selection import Selection
 from .mutation import Mutation
 from .population import Population
 from .normalization import Normalization
+from .exit import Exit
 
 from ..convenience_tools import FunctionData
 from ..molecular import topologies
@@ -176,7 +177,7 @@ class GAInput:
                 'parent_select_func', 'mutant_select_func', 
                 'mutation_func', 'opt_func', 'mutation_weights',
                 'crossover_func', 'fitness_func', 'normalization_func',
-                'comparison_pops']
+                'exit_func', 'comparison_pops']
     
     def __init__(self, input_file):
         """
@@ -194,8 +195,8 @@ class GAInput:
         # Read the input file and extract its information.
         self._extract_data()
         
-        # If the input file did not specify the number of crossovers or
-        # mutations it is assumed that none are wanted.
+        # If the input file did not specify some values, default 
+        # initialize them.
         if not hasattr(self, 'num_crossovers'):
             self.num_crossovers = 0
         
@@ -207,6 +208,9 @@ class GAInput:
             
         if not hasattr(self, 'normalization_func'):
             self.normalization_func = None
+ 
+        if not hasattr(self, 'exit_func'):
+            self.exit_func = FunctionData('no_exit')
         
     def _extract_data(self):
         """
@@ -335,6 +339,22 @@ class GAInput:
         """
         
         return Crossover(self.crossover_func, self.num_crossovers)
+
+    def exiter(self):
+        """
+        Returns a Exit instance loaded with data from the input file.
+        
+        Returns
+        -------
+        Exit
+            An Exit instance loaded with the exit function defined in 
+            the input file. If none was defined an exit function which
+            always returns ``False`` is used.
+        
+        """
+        
+        return Exit(self.exit_func)
+        
         
     def selector(self):
         """
@@ -481,7 +501,11 @@ class InputHelp:
                               topologies.__dict__.items() if
                               not name.startswith('_') and
                               not isinstance(cls, ModuleType) and 
-                              topologies.base.Topology in getmro(cls))
+                              topologies.base.Topology in getmro(cls)),
+                                
+                'exit_func' : (func for name, func in 
+                              Exit.__dict__.items() if not
+                              name.startswith('_'))
                }
         
     

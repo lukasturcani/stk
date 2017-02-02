@@ -42,13 +42,19 @@ class GATools:
     input : GAInput
         The GAInput object holding data gathered from the input file.
 
+    exit : Exit
+        An exit object which checks if the population achieved the 
+        exit criterion to stop the GA before all generations have been
+        made.
+        
     """
     
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
                  'optimization', 'fitness', 'input']    
     
-    def __init__(self, selection, crossover, mutation, 
-                       normalization, optimization, fitness, ga_input):
+    def __init__(self, selection, crossover, 
+                       mutation, normalization, 
+                       optimization, fitness, ga_input, exit_):
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
@@ -56,7 +62,8 @@ class GATools:
         self.optimization = optimization
         self.fitness = fitness
         self.input = ga_input
+        self.exit = exit_
 
     @classmethod
     def init_empty(cls):
-        return cls(None, None, None, None, None, None, None)
+        return cls(None, None, None, None, None, None, None, None)

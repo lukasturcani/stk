@@ -8,3 +8,4 @@ from .plotting import *
 from .population import *
 from .progress import *
 from .selection import *
+from .exit import *
