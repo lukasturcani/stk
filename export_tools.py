@@ -13,52 +13,11 @@ from functools import partial
 from multiprocessing import Pool
 import itertools as it
 
-from .classes import StructUnit, FGInfo, Population, functional_groups
-from .optimization import *
+from .ga import Population
+from .molecular import (StructUnit, functional_groups)
+from .molecular.optimization import *
 
-def redump_pop(*folders, ofolder, cls):
-    """
-    Collects all the MacroMolecule .dmp files and creates a dump file.
-    
-    The function creates a population of all the .dmp files in `folders`
-    and creates a dump file of that population. The dump file gets 
-    placed in `ofolder`.
-    
-    Parameters
-    ----------
-    *folders : str
-        The full paths of the folders holding the MacroMolecule .dmp
-        files.
-        
-    ofolder : str
-        The folder in which the dump file should be placed. 
-        
-    cls : MacroMolecule child class
-        The class to which the .dmp files belong.
-    
-    Modifies
-    --------
-    ofolder/pop_dump
-        Creates a file holding the population dump at this location.    
-    
-    Returns
-    -------
-    None : NoneType
-    
-    """
-    
-    # Collect the paths of all the .dmp files.
-    cage_paths = []
-    for folder in folders:
-        s = os.path.join(folder, '*.dmp')
-        cage_paths.extend(glob.glob(s))
-    
-    # Make a population holding all the MacroMolecule objects and dump
-    # it.
-    pop = Population(*(cls.load(x) for x in cage_paths))   
-    pop.dump(os.path.join(ofolder, 'pop_dump'))
-
-def fg_prune(ifolder, fg, fg_num):
+def fg_prune(ifolder, fg, fg_num, ext):
     """
     Deletes molecules without a given functional group from a folder.
     
@@ -154,42 +113,6 @@ def fg_distance_prune(folder, fg, ext):
                 os.remove(path)
                 break
 
-def substruct_prune(folder, ext, substruct):
-    """
-    Deletes molecules which contain the substructure `substruct`.
-    
-    Parameters
-    ----------
-    folder : str
-        The full path of the folder from which the files are checked for
-        the substructure and deleted.
-        
-    ext : str
-        The extension of the structure files in `folder`. All other 
-        files are skipped.
-    
-    substruct : str
-        The SMARTS string of the substructure, which if present in a 
-        molecule causes it to be deleted from `folder`.
-    
-    """
-    
-    # Create a rdkit molecule of the substructure.
-    substruct_mol = chem.MolFromSmarts(substruct)
-    # Go through all the files in `ifolder` if they do not have the 
-    # file extension `ext` go to the next file.   
-    for file_name in os.listdir(folder):
-        if not file_name.endswith(ext):
-            continue
-        
-        # Make a molecule from the file.
-        path = os.path.join(folder, file_name)
-        mol = StructUnit(path, minimal=True)
-        # Check for substruct and delete as appropriate.
-        if mol.mol.HasSubstructMatch(substruct_mol):
-            print('Removing {}.'.format(path))
-            os.remove(path)
-
 def optimize_folder(folder, macromodel_path,
                     timeout=False, temp=300, 
                     confs=500, eq_time=50, sim_time=500):
@@ -235,8 +158,8 @@ def optimize_folder(folder, macromodel_path,
     # substitutions.
     
     # Get the names of all the .mol files.
-    names = [os.path.join(path, file_name) for file_name in 
-             os.listdir(path) if file_name.endswith(".mol")] 
+    names = [os.path.join(folder, file_name) for file_name in 
+             os.listdir(folder) if file_name.endswith(".mol")] 
     # Make the StructUnit instances from the .mol files.
     macro_mols = [StructUnit(file_path, minimal=True) for file_path in 
                                                                   names]
@@ -248,3 +171,81 @@ def optimize_folder(folder, macromodel_path,
     
     with Pool() as p:
         p.map(md_opt, macro_mols)
+
+def redump_pop(*folders, ofolder, cls):
+    """
+    Collects all the MacroMolecule .dmp files and creates a dump file.
+    
+    The function creates a population of all the .dmp files in `folders`
+    and creates a dump file of that population. The dump file gets 
+    placed in `ofolder`.
+    
+    Parameters
+    ----------
+    *folders : str
+        The full paths of the folders holding the MacroMolecule .dmp
+        files.
+        
+    ofolder : str
+        The folder in which the dump file should be placed. 
+        
+    cls : MacroMolecule child class
+        The class to which the .dmp files belong.
+    
+    Modifies
+    --------
+    ofolder/pop_dump
+        Creates a file holding the population dump at this location.    
+    
+    Returns
+    -------
+    None : NoneType
+    
+    """
+    
+    # Collect the paths of all the .dmp files.
+    cage_paths = []
+    for folder in folders:
+        s = os.path.join(folder, '*.dmp')
+        cage_paths.extend(glob.glob(s))
+    
+    # Make a population holding all the MacroMolecule objects and dump
+    # it.
+    pop = Population(*(cls.load(x) for x in cage_paths))   
+    pop.dump(os.path.join(ofolder, 'pop_dump'))
+
+def substruct_prune(folder, ext, substruct):
+    """
+    Deletes molecules which contain the substructure `substruct`.
+    
+    Parameters
+    ----------
+    folder : str
+        The full path of the folder from which the files are checked for
+        the substructure and deleted.
+        
+    ext : str
+        The extension of the structure files in `folder`. All other 
+        files are skipped.
+    
+    substruct : str
+        The SMARTS string of the substructure, which if present in a 
+        molecule causes it to be deleted from `folder`.
+    
+    """
+    
+    # Create a rdkit molecule of the substructure.
+    substruct_mol = chem.MolFromSmarts(substruct)
+    # Go through all the files in `ifolder` if they do not have the 
+    # file extension `ext` go to the next file.   
+    for file_name in os.listdir(folder):
+        if not file_name.endswith(ext):
+            continue
+        
+        # Make a molecule from the file.
+        path = os.path.join(folder, file_name)
+        mol = StructUnit(path, minimal=True)
+        # Check for substruct and delete as appropriate.
+        if mol.mol.HasSubstructMatch(substruct_mol):
+            print('Removing {}.'.format(path))
+            os.remove(path)

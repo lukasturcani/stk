@@ -55,52 +55,57 @@ This is a step-by-step guide of how macromolecular assembly is carried
 out and what the classes do.
 
 First you create StructUnit instances of the building blocks which make 
-up the macromolecule. The StructUnit instances are initialized using
-paths to their molecular structure files. Initializing StructUnit 
-instances does a couple of things:
+up the macromolecule: 
+
+    bb = StructUnit('/path/to/struct/file.mol2')
+
+The StructUnit instances are initialized using paths of molecular 
+structure files. (Initializing a StructUnit automatically completes 
+steps 1 to 4.)
     
-    1) Initialize an rdkit instance from the structure file.
+    1) Place an rdkit instance of the molecule into the `mol` attribute
+       of the StructUnit.
     2) Scan the path of the structure file for the name of a functional
-       functional group.
+       group. (Alternatively the name of a functional group can be
+       supplied to the initializer).
 
 What functional groups are recognized by MMEA?
-The module ``/mmea/classes/fg_info.py`` defines a class called FGInfo.
-Instances of this class are held in the list `function_groups` (also in 
-that module). If you put an instance of FGInfo in that list, it will be
-recognized.
+The module ``/mmea/molecular_tools/fg_info.py`` defines a class called 
+FGInfo. Instances of this class are held in the list `functional_groups` 
+(also in that module). If you put an FGInfo instance in that list, the 
+functional group will be recognized.
 
-    3) Using the FGInfo instance of the functional group found in the
-       path, tag atom in the building block as either 'bonder' or 'del'.
-       'bonder' signifies that the atoms form bond during macromolecular
-       assembly, while 'del' means they are deleted. Note that only
-       one functional group per building block molecule is tagged. For
-       example, all 20 amine functional groups in a molecule will be
-       tagged but none of the 10 aldehyde functional groups if 'amine'
-       was in the path of the bulding block file.
+    3) Place the FGInfo instance of the functional group in the
+       `func_grp` attribute of the StructUnit.
+
+    4) Using the FGInfo instance, tag atoms in the building block as 
+       either 'bonder' or 'del'. 'bonder' signifies that the atoms form 
+       a bond during macromolecular assembly, while 'del' means they are 
+       deleted.           
        
-    4) Provide the instances of the StructUnits to the MacroMolecule
-       initializer along with a Topology class.
+    5) Give the StructUnit instances and the class representing the 
+       topology to the macromolecule's initializer.
        
-    5) Make an instance of the topology class in the MacroMolecule 
+    6) Make an instance of the topology class in the MacroMolecule 
       initializer.
       
-    6) Run the ``build()`` method of the Topology class in the 
-       MacroMolecule initializer.
+    7) Run the ``build()`` of the instance generated in 6) during 
+       MacroMolecule initialization.
        
-    7) The ``build()`` will vary depending on the Topology class. 
-       However the basic structure is the same (steps 8 - 10).
+    8) The ``build()`` will vary depending on the Topology class. 
+       However the basic structure is the same (steps 9 - 11).
        
-    8) Combine the building block ridkit molecules into a single rdkit 
+    9) Combine the StructUnit rdkit molecules into a single rdkit 
        molecule. Make sure that the building blocks are arranged in the 
        shape of the macromolecule. All the manipulations available via
        the StructUnit class are useful here to make sure all the 
-       building blocks are orientated corrected when forming the 
+       building blocks are orientated correctly when forming the 
        macromolecule.
        
-    9) Create bonds between all the disjoined building block molecules.
-       This is where the tagging done by StructUnit is needed.
+    10) Create bonds between all the disjoined building block molecules.
+        This is where the tagging done by StructUnit is needed.
        
-   10) Delete all the atoms tagged for deletion.
+    11) Delete all the atoms tagged for deletion.
 
 After all this you should have a rdkit instance of the macromolecule
 which should be placed in the `mol` attribute of the MacroMolecule
@@ -115,10 +120,10 @@ defined.
 
 If you're adding a new class of macromolecules, it quite likely you want
 to add a new ``Topology`` class. See the docstring of the
-/mmea/classes/topology/base.py module for guidance on adding these.
-The topology class does the assembly of the macromolecule from the 
-building blocks. The assembled macromolecule instance is then held by 
-the macromolecular class.
+/mmea/molecular_tools/topologies/base.py module for guidance on adding 
+these. The topology class does the assembly of the macromolecule from 
+the building blocks. The assembled macromolecule instance is then held 
+by the macromolecular class.
 
 """
 
@@ -134,12 +139,11 @@ import networkx as nx
 from scipy.spatial.distance import euclidean
 import pickle
 
-from ..convenience_tools import (flatten, periodic_table, 
+from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis)
 from .fg_info import functional_groups
-from .exception import MolError
 from .energy import Energy
 
 class CachedMacroMol(type):
@@ -1811,7 +1815,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
             The full path of the structure file where the macromolecule
             will be stored.
             
-        topology_args : list (default = None)
+        topology_args : dict (default = None)
             Any additional arguments needed to initialize the topology
             class supplied in the `topology` argument.
             
