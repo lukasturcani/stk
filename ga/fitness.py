@@ -296,6 +296,26 @@ def random_fitness_tuple(macro_mol):
     macro_mol.fitness_fail = False
     macro_mol.progress_params = [*carrot_array, *stick_array]
     return macro_mol
+
+def raiser(macro_mol, param1, param2=2):
+    """
+    Doens't calculate a fitness value, raises an error instead.
+    
+    This function is used to test that when fitness functions raise
+    errors during multiprocessing, they are handled correctly.
+
+    Parameters
+    ---------    
+    param1 : object
+        Dummy parameter, does nothing.
+        
+    param2 : object (default = 2)
+        Dummy keyword parameter, does nothing.
+    
+    """
+    
+    raise Exception('Raiser fitness function used.')
+
     
 # Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ','Window Difference ',
