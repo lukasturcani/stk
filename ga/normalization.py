@@ -187,6 +187,10 @@ class Normalization:
                            isinstance(x.unscaled_fitness, tuple)]
                            
         _carrot_means = np.mean(unscaled_carrots, axis=0)
+        if not isinstance(_carrot_means, np.ndarray):
+            raise TypeError(('Unscaled fitness values do not have'
+                             ' appropriate type.')) 
+            
         carrot_means = []
         for x in _carrot_means:
             if x == 0:
@@ -195,6 +199,10 @@ class Normalization:
                 carrot_means.append(x)
         
         _stick_means = np.mean(unscaled_sticks, axis=0)
+        if not isinstance(_carrot_means, np.ndarray):
+            raise TypeError(('Unscaled fitness values do not have'
+                             ' appropriate type.'))
+                             
         stick_means = []
         for x in _stick_means:
             if x == 0:
