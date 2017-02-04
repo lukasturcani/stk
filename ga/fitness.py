@@ -200,16 +200,15 @@ class _FitnessFunc:
     _calc_fitness(). It should not be applied explicitly when defining
     the functions.
     
-    Parameters
+    The decorator prevents fitness functions from raising if 
+    they fail (necessary for multiprocessing) and prevents them from
+    being run twice on the same molecule.    
+    
+    Attributes
     ----------
     func : function
-        The fitness function which is to be prevented from raising.    
-    
-    Returns
-    -------
-    function
-        A function which performs the same things as `func` but does
-        not raise.
+        The fitness function which is to be prevented from raising and
+        running twice on the same molecule.    
     
     """
     
@@ -219,7 +218,7 @@ class _FitnessFunc:
     
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
-            if macro_mol.fitness:
+            if macro_mol.fitness or macro_mol.unscaled_fitness:
                 print('Skipping {0}'.format(macro_mol.file))
                 return macro_mol          
             return self.func(macro_mol, *args, **kwargs)
