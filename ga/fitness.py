@@ -123,7 +123,7 @@ def _calc_fitness(func_data, population):
     # Get the fitness function object.
     func = globals()[func_data.name]
     # Make sure it won't raise errors while using multiprocessing.
-    p_func = _fail_safe(partial(func, **func_data.params))
+    p_func = _FailSafe(partial(func, **func_data.params))
 
     # Apply the function to every member of the population, in parallel.
     with mp.get_context('spawn').Pool() as pool:
@@ -197,9 +197,11 @@ def _param_labels(*labels):
         
     return add_labels
 
-def _fail_safe(func):
+class _FailSafe:
     """
     A decorator which prevents a function from raising an error.
+    
+    Defined as a class to be compatible with pickle.
     
     Parameters
     ----------
@@ -214,18 +216,19 @@ def _fail_safe(func):
     
     """
     
-    @wraps(func)
-    def inner(macro_mol, *args,  **kwargs):
+    def __init__(self, func):
+        self.func = func
+        wraps(func)(self)
+    
+    def __call__(self, macro_mol, *args,  **kwargs):
         try:
-            return func(*args, **kwargs)
+            return self.func(macro_mol, *args, **kwargs)
         except Exception as ex:
             # Prevents the error from being raised, but records it in 
             # ``failures.txt``.
             macro_mol.fail()
             MolError(ex, macro_mol, "During fitness calculation")
             return macro_mol
-    
-    return inner
             
 def random_fitness(macro_mol):
     """
@@ -311,6 +314,15 @@ def raiser(macro_mol, param1, param2=2):
         
     param2 : object (default = 2)
         Dummy keyword parameter, does nothing.
+        
+    Returns
+    -------
+    This function does not return. It only raises.
+    
+    Raises
+    ------
+    Exception
+        An exception is always raised.
     
     """
     
