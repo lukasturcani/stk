@@ -123,7 +123,7 @@ def _calc_fitness(func_data, population):
     # Get the fitness function object.
     func = globals()[func_data.name]
     # Make sure it won't raise errors while using multiprocessing.
-    p_func = _FailSafe(partial(func, **func_data.params))
+    p_func = _FitnessFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population, in parallel.
     with mp.get_context('spawn').Pool() as pool:
@@ -160,12 +160,7 @@ def _calc_fitness_serial(func_data, population):
 
     # Apply the function to every member of the population.
     for macro_mol in population:
-        try:
-            func(macro_mol, **func_data.params)
-                
-        except Exception as ex:
-            macro_mol.fail()
-            MolError(ex, macro_mol, 'During fitness calculation.')
+        _FitnessFunc(func(macro_mol, **func_data.params))
 
 
 def _param_labels(*labels):
@@ -197,11 +192,13 @@ def _param_labels(*labels):
         
     return add_labels
 
-class _FailSafe:
+class _FitnessFunc:
     """
-    A decorator which prevents a function from raising an error.
+    A decorator for fitness functions.
     
-    Defined as a class to be compatible with pickle.
+    This decorator is applied to all fitness functions automatically in
+    _calc_fitness(). It should not be applied explicitly when defining
+    the functions.
     
     Parameters
     ----------
@@ -222,7 +219,11 @@ class _FailSafe:
     
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
+            if macro_mol.fitness:
+                print('Skipping {0}'.format(macro_mol.file))
+                return macro_mol          
             return self.func(macro_mol, *args, **kwargs)
+            
         except Exception as ex:
             # Prevents the error from being raised, but records it in 
             # ``failures.txt``.
@@ -252,8 +253,6 @@ def random_fitness(macro_mol):
 
     """
     
-    if macro_mol.fitness:
-        return macro_mol
     macro_mol.fitness = abs(np.random.normal(50,20))
     return macro_mol    
 
@@ -289,9 +288,6 @@ def random_fitness_tuple(macro_mol):
         value.
         
     """
-    
-    if macro_mol.unscaled_fitness:
-        return macro_mol
       
     carrot_array = abs(np.random.normal(50,20,2))
     stick_array = abs(np.random.normal(50,20,2))
@@ -415,11 +411,6 @@ def cage(macro_mol, target_cavity, target_window=None,
 
     # Prevents warnings from getting printed when using multiprocessing.
     warnings.filterwarnings('ignore')
-    
-    # If the parameters have already been calculated for this 
-    # `macro_mol` do not recalculate them.
-    if macro_mol.unscaled_fitness:
-        return macro_mol
                    
     if target_window is None:
         target_window = target_cavity                       
@@ -657,12 +648,6 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     """
                      
     warnings.filterwarnings('ignore')
-
-    # If the cage already has a fitness value, don't run the
-    # calculation again.
-    if macro_mol.unscaled_fitness:
-        print('Skipping {0}'.format(macro_mol.file))
-        return macro_mol
        
     # Make a copy version of `macro_mol` which is unoptimizted.
     unopt_macro_mol = copy.deepcopy(macro_mol)

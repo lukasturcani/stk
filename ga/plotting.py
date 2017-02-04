@@ -28,7 +28,7 @@ def epp(progress, plot_name, fitness_func=None, norm_func=None):
         calculate the `progress_params` saved in `progress`.
         
     norm_func : callable (default = None)
-        The normalization function used to recalculate all the fitness
+        The Normalization object used to recalculate all the fitness
         values found in `progress`.
     
     Modifies
@@ -54,7 +54,7 @@ def epp(progress, plot_name, fitness_func=None, norm_func=None):
     # progress.maxs (and mins etc) were lists, they will be converted
     # to ints/floats.
     if norm_func:
-        progress.normalize(norm_func)
+        progress.normalize(norm_func.scaling_func)
     
     # Plot the EPP of the fitness values.
     fitness_epp(progress, plot_name)
