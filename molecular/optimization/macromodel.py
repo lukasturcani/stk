@@ -90,13 +90,7 @@ def macromodel_opt(macro_mol, force_field=16,
         more details.               
     
     """
-    
-    # If the molecule is already optimized, return.
-    if macro_mol.optimized:
-        print('Skipping {0}.'.format(macro_mol.file))       
-        return macro_mol
-    
-    print('\nOptimizing {0}.'.format(macro_mol.file))    
+       
     try:
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molecule.    
@@ -297,13 +291,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         more details.               
     
     """
-    
-    # If the molecule is already optimized, return.
-    if macro_mol.optimized:
-        print('Skipping {0}.'.format(macro_mol.file))       
-        return macro_mol
-    
-    print('\nOptimizing {0}.'.format(macro_mol.file))    
+      
     try:    
         # MacroModel requires a ``.mae`` file as input. This creates a 
         # ``.mae`` file holding the molecule.    
