@@ -10,8 +10,8 @@ first requirement allows users to identify which arguments are handled
 automatically by MMEA and which need to be defined in the input file.
 The convention is that if the optimization function takes an argument 
 called ``macro_mol`` the users does not have to specify that argument in 
-the input file. The second requirment is necessary for reasons to do
-with parallization. If it is not fulfilled, the molecule will not be
+the input file. The requirment is necessary for reasons to do with 
+parallization. If it is not fulfilled, the molecule will not be
 updated with the optimized version.
 
 Optimizations can be complicated. If the use of helper functions is 
@@ -99,7 +99,7 @@ def _optimize_all(func_data, population):
     # module.
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may require.
-    p_func = _FailSafe(partial(func, **func_data.params))
+    p_func = _OptimizationFunc(partial(func, **func_data.params))
     
     # Apply the function to every member of the population, in parallel.
     with mp.get_context('spawn').Pool() as pool:
@@ -160,25 +160,27 @@ def _optimize_all_serial(func_data, population):
     # module.    
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may require.
-    p_func = partial(func, **func_data.params)
+    p_func = _OptimizationFunc(partial(func, **func_data.params))
     
     # Apply the function to every member of the population.    
     return iter(p_func(member) for member in population)    
 
-class _FailSafe:
+class _OptimizationFunc:
     """
-    A decorator which prevents a function from raising an error.
+    A decorator for optimziation functions.
+
+    This decorator is applied to all optimization functions 
+    automatically in _otpimize_all(). It should not be applied 
+    explicitly when defining the functions.
     
-    Parameters
+    This decorator prevents optimization functions from raising if 
+    they fail (necessary for multiprocessing) and prevents them from
+    being run twice on the same molecule.
+    
+    Attributes
     ----------
     func : function
-        The fitness function which is to be prevented from raising.    
-    
-    Returns
-    -------
-    function
-        A function which performs the same things as `func` but does
-        not raise.
+        The function which is to have decorations applied.    
     
     """
     
@@ -188,7 +190,13 @@ class _FailSafe:
     
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
+            if macro_mol.optimized:
+                print('Skipping {0}'.format(macro_mol.file))
+                return macro_mol
+                
+            print('\nOptimizing {0}.'.format(macro_mol.file)) 
             return self.func(macro_mol, *args, **kwargs)
+            
         except Exception as ex:
             # Prevents the error from being raised, but records it in 
             # ``failures.txt``.
@@ -230,11 +238,6 @@ def rdkit_optimization(macro_mol):
         more details.
     
     """
-    
-    # If `macro_mol` is already optmized, return.
-    if macro_mol.optimized:
-        print('Skipping {0}.'.format(macro_mol.file))   
-        return macro_mol
         
     # Sanitize then optimize the rdkit molecule.
     chem.SanitizeMol(macro_mol.mol)
@@ -270,12 +273,7 @@ def do_not_optimize(macro_mol):
         The macromolecule not getting optimized.
     
     """
-    
-    if macro_mol.optimized:
-        print('Skipping', macro_mol.file)
-        return macro_mol
-    
-    print('Optimizing', macro_mol.file)
+
     macro_mol.optimized = True   
     return macro_mol   
 
