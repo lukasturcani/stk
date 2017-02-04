@@ -195,7 +195,7 @@ def run():
         print_info('Plotting EPP.')
         plot.epp(progress, os.path.join(root_dir, 'epp.png'),
                  ga_input.fitness_func, 
-                 pop.ga_tools.normalization.scaling_func)
+                 pop.ga_tools.normalization)
     
     os.chdir(root_dir)
     # Dump the GAProgress instance.
