@@ -24,7 +24,10 @@ argument called  ``population`` it does not have to be specified in the
 input file.
 
 Normalization functions calculate the fitness value of a molecule and
-place it in the `fitness` attribute.
+place it in the `fitness` attribute. This is not universally true, if a
+function is intended to be ``chained`` to other normalization functions.
+In other words if the normalization function is meant to be applied 
+before another one is. This is done via the ``chain()`` method.
 
 Note that fitness functions are only executed once per MacroMolecule, 
 while normalization functions can be executed multiple times. Because 
@@ -73,7 +76,7 @@ class Normalization:
                                     
     def __call__(self, population):
         """
-        Applies the normalization function on `populatoin`.
+        Applies the normalization function on `population`.
         
         Parameters
         ----------
@@ -84,6 +87,56 @@ class Normalization:
         """
         
         self.scaling_func(population)        
+        
+    def combine(self, population, elements, coefficients, exponents):
+        """
+        Combines elements in the unscaled_fitness attribute of members.
+
+        This normalization function is not stand-alone. It is desinged
+        to be chained to other normalization functions.
+        
+        This function assumes that the `unscaled_fitness` attribute
+        of the population's members is an array. It multiplies the
+        members of the array by the values in `coefficients` and then
+        raises them to the values in `exponents`. Lastly, the individual
+        array elements are summed to create a new smaller array.
+        
+        Parameters
+        ----------
+        population : Population
+            The population whose members need to have their fitness
+            values normalized.
+            
+        elements : list of ints
+            If the list is [3, 2, 3] then the first 3 elements are
+            summed to for the first element of the normalized vector.
+            The second element of the normalized vector is formed by
+            summing the next 2 elements of the original. Finally, the
+            last element of the normalized array is made by summing the
+            next 3 elements.
+            
+        coefficients : list of ints or floats
+            Before summing all the elements in the `unscaled_fitness`
+            attribute of members, their are multiplied by the numbers
+            in this list.
+            
+        exponents : list of ints or floats
+            Before summing all the elements in the `unscaled_fitness`
+            attribute of members, their are raised to the numbers in 
+            this list.       
+            
+        Modifies
+        --------
+        unscaled_fitness : numpy.array
+            This attribute is altered for the populations members.
+            
+        Returns
+        -------
+        None : NoneType       
+
+        """
+        
+        
         
     @staticmethod
     def carrots_and_sticks(population, carrot_coeffs, stick_coeffs,
@@ -264,3 +317,81 @@ class Normalization:
                 penalty_term = 1e101
                         
             macro_mol.fitness = penalty_term + carrot_term    
+            
+            
+    def chain(self, population, funcs):
+        """
+        Applies multiple normalization functions, one after the other.
+        
+        Parameters
+        ----------
+        population : Population
+            The population whose fitness values are normalized.        
+        
+        funcs : list of FunctionData objects
+            The FunctionData objects representing normalization
+            functions to be applied, in the order in which they should
+            be applied.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        for func_data in funcs:
+            func = getattr(self, func_data.name)
+            func(population, **func_data.params)
+            
+    def magnitudes(population, use_fitness=False):
+        """
+        Normalizes the values in unscaled_fitness by the average.
+        
+        This normalization function is not stand-alone. It is desinged
+        to be chained to other normalization functions.        
+        
+        Assumes that the populations members have a numpy array in their
+        `unscaled_fitness` attribute. The following steps are performed:
+            
+            1) Calculate the mean value for each element across the
+               population.
+               
+            2) Replace each element with its difference from the mean.
+            
+            3) Calculate the standard deviation of each element across 
+               the population.
+            
+            4) Replace each element with its value divided by the
+               standard deviation.
+            
+        
+        Parameters
+        ----------
+        population : Population
+            The population whose fitness values are normalized.
+            
+        use_fitness : bool (default = False)
+            If ``True`` the normalization function is applied to the
+            values in the `fitness` attribute of members instead of
+            `unscaled_fitness`. This is necessary when using multiple
+            normalization functions in a row.
+            
+        Modifies
+        --------
+        unscaled_fitness : numpy.array
+            This attribute is altered for the populations members.
+            
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        # Ge the name of the attribute which is 
+        if use_fitness:
+            attr_name
+        
+        # Get the mean of each element.
+        means = population.mean(lambda x : x.unscaled_fitness)
+        
+        
