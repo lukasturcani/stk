@@ -256,6 +256,9 @@ class Molecule:
         An instance of the ``Energy`` class. It handles all things
         energy.
         
+    optimized : bool
+        Indicates whether a Molecule has been passed through an 
+        optimization function or not.
     
     """
 
@@ -407,6 +410,34 @@ class Molecule:
         with open(file_name, 'wb') as dump_file:    
             pickle.dump(self, dump_file)     
 
+    def fail(self):
+        """
+        Used when an optimization fails.
+        
+        When an optimization function fails on a Molecule, this 
+        method should be run to ensure that repeated attempts to 
+        optimize it are not carried out by MMEA. For example:
+            
+            try:
+                some_opt_func(molecule_obj)
+            except:
+                molecule_obj.fail()
+        
+        Modifies
+        --------
+        optimized : bool
+            Set to ``True``.
+        
+        Returns
+        -------
+        None : NoneType
+        
+        """
+        
+        self.optimized = True
+        
+        return 
+            
     def graph(self):
         """
         Returns a mathematical graph representing the molecule.        
@@ -1144,7 +1175,7 @@ class StructUnit(Molecule, metaclass=Cached):
     
         return normalize_vector(self.centroid() - 
                                 self.bonder_centroid())
-
+        
     def functional_group_atoms(self):
         """
         Returns a container of atom ids of atoms in functional groups.
@@ -1883,7 +1914,8 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         
         """
         
-        self.optimized = True
+        # This sets optimized to ``True``.
+        super().fail()
         self.fitness = 1e-4
         self.unscaled_fitness = 1e-4
         self.fitness_fail = True       

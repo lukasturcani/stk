@@ -38,17 +38,23 @@ class GATools:
         Holds the name of the function in ``fitness.py`` to be used for
         calculating the fitness of ``MacroMolecule`` instances. It also
         holds any additional paramters the function may require.
-    
+
+    exit : Exit
+        An exit object which checks if the population achieved the 
+        exit criterion to stop the GA before all generations have been
+        made.
+        
     input : GAInput
         The GAInput object holding data gathered from the input file.
-
+        
     """
     
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
-                 'optimization', 'fitness', 'input']    
+                 'optimization', 'fitness', 'exit', 'input']    
     
-    def __init__(self, selection, crossover, mutation, 
-                       normalization, optimization, fitness, ga_input):
+    def __init__(self, selection, crossover, 
+                       mutation, normalization, 
+                       optimization, fitness, exit_, ga_input):
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
@@ -56,7 +62,8 @@ class GATools:
         self.optimization = optimization
         self.fitness = fitness
         self.input = ga_input
+        self.exit = exit_
 
     @classmethod
     def init_empty(cls):
-        return cls(None, None, None, None, None, None, None)
+        return cls(None, None, None, None, None, None, None, None)
