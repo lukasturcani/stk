@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MMEA User's Guide</title>
+    <meta name="author" content="Lukas Turcani">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu+Mono" />
+
+    <style>
+
+    *{
+        background-color: rgb(250,250,250);
+    }
+
+    h1,h2,h3,h4,h5,h6, p, code{
+        font-family: Roboto, sans-serif;
+        text-align: left;
+        margin-left: 25%;
+        margin-right: 25%;
+        font-size: 125%;
+        word-spacing: 0.35em;
+        line-height: 150%;
+        display: inline-block;
+    }
+
+    h1{
+        font-size: 200%;
+    }
+
+    code{
+        background-color: rgb(210,210,210);
+        border-radius: 20px;
+        display: block;
+        font-size: inherit;
+        padding: 1%;
+        margin: 0px;
+        margin-top: 1%;
+        margin-bottom: 1%;
+        display: block;
+        }
+
+    code.whole_file{
+        padding: 5%;
+    }
+
+    .value{
+        background-color: rgb(230,230,230);
+        font-weight: 300;
+    }
+
+    .mmea_output{
+        font-family: "Ubuntu Mono";
+    }
+
+
+    p.wide{
+        display: block;
+    }
+
+    </style>
+
+  </head>
+
+  <body>
+    <h1 id="introduction">Introduction</h1>
+    <p>
+      MMEA (<b>M</b>acro<b>M</b>olecular <b>E</b>volutionary <b>A</b>lgorithm) is
+      a genetic algorithm (GA) for chemistry. It aims to be as general as
+      possible, being suitable for all kinds of molecules. While it cannot support
+      everything out of the box, it is designed to be easily extended. For notes
+      on how to extend MMEA, see the developer's guide.
+    </p>
+
+    <h1 id="installing_mmea">Installing MMEA</h1>
+    <p>
+        Dunno yet.
+    </p>
+
+    <h1 id="input_files">Input Files</h1>
+    <p>
+      To run MMEA you need to use an input file. These contain all the details
+      required to start a GA calculation. Among other things, this may include
+      things like which fitness function you want to use, the number of
+      generations MMEA should make and how big the population should be. Have
+      a quick look at the example input file below, no need to understand
+      anything just yet.<br>
+      <code class="whole_file">
+        ####################################################################<br>
+        # Population initialization function.<br>
+        ####################################################################<br>
+<br>
+        init_func; init_random_cages;<br>
+        bb_db="/home/username/aldehydes_3f";<br>
+        lk_db="/home/username/amines_2f";<br>
+        topologies=[FourPlusSix, EightPlusTwelve]<br>
+<br>
+        ####################################################################<br>
+        # Selection function for selecting the next generation.<br>
+        ####################################################################<br>
+<br>
+        generational_select_func; stochastic_sampling; use_rank=True<br>
+<br>
+        ####################################################################<br>
+        # Selection function for selecting parents.<br>
+        ####################################################################<br>
+<br>
+        parent_select_func; crossover_roulette<br>
+<br>
+        ####################################################################<br>
+        # Selection function for selecting molecules for mutation.<br>
+        ####################################################################<br>
+<br>
+        mutant_select_func; stochastic_sampling; duplicates=True<br>
+<br>
+        ####################################################################<br>
+        # Crossover function.<br>
+        ####################################################################<br>
+<br>
+        crossover_func; bb_lk_exchange<br>
+<br>
+        ####################################################################<br>
+        # Mutation function 1.<br>
+        ####################################################################<br>
+<br>
+        mutation_func; similar_bb;<br>
+        database="/home/username/aldehydes_3f"<br>
+<br>
+        ####################################################################<br>
+        # Mutation function 2.<br>
+        ####################################################################<br>
+<br>
+        mutation_func; similar_lk;<br>
+        database="/home/username/amines_2f"<br>
+<br>
+        ####################################################################<br>
+        # When carrying mutations, chance that a given mutation function will be used.<br>
+        ####################################################################<br>
+<br>
+        mutation_weights=[1/2,1/2]<br>
+<br>
+        ####################################################################<br>
+        # Optimization function.<br>
+        ####################################################################<br>
+<br>
+        opt_func; macromodel_cage_opt;<br>
+        macromodel_path="/home/username/program_files/schrodinger2016-3"<br>
+<br>
+        ####################################################################<br>
+        # Fitness function.<br>
+        ####################################################################<br>
+<br>
+        fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
+        energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}<br>
+<br>
+        ####################################################################<br>
+        # Number of generations to create.<br>
+        ####################################################################<br>
+<br>
+        num_generations=10<br>
+<br>
+        ####################################################################<br>
+        # Number of mutation operations to perform each generation.<br>
+        ####################################################################<br>
+<br>
+        num_mutations=10<br>
+<br>
+        ####################################################################<br>
+        # Number of crossover operations to perform each generation.<br>
+        ####################################################################<br>
+<br>
+        num_crossovers=15<br>
+<br>
+        ####################################################################<br>
+        # Size of the population.<br>
+        ####################################################################<br>
+<br>
+        pop_size=20<br>
+      </code>
+
+    <h2>Format and structure.</h2>
+    <p>
+        The input file consists of a sequence of commands. Each command defines
+        a variable or function used by MMEA. If the command defines a function
+        used by MMEA, it must also define any parameters necessary to use the
+        function. It does not have to define any default initialized parameters,
+        though it may if desired.
+    </p><p>
+        Commands can be written across multiple lines
+        and terminate when the last parameter is defined. This means that
+    <code>
+          generational_select_func;<br>
+          stochastic_sampling;<br>
+          use_rank=True
+    </code>
+    and
+    <code>
+        mutant_select_func; stochastic_sampling; duplicates=True
+    </code>
+    define the same command.
+    </p><p>
+    Any lines consiting of only whitespace or begging with
+    <span class="value">#</span> are ignored. This
+    can be useful for separating the input file into sections or explaining what
+    a command is doing. For example,
+    <code>
+        ####################################################################<br>
+        # Selection function for selecting molecules for mutation.<br>
+        ####################################################################<br>
+<br>
+        mutant_select_func; stochastic_sampling; duplicates=True
+    </code></p>
+    <p>
+        There are two kinds of command in the input file. The first kind has the
+        form
+      <code>
+            keyword; function_name; param1=val1; param2=val2; param3=val3
+      </code>
+        For example,
+      <code>
+            generational_select_func; stochastic_sampling; use_rank=True
+      </code>
+        This means that the keyword is
+        <span class="value">generational_select_func</span>, the
+        function name is <span class="value">stochastic_sampling</span>,
+        parameter 1's name is <span class="value">use_rank</span> and its value
+        is <span class="value">True</span>. As you can see, in this case
+        there is only 1 parameter name-value pair. The words which
+        make up the command are separated by a semicolon. Notice that last
+        word of a command is not followed by one.
+    </p><p>
+        Commands with this format define functions used by MMEA. As a result,
+        it is called the <b>function definition format</b>.
+        The function will correspond to the
+        various GA operations, such as crossover, mutation and selection, or to
+        things like the fitness function or optimization function (which
+        optimizes the geometry of molecules created by MMEA).
+    </p><p>
+        The keyword defines which GA operation the command describes. In the
+        command above the keyword
+        <span class="value">generational_select_func</span>
+        signifies that the command defines which function is to be used for
+        selecting members of the next generation. The keyword in the command
+      <code>
+        parent_select_func; crossover_roulette
+      </code>
+        is <span class="value">parent_select_func</span>, which signifies that
+        the command defines the
+        function used for selecting parents for crossover. A list of valid
+        keywords is described in a following section.
+    </p><p>
+        The parameter <span class="value">function_name</span> immediately
+        follows the keyword (not counting the semicolon of course). It is the name
+        of the function which carries out the role defined by the keyword. In
+        a GA there are many tools for the same job. For example, if you wanted to
+        select members of the next generation you could select the 4 with the
+        highest fitness. Alternatively, you could select 4 completely at random.
+        In both cases you fulfill the same role and would therefore use the
+        keyword
+        <span class="value">generational_select_func</span> but you use different
+        functions to do it, hence different values would go into the
+        <span class="value">function_name</span> parameter.
+    </p><p>
+        Unsurprisingly, <span class="value">function_name</span> must correspond to
+        the name of a function defined within MMEA. Not only that, but the
+        function must also fulfill the role designated by the keyword. For
+        example, if the keyword is
+        <span class="value">generational_select_func</span> then
+        <span class="value">fittest</span> and
+        <span class="value">roulette</span> are both valid values.
+        How MMEA can give you the names and descriptions of valid functions
+        is described later in this guide.
+    </p><p>
+        Coming back to the command outline,
+        <code>
+              keyword; function_name; param1=val1; param2=val2; param3=val3
+        </code>
+        there is one part which still needs to be discussed. The
+        <span class="value">param</span> and
+        <span class="value">val</span> fields. These form a tuple separated by
+        <span class="value">=</span> and no space. Individual
+        <span class="value">param=val</span> tuples are then sperated by
+        semicolons and can be placed on individual lines.
+    </p><p>
+        As is relatively
+        normal for
+        functions, functions in MMEA take parameters. The names and number of
+        parameters will vary depending on the function. Some may take none.
+        Others may require you to input the values of some parameters and allow
+         you to omit others. When a function has a parameter that
+        it does not force you to define in the input file, it is <b> default
+        initialized</b>. This means that if you don't define the parameter
+        in the input file it defaults to some predetermined value. Once again,
+        if you want to know the valid parameters for a given function, a
+        description of how MMEA will give you this is given later.
+    </p><p>
+        Valid <span class="value">val</span> values depend on the parameter.
+        These follow Python syntax. So if a parameter wants you to
+        input some numerical value,
+        <code>
+            some_keyword; some_function_name; some_param=1.2
+        </code>
+        would be perfectly fine. On the other hand, if a parameter wanted a
+        string,
+        <code>
+            some_keyword; some_function_name; some_param="this is a string"
+        </code>
+    </p><p>
+        What if a numpy array is desired or some user-defined type buried deep
+        within the source code?
+        <code>
+            some_keyword; some_function_name; some_param=np.array([12, 3, 4])
+        </code>
+        and
+        <code>
+            some_keyword; some_function_name; some_param=SomeUsrType(12.1, "asd")
+        </code>
+        would both work! As long as the parameter says it needs a give type,
+        you can safely enter it, as long as you stick to Python syntax. Note
+        that the order in which you give the parameter-value tuples does not
+        matter.
+    </p><p>
+        All keywords should be defined in the input file once. The exception to
+        this is <span class="value">mutation_func</span>. It is quite possible
+        that during a GA run the
+        user wishes to use multiple mutation operations. As a result it is
+        perfectly reasonable to include multiple commands with the keyword
+        <span class="value">mutation_func</span>. When this is done, the user
+        must also include the line
+      <code>
+        mutation_weights=[0.1, 0.45, 0.45]
+      </code>
+        This line tells MMEA that when a mutation is to be performed it should
+        select the first mutation function defined in the input file with a 0.1
+        probability and the second and third mutation functions defined in the
+        input file with a 0.45 probability. The probabilities can of course be
+        modified by the user. The only requirements are that the probabilities
+        sum to 1 and that the number of elements in the list and the number of
+        mutation functions defined in the input file is the same.
+    </p><p>
+        There is a second kind of non-comment line in the input file of MMEA.
+        These lines have the form
+      <code>
+        keyword=val
+      </code>
+        As you can see, these are much simpler. They define basic constants
+        relevant to the GA. As a result, this is called the <b>constant
+        definition format</b>. This includes things like population size, number
+        of crossover operations carried out during each generation and so on. It
+        is merely the keyword, a <span class="value">=</span> and the value. No
+        spaces, no semicolons.
+    </p>
+    <h2>Valid input values.</h2>
+    <p>
+        In order to prevent the need to continuously update this documentation
+        when a new function is added to MMEA, only valid keywords are described
+        here. However, this does not mean a user has to go into the source code
+        to find out what functions they have at their disposal. This section
+        also describes how MMEA can be made to output valid function names and
+        parameters for each keyword.
+    </p>
+    <h3>List and explanation of valid keywords.</h3>
+
+    <p>
+        The keywords are given here with the following format<br><br>
+        <span class="value">keyword</span> - <b>line format</b> - <i>excluded_param1</i>, <i>excluded_param2</i> - Explantion of keyword.<br><br>
+        Excluded parameters are those that the function documentation may state
+        as required, but which do not need to be provided in the input file.
+    </p><p>
+
+The keywords are:<br><br>
+<span class="value">init_func</span> - <b>function definition format</b> - <i>ga_tools</i> - The function used to create the initial population.<br><br>
+<span class="value">generational_select_func</span> - <b>function definition format</b> -  <i>population</i> - The function used to select members of the next generation.<br><br>
+<span class="value">parent_select_func</span> - <b>function definition format</b> -  <i>population</i>  - The function used to select parents for crossover.<br><br>
+<span class="value">mutant_select_func</span> - <b>function definition format</b> -  <i>population</i>  - The function used to select individuals for mutation.<br><br>
+<span class="value">crossover_func</span>  - <b>function definition format</b> -  <i>marco_mol1</i> , <i>macro_mol2</i>  - The function which carries out the crossover operation.<br><br>
+<span class="value">mutation_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which carries out the mutation operation.<br><br>
+<span class="value">opt_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which optimizes the geometry of the molecules.<br><br>
+<span class="value">fitness_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which calculates fitness.<br><br>
+<span class="value">normalization_func</span>  - <b>function definition format</b> -  <i>population</i>  - The function which normalizes fitness values. This keyword is optional.<br><br>
+<span class="value">exit_func</span>  - <b>function definition format</b> - <i>population</i> - This is an optional keyword. It defines functions which cause the GA to stop before all the generations have been made.
+For example, once a given fittness has been reached or a certian molecule has been made.<br><br>
+<span class="value">num_generations</span>  - <b>constant definition format</b> - The number of generations which MMEA will create.<br><br>
+<span class="value">num_mutations</span>  - <b>constant definition format</b> - The number of mutations MMEA will carry out each generation.<br><br>
+<span class="value">num_crossovers</span>  - <b>constant definition format</b> - The number of crossover operations MMEA will carry out each generation.<br><br>
+<span class="value">pop_size</span>  - <b>constant definition format</b> - The size of the population.<br><br>
+<span class="value">mutation_weights</span>  - <b>constant definition format</b> - The probability with which each mutation function defined in the input
+file will be used when a mutation operation is performed. Note that the form of this constant is a list. For example<br><br>
+    <code>
+        mutation_weights=[0.1, 0.45, 0.45]
+    </code>
+</p>
+    <h3>Finding available functions and their arguments.</h3>
+
+    <p>
+        In order to find out what functions MMEA offers for a given keyword,
+        using the console go into the directory containing MMEA.<br>
+        Run the command
+    <code class="mmea_output">
+        python -m MMEA -h keyword
+    </code>
+        where <span class="value">keyword</span> is one of the valid keywords defined
+        in the previous section or <span class="value">energy</span> or
+        <span class="value">topologies</span>. <span class="value">energy</span>
+        lists the functions available for energy
+        calculations while the <span class="value">topology</span> lists the
+        macromolecules MMEA can construct. These values are often used as
+        parameters in functions.
+    </p><p>
+        Let's see an example,
+        <code class="mmea_output">
+            python -m MMEA -h mutation_func
+        </code>
+        MMEA will then output a list of valid functions, their description, and
+        a list of their parameters.
+        <code class="mmea_output">
+            random_bb<br>
+            ---------<br>
+<br>
+                    &emsp;Substitutes a building-block* with a random one from a database.<br>
+<br>
+                    &emsp;Parameters<br>
+                    &emsp;----------<br>
+                &emsp;&emsp;macro_mol : Cage<br>
+                        &emsp;&emsp;&emsp;The cage who's building-block* will be exchanged. Note that<br>
+                        &emsp;&emsp;&emsp;the cage is not destroyed. It is used a template for a new<br>
+                        &emsp;&emsp;&emsp;cage.<br>
+<br>
+                    &emsp;&emsp;database : str<br>
+                        &emsp;&emsp;&emsp;The full path of the database from which a new<br>
+                    &emsp;&emsp;&emsp;building-block* is to be found.<br>
+<br>
+                    &emsp;Returns<br>
+                &emsp;-------<br>
+                    &emsp;&emsp;Cage<br>
+                        &emsp;&emsp;&emsp;A cage instance generated by taking all attributes of<br>
+                        &emsp;&emsp;&emsp;`macro_mol` except its building-block* which is replaced by<br>
+                        &emsp;&emsp;&emsp;a random building-block* from `database`.<br>
+<br>
+<br>
+            random_cage_topology<br>
+            --------------------<br>
+<br>
+                    &emsp;Changes `macro_mol` topology to a random one from `topologies`.<br>
+<br>
+                    &emsp;Parameters<br>
+                    &emsp;----------<br>
+                    &emsp;&emsp;macro_mol : Cage<br>
+                        &emsp;&emsp;&emsp;The cage which is to be mutated.<br>
+<br>
+                    &emsp;&emsp;topologies : list of CageTopology instances<br>
+                        &emsp;&emsp;&emsp;This lists holds the topology classes from which one is<br>
+                        &emsp;&emsp;&emsp;selected at random to form a new cage. If the `macro_mol`<br>
+                        &emsp;&emsp;&emsp;has a topology found in `topologies` that topology will not<br>
+                        &emsp;&emsp;&emsp;be selected.<br>
+<br>
+                    &emsp;Returns<br>
+                    &emsp;-------<br>
+                    &emsp;&emsp;Cage<br>
+                        &emsp;&emsp;&emsp;A cage generated by initializing a new ``Cage`` instance<br>
+                        &emsp;&emsp;&emsp;with all the same paramters as `macro_mol` except for the<br>
+                        &emsp;&emsp;&emsp;topology.<br>
+<br>
+<br>
+            similar_bb<br>
+            ----------<br>
+<br>
+                    &emsp;Substitute the building-block* with similar one from `database`.<br>
+<br>
+                    &emsp;All of the molecules in `database` are checked for similarity to<br>
+                    &emsp;the building-block* of `macro_mol`. The first time this mutation<br>
+                    &emsp;function is run on a cage, the most similar molecule in<br>
+                    &emsp;`database` is used to substitute the building-block*. The next<br>
+                    &emsp;time this mutation function is run on the same cage, the second<br>
+                    &emsp;most similar molecule from `database` is used and so on.<br>
+<br>
+                    &emsp;Parameters<br>
+                    &emsp;----------<br>
+                    &emsp;&emsp;macro_mol : Cage<br>
+                        &emsp;&emsp;&emsp;The cage which is to have its building-block* substituted.<br>
+<br>
+                    &emsp;&emsp;database : str<br>
+                        &emsp;&emsp;&emsp;The full path of the database from which molecules are used<br>
+                        &emsp;&emsp;&emsp;to substitute the building-block* of `macro_mol`.<br>
+<br>
+                    &emsp;Modifies<br>
+                    &emsp;--------<br>
+                    &emsp;&emsp;macro_mol._similar_bb_mols : generator<br>
+                        &emsp;&emsp;&emsp;Creates this attribute on the `macro_mol` instance. This<br>
+                        &emsp;&emsp;&emsp;allows the function to keep track of which molecule from<br>
+                        &emsp;&emsp;&emsp;`database` should be used in the substitution.<br>
+<br>
+                    &emsp;Returns<br>
+                    &emsp;-------<br>
+                    &emsp;&emsp;Cage<br>
+                        &emsp;&emsp;&emsp;A new cage with the same linker as `macro_mol` but a<br>
+                        &emsp;&emsp;&emsp;different building-block*. The building-block* is selected<br>
+                        &emsp;&emsp;&emsp;according to the description in this docstring.<br>
+<br>
+<br>
+            similar_lk<br>
+            ----------<br>
+<br>
+                    &emsp;Substitute the linker with a similar one from `database`.<br>
+<br>
+                    &emsp;All of the molecules in `database` are checked for similarity to<br>
+                    &emsp;the linker of `macro_mol`. The first time this mutation function<br>
+                    &emsp;is run on a cage, the most similar molecule in `database` is<br>
+                    &emsp;used to substitute the linker. The next time this mutation<br>
+                    &emsp;function is run on the same cage, the second most similar<br>
+                    &emsp;molecule from `database` is used and so on.<br>
+<br>
+                    &emsp;Parameters<br>
+                    &emsp;----------<br>
+                    &emsp;&emsp;macro_mol : Cage<br>
+                        &emsp;&emsp;&emsp;The cage which is to have its linker substituted.<br>
+<br>
+                    &emsp;&emsp;database : str<br>
+                        &emsp;&emsp;&emsp;The full path of the database from which molecules are used<br>
+                        &emsp;&emsp;&emsp;to substitute the linker of `macro_mol`.<br>
+<br>
+                    &emsp;Modifies<br>
+                    &emsp;--------<br>
+                    &emsp;&emsp;macro_mol._similar_lk_mols : generator<br>
+                        &emsp;&emsp;&emsp;Creates this attribute on the `macro_mol` instance. This<br>
+                        &emsp;&emsp;&emsp;allows the function to keep track of which molecule from<br>
+                        &emsp;&emsp;&emsp;`database` should be used in the substitution.<br>
+<br>
+                    &emsp;Returns<br>
+                    &emsp;-------<br>
+                    &emsp;&emsp;Cage<br>
+                        &emsp;&emsp;&emsp;A new cage with the same building-block* as `macro_mol` but<br>
+                        &emsp;&emsp;&emsp;a different linker. The linker is selected according to the<br>
+                        &emsp;&emsp;&emsp;description in this docstring.<br>
+<br>
+<br>
+            random_lk<br>
+            ---------<br>
+<br>
+                    &emsp;Substitutes a linker with a random one from a database.<br>
+<br>
+                    &emsp;Parameters<br>
+                    &emsp;----------<br>
+                    &emsp;&emsp;macro_mol : Cage<br>
+                        &emsp;&emsp;&emsp;The cage who's linker will be exchanged. Note that<br>
+                        &emsp;&emsp;&emsp;the cage is not destroyed. It is used a template for a new<br>
+                        &emsp;&emsp;&emsp;cage.<br>
+<br>
+                    &emsp;&emsp;database : str<br>
+                        &emsp;&emsp;&emsp;The full path of the database from which a new linker is to<br>
+                        &emsp;&emsp;&emsp;be found.<br>
+<br>
+                    &emsp;Returns<br>
+                    &emsp;-------<br>
+                    &emsp;&emsp;Cage<br>
+                        &emsp;&emsp;&emsp;A cage instance generated by taking all attributes of<br>
+                        &emsp;&emsp;&emsp;`macro_mol` except its linker which is replaced by a random<br>
+                        &emsp;&emsp;&emsp;linker from `database`.<br>
+        </code>
+
+    </p>
+
+    <p>
+        In this example, the keyword <span class="value">mutation_func</span> was
+        used. Now we can select one of the mutation functions MMEA supports and
+        add a line into the input file,
+      <code>
+        mutation_func; random_bb; database="path/to/some/database"
+      </code>
+  </p>
+
+    <h2>Example</h2>
+
+    <p class="wide">
+        Here is an example input file followed by a line by line explanation of
+        what it's doing.
+
+    <code class="whole_file">
+###################################################################<br>
+# Population initialization function.<br>
+###################################################################<br>
+<br>
+init_func; init_random_cages;<br>
+bb_db="/home/username/aldehydes_3f";<br>
+lk_db="/home/username/amines_2f";<br>
+topologies=[FourPlusSix, EightPlusTwelve]<br>
+<br>
+###################################################################<br>
+# Selection function for selecting the next generation.<br>
+###################################################################<br>
+<br>
+generational_select_func; stochastic_sampling; use_rank=True<br>
+<br>
+###################################################################<br>
+# Selection function for selecting parents.<br>
+###################################################################<br>
+<br>
+parent_select_func; crossover_roulette<br>
+<br>
+###################################################################<br>
+# Selection function for selecting molecules for mutation.<br>
+###################################################################<br>
+<br>
+mutant_select_func; stochastic_sampling; duplicates=True<br>
+<br>
+###################################################################<br>
+# Crossover function.<br>
+###################################################################<br>
+<br>
+crossover_func; bb_lk_exchange<br>
+<br>
+###################################################################<br>
+# Mutation function 1.<br>
+###################################################################<br>
+<br>
+mutation_func; similar_bb;<br>
+database="/home/username/aldehydes_3f"<br>
+<br>
+###################################################################<br>
+# Mutation function 2.<br>
+###################################################################<br>
+<br>
+mutation_func; similar_lk;<br>
+database="/home/username/amines_2f"<br>
+<br>
+###################################################################<br>
+# When carrying mutations, chance that a given mutation function will be used.<br>
+###################################################################<br>
+<br>
+mutation_weights=[1/4,3/4]<br>
+<br>
+###################################################################<br>
+# Optimization function.<br>
+###################################################################<br>
+<br>
+opt_func; macromodel_cage_opt;<br>
+macromodel_path="/home/username/program_files/schrodinger2016-3"<br>
+<br>
+###################################################################<br>
+# Fitness function.<br>
+###################################################################<br>
+<br>
+fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
+energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}<br>
+<br>
+###################################################################<br>
+# Normalization function.<br>
+###################################################################<br>
+<br>
+normalization_func; carrots_and_sticks; carrot_coeffs=[1]; stick_coeffs=[1,1,1,1];<br>
+carrot_exponents=[1]; stick_exponents=[1,1,1,1]<br>
+<br>
+###################################################################<br>
+# Number of generations to create.<br>
+###################################################################<br>
+<br>
+num_generations=10<br>
+<br>
+###################################################################<br>
+# Number of mutation operations to perform each generation.<br>
+###################################################################<br>
+<br>
+num_mutations=10<br>
+<br>
+###################################################################<br>
+# Number of crossover operations to perform each generation.<br>
+###################################################################<br>
+<br>
+num_crossovers=15<br>
+<br>
+###################################################################<br>
+# Size of the population.<br>
+###################################################################<br>
+<br>
+pop_size=20
+    </code>
+</p>
+    <p>
+        The first command,
+        <code>
+            init_func; init_random_cages;<br>
+            bb_db="/home/username/aldehydes_3f";<br>
+            lk_db="/home/username/amines_2f";<br>
+            topologies=[FourPlusSix, EightPlusTwelve]
+        </code>
+
+        has the keyword <span class="value">init_func</span>, which  means that
+        it defines the initialization function
+        for the GA population. The initialization function is called
+        <span class="value">init_random_cages</span>. This function
+        creates a population consisting of randomly assembled porous "cage"
+        molecules. The
+         function
+        takes the parameter <span class="value">bb_db</span> which receives a
+        string. The string is the  path of  a directory which holds monomers
+        used for constructing the cages. The
+        parameter <span class="value">lk_db</span> has the same role. The
+        parameter <span class="value">topologies</span> requires a list. The
+         list contains the names of cage topologies defined within
+        MMEA.
+    </p><p>
+        The second command,
+        <code>
+            generational_select_func; stochastic_sampling; use_rank=True
+        </code>
+        defines which function is to select members of
+        successive generations. The function used to do this is
+        <span class="value">stochastic_sampling</span> and the
+        <span class="value">use_rank</span> parameter indicates that the
+        inidividuals should be selected based on their rank in their population
+        rather than their fitness.
+    </p><p>
+        The third command,
+        <code>
+            parent_select_func; crossover_roulette
+        </code>
+        defines which function is to select parents when crossover operations
+        are performed. This function takes no parameters.
+    </p><p>
+        The fourth command,
+        <code>
+mutant_select_func; stochastic_sampling; duplicates=True
+        </code>
+        defines which function is to select parents when mutation operations
+        are performed. The parameter <span class="value">duplicates</span>
+        indicates that a molecule can be selected more than once.
+    </p><p>
+        The fifth command,
+        <code>
+crossover_func; bb_lk_exchange
+        </code>
+        defines the function which performs the crossover operation. In this case
+        the building block and linkers of the two parents are exchanged to create
+        the "offspring". Again, no parameters here.
+    <p>
+        The sixth command,
+        <code>
+        mutation_func; similar_bb;
+        database="/home/username/aldehydes_3f"
+        </code>
+        defines the function which performs the mutation operation. In this
+        case the function <span class="value">similar_bb</span>. The seventh
+        commands also defines a mutation operation.
+    </p>
+    <p>
+        The eight command,
+        <code>
+            mutation_weights=[1/4, 3/4]
+        </code>
+        Says that when a mutation operation is to be performed, the first
+        mutation function defined in the input file should be selected with a
+        probability of 0.25 and the second with a probability of 0.75.
+    </p><p>
+        The ninth command,
+        <code>
+            opt_func; macromodel_cage_opt;<br>
+            macromodel_path="/home/username/program_files/schrodinger2016-3"
+        </code>
+        defines the optimization function which is used to optimize the geometry
+        of all generated molecules. The <span class="value">macromodel_path</span>
+        parameter holds the path where the MacroModel program is installed, as
+        this function uses it to perform the optimizations. Yep, you're going
+        need a MacroModel license to use this one.
+    </p><p>
+        The tenth command,
+        <code>
+            fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
+            energy_params={'energy_func': <br>
+            &emsp;&emsp;&emsp;&emsp;FunctionData('macromodel', <br>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;forcefield=16, <br>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;macromodel_path='/home/username/schrodinger2016-3')}
+        </code>
+        defines the fitness function of your GA. The <span class="value">cage</span>
+        fitness function is used for evaluating porous "cage" molecules.
+    Alternatives exist of course, depening on what kinds of molecules you want
+    MMEA to generate. Notice the <span class="value">energy_params</span>
+    parameter. It looks a little confusing. However, by breaking it down you will
+    see that the parameter's value is just a Python dictionary as denoted by the
+    curly brackets, <span class="value">{}</span>. The dictionary holds one key : value pair.
+    The key in this case is the string <span class="value">'energy_func'</span>.
+    The value associated with the key is a <span class="value">FunctionData</span>
+    object. This is a type used by MMEA to describe functions. The name of the
+    function is <span class="value">'macromodel'</span> and it takes the
+    parameter <span class="value">forcefield</span> which is to be set to
+    <span class="value">16</span>. It also takes the parameter
+    <span class="value">macromodel_path</span> which again points to the
+    MacroModel installation directory. All this is doing is telling the fitness function
+    to use a specific energy function when working out the molecular energies.
+</p><p>
+    The eleventh command,
+    <code>
+        normalization_func; carrots_and_sticks; carrot_coeffs=[1]; stick_coeffs=[1,1,1,1];<br>
+        carrot_exponents=[1]; stick_exponents=[1,1,1,1]
+    </code>
+    defines the normalization used for normalizing the fitness values
+    of the population. In this case the
+    <span class="value">carrots_and_sticks</span> function is used
+    for normalizing the values. What it does is explained in the
+    documentation (try the <span class="value">-h</span> option).
+</p><p>
+    The important point here is that some fitness functions may
+    require certain normalization functions for the GA to run
+    properly. In this case, <span class="value">cage</span>
+    always requires that <span class="value">carrots_and_sticks</span>
+    is defined in the input file. If a fitness function requires
+    a given normalizatoin function, it should be specified in its
+    documentation. The reverse is true as well. Some normalization
+    functions may need specific fitness functions to work properly. However
+    less restrive combinations may exist as well.
+
+</p><p class="wide">
+    The twelveth command,
+    <code>
+        num_generations=10
+    </code>
+    tells MMEA that it should stop after creating <span class="value">10</span> generations of molecules.
+
+</p><p class="wide">
+    The thirteenth command,
+    <code>
+        num_mutations=10
+    </code>
+    tells MMEA that it should carry out <span class="value">10</span> mutation operations each generation.
+
+</p><p class="wide">
+    The fourteenth command,
+    <code>
+        num_crossovers=15
+    </code>
+    tells MMEA that it should carry out <span class="value">15</span> crossover operations each generation.
+</p><p class="wide">
+        The fifteenth command,
+        <code>
+            pop_size=20
+        </code>
+        tells MMEA that the population's size should be <span class="value">20</span>.
+</p>
+        <h1>Running MMEA</h1>
+    <h2>From the command line.</h2>
+    <p>
+    Using the console make sure you are in the directory containing MMEA (not in MMEA itself).
+    Run the command,
+    <code class="mmea_output">
+        python -m MMEA input_file
+    </code>
+
+    where <span class="value">input_file</span> is the path to your input file.
+</p>
+
+    <h1>Output</h1>
+    <p>
+    While working MMEA will create a directory called <b>output</b>. Once the
+    GA has finished a new folder called <b>old_output</b> will be created and
+    your <b>output</b> folder will be placed inside. If you run multiple GA runs
+    each succesive <b>output</b> file will be placed in the <b>old_output</b>
+    folder and labelled from <b>0</b> upwards.
+</p>
+    <h1>MMEA as a Library</h1>
+  </body>
+</html>
