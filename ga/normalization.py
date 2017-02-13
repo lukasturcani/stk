@@ -138,15 +138,41 @@ class Normalization:
 
         """
 
-    def magnitudes(population, use_fitness=False):
+    def magnitudes(self, population):
         """
-        Normalizes the values in unscaled_fitness by the average.
+        Normalizes the relative values of elements in `fitness`.
 
-        This normalization function is not stand-alone. It is desinged
-        to be chained to other normalization functions.
+        This normalization function assumes that the value in `fitness`
+        is a numpy array:
 
-        Assumes that the populations members have a numpy array in their
-        `unscaled_fitness` attribute. The following steps are performed:
+            macro_mol.fitness = np.array([1000, 5e-5, 25])
+
+        Notice that each element has a very different order of
+        magnitude. For example if the fitness function calculated the
+        energy value of the molecule, its radius and the number of
+        atoms in it, this could be the data placed in the `fitness`
+        attribute.
+
+        When calculating the total fitness pased on thse values, it
+        would be useful to make them comparable. As it is, you can't
+        compare 10,000 kJ mol-1 and 5e-5 Angstroms. However what you
+        can do is check how much bigger or smaller than average
+        10,000 kJ mol-1 and 5e-5 Angstrom are. Then replace these
+        values with the size relative to the average. For example:
+
+            macro_mol.fitness = np.array([2, 0.5, 3])
+
+        This would be the outout of this function. It shows that the
+        energy of a given `macro_mol` is twice as large as the mean
+        energy of the population. The radius is half the average
+        molecular radius of the population and so on.
+
+        Now these values can be combined in a reasonable way. However,
+        that will have to be done by other normalization functions.
+        This one only scales relative to the population average.
+
+        Assuming that the populations members have a numpy array in
+        their `fitness` attribute. The following steps are performed:
 
             1) Calculate the mean value for each element across the
                population.
@@ -165,12 +191,6 @@ class Normalization:
         population : Population
             The population whose fitness values are normalized.
 
-        use_fitness : bool (default = False)
-            If ``True`` the normalization function is applied to the
-            values in the `fitness` attribute of members instead of
-            `unscaled_fitness`. This is necessary when using multiple
-            normalization functions in a row.
-
         Modifies
         --------
         fitness : numpy.array
@@ -182,9 +202,19 @@ class Normalization:
 
         """
 
-        # Ge the name of the attribute which is
-        if use_fitness:
-            attr_name
-
         # Get the mean of each element.
-        means = population.mean(lambda x : x.unscaled_fitness)
+        means = population.mean(lambda x : x.fitness)
+
+        # Replace values by deviations from mean.
+        for macro_mol in population:
+            macro_mol.fitness = macro_mol.fitness - means
+
+        
+
+
+    def pareto(self, population):
+        """
+
+        """
+
+        ...
