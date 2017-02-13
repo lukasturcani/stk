@@ -178,7 +178,12 @@ def run():
         # Save the min, max and mean values of the population.  
         with time_it():
             print_info('Recording progress.')
-            progress.update(pop)        
+            progress.update(pop)
+        
+        # If the user defined some premature exit function, check if the
+        # exit criterion has been fulfilled.
+        if pop.exit():
+            break
         
     # Running MacroModel optimizations sometimes leaves applications 
     # open. This closes them. If this is not done, directories may not 
@@ -190,7 +195,7 @@ def run():
         print_info('Plotting EPP.')
         plot.epp(progress, os.path.join(root_dir, 'epp.png'),
                  ga_input.fitness_func, 
-                 pop.ga_tools.normalization.scaling_func)
+                 pop.ga_tools.normalization)
     
     os.chdir(root_dir)
     # Dump the GAProgress instance.

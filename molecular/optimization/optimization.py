@@ -6,29 +6,29 @@ Extending MMEA: Adding optimization functions
 New optimization functions are added by writing them into this module.
 The only requirements are that the first argument is ``macro_mol`` and
 that the function returns the optimized instance of ``macro_mol``. The
-frist requirement allows users to identify which arguments are handled
+first requirement allows users to identify which arguments are handled
 automatically by MMEA and which need to be defined in the input file.
 The convention is that if the optimization function takes an argument 
 called ``macro_mol`` the users does not have to specify that argument in 
-the input file. The second requirment is necessary for reasons to do
-with parallization. If it is not fulfilled, the molecule will not be
+the input file. The requirment is necessary for reasons to do with 
+parallization. If it is not fulfilled, the molecule will not be
 updated with the optimized version.
 
-Optionally optimizations can be complicated. If the use of helper
-functions is required make sure that they are private, ie that their
-names begin with a leading underscore. In the event that the
-optimization is so complex that it requires its own module, place the 
-module in the to same folder as this file. Then import the optimization
-function into this file. See the ``macromodel.py`` as an example. Make
-sure that only the optimization functions are imported back into this
-file, not any of the helper functions or classes. 
+Optimizations can be complicated. If the use of helper functions is 
+required make sure that they are private, ie that their names begin with 
+a leading underscore. In the event that the optimization is so complex 
+that it requires its own module, place the module in the to same folder 
+as this file. Then import the optimization function into this file. See 
+the ``macromodel.py`` as an example. Make sure that only the 
+optimization functions are imported back into this file, not any of the 
+helper functions or classes. 
 
 """
 
 import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
 import multiprocessing as mp
-from functools import partial
+from functools import partial, wraps
 
 from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt, 
@@ -99,7 +99,7 @@ def _optimize_all(func_data, population):
     # module.
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may require.
-    p_func = partial(func, **func_data.params)
+    p_func = _OptimizationFunc(partial(func, **func_data.params))
     
     # Apply the function to every member of the population, in parallel.
     with mp.get_context('spawn').Pool() as pool:
@@ -160,10 +160,49 @@ def _optimize_all_serial(func_data, population):
     # module.    
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may require.
-    p_func = partial(func, **func_data.params)
+    p_func = _OptimizationFunc(partial(func, **func_data.params))
     
     # Apply the function to every member of the population.    
     return iter(p_func(member) for member in population)    
+
+class _OptimizationFunc:
+    """
+    A decorator for optimziation functions.
+
+    This decorator is applied to all optimization functions 
+    automatically in _otpimize_all(). It should not be applied 
+    explicitly when defining the functions.
+    
+    This decorator prevents optimization functions from raising if 
+    they fail (necessary for multiprocessing) and prevents them from
+    being run twice on the same molecule.
+    
+    Attributes
+    ----------
+    func : function
+        The function which is to have decorations applied.    
+    
+    """
+    
+    def __init__(self, func):
+        self.func = func
+        wraps(func)(self)
+    
+    def __call__(self, macro_mol, *args,  **kwargs):
+        try:
+            if macro_mol.optimized:
+                print('Skipping {0}'.format(macro_mol.file))
+                return macro_mol
+                
+            print('\nOptimizing {0}.'.format(macro_mol.file)) 
+            return self.func(macro_mol, *args, **kwargs)
+            
+        except Exception as ex:
+            # Prevents the error from being raised, but records it in 
+            # ``failures.txt``.
+            macro_mol.fail()
+            MolError(ex, macro_mol, "During optimization.")
+            return macro_mol
     
 def rdkit_optimization(macro_mol):
     """
@@ -199,28 +238,17 @@ def rdkit_optimization(macro_mol):
         more details.
     
     """
+        
+    # Sanitize then optimize the rdkit molecule.
+    chem.SanitizeMol(macro_mol.mol)
+    ac.MMFFOptimizeMolecule(macro_mol.mol)
+    
+    # Update the content of the structure file.
+    macro_mol.write()
+    
+    macro_mol.optimized = True   
+    return macro_mol
 
-    try:    
-    
-        # If `macro_mol` is already optmized, return.
-        if macro_mol.optimized:
-            print('Skipping {0}.'.format(macro_mol.file))   
-            return macro_mol
-            
-        # Sanitize then optimize the rdkit molecule.
-        chem.SanitizeMol(macro_mol.mol)
-        ac.MMFFOptimizeMolecule(macro_mol.mol)
-        
-        # Update the content of the structure file.
-        macro_mol.write()
-        
-        macro_mol.optimized = True   
-        return macro_mol
-    
-    except Exception as ex:
-        macro_mol.fail()
-        MolError(ex, macro_mol, 'Error during rdkit_optimization().')
-    
 def do_not_optimize(macro_mol):
     """
     Skips the optimization step.
@@ -245,11 +273,34 @@ def do_not_optimize(macro_mol):
         The macromolecule not getting optimized.
     
     """
-    
-    if macro_mol.optimized:
-        print('Skipping', macro_mol.file)
-        return macro_mol
-    
-    print('Optimizing', macro_mol.file)
+
     macro_mol.optimized = True   
     return macro_mol   
+
+def raiser(macro_mol, param1, param2=2):
+    """
+    Doens't optimize, raises an error instead.
+    
+    This function is used to test that when optimization functions raise
+    errors during multiprocessing, they are handled correctly.
+
+    Parameters
+    ---------    
+    param1 : object
+        Dummy parameter, does nothing.
+        
+    param2 : object (default = 2)
+        Dummy keyword parameter, does nothing.
+        
+    Returns
+    -------
+    This function does not return. It only raises.
+    
+    Raises
+    ------
+    Exception
+        An exception is always raised.
+    
+    """
+    
+    raise Exception('Raiser optimization function used.')
