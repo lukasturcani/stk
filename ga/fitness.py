@@ -294,13 +294,10 @@ def random_fitness(macro_mol):
     macro_mol.fitness_fail = False
     return macro_mol
 
-@_param_labels('carrot_var1', 'carrot_var2', 'stick_var1', 'stick_var2')
-def random_fitness_tuple(macro_mol):
+@_param_labels('var1', 'var2', 'var3', 'var4')
+def random_fitness_vector(macro_mol):
     """
-    Returns a tuple holding 2 arrays with random values.
-
-    To be used a random fitness function when testing out the
-    carrots_and_sticks() normalization function.
+    Assignes a random size 4 array to `unscaled_fitness`.
 
     Parameters
     ----------
@@ -313,25 +310,24 @@ def random_fitness_tuple(macro_mol):
         Set to ``False``.
 
     macro_mol.unscaled_fitness : numpy.array
-        The tuple of random arrays is placed in this attribute.
+        A size 4 numpy array of random numbers is placed in this
+        attribute.
 
     macro_mol.progress_params : list
-        The values of the random arrays are placed in this attribute
-        for use by the ``Plotter`` class.
+        The values of the elements in `unscaled_fitness` are placed
+        into a list in this attribute.
 
     Returns
     -------
     macro_mol : MacroMolecule
-        The `macro_mol` with a tuple of 2 random arrays as its fitness
-        value.
+        The `macro_mol` with a size 4 random array set as
+        `unscaled_fitness`.
 
     """
 
-    carrot_array = abs(np.random.normal(50,20,2))
-    stick_array = abs(np.random.normal(50,20,2))
-    macro_mol.unscaled_fitness = (carrot_array, stick_array)
+    macro_mol.unscaled_fitness = abs(np.random.normal(50,20,4))
     macro_mol.fitness_fail = False
-    macro_mol.progress_params = [*carrot_array, *stick_array]
+    macro_mol.progress_params = macro_mol.unscaled_fitness.tolist()
     return macro_mol
 
 def raiser(macro_mol, param1, param2=2):
