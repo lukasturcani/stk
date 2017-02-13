@@ -59,19 +59,19 @@ class Normalization:
 
     """
 
-    def __init__(self, func_data):
+    def __init__(self, funcs):
         """
         Initializes a Normalization instance.
 
         Parameters
         ----------
-        func_data : FunctionData
-            A FunctionData
+        funcs : list of FunctionData instances
+            Holds all the normalization functions to be applied each
+            generation, in the order in which they are to be applied.
 
         """
 
-        self.scaling_func = partial(getattr(self, func_data.name),
-                                    **func_data.params)
+        self.funcs = funcs
 
     def __call__(self, population):
         """
@@ -85,7 +85,10 @@ class Normalization:
 
         """
 
-        self.scaling_func(population)
+        for func_data in self.funcs:
+            scaling_func = partial(getattr(self, func_data.name),
+                                    **func_data.params)
+            scaling_func(population)
 
     def combine(self, population, elements, coefficients, exponents):
         """
@@ -126,7 +129,7 @@ class Normalization:
 
         Modifies
         --------
-        unscaled_fitness : numpy.array
+        fitness : numpy.array
             This attribute is altered for the populations members.
 
         Returns
@@ -134,188 +137,6 @@ class Normalization:
         None : NoneType
 
         """
-
-
-
-    @staticmethod
-    def carrots_and_sticks(population, carrot_coeffs, stick_coeffs,
-                           carrot_exponents, stick_exponents):
-        """
-        Applies the ``carrots and sticks`` normalization.
-
-        This function requires that the fitness functions places a tuple
-        of 2 arrays in the `unscaled_fitness` attribute of members.
-
-            mem.unscaled_fitness =  (carrots, sticks)
-
-        where
-
-            carrots = np.array([c1, c2, c3])
-
-        and
-
-            sticks = np.array([s1, s2])
-
-        Note that the arrays can be of any size.
-
-        The goal is to maximize the carrot values and minimize the
-        stick values. As a result, the fitness of an individual is given
-        by
-
-            (1) fitness = sum(carrots) + 1/sum(sticks)
-
-        What if c1 is 1000 and c2 is 0.01?
-
-        This means that the fitness value is dominated by c1 and c2
-        is barely getting optimized. To fix this the values of all
-        elements are recalculated
-
-            (2) Se = e / <e>
-
-        where ``e`` can represent a carrot or stick parameter (c1, s2
-        etc.). The <e> is the average of that parameter across all
-        members in the population.
-
-        This scaling means that c1 and c2 are rescaled to be around the
-        same order of magnitude.
-
-        What if we want c1 to twice as important to fitness as c3?
-
-        After equation (2) the elements are rescaled again
-
-            (3) Ne = A*(Se^a)
-
-        Here the ``Ne`` represents the parameter ``e`` after the second
-        rescaling.
-
-        This means that the sums showin in equation (1) are
-
-            (4) sum(carrots) = A*(Nc1^a) + B*(Nc2^b) + C*(Nc3^b)
-
-        The prefix ``N`` in front of c1, c1 and c3 means that the
-        operations in equations (2) and (3) have been applied to the
-        parameters.
-
-        So if you want c1 to be twice as important to fitness as c2
-        set
-
-            A = 1 and B = 2
-
-        This is done via the `coeff` and `exponents` parameters.
-
-        Parameters
-        ----------
-        population : Population
-            The population whose fitness values are normalized.
-
-        carrot_coeffs : numpy.array
-            The coeffients of the carrot parameters.
-
-        stick_coeffs : numpy.array
-            The coefficients of the stick parameters.
-
-        carrot_exponents : numpy.array
-            The exponents of the carrot parameters.
-
-        stick_exponents : numpy.array
-            The exponents of the stick parameters.
-
-        Modifies
-        --------
-        fitness : float
-            This attribute in all of the population's members is
-            modified.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        unscaled_carrots = [x.unscaled_fitness[0] for x in population if
-                            isinstance(x.unscaled_fitness, tuple)]
-
-        unscaled_sticks = [x.unscaled_fitness[1] for x in population if
-                           isinstance(x.unscaled_fitness, tuple)]
-
-        _carrot_means = np.mean(unscaled_carrots, axis=0)
-        if not isinstance(_carrot_means, np.ndarray):
-            raise TypeError(('Unscaled fitness values do not have'
-                             ' appropriate type.'))
-
-        carrot_means = []
-        for x in _carrot_means:
-            if x == 0:
-                carrot_means.append(1)
-            else:
-                carrot_means.append(x)
-
-        _stick_means = np.mean(unscaled_sticks, axis=0)
-        if not isinstance(_carrot_means, np.ndarray):
-            raise TypeError(('Unscaled fitness values do not have'
-                             ' appropriate type.'))
-
-        stick_means = []
-        for x in _stick_means:
-            if x == 0:
-                stick_means.append(1)
-            else:
-                stick_means.append(x)
-
-        for macro_mol in population:
-
-            # If one or more of the fitness parameters failed,
-            # return minimum fitness.
-            if macro_mol.fitness_fail:
-                macro_mol.fitness = 1e-4
-                continue
-
-            # Calculate the scaled fitness parameters by dividing the
-            # unscaled ones by the fitness.
-            scaled_carrots = np.divide(macro_mol.unscaled_fitness[0],
-                                       carrot_means)
-
-            scaled_sticks = np.divide(macro_mol.unscaled_fitness[1],
-                                      stick_means)
-
-            try:
-                scaled_carrots = np.power(scaled_carrots,
-                                          carrot_exponents)
-                scaled_sticks = np.power(scaled_sticks,
-                                         stick_exponents)
-
-                scaled_carrots = np.multiply(scaled_carrots,
-                                             carrot_coeffs)
-                scaled_sticks = np.multiply(scaled_sticks,
-                                            stick_coeffs)
-
-            # If the user forgot put the wrong number values in the
-            # exponent or coefficient arrays MMEA will tell them and
-            # exit gracefully.
-            except  ValueError:
-                print(('Fitness function calculates carrot array of '
-                       'size {} and stick array of size {}. This does '
-                       'not match the array sizes given to the '
-                       'normalization function:\n'
-                       '\tcarrot_coeffs : {}\n'
-                       '\tcarrot_exponents : {}\n'
-                       '\tstick_coeffs : {}\n'
-                       '\tstick_exponents : {}\n').format(
-                                   len(scaled_carrots),
-                                   len(scaled_sticks),
-                                   len(carrot_coeffs),
-                                   len(carrot_exponents),
-                                   len(stick_coeffs),
-                                   len(stick_exponents)))
-                sys.exit()
-
-            carrot_term = np.sum(scaled_carrots)
-            penalty_term = np.sum(scaled_sticks)
-            penalty_term =  np.divide(1,penalty_term)
-            if penalty_term > 1e101:
-                penalty_term = 1e101
-
-            macro_mol.fitness = penalty_term + carrot_term
 
     def magnitudes(population, use_fitness=False):
         """
@@ -352,7 +173,7 @@ class Normalization:
 
         Modifies
         --------
-        unscaled_fitness : numpy.array
+        fitness : numpy.array
             This attribute is altered for the populations members.
 
         Returns
