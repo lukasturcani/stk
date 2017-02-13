@@ -5,10 +5,12 @@ Normalization functions are functions that recalculate the fitness
 values of members in a population. The difference between fitness
 and normalization functions is that fitness functions are only use the
 MacroMolecule to calculate its fitness. Normalzation functions have
-access to all MacroMolecules in a population however. As a result they
-can scale the fitness values across the entire population. This is
-useful if you want to ensure a spread of fitness values in the
-population.
+access to all MacroMolecules in a population. As a result they can
+scale the fitness values across the entire population. This is useful
+if you want to ensure a spread of fitness values in the population.
+
+Each generation, a number of normalizatoin functions can be applied
+in sequence.
 
 Extending MMEA: Adding normalization functions.
 -----------------------------------------------
@@ -23,22 +25,18 @@ input file. The convention is that if the normalization function takes
 an argument called  ``population`` it does not have to be specified in
 the input file.
 
-Normalization functions calculate the fitness value of a molecule and
-place it in the `fitness` attribute. This is not universally true, if a
-function is intended to be ``chained`` to other normalization
-functions. In other words, if the normalization function is meant to be
-applied before another one is. This is done via the ``chain()`` method.
+Normalization functions should not interact with the `unscaled_fitness`
+attribute in any way. They should only modify the value in `fitness`.
+Before the first normalization function is applied each generation, the
+value in `unscaled_fitness` is copied into `fitness`. This happens
+automatically.
 
-Note that fitness functions are only executed once per MacroMolecule,
-while normalization functions can be executed multiple times. Because
-fitness functions are only executed once, the value they calculate
-should never be overwritten. As a result when using normalization
-functions, the fitness functions should write to the `unscaled_fitness`
-attribute of MacroMolecules. This will be unchanged once calculated.
-The normalization functions can then use the value in
-`unscaled_fitness` to calculate a value for `fitness`. The calculated
-`fitness` value may change each generation, depending on the scaling
-procedure used.
+Normalization functions calculate the fitness value of a molecule and
+place it in the `fitness` attribute. Multiple normalization functions
+can be applied in sequence. Only the last normalization function
+applied needs to place a value between 0 (exlusive) and infinity in the
+`fitness` attribute. The others can do whatever scaling is necessary
+to for the problem at hand.
 
 If a normalization function does not fit neatly into a single function
 make sure that any helper functions are private, ie that their names
@@ -318,31 +316,6 @@ class Normalization:
                 penalty_term = 1e101
 
             macro_mol.fitness = penalty_term + carrot_term
-
-
-    def chain(self, population, funcs):
-        """
-        Applies multiple normalization functions, one after the other.
-
-        Parameters
-        ----------
-        population : Population
-            The population whose fitness values are normalized.
-
-        funcs : list of FunctionData objects
-            The FunctionData objects representing normalization
-            functions to be applied, in the order in which they should
-            be applied.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        for func_data in funcs:
-            func = getattr(self, func_data.name)
-            func(population, **func_data.params)
 
     def magnitudes(population, use_fitness=False):
         """
