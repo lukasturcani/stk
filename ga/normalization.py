@@ -100,8 +100,9 @@ class Normalization:
         This function assumes that the `unscaled_fitness` attribute
         of the population's members is an array. It multiplies the
         members of the array by the values in `coefficients` and then
-        raises them to the values in `exponents`. Lastly, the individual
-        array elements are summed to create a new smaller array.
+        raises them to the values in `exponents`. Lastly, the
+        individual array elements are summed to create a new smaller
+        array.
 
         Parameters
         ----------
@@ -207,10 +208,22 @@ class Normalization:
 
         # Replace values by deviations from mean.
         for macro_mol in population:
-            macro_mol.fitness = macro_mol.fitness - means
+            macro_mol.fitness -= means
 
-        
+        # Calculate the standard devation of each element.
 
+        # First, get a matrix where each row consistents of the fitness
+        # parameters of a population member.
+        pop_mat = np.array([x.unscaled_fitness for x in population])
+
+        # To get the standard deviation, square each element and then
+        # sum all the squares of elements in the same column. Divide
+        # by the number of rows and square root.
+        devs = np.sqrt(np.sum(np.square(pop_mat), axis=0) / len(pop))
+
+        # Update the fitness values.
+        for macro_mol in population:
+            macro_mol.fitness = macro_mol.fitness / devs
 
     def pareto(self, population):
         """
