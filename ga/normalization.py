@@ -90,19 +90,15 @@ class Normalization:
                                     **func_data.params)
             scaling_func(population)
 
-    def combine(self, population, elements, coefficients, exponents):
+    def combine(self, population, coefficients, exponents):
         """
-        Combines elements in the unscaled_fitness attribute of members.
+        Combines elements in the `fitness` attribute of members.
 
-        This normalization function is not stand-alone. It is desinged
-        to be chained to other normalization functions.
-
-        This function assumes that the `unscaled_fitness` attribute
-        of the population's members is an array. It multiplies the
-        members of the array by the values in `coefficients` and then
-        raises them to the values in `exponents`. Lastly, the
-        individual array elements are summed to create a new smaller
-        array.
+        This function assumes that the `fitness` attribute
+        of the population's members is an array. It raises the members
+        of the array to the values in `exponents` and then multiplies
+        them with the values in `coefficients`. Lastly, the individual
+        array elements are summed to create a final value.
 
         Parameters
         ----------
@@ -110,34 +106,30 @@ class Normalization:
             The population whose members need to have their fitness
             values normalized.
 
-        elements : list of ints
-            If the list is [3, 2, 3] then the first 3 elements are
-            summed to for the first element of the normalized vector.
-            The second element of the normalized vector is formed by
-            summing the next 2 elements of the original. Finally, the
-            last element of the normalized array is made by summing the
-            next 3 elements.
-
         coefficients : list of ints or floats
-            Before summing all the elements in the `unscaled_fitness`
-            attribute of members, their are multiplied by the numbers
-            in this list.
+            Before summing all the elements in the `fitness` attribute,
+            their values are multiplied by the numbers in this list.
 
         exponents : list of ints or floats
-            Before summing all the elements in the `unscaled_fitness`
-            attribute of members, their are raised to the numbers in
-            this list.
+            Before summing all the elements in the `fitness` attribute,
+            their values are raised to the numbers in this list.
 
         Modifies
         --------
         fitness : numpy.array
-            This attribute is altered for the populations members.
+            This attribute is altered for the populations members. It
+            is changed from an array to a float.
 
         Returns
         -------
         None : NoneType
 
         """
+
+        for macro_mol in population:
+            new_array = np.power(macro_mol.fitness, exponents)
+            new_array = np.multiply(new_array, coefficients)
+            macro_mol.fitness = sum(new_array)
 
     def magnitudes(self, population):
         """
@@ -154,7 +146,7 @@ class Normalization:
         atoms in it, this could be the data placed in the `fitness`
         attribute.
 
-        When calculating the total fitness pased on thse values, it
+        When calculating the total fitness based on these values, it
         would be useful to make them comparable. As it is, you can't
         compare 10,000 kJ mol-1 and 5e-5 Angstroms. However what you
         can do is check how much bigger or smaller than average
@@ -163,7 +155,7 @@ class Normalization:
 
             macro_mol.fitness = np.array([2, 0.5, 3])
 
-        This would be the outout of this function. It shows that the
+        This would be the output of this function. It shows that the
         energy of a given `macro_mol` is twice as large as the mean
         energy of the population. The radius is half the average
         molecular radius of the population and so on.
@@ -171,21 +163,6 @@ class Normalization:
         Now these values can be combined in a reasonable way. However,
         that will have to be done by other normalization functions.
         This one only scales relative to the population average.
-
-        Assuming that the populations members have a numpy array in
-        their `fitness` attribute. The following steps are performed:
-
-            1) Calculate the mean value for each element across the
-               population.
-
-            2) Replace each element with its difference from the mean.
-
-            3) Calculate the standard deviation of each element across
-               the population.
-
-            4) Replace each element with its value divided by the
-               standard deviation.
-
 
         Parameters
         ----------
@@ -206,28 +183,68 @@ class Normalization:
         # Get the mean of each element.
         means = population.mean(lambda x : x.fitness)
 
-        # Replace values by deviations from mean.
         for macro_mol in population:
-            macro_mol.fitness -= means
+            macro_mol.fitness = macro_mol.fitness / means
 
-        # Calculate the standard devation of each element.
+    def shift_elements(indices):
+        """
+        Maps elements in `fitness` array to positive values.
 
-        # First, get a matrix where each row consistents of the fitness
-        # parameters of a population member.
-        pop_mat = np.array([x.unscaled_fitness for x in population])
+        Assumy you have a fitness array,
 
-        # To get the standard deviation, square each element and then
-        # sum all the squares of elements in the same column. Divide
-        # by the number of rows and square root.
-        devs = np.sqrt(np.sum(np.square(pop_mat), axis=0) / len(pop))
+            macro_mol.fitness = [1, -10, 1]
 
-        # Update the fitness values.
-        for macro_mol in population:
-            macro_mol.fitness = macro_mol.fitness / devs
+        One way to convert the fitness array into a fitness value is
+        by summing the elements (see the combine() normalization
+        function for this)
 
-    def pareto(self, population):
+            macro_mol.fitness = -8
+
+        Clearly this doesn't work, because the resulting fitness value
+        is not a positive number. To fix this the -10 should be shifted
+        to a positive value.
+
+        This normalization function looks at the elements specified by
+        by `indices`. It then finds the minimum value of these elements
+        in the population. It then shifts the elements by this value.
+
+        For example, take a population of
+
+            mol1.fitness = [1, -5, 5]
+            mol2.fitness = [3, -10, 2]
+            mol3.fitness = [2, 20, 1]
+
+        If the value of `indices` was [1] the after this normalization
+        function was applied the result would be
+
+            mol1.fitness = [1, 6, 5]
+            mol2.fitness = [3, 1, 2]
+            mol3.fitness = [2, 31, 1]
+
+        If `indices` was [0,1]
+
+            mol1.fitness = [3, 6, 5]
+            mol2.fitness = [5, 1, 2]
+            mol3.fitness = [4, 31, 1]
+
+        The shift is 1 + magnitude of smallest value. This prevents
+        0s in the array.
+
+        Parameters
+        ----------
+        indices : list of ints
+            This holds the indices of elements in the `fitness`
+            array which should be shifted to positive values.
+
+        Returns
+        -------
+        None : NoneType
+
         """
 
-        """
-
-        ...
+        # Get all the fitness arrays a matrix.
+        fmat = np.array([x.fitness for x in population])
+        # Get the minimum values of each element in the population.
+        mins = np.min(fmat, axis=0)
+        # Convert all the ones which are not to be changed to 0 and
+        # add 1 to the ones which are to be changed.
