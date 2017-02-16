@@ -255,7 +255,7 @@ class _FitnessFunc:
 
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
-            if macro_mol.unscaled_fitness:
+            if macro_mol.unscaled_fitness is not None:
                 print('Skipping {0}'.format(macro_mol.file))
                 macro_mol.fitness = macro_mol.unscaled_fitness
                 return macro_mol
