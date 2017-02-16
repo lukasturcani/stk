@@ -766,7 +766,7 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                                macro_mol.progress_params else False)
 
     macro_mol.unscaled_fitness = np.array([binding_energy,
-                      asymmetry if asymmetry is not None else 0]))
+                      asymmetry if asymmetry is not None else 0])
 
     return macro_mol
 
