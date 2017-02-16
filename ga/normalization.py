@@ -185,7 +185,7 @@ class Normalization:
         for macro_mol in population:
             macro_mol.fitness = macro_mol.fitness / means
 
-    def shift_elements(indices):
+    def shift_elements(self, population, indices):
         """
         Maps elements in `fitness` array to positive values.
 
