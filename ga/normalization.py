@@ -85,6 +85,11 @@ class Normalization:
 
         """
 
+        # First make sure that all the fitness values are reset and
+        # hold the values in `unscaled_fitness`.
+        for macro_mol in population:
+            macro_mol.fitness = macro_mol.unscaled_fitness
+
         for func_data in self.funcs:
             getattr(self, func_data.name)(population,
                                           **func_data.params)
