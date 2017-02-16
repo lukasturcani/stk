@@ -86,9 +86,8 @@ class Normalization:
         """
 
         for func_data in self.funcs:
-            scaling_func = partial(getattr(self, func_data.name),
-                                    **func_data.params)
-            scaling_func(population)
+            getattr(self, func_data.name)(population,
+                                          **func_data.params)
 
     def combine(self, population, coefficients, exponents):
         """
