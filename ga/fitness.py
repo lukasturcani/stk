@@ -144,7 +144,8 @@ def _calc_fitness(func_data, population):
         function and any additional parameters it may require.
 
     population : Population
-        The population whose members must have their fitness calculated.
+        The population whose members must have their fitness
+        calculated.
 
     Returns
     -------
@@ -159,7 +160,8 @@ def _calc_fitness(func_data, population):
     # Make sure it won't raise errors while using multiprocessing.
     p_func = _FitnessFunc(partial(func, **func_data.params))
 
-    # Apply the function to every member of the population, in parallel.
+    # Apply the function to every member of the population, in
+    # parallel.
     with mp.get_context('spawn').Pool() as pool:
         evaluated = pool.map(p_func, population)
 
@@ -180,7 +182,8 @@ def _calc_fitness_serial(func_data, population):
         function and any additional parameters it may require.
 
     population : Population
-        The population whose members must have their fitness calculated.
+        The population whose members must have their fitness
+        calculated.
 
     Returns
     -------
@@ -207,11 +210,11 @@ def _param_labels(*labels):
     Parameters
     ----------
     labels : tuple
-        List of strings about the fitness labels used for plotting EPPs.
-        The order of the strings should represent the order of the
-        fitness ``vars`` in the fitness funciton. In practice it should
-        correspond to the order of the ``coeffs`` or ``exponents``
-        parameters given to the fitness function.
+        List of strings about the fitness labels used for plotting
+        EPPs. The order of the strings should represent the order of
+        the fitness ``vars`` in the fitness funciton. In practice it
+        should correspond to the order of the ``coeffs`` or
+        ``exponents`` parameters given to the fitness function.
 
     Returns
     -------
@@ -512,8 +515,9 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
         The Schrodinger directory path.
 
     rotations : int (default = 0)
-        The number of times the target should be randomly rotated within
-        the cage cavity in order to find the most stable conformation.
+        The number of times the target should be randomly rotated
+        within the cage cavity in order to find the most stable
+        conformation.
 
     md : bool (default = False)
         Toggles the running of MD on cage-target complexes.
@@ -537,7 +541,8 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
     Returns
     -------
     macro_mol
-        The `macro_mol` with its unscaled fitness parameters calculated.
+        The `macro_mol` with its unscaled fitness parameters
+        calculated.
 
     """
 
@@ -606,7 +611,8 @@ def cage_c60(macro_mol, target_mol_file,
     Returns
     -------
     macro_mol
-        The `macro_mol` with its unscaled fitness parameters calculated.
+        The `macro_mol` with its unscaled fitness parameters
+        calculated.
 
     """
     return _cage_target(macro_mol, target_mol_file, macromodel_path,
@@ -638,8 +644,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         The Schrodinger directory path.
 
     rotation_func : function
-        A generator which carries out the rotations of the target within
-        the cage. It yields the complexes.
+        A generator which carries out the rotations of the target
+        within the cage. It yields the complexes.
 
     *rot_args : tuple
         Parameters to be passed to `rotation_func`.
@@ -667,7 +673,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     Returns
     -------
     macro_mol
-        The `macro_mol` with its unscaled fitness parameters calculated.
+        The `macro_mol` with its unscaled fitness parameters
+        calculated.
 
     """
 
@@ -817,7 +824,7 @@ def _generate_complexes(macro_mol, target, number=1):
 
 def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """
-    Rotates C60 about its axes of symmetry and places it in `macro_mol`.
+    Rotates C60 about its axes of symmetry while placed in `macro_mol`.
 
     Parameters
     ----------
