@@ -326,6 +326,12 @@ def random_fitness_vector(macro_mol):
     """
 
     macro_mol.unscaled_fitness = abs(np.random.normal(50,20,4))
+    # This multiplication ensures that the elements of the fitness
+    # vector all have different oraders of magnitude and that some
+    # are negative.
+    macro_mol.unscaled_fitness = np.multiply(
+                                    macro_mol.unscaled_fitness,
+                                    np.array([0.01, 1, 10, -100]))
     macro_mol.fitness_fail = False
     macro_mol.progress_params = macro_mol.unscaled_fitness.tolist()
     return macro_mol
