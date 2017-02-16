@@ -480,7 +480,7 @@ def cage(macro_mol, target_cavity, target_window=None,
     macro_mol.unscaled_fitness = np.array([cavity_diff,
                     (window_diff if window_diff is not None else 0),
                     (asymmetry if asymmetry is not None else 0),
-                    e_per_bond]))
+                    e_per_bond])
 
     return macro_mol
 
