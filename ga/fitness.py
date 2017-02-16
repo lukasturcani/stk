@@ -367,33 +367,27 @@ def raiser(macro_mol, param1, param2=2):
 
 # Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ','Window Difference ',
-                'Asymmetry ', 'Positive Energy per Bond ',
-                'Negative Energy per Bond ')
+                'Asymmetry ', 'Energy per Bond ')
 def cage(macro_mol, target_cavity, target_window=None,
          pseudoformation_params=
          { 'energy_func' : FunctionData('rdkit', forcefield='uff') }):
     """
-    Calculates the fitness of a cage.
+    Calculates the fitness vector of a cage.
 
-    This function is intended to be used with the normalization function
-    ``carrots_and_sticks()`` defined in ``normalization.py``.
+    The fitness vector consists of the following properties in the
+    listed order
 
-    The fitness function creates a tuple of 2 arrays. The first array
-    holds parameters of `macro_mol` which contribute to a high fitness.
-    The second array holds parameters of `macro_mol` which cause a low
-    fitness.
-
-    The parameter which indicates high fitness is the negative formation
-    energy per bond made. The remaining parameters indicate low fitness
-    and are:
         1) `cavity_diff` - the difference between the cavity of
            `macro_mol` and the `target_cavity`.
         2) `window_diff` - the difference between the largest window of
            `macro_mol` and `target_window`.
         3) `asymmetry` - the sum of the size differences of all the
            windows in `macro_mol`.
-        4) `pos_eng_per_bond` - The postive formation energy of
-           `macro_mol` per bond made.
+        4) `eng_per_bond` - The formation energy of `macro_mol` per
+           bond made.
+
+    The fitness vector is placed as a numpy array into the
+    `unscaled_fitness` attribute of `macro_mol`.
 
     Parameters
     ----------
@@ -408,7 +402,7 @@ def cage(macro_mol, target_cavity, target_window=None,
         ``None`` then `target_cavity` is used.
 
     pseudoformation_params : dict (default =
-            { 'energy_func' : FunctionData('rdkit', forcefield='uff') })
+          { 'energy_func' : FunctionData('rdkit', forcefield='uff') })
 
         This fitness function calculates the formation energy using the
         ``Energy.pseudoformation()`` method. This parameter defines the
@@ -432,10 +426,9 @@ def cage(macro_mol, target_cavity, target_window=None,
         was not calculated. ``False`` if every parameter was calculated
         successfully.
 
-    macro_mol.unscaled_fitness : tuple of 2 numpy.arrays
-        The first numpy array holds the value of the negative energy
-        per bond made. The second array holds the remaining parameters
-        described above.
+    macro_mol.unscaled_fitness : numpy.array
+        The numpy array holds the fitness vector described in this
+        docstring.
 
     macro_mol.progress_params : list
         Places the calculated parameters in a single list. The order
@@ -449,7 +442,8 @@ def cage(macro_mol, target_cavity, target_window=None,
 
     """
 
-    # Prevents warnings from getting printed when using multiprocessing.
+    # Prevents warnings from getting printed when using
+    # multiprocessing.
     warnings.filterwarnings('ignore')
 
     if target_window is None:
@@ -474,42 +468,36 @@ def cage(macro_mol, target_cavity, target_window=None,
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.topology.bonds_made
 
-    if e_per_bond < 0:
-        ne_per_bond = abs(e_per_bond)
-        pe_per_bond = 0
-    else:
-        ne_per_bond = 0
-        pe_per_bond = e_per_bond
-
     macro_mol.progress_params = [cavity_diff, window_diff,
-                               asymmetry, pe_per_bond, -ne_per_bond]
+                               asymmetry, e_per_bond]
 
     macro_mol.fitness_fail = (True if None in
                               macro_mol.progress_params else False)
 
-    macro_mol.unscaled_fitness = (np.array([ne_per_bond]),
-                    np.array([cavity_diff,
+    macro_mol.unscaled_fitness = np.array([cavity_diff,
                     (window_diff if window_diff is not None else 0),
                     (asymmetry if asymmetry is not None else 0),
-                    pe_per_bond]))
+                    e_per_bond]))
 
     return macro_mol
 
-@_param_labels('Negative Binding Energy', 'Positive Binding Energy',
-               'Asymmetry')
+@_param_labels('Binding Energy', 'Asymmetry')
 def cage_target(macro_mol, target_mol_file, macromodel_path,
                 rotations=0, md=False):
     """
     Calculates the fitness of a cage / target complex.
 
-    This function should be used with the ``carrots_and_sticks()``
-    normalization function.
+    The target is randomly rotated inside the cage's cavity and the
+    most stable conformation found is used.
 
-    The function calculates the binding energy of the cage/target
-    complex and the asymmetry of the molecule. It creates a tuple:
+    The function calculates a fitness vector. The fitness vector
+    consists of the following properties in the listed order,
 
-        macro_mol.unscaled_fitness = (numpy.array([neg_binding_eng],
-                               numpy.array([pos_binding_eng, asymmetry])
+            1) binding energy
+            2) asymmetry
+
+    This vector is placed in the `unscaled_fitness` attribute of the
+    population's members as a numpy array.
 
     Parameters
     ----------
@@ -541,11 +529,10 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
         This attribute is set to ``True`` if the fitness function
         completes successfully.  Otherwise set to ``False``.
 
-    macro_mol.unscaled_fitness : tuple of numpy.arrays
-        Places the unscaled fitness parameters into this attribute.
-        The parameters which increase with fitness are placed in the
-        first element of the tuple while the parameters which decrease
-        with increased fitness are placed in the second element.
+    macro_mol.unscaled_fitness : numpy.array
+        Places the fitness vector into this attribute.
+        The fitness vector consists of properites which affect the
+        fitness of a molecule.
 
     Returns
     -------
@@ -557,26 +544,25 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
     return _cage_target(macro_mol, target_mol_file, macromodel_path,
                         _generate_complexes, rotations+1, md=md)
 
-@_param_labels('Negative Binding Energy', 'Positive Binding Energy',
-               'Asymmetry')
+@_param_labels('Binding Energy', 'Asymmetry')
 def cage_c60(macro_mol, target_mol_file,
              macromodel_path, n5fold, n2fold, md=False):
     """
-    Calculates the fitness of a cage / C60 complex.
+    Calculates the fitness vector of a cage / C60 complex.
 
     The difference between this function and `cage_target()` is that
     the rotations are specifically aimed at sampling C60 entirely and
     systematically. Rather than the random sampling of the other
     function.
 
-    This function should be used in together with the
-    ``carrots_and_sticks()`` normalization function.
+    The fitness vector consists of the following properties in the
+    listed order,
 
-    The function calculates the binding energy of the cage/target
-    complex and the asymmetry of the molecule. It creates a tuple:
+        1) binding energy
+        2) asymmetry
 
-        macro_mol.unscaled_fitness = (numpy.array([neg_binding_eng],
-                               numpy.array([pos_binding_eng, asymmetry])
+    This vector is placed in the `unscaled_fitness` attribute of the
+    population's members as a numpy array.
 
     Parameters
     ----------
@@ -612,11 +598,10 @@ def cage_c60(macro_mol, target_mol_file,
         This attribute is set to ``True`` if the fitness function
         completes successfully.  Otherwise set to ``False``.
 
-    macro_mol.unscaled_fitness : tuple of numpy.arrays
-        Places the unscaled fitness parameters into this attribute.
-        The parameters which increase with fitness are placed in the
-        first element of the tuple while the parameters which decrease
-        with increased fitness are placed in the second element.
+    macro_mol.unscaled_fitness : numpy.array
+        Places the fitness vector into this attribute.
+        The fitness vector consists of properites which affect the
+        fitness of a molecule.
 
     Returns
     -------
@@ -627,18 +612,18 @@ def cage_c60(macro_mol, target_mol_file,
     return _cage_target(macro_mol, target_mol_file, macromodel_path,
                         _c60_rotations, n5fold, n2fold, md=md)
 
-
 def _cage_target(macro_mol, target_mol_file, macromodel_path,
                  rotation_func, *rot_args, md=False):
     """
-    A general fitness function for calculting fitness of complexes.
+    A general fitness function for calculating fitness of complexes.
 
     This function should be inherited by other fitness functions which
-    defined their own rotation function. For example ``cage_c60()`` and
+    define their own rotation function. For example ``cage_c60()`` and
     ``cage_target()``.
 
-    This function is meant to be used with the ``carrots_and_sticks()``
-    normalization function in ``normalization.py``.
+    The function places a fitness vector consisting of the
+    binding energy and asymmetry in the `unscaled_fitness` attribute
+    of members.
 
     Parameters
     ----------
@@ -674,11 +659,10 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         This attribute is set to ``True`` if the fitness function
         completes successfully.  Otherwise set to ``False``.
 
-    macro_mol.unscaled_fitness : tuple of numpy.arrays
-        Places the unscaled fitness parameters into this attribute.
-        The parameters which increase with fitness are placed in the
-        first element of the tuple while the parameters which decrease
-        with increased fitness are placed in the second element.
+    macro_mol.unscaled_fitness : numpy.array
+        Places the fitness vector into this attribute.
+        The fitness vector consists of properites which affect the
+        fitness of a molecule.
 
     Returns
     -------
@@ -692,7 +676,6 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     # Make a copy version of `macro_mol` which is unoptimizted.
     unopt_macro_mol = copy.deepcopy(macro_mol)
     unopt_macro_mol.topology.build()
-
 
     # Create an instance of the target molecule as a ``StructUnit``.
     target = StructUnit(target_mol_file)
@@ -741,13 +724,6 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                 min_eng_cmplx.energy.values[
     FunctionData('macromodel', forcefield=16)] - energy_separate)
 
-    if binding_energy > 0:
-        pos_be = binding_energy
-        neg_be = 0
-    else:
-        pos_be = 0
-        neg_be = abs(binding_energy)
-
     frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.mol,
                                     asMols=True,
                                     sanitizeFrags=False)
@@ -777,15 +753,13 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         asymmetry = None
 
 
-    macro_mol.progress_params = [-neg_be, pos_be, asymmetry]
+    macro_mol.progress_params = [binding_energy, asymmetry]
 
     macro_mol.fitness_fail = (True if None in
                                macro_mol.progress_params else False)
 
-    macro_mol.unscaled_fitness = (
-                      np.array([neg_be]),
-                      np.array([pos_be,
-                      (asymmetry if asymmetry is not None else 0)]))
+    macro_mol.unscaled_fitness = np.array([binding_energy,
+                      asymmetry if asymmetry is not None else 0]))
 
     return macro_mol
 
