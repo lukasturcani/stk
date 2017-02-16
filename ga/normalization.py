@@ -217,17 +217,17 @@ class Normalization:
         If the value of `indices` was [1] the after this normalization
         function was applied the result would be
 
-            mol1.fitness = [1, 6, 5]
-            mol2.fitness = [3, 1, 2]
-            mol3.fitness = [2, 31, 1]
+            mol1.fitness = [1, 5.1, 5]
+            mol2.fitness = [3, 0.1, 2]
+            mol3.fitness = [2, 30.1, 1]
 
         If `indices` was [0,1]
 
-            mol1.fitness = [3, 6, 5]
-            mol2.fitness = [5, 1, 2]
-            mol3.fitness = [4, 31, 1]
+            mol1.fitness = [2.01, 5.1, 5]
+            mol2.fitness = [4.01, 0.1, 2]
+            mol3.fitness = [3.01, 30.1, 1]
 
-        The shift is 1 + magnitude of smallest value. This prevents
+        The shift is  1.01 * magnitude of smallest value. This prevents
         0s in the array.
 
         Parameters
@@ -235,6 +235,12 @@ class Normalization:
         indices : list of ints
             This holds the indices of elements in the `fitness`
             array which should be shifted to positive values.
+
+        Modifies
+        --------
+        fitness : numpy.array
+            The `fitness` atttribute of the population's members is
+            changed in accordance to the docstring.
 
         Returns
         -------
@@ -246,5 +252,36 @@ class Normalization:
         fmat = np.array([x.fitness for x in population])
         # Get the minimum values of each element in the population.
         mins = np.min(fmat, axis=0)
-        # Convert all the ones which are not to be changed to 0 and
-        # add 1 to the ones which are to be changed.
+        # Convert all the ones which are not to be shifted to 0 and
+        # multiply the which are to be shifted by 1.01.
+        shift = np.zeros(len(mins))
+        for ind in indices:
+            shift[ind] = 1.01
+        shift = abs(np.multiply(mins, shift))
+
+        for macro_mol in population:
+            macro_mol.fitness += shift
+
+    def invert(self, population):
+        """
+        Convertes a fitness value to 1/fitness.
+
+        Parameters
+        ----------
+        population : Population
+            The population to be normalized.
+
+        Modifies
+        --------
+        fitness : float
+            The `fitness` attribute of the population's members is
+            changed to 1/`fitness`.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for macro_mol in population:
+            macro_mol.fitness = 1 / macro_mol.fitness
