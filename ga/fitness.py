@@ -26,7 +26,7 @@ The first thing to note is that multiple normalization functions can
 be applied sequentially. Each normalization function replaces the
 value in the `fitness` attribute. Normalization functions do not
 manipulate or intarct with the `unscaled_fitness` attribute in any way.
-Before the frist normalization function is applied, MMEA automatically
+Before the first normalization function is applied, MMEA automatically
 copies the value in `unscaled_fitness` into `fitness`.
 
 The normalization functions then place various values into the
@@ -257,12 +257,9 @@ class _FitnessFunc:
         try:
             if macro_mol.unscaled_fitness is not None:
                 print('Skipping {0}'.format(macro_mol.file))
-                macro_mol.fitness = macro_mol.unscaled_fitness
                 return macro_mol
 
-            new_macro_mol = self.func(macro_mol, *args, **kwargs)
-            new_macro_mol.fitness = new_macro_mol.unscaled_fitness
-            return new_macro_mol
+            return self.func(macro_mol, *args, **kwargs)
 
         except Exception as ex:
             # Prevents the error from being raised, but records it in

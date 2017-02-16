@@ -212,7 +212,7 @@ class GAInput:
             self.mutation_weights = [1]
 
         if not hasattr(self, 'normalization_func'):
-            self.normalization_func = None
+            self.normalization_func = []
 
         if not hasattr(self, 'exit_func'):
             self.exit_func = FunctionData('no_exit')
@@ -413,8 +413,7 @@ class GAInput:
 
         """
 
-        return (Normalization(self.normalization_func) if
-                             self.normalization_func else None)
+        return Normalization(self.normalization_func)
 
     def ga_tools(self):
         """
