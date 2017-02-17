@@ -153,9 +153,6 @@ def parameter_epp(progress, fitness_func, plot_name):
 
     fitness_func = globals()[fitness_func.name]
 
-    for x in progress.means:
-        print(x)
-    
     for x in range(len(progress.means[0])):
         y_mean = [v[x] for v in progress.means]
         y_max = [v[x] for v in progress.maxs]

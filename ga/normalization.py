@@ -110,7 +110,7 @@ class Normalization:
         # outliers.
 
         valid_pop = Population(*(mol for mol in population if not
-                                mol.fitness_fail))
+                                 mol.failed))
 
         for func_data in self.funcs:
             getattr(self, func_data.name)(valid_pop,
@@ -276,6 +276,7 @@ class Normalization:
 
         # Get all the fitness arrays a matrix.
         fmat = np.array([x.fitness for x in population])
+        
         # Get the minimum values of each element in the population.
         mins = np.min(fmat, axis=0)
         # Convert all the ones which are not to be shifted to 0 and

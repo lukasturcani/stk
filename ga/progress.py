@@ -98,8 +98,7 @@ class GAProgress:
         # then track these. Otherwise track fitness values.
         if any(x.progress_params for x in pop):
             unscaled_var_mat = np.matrix([
-                x.progress_params for x in pop if not
-                x.fitness_fail])
+                x.progress_params for x in pop if not x.failed])
 
             self.maxs.append(np.max(unscaled_var_mat,
                                     axis=0).tolist()[0])
