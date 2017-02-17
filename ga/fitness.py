@@ -421,10 +421,9 @@ def cage(macro_mol, target_cavity, target_window=None,
 
     Modifies
     --------
-    macro_mol.fitness_fail : bool
+    macro_mol.failed : bool
         The function sets this to ``True`` if one of the parameters
-        was not calculated. ``False`` if every parameter was calculated
-        successfully.
+        was not calculated.
 
     macro_mol.unscaled_fitness : numpy.array
         The numpy array holds the fitness vector described in this
@@ -458,10 +457,7 @@ def cage(macro_mol, target_cavity, target_window=None,
     else:
         window_diff  = None
 
-    if  macro_mol.topology.window_difference() is not None:
-        asymmetry = macro_mol.topology.window_difference()
-    else:
-        asymmetry = None
+    asymmetry = macro_mol.topology.window_difference()
 
     print('\n\nCalculating complex energies.\n')
     e_per_bond = macro_mol.energy.pseudoformation(
@@ -469,15 +465,15 @@ def cage(macro_mol, target_cavity, target_window=None,
     e_per_bond /= macro_mol.topology.bonds_made
 
     macro_mol.progress_params = [cavity_diff, window_diff,
-                               asymmetry, e_per_bond]
-
-    macro_mol.fitness_fail = (True if None in
-                              macro_mol.progress_params else False)
+                                 asymmetry, e_per_bond]
 
     macro_mol.unscaled_fitness = np.array([cavity_diff,
-                    (window_diff if window_diff is not None else 0),
-                    (asymmetry if asymmetry is not None else 0),
-                    e_per_bond])
+                                           window_diff,
+                                           asymmetry,
+                                           e_per_bond])
+
+    if any(x is None for x in macro_mol.unscaled_fitness):
+        macro_mol.fail()
 
     return macro_mol
 
@@ -658,9 +654,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         contribute to fitness in this attribute. This is used for
         plotting the EPP and other stats.
 
-    macro_mol.fitness_fail : bool
-        This attribute is set to ``True`` if the fitness function
-        completes successfully.  Otherwise set to ``False``.
+    macro_mol.failed : bool
+        Set to ``True`` if some part of the fitness calclution failed.
 
     macro_mol.unscaled_fitness : numpy.array
         Places the fitness vector into this attribute.
@@ -750,20 +745,13 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
                      '.mol', '_COMPLEX_{0}_no_target.mol'.format(i))
     cmplx_cage.write()
 
-
-    if cmplx_cage.topology.window_difference() is not None:
-        asymmetry = macro_mol.topology.window_difference()
-    else:
-        asymmetry = None
-
+    asymmetry = macro_mol.topology.window_difference()
 
     macro_mol.progress_params = [binding_energy, asymmetry]
+    macro_mol.unscaled_fitness = np.array([binding_energy, asymmetry])
 
-    macro_mol.fitness_fail = (True if None in
-                               macro_mol.progress_params else False)
-
-    macro_mol.unscaled_fitness = np.array([binding_energy,
-                      asymmetry if asymmetry is not None else 0])
+    if any(x is None for x in macro_mol.unscaled_fitness):
+        macro_mol.fail()
 
     return macro_mol
 
