@@ -27,53 +27,13 @@ class GAProgress:
 
     Attributes
     ----------
-    gens : list of ints
+    gens :
         The numbers of generations.
-
-    means : list of floats or of lists of floats ie
-            [[float, float, ...], [float, float, ..], ... ]
-
-        This list holds the mean fitness at each genertion in `gens`.
-        Alternatively, if `progress_params` was used by the fitness
-        function, the list holds the mean values of each element in
-        `progress_params` at each generation.
-
-    mins : list of floats or of lists of floats ie
-           [[float, float, ...], [float, float, ..], ... ]
-
-        This list holds the minimum fitness at each genertion in
-        `gens`. Alternatively, if `progress_params` was used by the
-        fitness function, the list holds the minimum values of each
-        element in `progress_params` at each generation.
-
-    maxs : list of floats or of lists of floats ie
-           [[float, float, ...], [float, float, ..], ... ]
-
-        This list holds the maximum fitness at each genertion in
-        `gens`. Alternatively, if `progress_params` was used by the
-        fitness function, the list holds the maximum values of each
-        element in `progress_params` at each generation.
-
-    pops : Population
-        This population holds each generations Population instance as
-        one of its subpopulations.
-
-    hist : list of GAProgress instances
-        Using the ``normalization()`` method overwrites the values of
-        the `means`, `mins` and `maxs` attributes.  In order to keep
-        the old values, each time this method is run, a copy of the
-        GAProgress instances with the old values is saved in this
-        attribute.
 
     """
 
     def __init__(self):
-        self.gens = []
-        self.means = []
-        self.mins = []
-        self.maxs = []
-        self.pops = Population()
-        self.hist = []
+        self.gens = Population()
 
     def update(self, pop):
         """
