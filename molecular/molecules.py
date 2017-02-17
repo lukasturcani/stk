@@ -260,6 +260,10 @@ class Molecule:
         Indicates whether a Molecule has been passed through an
         optimization function or not.
 
+    failed : bool
+        True if the fitness function or optimization function failed
+        when trying to evaluate the molecule.
+
     """
 
     def all_atom_coords(self):
@@ -428,6 +432,9 @@ class Molecule:
         optimized : bool
             Set to ``True``.
 
+        failed : bool
+            Set to ``True``.
+
         Returns
         -------
         None : NoneType
@@ -435,8 +442,7 @@ class Molecule:
         """
 
         self.optimized = True
-
-        return
+        self.failed = True
 
     def graph(self):
         """
@@ -1002,6 +1008,9 @@ class StructUnit(Molecule, metaclass=Cached):
         A flag to monitor whether an optimization has been performed on
         the molecule.
 
+    failed : bool
+        True if an optimization function failed to run on the molecule.
+
     """
 
     init_funcs = {'.mol' : partial(chem.MolFromMolFile,
@@ -1047,19 +1056,21 @@ class StructUnit(Molecule, metaclass=Cached):
         self.bonder_ids = []
         self.energy = Energy(self)
         self.optimized = False
+        self.failed = False
 
         # Define a generator which yields an ``FGInfo`` instance from
-        # `functional_groups`. The yielded ``FGInfo``instance represents
-        # the functional group of the molecule which will undergo bond
-        # formation. The generator determines the functional group of
-        # the molecule from the path of of the structure file.
+        # `functional_groups`. The yielded ``FGInfo``instance
+        # represents the functional group of the molecule which will
+        # undergo bond formation. The generator determines the
+        # functional group of the molecule from the path of of the
+        # structure file.
 
         # The database of precursors should be organized so that any
         # given structure file has the name of its functional group in
         # its path. Each file should have the name of only one
         # functional group in its path. If this is not the case, the
-        # generator will return the functional group which appears first
-        # in `functional_groups`.
+        # generator will return the functional group which appears
+        # first in `functional_groups`.
 
 
         # Assign the FGInfo instance from `functional_groups` which
@@ -1802,11 +1813,9 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
     unscaled_fitness : object (default = None)
         Fitness functions place the fitness values in this attribute.
 
-    fitness_fail : bool (default = True)
-        Used to indicate if the fitness function failed to calculate
-        a value for the MacroMolecule. Not all fitness functions or
-        normalization fucntions use this attribute but it can be
-        useful.
+    failed : bool (default = False)
+        ``True`` if the fitness or optimization function failed to
+        evaluate the molecule.
 
     progress_params : list (default = None)
         Holds the fitness parameters which the GA should track to make
@@ -1872,7 +1881,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         self.optimized = False
         self.fitness = None
         self.unscaled_fitness = None
-        self.fitness_fail = True
+        self.failed = False
         self.progress_params = None
         self.building_blocks = tuple(building_blocks)
         self.topology_args = topology_args
@@ -1903,7 +1912,7 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
         unscaled_fitness : float
             Changed to 1e-4.
 
-        fitness_fail : bool
+        failed : bool
             Changed to ``True``.
 
         Returns
@@ -1912,11 +1921,10 @@ class MacroMolecule(Molecule, metaclass=CachedMacroMol):
 
         """
 
-        # This sets optimized to ``True``.
+        # This sets `optimized` and `failed` to ``True``.
         super().fail()
         self.fitness = 1e-4
         self.unscaled_fitness = 1e-4
-        self.fitness_fail = True
 
     def same(self, other):
         """
