@@ -47,13 +47,6 @@ def epp(progress, plot_name, xlabel='Generation'):
     if any(hasattr(ind, 'progress_params') for ind in progress):
         parameter_epp(progress, plot_name)
 
-    # Renormalize all the fitness values across the entire GA run if
-    # a Normalization object was provided. If previously the values
-    # progress.maxs (and mins etc) were lists, they will be converted
-    # to ints/floats.
-    if norm:
-        progress.normalize(norm)
-
     # Plot the EPP of the fitness values.
     fitness_epp(progress, plot_name, xlabel)
 
