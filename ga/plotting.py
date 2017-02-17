@@ -80,8 +80,8 @@ def fitness_epp(progress, plot_name):
     Parameters
     ----------
     progress : GAProgress
-        An instance holding the maximum, minimum and mean fitness values
-        in the population, across different generations.
+        An instance holding the maximum, minimum and mean fitness
+        values in the population, across different generations.
 
     plot_name : str
         The full path of the .png file to which the plot should be
@@ -98,9 +98,12 @@ def fitness_epp(progress, plot_name):
     plt.ylabel('Fitness Value')
     plt.title('Evolutionary Progress Plot', fontsize=18)
 
-    plt.plot(progress.gens, progress.means, color='green', label='mean')
-    plt.plot(progress.gens, progress.mins, color='blue', label='min')
-    plt.plot(progress.gens, progress.maxs, color='red', label='max')
+    plt.plot(progress.gens, progress.means,
+             color='green', label='mean')
+    plt.plot(progress.gens, progress.mins,
+             color='blue', label='min')
+    plt.plot(progress.gens, progress.maxs,
+             color='red', label='max')
 
     lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     fig.savefig(plot_name, dpi=1000,
@@ -123,14 +126,14 @@ def parameter_epp(progress, fitness_func, plot_name):
     parameter across the generations, this would be the values 2, 5 and
     8. And so on.
 
-    On each graph, the lines for mins and means would be plotted as with
-    the maxs line.
+    On each graph, the lines for mins and means would be plotted as
+    with the maxs line.
 
     Parameters
     ----------
     progress : GAProgress
-        An instance holding the maximum, minimum and mean fitness values
-        in the population, across different generations.
+        An instance holding the maximum, minimum and mean fitness
+        values in the population, across different generations.
 
     fitness_func : FunctionData
         The fitness function used to calculate the progress paramters.
@@ -150,6 +153,9 @@ def parameter_epp(progress, fitness_func, plot_name):
 
     fitness_func = globals()[fitness_func.name]
 
+    for x in progress.means:
+        print(x)
+    
     for x in range(len(progress.means[0])):
         y_mean = [v[x] for v in progress.means]
         y_max = [v[x] for v in progress.maxs]
@@ -165,7 +171,8 @@ def parameter_epp(progress, fitness_func, plot_name):
         plt.plot(progress.gens, y_max, color='red', label='max')
 
         new_plot_name = str(x).join(os.path.splitext(plot_name))
-        lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
+                            borderaxespad=0.)
         fig.savefig(new_plot_name, dpi=1000,
                     bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.close('all')
@@ -247,9 +254,12 @@ def progress_params(pop, plot_name):
         unscaled_var_mat = np.matrix([
                   x.progress_params for x in sp if not x.fitness_fail])
 
-        max_params.append(np.max(unscaled_var_mat, axis=0).tolist()[0])
-        min_params.append(np.min(unscaled_var_mat, axis=0).tolist()[0])
-        mean_params.append(np.mean(unscaled_var_mat, axis=0).tolist()[0])
+        max_params.append(np.max(unscaled_var_mat,
+                                    axis=0).tolist()[0])
+        min_params.append(np.min(unscaled_var_mat,
+                                    axis=0).tolist()[0])
+        mean_params.append(np.mean(unscaled_var_mat,
+                                    axis=0).tolist()[0])
 
     for x in range(len(min_params[0])):
         fig = plt.figure()
@@ -261,10 +271,14 @@ def progress_params(pop, plot_name):
         y_max = [array[x] for array in max_params]
         y_min = [array[x] for array in min_params]
 
-        plt.scatter(xvals, y_mean, color='green', marker='x', label='mean')
-        plt.scatter(xvals, y_min, color='blue', marker='x', label='min')
-        plt.scatter(xvals, y_max, color='red', marker='x', label='max')
-        lgd=plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        plt.scatter(xvals, y_mean,
+                    color='green', marker='x', label='mean')
+        plt.scatter(xvals, y_min,
+                    color='blue', marker='x', label='min')
+        plt.scatter(xvals, y_max,
+                    color='red', marker='x', label='max')
+        lgd=plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
+                        borderaxespad=0.)
 
         new_plot_name = str(x).join(os.path.splitext(plot_name))
 
