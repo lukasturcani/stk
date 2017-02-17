@@ -184,7 +184,6 @@ def run():
     # open. This closes them. If this is not done, directories may not
     # be possible to move.
     kill_macromodel()
-    print(progress.means)
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
