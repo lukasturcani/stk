@@ -49,6 +49,8 @@ from functools import partial
 import numpy as np
 import sys
 
+from .population import Population
+
 class Normalization:
     """
     A class for carrying out normalization of fitness values.
@@ -90,8 +92,28 @@ class Normalization:
         for macro_mol in population:
             macro_mol.fitness = macro_mol.unscaled_fitness
 
+        # Make a population of members where all fitness values are
+        # valid. No point in normalizing molecules whose `fitness_fail`
+        # attribute is ``True``. The advantage of this is that when
+        # writing normalization functions you can assume all molecuels
+        # have the same type in their `fitness` attribute.
+
+        # Otherwise, if a fitness function calculated numpy arrays
+        # but the calculation on some molecules failed, the result
+        # would be that some molecules would have an array in their
+        # `fitness` attribute while others would have a float
+        # (1e-4 as a result of running the fail() method). The code of
+        # the normalization function would then have to accomadate
+        # this. By making sure only molecules with valid fitness values
+        # are present in the population provided to the normalization
+        # function, coding does not have to accomodate annoying
+        # outliers.
+
+        valid_pop = Population(*(mol for mol in population if not
+                                mol.fitness_fail))
+
         for func_data in self.funcs:
-            getattr(self, func_data.name)(population,
+            getattr(self, func_data.name)(valid_pop,
                                           **func_data.params)
 
     def combine(self, population, coefficients, exponents):
