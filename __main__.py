@@ -2,8 +2,8 @@ import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
 import pickle
 
-from .ga import (Population, GATools, GAProgress,
-                      GAInput, InputHelp, Normalization)
+from .ga import (Population, GATools,
+                 GAInput, InputHelp, Normalization)
 from .convenience_tools import (time_it, tar_output,
                                 PopulationSizeError,
                                 archive_output, kill_macromodel)
@@ -49,8 +49,9 @@ def run():
     # ``GAInput`` instance. Info about input file structure is
     # documented in ``GAInput`` docstring.
     ga_input = GAInput(os.path.basename(sys.argv[1]))
-    # Make a GAProgress object to keep track of progress.
-    progress = GAProgress()
+    # Make a Population which stores all previous generations to keep
+    # track of progress.
+    progress = Population(ga_input.ga_tools())
 
     # Generate and optimize an initial population.
     os.mkdir('initial')
@@ -96,11 +97,11 @@ def run():
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
         print('\n')
 
-    # Save the min, max and mean values of the population.
+    # Save the generation.
     with time_it():
         pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         print_info('Recording progress.')
-        progress.update(pop)
+        progress.add_subpopulation(pop)
 
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):
@@ -170,10 +171,10 @@ def run():
             pop.write(os.getcwd())
             pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
 
-        # Save the min, max and mean values of the population.
+        # Save tje generation.
         with time_it():
             print_info('Recording progress.')
-            progress.update(pop)
+            progress.add_subpopulation(pop)
 
         # If the user defined some premature exit function, check if
         # the exit criterion has been fulfilled.
@@ -187,14 +188,15 @@ def run():
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
-        plot.epp(progress, os.path.join(root_dir, 'epp.png'),
-                 ga_input.fitness_func,
-                 pop.ga_tools.normalization)
+        # Before plotting the EPP remove all molecules which failed.
+        progress.remove_failures()
+        # Make sure all fitness values are normalized.
+        progress.normalize_fitness_values()
+        plot.epp(progress, os.path.join(root_dir, 'epp.png'))
 
     os.chdir(root_dir)
-    # Dump the GAProgress instance.
-    with open('progress.dmp', 'wb') as dump_file:
-        pickle.dump(progress, dump_file)
+    # Dump the `progress` population.
+    progress.dump('progress.dmp')
 
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
