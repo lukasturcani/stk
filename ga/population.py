@@ -549,6 +549,35 @@ class Population:
 
             return pop
 
+    def max(self, key):
+        """
+        Calculates the max given a key.
+
+        This method applies key(member) on every member of the
+        population and returns the max of returned values.
+
+        For example, if the max value of the attribute `cavity_size`
+        was desired:
+
+            population.max(
+                 lambda macro_mol : macro_mol.topology.cavity_size())
+
+        Parameters
+        ----------
+        key : function
+            A function which should take a MacroMolecule instance as
+            its argument and return a value.
+
+        Returns
+        -------
+        float
+            The max of the values returned by the function `key` when
+            its applied to all members of the population.
+
+        """
+
+        return np.max([key(member) for member in self], axis=0)
+
     def mean(self, key):
         """
         Calculates the mean given a key.
@@ -577,6 +606,35 @@ class Population:
         """
 
         return np.mean([key(member) for member in self], axis=0)
+
+    def min(self, key):
+        """
+        Calculates the min given a key.
+
+        This method applies key(member) on every member of the
+        population and returns the min of returned values.
+
+        For example, if the min value of the attribute `cavity_size`
+        was desired:
+
+            population.min(
+                 lambda macro_mol : macro_mol.topology.cavity_size())
+
+        Parameters
+        ----------
+        key : function
+            A function which should take a MacroMolecule instance as
+            its argument and return a value.
+
+        Returns
+        -------
+        float
+            The min of the values returned by the function `key` when
+            its applied to all members of the population.
+
+        """
+
+        return np.min([key(member) for member in self], axis=0)
 
     def normalize_fitness_values(self):
         """
@@ -698,6 +756,28 @@ class Population:
             self.members = list(dedupe(self.members))
             for subpop in self.populations:
                 subpop.remove_duplicates(between_subpops=False)
+
+    def remove_failures(self):
+        """
+        Removes all members where `failed` is ``True``.
+
+        The structure of the population is preserved.
+
+        Modifies
+        --------
+        self : Population
+            All members of the population which have their `failed`
+            attribute set to ``True`` are removed.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        self.members = [ind for ind in self.members if not ind.failed]
+        for subpop in self.populations:
+            subpop.remove_failures()
 
     def select(self, type_='generational'):
         """
