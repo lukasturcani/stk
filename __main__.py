@@ -109,11 +109,11 @@ def run():
             raise PopulationSizeError('Population has the wrong size.')
 
         print_info('Generation {} of {}.'.format(x,
-                                              ga_input.num_generations))
+                                             ga_input.num_generations))
 
-        # At the start of each generation go into the root directory and
-        # create a folder to hold the next generation's ``.mol`` files.
-        # Change into the newly created directory.
+        # At the start of each generation go into the root directory
+        # and create a folder to hold the next generation's ``.mol``
+        # files. Change into the newly created directory.
         os.chdir(root_dir)
         os.mkdir(str(x))
         os.chdir(str(x))
@@ -141,7 +141,8 @@ def run():
             pop = Population(pop.ga_tools, *pop.optimize_population())
 
         with time_it():
-            print_info('Calculating the fitness of population members.')
+            print_info(('Calculating the fitness'
+                        ' of population members.'))
             pop = Population(pop.ga_tools,
                              *pop.calculate_member_fitness())
 
@@ -183,7 +184,7 @@ def run():
     # open. This closes them. If this is not done, directories may not
     # be possible to move.
     kill_macromodel()
-
+    print(progress.means)
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
@@ -273,8 +274,8 @@ def compare():
         sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
         pop.add_subpopulation(sp)
 
-    # Only try to run a normalization function if one was defined in the
-    # input file.
+    # Only try to run a normalization function if one was defined in
+    # the input file.
     if inp.normalization_func:
         pop.normalize_fitness_values()
         plot.progress_params(pop, 'param_comparison.png')
