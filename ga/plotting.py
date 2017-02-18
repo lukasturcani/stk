@@ -84,6 +84,10 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
     func_name = pop.ga_tools.input.fitness_func.name
     fitness_func = globals()[func_name]
 
+    # Exit if a function which does not have param_labels was used.
+    if not hasattr(fitness_func, 'param_labels'):
+        return
+
     min_params = []
     max_params = []
     mean_params = []
@@ -156,7 +160,7 @@ def plot_counter(counter, plot_name):
         labels.append(ind.fitness)
 
     plt.bar(x_vals, y_vals, color='blue')
-    plt.xticks([x+0.5 for x in x_vals], labels, rotation='vertical')
+    plt.xticks([x for x in x_vals], labels, rotation='vertical')
     plt.tight_layout()
     fig.savefig(plot_name, dpi=fig.dpi)
     plt.close('all')

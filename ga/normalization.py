@@ -48,6 +48,7 @@ start with a leading underscore.
 from functools import partial
 import numpy as np
 import sys
+import copy
 
 from .population import Population
 
@@ -90,7 +91,8 @@ class Normalization:
         # First make sure that all the fitness values are reset and
         # hold the values in `unscaled_fitness`.
         for macro_mol in population:
-            macro_mol.fitness = macro_mol.unscaled_fitness
+            macro_mol.fitness = copy.deepcopy(
+                                        macro_mol.unscaled_fitness)
 
         # Make a population of members where all fitness values are
         # valid. No point in normalizing molecules whose `fitness_fail`
@@ -276,7 +278,7 @@ class Normalization:
 
         # Get all the fitness arrays a matrix.
         fmat = np.array([x.fitness for x in population])
-        
+
         # Get the minimum values of each element in the population.
         mins = np.min(fmat, axis=0)
         # Convert all the ones which are not to be shifted to 0 and
