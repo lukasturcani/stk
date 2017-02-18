@@ -320,8 +320,9 @@
         that the order in which you give the parameter-value tuples does not
         matter.
     </p><p>
-        All keywords should be defined in the input file once. The exception to
-        this is <span class="value">mutation_func</span>. It is quite possible
+        All keywords should be defined in the input file once. The exceptions to
+        this are <span class="value">mutation_func</span> and
+        <span class="value">normalization_func</span> . It is quite possible
         that during a GA run the
         user wishes to use multiple mutation operations. As a result it is
         perfectly reasonable to include multiple commands with the keyword
@@ -338,6 +339,14 @@
         sum to 1 and that the number of elements in the list and the number of
         mutation functions defined in the input file is the same.
     </p><p>
+        Multiple normalization functions can also be defined. This allows
+        the user to preform multiple normalizations of the fitness values
+        in succession. When multiple normalization functions are defined,
+        the first one is applied first, followed by the second one defined
+        and so on.
+    </p>
+
+    <p>
         There is a second kind of non-comment line in the input file of MMEA.
         These lines have the form
       <code>
