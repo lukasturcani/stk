@@ -11,45 +11,6 @@ from operator import attrgetter
 
 from .fitness import *
 
-def epp(progress, plot_name, xlabel='Generation'):
-    """
-    Plots all the EPPs.
-
-    Parameters
-    ----------
-    progress : Population
-        A population which holds all of the generations in a separate
-        subpopulation.
-
-    plot_name : str
-        The full path of the .png file to which the plots should be
-        saved. Values may be attached to the end of this name if
-        multiple plots are plotted.
-
-    xlabel : str (default = 'Generation')
-        The label on the x-axis of the EPP plot.
-
-    Modifies
-    --------
-    Creates plots at the path of `plot_name`.
-
-    If `norm_func` is provided the data in `progress` is replaced with
-    normalized values.
-
-    Returns
-    -------
-    None : NoneType
-
-    """
-
-    # ``True`` if the fitness function defined `progress_params`. In
-    # this case plot the EPP for each of the `progress_params`.
-    if any(hasattr(ind, 'progress_params') for ind in progress):
-        parameter_epp(progress, plot_name)
-
-    # Plot the EPP of the fitness values.
-    fitness_epp(progress, plot_name, xlabel)
-
 def fitness_epp(pop, plot_name, xlabel='Generation'):
     """
     Plots the min, max and avg fitness values of each subpopulation.
@@ -64,7 +25,7 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
         The full path of where the plot should be saved.
 
     xlabel : str (default = 'Generation')
-        The label on the x-axis of the EPP plot.
+        The label on the x-axis.
 
     Returns
     -------
@@ -94,7 +55,7 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
                 bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close('all')
 
-def parameter_epp(pop, plot_name):
+def parameter_epp(pop, plot_name, xlabel='Generation'):
     """
     Plots the progress_params values across subpopulations.
 
@@ -110,6 +71,9 @@ def parameter_epp(pop, plot_name):
 
     plot_name : str
         The full path of where the plots should be saved.
+
+    xlabel : str (default = 'Generation')
+        The label on the x-axis.
 
     Returns
     -------
@@ -138,7 +102,7 @@ def parameter_epp(pop, plot_name):
 
     for x in range(len(min_params[0])):
         fig = plt.figure()
-        plt.xlabel('Population')
+        plt.xlabel(xlabel)
         plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
         plt.title('Population Comparison', fontsize=18)
 
