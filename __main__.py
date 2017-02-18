@@ -192,7 +192,13 @@ def run():
         progress.remove_failures()
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
-        plot.epp(progress, os.path.join(root_dir, 'epp.png'))
+
+        plot.fitness_epp(progress, os.path.join(root_dir, 'epp.png'))
+        # Only plot the EPP of progress parameters if they are used
+        # by the fitness function.
+        if hasattr(progress.ga_tools.fitness_func, 'param_labels'):
+            plot.parameter_epp(progress,
+                               os.path.join(root_dir, 'epp.png'))
 
     os.chdir(root_dir)
     # Dump the `progress` population.
