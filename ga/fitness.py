@@ -5,39 +5,47 @@ A note on how fitness values are calculated.
 --------------------------------------------
 Calculation of fitness values can be a multi-step process. The goal is
 to place a numerical value between 0 (exclusive) and infinity in the
-`fitness` attribute of a MacroMolecule instance.
+`fitness` attribute of a MacroMolecule instance. A thing to keep in
+mind is that once a value is placed into the `unscaled_fitness`
+attribute it never changes (for a given fitness function and molecule).
+However, values placed into the `fitness` attribute are subject to
+change. This is because the outcome of a normalization procedure can
+depend on other members of the population, not just the one being
+evaulated. As a result this can be different each generation.
 
-There are 2 ways in which this can be achieved. First, using only a
-fitness function. Second, using a fitness function and normalization
-functions.
+There are 2 ways in which calculation of a `fitness` value can be
+achieved. First, using only a fitness function. Second, using a fitness
+function and normalization functions.
 
 The case when only a fitness function is used is simple. All fitness
-functions place a value in the `unscaled_fitness` attribute
-of the MacroMolecule instance they are evaluating. MMEA will then
-automatically copy this value into the `fitness` attribute.
+functions take a MacroMoleule instance as an argument and return the
+value of its fitness. MMEA then automatically puts this returned value
+into the `unscaled_fitness` attribute. Next MMEA copies this value into
+the `fitness` attribute.
 
-When only a fitness function is being used, the fitness function itself
-should place a value between 0 (exclusive) and infinity in the
-`unscaled_fitness` attribute.
-
-So what happens if a normalization functions are used?
+So what happens if normalization functions are used?
 
 The first thing to note is that multiple normalization functions can
 be applied sequentially. Each normalization function replaces the
-value in the `fitness` attribute. Normalization functions do not
-manipulate or intarct with the `unscaled_fitness` attribute in any way.
-Before the first normalization function is applied, MMEA automatically
-copies the value in `unscaled_fitness` into `fitness`.
+previous value in the `fitness` attribute. Normalization functions do
+not manipulate or intarct with the `unscaled_fitness` attribute in any
+way. Before the first normalization function is applied, MMEA
+automatically copies the value in `unscaled_fitness` into `fitness`.
 
 The normalization functions then place various values into the
 `fitness` attribute. Only the last normalization function needs to
 place a value between 0 (exclusive) and infinity in the `fitness`
-attribute.
+attribute. This is useful if the fitness function calculates the values
+a number of fitness parameters (such as energy, molecular weight, etc.)
+and then the normalization functions combine them into a single number.
 
 Each generation, before all the normalization functions are reapplied,
 MMEA automatically copies the value in `unscaled_fitness` into
 `fitness`. Then the sequence of normalization functions is applied
 again.
+
+While fitness functions are only applied once per molecule,
+normalization functions are reapplied each generation.
 
 Extending MMEA: Adding fitness functions.
 -----------------------------------------
@@ -53,18 +61,11 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input
 file.
 
-In order for fitness functions to be parallelizable, a requirement must
-be met. The fitness function's return value should be the `macro_mol`
-instance they took as an argument.
-
-Fitness functions only need to assign a value to the `unscaled_fitness`
-attribute of the `macro_mol` and set its `fitness_fail` attribute to
-``False`` if that assignment was successful.
-
-If a fitness function is meant to be paired with a normalization
-funtion it can place any value or object it likes into the
-`unscaled_fitness` attribute. Just as long as the normalization
-functions know how to deal with it and convert it to a number.
+A fitness function must return the value which holds the fitness of the
+molecule taken as an argument. If a fitness function is meant to be
+paired with a normalization funtion it can return any value or object
+it likes. Just as long as the normalization functions know how to deal
+with it and convert it to a number.
 
 A fitness function may be complex and may not fit neatly into a single
 function. For example, the ``cage_target()`` fitness function needs to
@@ -108,8 +109,7 @@ Let's create a basic outline of a some fitness function:
         ...
         macro_mol.progress_params = [mol_energy, mol_radius]
         ...
-        macro_mol.fitness_fail = False
-        return macro_mol
+        return fitness_value
 
 If this function is used in the GA, a progress plot will be made for
 each of the `progress_params` and they will have their y-axes labelled
@@ -238,66 +238,53 @@ class _FitnessFunc:
     the functions.
 
     The decorator prevents fitness functions from raising if
-    they fail (necessary for multiprocessing) and prevents them from
-    being run twice on the same molecule.
-
-    Attributes
-    ----------
-    func : function
-        The fitness function which is to be prevented from raising and
-        running twice on the same molecule.
+    they fail (necessary for multiprocessing), prevents them from
+    being run twice on the same molecule and stores the value returned
+    by them in the `unscaled_fitness` dictionary.
 
     """
 
     def __init__(self, func):
-        self.func = func
         wraps(func)(self)
 
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
-            if macro_mol.unscaled_fitness is not None:
+            if self.__name__ in macro_mol.unscaled_fitness:
                 print('Skipping {0}'.format(macro_mol.file))
                 return macro_mol
 
-            return self.func(macro_mol, *args, **kwargs)
+            val = self.__wrapped__(macro_mol, *args, **kwargs)
+            macro_mol.unscaled_fitness[self.__name__] = val
+            return macro_mol
 
         except Exception as ex:
-            # Prevents the error from being raised, but records it in
-            # ``failures.txt``.
-            macro_mol.fail()
+            macro_mol.failed = True
+            macro_mol.unscaled_fitness[self.__name__] = None
             MolError(ex, macro_mol, "During fitness calculation")
             return macro_mol
 
 def random_fitness(macro_mol):
     """
-    Returns a random fitness value between 1 and 10.
+    Returns a random fitness value.
 
     Parameters
     ----------
     macro_mol : MacroMolecule
         The macromolecule to which a fitness value is to be assigned.
 
-    Modifies
-    --------
-    macro_mol.unscaled_fitness : float
-        Assigns a fitness to this attribute.
-
     Returns
     -------
-    macro_mol : MacroMolecule
-        The `macro_mol` with an integer between 0 (including) and 100
-        (excluding) as its fitness.
+    float
+        A random postive number.
 
     """
 
-    macro_mol.unscaled_fitness = abs(np.random.normal(50,20))
-    macro_mol.fitness_fail = False
-    return macro_mol
+    return abs(np.random.normal(50,20))
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
 def random_fitness_vector(macro_mol):
     """
-    Assignes a random size 4 array to `unscaled_fitness`.
+    Returns an array of random numbers.
 
     Parameters
     ----------
@@ -306,35 +293,24 @@ def random_fitness_vector(macro_mol):
 
     Modifies
     --------
-    macro_mol.fitness_fail : bool
-        Set to ``False``.
-
-    macro_mol.unscaled_fitness : numpy.array
-        A size 4 numpy array of random numbers is placed in this
-        attribute.
-
     macro_mol.progress_params : list
-        The values of the elements in `unscaled_fitness` are placed
-        into a list in this attribute.
+        The random numbers are also placed into this attribute.
 
     Returns
     -------
-    macro_mol : MacroMolecule
-        The `macro_mol` with a size 4 random array set as
-        `unscaled_fitness`.
+    numpy.array
+        An array holding random numbers.
 
     """
 
-    macro_mol.unscaled_fitness = abs(np.random.normal(50,20,4))
+    # Make a random fitness vector.
+    f = abs(np.random.normal(50,20,4))
     # This multiplication ensures that the elements of the fitness
     # vector all have different oraders of magnitude and that some
     # are negative.
-    macro_mol.unscaled_fitness = np.multiply(
-                                    macro_mol.unscaled_fitness,
-                                    np.array([0.01, 1, 10, -100]))
-    macro_mol.fitness_fail = False
-    macro_mol.progress_params = macro_mol.unscaled_fitness.tolist()
-    return macro_mol
+    f = np.multiply(f, np.array([0.01, 1, 10, -100]))
+    macro_mol.progress_params = f.tolist()
+    return f
 
 def raiser(macro_mol, param1, param2=2):
     """
@@ -372,7 +348,7 @@ def cage(macro_mol, target_cavity, target_window=None,
          pseudoformation_params=
          { 'energy_func' : FunctionData('rdkit', forcefield='uff') }):
     """
-    Calculates the fitness vector of a cage.
+    Returns the fitness vector of a cage.
 
     The fitness vector consists of the following properties in the
     listed order
@@ -385,9 +361,6 @@ def cage(macro_mol, target_cavity, target_window=None,
            windows in `macro_mol`.
         4) `eng_per_bond` - The formation energy of `macro_mol` per
            bond made.
-
-    The fitness vector is placed as a numpy array into the
-    `unscaled_fitness` attribute of `macro_mol`.
 
     Parameters
     ----------
@@ -425,19 +398,19 @@ def cage(macro_mol, target_cavity, target_window=None,
         The function sets this to ``True`` if one of the parameters
         was not calculated.
 
-    macro_mol.unscaled_fitness : numpy.array
-        The numpy array holds the fitness vector described in this
-        docstring.
-
     macro_mol.progress_params : list
-        Places the calculated parameters in a single list. The order
+        Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
 
     Returns
     -------
-    macro_mol : Cage
-        The `macro_mol` with its fitness parameters calculated.
+    numpy.array
+        The numpy array holds the fitness vector described in this
+        docstring.
+
+    None : NoneType
+        Returned if any fitness parameter failed to calculate.
 
     """
 
@@ -467,21 +440,17 @@ def cage(macro_mol, target_cavity, target_window=None,
     macro_mol.progress_params = [cavity_diff, window_diff,
                                  asymmetry, e_per_bond]
 
-    macro_mol.unscaled_fitness = np.array([cavity_diff,
-                                           window_diff,
-                                           asymmetry,
-                                           e_per_bond])
+    if None in macro_mol.progress_params:
+        macro_mol.failed = True
+        return None
 
-    if any(x is None for x in macro_mol.unscaled_fitness):
-        macro_mol.fail()
-
-    return macro_mol
+    return np.array([cavity_diff, window_diff, asymmetry, e_per_bond])
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_target(macro_mol, target_mol_file, macromodel_path,
                 rotations=0, md=False):
     """
-    Calculates the fitness of a cage / target complex.
+    Returns the fitness vector of a cage / target complex.
 
     The target is randomly rotated inside the cage's cavity and the
     most stable conformation found is used.
@@ -491,9 +460,6 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
 
             1) binding energy
             2) asymmetry
-
-    This vector is placed in the `unscaled_fitness` attribute of the
-    population's members as a numpy array.
 
     Parameters
     ----------
@@ -518,24 +484,22 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
     Modifies
     --------
     macro_mol.progress_params : list
-        Places the various physical properties of `macro_mol` which
-        contribute to fitness in this attribute. This is used for
-        plotting the EPP and other stats.
+        Places the calculated parameters in the list. The order
+        corresponds to the arguments in the ``_param_labels()``
+        decorator applied to this function.
 
-    macro_mol.fitness_fail : bool
-        This attribute is set to ``True`` if the fitness function
-        completes successfully.  Otherwise set to ``False``.
-
-    macro_mol.unscaled_fitness : numpy.array
-        Places the fitness vector into this attribute.
-        The fitness vector consists of properites which affect the
-        fitness of a molecule.
+    macro_mol.failed : bool
+        The function sets this to ``True`` if one of the parameters
+        was not calculated.
 
     Returns
     -------
-    macro_mol
-        The `macro_mol` with its unscaled fitness parameters
-        calculated.
+    numpy.array
+        The numpy array holds the fitness vector described in this
+        docstring.
+
+    None : NoneType
+        Returned if any fitness parameter failed to calculate.
 
     """
 
@@ -558,9 +522,6 @@ def cage_c60(macro_mol, target_mol_file,
 
         1) binding energy
         2) asymmetry
-
-    This vector is placed in the `unscaled_fitness` attribute of the
-    population's members as a numpy array.
 
     Parameters
     ----------
@@ -588,24 +549,22 @@ def cage_c60(macro_mol, target_mol_file,
     Modifies
     --------
     macro_mol.progress_params : list
-        Places the various physical properties of `macro_mol` which
-        contribute to fitness in this attribute. This is used for
-        plotting the EPP and other stats.
+        Places the calculated parameters in the list. The order
+        corresponds to the arguments in the ``_param_labels()``
+        decorator applied to this function.
 
-    macro_mol.fitness_fail : bool
-        This attribute is set to ``True`` if the fitness function
-        completes successfully.  Otherwise set to ``False``.
-
-    macro_mol.unscaled_fitness : numpy.array
-        Places the fitness vector into this attribute.
-        The fitness vector consists of properites which affect the
-        fitness of a molecule.
+    macro_mol.failed : bool
+        The function sets this to ``True`` if one of the parameters
+        was not calculated.
 
     Returns
     -------
-    macro_mol
-        The `macro_mol` with its unscaled fitness parameters
-        calculated.
+    numpy.array
+        The numpy array holds the fitness vector described in this
+        docstring.
+
+    None : NoneType
+        Returned if any fitness parameter failed to calculate.
 
     """
     return _cage_target(macro_mol, target_mol_file, macromodel_path,
@@ -620,9 +579,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     define their own rotation function. For example ``cage_c60()`` and
     ``cage_target()``.
 
-    The function places a fitness vector consisting of the
-    binding energy and asymmetry in the `unscaled_fitness` attribute
-    of members.
+    The function returns a fitness vector consisting of the
+    binding energy and asymmetry.
 
     Parameters
     ----------
@@ -650,23 +608,22 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     Modifies
     --------
     macro_mol.progress_params : list
-        Places the various physical properties of `macro_mol` which
-        contribute to fitness in this attribute. This is used for
-        plotting the EPP and other stats.
+        Places the calculated parameters in the list. The order
+        corresponds to the arguments in the ``_param_labels()``
+        decorator applied to this function.
 
     macro_mol.failed : bool
-        Set to ``True`` if some part of the fitness calclution failed.
-
-    macro_mol.unscaled_fitness : numpy.array
-        Places the fitness vector into this attribute.
-        The fitness vector consists of properites which affect the
-        fitness of a molecule.
+        The function sets this to ``True`` if one of the parameters
+        was not calculated.
 
     Returns
     -------
-    macro_mol
-        The `macro_mol` with its unscaled fitness parameters
-        calculated.
+    numpy.array
+        The numpy array holds the fitness vector described in this
+        docstring.
+
+    None : NoneType
+        Returned if any fitness parameter failed to calculate.
 
     """
 
@@ -748,12 +705,13 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     asymmetry = macro_mol.topology.window_difference()
 
     macro_mol.progress_params = [binding_energy, asymmetry]
-    macro_mol.unscaled_fitness = np.array([binding_energy, asymmetry])
 
-    if any(x is None for x in macro_mol.unscaled_fitness):
-        macro_mol.fail()
 
-    return macro_mol
+    if None in macro_mol.progress_params:
+        macro_mol.failed = True
+        return None
+
+    return np.array([binding_energy, asymmetry])
 
 def _generate_complexes(macro_mol, target, number=1):
     """
