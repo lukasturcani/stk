@@ -249,7 +249,9 @@ class _FitnessFunc:
 
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
-            if self.__name__ in macro_mol.unscaled_fitness:
+            if (macro_mol.failed or
+                        self.__name__ in macro_mol.unscaled_fitness):
+                        
                 print('Skipping {0}'.format(macro_mol.file))
                 return macro_mol
 
