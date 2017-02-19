@@ -88,11 +88,12 @@ class Normalization:
 
         """
 
+        fitness_func = population.ga_tools.fitness.name
         # First make sure that all the fitness values are reset and
-        # hold the values in `unscaled_fitness`.
+        # hold the value of the approraite fitness function.
         for macro_mol in population:
             macro_mol.fitness = copy.deepcopy(
-                                        macro_mol.unscaled_fitness)
+                            macro_mol.unscaled_fitness[fitness_func])
 
         # Make a population of members where all fitness values are
         # valid. No point in normalizing molecules whose `fitness_fail`
