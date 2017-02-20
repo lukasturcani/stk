@@ -139,7 +139,7 @@ import networkx as nx
 from scipy.spatial.distance import euclidean
 import pickle
 import json
-from inspect import signature
+from collections import namedtuple, Counter
 
 from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
@@ -201,10 +201,10 @@ class CachedStructUnit(type):
         super().__init__(*args, **kwargs)
         self.cache = dict()
 
-    def __call__(self, file, *args, **kwargs):
+    def __call__(self, file, *args, functional_group=None, **kwargs):
         _, ext = os.path.splitext(file)
         mol = self.init_funcs[ext](file)
-        key = self.gen_key(mol)
+        key = self.gen_key(mol, functional_group)
         if key in self.cache:
             return self.cache[key]
         else:
@@ -248,7 +248,7 @@ class Molecule:
         self.failed = False
         self.optimized = False
         self.energy = Energy(self)
-        self.bonder_ids = set()
+        self.bonder_ids = []
 
     def all_atom_coords(self):
         """
@@ -524,7 +524,7 @@ class Molecule:
 
         Modifies
         --------
-        bonder_ids : set of ints
+        bonder_ids : list of ints
             Updates this set with the ids of atoms tagged 'bonder'.
 
         Returns
@@ -534,10 +534,10 @@ class Molecule:
         """
 
         # Clear the set in case the method is run twice.
-        self.bonder_ids = set()
+        self.bonder_ids = []
         for atom in self.mol.GetAtoms():
             if atom.HasProp('bonder'):
-                self.bonder_ids.add(atom.GetIdx())
+                self.bonder_ids.append(atom.GetIdx())
 
     def rotate(self, theta, axis):
         """
@@ -919,8 +919,7 @@ class Molecule:
         with open(self.file, 'w') as pdb:
             pdb.write(new_content)
 
-@total_ordering
-class StructUnit(Molecule, metaclass=Cached):
+class StructUnit(Molecule, metaclass=CachedStructUnit):
     """
     Represents the building blocks of macromolecules examined by MMEA.
 
@@ -1228,7 +1227,7 @@ class StructUnit(Molecule, metaclass=Cached):
         self.tag_atoms()
 
     @staticmethod
-    def gen_key(file, functional_group):
+    def gen_key(rdkit_mol, functional_group):
         """
         Generates the key for caching the molecule.
 
@@ -1237,14 +1236,16 @@ class StructUnit(Molecule, metaclass=Cached):
         rdkit_mol : rdkit.Chem.rdchem.Mol
             An rdkit instance of the molecule.
 
+        functional_group : str
+            The name of the functional group being used to make
+            macromolecules.
+
         Returns
         -------
         frozenset
             The key used for caching the molecule.
 
         """
-
-
 
         return frozenset([chem.MolToInchi(rdkit_mol),
                           functional_group])
@@ -1467,7 +1468,7 @@ class StructUnit(Molecule, metaclass=Cached):
         """
 
         # Clear this list in case the method is being rerun.
-        self.bonder_ids = set()
+        self.bonder_ids = []
 
         # Give all atoms in functional groups the tag 'fg' and set its
         # value to the name of the functional group.
@@ -1483,7 +1484,7 @@ class StructUnit(Molecule, metaclass=Cached):
         for atom_id in flatten(bond_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
             atom.SetProp('bonder', '1')
-            self.bonder_ids.add(atom_id)
+            self.bonder_ids.append(atom_id)
 
         # Give all atoms which form bonds during reactions the tag
         # 'del' and set its value to '1'.
@@ -1849,7 +1850,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
     bonds_made : int
         The number of bonds created during assembly.
 
-    bonder_ids : set of ints
+    bonder_ids : list of ints
         The ids of atoms which have bonds added during assembly.
 
     key : MacroMolKey
@@ -2053,7 +2054,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
             cage.fitness = 3.14
             MacroMolecule._cache[key] = cage
             return cage
-
 
 class Cage(MacroMolecule):
     """
