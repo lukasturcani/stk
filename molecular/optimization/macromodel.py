@@ -11,6 +11,7 @@ import rdkit.Chem.AllChem as ac
 import warnings
 import psutil
 import re
+from uuid import uuid4
 
 from ...convenience_tools import MolError, MAEExtractor
 
@@ -34,8 +35,7 @@ class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
 
-def macromodel_opt(macro_mol, force_field=16,
-                 macromodel_path=r"C:\Program Files\Schrodinger2016-2",
+def macromodel_opt(macro_mol, macromodel_path, force_field=16,
                  no_fix=False, md=False, lewis_fixed=False):
     """
     Optimizes the molecule using MacroModel.
@@ -73,11 +73,6 @@ def macromodel_opt(macro_mol, force_field=16,
         The rdkit molecule held in this attribute is replaced by an
         rdkit molecule with an optimized structure.
 
-    macro_mol.file's content
-        The content of the structure file located at `macro_mol.file`,
-        is changed so that it holds the structure of the optimized
-        molecule.
-
     Returns
     -------
     None : NoneType
@@ -85,6 +80,10 @@ def macromodel_opt(macro_mol, force_field=16,
     """
 
     try:
+        macro_mol._file = getattr(macro_mol, '_file',
+                                 '{}.mol'.format(uuid4().int))
+        # First write a .mol file of the molecule.
+        macro_mol.write(macro_mol._file)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
         _create_mae(macro_mol, macromodel_path)
@@ -95,7 +94,8 @@ def macromodel_opt(macro_mol, force_field=16,
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
         _convert_maegz_to_mae(macro_mol, macromodel_path)
-        macro_mol.update_from_mae()
+        macro_mol.update_from_mae(
+                            macro_mol._file.replace('.mol', '.mae'))
 
         if md:
             macromodel_md_opt(macro_mol, macromodel_path)
@@ -107,7 +107,7 @@ def macromodel_opt(macro_mol, force_field=16,
 
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {0}').format(macro_mol.file))
+               '- {}').format(macro_mol))
         return macromodel_opt(macro_mol, force_field=14,
                               lewis_fixed=lewis_fixed,
                               macromodel_path=macromodel_path,
@@ -127,8 +127,12 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
                       timeout=True, force_field=16,
                       temp=300, confs=50, eq_time=10, sim_time=200):
 
-    print('\nRunning MD on {0}.'.format(macro_mol.file))
+    print('\nRunning MD on {}.'.format(macro_mol))
     try:
+        macro_mol._file = getattr(macro_mol, '_file',
+                                 '{}.mol'.format(uuid4().int))
+        # First write a .mol file of the molecule.
+        macro_mol.write(macro_mol._file)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
         _create_mae(macro_mol, macromodel_path)
@@ -138,7 +142,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
         # Run the optimization.
         _run_bmin(macro_mol, macromodel_path, timeout)
         # Extract the lowest energy conformer into its own .mae file.
-        conformer_mae = MAEExtractor(macro_mol).path
+        conformer_mae = MAEExtractor(macro_mol._file).path
         macro_mol.update_from_mae(conformer_mae)
 
     except _ForceFieldError as ex:
@@ -147,7 +151,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
             raise ex
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {0}').format(macro_mol.file))
+               '- {}').format(macro_mol))
         return macromodel_md_opt(macro_mol, macromodel_path,
                                  timeout=timeout, force_field=14,
                                  lewis_fixed=lewis_fixed,
@@ -165,8 +169,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
         else:
             raise ex
 
-def macromodel_cage_opt(macro_mol, force_field=16,
-                 macromodel_path=r"C:\Program Files\Schrodinger2016-2",
+def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
                  no_fix=False, md=False, lewis_fixed=False):
     """
     Optimizes the molecule using MacroModel.
@@ -209,11 +212,6 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         The rdkit molecule held in this attribute is replaced by a
         rdkit molecule with an optimized structure.
 
-    macro_mol.file's content
-        The content of the structure file located at `macro_mol.file`,
-        is changed so that it holds the structure of the optimized
-        molecule.
-
     Returns
     -------
     None : NoneType
@@ -221,6 +219,10 @@ def macromodel_cage_opt(macro_mol, force_field=16,
     """
 
     try:
+        macro_mol._file = getattr(macro_mol, '_file',
+                                 '{}.mol'.format(uuid4().int))
+        # First write a .mol file of the molecule.
+        macro_mol.write(macro_mol._file)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
         _create_mae(macro_mol, macromodel_path)
@@ -231,13 +233,14 @@ def macromodel_cage_opt(macro_mol, force_field=16,
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
         _convert_maegz_to_mae(macro_mol, macromodel_path)
-        macro_mol.update_from_mae()
+        macro_mol.update_from_mae(
+                             macro_mol._file.replace('.mol', '.mae'))
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            if macro_mol.topology.windows is not None:
-                all_windows = (len(macro_mol.topology.windows) ==
-                                       macro_mol.topology.n_windows)
+            if macro_mol.windows is not None:
+                all_windows = (len(macro_mol.windows) ==
+                                       macro_mol.n_windows)
 
                 if md and all_windows:
                     macromodel_md_opt(macro_mol, macromodel_path)
@@ -249,7 +252,7 @@ def macromodel_cage_opt(macro_mol, force_field=16,
 
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-        '- {0}').format(macro_mol.file))
+        '- {}').format(macro_mol))
         return macromodel_cage_opt(macro_mol, force_field=14,
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md,
@@ -268,13 +271,13 @@ def macromodel_cage_opt(macro_mol, force_field=16,
 def _run_bmin(macro_mol, macromodel_path, timeout=True):
 
     print("", time.ctime(time.time()),
-    'Running bmin - {0}.'.format(macro_mol.file), sep='\n')
+    'Running bmin - {}.'.format(macro_mol), sep='\n')
 
-    # To run MacroModel a command is issued to to the console via
-    # ``subprocess.Popen``. The command is the full path of the ``bmin``
-    # program. ``bmin`` is located in the Schrodinger installation
-    # folder.
-    file_root, ext = os.path.splitext(macro_mol.file)
+    # To run MacroModel a command is issued to the console via
+    # ``subprocess.Popen``. The command is the full path of the
+    # ``bmin`` program. ``bmin`` is located in the Schrodinger
+    # installation folder.
+    file_root, ext = os.path.splitext(macro_mol._file)
     log_file = file_root + '.log'
     opt_app = os.path.join(macromodel_path, "bmin")
     # The first member of the list is the command, the following ones
@@ -292,7 +295,7 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
 
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
-               'by force - {}\n').format(macro_mol.file))
+               'by force - {}\n').format(macro_mol))
         _kill_bmin(macro_mol, macromodel_path)
         proc_out = ""
 
@@ -331,7 +334,7 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
                      'files were not created by the optimization.'))
 
 def _kill_bmin(macro_mol, macromodel_path):
-    name, ext = os.path.splitext(macro_mol.file)
+    name, ext = os.path.splitext(macro_mol._file)
     name = re.split(r'\\|/', name)[-1]
     app = os.path.join(macromodel_path, 'jobcontrol')
     cmd = [app, '-stop', name]
@@ -357,7 +360,7 @@ def _kill_bmin(macro_mol, macromodel_path):
             break
 
 def _run_applyhtreat(macro_mol, macromodel_path):
-    name, ext = os.path.splitext(macro_mol.file)
+    name, ext = os.path.splitext(macro_mol._file)
     mae = name + '.mae'
     mae_out = name + '_htreated.mae'
     _create_mae(macro_mol, macromodel_path)
@@ -410,7 +413,7 @@ def _license_found(output, macro_mol=None):
 
     # Check if the file exists first. If not, this is often means the
     # calculation must be redone so return False anyway.
-    log_file_path = macro_mol.file.replace('mol', 'log')
+    log_file_path = macro_mol._file.replace('mol', 'log')
     with open(log_file_path, 'r') as log_file:
         log_file_content = log_file.read()
 
@@ -458,7 +461,7 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 
     """
 
-    print('Creating .com file - {}.'.format(macro_mol.file))
+    print('Creating .com file - {}.'.format(macro_mol))
 
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
@@ -489,7 +492,7 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
     # Create a path for the ``.com`` file. It is the same as that of the
     # structure file but with a ``.com`` extension. Get the path of the
     # ``.mae`` file and the output file in the same way.
-    name, ext = os.path.splitext(macro_mol.file)
+    name, ext = os.path.splitext(macro_mol._file)
     com_file = name + '.com'
     mae = name + '.mae'
     output = name + '-out.maegz'
@@ -513,7 +516,7 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 
 def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
 
-    print('Creating .com file - {0}.'.format(macro_mol.file))
+    print('Creating .com file - {}.'.format(macro_mol))
 
     # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
     # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
@@ -539,7 +542,7 @@ def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, 
     main_string = main_string.format(force_field=force_field, temp=temp,
                         confs=confs, eq_time=eq_time, sim_time=sim_time)
 
-    name, ext = os.path.splitext(macro_mol.file)
+    name, ext = os.path.splitext(macro_mol._file)
     com_file = name + '.com'
     mae = name + '.mae'
     output = name + '-out.maegz'
@@ -571,8 +574,8 @@ def _create_mae(macro_mol, macromodel_path):
 
     Modifies
     --------
-    This function creates a new ``.mae`` file from the structure file in
-    `macro_mol.file`. This new file is placed in the same
+    This function creates a new ``.mae`` file from the structure file
+    in `macro_mol._file`. This new file is placed in the same
     folder as the original file and has the same name. Only the
     extensions are different.
 
@@ -583,16 +586,15 @@ def _create_mae(macro_mol, macromodel_path):
 
     """
 
-    _, ext = os.path.splitext(macro_mol.file)
+    _, ext = os.path.splitext(macro_mol._file)
 
-    print('Converting {} to .mae - {}.'.format(ext,
-                                              macro_mol.file))
+    print('Converting {} to .mae - {}.\n'.format(ext, macro_mol))
 
     # Create the name of the new ``.mae`` file. It is the same as the
     # original structure file, including the same path. Only the
     # extensions are different.
-    mae_file = macro_mol.file.replace(ext, '.mae')
-    _structconvert(macro_mol.file, mae_file, macromodel_path)
+    mae_file = macro_mol._file.replace(ext, '.mae')
+    _structconvert(macro_mol._file, mae_file, macromodel_path)
     return mae_file
 
 def _convert_maegz_to_mae(macro_mol, macromodel_path):
@@ -630,9 +632,9 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
 
     """
 
-    print('Converting .maegz to .mae - {}.'.format(macro_mol.file))
+    print('Converting .maegz to .mae - {}.'.format(macro_mol))
 
-    name, ext = os.path.splitext(macro_mol.file)
+    name, ext = os.path.splitext(macro_mol._file)
     # ``out`` is the full path of the optimized ``.mae`` file.
     maegz = name + '-out.maegz'
     # Replace extensions to get the names of the various files.
@@ -769,8 +771,8 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
         atom1 = bond.GetBeginAtom()
         atom2 = bond.GetEndAtom()
 
-        if (atom1.GetIdx() in macro_mol.topology.bonder_ids and
-            atom2.GetIdx() in macro_mol.topology.bonder_ids):
+        if (atom1.GetIdx() in macro_mol.bonder_ids and
+            atom2.GetIdx() in macro_mol.bonder_ids):
             continue
 
         atom1_id = atom1.GetIdx()
@@ -851,9 +853,9 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     # bonds not added during assembly which will not be fixed. However,
     # it is assumed that the effect of this will be minimal.
     for atom1_id, atom2_id, atom3_id in ba_atoms:
-        if (atom1_id in macro_mol.topology.bonder_ids or
-            atom2_id in macro_mol.topology.bonder_ids or
-            atom3_id in macro_mol.topology.bonder_ids):
+        if (atom1_id in macro_mol.bonder_ids or
+            atom2_id in macro_mol.bonder_ids or
+            atom3_id in macro_mol.bonder_ids):
             continue
 
         ba = ac.GetAngleDeg(conf, atom1_id, atom2_id, atom3_id)
@@ -930,10 +932,10 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     # be fixed. However, it is assumed that the effect of this will be
     # minimal.
     for atom1_id, atom2_id, atom3_id, atom4_id in ta_atoms:
-        if (atom1_id in macro_mol.topology.bonder_ids or
-            atom2_id in macro_mol.topology.bonder_ids or
-            atom3_id in macro_mol.topology.bonder_ids or
-            atom4_id in macro_mol.topology.bonder_ids):
+        if (atom1_id in macro_mol.bonder_ids or
+            atom2_id in macro_mol.bonder_ids or
+            atom3_id in macro_mol.bonder_ids or
+            atom4_id in macro_mol.bonder_ids):
             continue
 
         ta = ac.GetDihedralDeg(conf, atom1_id, atom2_id,
@@ -968,7 +970,7 @@ def _wait_for_file(file_name, timeout=10):
     while True:
         time_taken = time.time() - t_start
         if divmod(time_taken, 5)[0] == tick + 1:
-            print('Waiting for {0}.'.format(file_name))
+            print('Waiting for {}.'.format(file_name))
             tick += 1
 
         if os.path.exists(file_name) or time_taken > timeout:
