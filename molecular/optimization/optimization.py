@@ -160,11 +160,6 @@ def rdkit_optimization(macro_mol):
         changed as a result of the optimization. This means the
         ``Conformer`` instance held by the rdkit molecule is changed.
 
-    macro_mol.file's content
-        The content of the structure file located at
-        `macro_mol.file`, is changed so that it holds the structure of
-        the optimized rdkit molecule.
-
     Returns
     -------
     None : NoneType
@@ -174,9 +169,6 @@ def rdkit_optimization(macro_mol):
     # Sanitize then optimize the rdkit molecule.
     chem.SanitizeMol(macro_mol.mol)
     ac.MMFFOptimizeMolecule(macro_mol.mol)
-
-    # Update the content of the structure file.
-    macro_mol.write()
 
 def do_not_optimize(macro_mol):
     """
