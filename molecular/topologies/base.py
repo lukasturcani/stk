@@ -185,3 +185,12 @@ class Topology:
             return rdkit.Chem.rdchem.BondType.DOUBLE
         else:
             return rdkit.Chem.rdchem.BondType.SINGLE
+
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        r = "{}(".format(self.__class__.__name__)
+        for key, value in self.__dict__.items():
+            r += "{!r}={!r}".format(key, value)
+        return r + ")"
