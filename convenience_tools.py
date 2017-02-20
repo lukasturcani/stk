@@ -168,16 +168,12 @@ class MolError(Exception):
 
             f.write('\nnote = {}\n'.format(self.notes))
 
-            f.write('file = {}\n'.format(mol.file))
-
             if hasattr(mol, 'building_blocks'):
                 f.write('building blocks = {}\n'.format(
                                                   mol.building_blocks))
 
                 f.write('topology = {}\n'.format(mol.topology))
 
-                f.write('topology_args = {}\n'.format(
-                                                 mol.topology_args))
             f.write('\n'+'='*240)
             f.write('\n\n\n')
 
