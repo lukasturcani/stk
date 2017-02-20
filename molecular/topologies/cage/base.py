@@ -8,7 +8,6 @@ from ..base import Topology
 from ....convenience_tools import (centroid, vector_theta,
                                       rotation_matrix_arbitrary_axis,
                                       normalize_vector, atom_vdw_radii)
-from ....addons.pyWindow import window_sizes
 
 class WindowError(Exception):
     def __init__(self, message):
