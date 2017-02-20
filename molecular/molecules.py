@@ -140,13 +140,16 @@ from scipy.spatial.distance import euclidean
 import pickle
 import json
 from collections import namedtuple, Counter
+import io
 
+from ..addons.pyWindow import window_sizes
 from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis)
 from .fg_info import functional_groups
 from .energy import Energy
+
 
 class Cached(type):
     """
@@ -201,14 +204,22 @@ class CachedStructUnit(type):
         super().__init__(*args, **kwargs)
         self.cache = dict()
 
-    def __call__(self, file, *args, functional_group=None, **kwargs):
+    def __call__(self, file, functional_group=None):
         _, ext = os.path.splitext(file)
         mol = self.init_funcs[ext](file)
+
+        # Assign the FGInfo instance from `functional_groups` which
+        # describes the functional group provided in `functional_group`
+        # or is found in the path name.
+        if not functional_group:
+            functional_group = next((x.name for x in functional_groups if
+                                  x.name in file), None)
+
         key = self.gen_key(mol, functional_group)
         if key in self.cache:
             return self.cache[key]
         else:
-            obj = super().__call__(file, *args, **kwargs)
+            obj = super().__call__(file, functional_group)
             obj.key = key
             self.cache[key] = obj
             return obj
@@ -788,32 +799,21 @@ class Molecule:
         new_mol.AddConformer(conformer)
         return new_mol
 
-    def update_from_mae(self, mae_path=None):
+    def update_from_mae(self, mae_path):
         """
-        Updates data in attributes to match what is held a .mae file.
-
-        The molecule can be updated from a random .mae file held
-        anywhere. Alterntatively, if no path is specified it is assumed
-        the .mae file has the same path and name as `file` only with
-        the extension replaced with .mae.
+        Updates molecular structure to match an .mae file.
 
         Parameters
         ----------
-        mae_path : str (default = None)
-            The full path of the .mae file from which the attributes
-            should be updated. If ``None`` the .mae file is assumed to
-            have the same path and name as `file` only with the
-            extension replaced with .mae.
+        mae_path : str
+            The full path of the .mae file from which the structure
+            should be updated.
 
         Modifies
         --------
-        self.mol : rdkit.Chem.rdchem.Mol
-            The rdkit molecule held in this attribute is changed so that
-            it matches the moleclue held in the .mae file.
-
-        self.file's content
-            The content in this file is changed to match the content in
-            the .mae file.
+        mol : rdkit.Chem.rdchem.Mol
+            The rdkit molecule held in this attribute is changed so
+            that it matches the moleclue held in the .mae file.
 
         Returns
         -------
@@ -821,11 +821,7 @@ class Molecule:
 
         """
 
-        if mae_path is None:
-            mae_path = os.path.splitext(self.file)[0] + '.mae'
-
         self.mol = mol_from_mae_file(mae_path)
-        self.write()
 
     def write(self, path):
         """
@@ -1198,11 +1194,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return json.dumps({
 
-        'id' : self.id,
+        'key' : list(self.key),
         'class' : self.__class__.__name__,
         'mol_block' : self.mdl_mol_block()
 
-        })
+        }, indent=4)
 
     def _json_init(self, json_dict):
         """
@@ -1397,8 +1393,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
         Returns molecules from `database` ordered by similarity.
 
-        This method uses the Morgan fingerprints of radius 4 to evaluate
-        how similar the molecules in `database` are to `self`.
+        This method uses the Morgan fingerprints of radius 4 to
+        evaluate how similar the molecules in `database` are.
 
         Parameters
         ----------
@@ -1410,8 +1406,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         -------
         list of tuples of form (float, str)
             The float is the similarity of a given molecule in the
-            database to `self` while the str is the full path of the
-            .mol file of that molecule.
+            database to `mol` while the str is the full path of the
+            structure file of that molecule.
 
         """
 
@@ -1428,7 +1424,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             # Ignore files which are not structure files and the
             # structure file of the molecule itself.
             _, ext = os.path.splitext(path)
-            if ext not in self.init_funcs or path == self.file:
+            if ext not in self.init_funcs:
                 continue
 
             mol = self.init_funcs[ext](path)
@@ -1521,15 +1517,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             atom.ClearProp('del')
 
     def __str__(self):
-        return self.file
+        return "{} {}".format(self.__class__.__name__, list(self.key))
 
     def __repr__(self):
-        repr_ =  "{0!r}".format(type(self))
-        repr_ = repr_.replace(">",
-        ", file={0.file!r}>".format(self))
-        repr_ = repr_.replace("class ", "class=")
-        return repr_
-
+        return self.json()
 class StructUnit2(StructUnit):
     """
     Represents building blocks with 2 functional groups.
@@ -1907,17 +1898,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
         The representation has the following form:
 
             {
-                'uid' : 5125
                 'class' : 'Polymer',
                 'mol_block' : 'A string holding the V3000 mol
                                block of the molecule.'
-                'building_blocks' : [bb1.json(), bb2.json()]
-                'topology' : 'Copolymer'
-                'topology_args' : {'arg1' : arg1_val,
-                                   'arg2' : arg2_val},
+                'building_blocks' : {bb1.json(), bb2.json()}
+                'topology' : 'Copolymer(repeating_unit='AB')'
                 'unscaled_fitness' : {'fitness_func1' : fitness1,
                                       'fitness_func2' : fitness2}
-
             }
 
         Returns
@@ -1929,15 +1916,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         return json.dumps({
 
-        'uid' : self.uid,
         'class' : self.__class__.__name__,
         'mol_block' : self.mdl_mol_block(),
         'building_blocks' : [x.json() for x in self.building_blocks],
-        'topology' : self.topology.__name__,
-        'topology_args' : self.topology_args,
+        'topology' : repr(self.topology),
         'unscaled_fitness' : self.unscaled_fitness
 
-        })
+        }, indent=4)
 
     @staticmethod
     def gen_key(building_blocks, topology):
@@ -2019,14 +2004,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
         return self.fitness < other.fitness
 
     def __str__(self):
-        return str({key: value for key, value in
-                                    self.__dict__.items() if
-                                    key in {'topology',
-                                            'fitness',
-                                            'unscaled_fitness',
-                                            'id',
-                                            'optimized',
-                                            'building_blocks'}}) + "\n"
+        return "{}(building_blocks={}, topology={!r})".format(
+                            self.__class__.__name__,
+                            [str(x) for x in self.building_blocks],
+                            self.topology)
 
     def __repr__(self):
         return str(self)
@@ -2172,7 +2153,7 @@ class Cage(MacroMolecule):
 
         # Get indices of where the list should be split.
         split = []
-        for x in range(self.n_window_types-1):
+        for x in range(self.topology.n_window_types-1):
             i = diffs.index(sorted_diffs[x]) + 1
             split.append(i)
 
@@ -2183,7 +2164,7 @@ class Cage(MacroMolecule):
             clusters.append(og[i:])
             og = og[:i]
 
-        if self.n_window_types == 1:
+        if self.topology.n_window_types == 1:
             clusters.append(og)
 
         # After this sum the differences in each group and then sum the
@@ -2191,10 +2172,10 @@ class Cage(MacroMolecule):
         diff_sums = []
         for cluster in clusters:
             diff_sum = sum(abs(w1 - w2) for w1, w2 in
-                                    itertools.combinations(cluster, 2))
+                                    it.combinations(cluster, 2))
 
             diff_num = sum(1 for _ in
-                itertools.combinations(cluster, 2))
+                it.combinations(cluster, 2))
 
             diff_sums.append(diff_sum / diff_num)
 
@@ -2219,13 +2200,14 @@ class Cage(MacroMolecule):
 
         """
 
-        all_windows = window_sizes(self.macro_mol.file)
+        all_windows = window_sizes(io.StringIO(self.mdl_mol_block()))
 
         # If pyWindow failed, return ``None``.
         if all_windows is None:
             return None
 
-        all_windows = sorted(all_windows, reverse=True)[:self.n_windows]
+        all_windows = sorted(all_windows,
+                             reverse=True)[:self.topology.n_windows]
         for i, x in enumerate(all_windows):
             # Return ``None`` when pyWindow fucks up and outputs a
             # mistakenly large window size.

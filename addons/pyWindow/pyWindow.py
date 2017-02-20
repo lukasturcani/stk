@@ -28,8 +28,8 @@ from matplotlib.patches import Circle, PathPatch
 #Atom mass dictionary taken from www.ccdc.cam.ac.uk/Lists/ResourceFileList/Elemental_Radii.xlsx 13 Oct 2015
 #Excluding unstable radioisotopes, dummy atom denoted X (and D) have atomic weight equal 1
 atom_mass = {
-             'AL': 26.982,  'SB': 121.76,  'AR': 39.948,  'AS': 74.922,  'BA': 137.327, 'BE': 9.012,   'BI': 208.98, 
-             'B':  10.811,  'BR': 79.904,  'CD': 112.411, 'CS': 132.905, 'CA': 40.078,  'C':  12.011,  'CE': 140.116, 
+             'AL': 26.982,  'SB': 121.76,  'AR': 39.948,  'AS': 74.922,  'BA': 137.327, 'BE': 9.012,   'BI': 208.98,
+             'B':  10.811,  'BR': 79.904,  'CD': 112.411, 'CS': 132.905, 'CA': 40.078,  'C':  12.011,  'CE': 140.116,
              'CL': 35.453,  'CR': 51.996,  'CO': 58.933,  'CU': 63.546,  'DY': 162.5,   'ER': 167.26,  'EU': 151.964,
              'F':  18.998,  'GD': 157.25,  'GA': 69.723,  'GE': 72.61,   'AU': 196.967, 'HF': 178.49,  'HE': 4.003,
              'HO': 164.93,  'H':  1.008,   'IN': 114.818, 'I':  126.904, 'IR': 192.217, 'FE': 55.845,  'KR': 83.8,
@@ -46,8 +46,8 @@ atom_mass = {
 #Atom vdW radii dictionary taken from www.ccdc.cam.ac.uk/Lists/ResourceFileList/Elemental_Radii.xlsx 13 Oct 2015
 #Excluding unstable radioisotopes, dummy atom denoted X (and D) have atomic vdW radii equal 1
 atom_vdw_radii = {
-                  'AL': 2,    'SB': 2,    'AR': 1.88, 'AS': 1.85, 'BA': 2,    'BE': 2,    'BI': 2, 
-                  'B':  2,    'BR': 1.85, 'CD': 1.58, 'CS': 2,    'CA': 2,    'C':  1.7,  'CE': 2, 
+                  'AL': 2,    'SB': 2,    'AR': 1.88, 'AS': 1.85, 'BA': 2,    'BE': 2,    'BI': 2,
+                  'B':  2,    'BR': 1.85, 'CD': 1.58, 'CS': 2,    'CA': 2,    'C':  1.7,  'CE': 2,
                   'CL': 1.75, 'CR': 2,    'CO': 2,    'CU': 1.4,  'DY': 2,    'ER': 2,    'EU': 2,
                   'F':  1.47, 'GD': 2,    'GA': 1.87, 'GE': 2,    'AU': 1.66, 'HF': 2,    'HE': 1.4,
                   'HO': 2,    'H':  1.09, 'IN': 1.93, 'I':  1.98, 'IR': 2,    'FE': 2,    'KR': 2.02,
@@ -60,12 +60,12 @@ atom_vdw_radii = {
                   'U':  1.86, 'V':  2,    'XE': 2.16, 'YB': 2,    'Y':  2,    'ZN': 1.29, 'ZR': 2,
                   'X':  1.0,  'D':  1.0
                  }
-    
+
 #Atom covalent radii dictionary taken from www.ccdc.cam.ac.uk/Lists/ResourceFileList/Elemental_Radii.xlsx 13 Oct 2015
 #Excluding unstable radioisotopes, dummy atom denoted X (and D) have atomic cov radii equal 1
 atom_cov_radii = {
-                  'AL': 1.21, 'SB': 1.39, 'AR': 1.51, 'AS': 1.21, 'BA': 2.15, 'BE': 0.96, 'BI': 1.48, 
-                  'B':  0.83, 'BR': 1.21, 'CD': 1.54, 'CS': 2.44, 'CA': 1.76, 'C':  0.68, 'CE': 2.04, 
+                  'AL': 1.21, 'SB': 1.39, 'AR': 1.51, 'AS': 1.21, 'BA': 2.15, 'BE': 0.96, 'BI': 1.48,
+                  'B':  0.83, 'BR': 1.21, 'CD': 1.54, 'CS': 2.44, 'CA': 1.76, 'C':  0.68, 'CE': 2.04,
                   'CL': 0.99, 'CR': 1.39, 'CO': 1.26, 'CU': 1.32, 'DY': 1.92, 'ER': 1.89, 'EU': 1.98,
                   'F':  0.64, 'GD': 1.96, 'GA': 1.22, 'GE': 1.17, 'AU': 1.36, 'HF': 1.75, 'HE': 1.5,
                   'HO': 1.92, 'H':  0.23, 'IN': 1.42, 'I':  1.4,  'IR': 1.41, 'FE': 1.52, 'KR': 1.5,
@@ -82,12 +82,12 @@ atom_cov_radii = {
 #Atom keys for deciphering OPLS_2005 taken from DL_FIELD 3.3 dl_field.atom_type
 opls_atom_keys = {'C': ['CA', 'CR3', 'CT', 'CD', 'C3T', 'C4T', 'CA5', 'CM', 'CT1', 'C', 'CZB', 'CZN', 'CO3', 'CG1',
                         'CO4', 'CALK', 'CQ', 'C5A', 'C5BC', 'CANI', 'CZ', 'CT1G', 'CTA', 'CTD', 'CTE', 'CTG', 'CTI',
-                        'CTJ', 'CTM', 'CTP', 'CTQ', 'CTS', 'CTU', 'CP1', 'CTH', 'C5M', 'C5N', 'CN', 'CB', 'CTC', 
+                        'CTJ', 'CTM', 'CTP', 'CTQ', 'CTS', 'CTU', 'CP1', 'CTH', 'C5M', 'C5N', 'CN', 'CB', 'CTC',
                         'CRA', 'C5X', 'CT1', 'C5B', 'CRA'],
                   'H': ['H', 'HE', 'HC', 'HAE', 'HANI', 'HMET', 'HA', 'HO', 'HS', 'H_OH'],
-                  'O': ['O3T', 'O4T', 'OS', 'OVE', 'OHP', 'O', 'OH', 'OAL', 'O2Z', 'OES', 'OA', 'OM', 'ON', 'OY', 
+                  'O': ['O3T', 'O4T', 'OS', 'OVE', 'OHP', 'O', 'OH', 'OAL', 'O2Z', 'OES', 'OA', 'OM', 'ON', 'OY',
                         'OZ'],
-                  'N': ['NA', 'NA5B', 'NA5', 'N5B', 'N', 'NE', 'NI', 'NZB', 'NG', 'NP', 'NB', 'NZ', 'NOM', 'NO2', 
+                  'N': ['NA', 'NA5B', 'NA5', 'N5B', 'N', 'NE', 'NI', 'NZB', 'NG', 'NP', 'NB', 'NZ', 'NOM', 'NO2',
                         'NT', 'NE1'],
                   'F': ['F', 'FG'],
                   'S': ['S', 'SH', 'SY', 'SZ', 'SX6']}
@@ -159,7 +159,7 @@ def com2zero(atom_list):
     This function first calculates the center of mass of the molecule and than translate all the coordinates
     So that new center of mass ends up in origin.
     """
-    com = center_of_mass(atom_list) 
+    com = center_of_mass(atom_list)
     return([[i[0],i[1],i[2]-com[0],i[3]-com[1],i[4]-com[2]] for i in atom_list])
 
 
@@ -186,7 +186,7 @@ def void_diameter(atom_list, atom_coord, atom_vdw):
     answer = [atom_list[np.argmin(new_dist_matrix)][:2],new_dist_matrix[np.argmin(new_dist_matrix)][0]*2]
     return(answer[1])
 
-#Calculate normal vector for a provided set: COM(centre) of this plane and two vectors for two points on this plane 
+#Calculate normal vector for a provided set: COM(centre) of this plane and two vectors for two points on this plane
 def normal_vector(x,y):
     va = (y[0][2:])
     vb = (y[1][2:])
@@ -227,7 +227,7 @@ def angle(x,y):
         benzene_rings.append(temp_ring_list)
     com_list = []
     for i in benzene_rings:
-        com_list.append(com(i))   
+        com_list.append(com(i))
     nv_host_benzenes = []
     for i,j in zip(benzene_rings,com_list):
         nv_host_benzenes.append(normal_vector(j,i))
@@ -238,7 +238,7 @@ def angle(x,y):
 
 def vector_analysis(vector, atom_list, atom_coord, atom_vdw, increment):
     """
-    First part of this function calculates a set of points on a vector, in specified increments, 
+    First part of this function calculates a set of points on a vector, in specified increments,
     drawn in XYZ system starting at origin.
     Output: 'pathway' list of XYZ coordinates (floats) [[a1,b1,c1],[a2,b2,c2], ... ,[an,bn,cn]]
     Second part calculates the diameter of a biggest sphere that can be drown on a single point in XYZ space,
@@ -279,7 +279,7 @@ def vector_analysis(vector, atom_list, atom_coord, atom_vdw, increment):
         return(values_mat[min(enumerate(sphere_sizes_mat), key=op.itemgetter(1))[0]])
     else:
         return(None)
-    
+
 def no_of_discrete_molecules(atom_list):
     """
     A function that iterates through atom list of type [id, no, x, y, z] and finds discrete molecules
@@ -295,11 +295,11 @@ def no_of_discrete_molecules(atom_list):
     while len(alist) > 0:                     #Continue as long as there are unassigned atoms
         final_list = []                       #Final list for a single iteration contaning single molecule
         length_of_alist = len(alist)
-        iteration += 1 
+        iteration += 1
         final_list.append(alist[0])           #Append first atom from the pdb list, it's random which one is first
         alist.pop(0)                          #Delete this atom from the pdb list to avoid infinite loops
-        for i in final_list:                  #Although it is for every i, it is usually the first one only 
-            temp_list = []                    #Temp storage for all bonded neighbours to our i 
+        for i in final_list:                  #Although it is for every i, it is usually the first one only
+            temp_list = []                    #Temp storage for all bonded neighbours to our i
             for j in alist:                   #If a neighbour is found and the distance is ok, append it!
                 if i[2]-2 < j[2] < i[2]+2 and i[3]-2 < j[3] < i[3]+2 and i[4]-2 < j[4] < i[4]+2:
                     if 0.1 < two_points_distance(i[2:],j[2:]) < 2:
@@ -307,15 +307,15 @@ def no_of_discrete_molecules(atom_list):
         while len(temp_list) > 0:             #As long as there are candidates we look for neighbours for them!
             temp_list = uniq(temp_list)       #Because of 'cyclic' problems we delete replicates
             final_list.append(temp_list[0])   #Similiar to previous steps
-            ref = temp_list.pop(0)         
+            ref = temp_list.pop(0)
             alist.remove(ref)                 #Here it works like a snow ball efect, especially with cages
             for j in alist:                   #The search spreads like a web and ends quickly
                 if ref[2]-2 < j[2] < ref[2]+2 and ref[3]-2 < j[3] < ref[3]+2 and ref[4]-2 < j[4] < ref[4]+2:
                     if 0.1 < two_points_distance(ref[2:],j[2:]) < 2:
                         temp_list.append(j)
         output.append(final_list)             #Append results for SINGLE molecue to output list as a list
-        no_of_atoms = length_of_alist - len(alist) 
-    return(iteration,output) 
+        no_of_atoms = length_of_alist - len(alist)
+    return(iteration,output)
 
 #Function that translates coordinates from HISTORY file
 def coor_translate2(h,c):
@@ -500,7 +500,7 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
     max_value = max(np.array(window)[:,1])
     number = [a for a, j in enumerate(window) if j[1] == max_value]
     vector2analyse = window[number[0]][5:8]
-    vector_analysed = vector_analysis(vector2analyse, atom_list, atom_coor, atom_vdw, 0.1) 
+    vector_analysed = vector_analysis(vector2analyse, atom_list, atom_coor, atom_vdw, 0.1)
 
     #UPDATE: Try rotation first, than translation
     vector_main = np.array([vector_analysed[5],vector_analysed[6],vector_analysed[7]])
@@ -512,7 +512,7 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
 
     if vector_main[0] >= 0 and vector_main[1] >= 0 and vector_main[2] >= 0:
         angle_1 = -angle_1
-        angle_2 = -angle_2                
+        angle_2 = -angle_2
     if vector_main[0] < 0 and vector_main[1] >= 0 and vector_main[2] >= 0:
         angle_1 = np.pi*2 + angle_1
         angle_2 = angle_2
@@ -530,11 +530,11 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
         angle_2 = angle_2 + np.pi
     if vector_main[0] < 0 and vector_main[1] < 0 and vector_main[2] < 0:
         angle_1 = -angle_1
-        angle_2 = np.pi - angle_2 
+        angle_2 = np.pi - angle_2
 
     #First rotation around z-axis with angle_1
 
-    rot_matrix_z = np.array([[np.cos(angle_1), -np.sin(angle_1),      0], 
+    rot_matrix_z = np.array([[np.cos(angle_1), -np.sin(angle_1),      0],
                              [np.sin(angle_1),  np.cos(angle_1),      0],
                              [                0,                  0,      1]])
 
@@ -553,7 +553,7 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
                             np.dot(rot_matrix_y, i[2:])[1],
                             np.dot(rot_matrix_y, i[2:])[2]] for i in atom_list_translated]
 
-    #Third step is translation! We are now at approximetely [0,0,-z] 
+    #Third step is translation! We are now at approximetely [0,0,-z]
     #We need to shift the origin into the point of the window
     #the value for z we know from the original vector analysis (it is the length on vector where
     #there was the biggest sphere (step - vector_analysed[0]) first value!)
@@ -567,7 +567,7 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
     #!!!Here the xy and z sampling has to take place!!!
     #First sample the same point to check if nothing has changed
     #This point should represent 0,0,0 the origin
-    
+
     distance_list = []
     for i in atom_list_translated2:
         distance_list.append(np.linalg.norm(np.array([i[2:5]]))-atom_vdw_radii[i[0]])
@@ -591,20 +591,20 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
     #BRUTE
     rranges = ((-max_value/2, max_value/2), (-max_value/2, max_value/2))
     parameters2 = (z_opt, atom_list_translated)
-    brute_optimisation = scipy.optimize.brute(analyse_xy, rranges, args=parameters2, 
+    brute_optimisation = scipy.optimize.brute(analyse_xy, rranges, args=parameters2,
                                              full_output=True, finish=scipy.optimize.fmin)
 
     x_opt = brute_optimisation[0][0]
     y_opt = brute_optimisation[0][1]
     xyz_window.append(2*min([two_points_distance([x_opt,y_opt, z_opt],i[2:5])-atom_vdw_radii[i[0]]                                                for i in atom_list_translated]))
-    
+
     #control_point_1 = np.array([x_opt, y_opt, z_opt])
-    
+
     #Reverse translation step
     #rev_resulting_vector3 = np.add(new_resulting_vector3, [0,0,new_z])
-    
+
     #Reversing the second rotation around axis y
-    #angle_2_1 = - angle_2 
+    #angle_2_1 = - angle_2
     #rev_matrix_y = np.array([[ np.cos(angle_2_1),         0,       np.sin(angle_2_1)],
     #                         [               0,          1,                     0],
     #                         [-np.sin(angle_2_1),         0,       np.cos(angle_2_1)]])
@@ -613,8 +613,8 @@ def window_analysis(window, atom_list, atom_coor, atom_vdw):
     #rev_resulting_vector4 = np.dot(rev_matrix_y, rev_resulting_vector3)
 
     #Reversing the first rotation around axis z
-    #angle_1_1 = - angle_1 
-    #rev_matrix_z = np.array([[np.cos(angle_1_1), -np.sin(angle_1_1),      0], 
+    #angle_1_1 = - angle_1
+    #rev_matrix_z = np.array([[np.cos(angle_1_1), -np.sin(angle_1_1),      0],
     #                         [np.sin(angle_1_1),  np.cos(angle_1_1),      0],
     #                         [                0,                  0,      1]])
 
@@ -650,7 +650,7 @@ class XYZ:
             iteration += 1
         self.atom_list = atom_list
         self.array = np.array(array)
-    
+
     def com2zero(self):
         """
         This function first calculates the center of mass of the molecule and than translate all the coordinates
@@ -660,11 +660,10 @@ class XYZ:
         com = center_of_mass(self.atom_list)
         self.atom_list = [[i[0],i[1],i[2]-com[0],i[3]-com[1],i[4]-com[2]] for i in self.atom_list]
         self.array = np.array([[i[0]-com[0],i[1]-com[1],i[2]-com[2]] for i in self.array])
-        
+
 class MOL:
     """
     This class load and open an MOL file.
-    self.path: Path of the file
     self.name: Name of the file
     self.body: list of string as in loaded file
     self.no_of_atoms: total number of atoms
@@ -672,13 +671,10 @@ class MOL:
     self.atom_list: Creates list of kind [[id1, no1, x1, y1, z1], ...,[idn, non, xn, yn, zn]]
     self.array: It also creates a numpy array containing only atom coordinates [[x1,y1,z1], ..., [xn,yn,zn]]
     """
-    def __init__(self, mol):
-        self.path = mol
-        self.name = mol.split('/')[-1][:-4]
-        with open(mol, 'r') as mol_source:
-            self.body = [i.split() for i in mol_source.readlines()]
-            #self.no_of_atoms = int(self.body[0][0])
-            #self.comment = self.body[1][0]
+    def __init__(self, mol_source):
+        self.body = [i.split() for i in mol_source.readlines()]
+        #self.no_of_atoms = int(self.body[0][0])
+        #self.comment = self.body[1][0]
         iteration = 1
         atom_list = []
         array = []
@@ -695,7 +691,7 @@ class MOL:
                     flag = True
         self.atom_list = atom_list
         self.array = np.array(array)
-        
+
     def com2zero(self):
         """
         This function first calculates the center of mass of the molecule and than translate all the coordinates
@@ -705,7 +701,7 @@ class MOL:
         com = center_of_mass(self.atom_list)
         self.atom_list = [[i[0],i[1],i[2]-com[0],i[3]-com[1],i[4]-com[2]] for i in self.atom_list]
         self.array = np.array([[i[0]-com[0],i[1]-com[1],i[2]-com[2]] for i in self.array])
-        
+
 class PDB:
     """
     This class load and open an PDB file.
@@ -730,7 +726,7 @@ class PDB:
                      i[30:38], i[38:46], i[46:54], i[54:60], i[60:66], i[76:78], i[78:80]] \
                     for i in self.block if i[:6] == 'HETATM' or i[:6] == 'ATOM  ']
         self.conect = [i for i in self.block if i[:6] == 'CONECT']
-        
+
         iteration = 1
         atom_list = []
         array = []
@@ -740,7 +736,7 @@ class PDB:
             iteration += 1
         self.atom_list = atom_list
         self.array = np.array(array)
-        
+
     def com2zero(self):
         """
         This function first calculates the center of mass of the molecule and than translate all the coordinates
@@ -766,7 +762,7 @@ def sub_main(file_atom_list, verbose=False, figures=True, adjust=250, psd_output
     #current_milli_time = int(round(time.time() * 1000))
     #print('start mili function :', current_milli_time)
     output_list = []
-    discrete = no_of_discrete_molecules(file_atom_list) #Each discrete molecule has to be analysed seperately 
+    discrete = no_of_discrete_molecules(file_atom_list) #Each discrete molecule has to be analysed seperately
     if verbose == True:
         print("Number of discrete molecules found: {0}".format(discrete[0]))
     iteration = 0
@@ -830,13 +826,13 @@ def sub_main(file_atom_list, verbose=False, figures=True, adjust=250, psd_output
             values.append(dist[0][2])
             values.append(dist[0][3])
 
-        eps = np.mean(values) 
+        eps = np.mean(values)
         eps_sqrt = eps + eps**0.5
 #        print('EPS_KDTree_sqrt ', eps_sqrt)
 
-        #Multiprocessing    
+        #Multiprocessing
 #        pool = mp.Pool(processes=8)
-#        parallel = [pool.apply_async(vector_analysis, 
+#        parallel = [pool.apply_async(vector_analysis,
 #                    args=(x, atom_list, atom_coor, atom_vdw, 2.0)) for x in points]
 #        results = [p.get() for p in parallel if p.get() is not None]
 #        pool.terminate()
@@ -886,19 +882,19 @@ def sub_main(file_atom_list, verbose=False, figures=True, adjust=250, psd_output
                 for j,k in zip(clusters,results):
                     if j[1] == i:
                         clustered_results[i].append(k)
-            
+
             #Here starts the multiprocessing for the window size analysis and minimasation
 #            pool = mp.Pool(processes=8)
-#            window_parallel = [pool.apply_async(window_analysis, args=(clustered_results[x], atom_list, atom_coor, 
+#            window_parallel = [pool.apply_async(window_analysis, args=(clustered_results[x], atom_list, atom_coor,
 #                                        atom_vdw,)) for x in clustered_results]
 #            window_results = [p.get() for p in window_parallel if p.get() is not None]
 #            pool.terminate()
-            
+
             #Use this part instead for serial analysis
             window_results = []
             for i in clustered_results:
                 window_results.append(window_analysis(clustered_results[i], atom_list, atom_coor, atom_vdw))
-                
+
             #for i in window_results:
             #    print(i)
             #    print(np.add(i[1], com))
@@ -906,7 +902,7 @@ def sub_main(file_atom_list, verbose=False, figures=True, adjust=250, psd_output
     #current_milli_time1 = int(round(time.time() * 1000))
     #print('end mili function :', current_milli_time1- current_milli_time)
     return(window_results)
-        
+
 
 def main():
     """
@@ -917,14 +913,14 @@ def main():
     operation has to be done here, as I want sub_main() function to work with each of the allowed inputs.
     """
     print('Output generated on {0} {1}\n'.format(time.strftime("%H:%M:%S"), time.strftime("%d/%m/%Y")))
-    
+
     for i in glob.glob('molecules/*'):   #ENRICO! Create an input dir in your working dir and run the script :)
         if i.split('/')[-1][-3:] == 'xyz':               #If it is XYZ file start the analysis rout for XYZ files
             file = XYZ(i)
             print('\n                    Analysing {0}'.format(file.path))
             print('Start time {0}\n'.format(time.strftime("%H:%M:%S")))
             file_atom_list = file.atom_list
-            sub_main(file_atom_list) 
+            sub_main(file_atom_list)
         elif i.split('/')[-1][-3:] == 'pdb':             #If it is PDB file start the analysis rout for PDB files
             file = PDB(i)
             print('\n                    Analysing {0}'.format(file.path))
@@ -951,7 +947,7 @@ def main():
             frame_data = []
             frame_data_line = []
             cell_parameters = []
-            
+
             with open(i, 'r') as history_file:
                 with ct.closing(mmap.mmap(history_file.fileno(), 0, access=mmap.ACCESS_READ)) as history_binary_map:
                     while binary_step <= len(history_binary_map):
@@ -975,7 +971,7 @@ def main():
                             elif periodic_boundry_key == 1 or periodic_boundry_key == 2 or periodic_boundry_key == 3:
                                 reconstruction_flag = True
                             else:
-                                print("The periodic boundry condition of this trajectory file is not covered by " + 
+                                print("The periodic boundry condition of this trajectory file is not covered by " +
                                      "this script. This file will not be analysed. \nTerminate\n")
                                 break
                             number_of_atoms = int(string_line[2])
@@ -1025,12 +1021,12 @@ def main():
                                     if number_of_atoms != len(frame_data):
                                         print("Number of atoms does not equal number of entries in frame data")
                                         break
-                                    # Here we extract a trajectory frame 
+                                    # Here we extract a trajectory frame
                                     host_xyz_original = copy.deepcopy(frame_data)
-                                    
+
                                     # We reconstruct the solid-state structure from the trajectory file for the host
                                     # First we translate atom positions from a 0,0,0 centered unit cell to a normalised
-                                    # unit cell where 0,0,0 is the beginning of the unit cell and c_a/2,c_b/2,c_c/2 
+                                    # unit cell where 0,0,0 is the beginning of the unit cell and c_a/2,c_b/2,c_c/2
                                     host_xyz_step_1 = coor_translate2(host_xyz_original, cell_parameters)
 
                                     # This is the most important part. Now the cage molecules are reconstructed
@@ -1075,7 +1071,7 @@ def main():
 
                                     # We update the coordinates according to the matrix. This will automatically cover the step for
                                     # the cage reconstruction which is almost the longest. It will also change atom is from HC to HE
-                                    # when neccessery and will append the 'good' itteration number into the list this will also help 
+                                    # when neccessery and will append the 'good' itteration number into the list this will also help
                                     # in the next steps
                                     host_xyz_updated = update_coor(host_xyz,new_matrix,cell_parameters)
 
@@ -1085,7 +1081,7 @@ def main():
 
                                 timestep_condition = False
                                 frame_line = 0"""
-                                
+
                         if timestep_flag == True and reconstruction_flag == False:
                             frame_line += 1
                             if frame_line > 0 and frame_line % 2 != 0 and len(string_line) > 0 and end_flag == False:
@@ -1115,14 +1111,14 @@ def main():
                                 frame_data_line.append(float(string_line[2]))
                                 frame_data.append(frame_data_line)
                                 frame_data_line = []
-                            
+
                             if len(binary_line) > 0:
                                 if string_line[0] == 'timestep':
                                     if frame >= 1:
                                         if number_of_atoms != len(frame_data):
                                             print("Number of atoms does not equal number of entries in frame data")
                                             break
-                                        # Here we extract a trajectory frame 
+                                        # Here we extract a trajectory frame
                                         host_xyz_original = copy.deepcopy(frame_data)
                                         output = sub_main(host_xyz_original)
                                         #if frame == 1:
@@ -1153,16 +1149,16 @@ def main():
                                                         second_line_to_append.append(round(float(k), 4))
                                             txt_output.append(second_line_to_append)
                                             second_line_to_append = []
-                                        
+
 
                                     timestep_flag = False
                                     frame_line = 0
-                                    
+
                             if len(binary_line) == 0 and end_flag == True:
                                 if number_of_atoms != len(frame_data):
                                     print("Number of atoms does not equal number of entries in frame data")
                                     break
-                                # Here we extract a trajectory frame 
+                                # Here we extract a trajectory frame
                                 host_xyz_original = copy.deepcopy(frame_data)
                                 output = sub_main(host_xyz_original)
                                 second_line_to_append = []
@@ -1183,7 +1179,7 @@ def main():
                                     second_line_to_append = []
                                 print('Analysis is complete. Break.')
                                 break
-                                
+
                         if len(binary_line) > 0:
                             if string_line[0] == 'timestep':
                                 frame += 1
@@ -1194,6 +1190,6 @@ def main():
                                 timestep_flag = True
         else:
             pass
-        
+
 def window_sizes(mol_file):
     return sub_main(MOL(mol_file).atom_list)
