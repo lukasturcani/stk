@@ -467,7 +467,8 @@ class _CageTopology(Topology):
                 if atom1_id in paired or atom2_id in paired:
                     continue
 
-                bond_type = self.determine_bond_type(atom1_id,
+                bond_type = self.determine_bond_type(macro_mol,
+                                                     atom1_id,
                                                      atom2_id)
                 # Add the bond.
                 editable_mol.AddBond(atom1_id, atom2_id, bond_type)
@@ -477,7 +478,7 @@ class _CageTopology(Topology):
 
         macro_mol.mol = editable_mol.GetMol()
 
-    def pair_bonders_with_positions(self, vertex):
+    def pair_bonders_with_positions(self, macro_mol, vertex):
         """
         Matches atoms with the closest building block position.
 
@@ -489,6 +490,9 @@ class _CageTopology(Topology):
 
         Parameters
         ----------
+        macro_mol : MacroMolecule
+            The macromolecule being buit.
+
         vertex : Vertex
             The position at which all the atoms being paired are
             located.
@@ -510,7 +514,7 @@ class _CageTopology(Topology):
         # finds the distances of all the options.
         distances = []
         for bonder_id in vertex.bonder_ids:
-            atom_coord = self.macro_mol.atom_coords(bonder_id)
+            atom_coord = macro_mol.atom_coords(bonder_id)
             for position in vertex.connected:
                 distance = euclidean(atom_coord, position.coord)
                 distances.append((distance, bonder_id, position))
@@ -636,7 +640,7 @@ class _CageTopology(Topology):
             # Save the ids of atoms which form new bonds and pair them
             # up with positions.
             position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(position)
+            self.pair_bonders_with_positions(macro_mol, position)
 
         # This loop places all linkers on the points at `positions_B`.
         # It then saves all atoms which form a new bond to the position
