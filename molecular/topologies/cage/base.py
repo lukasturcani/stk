@@ -539,7 +539,6 @@ class _CageTopology(Topology):
             paired_ids.add(bonder_id)
             paired_pos.add(pos)
 
-
     def cavity_size(self):
         """
         Returns the diameter of the cage cavity.
@@ -684,31 +683,31 @@ class _VertexOnlyCageTopology(_CageTopology):
         self.random_placement = random_placement
         self.connect()
 
-    def place_mols(self):
+    def place_mols(self, macro_mol):
 
-        self.macro_mol.mol = chem.Mol()
+        macro_mol.mol = chem.Mol()
 
         if self.random_placement:
-            return self.place_mols_random()
-        return self.place_mols_assigned()
+            return self.place_mols_random(macro_mol)
+        return self.place_mols_assigned(macro_mol)
 
-    def place_mols_random(self):
+    def place_mols_random(self, macro_mol):
         for position in self.positions_A:
-            bb = np.random.choice(self.macro_mol.building_blocks)
+            bb = np.random.choice(list(macro_mol.building_blocks))
             n_bb = len(bb.functional_group_atoms())
 
-            self.macro_mol.mol = chem.CombineMols(
-                                        self.macro_mol.mol,
-                                        position.place_mol(bb))
-            self.bb_counter.update([bb])
+            macro_mol.mol = chem.CombineMols(
+                                            macro_mol.mol,
+                                            position.place_mol(bb))
+            macro_mol.bb_counter.update([bb])
 
             bonder_ids = deque(maxlen=n_bb)
-            for atom in self.macro_mol.mol.GetAtoms():
+            for atom in macro_mol.mol.GetAtoms():
                 if atom.HasProp('bonder'):
                     bonder_ids.append(atom.GetIdx())
 
             position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(position)
+            self.pair_bonders_with_positions(macro_mol, position)
 
     @classmethod
     def connect(cls):
