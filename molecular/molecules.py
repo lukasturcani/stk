@@ -901,11 +901,11 @@ class Molecule:
         """
 
         # First write the file using rdkit.
-        chem.MolToPDBFile(self.mol, self.file)
+        chem.MolToPDBFile(self.mol, path)
 
         # Edit the file because rkdit does poor atom labelling.
         new_content = ''
-        with open(self.file, 'r') as pdb:
+        with open(path, 'r') as pdb:
             for line in pdb:
                 if 'HETATM' in line:
                     words = line.split()
@@ -916,7 +916,7 @@ class Molecule:
 
                 new_content += line
 
-        with open(self.file, 'w') as pdb:
+        with open(path, 'w') as pdb:
             pdb.write(new_content)
 
 class StructUnit(Molecule, metaclass=CachedStructUnit):
