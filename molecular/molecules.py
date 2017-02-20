@@ -30,8 +30,8 @@ The MacroMolecule holds in its `building_blocks` attribute a list of
 StructUnit (or derived classes) instances. These represent the
 monomers which form the macromolecule. Only one StructUnit instance per
 monomer type is held. So if 4 of one type of monomer and 2 of another
-type of monomer form a macromolecule, only 2 StructUnit instances are in
-`building_blocks`.
+type of monomer form a macromolecule, only 2 StructUnit instances are
+in `building_blocks`.
 
 In its `topology` attribute a MacroMolecule holds a ``Topology` child
 class instance. This instance is responsible for assembling the
@@ -42,9 +42,9 @@ assembled macromoleclue in the `mol` attribute of the MacroMolecule
 instance.
 
 The StructUnit class labels atoms in the functional groups of the
-building blocks as either ``bonder`` or ``del`` (see its documentation).
-This tells the Topology intance which atoms form bonds and which are
-removed during assembly.
+building blocks as either ``bonder`` or ``del`` (see its
+documentation). This tells the Topology intance which atoms form bonds
+and which are removed during assembly.
 
 No need to worry about the metaclasses.
 
@@ -71,17 +71,17 @@ steps 1 to 4.)
 
 What functional groups are recognized by MMEA?
 The module ``/mmea/molecular_tools/fg_info.py`` defines a class called
-FGInfo. Instances of this class are held in the list `functional_groups`
-(also in that module). If you put an FGInfo instance in that list, the
-functional group will be recognized.
+FGInfo. Instances of this class are held in the list
+`functional_groups` (also in that module). If you put an FGInfo
+instance in that list, the functional group will be recognized.
 
     3) Place the FGInfo instance of the functional group in the
        `func_grp` attribute of the StructUnit.
 
     4) Using the FGInfo instance, tag atoms in the building block as
        either 'bonder' or 'del'. 'bonder' signifies that the atoms form
-       a bond during macromolecular assembly, while 'del' means they are
-       deleted.
+       a bond during macromolecular assembly, while 'del' means they
+       are deleted.
 
     5) Give the StructUnit instances and the class representing the
        topology to the macromolecule's initializer.
@@ -102,8 +102,9 @@ functional group will be recognized.
        building blocks are orientated correctly when forming the
        macromolecule.
 
-    10) Create bonds between all the disjoined building block molecules.
-        This is where the tagging done by StructUnit is needed.
+    10) Create bonds between all the disjoined building block
+        molecules. This is where the tagging done by StructUnit is
+        needed.
 
     11) Delete all the atoms tagged for deletion.
 
@@ -118,8 +119,8 @@ To add new macromolecules create a new class which inherits
 a custom one may be used. However, all the same attributes must be
 defined.
 
-If you're adding a new class of macromolecules, it quite likely you want
-to add a new ``Topology`` class. See the docstring of the
+If you're adding a new class of macromolecules, it quite likely you
+want to add a new ``Topology`` class. See the docstring of the
 /mmea/molecular_tools/topologies/base.py module for guidance on adding
 these. The topology class does the assembly of the macromolecule from
 the building blocks. The assembled macromolecule instance is then held
@@ -137,7 +138,6 @@ from rdkit import DataStructs
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
-import pickle
 import json
 from collections import namedtuple, Counter
 import io
@@ -212,8 +212,9 @@ class CachedStructUnit(type):
         # describes the functional group provided in `functional_group`
         # or is found in the path name.
         if not functional_group:
-            functional_group = next((x.name for x in functional_groups if
-                                  x.name in file), None)
+            functional_group = next((x.name for x in
+                                     functional_groups if
+                                     x.name in file), None)
 
         key = self.gen_key(mol, functional_group)
         if key in self.cache:
@@ -228,11 +229,12 @@ class Molecule:
     """
     The most basic class representing molecules.
 
-    This class defines defines the operations which any class describing
-    molecules should inherit or may find useful. Examples of such
-    classes are ``StructUnit`` and ``MacroMolecule``. This calls is
-    unlikely to be useful as in and of itself. It lacks an `__init__()`
-    method because it does not need one. Child classes should define it.
+    This class defines defines the operations which any class
+    describing molecules should inherit or may find useful. Examples of
+    such classes are ``StructUnit`` and ``MacroMolecule``. This calls
+    is unlikely to be useful as in and of itself. It lacks an
+    `__init__()` method because it does not need one. Child classes
+    should define it.
 
     It is assumed that child classes will have some basic attributes.
 
@@ -402,7 +404,7 @@ class Molecule:
 
         """
 
-        # Create a graph instance and add the atom ids as nodes. Use the
+        # Create a graph instance and add the atom ids as nodes. Use
         # the atom ids from each end of a bond to define edges. Do this
         # for all bonds to account for all edges.
 
@@ -412,7 +414,8 @@ class Molecule:
             graph.add_node(atom.GetIdx())
 
         for bond in self.mol.GetBonds():
-            graph.add_edge(bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+            graph.add_edge(bond.GetBeginAtomIdx(),
+                           bond.GetEndAtomIdx())
 
         return graph
 
@@ -610,18 +613,18 @@ class Molecule:
         the molecule. The rotation will be along the appropriate
         direction.
 
-        The great thing about this method is that you as long as you can
-        associate a gemotric feature of the molecule with a vector, then
-        the molecule can be roatated so that this vector is aligned with
-        `end`. The defined vector can be virtually anything. This means
-        that any geomteric feature of the molecule can be easily aligned
-        with any arbitrary axis.
+        The great thing about this method is that you as long as you
+        can associate a gemotric feature of the molecule with a vector,
+        then the molecule can be roatated so that this vector is
+        aligned with `end`. The defined vector can be virtually
+        anything. This means that any geomteric feature of the molecule
+        can be easily aligned with any arbitrary axis.
 
         Parameters
         ----------
         start : numpy.array
-            A vector which is to be rotated so that it transforms to the
-            `end` vector.
+            A vector which is to be rotated so that it transforms to
+            the `end` vector.
 
         end : numpy.array
             This array holds the vector, onto which `start` is rotated.
@@ -652,8 +655,8 @@ class Molecule:
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
 
-        # Apply the rotation matrix to the atomic positions to yield the
-        # new atomic positions.
+        # Apply the rotation matrix to the atomic positions to yield
+        # the new atomic positions.
         new_pos_mat = np.dot(rot_mat, self.position_matrix())
 
         # Set the positions of the molecule.
@@ -693,8 +696,8 @@ class Molecule:
         # Apply the shift and get the resulting rdkit conformer object.
         new_conf = self.shift(shift).GetConformer()
 
-        # Replace the old rkdit conformer with one where the centroid is
-        # at `position`.
+        # Replace the old rkdit conformer with one where the centroid
+        # is at `position`.
         self.mol.RemoveAllConformers()
         self.mol.AddConformer(new_conf)
 
@@ -713,7 +716,8 @@ class Molecule:
             The dimensions are 3 x n. Each column of `pos_mat`
             represents the coordinates of a single atom. The 1st column
             sets the coordinate of the atom with id of 0. The next
-            column sets the coordinate of the atom with id 1, and so on.
+            column sets the coordinate of the atom with id 1, and so
+            on.
 
         Modifies
         --------
@@ -772,8 +776,10 @@ class Molecule:
             atom_id = atom.GetIdx()
 
             # `atom_position` in an instance holding in the x, y and z
-            # coordinates of an atom in its 'x', 'y' and 'z' attributes.
-            atom_position = np.array(conformer.GetAtomPosition(atom_id))
+            # coordinates of an atom in its 'x', 'y' and 'z'
+            # attributes.
+            atom_position = np.array(
+                                    conformer.GetAtomPosition(atom_id))
 
             # Inducing the shift.
             new_atom_position = atom_position + shift
@@ -952,13 +958,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         The rdkit instance of the molecule held in `file`.
 
     func_grp : FGInfo
-        The ``FGInfo`` instance holding information about the functional
-        group which will react when the building block assembles to form
-        macromolecules.
+        The ``FGInfo`` instance holding information about the
+        functional group which will react when the building block
+        assembles to form macromolecules.
 
     bonder_ids : list of ints
-        A list holding the atom ids of the atoms which form bonds during
-        macromolecular assembly.
+        A list holding the atom ids of the atoms which form bonds
+        during macromolecular assembly.
 
     energy : Energy
         This attribute handles information about the energy of the
@@ -1140,8 +1146,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Returns
         -------
         numpy.array
-            The normalized direction vector running from the centroid of
-            the bonder atoms to the molecular centroid.
+            The normalized direction vector running from the centroid
+            of the bonder atoms to the molecular centroid.
 
         """
 
@@ -1157,19 +1163,19 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         tuple of tuples of ints
             The form of the returned tuple is:
             ((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with
-            ids 1 to 9 are in a functional group and that the atoms 1, 2
-            and 3 all form one functional group together. So do 4, 5 and
-            5 and so on.
+            ids 1 to 9 are in a functional group and that the atoms 1,
+            2 and 3 all form one functional group together. So do 4, 5
+            and 5 and so on.
 
         """
 
-        # Generate a ``rdkit.Chem.rdchem.Mol`` instance which represents
-        # the functional group of the molecule.
+        # Generate a ``rdkit.Chem.rdchem.Mol`` instance which
+        # represents the functional group of the molecule.
         func_grp_mol = chem.MolFromSmarts(self.func_grp.fg_smarts)
 
         # Do a substructure search on the the molecule in `mol` to find
-        # which atoms match the functional group. Return the atom ids of
-        # those atoms.
+        # which atoms match the functional group. Return the atom ids
+        # of those atoms.
         return self.mol.GetSubstructMatches(func_grp_mol)
 
     def json(self):
@@ -1273,8 +1279,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # Save the origin position of the bonder atom centroid.
         og_position = self.bonder_centroid()
-        # Change the position of the centroid of the bonder atoms to the
-        # origin so that the rotation occurs about this point.
+        # Change the position of the centroid of the bonder atoms to
+        # the origin so that the rotation occurs about this point.
         self.set_bonder_centroid([0,0,0])
         # Get the rotation matrix.
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
@@ -1293,8 +1299,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Parameters
         ----------
         position : numpy.array
-            A numpy array holding the desired the position. It holds the
-            x, y and z coordinates, respectively.
+            A numpy array holding the desired the position. It holds
+            the x, y and z coordinates, respectively.
 
         Modifies
         --------
@@ -1337,18 +1343,18 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         the molecule. The rotation will be along the appropriate
         direction.
 
-        The great thing about this method is that you as long as you can
-        associate a gemotric feature of the molecule with a vector, then
-        the molecule can be roatated so that this vector is aligned with
-        `end`. The defined vector can be virtually anything. This means
-        that any geomteric feature of the molecule can be easily aligned
-        with any arbitrary axis.
+        The great thing about this method is that you as long as you
+        can associate a gemotric feature of the molecule with a vector,
+        then the molecule can be roatated so that this vector is
+        aligned with `end`. The defined vector can be virtually
+        anything. This means that any geomteric feature of the molecule
+        can be easily aligned with any arbitrary axis.
 
         Parameters
         ----------
         start : numpy.array
-            A vector which is to be rotated so that it transforms to the
-            `end` vector.
+            A vector which is to be rotated so that it transforms to
+            the `end` vector.
 
         end : numpy.array
             This array holds the vector, onto which `start` is rotated.
@@ -1379,8 +1385,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
 
-        # Apply the rotation matrix to the atomic positions to yield the
-        # new atomic positions.
+        # Apply the rotation matrix to the atomic positions to yield
+        # the new atomic positions.
         new_pos_mat = np.dot(rot_mat, self.position_matrix())
 
         # Set the positions in the rdkit molecule.
@@ -1596,7 +1602,8 @@ class StructUnit2(StructUnit):
         theta = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)
 
-        # First determine the direction in which iteration should occur.
+        # First determine the direction in which iteration should
+        # occur.
         self.rotate2(step, axis)
         theta2 = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)
@@ -1637,8 +1644,8 @@ class StructUnit3(StructUnit):
         The coefficent d is found by substituting these coefficients
         along with the x, y and z variables in the scalar equation and
         solving for d. The variables x, y and z are substituted by the
-        coordinate of some point on the plane. For example, the position
-        of one of the bonder atoms.
+        coordinate of some point on the plane. For example, the
+        position of one of the bonder atoms.
 
         Returns
         -------
@@ -1648,7 +1655,7 @@ class StructUnit3(StructUnit):
 
         References
         ----------
-        http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx
+        https://tinyurl.com/okpqv6
 
         """
 
@@ -1667,8 +1674,8 @@ class StructUnit3(StructUnit):
         Returns
         -------
         numpy.array
-            A unit vector which describes the normal to the plane of the
-            bonder atoms.
+            A unit vector which describes the normal to the plane of
+            the bonder atoms.
 
         """
 
@@ -1730,8 +1737,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
     """
     A class for assembled macromolecules.
 
-    The goal of this class is to represent an individual used by the GA.
-    As such, it holds attributes that are to be expected for this
+    The goal of this class is to represent an individual used by the
+    GA. As such, it holds attributes that are to be expected for this
     purpose. Mainly, it has a fitness value stored in its `fitness`
     attribute and a genetic code - as defined by its `building_blocks`
     and  `topology` attributes. If a change is made to either of these
@@ -1741,9 +1748,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     Because of this, as well as the computational cost associated with
     macromolecule initialization, instances of this class are cached.
-    This means that providing the same arguments to the initializer will
-    not build a different instance with the same attribute values. It
-    will yield the original instance, retrieved from memory.
+    This means that providing the same arguments to the initializer
+    will not build a different instance with the same attribute values.
+    It will yield the original instance, retrieved from memory.
 
     To prevent bloating this class, any information that can be
     categorized is. For example, storing information that concerns
@@ -1757,9 +1764,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
     coordinates, which can be access with the ``atom_coords()`` method.
 
     It should also be noted that only a single copy of each
-    ``StructUnit`` instance representing a specific building block needs
-    to be held. How many of such building blocks are need to assemble
-    the molecule is the handled by the ``Topology`` class.
+    ``StructUnit`` instance representing a specific building block
+    needs to be held. How many of such building blocks are need to
+    assemble the molecule is the handled by the ``Topology`` class.
 
     This class is not intended to be used directly but should be
     inherited by subclasses representing specific macromolecules. The
@@ -1769,25 +1776,25 @@ class MacroMolecule(Molecule, metaclass=Cached):
     should be included in derived classes.
 
     This class also supports comparison operations, these act on the
-    fitness value assiciated with a macromolecule. Comparison operations
-    not explicitly defined are included via the ``total_ordering``
-    decorator. For other operations and methods supported by this class
-    examine the rest of the class definition.
+    fitness value assiciated with a macromolecule. Comparison
+    operations not explicitly defined are included via the
+    ``total_ordering`` decorator. For other operations and methods
+    supported by this class examine the rest of the class definition.
 
     Finally, a word of caution. The equality operator ``==`` compares
     fitness values. This means two macromolecules, made from different
     building blocks, can compare equal if they happen to have the same
     fitness. The operator is not to be used to check if one
     macromolecule is the same structurally as another. To do this check
-    use the ``same()`` method. This method may be overwritten in derived
-    classes, as necessary. In addition the ``is`` operator is
-    implemented as is default in Python. It compares whether two objects
-    are in the same location in memory. Because the ``MacroMolecule``
-    class is cached the ``is`` operator could in principle be used
-    instead of the `same` method (including in derived classes).
-    However, this is not intended use and is not guuranteed to work in
-    future implementations. If caching stops being implemented such code
-    would break.
+    use the ``same()`` method. This method may be overwritten in
+    derived classes, as necessary. In addition the ``is`` operator is
+    implemented as is default in Python. It compares whether two
+    objects are in the same location in memory. Because the
+    ``MacroMolecule`` class is cached the ``is`` operator could in
+    principle be used instead of the `same` method (including in
+    derived classes). However, this is not intended use and is not
+    guaranteed to work in future implementations. If caching stops
+    being implemented such code would break.
 
     Attributes
     ----------
@@ -1948,43 +1955,47 @@ class MacroMolecule(Molecule, metaclass=Cached):
         tkey.add(topology.__class__.__name__)
         tkey = frozenset(tkey)
 
-        return MacroMolKey(building_blocks=frozenset(building_blocks),
+        return MacroMolKey(
+                    building_blocks=frozenset(building_blocks),
                            topology=tkey)
 
     def same(self, other):
         """
-        Check if the `other` instance has the same molecular structure.
+        Check if `other` has the same molecular structure.
 
         Parameterss.getcwd()
         ----------
         other : MacroMolecule
-            The ``MacroMolecule`` instance you are checking has the same
-            structure.
+            The ``MacroMolecule`` instance you are checking has
+            the same structure.
 
         Returns
         -------
         bool
-            Returns ``True`` if the building blocks and topology of the
-            macromolecules are all the same.
+            Returns ``True`` if the building blocks and topology
+            of the macromolecules are the same.
 
         """
 
+        t1 = self.topology
+        t2 = other.topology
         # Compare the building blocks and topology making up the
-        # macromolecule. If these are the same then the molecules have
-        # the same structure.
+        # macromolecule. If these are the same then the molecules
+        # have the same structure.
         return (self.building_blocks == other.building_blocks and
-                type(self.topology) == type(other.topology) and
-                self.topology_args == other.topology_args)
+                t1.__class__ == t2.__class__ and
+                t1.__dict__.items() == t2.__dict__.items())
 
     def update_cache(self):
         """
-        Updates the caching dictionary so that it contains `self`.
+        Updates caching dictionary so that it contains `self`.
 
-        When an instance of ``MacroMolecule`` is first created it is
-        cached. Using multiprocessing to perform optimizations returns
-        modified copies of the cached molecules. In order to ensure that
-        the cache points to the modified copies not to the originally
-        initialized molecule, this method must be run.
+        When an instance of ``MacroMolecule`` is first created it
+        is cached. Using multiprocessing to perform optimizations
+        returns modified copies of the cached molecules. In order
+        to ensure that the cache holds to the modified copies,
+        not to the originally initialized molecule, this method
+        must be run.
 
         Returns
         -------
@@ -2005,9 +2016,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def __str__(self):
         return "{}(building_blocks={}, topology={!r})".format(
-                            self.__class__.__name__,
-                            [str(x) for x in self.building_blocks],
-                            self.topology)
+                        self.__class__.__name__,
+                        [str(x) for x in self.building_blocks],
+                        self.topology)
 
     def __repr__(self):
         return str(self)
@@ -2023,18 +2034,24 @@ class MacroMolecule(Molecule, metaclass=Cached):
     """
 
     @classmethod
-    def testing_init(cls, bb_str, lk_str, topology_str):
-        key = (bb_str, lk_str, topology_str)
-        if key in MacroMolecule._cache.keys():
-            return MacroMolecule._cache[key]
+    def testing_init(cls, bb1, bb2, topology):
+
+        tkey = set(topology.__dict__.items())
+        tkey.add(topology.__class__.__name__)
+        tkey = frozenset(tkey)
+
+        key = MacroMolKey(
+                    building_blocks=frozenset([bb1, bb2]),
+                           topology=tkey)
+
+        if key in MacroMolecule.cache.keys():
+            return MacroMolecule.cache[key]
         else:
-            cage = cls.__new__(cls)
-            cage.building_blocks = {bb_str, lk_str}
-            cage.topology = topology_str
-            cage.topology_args = {'a' : 1}
-            cage.fitness = 3.14
-            MacroMolecule._cache[key] = cage
-            return cage
+            macro_mol = cls.__new__(cls)
+            macro_mol.building_blocks = {bb1, bb2}
+            macro_mol.topology = topology
+            MacroMolecule.cache[key] = macro_mol
+            return macro_mol
 
 class Cage(MacroMolecule):
     """
@@ -2109,20 +2126,21 @@ class Cage(MacroMolecule):
         """
         The total difference in all window sizes.
 
-        Every combination of windows is considered and all the size
-        differences are summed and returned. Only differences between
-        windows of the same type are considered.
+        Every combination of windows is considered and all the
+        size differences are summed and returned. Only
+        differences between windows of the same type are
+        considered.
 
-        Consider a triangular-based prism cage topology. Such a cage
-        will have triangular windows and square windows. You only want
-        to compare the triangulars with other triangular windows and
-        squares only with other squares.
+        Consider a triangular-based prism cage topology. Such a
+        cage will have triangular windows and square windows. You
+        only want to compare the triangulars with other
+        triangular windows and squares only with other squares.
 
         Returns
         -------
         float
-            The total difference of window size when considering every
-            combination of windows of the same type.
+            The total difference of window size when considering
+            every combination of windows of the same type.
 
         None : NoneType
             If not all windows were found.
@@ -2131,21 +2149,25 @@ class Cage(MacroMolecule):
         Raises
         ------
         WindowError
-            When the number of found windows is less than the number of
-            expected windows. Likely due to a collapsed cage.
+            When the number of found windows is less than the
+            number of expected windows. Likely due to a collapsed
+            cage.
 
         """
 
 
-        if self.windows is None or len(self.windows) < self.n_windows:
+        if (self.windows is None or
+            len(self.windows) < self.n_windows):
             return None
 
-        # Cluster the windows into groups so that only size differences
-        # between windows of the same type are taken into account. To do
-        # this, first sort the windows by size. If two windows types are
-        # present split the windows at the two groups at the point where
-        # the window sizes have the biggest difference. If there are
-        # three types split it at the two biggest differences and so on.
+        # Cluster the windows into groups so that only size
+        # differences between windows of the same type are taken
+        # into account. To do this, first sort the windows by
+        # size. If two windows types are present split the
+        # windows at the two groups at the point where the window
+        # sizes have the biggest difference. If there are three
+        # types split it at the two biggest differences and so
+        # on.
         windows = np.array(self.windows)
 
         diffs = list(abs(np.ediff1d(windows)))
@@ -2167,8 +2189,8 @@ class Cage(MacroMolecule):
         if self.topology.n_window_types == 1:
             clusters.append(og)
 
-        # After this sum the differences in each group and then sum the
-        # group totals.
+        # After this sum the differences in each group and then
+        # sum the group totals.
         diff_sums = []
         for cluster in clusters:
             diff_sum = sum(abs(w1 - w2) for w1, w2 in
@@ -2184,6 +2206,7 @@ class Cage(MacroMolecule):
     @property
     def windows(self):
         """
+        Returns window sizes found by pyWindow.
 
         Returns
         -------
@@ -2193,24 +2216,26 @@ class Cage(MacroMolecule):
             if it failed for some other reason.
 
         list of floats
-            Each float in the list represents the size of a window in
-            the cage. If the window finding function found more than
-            the expected number of windows, only the largest n windows
-            are returned. Where n is the number of expected windows.
+            Each float in the list represents the size of a
+            window in the cage. If the window finding function
+            found more than the expected number of windows, only
+            the largest n windows are returned. Where n is the
+            number of expected windows.
 
         """
 
-        all_windows = window_sizes(io.StringIO(self.mdl_mol_block()))
+        all_windows = window_sizes(
+                            io.StringIO(self.mdl_mol_block()))
 
         # If pyWindow failed, return ``None``.
         if all_windows is None:
             return None
 
         all_windows = sorted(all_windows,
-                             reverse=True)[:self.topology.n_windows]
+                         reverse=True)[:self.topology.n_windows]
         for i, x in enumerate(all_windows):
-            # Return ``None`` when pyWindow fucks up and outputs a
-            # mistakenly large window size.
+            # Return ``None`` when pyWindow fucks up and outputs
+            # a mistakenly large window size.
             if x > 500:
                 return None
 
