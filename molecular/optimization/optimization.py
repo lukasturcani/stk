@@ -102,7 +102,8 @@ def _optimize_all_serial(func_data, population):
     # function object from one of the functions defined within the
     # module.
     func = globals()[func_data.name]
-    # Provide the function with any additional paramters it may require.
+    # Provide the function with any additional paramters it may
+    # require.
     p_func = _OptimizationFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population.
@@ -195,8 +196,8 @@ def raiser(macro_mol, param1, param2=2):
     """
     Doens't optimize, raises an error instead.
 
-    This function is used to test that when optimization functions raise
-    errors during multiprocessing, they are handled correctly.
+    This function is used to test that when optimization functions
+    raise errors during multiprocessing, they are handled correctly.
 
     Parameters
     ---------
