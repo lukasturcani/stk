@@ -27,8 +27,8 @@ class Vertex:
         vertex, in that order.
 
     connected : list of Edge or Vertex instances
-        This list holds the Edge or Vertex instances which represent the
-        edges or vertices connected to the `self` vertex.
+        This list holds the Edge or Vertex instances which represent
+        the edges or vertices connected to the `self` vertex.
 
     bonder_ids : list of ints
         This list holds the ids of atoms which belong to the building
@@ -66,8 +66,8 @@ class Vertex:
 
         This initalizer automatically calculates the position of the
         vertex from the positions of the vertices provided to the
-        initializer. Its position is set to the centroid of the provided
-        vertices.
+        initializer. Its position is set to the centroid of the
+        provided vertices.
 
         The `connected` attributes of all the involved vertices are
         also updated.
@@ -95,7 +95,7 @@ class Vertex:
 
     def place_mol(self, building_block, aligner=0):
         """
-        Places a StructUnit3 building block on the coords of the vertex.
+        Place a StructUnit3 building block on the coords of the vertex.
 
         The orientation of the building block is aligned with 2
         parameters. Firstly, the normal of the plane of bonder atoms of
@@ -107,8 +107,9 @@ class Vertex:
         of the cage.
 
         Secondly, the building block is rotated so that a bonder atom
-        is aligned perfectly with an edge. This reduces the rms distance
-        between the edges and bonder atoms to some extent, probably.
+        is aligned perfectly with an edge. This reduces the rms
+        distance between the edges and bonder atoms to some extent,
+        probably.
 
         Parameters
         ----------
@@ -136,8 +137,8 @@ class Vertex:
         # Flush the list of data from previous molecules.
         self.distances = []
 
-        # The method first aligns the normal of the bonder atom plane to
-        # the normal of the edge plane. This means the bulk of the
+        # The method first aligns the normal of the bonder atom plane
+        # to the normal of the edge plane. This means the bulk of the
         # building block is always pointed away from the center of the
         # molecule.
         building_block.set_orientation2(self.edge_plane_normal())
@@ -149,7 +150,8 @@ class Vertex:
         #   2) Place the centroid of the edges connected to the vertex
         #      at the origin.
         #   3) Rotate the building block by some amount `theta`, so
-        #      so that one of the bonder atoms is perfectly aligned with
+        #      so that one of the bonder atoms is perfectly aligned
+        #      with
         #      one of the edges. The axis of rotation is the normal to
         #      the plane of bonder atoms.
         #
@@ -162,11 +164,12 @@ class Vertex:
         # Get the coordinate of the atom which is to be aligned with an
         # edge.
         atom_coord = building_block.atom_coords(
-                                     building_block.bonder_ids[aligner])
+                                 building_block.bonder_ids[aligner])
 
         # Get the coordinates of all the edges and translate the
         # centroid to the origin.
-        edge_coord_mat = self.edge_coord_matrix() - self.edge_centroid()
+        edge_coord_mat = (self.edge_coord_matrix() -
+                                                self.edge_centroid())
         edge_coord = np.array(edge_coord_mat[0,:])[0]
 
         # Get the angle between an edge and the atom.
@@ -175,7 +178,7 @@ class Vertex:
         # Get the rotation matrix necessary to do the rotation of
         # `theta` about the normal to the plane.
         rot_mat = rotation_matrix_arbitrary_axis(theta,
-                                               self.edge_plane_normal())
+                                           self.edge_plane_normal())
         # Apply the rotation to the positions of the atoms and get a
         # position matrix of the new coordinates.
         pos_mat = building_block.position_matrix()
@@ -240,8 +243,8 @@ class Vertex:
         The coefficent d is found by substituting these coefficients
         along with the x, y and z variables in the scalar equation and
         solving for d. The variables x, y and z are substituted by the
-        coordinate of some point on the plane. For example, the position
-        of one of the connected edges.
+        coordinate of some point on the plane. For example, the
+        position of one of the connected edges.
 
         Returns
         -------
@@ -251,7 +254,7 @@ class Vertex:
 
         References
         ----------
-        http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx
+        https://tinyurl.com/okpqv6
 
         """
 
@@ -315,8 +318,8 @@ class Edge(Vertex):
     """
     Used to represent the edges of Cage polyhedra.
 
-    This class stores information about the edges which make up a Cage's
-    structure.
+    This class stores information about the edges which make up a
+    Cage's structure.
 
     Attributes
     ----------
@@ -347,8 +350,8 @@ class Edge(Vertex):
         Parameters
         ----------
         linker : StructUnit2
-            The linker which is to be placed and orientated as described
-            in the docstring.
+            The linker which is to be placed and orientated as
+            described in the docstring.
 
         flip : bool (default = True)
             If ``True`` the linker has a 50% chance of being rotated
@@ -379,8 +382,8 @@ class Edge(Vertex):
         linker.set_bonder_centroid(self.coord)
 
         # If `flip` is ``True`` the linker rotated at randomly chosen
-        # to align either with the edge direction vector or its opposite
-        # direction.
+        # to align either with the edge direction vector or its
+        # opposite direction.
         f = 1
         if flip:
             f = np.random.choice([1,-1])
@@ -449,8 +452,8 @@ class _CageTopology(Topology):
         for position in self.positions_A:
             for atom_id, vertex in position.atom_position_pairs:
                 # Get all the distances between the atom and the other
-                # bonding atoms on the vertex. Store this information on
-                # the vertex.
+                # bonding atoms on the vertex. Store this information
+                # on the vertex.
                 for atom2_id in vertex.bonder_ids:
                     distance = macro_mol.atom_distance(atom_id,
                                                        atom2_id)
@@ -484,8 +487,8 @@ class _CageTopology(Topology):
         After a building block is placed on a position, each atom
         which forms a bond must be paired with the location of the
         building block to which it bonds. This function matches atoms
-        and positions so that each is only present in one pairing and so
-        that the total distance of the pairings is minimized.
+        and positions so that each is only present in one pairing and
+        so that the total distance of the pairings is minimized.
 
         Parameters
         ----------

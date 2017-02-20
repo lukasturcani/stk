@@ -13,7 +13,7 @@ import psutil
 import re
 from uuid import uuid4
 
-from ...convenience_tools import MolError, MAEExtractor
+from ...convenience_tools import MAEExtractor
 
 class _ConversionError(Exception):
     def __init__(self, message):
@@ -261,7 +261,8 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
     except _LewisStructureError as ex:
         if not lewis_fixed:
             _run_applyhtreat(macro_mol, macromodel_path)
-            return macromodel_cage_opt(macro_mol, force_field=force_field,
+            return macromodel_cage_opt(macro_mol,
+                              force_field=force_field,
                               lewis_fixed=True,
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md)
@@ -303,11 +304,16 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
         log_content = log.read()
 
     # Check the log for error reports.
-    if "termination due to error condition           21-" in log_content:
+    if ("termination due to error condition           21-" in
+                                                         log_content):
         raise _OptimizationError(("`bmin` crashed due to"
-                                " an error condition. See .log file."))
-    if "FATAL do_nosort_typing: NO MATCH found for atom " in log_content:
-        raise _ForceFieldError('The log implies the force field failed.')
+                            " an error condition. See .log file."))
+
+    if ("FATAL do_nosort_typing: NO MATCH found for atom " in
+                                                         log_content):
+        raise _ForceFieldError(
+                        'The log implies the force field failed.')
+
     if (("FATAL gen_lewis_structure(): could not find best Lewis"
          " structure") in log_content and ("skipping input structure  "
          "due to forcefield interaction errors") in log_content):
@@ -346,10 +352,10 @@ def _kill_bmin(macro_mol, macromodel_path):
         return _kill_bmin(macro_mol, macromodel_path)
 
 
-   # This loop causes the function to wait until the job has been killed
-   # via job control. This means the output files will have been written
-   # by the time the function exits. Essentially the loop continues
-   # until the job is no longer found by "./jobcontrol -list"
+   # This loop causes the function to wait until the job has been
+   # killed via job control. This means the output files will have been
+   # written by the time the function exits. Essentially the loop
+   # continues until the job is no longer found by "./jobcontrol -list"
     cmd = [app, '-list']
     output = name
     start = time.time()
@@ -398,8 +404,8 @@ def _license_found(output, macro_mol=None):
     Returns
     -------
     bool
-        ``True`` if the license was found. ``False`` if the minimization
-        did not occur due to a missing license.
+        ``True`` if the license was found. ``False`` if the
+        minimization did not occur due to a missing license.
 
     """
 
@@ -434,8 +440,8 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
     This fixing is implemented by creating a ``.com`` file with various
     ``FX`` commands written within its body.
 
-    This function is called by ``macromodel_opt``. It is private because
-    it should probably not be used outside of this context.
+    This function is called by ``macromodel_opt``. It is private
+    because it should probably not be used outside of this context.
 
     Parameters
     ----------
@@ -489,9 +495,9 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 "0.0000     0.0000\n"
 " ").format(force_field)
 
-    # Create a path for the ``.com`` file. It is the same as that of the
-    # structure file but with a ``.com`` extension. Get the path of the
-    # ``.mae`` file and the output file in the same way.
+    # Create a path for the ``.com`` file. It is the same as that of
+    # the structure file but with a ``.com`` extension. Get the path of
+    # the ``.mae`` file and the output file in the same way.
     name, ext = os.path.splitext(macro_mol._file)
     com_file = name + '.com'
     mae = name + '.mae'
@@ -514,12 +520,10 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, sim_time=200):
+def _generate_md_com(macro_mol, force_field=16,
+                     temp=300, confs=50, eq_time=10, sim_time=200):
 
     print('Creating .com file - {}.'.format(macro_mol))
-
-    # Defining the string to be printed in the COM file - uses OPLS3 (FFLD = 16)
-    # run a 200 ns MD, at 300K and optimize 50 random conformations generated during the trajectory
 
     main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
  FFLD{force_field:8}      1      0      0     1.0000     0.0000     0.0000     0.0000
@@ -539,8 +543,10 @@ def _generate_md_com(macro_mol, force_field=16, temp=300, confs=50, eq_time=10, 
  MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
  END        0      0      0      0     0.0000     0.0000     0.0000     0.0000"""
 
-    main_string = main_string.format(force_field=force_field, temp=temp,
-                        confs=confs, eq_time=eq_time, sim_time=sim_time)
+    main_string = main_string.format(force_field=force_field,
+                                     temp=temp, confs=confs,
+                                     eq_time=eq_time,
+                                     sim_time=sim_time)
 
     name, ext = os.path.splitext(macro_mol._file)
     com_file = name + '.com'
@@ -668,9 +674,9 @@ def _structconvert(iname, oname, macromodel_path):
 
     _wait_for_file(oname)
     if not os.path.exists(oname):
-        raise _ConversionError(('Conversion output file {} was not found.'
-                ' Console output was {}.').format(oname,
-                                                  convrt_return.stdout))
+        raise _ConversionError(
+        ('Conversion output file {} was not found.'
+        ' Console output was {}.').format(oname, convrt_return.stdout))
 
     return convrt_return
 
@@ -679,13 +685,13 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     Adds lines to the ``.com`` body fixing bond distances and angles.
 
     For each bond distance, bond angle and torisional angle that does
-    not involve a bond created during assembly a ``FX`` command is added
-    to the string holding holding the body of the ``.com`` file.
+    not involve a bond created during assembly a ``FX`` command is
+    added to the string holding holding the body of the ``.com`` file.
 
     These lines replace the filler line in the main string.
 
-    This function is called by ``macromodel_opt``. It is private because
-    it should probably not be used outside of this context.
+    This function is called by ``macromodel_opt``. It is private
+    because it should probably not be used outside of this context.
 
     Parameters
     ----------
@@ -697,15 +703,15 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
         added.
 
     no_fix : bool (default = False)
-        When ``True`` the block containing instructions to fix molecular
-        parameters is not added to the .com file.
+        When ``True`` the block containing instructions to fix
+        molecular parameters is not added to the .com file.
 
     Returns
     -------
     str
-        A string holding the body of the ``.com`` file with instructions
-        to fix the various bond distances and angles as described in the
-        docstring.
+        A string holding the body of the ``.com`` file with
+        instructions to fix the various bond distances and angles as
+        described in the docstring.
 
     """
 
@@ -739,15 +745,15 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
         The macromolecule to be optimized.
 
     fix_block : str
-        The string holding all the lines containing fix commands for the
-        ``.com`` file.
+        The string holding all the lines containing fix commands for
+        the ``.com`` file.
 
     Returns
     -------
     str
         A string holding lines containg fix commands for the ``.com``
-        file. The string has the lines fixing bond distances added to it
-        by this function.
+        file. The string has the lines fixing bond distances added to
+        it by this function.
 
     """
 
@@ -762,11 +768,11 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
                     "   100.0000 {2:>10.4f}     0.0000     0.0000")
 
     # Go through all the bonds in the rdkit molecule. If the bond
-    # is not between bonder atoms get its distance. Add a fix line using
-    # the bond distance and atomic indices to the ``fix_block``. If the
-    # bond does invovle two bonder atoms go to the next bond. This is
-    # because a bond between 2 bonder atoms was added during assembly
-    # and should therefore not be fixed.
+    # is not between bonder atoms get its distance. Add a fix line
+    # using the bond distance and atomic indices to the ``fix_block``.
+    # If the bond does invovle two bonder atoms go to the next bond.
+    # This is because a bond between 2 bonder atoms was added during
+    # assembly and should therefore not be fixed.
     for bond in macro_mol.mol.GetBonds():
         atom1 = bond.GetBeginAtom()
         atom2 = bond.GetEndAtom()
@@ -797,12 +803,12 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
 
         A-B-C-D=E
 
-    if the bond between D and E (``=``) represents the bond added during
-    assembly, the bond angle A-B-C will be fixed but B-C-D will not be.
-    This is an artifact of the implementation but is not expected to
-    play a significant role as the vast majority of bond angles which
-    should be fixed, will be. The bond angle C-D=E will also not be
-    fixed as that is the purpose of this function.
+    if the bond between D and E (``=``) represents the bond added
+    during assembly, the bond angle A-B-C will be fixed but B-C-D will
+    not be. This is an artifact of the implementation but is not
+    expected to play a significant role as the vast majority of bond
+    angles which should be fixed, will be. The bond angle C-D=E will
+    also not be fixed as that is the purpose of this function.
 
     Parameters
     ----------
@@ -810,24 +816,24 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
         The macromolecule to be optimized.
 
     fix_block : str
-        The string holding all the lines containing fix commands for the
-        ``.com`` file.
+        The string holding all the lines containing fix commands for
+        the ``.com`` file.
 
     Returns
     -------
     str
         A string holding lines containg fix commands for the ``.com``
-        file. The string has the lines fixing bond angles added to it by
-        this function.
+        file. The string has the lines fixing bond angles added to it
+        by this function.
 
     """
     # This line holds the format for a line fixing the bond angles
     # between 3 atoms. The first 3 ``{...}`` are replaced with the ids
-    # of atoms. The last ``{...}`` is replaced with the bond angle. Note
-    # that in the ``.mae`` files the indices of atoms start at 1 while
-    # in rdkit they start at 0. As far as I can tell this corresponds to
-    # a shift of 1 for each atom index, with the ordering being the
-    # same.
+    # of atoms. The last ``{...}`` is replaced with the bond angle.
+    # Note that in the ``.mae`` files the indices of atoms start at 1
+    # while in rdkit they start at 0. As far as I can tell this
+    # corresponds to a shift of 1 for each atom index, with the
+    # ordering being the same.
     fix_ba = (" FXBA {0:>7}{1:>7}{2:>7}      0   100.0000 "
               "{3:>10.4f}     0.0000     0.0000")
 
@@ -837,21 +843,22 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     # will therefore have a bond angle.
     ba_mol = chem.MolFromSmarts('[*]~[*]~[*]')
 
-    # Get the indices of all atoms which have a bond angle. ``ba_atoms``
-    # is a tuple of tuples of the form ((1,2,3), (4,5,6), (7,8,9), ...).
-    # Each inner tuple holds the indicies of the atoms which form a bond
-    # angle.
+    # Get the indices of all atoms which have a bond angle.
+    # ``ba_atoms`` is a tuple of tuples of the form ((1,2,3), (4,5,6),
+    # (7,8,9), ...). Each inner tuple holds the indicies of the atoms
+    # which form a bond angle.
     ba_atoms = macro_mol.mol.GetSubstructMatches(ba_mol)
 
     # Get the conformer holding the atomic positions.
     conf = macro_mol.mol.GetConformer()
 
     # For each bond angle check if a bonder atom is involved in forming
-    # it. If no, a line fixing the bond angle is added to ``fix_block``.
-    # If any atom of the 3 is a bonder atom the bond angle is not fixed.
-    # This means that there will be some bond angles which consist of 2
-    # bonds not added during assembly which will not be fixed. However,
-    # it is assumed that the effect of this will be minimal.
+    # it. If no, a line fixing the bond angle is added to
+    # ``fix_block``. If any atom of the 3 is a bonder atom the bond
+    # angle is not fixed. This means that there will be some bond
+    # angles which consist of 2 bonds not added during assembly which
+    # will not be fixed. However, it is assumed that the effect of this
+    # will be minimal.
     for atom1_id, atom2_id, atom3_id in ba_atoms:
         if (atom1_id in macro_mol.bonder_ids or
             atom2_id in macro_mol.bonder_ids or
@@ -875,12 +882,12 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
         A-B-C-D-E=F
 
-    if the bond between E and F (``=``) represents the bond added during
-    assembly, the torsional angle A-B-C-D will be fixed but B-C-D-E will
-    not be. This is an artifact of the implementation but is not
-    expected to play a significant role as the vast majority of bond
-    angles which should be fixed, will be. The bond angle C-D-E=F will
-    also not be fixed as that is the purpose of this function.
+    if the bond between E and F (``=``) represents the bond added
+    during assembly, the torsional angle A-B-C-D will be fixed but
+    B-C-D-E will not be. This is an artifact of the implementation but
+    is not expected to play a significant role as the vast majority of
+    bond angles which should be fixed, will be. The bond angle C-D-E=F
+    will also not be fixed as that is the purpose of this function.
 
     Parameters
     ----------
@@ -888,25 +895,25 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
         The macromolecule to be optimized.
 
     fix_block : str
-        The string holding all the lines containing fix commands for the
-        ``.com`` file.
+        The string holding all the lines containing fix commands for
+        the ``.com`` file.
 
     Returns
     -------
     str
         A string holding lines containg fix commands for the ``.com``
-        file. The string has the lines fixing bond angles added to it by
-        this function.
+        file. The string has the lines fixing bond angles added to it
+        by this function.
 
     """
 
     # This line holds the format for a line fixing the torsional angles
     # between 4 atoms. The first 4 ``{...}`` are replaced with the ids
-    # of atoms. The last ``{...}`` is replaced with the torsional angle.
-    # Note that in the ``.mae`` files the indices of atoms start at 1
-    # while in rdkit they start at 0. As far as I can tell this
-    # corresponds to a shift of 1 for each atom index, with the ordering
-    # being the same.
+    # of atoms. The last ``{...}`` is replaced with the torsional
+    # angle. Note that in the ``.mae`` files the indices of atoms start
+    # at 1 while in rdkit they start at 0. As far as I can tell this
+    # corresponds to a shift of 1 for each atom index, with the
+    # ordering being the same.
     fix_ta = (" FXTA {0:>7}{1:>7}{2:>7}{3:>7}   100.0000 "
                 "{4:>10.4f}     0.0000     0.0000")
 
@@ -927,10 +934,10 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     # For each torsional angle check if a bonder atom is involved in
     # forming it. If no, a line fixing the torsional angle is added to
     # ``fix_block``. If any atom of the 4 is a bonder atom the bond
-    # angle is not fixed. This means that there will be some bond angles
-    # which consist of 3 bonds not added during assembly which will not
-    # be fixed. However, it is assumed that the effect of this will be
-    # minimal.
+    # angle is not fixed. This means that there will be some bond
+    # angles which consist of 3 bonds not added during assembly which
+    # will not be fixed. However, it is assumed that the effect of this
+    # will be minimal.
     for atom1_id, atom2_id, atom3_id, atom4_id in ta_atoms:
         if (atom1_id in macro_mol.bonder_ids or
             atom2_id in macro_mol.bonder_ids or

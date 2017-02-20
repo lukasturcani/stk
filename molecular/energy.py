@@ -12,10 +12,10 @@ as a method to the ``Energy`` class. There really aren't any
 requirements beyond this, just make sure the energy value is what the
 method returns.
 
-If the energy method does not fit neatly into a single method, feel free
-to split it up. Make sure sure that any helper methods are private, ie
-that their names start with a leading underscore. Only the main method
-which the user will use should be public.
+If the energy method does not fit neatly into a single method, feel
+free to split it up. Make sure sure that any helper methods are
+private, ie that their names start with a leading underscore. Only the
+main method which the user will use should be public.
 
 To calculate the energy of some ``Molecule`` object the only thing that
 is needed is calling one of the ``Energy`` methods:
@@ -49,10 +49,10 @@ using the ``macromodel`` program, the ``Energy.macromodel()`` function
 can be used:
 
     molecule.energy.macromodel(forcefield=16,
-                               macromodel_path='path/to/macromodel/dir')
+                              macromodel_path='path/to/macromodel/dir')
 
-This function requires the number of a forcefield (16) and the directory
-where ``macromodel`` is installed on the users computer
+This function requires the number of a forcefield (16) and the
+directory where ``macromodel`` is installed on the users computer
 ('path/to/macromodel/dir'). However, the directory does not affect the
 value of the calculated energy. When running:
 
@@ -71,7 +71,7 @@ However if we just define the ``Energy.macromodel()`` function within
 the energy class, and then run:
 
     molecule.energy.macromodel(forcefield=16,
-                               macromodel_path='path/to/macromodel/dir')
+                           macromodel_path='path/to/macromodel/dir')
 
 The output of
 
@@ -83,9 +83,9 @@ will be
           FunctionData('macromolecule', forcefield=16,
                         macromodel_path='path/to/macromodel/dir'): 200}
 
-In order to make sure that the macromodel_path is excluded from the key,
-decorate the function ``Energy.macromodel()`` with the ``exclude()``
-decorator. For example:
+In order to make sure that the macromodel_path is excluded from the
+key, decorate the function ``Energy.macromodel()`` with the
+``exclude()`` decorator. For example:
 
     @exclude('macromodel_path')
     def macromodel(self, forcefield, macromodel_path):
@@ -130,7 +130,7 @@ this:
 
     FunctionData('pseudoformation', building_blocks=None,
                  func=FunctionData('macromodel', forcefield=16,
-                macromodel_path='C:\\Program Files\\Schrodinger2016-3'))
+            macromodel_path='C:\\Program Files\\Schrodinger2016-3'))
 
 Notice that the path of the macromodel installation was kept nested in
 the key of the ``Energy.formation()`` function. This is undesirable. To
@@ -149,8 +149,8 @@ function:
 The `fargs` and `fkwargs` arguments are the arguments and keyword
 arguments with which ``Energy.formation()`` was called (including
 `self`). The ``formation_key()`` function should return a FunctionData
-instance which will act as the key. In our case the function was defined
-so that the key is:
+instance which will act as the key. In our case the function was
+defined so that the key is:
 
     FunctionData('formation', products=[], building_blocks=None,
                  func=FunctionData('macromodel', forcefield=16))
@@ -163,8 +163,8 @@ calculation repeatedly.
 Sidenote2
 ---------
 The automatic updating of the dictionary is  achieved by the ``EMeta``
-metaclass, ``EMethod`` descriptor and ``e_logger`` decorator. You do not
-need to worry about these, but information about how they work is
+metaclass, ``EMethod`` descriptor and ``e_logger`` decorator. You do
+not need to worry about these, but information about how they work is
 provided in the docstring of ``EMeta``.
 
 """
@@ -173,7 +173,6 @@ import os
 import rdkit.Chem as chem
 import rdkit.Chem.AllChem as ac
 import subprocess as sp
-import shutil
 from uuid import uuid4
 from types import MethodType
 from functools import wraps
@@ -247,10 +246,10 @@ class EMeta(type):
     """
     A metaclass for ``Energy``.
 
-    In conjuction with the EMethod descriptor and the e_logger decorator
-    this function allows methods to automatically update the `values`
-    attribute of their Energy instance without explicitly being told to
-    do so.
+    In conjuction with the EMethod descriptor and the e_logger
+    decorator this function allows methods to automatically update the
+    `values` attribute of their Energy instance without explicitly
+    being told to do so.
 
     Basically this metaclass turns all methods of the Energy class into
     descriptors of the EMethod class. These descriptors return a
@@ -359,7 +358,7 @@ def func_key(func, fargs=None, fkwargs=None):
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key : value.default for key,value in
-               dict(fsig.parameters).items() if key not in bound.keys()}
+              dict(fsig.parameters).items() if key not in bound.keys()}
 
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
@@ -372,8 +371,8 @@ def func_key(func, fargs=None, fkwargs=None):
         for key in func.exclude:
             bound.pop(key)
 
-    # Return an FunctionData object representing the function and chosen
-    # parameters.
+    # Return an FunctionData object representing the function and
+    # chosen parameters.
     return FunctionData(func.__name__, **bound)
 
 def exclude(*args):
@@ -431,8 +430,8 @@ class Energy(metaclass=EMeta):
         """
         Calculates the formation energy.
 
-        The formation energy is calculated under the assumption that the
-        molecule in `self.molecule` is composed of the molecules in
+        The formation energy is calculated under the assumption that
+        the molecule in `self.molecule` is composed of the molecules in
         `building_blocks` and that during formation molecules in
         `products` are formed in addition to `self.molecule`.
 
@@ -447,16 +446,16 @@ class Energy(metaclass=EMeta):
 
         products : tuple of form (float, Molecule)
             This tuple holds the molecules produced in addition to
-            `self.molecule`, when  a single `self.molecule` is made. The
-            ``int`` represents the number made per `self.molecule`.
+            `self.molecule`, when  a single `self.molecule` is made.
+            The ``int`` represents the number made per `self.molecule`.
 
         building_blocks : tuple (default = None)
             This argument should be a tuple of the form
             (float, Molecule). It holds the number of a given Molecule
-            required to build a single molecule held in `self.molecule`.
-            This argument can be omitted when the formation energy of a
-            MacroMolecule instance is being found, as they keep this
-            data stored elsewhere already.
+            required to build a single molecule held in
+            `self.molecule`. This argument can be omitted when the
+            formation energy of a MacroMolecule instance is being
+            found, as they keep this data stored elsewhere already.
 
         force_e_calc : bool (default = False)
             If the this is ``True`` then all building blocks, products
@@ -501,8 +500,8 @@ class Energy(metaclass=EMeta):
         """
         Calculates the formation energy, sans other products.
 
-        This is the formation energy if the energy of the other products
-        of the reaction is not taken into account.
+        This is the formation energy if the energy of the other
+        products of the reaction is not taken into account.
 
         Parameters
         ----------
@@ -516,10 +515,10 @@ class Energy(metaclass=EMeta):
         building_blocks : tuple (default = None)
             This argument should be a tuple of the form
             (float, Molecule). It holds the number of a given Molecule
-            required to build a single molecule held in `self.molecule`.
-            This argument can be omitted when the formation energy of a
-            MacroMolecule instance is being found, as they keep this
-            data stored elsewhere already.
+            required to build a single molecule held in
+            `self.molecule`. This argument can be omitted when the
+            formation energy of a MacroMolecule instance is being
+            found, as they keep this data stored elsewhere already.
 
         force_e_calc : bool (default = False)
             If the this is ``True`` then all building blocks, products
@@ -542,7 +541,7 @@ class Energy(metaclass=EMeta):
 
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in
-                              self.molecule.topology.bb_counter.items())
+                            self.molecule.topology.bb_counter.items())
 
         # Recalculate energies if requested.
         if force_e_calc:
@@ -552,7 +551,8 @@ class Energy(metaclass=EMeta):
 
             getattr(self, energy_func.name)(**energy_func.params)
 
-        # Sum the energy of building blocks under the chosen forcefield.
+        # Sum the energy of building blocks under the chosen
+        # forcefield.
         e_reactants = 0
         for n, mol in building_blocks:
             # If the calculation has not been done already, perform it.
@@ -565,7 +565,8 @@ class Energy(metaclass=EMeta):
         # Get the energy of `self.molecule`. The only product whose
         # energy matters in pseudoformation.
         e_products = (self.values[fkey] if fkey in self.values.keys()
-             else getattr(self, energy_func.name)(**energy_func.params))
+             else getattr(self,
+                        energy_func.name)(**energy_func.params))
 
         eng = e_reactants - e_products
         return eng
@@ -620,9 +621,9 @@ class Energy(metaclass=EMeta):
             The id number of the forcefield to be used by macromodel.
 
         macromodel_path : str
-            The full path of the ``Schrodinger`` suite within the user's
-            machine. For example, in a default Microsoft installation
-            the folder will probably be something like
+            The full path of the ``Schrodinger`` suite within the
+            user's machine. For example, in a default Microsoft
+            installation the folder will probably be something like
             ``C:\Program Files\Schrodinger2016-2``.
 
         Returns
@@ -724,7 +725,7 @@ def formation_key(fargs, fkwargs):
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key : value.default for key,value in
-               dict(fsig.parameters).items() if key not in bound.keys()}
+           dict(fsig.parameters).items() if key not in bound.keys()}
 
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
@@ -742,8 +743,8 @@ def formation_key(fargs, fkwargs):
     # result.
     bound.pop('force_e_calc')
 
-    # Return an FunctionData object representing the function and chosen
-    # parameters.
+    # Return an FunctionData object representing the function and
+    # chosen parameters.
     return FunctionData('formation', **bound)
 
 Energy.formation.key = formation_key
@@ -776,7 +777,7 @@ def pseudoformation_key(fargs, fkwargs):
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key : value.default for key,value in
-               dict(fsig.parameters).items() if key not in bound.keys()}
+           dict(fsig.parameters).items() if key not in bound.keys()}
 
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
@@ -794,8 +795,8 @@ def pseudoformation_key(fargs, fkwargs):
     # result.
     bound.pop('force_e_calc')
 
-    # Return an FunctionData object representing the function and chosen
-    # parameters.
+    # Return an FunctionData object representing the function and
+    # chosen parameters.
     return FunctionData('pseudoformation', **bound)
 
 Energy.pseudoformation.key = pseudoformation_key
