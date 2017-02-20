@@ -40,9 +40,6 @@ topology is at the origin.
 
 """
 
-
-
-from collections import Counter
 import rdkit
 import rdkit.Chem as chem
 
