@@ -150,6 +150,22 @@ def test_position_matrix():
 
         assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
 
+def test_save_bonders():
+    mol.bonder_ids = []
+    for i, atom in enumerate(mol.mol.GetAtoms()):
+        if i < 5:
+            atom.SetProp('bonder', '1')
+        elif i < 10:
+            atom.SetProp('del', '1')
+        else:
+            break
+
+    mol.save_bonders()
+    assert len(mol.bonder_ids) == 5
+    for atom in mol.mol.GetAtoms():
+        atom.ClearProp('bonder')
+        atom.ClearProp('del')
+
 def test_set_position_from_matrix():
     try:
         new_pos_mat = np.matrix([[0 for x in range(3)] for y in
