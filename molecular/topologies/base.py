@@ -189,5 +189,5 @@ class Topology:
     def __repr__(self):
         r = "{}(".format(self.__class__.__name__)
         for key, value in self.__dict__.items():
-            r += "{!r}={!r}".format(key, value)
+            r += "{!s}={!r}".format(key, value)
         return r + ")"
