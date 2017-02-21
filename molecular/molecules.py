@@ -129,6 +129,7 @@ by the macromolecular class.
 """
 
 import numpy as np
+from numpy import array
 from functools import total_ordering, partial
 import itertools as it
 from rdkit import Chem as chem
@@ -142,6 +143,7 @@ import json
 from collections import namedtuple, Counter
 import io
 
+from . import topologies
 from ..addons.pyWindow import window_sizes
 from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
@@ -420,19 +422,26 @@ class Molecule:
         return graph
 
     @classmethod
-    def load(cls, json_dict):
+    def load(cls, json_dict, optimized=True):
         """
-        Creates a MacroMolecule from a JSON dict.
+        Creates a Molecule from a JSON dict.
+
+        The Molecule returned has the class specified in the JSON
+        dictionary, not ``Molecule``.
 
         Parameters
         ----------
         json_dict : str
-            A JSON representation of a macromolecule.
+            A JSON representation of a molecule.
+
+        optimized : bool
+            The value passed to the loaded molecules `optimized`
+            attribute.
 
         Returns
         -------
-        MacroMolecule
-            A macromolecule represented by `json_dict`.
+        Molecule
+            The molecule represented by `json_dict`.
 
         """
 
@@ -440,15 +449,23 @@ class Molecule:
 
         # Get the class of the object.
         c = globals()[d['class']]
+        # Check if the Molecule already exists in the cache, if so
+        # return it.
+        key = eval(d['key'])
+        if key in c.cache:
+            return c.cache[key]
+
         obj = c.__new__(c)
         # Initialize attributes.
         obj.mol = chem.MolFromMolBlock(d['mol_block'],
                                        sanitize=False, removeHs=False)
-        obj.uid = d['uid']
-        obj.optimized = False
+        obj.optimized = optimized
         obj.failed = False
         obj.energy = Energy(obj)
+        obj.key = key
         obj._json_init(d)
+        c.cache[key] = obj
+        return obj
 
     def mdl_mol_block(self):
         """
@@ -1185,7 +1202,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         The representation has the following form:
 
             {
-                'uid' : 5125
+                'key' : 'frozenset({'amine', 'InChiKey=[...]'})'
                 'class' : 'StructUnit',
                 'mol_block' : 'A string holding the V3000 mol
                                block of the molecule.'
@@ -1200,7 +1217,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return json.dumps({
 
-        'key' : list(self.key),
+        'key' : repr(self.key),
         'class' : self.__class__.__name__,
         'mol_block' : self.mdl_mol_block()
 
@@ -1217,7 +1234,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Parameters
         ----------
         json_dict : dict
-            A dictionary holding that attribute data of the molecule.
+            A dictionary holding the attribute data of the molecule.
 
         Returns
         -------
@@ -1226,6 +1243,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
 
         self.file = 'JSON'
+        self.func_grp = next((x for x in functional_groups if
+                                x.name in self.key), None)
         self.tag_atoms()
 
     @staticmethod
@@ -1923,13 +1942,49 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         return json.dumps({
 
+        'bb_counter' : [(key.json(), val) for key, val in
+                                            self.bb_counter.items()],
+        'bonds_made' : self.bonds_made,
+        'bonder_ids' : self.bonder_ids,
         'class' : self.__class__.__name__,
         'mol_block' : self.mdl_mol_block(),
         'building_blocks' : [x.json() for x in self.building_blocks],
         'topology' : repr(self.topology),
-        'unscaled_fitness' : self.unscaled_fitness
+        'unscaled_fitness' : repr(self.unscaled_fitness),
+        'key' : repr(self.key)
 
         }, indent=4)
+
+    def _json_init(self, json_dict):
+        """
+        Completes a JSON initialization.
+
+        This function is not to be used. Use ``Molecule.load()``
+        for loading instances from a JSON string. That function will
+        automatically call this one.
+
+        Parameters
+        ----------
+        json_dict : dict
+            A dictionary holding the attribute data of the molecule.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        self.building_blocks = {Molecule.load(x) for x in
+                                    json_dict['building_blocks']}
+        self.topology = eval('topologies.' + json_dict['topology'])
+        self.unscaled_fitness = eval(json_dict['unscaled_fitness'])
+        self.fitness = None
+        self.progress_params = None
+        self.bb_counter = Counter({Molecule.load(key) : val for
+                                key, val in json_dict['bb_counter']})
+        self.bonds_made = json_dict['bonds_made']
+        self.energy = Energy(self)
+        self.bonder_ids = json_dict['bonder_ids']
 
     @staticmethod
     def gen_key(building_blocks, topology):
@@ -1956,8 +2011,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         tkey = frozenset(tkey)
 
         return MacroMolKey(
-                    building_blocks=frozenset(building_blocks),
-                           topology=tkey)
+            building_blocks=frozenset(x.key for x in building_blocks),
+            topology=tkey)
 
     def same(self, other):
         """
