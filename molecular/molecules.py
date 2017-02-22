@@ -129,7 +129,6 @@ by the macromolecular class.
 """
 
 import numpy as np
-from numpy import array
 from functools import total_ordering, partial
 import itertools as it
 from rdkit import Chem as chem
@@ -1976,8 +1975,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         self.building_blocks = {Molecule.load(x) for x in
                                     json_dict['building_blocks']}
-        self.topology = eval('topologies.' + json_dict['topology'])
-        self.unscaled_fitness = eval(json_dict['unscaled_fitness'])
+        self.topology = eval(json_dict['topology'],
+                             topologies.__dict__)
+        self.unscaled_fitness = eval(json_dict['unscaled_fitness'],
+                                     np.__dict__)
         self.fitness = None
         self.progress_params = None
         self.bb_counter = Counter({Molecule.load(key) : val for
