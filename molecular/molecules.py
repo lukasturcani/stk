@@ -431,7 +431,7 @@ class Molecule:
 
         Parameters
         ----------
-        json_dict : str
+        json_dict : dict
             A JSON representation of a molecule.
 
         optimized : bool
@@ -445,25 +445,23 @@ class Molecule:
 
         """
 
-        d = json.loads(json_dict)
-
         # Get the class of the object.
-        c = globals()[d['class']]
+        c = globals()[json_dict['class']]
         # Check if the Molecule already exists in the cache, if so
         # return it.
-        key = eval(d['key'])
+        key = eval(json_dict['key'])
         if key in c.cache:
             return c.cache[key]
 
         obj = c.__new__(c)
         # Initialize attributes.
-        obj.mol = chem.MolFromMolBlock(d['mol_block'],
+        obj.mol = chem.MolFromMolBlock(json_dict['mol_block'],
                                        sanitize=False, removeHs=False)
         obj.optimized = optimized
         obj.failed = False
         obj.energy = Energy(obj)
         obj.key = key
-        obj._json_init(d)
+        obj._json_init(json_dict)
         c.cache[key] = obj
         return obj
 
@@ -1210,18 +1208,18 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        str
-            A JSON string which represents the molecule.
+        dict
+            A dict which represents the molecule.
 
         """
 
-        return json.dumps({
+        return {
 
         'key' : repr(self.key),
         'class' : self.__class__.__name__,
         'mol_block' : self.mdl_mol_block()
 
-        }, indent=4)
+        }
 
     def _json_init(self, json_dict):
         """
@@ -1935,12 +1933,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         Returns
         -------
-        str
-            A JSON string which represents the molecule.
+        dict
+            A dict which represents the molecule.
 
         """
 
-        return json.dumps({
+        return {
 
         'bb_counter' : [(key.json(), val) for key, val in
                                             self.bb_counter.items()],
@@ -1953,7 +1951,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         'unscaled_fitness' : repr(self.unscaled_fitness),
         'key' : repr(self.key)
 
-        }, indent=4)
+        }
 
     def _json_init(self, json_dict):
         """
