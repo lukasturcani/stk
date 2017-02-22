@@ -461,10 +461,10 @@ class Population:
 
         pop = cls()
         for item in pop_list:
-            if isinstance(item, str):
+            if isinstance(item, dict):
                 pop.members.append(Molecule.load(item))
-            elif isinstance(item, cls):
-                pop.populations.append(item.fromlist())
+            elif isinstance(item, list):
+                pop.populations.append(cls.fromlist(item))
 
             else:
                 raise TypeError(('Population list must consist only'
@@ -576,7 +576,6 @@ class Population:
 
         with open(path, 'r') as f:
             pop_list = json.load(f)
-        print([type(x) for x in pop_list])
         return cls.fromlist(pop_list)
 
     def max(self, key):
