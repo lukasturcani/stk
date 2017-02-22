@@ -3,8 +3,7 @@ from ..molecular import Molecule
 import numpy as np
 import json
 
-path = join('data', 'macromolecule', 'mm.json')
-with open(path, 'r') as f:
+with open(join('data', 'macromolecule', 'mm.json'), 'r') as f:
     mol = Molecule.load(json.load(f))
 
 def test_rdkit():
