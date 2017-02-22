@@ -8,12 +8,13 @@ import os
 import numpy as np
 import pickle
 from collections import Counter
+import json
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..molecular import (MacroMolecule, Cage,
+from ..molecular import (MacroMolecule, Cage, Molecule
                                StructUnit, StructUnit2, StructUnit3)
 from ..molecular.optimization.optimization import (_optimize_all,
                                         _optimize_all_serial)
@@ -398,13 +399,22 @@ class Population:
 
         return _calc_fitness(self.ga_tools.fitness, self)
 
-    def dump(self, file_name):
+    def dump(self, path):
         """
-        Write the population object to a file.
+        Write the population to a file.
+
+        The population is written in the JSON format in the following
+        way. The population is represented as a list,
+
+            [mem1.json(), mem2.json(), [mem3.json(), [mem4.json()]]]
+
+        where each member of the population held directly in the
+        `members` attribute is placed an an element in the list. Any
+        subpopulations are held as  sublists.
 
         Parameters
         ----------
-        file_name : str
+        path : str
             The full path of the file to which the population should
             be written.
 
@@ -414,8 +424,8 @@ class Population:
 
         """
 
-        with open(file_name, 'wb') as dump_file:
-            pickle.dump(self, dump_file)
+        with open(path, 'w') as f:
+            json.dump(self.tolist(), f, indent=4)
 
     def exit(self):
         """
@@ -430,6 +440,36 @@ class Population:
         """
 
         return self.ga_tools.exit(self)
+
+    @classmethod
+    def fromlist(cls, pop_list):
+        """
+        Initializes a population from a list representation of one.
+
+        Parameters
+        ----------
+        pop_list : list of str and lists
+            A list which represents a population. Like the ones created
+            by `tolist()`.
+
+        Returns
+        -------
+        Population
+            The population represented by `pop_list`.
+
+        """
+
+        pop = cls()
+        for item in pop_list:
+            if isinstance(item, str):
+                pop.members.append(Molecule.load(item))
+            elif isinstance(item, cls):
+                pop.populations.append(item.fromlist())
+
+            else:
+                raise TypeError(('Population list must consist only'
+                                 ' of strings and lists.'))
+        return pop
 
     def gen_mutants(self):
         """
@@ -512,14 +552,14 @@ class Population:
 
         return self.ga_tools.crossover(self)
 
-    @staticmethod
-    def load(file_name, ga_tools=None):
+    @classmethod
+    def load(cls, path, ga_tools=None):
         """
-        Initializes a Population from one dumped to a file with pickle.
+        Initializes a Population from one dumped to a file.
 
         Parameters
         ----------
-        file_name : str
+        path : str
             The full path of the file holding the dumped population.
 
         ga_tools : GATools (default = None)
@@ -534,20 +574,9 @@ class Population:
 
         """
 
-        # Read the pickle file, load it into the `pop` variable. If
-        # `ga_tools` parameter was supplied, place it into the
-        # `ga_tools` attribute of `pop`.
-        with open(file_name, 'rb') as dump_file:
-            pop = pickle.load(dump_file)
-            if ga_tools is not None:
-                pop.ga_tools = ga_tools
-
-            # Make sure the the cache is updated with the loaded
-            # population.
-            for member in pop:
-                member.update_cache()
-
-            return pop
+        with open(path, 'r') as f:
+            pop_list = json.load(f)
+        return cls.fromlist(pop_list)
 
     def max(self, key):
         """
@@ -837,6 +866,26 @@ class Population:
         """
 
         return self.ga_tools.selection(self, type_)
+
+    def tolist(self):
+        """
+        Converts the population to a list representation.
+
+        The population and any subpopulations are represented as lists
+        (and sublists), while members are represented by their JSON
+        dictionaries (as strings).
+
+        Returns
+        -------
+        str
+            A JSON string representing the population.
+
+        """
+
+        pop = [x.json() for x in self.members]
+        for sp in self.populations:
+            pop.append(sp.tolist())
+        return pop
 
     def write(self, dir_path):
         """
