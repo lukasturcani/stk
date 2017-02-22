@@ -1,4 +1,4 @@
-{
+[{
     "key": "MacroMolKey(building_blocks=frozenset({frozenset({'InChI=1S/C29H24O3/c1-26-20-8-5-18(15-31)12-24(20)28(3)22-10-7-19(16-32)13-25(22)27(2,29(26,28)4)21-9-6-17(14-30)11-23(21)26/h5-16H,1-4H3/t26-,27-,28-,29+/m0/s1', 'aldehyde'}), frozenset({'amine', 'InChI=1S/C15H15N3O4/c1-2-21-14(19)10-9-7-5-3-4-6-8(7)22-15(20)11(9)13(17)18-12(10)16/h3-6,9,18H,2,16-17H2,1H3/t9-/m0/s1'})}), topology=frozenset({'FourPlusSix', ('alignment', None)}))",
     "unscaled_fitness": "{}",
     "bonds_made": 12,
@@ -45,7 +45,7 @@
         384,
         387
     ]
-}
+},
 
 {
     "bonds_made": 24,
@@ -118,4 +118,4 @@
     ],
     "topology": "EightPlusTwelve(alignment=None)",
     "unscaled_fitness": "{}"
-}
+}]

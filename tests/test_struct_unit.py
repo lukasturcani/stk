@@ -3,6 +3,7 @@ import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 import rdkit.Chem as chem
+import json
 
 from ..molecular import StructUnit, Molecule
 from ..convenience_tools import normalize_vector
@@ -76,9 +77,7 @@ def test_functional_group_atoms():
 
 def test_json_init():
     with open(join('data', 'struct_unit', 'su.json')) as f:
-        jsonstr = f.read()
-
-    bb1 = Molecule.load(jsonstr)
+        bb1 = Molecule.load(json.load(f))
     assert bb1.file == 'JSON'
     assert bb1.optimized == True
     assert bb1.bonder_ids == [7, 10]
@@ -102,8 +101,7 @@ def test_caching():
         mol = StructUnit(data_dir)
         # Make a StructUnit using JSON.
         with open(join('data', 'struct_unit', 'su.json')) as f:
-            jsonstr = f.read()
-        mol2 = Molecule.load(jsonstr)
+            mol2 = Molecule.load(json.load(f))
 
         # Try to remake them and check that caching was fine.
         assert mol2 is not mol
@@ -114,7 +112,9 @@ def test_caching():
         # Make an alteration and make sure new molecules were
         # generated.
         mol3 = StructUnit(data_dir, 'aldehyde')
-        mol4 = Molecule.load(mol2.json().replace('amine', 'aldehyde'))
+        mol2dict = mol2.json()
+        mol2dict['key'] = mol2dict['key'].replace('amine', 'aldehyde')
+        mol4 = Molecule.load(mol2dict)
         assert mol3 is not mol
         assert mol3 is not mol2
         assert mol3 is not mol4

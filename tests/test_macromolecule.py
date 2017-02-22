@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 from os.path import join
+import json
 from ..molecular import (MacroMolecule, Molecule, FourPlusSix,
                          StructUnit,
                          StructUnit2, StructUnit3, MacroMolKey)
@@ -58,7 +59,7 @@ def test_caching():
 
         # Make a MacroMolecule using JSON.
         with open(join('data', 'macromolecule', 'mm.json'), 'r') as f:
-            mol2 = Molecule.load(f.read())
+            mol2 = Molecule.load(json.load(f))
 
         assert mol1 is not mol2
 
@@ -79,7 +80,7 @@ def test_caching():
 def test_json_init():
     # Make a MacroMolecule using JSON.
     with open(join('data', 'macromolecule', 'mm.json'), 'r') as f:
-        mol = Molecule.load(f.read())
+        mol = Molecule.load(json.load(f))
 
     assert mol.fitness == None
     assert all(isinstance(x, StructUnit) for x in mol.building_blocks)
@@ -96,4 +97,3 @@ def test_json_init():
     assert mol.bonds_made == 12
     assert set(mol.bb_counter.values()) == {4, 6}
     assert mol.progress_params == None
-    
