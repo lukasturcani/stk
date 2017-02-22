@@ -1,10 +1,10 @@
-from ..ga import Mutation
-from ..molecular import Molecule, EightPlusTwelve, FourPlusSix
+from ..ga import Mutation, Population
+from ..molecular import EightPlusTwelve, FourPlusSix
 from os.path import join
 
-path = join('data', 'mutation', 'm.json')
-with open(path, 'r') as f:
-    mol = Molecule.load(f.read())
+path = join('data', 'mutation', 'molecules.json')
+pop = Population.load(path)
+mol = pop[0]
 
 def test_cage_random_bb():
     ...
