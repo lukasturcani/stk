@@ -2117,7 +2117,7 @@ class Cage(MacroMolecule):
     """
 
     @classmethod
-    def init_fixed_bb(cls, bb_file, lk_db, topologies, file):
+    def init_fixed_bb(cls, bb_file, lk_db, topologies):
         bb = StructUnit3(bb_file)
 
         while True:
@@ -2131,10 +2131,10 @@ class Cage(MacroMolecule):
 
         topology = np.random.choice(topologies)
 
-        return cls((bb, lk), topology, file)
+        return cls((bb, lk), topology)
 
     @classmethod
-    def init_random(cls, bb_db, lk_db, topologies, file):
+    def init_random(cls, bb_db, lk_db, topologies):
         """
         Makes ``Cage`` from random building blocks and topology.
 
@@ -2177,7 +2177,7 @@ class Cage(MacroMolecule):
                 continue
 
         topology = np.random.choice(topologies)
-        return cls((bb, lk), topology, file)
+        return cls((bb, lk), topology)
 
     def window_difference(self):
         """
