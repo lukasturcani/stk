@@ -14,7 +14,7 @@ from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..molecular import (MacroMolecule, Cage, Molecule
+from ..molecular import (MacroMolecule, Cage, Molecule,
                                StructUnit, StructUnit2, StructUnit3)
 from ..molecular.optimization.optimization import (_optimize_all,
                                         _optimize_all_serial)
@@ -576,6 +576,7 @@ class Population:
 
         with open(path, 'r') as f:
             pop_list = json.load(f)
+        print([type(x) for x in pop_list])
         return cls.fromlist(pop_list)
 
     def max(self, key):
