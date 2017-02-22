@@ -129,6 +129,7 @@ by the macromolecular class.
 """
 
 import numpy as np
+import warnings
 from functools import total_ordering, partial
 import itertools as it
 from rdkit import Chem as chem
@@ -2211,7 +2212,6 @@ class Cage(MacroMolecule):
 
         """
 
-
         if (self.windows is None or
             len(self.windows) < self.n_windows):
             return None
@@ -2280,7 +2280,9 @@ class Cage(MacroMolecule):
 
         """
 
-        all_windows = window_sizes(
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            all_windows = window_sizes(
                             io.StringIO(self.mdl_mol_block()))
 
         # If pyWindow failed, return ``None``.
