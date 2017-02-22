@@ -1520,8 +1520,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Modifies
         --------
         mol : rdkit.Chem.rdchem.Mol
-            The atoms in this rdkit molecule have the properties 'fg',
-            'bonder' and 'del' removed.
+            The atoms in this rdkit molecule have the properties
+            'fg', 'bonder' and 'del' removed.
 
         bonder_ids : list of ints
             This list is set to [].
@@ -1543,7 +1543,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         return "{} {}".format(self.__class__.__name__, list(self.key))
 
     def __repr__(self):
-        return self.json()
+        return str(self)
+
 class StructUnit2(StructUnit):
     """
     Represents building blocks with 2 functional groups.
