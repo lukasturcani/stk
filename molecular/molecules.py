@@ -171,11 +171,6 @@ class Cached(type):
         if key in self.cache:
             return self.cache[key]
         else:
-            for arg in args[0]:
-                print(arg.file)
-                print(arg.note)
-                print('key', arg.key, '\n\n\n')
-                print(*(x for x in arg.__class__.cache.keys()), sep='\n')
             obj = super().__call__(*args, **kwargs)
             obj.key = key
             self.cache[key] = obj
@@ -228,10 +223,8 @@ class CachedStructUnit(type):
 
         key = self.gen_key(mol, functional_group)
         if key in self.cache:
-            print('in cache', file)
             return self.cache[key]
         else:
-            print('not in cache', file)
             obj = super().__call__(file, functional_group, note)
             obj.key = key
             self.cache[key] = obj
@@ -1481,7 +1474,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             mol_fp = ac.GetMorganFingerprint(mol, 4)
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
             mols.append((similarity, path))
-
+            
         return sorted(mols, reverse=True)
 
     def tag_atoms(self):

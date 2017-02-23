@@ -336,11 +336,11 @@ class Mutation:
         # the index which is to be accessed the next time this function
         # is run on the same `macro_mol`.
 
-        _, lk = max(zip(macro_mol.topology.bb_counter.values(),
-                        macro_mol.topology.bb_counter.keys()))
+        _, lk = max(zip(macro_mol.bb_counter.values(),
+                        macro_mol.bb_counter.keys()))
 
-        _, og_bb = min(zip(macro_mol.topology.bb_counter.values(),
-                        macro_mol.topology.bb_counter.keys()))
+        _, og_bb = min(zip(macro_mol.bb_counter.values(),
+                        macro_mol.bb_counter.keys()))
 
         if not hasattr(macro_mol, '_similar_bb_mols'):
             macro_mol._similar_bb_mols = (
@@ -418,12 +418,12 @@ class Mutation:
         # index which is to be accessed the next time this function is
         # run on the same `macro_mol`.
 
-        _, og_lk = max(zip(macro_mol.topology.bb_counter.values(),
-                        macro_mol.topology.bb_counter.keys()))
+        _, og_lk = max(zip(macro_mol.bb_counter.values(),
+                        macro_mol.bb_counter.keys()))
         lk_type = type(og_lk)
 
-        _, bb = min(zip(macro_mol.topology.bb_counter.values(),
-                        macro_mol.topology.bb_counter.keys()))
+        _, bb = min(zip(macro_mol.bb_counter.values(),
+                        macro_mol.bb_counter.keys()))
 
         if not hasattr(macro_mol, '_similar_lk_mols'):
             macro_mol._similar_lk_mols = (
