@@ -1,10 +1,9 @@
 from os.path import join
-from ..molecular import Molecule
+from ..ga import Population
 import numpy as np
-import json
 
-with open(join('data', 'macromolecule', 'mm.json'), 'r') as f:
-    mol = Molecule.load(json.load(f))
+
+mol = Population.load(join('data', 'macromolecule', 'mm.json'))[0]
 
 def test_rdkit():
     print(mol)
