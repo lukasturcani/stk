@@ -1,16 +1,43 @@
 from ..ga import Mutation, Population
-from ..molecular import EightPlusTwelve, FourPlusSix
+from ..molecular import EightPlusTwelve, FourPlusSix, StructUnit
 from os.path import join
-
-path = join('data', 'mutation', 'molecules.json')
+from glob import glob
+path = join('data', 'mutation', 'mutants.json')
 pop = Population.load(path)
 mol = pop[0]
 
+
+
 def test_cage_random_bb():
-    ...
+
+    for bb_file in glob(r'data/mutation/cage/bb/*.mol'):
+        StructUnit(bb_file, 'aldehyde')
+        
+
+    mutant = Mutation.cage_random_bb(None, mol,
+                join('data', 'mutation', 'cage', 'bb'),
+                'aldehyde')
+
+    _, bb1 = min(zip(mol.bb_counter.values(),
+                     mol.bb_counter.keys()))
+    _, lk1 = max(zip(mol.bb_counter.values(),
+                     mol.bb_counter.keys()))
+
+    assert mutant.topology.__class__ == mol.topology.__class__
+    assert False
 
 def test_cage_random_lk():
-    ...
+    mutant = Mutation.cage_random_lk(None, mol,
+                join('data', 'mutation', 'cage', 'lk'),
+                     'amine')
+
+    _, bb1 = min(zip(mol.bb_counter.values(),
+                     mol.bb_counter.keys()))
+    _, lk1 = max(zip(mol.bb_counter.values(),
+                     mol.bb_counter.keys()))
+
+    assert mutant.topology.__class__ == mol.topology.__class__
+    assert False
 
 def test_cage_similar_bb():
     ...

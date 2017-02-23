@@ -165,7 +165,7 @@ class Mutation:
                               'mutation_counter.png'))
         return mutant_pop
 
-    def cage_random_bb(self, macro_mol, database):
+    def cage_random_bb(self, macro_mol, database, fg=None):
         """
         Substitutes a building block with a random one from a database.
 
@@ -179,6 +179,13 @@ class Mutation:
         database : str
             The full path of the database from which a new
             building block is to be found.
+
+        fg : str (default = None)
+            The name of a functional group. All molecules in
+            `database` must have this functional group. This is the
+            functional group which is used to assemble the
+            macromolecules. If ``None`` it is assumed that the
+            path `database` holds the name of the functional group.
 
         Returns
         -------
@@ -199,7 +206,7 @@ class Mutation:
             try:
                 bb_file = np.random.choice(os.listdir(database))
                 bb_file = os.path.join(database, bb_file)
-                bb = StructUnit3(bb_file)
+                bb = StructUnit3(bb_file, fg)
                 break
 
             except TypeError:
@@ -211,11 +218,11 @@ class Mutation:
                    ' not have the same number of functional groups as '
                    'the original building block.\n\nOriginal building '
                   'block:\n\n{}\n\nReplacement building block:\n\n'
-                  '{}\n\n').format(og_bb.file, bb.file))
+                  '{}\n\n').format(og_bb, bb))
 
         return Cage({bb, lk}, macro_mol.topology)
 
-    def cage_random_lk(self, macro_mol, database):
+    def cage_random_lk(self, macro_mol, database, fg=None):
         """
         Substitutes a linker with a random one from a database.
 
@@ -229,6 +236,13 @@ class Mutation:
         database : str
             The full path of the database from which a new linker is to
             be found.
+
+        fg : str (default = None)
+            The name of a functional group. All molecules in
+            `database` must have this functional group. This is the
+            functional group which is used to assemble the
+            macromolecules. If ``None`` it is assumed that the
+            path `database` holds the name of the functional group.
 
         Returns
         -------
@@ -250,7 +264,7 @@ class Mutation:
             try:
                 lk_file = np.random.choice(os.listdir(database))
                 lk_file = os.path.join(database, lk_file)
-                lk = lk_type(lk_file)
+                lk = lk_type(lk_file, fg)
                 break
 
             except TypeError:
@@ -261,12 +275,11 @@ class Mutation:
                  ('\n\nMUTATION ERROR: Replacement linker does not'
                   ' have the same number of functional groups as the'
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
-                  'Replacement linker:\n\n{}\n\n').format(og_lk.file,
-                                                           lk.file))
+                  'Replacement linker:\n\n{}\n\n').format(og_lk, lk))
 
         return Cage({bb, lk}, macro_mol.topology)
 
-    def cage_similar_bb(self, macro_mol, database):
+    def cage_similar_bb(self, macro_mol, database, fg=None):
         """
         Substitute the building block with similar one from `database`.
 
@@ -285,6 +298,13 @@ class Mutation:
         database : str
             The full path of the database from which molecules are used
             to substitute the building-block* of `macro_mol`.
+
+        fg : str (default = None)
+            The name of a functional group. All molecules in
+            `database` must have this functional group. This is the
+            functional group which is used to assemble the
+            macromolecules. If ``None`` it is assumed that the
+            path `database` holds the name of the functional group.
 
         Modifies
         --------
@@ -327,7 +347,7 @@ class Mutation:
                                og_bb.similar_molecules(database), 0)
 
         sim_mols, cur_index = macro_mol._similar_bb_mols
-        new_bb = StructUnit3(sim_mols[cur_index][-1])
+        new_bb = StructUnit3(sim_mols[cur_index][-1], fg)
 
         if len(og_bb.bonder_ids) != len(new_bb.bonder_ids):
             raise MutationError(
@@ -335,13 +355,13 @@ class Mutation:
                ' not have the same number of functional groups as '
                'the original building block.\n\nOriginal building '
               'block:\n\n{}\n\nReplacement building block:\n\n'
-              '{}\n\n').format(og_bb.file, new_bb.file))
+              '{}\n\n').format(og_bb, new_bb))
 
         macro_mol._similar_bb_mols = sim_mols, cur_index + 1
 
         return Cage({new_bb, lk}, macro_mol.topology)
 
-    def cage_similar_lk(self, macro_mol, database):
+    def cage_similar_lk(self, macro_mol, database, fg=None):
         """
         Substitute the linker with a similar one from `database`.
 
@@ -360,6 +380,13 @@ class Mutation:
         database : str
             The full path of the database from which molecules are used
             to substitute the linker of `macro_mol`.
+
+        fg : str (default = None)
+            The name of a functional group. All molecules in
+            `database` must have this functional group. This is the
+            functional group which is used to assemble the
+            macromolecules. If ``None`` it is assumed that the
+            path `database` holds the name of the functional group.
 
         Modifies
         --------
@@ -403,15 +430,14 @@ class Mutation:
                             og_lk.similar_molecules(database), 0)
 
         sim_mols, cur_index = macro_mol._similar_lk_mols
-        new_lk = lk_type(sim_mols[cur_index][-1])
+        new_lk = lk_type(sim_mols[cur_index][-1], fg)
 
         if len(og_lk.bonder_ids) != len(new_lk.bonder_ids):
             raise MutationError(
              ('\n\nMUTATION ERROR: Replacement linker does not'
               ' have the same number of functional groups as the'
               ' original linker.\n\nOriginal linker:\n\n{}\n\n'
-              'Replacement linker:\n\n{}\n\n').format(og_lk.file,
-                                                      new_lk.file))
+              'Replacement linker:\n\n{}\n\n').format(og_lk, new_lk))
 
         macro_mol._similar_lk_mols = sim_mols, cur_index + 1
         return Cage({new_lk, bb}, macro_mol.topology)

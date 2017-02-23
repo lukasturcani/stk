@@ -141,6 +141,7 @@ import networkx as nx
 from scipy.spatial.distance import euclidean
 import json
 from collections import namedtuple, Counter
+from inspect import signature
 import io
 
 from . import topologies
@@ -164,10 +165,17 @@ class Cached(type):
         self.cache = dict()
 
     def __call__(self, *args, **kwargs):
-        key = self.gen_key(*args, **kwargs)
+        sig = signature(self.__init__)
+        sig = sig.bind_partial(self, *args, **kwargs).arguments
+        key = self.gen_key(sig['building_blocks'], sig['topology'])
         if key in self.cache:
             return self.cache[key]
         else:
+            for arg in args[0]:
+                print(arg.file)
+                print(arg.note)
+                print('key', arg.key, '\n\n\n')
+                print(*(x for x in arg.__class__.cache.keys()), sep='\n')
             obj = super().__call__(*args, **kwargs)
             obj.key = key
             self.cache[key] = obj
@@ -206,7 +214,7 @@ class CachedStructUnit(type):
         super().__init__(*args, **kwargs)
         self.cache = dict()
 
-    def __call__(self, file, functional_group=None):
+    def __call__(self, file, functional_group=None, note=''):
         _, ext = os.path.splitext(file)
         mol = self.init_funcs[ext](file)
 
@@ -220,9 +228,11 @@ class CachedStructUnit(type):
 
         key = self.gen_key(mol, functional_group)
         if key in self.cache:
+            print('in cache', file)
             return self.cache[key]
         else:
-            obj = super().__call__(file, functional_group)
+            print('not in cache', file)
+            obj = super().__call__(file, functional_group, note)
             obj.key = key
             self.cache[key] = obj
             return obj
@@ -257,13 +267,18 @@ class Molecule:
         True if the fitness function or optimization function failed
         when trying to evaluate the molecule.
 
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
+
     """
 
-    def __init__(self):
+    def __init__(self, note=""):
         self.failed = False
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
+        self.note = note
 
     def all_atom_coords(self):
         """
@@ -460,6 +475,7 @@ class Molecule:
         obj.optimized = optimized
         obj.failed = False
         obj.energy = Energy(obj)
+        obj.note = json_dict['note']
         obj.key = key
         obj._json_init(json_dict)
         c.cache[key] = obj
@@ -996,6 +1012,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     key : MacroMolKey
         The key used for caching the molecule.
 
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
+
     """
 
     init_funcs = {'.mol' : partial(chem.MolFromMolFile,
@@ -1011,7 +1031,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   '.pdb' : partial(chem.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
 
-    def __init__(self, file, functional_group=None):
+    def __init__(self, file, functional_group=None, note=""):
         """
         Initializes a ``StructUnit`` instance.
 
@@ -1028,9 +1048,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             to this parameter and the name of one is not present in
             `file`, no tagging is done.
 
+        note : str (defaulat = None)
+            A note or comment about the molecule
+
         """
 
-        super().__init__()
+        super().__init__(note)
         self.file = file
         _, ext = os.path.splitext(file)
 
@@ -1204,6 +1227,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 'class' : 'StructUnit',
                 'mol_block' : 'A string holding the V3000 mol
                                block of the molecule.'
+                'note' : 'This molecule is nice.'
             }
 
         Returns
@@ -1217,7 +1241,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         'key' : repr(self.key),
         'class' : self.__class__.__name__,
-        'mol_block' : self.mdl_mol_block()
+        'mol_block' : self.mdl_mol_block(),
+        'note' : self.note
 
         }
 
@@ -1874,9 +1899,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
         `update_cache` to work. This attribute is assigned by the
         `__call__()` method of the ``Cached`` metaclass.
 
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
+
     """
 
-    def __init__(self, building_blocks, topology):
+    def __init__(self, building_blocks, topology, note=""):
         """
         Initialize a ``MacroMolecule`` instance.
 
@@ -1894,9 +1923,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
             An instance of a class derived from ``Topology``. It
             assembles the marcormolecule from the building_blocks.
 
+        note : str (default = "")
+            A note or comment about the molecule.
+
         """
 
-        super().__init__()
+        super().__init__(note)
         self.fitness = None
         self.unscaled_fitness = {}
         self.progress_params = None
@@ -1929,7 +1961,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 'building_blocks' : {bb1.json(), bb2.json()}
                 'topology' : 'Copolymer(repeating_unit='AB')'
                 'unscaled_fitness' : {'fitness_func1' : fitness1,
-                                      'fitness_func2' : fitness2}
+                                      'fitness_func2' : fitness2},
+                'note' : 'A nice molecule.'
             }
 
         Returns
@@ -1950,7 +1983,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         'building_blocks' : [x.json() for x in self.building_blocks],
         'topology' : repr(self.topology),
         'unscaled_fitness' : repr(self.unscaled_fitness),
-        'key' : repr(self.key)
+        'key' : repr(self.key),
+        'note' : self.note
 
         }
 
