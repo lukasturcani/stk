@@ -5,7 +5,7 @@
 init_func; init_random_cages;
 bb_db=r'path1';
 lk_db=r'path2';
-topologies=[FourPlusSix]
+topologies=[FourPlusSix()]
 
 ##################################################################################
 # Selection function for selecting the next generation.
@@ -98,4 +98,4 @@ num_crossovers=2
 
 pop_size=5
 
-comparison_pops = ['pop1', 'pop2']
+comparison_pops=['pop1', 'pop2']
