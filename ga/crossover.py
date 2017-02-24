@@ -70,10 +70,6 @@ class Crossover:
         The total number of times an instance of ``Crossover`` has been
         called during its lifetime.
 
-    name : str
-        A template string for naming ``MacroMolecule`` instances
-        produced via crossover.
-
     """
 
 
@@ -81,7 +77,6 @@ class Crossover:
         self.func_data = func_data
         self.num_crossovers = num_crossovers
         self.n_calls = 0
-        self.name = "crossover_{0}_topology_{1}_offspring_{2}.mol"
 
     def __call__(self, population):
         """
