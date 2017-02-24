@@ -188,6 +188,12 @@ class Topology:
 
     def __repr__(self):
         r = "{}(".format(self.__class__.__name__)
-        for key, value in self.__dict__.items():
+        for key, value in sorted(self.__dict__.items()):
             r += "{!s}={!r}".format(key, value)
         return r + ")"
+
+    def __eq__(self, other):
+        return repr(self) == repr(other)
+
+    def __hash__(self):
+        return id(self)
