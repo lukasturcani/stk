@@ -1474,7 +1474,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             mol_fp = ac.GetMorganFingerprint(mol, 4)
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
             mols.append((similarity, path))
-            
+
         return sorted(mols, reverse=True)
 
     def tag_atoms(self):
@@ -2141,69 +2141,6 @@ class Cage(MacroMolecule):
     Used to represent molecular cages.
 
     """
-
-    @classmethod
-    def init_fixed_bb(cls, bb_file, lk_db, topologies):
-        bb = StructUnit3(bb_file)
-
-        while True:
-            try:
-                lk_file = np.random.choice(os.listdir(lk_db))
-                lk_file = os.path.join(lk_db, lk_file)
-                lk = StructUnit2(lk_file)
-                break
-            except TypeError:
-                continue
-
-        topology = np.random.choice(topologies)
-
-        return cls((bb, lk), topology)
-
-    @classmethod
-    def init_random(cls, bb_db, lk_db, topologies):
-        """
-        Makes ``Cage`` from random building blocks and topology.
-
-        Parameters
-        ----------
-        bb_db : str
-
-        lk_db : str
-
-        topologies : list of ``Topology`` child classes.
-
-        file : str
-
-        """
-
-        while True:
-            try:
-                bb_file = np.random.choice(os.listdir(bb_db))
-                bb_file = os.path.join(bb_db, bb_file)
-                bb = StructUnit3(bb_file)
-                break
-
-            except TypeError:
-                continue
-
-        while True:
-            try:
-                lk_file = np.random.choice(os.listdir(lk_db))
-                lk_file = os.path.join(lk_db, lk_file)
-                lk = StructUnit(lk_file)
-
-                if len(lk.bonder_ids) >= 3:
-                    lk = StructUnit3(lk_file)
-                else:
-                    lk = StructUnit2(lk_file)
-
-                break
-
-            except TypeError:
-                continue
-
-        topology = np.random.choice(topologies)
-        return cls((bb, lk), topology)
 
     def window_difference(self):
         """
