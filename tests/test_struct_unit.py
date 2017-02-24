@@ -100,21 +100,20 @@ def test_caching():
         # Make a StructUnit.
         mol = StructUnit(data_dir)
         # Make a StructUnit using JSON.
-        with open(join('data', 'struct_unit', 'su.json')) as f:
-            mol2 = Molecule.load(json.load(f))
+        mol2 = Molecule.load(join('data', 'struct_unit', 'su.json'))
 
         # Try to remake them and check that caching was fine.
         assert mol2 is not mol
-        assert Molecule.load(mol.json()) is mol
+        assert Molecule.fromdict(mol.json()) is mol
         assert StructUnit(data_dir) is mol
-        assert Molecule.load(mol2.json()) is mol2
+        assert Molecule.fromdict(mol2.json()) is mol2
 
         # Make an alteration and make sure new molecules were
         # generated.
         mol3 = StructUnit(data_dir, 'aldehyde')
         mol2dict = mol2.json()
         mol2dict['key'] = mol2dict['key'].replace('amine', 'aldehyde')
-        mol4 = Molecule.load(mol2dict)
+        mol4 = Molecule.fromdict(mol2dict)
         assert mol3 is not mol
         assert mol3 is not mol2
         assert mol3 is not mol4
