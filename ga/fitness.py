@@ -348,7 +348,7 @@ def raiser(macro_mol, param1, param2=2):
                 'Asymmetry ', 'Energy per Bond ')
 def cage(macro_mol, target_cavity, target_window=None,
          pseudoformation_params=
-         { 'energy_func' : FunctionData('rdkit', forcefield='uff') }):
+         { 'energy_func' : FunctionData('rdkit', forcefield='mmff') }):
     """
     Returns the fitness vector of a cage.
 
@@ -426,7 +426,7 @@ def cage(macro_mol, target_cavity, target_window=None,
     cavity_diff = abs(target_cavity -
                       macro_mol.cavity_size())
 
-    if macro_mol.topology.windows is not None:
+    if macro_mol.windows is not None:
         window_diff = abs(target_window -
                           max(macro_mol.windows))
     else:
@@ -437,7 +437,7 @@ def cage(macro_mol, target_cavity, target_window=None,
     print('\n\nCalculating complex energies.\n')
     e_per_bond = macro_mol.energy.pseudoformation(
                                            **pseudoformation_params)
-    e_per_bond /= macro_mol.topology.bonds_made
+    e_per_bond /= macro_mol.bonds_made
 
     macro_mol.progress_params = [cavity_diff, window_diff,
                                  asymmetry, e_per_bond]
