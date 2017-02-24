@@ -7,7 +7,7 @@ import rdkit.Chem as chem
 from ..base import Topology
 from ....convenience_tools import (centroid, vector_theta,
                                       rotation_matrix_arbitrary_axis,
-                                      normalize_vector, atom_vdw_radii)
+                                      normalize_vector)
 
 class WindowError(Exception):
     def __init__(self, message):
@@ -540,24 +540,6 @@ class _CageTopology(Topology):
             vertex.atom_position_pairs.append((bonder_id, pos))
             paired_ids.add(bonder_id)
             paired_pos.add(pos)
-
-    def cavity_size(self):
-        """
-        Returns the diameter of the cage cavity.
-
-        Returns
-        -------
-        float
-            The size of the cage cavity.
-
-        """
-
-        center_of_mass = self.macro_mol.center_of_mass()
-        min_dist = min((euclidean(coord, center_of_mass) -
-        atom_vdw_radii[self.macro_mol.atom_symbol(atom_id)])
-                           for atom_id, coord in
-                               self.macro_mol.all_atom_coords())
-        return 2 * abs(min_dist)
 
     def place_mols(self, macro_mol):
         """
