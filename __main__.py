@@ -106,8 +106,7 @@ def run():
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):
         # Check that the population has the correct size.
-        if len(pop) != ga_input.pop_size:
-            raise PopulationSizeError('Population has the wrong size.')
+        assert len(pop) == ga_input.pop_size
 
         print_info('Generation {} of {}.'.format(x,
                                              ga_input.num_generations))
