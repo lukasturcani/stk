@@ -17,5 +17,4 @@ def test_pseudoformation():
     ...
 
 def test_logging():
-    print(mol)
     assert len(mol.energy.values.keys()) == 2
