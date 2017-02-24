@@ -149,7 +149,8 @@ from ..addons.pyWindow import window_sizes
 from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
-                                 rotation_matrix_arbitrary_axis)
+                                 rotation_matrix_arbitrary_axis,
+                                 atom_vdw_radii)
 from .fg_info import functional_groups
 from .energy import Energy
 
@@ -2069,7 +2070,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        self.building_blocks = {Molecule.load(x) for x in
+        self.building_blocks = {Molecule.fromdict(x) for x in
                                     json_dict['building_blocks']}
         self.topology = eval(json_dict['topology'],
                              topologies.__dict__)
@@ -2077,7 +2078,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                      np.__dict__)
         self.fitness = None
         self.progress_params = None
-        self.bb_counter = Counter({Molecule.load(key) : val for
+        self.bb_counter = Counter({Molecule.fromdict(key) : val for
                                 key, val in json_dict['bb_counter']})
         self.bonds_made = json_dict['bonds_made']
         self.energy = Energy(self)
@@ -2211,6 +2212,23 @@ class Cage(MacroMolecule):
 
     """
 
+    def cavity_size(self):
+        """
+        Returns the diameter of the cage cavity.
+
+        Returns
+        -------
+        float
+            The size of the cage cavity.
+
+        """
+
+        center_of_mass = self.center_of_mass()
+        min_dist = min((euclidean(coord, center_of_mass) -
+                atom_vdw_radii[self.atom_symbol(atom_id)])
+                       for atom_id, coord in self.all_atom_coords())
+        return 2 * abs(min_dist)
+
     def window_difference(self):
         """
         The total difference in all window sizes.
@@ -2245,7 +2263,7 @@ class Cage(MacroMolecule):
         """
 
         if (self.windows is None or
-            len(self.windows) < self.n_windows):
+            len(self.windows) < self.topology.n_windows):
             return None
 
         # Cluster the windows into groups so that only size
