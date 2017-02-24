@@ -76,8 +76,7 @@ def test_functional_group_atoms():
                 mol.functional_group_atoms())
 
 def test_json_init():
-    with open(join('data', 'struct_unit', 'su.json')) as f:
-        bb1 = Molecule.load(json.load(f))
+    bb1 = Molecule.load(join('data', 'struct_unit', 'su.json'))
     assert bb1.file == 'JSON'
     assert bb1.optimized == True
     assert bb1.bonder_ids == [7, 10]
