@@ -251,7 +251,7 @@ class _FitnessFunc:
         try:
             if (macro_mol.failed or
                         self.__name__ in macro_mol.unscaled_fitness):
-                        
+
                 print('Skipping {0}'.format(macro_mol.file))
                 return macro_mol
 
@@ -424,15 +424,15 @@ def cage(macro_mol, target_cavity, target_window=None,
         target_window = target_cavity
 
     cavity_diff = abs(target_cavity -
-                      macro_mol.topology.cavity_size())
+                      macro_mol.cavity_size())
 
     if macro_mol.topology.windows is not None:
         window_diff = abs(target_window -
-                          max(macro_mol.topology.windows))
+                          max(macro_mol.windows))
     else:
         window_diff  = None
 
-    asymmetry = macro_mol.topology.window_difference()
+    asymmetry = macro_mol.window_difference()
 
     print('\n\nCalculating complex energies.\n')
     e_per_bond = macro_mol.energy.pseudoformation(

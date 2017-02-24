@@ -209,7 +209,7 @@ class CachedStructUnit(type):
         super().__init__(*args, **kwargs)
         self.cache = dict()
 
-    def __call__(self, file, functional_group=None, note=''):
+    def __call__(self, file, functional_group=None, note='', name=''):
         _, ext = os.path.splitext(file)
         mol = self.init_funcs[ext](file)
 
@@ -225,7 +225,7 @@ class CachedStructUnit(type):
         if key in self.cache:
             return self.cache[key]
         else:
-            obj = super().__call__(file, functional_group, note)
+            obj = super().__call__(file, functional_group, note, name)
             obj.key = key
             self.cache[key] = obj
             return obj
@@ -264,14 +264,19 @@ class Molecule:
         A note or comment about the molecule. Purely optional but can
         be useful for labelling and debugging.
 
+    name : str (default = "")
+        A name which can be optionally given to the molcule for easy
+        identification.
+
     """
 
-    def __init__(self, note=""):
+    def __init__(self, note="", name=""):
         self.failed = False
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
         self.note = note
+        self.name = name
 
     def all_atom_coords(self):
         """
@@ -402,6 +407,69 @@ class Molecule:
         centroid = sum(x for _, x in self.all_atom_coords())
         return np.divide(centroid, self.mol.GetNumAtoms())
 
+    def dump(self, path):
+        """
+        Writes a JSON dict of the molecule to a file.
+
+        Parameters
+        ----------
+        path : str
+            The full path of the file to which the JSON dict of the
+            molecule can be written.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        with open(path, 'w') as f:
+            json.dump(self.json(), f, indent=4)
+
+    @classmethod
+    def fromdict(self, json_dict, optimized=True):
+        """
+        Creates a Molecule from a JSON dict.
+
+        The Molecule returned has the class specified in the JSON
+        dictionary, not ``Molecule``.
+
+        Parameters
+        ----------
+        json_dict : dict
+            A dict holding the JSON representation of a molecule.
+
+        optimized : bool
+            The value passed to the loaded molecules `optimized`
+            attribute.
+
+        Returns
+        -------
+        Molecule
+            The molecule represented by `json_dict`.
+
+        """
+        # Get the class of the object.
+        c = globals()[json_dict['class']]
+        # Check if the Molecule already exists in the cache, if so
+        # return it.
+        key = eval(json_dict['key'])
+        if key in c.cache:
+            return c.cache[key]
+
+        obj = c.__new__(c)
+        # Initialize attributes.
+        obj.mol = chem.MolFromMolBlock(json_dict['mol_block'],
+                                       sanitize=False, removeHs=False)
+        obj.optimized = optimized
+        obj.failed = False
+        obj.energy = Energy(obj)
+        obj.note = json_dict['note']
+        obj.key = key
+        obj._json_init(json_dict)
+        c.cache[key] = obj
+        return obj
+
     def graph(self):
         """
         Returns a mathematical graph representing the molecule.
@@ -430,17 +498,17 @@ class Molecule:
         return graph
 
     @classmethod
-    def load(cls, json_dict, optimized=True):
+    def load(cls, path, optimized=True):
         """
-        Creates a Molecule from a JSON dict.
+        Creates a Molecule from a JSON file.
 
         The Molecule returned has the class specified in the JSON
         dictionary, not ``Molecule``.
 
         Parameters
         ----------
-        json_dict : dict
-            A JSON representation of a molecule.
+        path : str
+            The full path holding a JSON representation to a molecule.
 
         optimized : bool
             The value passed to the loaded molecules `optimized`
@@ -449,30 +517,14 @@ class Molecule:
         Returns
         -------
         Molecule
-            The molecule represented by `json_dict`.
+            The molecule held in `path`.
 
         """
 
-        # Get the class of the object.
-        c = globals()[json_dict['class']]
-        # Check if the Molecule already exists in the cache, if so
-        # return it.
-        key = eval(json_dict['key'])
-        if key in c.cache:
-            return c.cache[key]
+        with open(path, 'r') as f:
+            json_dict = json.load(f)
 
-        obj = c.__new__(c)
-        # Initialize attributes.
-        obj.mol = chem.MolFromMolBlock(json_dict['mol_block'],
-                                       sanitize=False, removeHs=False)
-        obj.optimized = optimized
-        obj.failed = False
-        obj.energy = Energy(obj)
-        obj.note = json_dict['note']
-        obj.key = key
-        obj._json_init(json_dict)
-        c.cache[key] = obj
-        return obj
+        return cls.fromdict(json_dict, optimized)
 
     def mdl_mol_block(self):
         """
@@ -1009,6 +1061,10 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         A note or comment about the molecule. Purely optional but can
         be useful for labelling and debugging.
 
+    name : str (default = "")
+        A name which can be optionally given to the molcule for easy
+        identification.
+
     """
 
     init_funcs = {'.mol' : partial(chem.MolFromMolFile,
@@ -1024,7 +1080,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   '.pdb' : partial(chem.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
 
-    def __init__(self, file, functional_group=None, note=""):
+    def __init__(self, file, functional_group=None, note="", name=""):
         """
         Initializes a ``StructUnit`` instance.
 
@@ -1044,9 +1100,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         note : str (defaulat = None)
             A note or comment about the molecule
 
+        name : str (default = "")
+            A name which can be optionally given to the molcule for easy
+            identification.
+
         """
 
-        super().__init__(note)
+        super().__init__(note, name)
         self.file = file
         _, ext = os.path.splitext(file)
 
@@ -1896,9 +1956,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
         A note or comment about the molecule. Purely optional but can
         be useful for labelling and debugging.
 
+    name : str (default = "")
+        A name which can be optionally given to the molcule for easy
+        identification.
+
     """
 
-    def __init__(self, building_blocks, topology, note=""):
+    def __init__(self, building_blocks, topology, note="", name=""):
         """
         Initialize a ``MacroMolecule`` instance.
 
@@ -1919,9 +1983,14 @@ class MacroMolecule(Molecule, metaclass=Cached):
         note : str (default = "")
             A note or comment about the molecule.
 
+        name : str (default = "")
+            A name which can be optionally given to the molcule for easy
+            identification.
+
+
         """
 
-        super().__init__(note)
+        super().__init__(note, name)
         self.fitness = None
         self.unscaled_fitness = {}
         self.progress_params = None

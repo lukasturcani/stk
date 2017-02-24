@@ -84,10 +84,6 @@ class Mutation:
         The total number of times an instance of ``Mutation`` has been
         called during its lifetime.
 
-    name : str
-        A template string for naming ``MacroMolecule`` instances
-        produced during mutation.
-
     weights : None or list of floats (default = None)
         When ``None`` each mutation function has equal likelihood of
         being picked. If `weights` is a list each float corresponds to

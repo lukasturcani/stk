@@ -460,7 +460,7 @@ class Population:
         pop = cls()
         for item in pop_list:
             if isinstance(item, dict):
-                pop.members.append(Molecule.load(item))
+                pop.members.append(Molecule.fromdict(item))
             elif isinstance(item, list):
                 pop.populations.append(cls.fromlist(item))
 
@@ -885,17 +885,21 @@ class Population:
             pop.append(sp.tolist())
         return pop
 
-    def write(self, dir_path):
+    def write(self, dir_path, use_name=False):
         """
         Writes the ``.mol`` files of members to a directory.
-
-        This writes the pristine version of the ``.mol`` file.
 
         Parameters
         ----------
         dir_path : str
             The full path of the directory into which the ``.mol`` file
-            is copied.
+            is written.
+
+        use_name : bool (default = False)
+            When ``True`` the `name` attribute of the population's
+            members is used to make the name of the .mol file. If
+            ``False`` the files are just named after the member's
+            index in the population.
 
         Returns
         -------
@@ -907,16 +911,14 @@ class Population:
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
 
-        for member in self:
+        for i, member in enumerate(self):
+            if use_name:
+                fname = os.path.join(dir_path, '{}.mol'.format(
+                                                        member.name))
+            else:
+                fname = os.path.join(dir_path, '{}.mol'.format(i))
 
-            name = os.path.split(member.file)[1]
-
-            struct_file = os.path.join(dir_path, name)
-            member.write(struct_file)
-
-            dump_file = os.path.splitext(name)[0] + '.dmp'
-            dump_file = os.path.join(dir_path, dump_file)
-            member.dump(dump_file)
+            member.write(fname)
 
     def __iter__(self):
         """
