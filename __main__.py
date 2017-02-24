@@ -26,8 +26,8 @@ def run():
     launch_dir = os.getcwd()
 
     # Running MacroModel optimizations sometimes leaves applications
-    # open.This closes them. If this is not done, directories may not be
-    # possible to move.
+    # open.This closes them. If this is not done, directories may not
+    # be possible to move.
     kill_macromodel()
 
     # If an output folder of MMEA exists, archive it. This just moves
