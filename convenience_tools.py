@@ -226,6 +226,7 @@ class FunctionData:
         s = ", ".join("{}={!r}".format(key, value) for key, value in
                                 self.params.items())
         return "FunctionData({!r}, ".format(self.name) + s + ")"
+
     def __repr__(self):
         return str(self)
 
