@@ -6,7 +6,7 @@ from ..molecular import (MacroMolecule, Molecule, FourPlusSix,
                          StructUnit2, StructUnit3, MacroMolKey)
 from ..ga import Population
 
-Population.load(join('data', 'macromolecule', 'mm.json'))
+pop = Population.load(join('data', 'macromolecule', 'mm.json'))
 
 def test_same():
     """
@@ -58,13 +58,12 @@ def test_caching():
     mol1 = MacroMolecule({bb1, bb2}, FourPlusSix())
 
     # Make a MacroMolecule using JSON.
-    with open(join('data', 'macromolecule', 'mm.json'), 'r') as f:
-        mol2 = Molecule.load(json.load(f)[0])
+    mol2 = pop[0]
 
     assert mol1 is not mol2
 
     # Remake the MacroMolecules.
-    mol3 = Molecule.load(mol1.json())
+    mol3 = Molecule.fromdict(mol1.json())
     mol4 = MacroMolecule(mol2.building_blocks,
                          mol2.topology.__class__())
 
@@ -79,8 +78,7 @@ def test_json_init():
     try:
         # Make a MacroMolecule using JSON.
         MacroMolecule.cache = {}
-        with open(join('data', 'macromolecule', 'mm.json'), 'r') as f:
-            mol = Molecule.load(json.load(f)[0])
+        mol = pop[0]
 
         assert mol.fitness == None
         assert all(isinstance(x, StructUnit) for x in

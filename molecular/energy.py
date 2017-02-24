@@ -541,7 +541,7 @@ class Energy(metaclass=EMeta):
 
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in
-                            self.molecule.topology.bb_counter.items())
+                            self.molecule.bb_counter.items())
 
         # Recalculate energies if requested.
         if force_e_calc:
@@ -735,9 +735,9 @@ def formation_key(fargs, fkwargs):
 
     # Replace the energy function to be used with the key of the
     # energy function to be used.
-    efuncdata = bound['energy_func']
+    efuncdata = bound['func']
     efunc = getattr(Energy, efuncdata.name)
-    bound['energy_func'] = func_key(efunc, None, efuncdata.params)
+    bound['func'] = func_key(efunc, None, efuncdata.params)
 
     # Don't want this paramter in the key as it doenst affect the
     # result.
