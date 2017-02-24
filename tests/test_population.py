@@ -2,9 +2,12 @@ import pytest
 from collections import Counter
 import numpy as np
 from types import SimpleNamespace
+from os.path import join
 
-from ..molecular import Cage, MacroMolecule
+from ..molecular import Cage, MacroMolecule, FourPlusSix
 from ..ga import Population, GATools
+
+Population.load(join('data', 'population', 'population.json'))
 
 def generate_population(offset=False):
     """
@@ -65,6 +68,15 @@ def test_init():
                    Population.__new__(Population), Cage.__new__(Cage),
                    Population.__new__(Population),
                    GATools.__new__(GATools), 12)
+
+def test_init_cage_isomers():
+    lk_file = join('data', 'struct_unit2', 'amine.mol2')
+    bb_file = join('data', 'struct_unit3', 'amine.mol2')
+    pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix(),
+                                       GATools.init_empty())
+
+    pop.remove_duplicates()
+    assert len(pop) == 81
 
 def test_add_members_duplicates():
     """
@@ -194,6 +206,20 @@ def test_all_members():
     with pytest.raises(AssertionError):
         assert all(cage in all_members for cage in cages)
 
+def test_max():
+    pop = generate_population()
+
+    for i, mem in enumerate(pop):
+        mem.fitness = i
+        mem.unscaled_fitness = [i, 2*i, 3*i, 4*i]
+
+    maxf = pop.max(lambda x : x.fitness)
+    maxuf = pop.max(lambda x : x.unscaled_fitness)
+    m = np.matrix([x.unscaled_fitness for x in pop])
+
+    assert np.max([x.fitness for x in pop]) == maxf
+    assert np.allclose(np.max(m, axis=0), maxuf, atol=1e-8)
+
 def test_mean():
     pop = generate_population()
 
@@ -207,6 +233,20 @@ def test_mean():
 
     assert np.mean([x.fitness for x in pop]) == avgf
     assert np.allclose(np.mean(m, axis=0), avguf, atol=1e-8)
+
+def test_min():
+    pop = generate_population()
+
+    for i, mem in enumerate(pop):
+        mem.fitness = i
+        mem.unscaled_fitness = [i, 2*i, 3*i, 4*i]
+
+    minf = pop.min(lambda x : x.fitness)
+    minuf = pop.min(lambda x : x.unscaled_fitness)
+    m = np.matrix([x.unscaled_fitness for x in pop])
+
+    assert np.min([x.fitness for x in pop]) == minf
+    assert np.allclose(np.min(m, axis=0), minuf, atol=1e-8)
 
 def test_remove_duplicates_between_subpops():
     """
@@ -289,6 +329,17 @@ def test_remove_duplicates_not_between_subpops():
     assert subpop1.populations[0].populations
     assert subpop1.populations[0].populations[0].members
     assert not subpop1.populations[0].populations[0].populations
+
+def remove_failures():
+    pop = generate_population()
+    og_length = len(pop)
+
+    for x in range(5):
+        pop[x].failed = True
+
+    pop.remove_failures()
+
+    assert len(pop) == og_length - 5
 
 def test_getitem():
     """
