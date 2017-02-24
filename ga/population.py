@@ -153,8 +153,8 @@ class Population:
             The full path to the file holding the building block of the
             cage.
 
-        topology : Topology
-            The topology of the cage.
+        topology : _CageTopology child class
+            An object of the topology to be made.
 
         ga_tools : GATools
             The GATools instance to be used by created population.
@@ -191,16 +191,16 @@ class Population:
 
         pop = cls(ga_tools)
         for i, align in enumerate(alignments):
-            cage = Cage((lk, bb), topology,
-                       'isomer_{}.mol'.format(i),
-                       {'alignment' : align})
+            topology.alignment = align
+            cage = Cage((lk, bb), topology)
             pop.members.append(cage)
 
         return pop
 
     @classmethod
     def init_random_cages(cls, bb_db, lk_db,
-                          topologies, size, ga_tools):
+                          topologies, size, ga_tools,
+                          bb_fg=None, lk_fg=None):
         """
         Creates a population of cages built from provided databases.
 
@@ -229,6 +229,18 @@ class Population:
         ga_tools : GATools
             The GATools instance to be used by created population.
 
+        bb_fg : str (default = None)
+            The name of the functional group present in molecules in
+            `bb_db`. It is the name of the functional group used to
+            build the macromolecules. If ``None`` it is assumed that
+            the name is present in `bb_db`.
+
+        lk_fg : str (default = None)
+            The name of the functional group present in molecules in
+            `lk_db`. It is the name of the functional group used to
+            build the macromolecules. If ``None`` it is assumed that
+            the name is present in `lk_db`.
+
         Returns
         -------
         Population
@@ -236,55 +248,41 @@ class Population:
 
         """
 
-        cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies,
-                    os.path.join(os.getcwd(),"init_{}.mol".format(x)))
-                        for x in range(size))
 
-        return cls(*cage_gen, ga_tools)
+        pop = cls(ga_tools)
+        for x in range(size):
 
-    @classmethod
-    def init_fixed_bb_cages(cls, bb_file, lk_db,
-                            topologies, size, ga_tools):
-        """
-        Creates a population of random cages sharing a building-block*.
+            # Make a building block.
+            while True:
+                try:
+                    bb_file = np.random.choice(os.listdir(bb_db))
+                    bb_file = os.path.join(bb_db, bb_file)
+                    bb = StructUnit3(bb_file, bb_fg)
+                    break
 
-        The population created consists of cages where the linkers are
-        randomly selected from the database `lk_db`. The
-        building-block* of all cages corresponds to molecule in the
-        file `bb_file`.
+                except TypeError:
+                    continue
 
-        Parameters
-        ----------
-        bb_file : str
-            The full path of the molecular structure file holding
-            building-block* used by all cages.
+            # Make a linker.
+            while True:
+                try:
+                    lk_file = np.random.choice(os.listdir(lk_db))
+                    lk_file = os.path.join(lk_db, lk_file)
+                    lk = StructUnit(lk_file, lk_fg)
 
-        lk_db : str
-            The full path to the directory which holds the database of
-            linker molecules.
+                    if len(lk.bonder_ids) >= 3:
+                        lk = StructUnit3(lk_file, lk_fg)
+                    else:
+                        lk = StructUnit2(lk_file, lk_fg)
 
-        topologies : iterable of ``Topology`` child classes.
-            An iterable holding topologies which should be randomly
-            selected for cage initialization.
+                    break
 
-        size : int
-            The size of the population.
+                except TypeError:
+                    continue
 
-        ga_tools : GATools
-            The GATools instance to be used by created population.
+            pop.members.append(Cage({bb, lk}, topology))
 
-        Returns
-        -------
-        Population
-            A population of cages which all have the same building
-            block but different linkers.
-
-        """
-
-        cage_gen = iter(Cage.init_fixed_bb(bb_file, lk_db, topologies,
-                    os.path.join(os.getcwd(),"init_{}.mol".format(x)))
-                        for x in range(size))
-        return cls(*cage_gen, ga_tools)
+        return pop
 
     def add_members(self, population, duplicates=False):
         """
