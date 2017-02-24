@@ -1,16 +1,10 @@
 from ..ga import cage, cage_target, cage_c60
 from ..molecular import Molecule
 from os.path import join
+import numpy as np
 
 cagemol = Molecule.load(join('data', 'fitness', 'cage.json'))
 
 def test_cage():
-    cage(cagemol, 8)
-
-    assert cagemol.unscaled_fitness == [1,1,1,1]
-
-def test_cage_target():
-    ...
-
-def test_cage_c60():
-    ...
+    assert np.allclose(cage(cagemol, 8),
+        [9.32137896, 6.87621275, 0.71956529, -133.76115919], atol=1)
