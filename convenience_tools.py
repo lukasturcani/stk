@@ -862,6 +862,20 @@ def rotation_matrix_arbitrary_axis(angle, axis):
                      [e21, e22, e23],
                      [e31, e32, e33]])
 
+def tar_output():
+    """
+    Places all the content in the `output` folder into a .tgz file.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    tname = os.path.join('output','output.tgz')
+    with tarfile.open(tname, 'w:gz') as tar:
+        tar.add('output')
+
 @contextmanager
 def time_it():
     """

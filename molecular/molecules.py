@@ -428,7 +428,7 @@ class Molecule:
             json.dump(self.json(), f, indent=4)
 
     @classmethod
-    def fromdict(self, json_dict, optimized=True):
+    def fromdict(self, json_dict, optimized=True, load_names=True):
         """
         Creates a Molecule from a JSON dict.
 
@@ -443,6 +443,10 @@ class Molecule:
         optimized : bool
             The value passed to the loaded molecules `optimized`
             attribute.
+
+        load_names : bool (default = True)
+            If ``True`` then the `name` attribute stored in the JSON
+            objects is loaded. If ``False`` then it's not.
 
         Returns
         -------
@@ -466,7 +470,7 @@ class Molecule:
         obj.failed = False
         obj.energy = Energy(obj)
         obj.note = json_dict['note']
-        obj.name = json_dict['name']
+        obj.name = json_dict['name'] if load_names else ""
         obj.key = key
         obj._json_init(json_dict)
         c.cache[key] = obj
@@ -500,7 +504,7 @@ class Molecule:
         return graph
 
     @classmethod
-    def load(cls, path, optimized=True):
+    def load(cls, path, optimized=True, load_names=True):
         """
         Creates a Molecule from a JSON file.
 
@@ -512,9 +516,13 @@ class Molecule:
         path : str
             The full path holding a JSON representation to a molecule.
 
-        optimized : bool
+        optimized : bool (default = True)
             The value passed to the loaded molecules `optimized`
             attribute.
+
+        load_names : bool (default = True)
+            If ``True`` then the `name` attribute stored in the JSON
+            objects is loaded. If ``False`` then it's not.
 
         Returns
         -------
@@ -526,7 +534,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.fromdict(json_dict, optimized)
+        return cls.fromdict(json_dict, optimized, load_names)
 
     def mdl_mol_block(self):
         """
