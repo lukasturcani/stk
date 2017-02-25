@@ -198,7 +198,7 @@ class Cached(type):
 
         """
 
-        self._cache[mol.key] = mol
+        self.cache[mol.key] = mol
 
 class CachedStructUnit(type):
     """
@@ -266,7 +266,7 @@ class Molecule:
         be useful for labelling and debugging.
 
     name : str (default = "")
-        A name which can be optionally given to the molcule for easy
+        A name which can be optionally given to the molecule for easy
         identification.
 
     """
@@ -466,6 +466,7 @@ class Molecule:
         obj.failed = False
         obj.energy = Energy(obj)
         obj.note = json_dict['note']
+        obj.name = json_dict['name']
         obj.key = key
         obj._json_init(json_dict)
         c.cache[key] = obj
@@ -1277,11 +1278,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         The representation has the following form:
 
             {
-                'key' : 'frozenset({'amine', 'InChiKey=[...]'})'
+                'key' : 'frozenset({'amine', 'InChiKey=[...]'})',
                 'class' : 'StructUnit',
                 'mol_block' : 'A string holding the V3000 mol
-                               block of the molecule.'
-                'note' : 'This molecule is nice.'
+                               block of the molecule.',
+                'note' : 'This molecule is nice.',
+                'name' : 'benzene'
             }
 
         Returns
@@ -1296,7 +1298,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         'key' : repr(self.key),
         'class' : self.__class__.__name__,
         'mol_block' : self.mdl_mol_block(),
-        'note' : self.note
+        'note' : self.note,
+        'name' : self.name
 
         }
 
@@ -2025,7 +2028,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 'topology' : 'Copolymer(repeating_unit='AB')'
                 'unscaled_fitness' : {'fitness_func1' : fitness1,
                                       'fitness_func2' : fitness2},
-                'note' : 'A nice molecule.'
+                'note' : 'A nice molecule.',
+                'name' : 'Poly-Benzene'
             }
 
         Returns
@@ -2047,7 +2051,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         'topology' : repr(self.topology),
         'unscaled_fitness' : repr(self.unscaled_fitness),
         'key' : repr(self.key),
-        'note' : self.note
+        'note' : self.note,
+        'name' : self.name
 
         }
 
@@ -2158,8 +2163,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         # The caching is done by the class. Access it and use its
         # ``_update_cache()`` method.
-        cls = type(self)
-        cls._update_cache(self)
+        self.__class__._update_cache(self)
 
     def __eq__(self, other):
         return self.fitness == other.fitness
