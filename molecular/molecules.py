@@ -212,6 +212,12 @@ class CachedStructUnit(type):
 
     def __call__(self, file, functional_group=None, note='', name=''):
         _, ext = os.path.splitext(file)
+
+        # Ensure a valid file type was provided.
+        if ext not in self.init_funcs:
+            raise TypeError(
+            'Unable to initialize from "{}" files.'.format(ext))
+
         mol = self.init_funcs[ext](file)
 
         # Assign the FGInfo instance from `functional_groups` which
@@ -1111,8 +1117,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             A note or comment about the molecule
 
         name : str (default = "")
-            A name which can be optionally given to the molcule for easy
-            identification.
+            A name which can be optionally given to the molcule for
+            easy identification.
 
         """
 
@@ -1996,8 +2002,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
             A note or comment about the molecule.
 
         name : str (default = "")
-            A name which can be optionally given to the molcule for easy
-            identification.
+            A name which can be optionally given to the molcule for
+            easy identification.
 
 
         """
