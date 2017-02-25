@@ -196,12 +196,11 @@ def run():
     progress.dump('progress.json')
     # Remove the ``scratch`` directory.
     shutil.rmtree('scratch')
+    # Write the .mol files of the final population.
+    pop.write('final_pop', True)
 
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
-
-    with time_it():
-        tar_output()
 
     with time_it():
         archive_output()

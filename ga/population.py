@@ -251,7 +251,7 @@ class Population:
 
         pop = cls(ga_tools)
         for x in range(size):
-
+            topology = np.random.choice(topologies)
             # Make a building block.
             while True:
                 try:

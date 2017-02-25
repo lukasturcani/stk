@@ -862,41 +862,6 @@ def rotation_matrix_arbitrary_axis(angle, axis):
                      [e21, e22, e23],
                      [e31, e32, e33]])
 
-def tar_output():
-    """
-    Places all the content in the `output` folder into a .tgz file.
-
-    This function also deletes all the folders in the `output` folder
-    except the one holding the final generation.
-
-    Returns
-    -------
-    None : NoneType
-
-    """
-
-    s = "Compressing output."
-    print("\n\n"+s+"\n"+"-"*len(s)+"\n\n")
-
-    tname = os.path.join('output','output.tgz')
-    with tarfile.open(tname, 'w:gz') as tar:
-        tar.add('output')
-
-    # Get a list of all the folders in the ``output`` directory.
-    folders = [x for x in os.listdir('output') if
-                os.path.isdir(os.path.join('output', x))]
-
-    # Get name of the folder of the last generation. Ie the one which
-    # is the largest number.
-    max_folder = max((x for x in folders if x != 'initial'),
-                     key=lambda x : int(x))
-
-    # Delete all folders except the last.
-    for folder in folders:
-        if folder != max_folder:
-            shutil.rmtree(os.path.join('output', folder))
-
-
 @contextmanager
 def time_it():
     """

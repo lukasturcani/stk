@@ -129,12 +129,12 @@ class _OptimizationFunc:
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
             if macro_mol.optimized:
-                print('Skipping {0}'.format(macro_mol.file))
+                print('Skipping {0}'.format(macro_mol.name))
                 return macro_mol
 
-            print('\nOptimizing {0}.'.format(macro_mol.file))
+            print('\nOptimizing {0}.'.format(macro_mol.name))
             self.__wrapped__(macro_mol, *args, **kwargs)
-            self.optimized = True
+            macro_mol.optimized = True
             return macro_mol
 
         except Exception as ex:
