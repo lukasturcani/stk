@@ -683,16 +683,20 @@ class Energy(metaclass=EMeta):
                file_root, "-WAIT", "-LOCAL"]
         sp.call(cmd)
 
+        # Check if the license was found. If not run the function
+        # again.
+        with open(file_root+'.log', 'r') as f:
+            log_content = f.read()
+        if ('FATAL -96: Could not check out a license for mmlibs' in
+            log_content):
+            return self.macromodel(forcefield, macromodel_path)
+
         # Read the .log file and return the energy.
         with open(file_root+'.log', 'r') as f:
             for line in f:
                 if "                   Total Energy =" in line:
                     eng = float(line.split()[-2].replace("=", ""))
 
-        # Clean up temporary files.
-        for filename in os.listdir():
-            if tmp_file.replace('.mol', '') in filename:
-                os.remove(filename)
         try:
             return eng
         except UnboundLocalError:
