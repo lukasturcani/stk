@@ -107,7 +107,7 @@ def macromodel_opt(macro_mol, macromodel_path, force_field=16,
 
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {}').format(macro_mol))
+               '- {}').format(macro_mol.name))
         return macromodel_opt(macro_mol, force_field=14,
                               lewis_fixed=lewis_fixed,
                               macromodel_path=macromodel_path,
@@ -127,7 +127,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
                       timeout=True, force_field=16,
                       temp=300, confs=50, eq_time=10, sim_time=200):
 
-    print('\nRunning MD on {}.'.format(macro_mol))
+    print('\nRunning MD on {}.'.format(macro_mol.name))
     try:
         macro_mol._file = getattr(macro_mol, '_file',
                                  '{}.mol'.format(uuid4().int))
@@ -151,7 +151,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
             raise ex
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-               '- {}').format(macro_mol))
+               '- {}').format(macro_mol.name))
         return macromodel_md_opt(macro_mol, macromodel_path,
                                  timeout=timeout, force_field=14,
                                  lewis_fixed=lewis_fixed,
@@ -252,7 +252,7 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
 
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
-        '- {}').format(macro_mol))
+        '- {}').format(macro_mol.name))
         return macromodel_cage_opt(macro_mol, force_field=14,
                               macromodel_path=macromodel_path,
                               no_fix=no_fix, md=md,
@@ -272,7 +272,7 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
 def _run_bmin(macro_mol, macromodel_path, timeout=True):
 
     print("", time.ctime(time.time()),
-    'Running bmin - {}.'.format(macro_mol), sep='\n')
+    'Running bmin - {}.'.format(macro_mol.name), sep='\n')
 
     # To run MacroModel a command is issued to the console via
     # ``subprocess.Popen``. The command is the full path of the
@@ -296,7 +296,7 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
 
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
-               'by force - {}\n').format(macro_mol))
+               'by force - {}\n').format(macro_mol.name))
         _kill_bmin(macro_mol, macromodel_path)
         proc_out = ""
 
@@ -467,7 +467,7 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 
     """
 
-    print('Creating .com file - {}.'.format(macro_mol))
+    print('Creating .com file - {}.'.format(macro_mol.name))
 
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
@@ -523,7 +523,7 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 def _generate_md_com(macro_mol, force_field=16,
                      temp=300, confs=50, eq_time=10, sim_time=200):
 
-    print('Creating .com file - {}.'.format(macro_mol))
+    print('Creating .com file - {}.'.format(macro_mol.name))
 
     main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
  FFLD{force_field:8}      1      0      0     1.0000     0.0000     0.0000     0.0000
@@ -594,7 +594,7 @@ def _create_mae(macro_mol, macromodel_path):
 
     _, ext = os.path.splitext(macro_mol._file)
 
-    print('Converting {} to .mae - {}.\n'.format(ext, macro_mol))
+    print('Converting {} to .mae - {}.\n'.format(ext, macro_mol.name))
 
     # Create the name of the new ``.mae`` file. It is the same as the
     # original structure file, including the same path. Only the
@@ -638,7 +638,7 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
 
     """
 
-    print('Converting .maegz to .mae - {}.'.format(macro_mol))
+    print('Converting .maegz to .mae - {}.'.format(macro_mol.name))
 
     name, ext = os.path.splitext(macro_mol._file)
     # ``out`` is the full path of the optimized ``.mae`` file.
