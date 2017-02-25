@@ -1730,7 +1730,7 @@ class StructUnit2(StructUnit):
             theta = vector_theta(self.centroid_centroid_dir_vector(),
                              vector)
 
-            if theta > prev_theta:
+            if theta >= prev_theta:
                 axis = np.multiply(axis, -1)
                 self.rotate2(step, axis)
                 break
