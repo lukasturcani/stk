@@ -1,6 +1,5 @@
 import warnings, os, shutil, sys
 warnings.filterwarnings("ignore")
-import pickle
 
 from .ga import (Population, GATools,
                  GAInput, InputHelp, Normalization)
@@ -52,10 +51,16 @@ def run():
     # Make a Population which stores all previous generations to keep
     # track of progress.
     progress = Population(ga_input.ga_tools())
+    # The variable `id_` is used to give each molecule a unique name
+    # during the GA run.
+    id_ = 0
 
-    # Generate and optimize an initial population.
-    os.mkdir('initial')
-    os.chdir('initial')
+    # Make the ``scratch`` directory which acts as the working
+    # directory during the GA run.
+    os.mkdir('scratch')
+    os.chdir('scratch')
+
+    # Generate the initial population.
     with time_it():
         pop_init = getattr(Population, ga_input.init_func.name)
         print_info('Generating initial population.')
@@ -72,12 +77,16 @@ def run():
 
                 mem.file = os.path.join(os.getcwd(), name)
 
-            pop.write(os.getcwd())
-
         else:
             pop = pop_init(**ga_input.init_func.params,
                            size=ga_input.pop_size,
                            ga_tools=ga_input.ga_tools())
+
+    # Give each population member a name for easy identification when
+    # logging.
+    for mem in pop:
+        mem.name = str(id_)
+        id_ += 1
 
     with time_it():
         print_info('Optimizing the population.')
@@ -93,7 +102,7 @@ def run():
 
     # Print the scaled and unscaled fitness values.
     for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.file)
+        print(macro_mol.name)
         print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
         print('\n')
 
@@ -111,13 +120,6 @@ def run():
         print_info('Generation {} of {}.'.format(x,
                                              ga_input.num_generations))
 
-        # At the start of each generation go into the root directory
-        # and create a folder to hold the next generation's ``.mol``
-        # files. Change into the newly created directory.
-        os.chdir(root_dir)
-        os.mkdir(str(x))
-        os.chdir(str(x))
-
         with time_it():
             print_info('Starting crossovers.')
             offspring = pop.gen_offspring()
@@ -134,7 +136,11 @@ def run():
             print_info('Removing duplicates, if any.')
             pop.remove_duplicates()
 
-        pop.dump(os.path.join(os.getcwd(), 'preselection_pop_dump'))
+        # Make sure that every population member has a name.
+        for mem in pop:
+            if not mem.name:
+                mem.name = id_
+                id_ += 1
 
         with time_it():
             print_info('Optimizing the population.')
@@ -152,7 +158,7 @@ def run():
 
         # Print the scaled and unscaled fitness values.
         for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.file)
+            print(macro_mol.name)
             print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
             print('\n')
 
@@ -160,17 +166,7 @@ def run():
             print_info('Selecting members of the next generation.')
             pop = pop.gen_next_gen(ga_input.pop_size)
 
-        # Create a folder within a generational folder for the the
-        # ``.mol``files corresponding to molecules selected for the
-        # next generation. Place the ``.mol`` files into that folder.
-        print_info('Placing selected members in `selected` directory.')
-        with time_it():
-            os.mkdir('selected')
-            os.chdir('selected')
-            pop.write(os.getcwd())
-            pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
-
-        # Save tje generation.
+        # Save the generation.
         with time_it():
             print_info('Recording progress.')
             progress.add_subpopulation(pop)
@@ -197,7 +193,9 @@ def run():
 
     os.chdir(root_dir)
     # Dump the `progress` population.
-    progress.dump('progress.dmp')
+    progress.dump('progress.json')
+    # Remove the ``scratch`` directory.
+    shutil.rmtree('scratch')
 
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
