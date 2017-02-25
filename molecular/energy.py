@@ -495,7 +495,7 @@ class Energy(metaclass=EMeta):
         eng -= e_products
         return eng
 
-    def pseudoformation(self, energy_func,
+    def pseudoformation(self, func,
                         building_blocks=None,  force_e_calc=False):
         """
         Calculates the formation energy, sans other products.
@@ -505,7 +505,7 @@ class Energy(metaclass=EMeta):
 
         Parameters
         ----------
-        energy_func : FunctionData
+        func : FunctionData
             A FunctionData object which describes the method of the
             ``Energy`` class used to calculate the energies of the
             various molecules. For example:
@@ -535,9 +535,9 @@ class Energy(metaclass=EMeta):
         """
 
         # Get the function used to calculate the energies.
-        efunc = getattr(self, energy_func.name)
+        efunc = getattr(self, func.name)
         # Get the key of the function used to calculate the energies.
-        fkey = func_key(efunc, None, energy_func.params)
+        fkey = func_key(efunc, None, func.params)
 
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in
@@ -546,10 +546,10 @@ class Energy(metaclass=EMeta):
         # Recalculate energies if requested.
         if force_e_calc:
             for _, mol in building_blocks:
-                molf = getattr(mol.energy, energy_func.name)
-                molf(**energy_func.params)
+                molf = getattr(mol.energy, func.name)
+                molf(**func.params)
 
-            getattr(self, energy_func.name)(**energy_func.params)
+            getattr(self, func.name)(**func.params)
 
         # Sum the energy of building blocks under the chosen
         # forcefield.
@@ -557,16 +557,15 @@ class Energy(metaclass=EMeta):
         for n, mol in building_blocks:
             # If the calculation has not been done already, perform it.
             if fkey not in mol.energy.values.keys():
-                molf= getattr(mol.energy, energy_func.name)
-                molf(**energy_func.params)
+                molf= getattr(mol.energy, func.name)
+                molf(**func.params)
 
             e_reactants += n * mol.energy.values[fkey]
 
         # Get the energy of `self.molecule`. The only product whose
         # energy matters in pseudoformation.
         e_products = (self.values[fkey] if fkey in self.values.keys()
-             else getattr(self,
-                        energy_func.name)(**energy_func.params))
+             else getattr(self, func.name)(**func.params))
 
         eng = e_reactants - e_products
         return eng
@@ -791,9 +790,9 @@ def pseudoformation_key(fargs, fkwargs):
 
     # Replace the energy function to be used with the key of the
     # energy function to be used.
-    efuncdata = bound['energy_func']
+    efuncdata = bound['func']
     efunc = getattr(Energy, efuncdata.name)
-    bound['energy_func'] = func_key(efunc, None, efuncdata.params)
+    bound['func'] = func_key(efunc, None, efuncdata.params)
 
     # Don't want this paramter in the key as it doenst affect the
     # result.
