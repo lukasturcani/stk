@@ -4,7 +4,6 @@ warnings.filterwarnings("ignore")
 from .ga import (Population, GATools,
                  GAInput, InputHelp, Normalization)
 from .convenience_tools import (time_it, tar_output,
-                                PopulationSizeError,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
 
@@ -44,13 +43,30 @@ def run():
 
     os.chdir('output')
     root_dir = os.getcwd()
+    os.mkdir('counters')
+    # Make template names for the counters which are created showing
+    # which members get selected.
+    mutation_counter = os.path.join(root_dir, 'counters',
+                            "gen_{}_mutation_counter.png")
+    crossover_counter = os.path.join(root_dir, 'counters',
+                                "gen_{}_crossover_counter.png")
+    gen_counter = os.path.join(root_dir, 'counters',
+                                "gen_{}_selection_counter.png")
+
     # Get the name of the input file and load its contents into a
     # ``GAInput`` instance. Info about input file structure is
     # documented in ``GAInput`` docstring.
     ga_input = GAInput(os.path.basename(sys.argv[1]))
+    # Load all molecules stored in databases into memory.
+    for db in ga_input.databases:
+        Population.load(db, load_names=False)
+
     # Make a Population which stores all previous generations to keep
     # track of progress.
     progress = Population(ga_input.ga_tools())
+    # Make a Population which stores every molecule, selected or not,
+    # made during the GA run.
+    run_db = Population()
     # The variable `id_` is used to give each molecule a unique name
     # during the GA run.
     id_ = 0
@@ -108,9 +124,9 @@ def run():
 
     # Save the generation.
     with time_it():
-        pop.dump(os.path.join(os.getcwd(), 'pop_dump'))
         print_info('Recording progress.')
         progress.add_subpopulation(pop)
+        run_db.add_members(pop)
 
     # Run the GA.
     for x in range(1, ga_input.num_generations+1):
@@ -122,11 +138,11 @@ def run():
 
         with time_it():
             print_info('Starting crossovers.')
-            offspring = pop.gen_offspring()
+            offspring = pop.gen_offspring(crossover_counter.format(x))
 
         with time_it():
             print_info('Starting mutations.')
-            mutants = pop.gen_mutants()
+            mutants = pop.gen_mutants(mutation_counter.format(x))
 
         with time_it():
             print_info('Adding offsping and mutants to population.')
@@ -164,12 +180,14 @@ def run():
 
         with time_it():
             print_info('Selecting members of the next generation.')
-            pop = pop.gen_next_gen(ga_input.pop_size)
+            pop = pop.gen_next_gen(ga_input.pop_size,
+                                   gen_counter.format(x))
 
         # Save the generation.
         with time_it():
             print_info('Recording progress.')
             progress.add_subpopulation(pop)
+            run_db.add_members(pop)
 
         # If the user defined some premature exit function, check if
         # the exit criterion has been fulfilled.
@@ -192,8 +210,9 @@ def run():
         plot.parameter_epp(progress, os.path.join(root_dir, 'epp.png'))
 
     os.chdir(root_dir)
-    # Dump the `progress` population.
+    # Dump the `progress` and `run_db` populations.
     progress.dump('progress.json')
+    run_db.dump('run_db.json')
     # Remove the ``scratch`` directory.
     shutil.rmtree('scratch')
     # Write the .mol files of the final population.
@@ -201,6 +220,10 @@ def run():
 
     # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
+
+    with time_it():
+        print_info('Compressing output.')
+        tar_output()
 
     with time_it():
         archive_output()
