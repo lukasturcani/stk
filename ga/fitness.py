@@ -251,20 +251,21 @@ class _FitnessFunc:
         wraps(func)(self)
 
     def __call__(self, macro_mol, *args,  **kwargs):
+        func_name = self.__wrapped__.func.__name__
         try:
             if (macro_mol.failed or
-                        self.__name__ in macro_mol.unscaled_fitness):
+                func_name in macro_mol.unscaled_fitness):
 
-                print('Skipping {0}'.format(macro_mol.file))
+                print('Skipping {0}'.format(macro_mol.name))
                 return macro_mol
 
             val = self.__wrapped__(macro_mol, *args, **kwargs)
-            macro_mol.unscaled_fitness[self.__name__] = val
+            macro_mol.unscaled_fitness[func_name] = val
             return macro_mol
 
         except Exception as ex:
             macro_mol.failed = True
-            macro_mol.unscaled_fitness[self.__name__] = None
+            macro_mol.unscaled_fitness[func_name] = None
             MolError(ex, macro_mol, "During fitness calculation")
             return macro_mol
 
