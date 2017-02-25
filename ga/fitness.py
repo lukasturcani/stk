@@ -352,7 +352,7 @@ def raiser(macro_mol, param1, param2=2):
                 'Asymmetry ', 'Energy per Bond ')
 def cage(macro_mol, target_cavity, target_window=None,
          pseudoformation_params=
-         { 'energy_func' : FunctionData('rdkit', forcefield='mmff') }):
+         { 'func' : FunctionData('rdkit', forcefield='mmff') }):
     """
     Returns the fitness vector of a cage.
 
