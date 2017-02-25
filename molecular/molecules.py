@@ -542,6 +542,21 @@ class Molecule:
 
         return cls.fromdict(json_dict, optimized, load_names)
 
+    def max_diameter(self):
+        """
+        Returns the largest distance between 2 atoms in the molecule.
+
+        Returns
+        -------
+        tuple of form (float, int, int)
+            The float represents the largest inter-atomic distance on
+            the molecule. The ints are the ids of the atoms.
+
+        """
+
+        return max(self.atom_distance(*x) for x in
+                    it.combinations(range(self.mol.GetNumAtoms()), 2))
+
     def mdl_mol_block(self):
         """
         Returns a V3000 mol block of the molecule.
