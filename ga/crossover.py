@@ -78,7 +78,8 @@ class Crossover:
         self.num_crossovers = num_crossovers
         self.n_calls = 0
 
-    def __call__(self, population):
+    def __call__(self, population,
+                 counter_name='crossover_counter.png'):
         """
         Carries out crossover operations on the supplied population.
 
@@ -96,6 +97,10 @@ class Crossover:
         ----------
         population : Population
             The population instance who's members are to crossed.
+
+        counter_name : str (default='crossover_counter.png')
+            The name of the .png file showing which members were
+            selected for crossover.
 
         Returns
         -------
@@ -145,8 +150,7 @@ class Crossover:
         for member in population:
             if member not in counter.keys():
                 counter.update({member : 0})
-        plot_counter(counter, os.path.join(os.getcwd(),
-                              'crossover_counter.png'))
+        plot_counter(counter, counter_name)
         return offspring_pop
 
     """

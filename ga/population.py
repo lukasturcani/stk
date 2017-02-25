@@ -440,7 +440,7 @@ class Population:
         return self.ga_tools.exit(self)
 
     @classmethod
-    def fromlist(cls, pop_list):
+    def fromlist(cls, pop_list, load_names=True):
         """
         Initializes a population from a list representation of one.
 
@@ -449,6 +449,10 @@ class Population:
         pop_list : list of str and lists
             A list which represents a population. Like the ones created
             by `tolist()`.
+
+        load_names : bool (default = True)
+            If ``True`` then the `name` attribute stored in the JSON
+            objects is loaded. If ``False`` then it's not.
 
         Returns
         -------
@@ -460,22 +464,28 @@ class Population:
         pop = cls()
         for item in pop_list:
             if isinstance(item, dict):
-                pop.members.append(Molecule.fromdict(item))
+                pop.members.append(Molecule.fromdict(item, load_names))
             elif isinstance(item, list):
-                pop.populations.append(cls.fromlist(item))
+                pop.populations.append(cls.fromlist(item, load_names))
 
             else:
                 raise TypeError(('Population list must consist only'
                                  ' of strings and lists.'))
         return pop
 
-    def gen_mutants(self):
+    def gen_mutants(self, counter_name='mutation_counter.png'):
         """
         Returns a population of mutant ``MacroMolecule`` instances.
 
         This is a GA operation and as a result this method merely
         delegates the request to the ``Mutation`` instance held in the
         `ga_tools` attribute.
+
+        Parameters
+        ----------
+        counter_name : str (default='mutation_counter.png')
+            The name of the .png file showing which members were
+            selected for mutation.
 
         Returns
         -------
@@ -485,9 +495,9 @@ class Population:
 
         """
 
-        return self.ga_tools.mutation(self)
+        return self.ga_tools.mutation(self, counter_name)
 
-    def gen_next_gen(self, pop_size):
+    def gen_next_gen(self, pop_size, counter_name='gen_select.png'):
         """
         Returns a population hodling the next generation of structures.
 
@@ -498,6 +508,10 @@ class Population:
         ----------
         pop_size : int
             The size of the next generation.
+
+        counter_name : str (default='gen_select.png')
+            The name of the .png file showing which members were
+            selected for the next generation.
 
         Returns
         -------
@@ -517,11 +531,10 @@ class Population:
             if member not in counter.keys():
                 counter.update({member : 0})
 
-        plot_counter(counter, os.path.join(os.getcwd(),
-                                           'gen_select.png'))
+        plot_counter(counter, counter_name)
         return new_gen
 
-    def gen_offspring(self):
+    def gen_offspring(self, counter_name='crossover_counter.png'):
         """
         Returns a population of offspring ``MacroMolecule`` instances.
 
@@ -540,6 +553,12 @@ class Population:
         For more details about how crossover is implemented see the
         ``Crossover`` class documentation.
 
+        Parameters
+        ----------
+        counter_name : str (default='crossover_counter.png')
+            The name of the .png file showing which members were
+            selected for crossover.
+
         Returns
         -------
         Population
@@ -548,10 +567,10 @@ class Population:
 
         """
 
-        return self.ga_tools.crossover(self)
+        return self.ga_tools.crossover(self, counter_name)
 
     @classmethod
-    def load(cls, path, ga_tools=None):
+    def load(cls, path, ga_tools=None, load_names=True):
         """
         Initializes a Population from one dumped to a file.
 
@@ -565,6 +584,10 @@ class Population:
             ``None`` the ``GATools`` instance of the loaded population
             is used.
 
+        load_names : bool (default = True)
+            If ``True`` then the `name` attribute stored in the JSON
+            objects is loaded. If ``False`` then it's not.
+
         Returns
         -------
         Population
@@ -574,7 +597,10 @@ class Population:
 
         with open(path, 'r') as f:
             pop_list = json.load(f)
-        return cls.fromlist(pop_list)
+
+        pop = cls.fromlist(pop_list, load_names)
+        pop.ga_tools = ga_tools
+        return pop
 
     def max(self, key):
         """
@@ -1010,7 +1036,9 @@ class Population:
         if isinstance(key, slice):
             mols = it.islice(self.all_members(),
                                      key.start, key.stop, key.step)
-            return Population(*mols, self.ga_tools)
+            pop = Population(*mols)
+            pop.ga_tools = self.ga_tools
+            return pop
 
         # If `key` is not ``int`` or ``slice`` raise ``TypeError``.
         raise TypeError("Index must be an integer or slice, not"

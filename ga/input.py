@@ -175,6 +175,14 @@ class GAInput:
         A list of the full paths to pop_dump files which are to be
         compared. Only needed when using the `-c` option.
 
+    databases : list of strings
+        A list which holds the paths to any number JSON files. These
+        files must hold the JSON represenatations of Population
+        instances. All the molecules in the Populations are loaded
+        into memory for the duration of the GA run. This means not all
+        molecules have to be remade and optimized and have their
+        fitness value recalculated.
+
     """
 
     keywords = ['num_generations', 'num_mutations', 'num_crossovers',
@@ -182,7 +190,7 @@ class GAInput:
                 'parent_select_func', 'mutant_select_func',
                 'mutation_func', 'opt_func', 'mutation_weights',
                 'crossover_func', 'fitness_func', 'normalization_func',
-                'exit_func', 'comparison_pops']
+                'exit_func', 'comparison_pops', 'databases']
 
     def __init__(self, input_file):
         """
@@ -216,6 +224,9 @@ class GAInput:
 
         if not hasattr(self, 'exit_func'):
             self.exit_func = FunctionData('no_exit')
+
+        if not hasattr(self, 'databases'):
+            self.databases = []
 
     def _extract_data(self):
         """
