@@ -7,7 +7,7 @@ import numpy as np
 pop = Population.load(join('data',
                             'macromolecule', 'mm.json'))
 
-mol, mol2 = pop[:2]
+mol, mol2= pop[:2]
 
 def test_rdkit():
 

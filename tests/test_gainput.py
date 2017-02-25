@@ -28,6 +28,7 @@ def test_init():
     assert i.pop_size == 5
     assert i.comparison_pops == ['pop1', 'pop2']
     assert i.exit_func == FunctionData('no_exit')
+    assert i.databases == ['1', '2']
 
 def test_crosser():
     crosser = i.crosser()
