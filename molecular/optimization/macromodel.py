@@ -35,8 +35,7 @@ class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
 
-def macromodel_opt(macro_mol, macromodel_path,
-                   settings={}, md={}):
+def macromodel_opt(macro_mol, macromodel_path, settings={}, md={}):
     """
     Optimizes the molecule using MacroModel.
 
@@ -171,8 +170,7 @@ def macromodel_opt(macro_mol, macromodel_path,
         else:
             raise ex
 
-def macromodel_md_opt(macro_mol, macromodel_path,
-                      settings={}):
+def macromodel_md_opt(macro_mol, macromodel_path, settings={}):
     """
     Runs a MD conformer search on `macro_mol`.
 
@@ -298,8 +296,8 @@ def macromodel_md_opt(macro_mol, macromodel_path,
         else:
             raise ex
 
-def macromodel_cage_opt(macro_mol, macromodel_path, settings={},
-                        md={}):
+def macromodel_cage_opt(macro_mol,
+                        macromodel_path, settings={}, md={}):
     """
     Optimizes the molecule using MacroModel.
 
