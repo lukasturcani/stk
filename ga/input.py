@@ -480,7 +480,6 @@ class GAInput:
         # Separate the commands and variables.
         for line in lines:
             if line.startswith('$$'):
-                print(line)
                 name, val = line[1:].split('=', 1)
                 self._variables[name] = val
             else:
