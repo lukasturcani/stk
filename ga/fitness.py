@@ -382,7 +382,7 @@ def cage(macro_mol, target_cavity, target_window=None,
         ``None`` then `target_cavity` is used.
 
     pseudoformation_params : dict (default =
-          { 'energy_func' : FunctionData('rdkit', forcefield='uff') })
+          { 'func' : FunctionData('rdkit', forcefield='uff') })
 
         This fitness function calculates the formation energy using the
         ``Energy.pseudoformation()`` method. This parameter defines the
@@ -455,7 +455,7 @@ def cage(macro_mol, target_cavity, target_window=None,
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_target(macro_mol, target_mol_file,
-                eng_func, opt_func, rotations=0):
+                energy_func, opt_func, rotations=0):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -515,7 +515,7 @@ def cage_target(macro_mol, target_mol_file,
     return _cage_target(macro_mol,
                         target_mol_file, energy_func, opt_func,
                         FunctionData('_generate_complexes',
-                                     rotations+1))
+                                     number=rotations+1))
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_c60(macro_mol, target_mol_file,
@@ -646,7 +646,6 @@ def _cage_target(macro_mol, target_mol_file,
     # function.
     folder_path = _make_cage_target_folder()
     # Transform the FunctionData instances into functions.
-    efunc = getattr(Energy, energy_func.name)
     ofunc = getattr(optimization, opt_func.name)
     rot_func = globals()[rotation_func.name]
 
@@ -688,23 +687,31 @@ def _cage_target(macro_mol, target_mol_file,
         mm_complex.energy = Energy(mm_complex)
         mm_complex.topology = macro_mol.topology
         mm_complex.building_blocks = macro_mol.building_blocks
+        mm_complex.bonder_ids = macro_mol.bonder_ids
         ofunc(mm_complex, **opt_func.params)
         macromol_complexes.append(mm_complex)
 
     # Calculate the energy of the complex and compare to the
     # individual energies. If more than complex was made, use the
     # most stable version.
-    energy_separate = (efunc(macro_mol, **energy_func.params) +
-                       efunc(target, **energy_func.params))
+    mm_energy = getattr(macro_mol.energy,
+                        energy_func.name)(**energy_func.params)
+    target_energy = getattr(target.energy,
+                        energy_func.name)(**energy_func.params)
+
+    energy_separate = mm_energy + target_energy
 
     print('\n\nCalculating complex energies.\n')
     min_eng_cmplx = min(macromol_complexes,
-                        key=lambda x : efunc(x, **energy_func.params))
+                    key=lambda x :
+            getattr(x.energy, energy_func.name)(**energy_func.params))
 
     # Write the most stable complex to a file.
     min_eng_cmplx.write(join(folder_path, min_eng_cmplx.name+'.mol'))
 
-    ekey = func_key(efunc, min_eng_complx, energy_func.params)
+    ekey = func_key(getattr(Energy, energy_func.name),
+                    (min_eng_cmplx.energy, ), energy_func.params)
+
     binding_energy = (min_eng_cmplx.energy.values[ekey] -
                                                     energy_separate)
 
