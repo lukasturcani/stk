@@ -42,6 +42,8 @@ topology is at the origin.
 
 import rdkit
 import rdkit.Chem as chem
+from collections import deque
+import numpy as np
 
 from ..fg_info import double_bond_combs
 from ...convenience_tools import dedupe
@@ -199,7 +201,7 @@ class Topology:
     def __hash__(self):
         return id(self)
 
-def Linear(Topology):
+class Linear(Topology):
     """
     A class represting linear polymers.
 
@@ -217,7 +219,7 @@ def Linear(Topology):
 
     """
 
-    def __init__(self, repeating_unit, n)
+    def __init__(self, repeating_unit, n):
         self.repeating_unit = repeating_unit
         self.n = n
 
@@ -246,27 +248,26 @@ def Linear(Topology):
 
         # Make a map from monomer label to object.
         mapping = {}
-        # Make sure very monomer is aligned with x-axis and assign
-        # every monomer a label ("A", "B", "C", etc.). Also make sure
-        # that the monomer is centered on the origin.
+        # Assign every monomer a label ("A", "B", "C", etc.).
         for label, monomer in zip(dedupe(self.repeating_unit),
                                   macro_mol.building_blocks):
-            monomer.set_position([0,0,0])
-            monomer.set_orientation2([1,0,0])
             mapping[label] = monomer
 
         # Go through the repeating unit. Place each monomer 50 A apart.
         # Also create a bond.
-        self.bonders = []
+        self.bonders = deque(maxlen=2)
         macro_mol.mol = chem.Mol()
         for i, label in enumerate(self.repeating_unit*self.n):
-            self.bonders.extend(macro_mol.mol.GetNumAtoms() + id_ for
-                           id_ in mapping[label].bonder_ids)
+            self.bonders.append([
+                macro_mol.mol.GetNumAtoms() + id_ for
+                           id_ in mapping[label].bonder_ids])
 
+            direction = np.random.choice([-1, 1])
+            mapping[label].set_orientation2([direction, 0, 0])
             macro_mol.mol = chem.CombineMols(macro_mol.mol,
                             mapping[label].set_position([i*50, 0, 0]))
-
-            macro_mol.mol = self.join(macro_mol)
+            if i != 0:
+                self.join(macro_mol)
 
     def join(self, macro_mol):
         """
@@ -288,8 +289,18 @@ def Linear(Topology):
 
         """
 
+        distances = []
+        for bonder1 in self.bonders[0]:
+            for bonder2 in self.bonders[1]:
+                distances.append(
+        (macro_mol.atom_distance(bonder1, bonder2), bonder1, bonder2))
 
+        _, bonder1, bonder2 = min(distances)
+        emol = chem.EditableMol(macro_mol.mol)
+        emol.AddBond(bonder1, bonder2,
+                self.determine_bond_type(macro_mol, bonder1, bonder2))
 
+        macro_mol.mol = emol.GetMol()
 
     def join_mols(self, macro_mol):
         """
