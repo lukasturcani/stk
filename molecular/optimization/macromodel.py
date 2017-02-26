@@ -35,8 +35,8 @@ class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
 
-def macromodel_opt(macro_mol, macromodel_path, force_field=16,
-                 no_fix=False, md=False, lewis_fixed=False):
+def macromodel_opt(macro_mol, macromodel_path,
+                   settings={}, md={}):
     """
     Optimizes the molecule using MacroModel.
 
@@ -55,17 +55,44 @@ def macromodel_opt(macro_mol, macromodel_path, force_field=16,
         folder will probably be something like
         ``C:\Program Files\Schrodinger2016-2``.
 
-    force_field : int (default = 16)
-        The number of the force field, within MacroModel, to be used in
-        the optimization.
+    settings : dict (default = {})
+        A dictionary which maps the names of optimization parameters to
+        their values. Valid values are:
 
-    no_fix : bool (default = False)
-        When ``True`` the molecular parameters will not be fixed during
-        the optimization.
+            'restricted' : bool (default = True)
+                If False then all bonds are optimized, not just the
+                ones created during macromolecular assembly.
 
-    md : bool (default = False)
-        If ``True`` then a macromodel optimization using MD is carried
-        out to sample different conformtions.
+            'timeout' : float (default = 0)
+                The amount in seconds the optimization is allowed to
+                run before being terminated. 0 means there is no
+                timeout.
+
+            'force_field' : int (default = 16)
+                The number of the force field to be used.
+
+            'max_iter' : int (default = 2500)
+                The maximum number of iterations done during the
+                optimization.
+
+            'gradient' : float (default = 0.05)
+                The gradient at which optimization is stopped.
+
+            'md' : bool (default=False)
+                Toggles whether a MD conformer search should be
+                performed.
+
+        Only values which need to be changed from the default need to
+        be specified. For exmaple:
+
+            macromodel_opt(mol, 'path', {'max_iter' : 10})
+
+
+    md : dict (default = {})
+        A dictionary holding settings for the MD conformer search.
+        This parameter is used in the same way as `settings` except
+        the values effect the MD only. See docstring of
+        macromodel_md_opt() for valid values.
 
     Modifies
     --------
@@ -79,6 +106,22 @@ def macromodel_opt(macro_mol, macromodel_path, force_field=16,
 
     """
 
+    vals = {
+             'restricted' : True,
+             'timeout' : 0,
+             'force_field' : 16,
+             'max_iter' : 2500,
+             'gradient' : 0.05,
+             'md' : False
+            }
+    vals.update(settings)
+
+    # Default initiailize some parameters. These are for the internal
+    # use of the function (to prevent infinite recursion) not for the
+    # user. Also see comments below.
+    if 'lewis_fixed' not in vals:
+        vals['lewis_fixed'] = False
+
     try:
         macro_mol._file = getattr(macro_mol, '_file',
                                  '{}.mol'.format(uuid4().int))
@@ -88,7 +131,7 @@ def macromodel_opt(macro_mol, macromodel_path, force_field=16,
         # ``.mae`` file holding the molecule.
         _create_mae(macro_mol, macromodel_path)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(macro_mol, force_field, no_fix)
+        _generate_com(macro_mol, vals)
         # Run the optimization.
         _run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and
@@ -97,35 +140,120 @@ def macromodel_opt(macro_mol, macromodel_path, force_field=16,
         macro_mol.update_from_mae(
                             macro_mol._file.replace('.mol', '.mae'))
 
-        if md:
-            macromodel_md_opt(macro_mol, macromodel_path)
+        if vals['md']:
+            macromodel_md_opt(macro_mol, macromodel_path, md)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
-        if force_field == 14:
+        if vals['force_field'] == 14:
             raise ex
 
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
                '- {}').format(macro_mol.name))
-        return macromodel_opt(macro_mol, force_field=14,
-                              lewis_fixed=lewis_fixed,
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
 
+        vals['force_field'] = 14
+        return macromodel_opt(macro_mol,
+                              macromodel_path, vals, md)
+
+    # The 'lewis_fixed' parameter should not be used by the user.
+    # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
+    # the case the function tries to fix it and then runs itself again.
+    # The `lewis_fixed` parameter indicates if the fix has already been
+    # tried to prevent infinite recursion.
     except _LewisStructureError as ex:
-        if not lewis_fixed:
+        print('Attempting to fix Lewis structure.')
+        if not vals['lewis_fixed']:
             _run_applyhtreat(macro_mol, macromodel_path)
-            return macromodel_opt(macro_mol, force_field=force_field,
-                              lewis_fixed=True,
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
+            vals['lewis_fixed'] = True
+            return macromodel_opt(macro_mol,
+                                  macromodel_path, vals, md)
         else:
             raise ex
 
-def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
-                      timeout=True, force_field=16,
-                      temp=300, confs=50, eq_time=10, sim_time=200):
+def macromodel_md_opt(macro_mol, macromodel_path,
+                      settings={}):
+    """
+    Runs a MD conformer search on `macro_mol`.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure must be optimized.
+
+    macromodel_path : str
+        The full path of the ``Schrodinger`` suite within the user's
+        machine. For example, in a default Microsoft installation the
+        folder will probably be something like
+        ``C:\Program Files\Schrodinger2016-2``.
+
+    settings : dict (default = {})
+        Each key is a string describing an MD parameter. The value is
+        the corresponding value. Only values which need to be changed
+        from the default need to be specified. The allowed parameters
+        are:
+
+            'timeout' : float (default = 0)
+                The amount in seconds the MD is allowed to run before
+                being terminated. 0 means there is no timeout.
+
+            'force_field' : int (default = 16)
+                The number of the force field to be used.
+
+            'temp' : float (default = 300)
+                The temperature in Kelvin at which the MD is run.
+
+            'confs' : int (default = 50)
+                The number of conformers sampled and optimized from the
+                MD.
+
+            'time_step' : float (default = 1.5)
+                The time step for the MD.
+
+            'eq_time' : float (default = 10)
+                The equilibriation time before the MD is run.
+
+            'sim_time' : float (default = 200)
+                The simulation time of the MD.
+
+            'max_iter' : int (default = 2500)
+                The maximum number of iterations done during the
+                optimization.
+
+            'gradient' : float (default = 0.05)
+                The gradient at which optimization is stopped.
+
+    Modifies
+    --------
+    macro_mol.mol
+        The rdkit molecule held in this attribute is replaced by an
+        rdkit molecule with an optimized structure.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    vals = {
+               'timeout' : 0,
+               'force_field' : 16,
+               'temp' : 300,
+               'confs' : 50,
+               'time_step' : 1.5,
+               'eq_time' : 10,
+               'sim_time' : 200,
+               'max_iter' : 2500,
+               'gradient' : 0.05
+              }
+
+    vals.update(settings)
+
+    # Default initiailize some parameters. These are for the internal
+    # use of the function (to prevent infinite recursion) not for the
+    # user. Also see comments below.
+    if 'lewis_fixed' not in vals:
+        vals['lewis_fixed'] = False
 
     print('\nRunning MD on {}.'.format(macro_mol.name))
     try:
@@ -137,40 +265,41 @@ def macromodel_md_opt(macro_mol, macromodel_path, lewis_fixed=False,
         # ``.mae`` file holding the molecule.
         _create_mae(macro_mol, macromodel_path)
         # Generate the ``.com`` file for the MacroModel MD run.
-        _generate_md_com(macro_mol, force_field=force_field, temp=temp,
-                       confs=confs, eq_time=eq_time, sim_time=sim_time)
+        _generate_md_com(macro_mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, timeout)
+        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(macro_mol._file).path
         macro_mol.update_from_mae(conformer_mae)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
-        if force_field == 14:
+        if vals['force_field'] == 14:
             raise ex
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
                '- {}').format(macro_mol.name))
-        return macromodel_md_opt(macro_mol, macromodel_path,
-                                 timeout=timeout, force_field=14,
-                                 lewis_fixed=lewis_fixed,
-                                 temp=temp, confs=confs,
-                                 eq_time=eq_time, sim_time=sim_time)
 
+        vals['force_field'] = 14
+        return macromodel_md_opt(macro_mol, macromodel_path, vals)
+
+    # The 'lewis_fixed' parameter should not be used by the user.
+    # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
+    # the case the function tries to fix it and then runs itself again.
+    # The `lewis_fixed` parameter indicates if the fix has already been
+    # tried to prevent infinite recursion.
     except _LewisStructureError as ex:
-        if not lewis_fixed:
+        print('Attempting to fix Lewis structure.')
+        if not vals['lewis_fixed']:
+            vals['lewis_fixed'] = True
             _run_applyhtreat(macro_mol, macromodel_path)
-            return macromodel_md_opt(macro_mol, macromodel_path,
-                             timeout=timeout, force_field=force_field,
-                             lewis_fixed=True,
-                             temp=temp, confs=confs,
-                             eq_time=eq_time, sim_time=sim_time)
+            return macromodel_md_opt(macro_mol,
+                                     macromodel_path, vals)
         else:
             raise ex
 
-def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
-                 no_fix=False, md=False, lewis_fixed=False):
+def macromodel_cage_opt(macro_mol, macromodel_path, settings={},
+                        md={}):
     """
     Optimizes the molecule using MacroModel.
 
@@ -194,22 +323,49 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
         folder will probably be something like
         ``C:\Program Files\Schrodinger2016-2``.
 
-    force_field : int (default = 16)
-        The number of the force field, within MacroModel, to be used in
-        the optimization.
+    settings : dict (default = {})
+        A dictionary which maps the names of optimization parameters to
+        their values. Valid values are:
 
-    no_fix : bool (default = False)
-        When ``True`` the molecular parameters will not be fixed during
-        the optimization.
+            'restricted' : bool (default = True)
+                If False then all bonds are optimized, not just the
+                ones created during macromolecular assembly.
 
-    md : bool (default = False)
-        If ``True`` then a macromodel optimization using MD is carried
-        out to sample different conformtions.
+            'timeout' : float (default = 0)
+                The amount in seconds the optimization is allowed to
+                run before being terminated. 0 means there is no
+                timeout.
+
+            'force_field' : int (default = 16)
+                The number of the force field to be used.
+
+            'max_iter' : int (default = 2500)
+                The maximum number of iterations done during the
+                optimization.
+
+            'gradient' : float (default = 0.05)
+                The gradient at which optimization is stopped.
+
+            'md' : bool (default=False)
+                Toggles whether a MD conformer search should be
+                performed.
+
+        Only values which need to be changed from the default need to
+        be specified. For exmaple:
+
+            macromodel_opt(mol, 'path', {'max_iter' : 10})
+
+
+    md : dict (default = {})
+        A dictionary holding settings for the MD conformer search.
+        This parameter is used in the same way as `settings` except
+        the values effect the MD only. See docstring of
+        macromodel_md_opt() for valid values.
 
     Modifies
     --------
     macro_mol.mol
-        The rdkit molecule held in this attribute is replaced by a
+        The rdkit molecule held in this attribute is replaced by an
         rdkit molecule with an optimized structure.
 
     Returns
@@ -217,6 +373,22 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
     None : NoneType
 
     """
+
+    vals = {
+             'restricted' : True,
+            'timeout' : 0,
+             'force_field' : 16,
+             'max_iter' : 2500,
+             'gradient' : 0.05,
+             'md' : False
+            }
+    vals.update(settings)
+
+    # Default initialize some parameters. These are for the internal
+    # use of the function (to prevent infinite recursion) not for the
+    # user. Also see comments below.
+    if 'lewis_fixed' not in vals:
+        vals['lewis_fixed'] = False
 
     try:
         macro_mol._file = getattr(macro_mol, '_file',
@@ -227,7 +399,7 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
         # ``.mae`` file holding the molecule.
         _create_mae(macro_mol, macromodel_path)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(macro_mol, force_field, no_fix)
+        _generate_com(macro_mol, vals)
         # Run the optimization.
         _run_bmin(macro_mol, macromodel_path)
         # Get the ``.maegz`` file output from the optimization and
@@ -240,36 +412,38 @@ def macromodel_cage_opt(macro_mol, macromodel_path, force_field=16,
             warnings.simplefilter("ignore")
             if macro_mol.windows is not None:
                 all_windows = (len(macro_mol.windows) ==
-                                       macro_mol.n_windows)
+                                       macro_mol.topology.n_windows)
 
-                if md and all_windows:
-                    macromodel_md_opt(macro_mol, macromodel_path)
+                if vals['md'] and all_windows:
+                    macromodel_md_opt(macro_mol, macromodel_path, md)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
-        if force_field==14:
+        if vals['force_field'] == 14:
             raise ex
 
         # If OPLSE_2005 has not been tried - try it.
         print(('Minimization with OPLS3 failed. Trying OPLS_2005. '
         '- {}').format(macro_mol.name))
-        return macromodel_cage_opt(macro_mol, force_field=14,
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md,
-                              lewis_fixed=lewis_fixed)
+        vals['force_field'] = 14
+        return macromodel_cage_opt(macro_mol, macromodel_path, vals)
 
+    # The 'lewis_fixed' parameter should not be used by the user.
+    # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
+    # the case the function tries to fix it and then runs itself again.
+    # The `lewis_fixed` parameter indicates if the fix has already been
+    # tried to prevent infinite recursion.
     except _LewisStructureError as ex:
-        if not lewis_fixed:
+        print('Attempting to fix Lewis structure.')
+        if not vals['lewis_fixed']:
             _run_applyhtreat(macro_mol, macromodel_path)
+            vals['lewis_fixed'] = True
             return macromodel_cage_opt(macro_mol,
-                              force_field=force_field,
-                              lewis_fixed=True,
-                              macromodel_path=macromodel_path,
-                              no_fix=no_fix, md=md)
+                                       macromodel_path, vals)
         else:
             raise ex
 
-def _run_bmin(macro_mol, macromodel_path, timeout=True):
+def _run_bmin(macro_mol, macromodel_path, timeout=0):
 
     print("", time.ctime(time.time()),
     'Running bmin - {}.'.format(macro_mol.name), sep='\n')
@@ -290,9 +464,10 @@ def _run_bmin(macro_mol, macromodel_path, timeout=True):
                             universal_newlines=True)
     try:
         if timeout:
-            proc_out, _ = opt_proc.communicate(timeout=600)
+            proc_out, _ = opt_proc.communicate(timeout=timeout)
         else:
             proc_out, _ = opt_proc.communicate()
+
 
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
@@ -428,7 +603,12 @@ def _license_found(output, macro_mol=None):
 
     return True
 
-def _generate_com(macro_mol, force_field=16, no_fix=False):
+def _com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
+    return (" {:<5}{:>7}{:>7}{:>7}{:>7}{:>11.4f}{:>11.4f}"
+            "{:>11.4f}{:>11.4f}").format(arg1, arg2, arg3, arg4,
+                                         arg5, arg6, arg7, arg8, arg9)
+
+def _generate_com(macro_mol, settings):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -448,13 +628,9 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
     macro_mol : MacroMolecule
         The macromolecule which is to be optimized.
 
-    force_field : int (default = 16)
-        The number of the force field, within MacroModel, to be used in
-        the optimization.
-
-    no_fix : bool (default = False)
-        When ``True`` the generated .com file will not contain commands
-        which fix the molecular parameters during optimization.
+    settings : dict
+        A dictionary of settings for the optimization. See
+        macromodel_opt() documentation.
 
     Modifies
     --------
@@ -472,28 +648,18 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
     # that fix bond distances and angles.
-    main_string= (" MMOD       0      1      0      0     0.0000     "
-    "0.0000     0.0000     0.0000\n"
-" DEBG      55      0      0      0     0.0000     0.0000     "
-"0.0000     0.0000\n"
-" FFLD{0:8}      1      0      0     1.0000     0.0000     "
-"0.0000     0.0000\n"
-" BDCO       0      0      0      0    41.5692 99999.0000     "
-"0.0000     0.0000\n"
-" CRMS       0      0      0      0     0.0000     0.5000     "
-"0.0000     0.0000\n"
-" BGIN       0      0      0      0     0.0000     0.0000     "
-"0.0000     0.0000\n"
-" READ       0      0      0      0     0.0000     0.0000     "
-"0.0000     0.0000\n"
-"!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!\n"
-" CONV       2      0      0      0     0.0500     0.0000     "
-"0.0000     0.0000\n"
-" MINI       1      0   2500      0     0.0000     0.0000     "
-"0.0000     0.0000\n"
-" END        0      0      0      0     0.0000     0.0000     "
-"0.0000     0.0000\n"
-" ").format(force_field)
+    main_string = "\n".join([
+        _com_line('MMOD', 0, 1, 0, 0, 0, 0, 0, 0),
+
+        _com_line('FFLD',
+                  settings['force_field'], 1, 0, 0, 1, 0, 0, 0),
+
+        _com_line('BGIN', 0, 0, 0, 0, 0, 0, 0, 0),
+        _com_line('READ', 0, 0, 0, 0, 0, 0, 0, 0),
+        "!!!BLOCK_OF_FIXED_PARAMETERS_COMES_HERE!!!",
+        _com_line('CONV', 2, 0, 0, 0, settings['gradient'], 0, 0, 0),
+        _com_line('MINI', 1, 0, settings['max_iter'], 0, 0, 0, 0, 0),
+        _com_line('END', 0, 1, 0, 0, 0, 0, 0, 0)])
 
     # Create a path for the ``.com`` file. It is the same as that of
     # the structure file but with a ``.com`` extension. Get the path of
@@ -505,8 +671,8 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
 
     # This function adds all the lines which fix bond distances and
     # angles into ``main_string``.
-    main_string = _fix_params_in_com_file(macro_mol,
-                                          main_string, no_fix)
+    main_string = _fix_params_in_com_file(macro_mol, main_string,
+                                          settings['restricted'])
 
     # Writes the ``.com`` file.
     with open(com_file, "w") as com:
@@ -520,33 +686,33 @@ def _generate_com(macro_mol, force_field=16, no_fix=False):
         # ``main_string``.
         com.write(main_string)
 
-def _generate_md_com(macro_mol, force_field=16,
-                     temp=300, confs=50, eq_time=10, sim_time=200):
-
+def _generate_md_com(macro_mol, settings):
     print('Creating .com file - {}.'.format(macro_mol.name))
 
-    main_string= """ MMOD       0      1      0      0     0.0000     0.0000     0.0000     0.0000
- FFLD{force_field:8}      1      0      0     1.0000     0.0000     0.0000     0.0000
- BDCO       0      0      0      0    41.5692 99999.0000     0.0000     0.0000
- READ       0      0      0      0     0.0000     0.0000     0.0000     0.0000
- CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
- MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
- MDIT       0      0      0      0   300.0000     0.0000     0.0000     0.0000
- MDYN       0      0      0      0     1.5000{eq_time:6}.0000{temp:6}.0000     0.0000
- MDSA{confs:8}      0      0      0     0.0000     0.0000     1.0000     0.0000
- MDYN       1      0      0      0     1.5000{sim_time:6}.0000{temp:6}.0000     0.0000
- WRIT       0      0      0      0     0.0000     0.0000     0.0000     0.0000
- RWND       0      1      0      0     0.0000     0.0000     0.0000     0.0000
- BGIN       0      0      0      0     0.0000     0.0000     0.0000     0.0000
- READ      -2      0      0      0     0.0000     0.0000     0.0000     0.0000
- CONV       2      0      0      0     0.0500     0.0000     0.0000     0.0000
- MINI       1      0   2500      0     0.0000     0.0000     0.0000     0.0000
- END        0      0      0      0     0.0000     0.0000     0.0000     0.0000"""
+    main_string = "\n".join([
+        _com_line('MMOD', 0, 1, 0, 0, 0, 0, 0, 0),
 
-    main_string = main_string.format(force_field=force_field,
-                                     temp=temp, confs=confs,
-                                     eq_time=eq_time,
-                                     sim_time=sim_time)
+        _com_line('FFLD',
+                  settings['force_field'], 1, 0, 0, 1, 0, 0, 0),
+
+        _com_line('READ', 0, 0, 0, 0, 0, 0, 0, 0),
+        _com_line('MDIT', 0, 0, 0, 0, settings['temp'], 0, 0, 0),
+
+        _com_line('MDYN', 0, 0, 0, 0, settings['time_step'],
+                    settings['eq_time'], settings['temp'], 0),
+
+        _com_line('MDSA', settings['confs'], 0, 0, 0, 0, 0, 1, 0),
+
+        _com_line('MDYN', 1, 0, 0, 0, settings['time_step'],
+                   settings['sim_time'], settings['temp'], 0),
+
+        _com_line('WRIT', 0, 0, 0, 0, 0, 0, 0, 0),
+        _com_line('RWND', 0, 1, 0, 0, 0, 0, 0, 0),
+        _com_line('BGIN', 0, 0, 0, 0, 0, 0, 0, 0),
+        _com_line('READ', -2, 0, 0, 0, 0, 0, 0, 0),
+        _com_line('CONV', 2, 0, 0, 0, settings['gradient'], 0, 0, 0),
+        _com_line('MINI', 1, 0, settings['max_iter'], 0, 0, 0, 0, 0),
+        _com_line('END', 0, 1, 0, 0, 0, 0, 0, 0)])
 
     name, ext = os.path.splitext(macro_mol._file)
     com_file = name + '.com'
@@ -680,7 +846,7 @@ def _structconvert(iname, oname, macromodel_path):
 
     return convrt_return
 
-def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
+def _fix_params_in_com_file(macro_mol, main_string, restricted):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
 
@@ -702,8 +868,8 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
         The body of the ``.com`` file which is to have fix commands
         added.
 
-    no_fix : bool (default = False)
-        When ``True`` the block containing instructions to fix
+    restricted : bool (default = True)
+        When ``False`` the block containing instructions to fix
         molecular parameters is not added to the .com file.
 
     Returns
@@ -718,8 +884,8 @@ def _fix_params_in_com_file(macro_mol, main_string, no_fix=False):
     # Make a string to hold all of the ``FX`` lines.
     fix_block = ""
 
-    # If no_fix is ``True`` do not add a fix block.
-    if no_fix:
+    # If `restricted` is ``False`` do not add a fix block.
+    if not restricted:
         return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                     "COMES_HERE!!!\n"), fix_block)
     # Add lines that fix the bond distance.
