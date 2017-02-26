@@ -134,7 +134,8 @@ from ..convenience_tools import (matrix_centroid,
                                  rotation_matrix_arbitrary_axis)
 
 from ..molecular import (MacroMolecule,
-                         StructUnit, Energy, optimization)
+                         StructUnit, Energy, optimization,
+                         func_key)
 
 def _calc_fitness(func_data, population):
     """
@@ -453,8 +454,8 @@ def cage(macro_mol, target_cavity, target_window=None,
     return np.array([cavity_diff, window_diff, asymmetry, e_per_bond])
 
 @_param_labels('Binding Energy', 'Asymmetry')
-def cage_target(macro_mol, target_mol_file, macromodel_path,
-                rotations=0, md=False):
+def cage_target(macro_mol, target_mol_file,
+                eng_func, opt_func, rotations=0):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -476,16 +477,18 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
         The full path of the .mol file hodling the target molecule
         placed inside the cage.
 
-    macromodel_path : str
-        The Schrodinger directory path.
+    energy_func : FunctionData
+        A FunctionData object representing the energy function used to
+        calculate energies.
+
+    opt_func : FunctionData
+        A FunctionData object representing the optimization function to
+        be run on the generated complexes.
 
     rotations : int (default = 0)
         The number of times the target should be randomly rotated
         within the cage cavity in order to find the most stable
         conformation.
-
-    md : bool (default = False)
-        Toggles the running of MD on cage-target complexes.
 
     Modifies
     --------
@@ -509,12 +512,14 @@ def cage_target(macro_mol, target_mol_file, macromodel_path,
 
     """
 
-    return _cage_target(macro_mol, target_mol_file, macromodel_path,
-                        _generate_complexes, rotations+1, md=md)
+    return _cage_target(macro_mol,
+                        target_mol_file, energy_func, opt_func,
+                        FunctionData('_generate_complexes',
+                                     rotations+1))
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_c60(macro_mol, target_mol_file,
-             macromodel_path, n5fold, n2fold, md=False):
+             energy_func, opt_func, n5fold, n2fold):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
@@ -538,8 +543,13 @@ def cage_c60(macro_mol, target_mol_file,
         The full path of the .mol file hodling the target molecule
         placed inside the cage.
 
-    macromodel_path : str
-        The Schrodinger directory path.
+    energy_func : FunctionData
+        A FunctionData object representing the energy function used to
+        calculate energies.
+
+    opt_func : FunctionData
+        A FunctionData object representing the optimization function to
+        be run on the generated complexes.
 
     n5fold : int
         The number of rotations along the 5-fold axis of symmetry.
@@ -547,10 +557,6 @@ def cage_c60(macro_mol, target_mol_file,
     n2fold : int
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
-
-    md : bool (default = False)
-        If ``True`` the generated complexes will have a MD simulation
-        performed on them to find the lowest energy conformer.
 
     Modifies
     --------
@@ -573,11 +579,14 @@ def cage_c60(macro_mol, target_mol_file,
         Returned if any fitness parameter failed to calculate.
 
     """
-    return _cage_target(macro_mol, target_mol_file, macromodel_path,
-                        _c60_rotations, n5fold, n2fold, md=md)
+    return _cage_target(macro_mol,
+                        target_mol_file, energy_func, opt_func,
+                        FunctionData('_c60_rotations',
+                                     n5fold=n5fold,
+                                     n2fold=n2fold))
 
-def _cage_target(macro_mol, target_mol_file, macromodel_path,
-                 rotation_func, *rot_args, md=False):
+def _cage_target(macro_mol, target_mol_file,
+                 energy_func, opt_func, rotation_func):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -597,19 +606,17 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         The full path of the .mol file hodling the target molecule
         placed inside the cage.
 
-    macromodel_path : str
-        The Schrodinger directory path.
+    energy_func : FunctionData
+        A FunctionData object representing the energy function used to
+        calculate energies.
 
-    rotation_func : function
-        A generator which carries out the rotations of the target
-        within the cage. It yields the complexes.
+    opt_func : FunctionData
+        A FunctionData object representing the optimization function to
+        be run on the generated complexes.
 
-    *rot_args : tuple
-        Parameters to be passed to `rotation_func`.
-
-    md : bool (default = False)
-        If ``True`` the generated complexes will have a MD simulation
-        performed on them to find the lowest energy conformer.
+    rotation_func : FunctionData
+        A FunctionData object representing the rotation function to be
+        used.
 
     Modifies
     --------
@@ -638,6 +645,11 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
     # Create a folder to hold all the complexes generated by this
     # function.
     folder_path = _make_cage_target_folder()
+    # Transform the FunctionData instances into functions.
+    efunc = getattr(Energy, energy_func.name)
+    ofunc = getattr(optimization, opt_func.name)
+    rot_func = globals()[rotation_func.name]
+
     # Make a template name for all the complexes generated by this
     # function. If `macro_mol` has a `name` attribute use that as the
     # template. If `macro_mol` does not have a `name` the template will
@@ -659,8 +671,8 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
 
     # Create rdkit instances of the target in the cage for each
     # rotation.
-    rdkit_complexes = rotation_func(unopt_macro_mol, target,
-                                     *rot_args)
+    rdkit_complexes = rot_func(macro_mol, target,
+                               **rotation_func.params)
 
     # Optimize the strcuture of the cage/target complexes.
     macromol_complexes = []
@@ -676,28 +688,25 @@ def _cage_target(macro_mol, target_mol_file, macromodel_path,
         mm_complex.energy = Energy(mm_complex)
         mm_complex.topology = macro_mol.topology
         mm_complex.building_blocks = macro_mol.building_blocks
-        optimization.macromodel_opt(mm_complex, no_fix=True,
-                       macromodel_path=macromodel_path, md=md)
+        ofunc(mm_complex, **opt_func.params)
         macromol_complexes.append(mm_complex)
 
     # Calculate the energy of the complex and compare to the
     # individual energies. If more than complex was made, use the
     # most stable version.
-    energy_separate = (
-            macro_mol.energy.macromodel(16, macromodel_path) +
-            target.energy.macromodel(16, macromodel_path))
+    energy_separate = (efunc(macro_mol, **energy_func.params) +
+                       efunc(target, **energy_func.params))
 
     print('\n\nCalculating complex energies.\n')
     min_eng_cmplx = min(macromol_complexes,
-                key=lambda x :
-                    x.energy.macromodel(16, macromodel_path))
+                        key=lambda x : efunc(x, **energy_func.params))
 
     # Write the most stable complex to a file.
     min_eng_cmplx.write(join(folder_path, min_eng_cmplx.name+'.mol'))
 
-    binding_energy = (
-                min_eng_cmplx.energy.values[
-    FunctionData('macromodel', forcefield=16)] - energy_separate)
+    ekey = func_key(efunc, min_eng_complx, energy_func.params)
+    binding_energy = (min_eng_cmplx.energy.values[ekey] -
+                                                    energy_separate)
 
     frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.mol,
                                     asMols=True,
