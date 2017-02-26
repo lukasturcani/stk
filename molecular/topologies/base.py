@@ -44,6 +44,7 @@ import rdkit
 import rdkit.Chem as chem
 
 from ..fg_info import double_bond_combs
+from ...convenience_tools import dedupe
 
 class Topology:
     """
@@ -197,3 +198,112 @@ class Topology:
 
     def __hash__(self):
         return id(self)
+
+def Linear(Topology):
+    """
+    A class represting linear polymers.
+
+    Attributes
+    ----------
+    repeating_unit : str
+        A string showing the repeating unit of the Polymer. For
+        example, "AB" or "ABB". The building block with index 0 in
+        `building-blocks` is labelled as "A" while index 1 as "B" and
+        so on.
+
+    n : int
+        The number of repeating units which are used to make the
+        polymer.
+
+    """
+
+    def __init__(self, repeating_unit, n)
+        self.repeating_unit = repeating_unit
+        self.n = n
+
+    def place_mols(self, macro_mol):
+        """
+        Places monomers side by side and joins them.
+
+        The monomers are placed along the x-axis, so that the vector
+        running between the functional groups is placed on the axis.
+
+        Parameters
+        ----------
+        macro_mol : Polymer
+            The polymer being assembled.
+
+        Modifies
+        --------
+        macro_mol.mol : rdkit.Chem.rdchem.Mol
+            The monomers are placed.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        # Make a map from monomer label to object.
+        mapping = {}
+        # Make sure very monomer is aligned with x-axis and assign
+        # every monomer a label ("A", "B", "C", etc.). Also make sure
+        # that the monomer is centered on the origin.
+        for label, monomer in zip(dedupe(self.repeating_unit),
+                                  macro_mol.building_blocks):
+            monomer.set_position([0,0,0])
+            monomer.set_orientation2([1,0,0])
+            mapping[label] = monomer
+
+        # Go through the repeating unit. Place each monomer 50 A apart.
+        # Also create a bond.
+        self.bonders = []
+        macro_mol.mol = chem.Mol()
+        for i, label in enumerate(self.repeating_unit*self.n):
+            self.bonders.extend(macro_mol.mol.GetNumAtoms() + id_ for
+                           id_ in mapping[label].bonder_ids)
+
+            macro_mol.mol = chem.CombineMols(macro_mol.mol,
+                            mapping[label].set_position([i*50, 0, 0]))
+
+            macro_mol.mol = self.join(macro_mol)
+
+    def join(self, macro_mol):
+        """
+        Joins 2 monomers.
+
+        Parameters
+        ----------
+        macro_mol : Polymer
+            The polymer being assembled.
+
+        Modifies
+        --------
+        macro_mol.mol : rdkit.Chem.rdchem.Mol
+            The polymer with the monomers connected.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+
+
+
+    def join_mols(self, macro_mol):
+        """
+        Does nothing, place_mols() joins up the molecules too.
+
+        Parameters
+        ----------
+        macro_mol : Polymer
+            The polymer being assembled.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        return
