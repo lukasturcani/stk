@@ -1927,11 +1927,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     Attributes
     ----------
-    building_blocks : frozenset of ``StructUnit`` instances
+    building_blocks : list of ``StructUnit`` instances
         This attribute holds ``StructUnit`` instances which represent
         the monomers forming the macromolecule. Only one ``StructUnit``
-        instance is needed per monomer, even if multiples of a monomer
-        join up to form the macromolecule
+        instance is needed per building block, even if multiples of a
+        building block join up to form the macromolecule
 
     bb_counter : Counter
         A counter keeping track of how much of each building block is
@@ -2027,7 +2027,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.fitness = None
         self.unscaled_fitness = {}
         self.progress_params = None
-        self.building_blocks = frozenset(building_blocks)
+        self.building_blocks = building_blocks
         self.bb_counter = Counter()
         self.topology = topology
         self.bonds_made = 0
@@ -2104,8 +2104,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        self.building_blocks = {Molecule.fromdict(x) for x in
-                                    json_dict['building_blocks']}
+        self.building_blocks = [Molecule.fromdict(x) for x in
+                                    json_dict['building_blocks']]
         self.topology = eval(json_dict['topology'],
                              topologies.__dict__)
         self.unscaled_fitness = eval(json_dict['unscaled_fitness'],
@@ -2387,4 +2387,5 @@ class Polymer(MacroMolecule):
     Used to represent polymers.
 
     """
+
     pass
