@@ -71,6 +71,11 @@ def run():
     # during the GA run.
     id_ = 0
 
+    # Make a ``pop_dumps`` directory for string populations as the GA
+    # progresses. For debugging, allows the restoration of state before
+    # a crash.
+    os.mkdir('pop_dumps')
+    pop_dump_path = os.path.join(root_dir, 'pop_dumps')
     # Make the ``scratch`` directory which acts as the working
     # directory during the GA run.
     os.mkdir('scratch')
@@ -103,6 +108,9 @@ def run():
     for mem in pop:
         mem.name = str(id_)
         id_ += 1
+
+    # Dump the population before attempting any operations.
+    pop.dump(os.path.join(pop_dump_path, 'init_pop'))
 
     with time_it():
         print_info('Optimizing the population.')
@@ -158,6 +166,9 @@ def run():
                 mem.name = id_
                 id_ += 1
 
+        # Dump the population before attempting any operations.
+        pop.dump(os.path.join(pop_dump_path, 'gen_{}_unselected.json'))
+
         with time_it():
             print_info('Optimizing the population.')
             pop = Population(pop.ga_tools, *pop.optimize_population())
@@ -188,6 +199,8 @@ def run():
             print_info('Recording progress.')
             progress.add_subpopulation(pop)
             run_db.add_members(pop)
+            pop.dump(os.path.join(pop_dump_path,
+                                  'gen_{}_selected.json'))
 
         # If the user defined some premature exit function, check if
         # the exit criterion has been fulfilled.
