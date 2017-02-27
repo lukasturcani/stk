@@ -190,10 +190,10 @@ class Topology:
         return repr(self)
 
     def __repr__(self):
-        r = "{}(".format(self.__class__.__name__)
+        c = ""
         for key, value in sorted(self.__dict__.items()):
-            r += "{!s}={!r}".format(key, value)
-        return r + ")"
+            c += "{!s}={!r}".format(key, value)
+        return "{}({})".format(self.__class__.__name__, c)
 
     def __eq__(self, other):
         return repr(self) == repr(other)
@@ -213,14 +213,21 @@ class Linear(Topology):
         `building-blocks` is labelled as "A" while index 1 as "B" and
         so on.
 
+    orientation : list of ints
+        For each character in the repeating unit, a value of -1, 0 or
+        1 must be given as a list. It indicates the direction at
+        which each monomer of the repeating unit is placed. 0 means
+        that the direction is random.
+
     n : int
         The number of repeating units which are used to make the
         polymer.
 
     """
 
-    def __init__(self, repeating_unit, n):
+    def __init__(self, repeating_unit, orientation, n):
         self.repeating_unit = repeating_unit
+        self.orientation = orientation
         self.n = n
 
     def place_mols(self, macro_mol):
@@ -257,13 +264,18 @@ class Linear(Topology):
         # Also create a bond.
         self.bonders = deque(maxlen=2)
         macro_mol.mol = chem.Mol()
-        for i, label in enumerate(self.repeating_unit*self.n):
+        polymer = self.repeating_unit*self.n
+        dirs = ",".join(str(x) for x in self.orientation)
+        dirs *= self.n
+        dirs = [int(x) for x in orientations.split(',')]
+
+        for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             self.bonders.append([
                 macro_mol.mol.GetNumAtoms() + id_ for
                            id_ in mapping[label].bonder_ids])
 
-            direction = np.random.choice([-1, 1])
-            mapping[label].set_orientation2([direction, 0, 0])
+            mdir = np.random.choice([-1, 1]) if not mdir else mdir
+            mapping[label].set_orientation2([mdir, 0, 0])
             macro_mol.mol = chem.CombineMols(macro_mol.mol,
                             mapping[label].set_position([i*50, 0, 0]))
             if i != 0:
