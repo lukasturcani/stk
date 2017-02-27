@@ -44,9 +44,10 @@ import rdkit
 import rdkit.Chem as chem
 from collections import deque
 import numpy as np
+from itertools import chain
 
 from ..fg_info import double_bond_combs
-from ...convenience_tools import dedupe
+from ...convenience_tools import dedupe, flatten
 
 class Topology:
     """
@@ -213,7 +214,7 @@ class Linear(Topology):
         `building-blocks` is labelled as "A" while index 1 as "B" and
         so on.
 
-    orientation : list of ints
+    orientation : tuple of ints
         For each character in the repeating unit, a value of -1, 0 or
         1 must be given as a list. It indicates the direction at
         which each monomer of the repeating unit is placed. 0 means
@@ -227,8 +228,55 @@ class Linear(Topology):
 
     def __init__(self, repeating_unit, orientation, n):
         self.repeating_unit = repeating_unit
-        self.orientation = orientation
+        self.orientation = tuple(orientation)
         self.n = n
+
+    def del_atoms(self, macro_mol):
+        """
+        Removes almost all atoms tagged for deletion.
+
+        In polymers, you don't want to delete the atoms on the
+        functional groups
+
+        Parameters
+        ----------
+        macro_mol : Polymer
+            The polymer being assembled.
+
+        Modifies
+        --------
+        macro_mol.mol : rdkit.Chem.rdchem.Mol
+            Redundant atoms are removed.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        fgs = set()
+        # Get all atoms tagged for deletion, held in tuples
+        # corresponding to individual functional groups.
+        for bb in macro_mol.building_blocks:
+            delmol = chem.MolFromSmarts(bb.func_grp.del_smarts)
+            fgs = fgs.union(macro_mol.mol.GetSubstructMatches(delmol))
+
+        # Get the functional groups which hold the atoms with the
+        # smallest and largest values for the x coordinate need to have
+        # deletion tags removed.
+        maxid = max(flatten(fgs),
+                key=lambda x : macro_mol.atom_coords(x)[0])
+        maxfg = next(fg for fg in fgs if maxid in fg)
+
+        minid = min(flatten(fgs),
+                key=lambda x : macro_mol.atom_coords(x)[0])
+        minfg = next(fg for fg in fgs if minid in fg)
+
+        for atom_id in chain(flatten(minfg), flatten(maxfg)):
+            atom = macro_mol.mol.GetAtomWithIdx(atom_id)
+            atom.ClearProp('del')
+
+        super().del_atoms(macro_mol)
 
     def place_mols(self, macro_mol):
         """
@@ -267,7 +315,7 @@ class Linear(Topology):
         polymer = self.repeating_unit*self.n
         dirs = ",".join(str(x) for x in self.orientation)
         dirs *= self.n
-        dirs = [int(x) for x in orientations.split(',')]
+        dirs = [int(x) for x in dirs.split(',')]
 
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             self.bonders.append([
