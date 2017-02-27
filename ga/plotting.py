@@ -40,9 +40,14 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
 
     for i, subpop in enumerate(pop.populations, 1):
         xvals.append(i)
-        maxs.append(max(x.fitness for x in subpop))
-        means.append(subpop.mean(lambda x : x.fitness))
-        mins.append(min(x.fitness for x in subpop))
+        if len(subpop) == 0:
+            maxs.append(0)
+            means.append(0)
+            mins.append(0)
+        else:
+            maxs.append(max(x.fitness for x in subpop))
+            means.append(subpop.mean(lambda x : x.fitness))
+            mins.append(min(x.fitness for x in subpop))
 
     fig = plt.figure()
     plt.xlabel(xlabel)

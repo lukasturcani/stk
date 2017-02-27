@@ -168,7 +168,7 @@ def do_not_optimize(macro_mol):
 
     return
 
-def partial_raiser(macro_mol, opt_func):
+def partial_raiser(macro_mol, ofunc):
     """
     Raises and optimizes at random.
 
@@ -177,7 +177,7 @@ def partial_raiser(macro_mol, opt_func):
     macro_mol : MacroMolecule
         The macromolecule being optimized.
 
-    opt_func : FunctionData
+    ofunc : FunctionData
         A FunctionData object representing the optimization function
         to be used.
 
@@ -195,8 +195,7 @@ def partial_raiser(macro_mol, opt_func):
     if not np.random.choice([0,1]):
         raise Exception('Partial raiser.')
 
-    ofunc = global()[opt_func.name]
-    ofunc(macro_mol, **opt_func.params)
+    globals()[ofunc.name](macro_mol, **ofunc.params)
 
 def raiser(macro_mol, param1, param2=2):
     """
