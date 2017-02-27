@@ -12,6 +12,18 @@ Adding a new ``FGInfo`` instance to `functional_groups` will allow the
 (all) others during assembly. Nothing except adding this instance
 should be necessary in order to incorporate new functional groups.
 
+Note that when adding SMARTS if you want to make a SMARTS that targets
+an atom in an environment, for example a bromine connected to a carbon
+
+    [$([Br][C]);$([Br])]
+
+The atom you are targeting needs to be written first. The above SMARTS
+works but
+
+    [$([C][Br]);$([Br])]
+
+doesn't. This is an rkdit issue or feature.
+
 If this new functional group is to connect to another functional group
 with a double bond during assembly, the names of the functional groups
 should be added to the `double_bond_combs` list. The order in
@@ -86,7 +98,11 @@ functional_groups = [
 
                 FGInfo("thiol", "[S][H]",
                                 "[$([S][H]);$([S])]",
-                                "[$([H][S]);$([H])]")
+                                "[$([H][S]);$([H])]"),
+
+                FGInfo("bromine", "[C][Br]",
+                                  "[$([C][Br]);$([C])]",
+                                  "[$([Br][C]);$([Br])]")
 
                     ]
 
