@@ -92,7 +92,10 @@ class Normalization:
         # First make sure that all the fitness values are reset and
         # hold the value of the approraite fitness function.
         for macro_mol in population:
-            macro_mol.fitness = copy.deepcopy(
+            if macro_mol.failed:
+                macro_mol.fitness = 1e-4
+            else:
+                macro_mol.fitness = copy.deepcopy(
                             macro_mol.unscaled_fitness[fitness_func])
 
         # Make a population of members where all fitness values are
@@ -114,6 +117,10 @@ class Normalization:
 
         valid_pop = Population(*(mol for mol in population if not
                                  mol.failed))
+
+        # If there were no valid molecules, no need to normalize.
+        if len(valid_pop) == 0:
+            return
 
         for func_data in self.funcs:
             getattr(self, func_data.name)(valid_pop,

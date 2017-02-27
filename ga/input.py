@@ -18,7 +18,7 @@ from .selection import Selection
 from .mutation import Mutation
 from .population import Population
 from .normalization import Normalization
-from .exit import Exit
+from .ga_exit import Exit
 
 from ..convenience_tools import FunctionData
 from ..molecular import topologies
