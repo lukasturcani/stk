@@ -110,7 +110,7 @@ def run():
         id_ += 1
 
     # Dump the population before attempting any operations.
-    pop.dump(os.path.join(pop_dump_path, 'init_pop'))
+    pop.dump(os.path.join(pop_dump_path, 'init_pop.json'))
 
     with time_it():
         print_info('Optimizing the population.')
@@ -167,7 +167,8 @@ def run():
                 id_ += 1
 
         # Dump the population before attempting any operations.
-        pop.dump(os.path.join(pop_dump_path, 'gen_{}_unselected.json'))
+        pop.dump(os.path.join(pop_dump_path,
+                              'gen_{}_unselected.json'.format(x)))
 
         with time_it():
             print_info('Optimizing the population.')
@@ -200,7 +201,7 @@ def run():
             progress.add_subpopulation(pop)
             run_db.add_members(pop)
             pop.dump(os.path.join(pop_dump_path,
-                                  'gen_{}_selected.json'))
+                                  'gen_{}_selected.json'.format(x)))
 
         # If the user defined some premature exit function, check if
         # the exit criterion has been fulfilled.
@@ -214,8 +215,6 @@ def run():
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
-        # Before plotting the EPP remove all molecules which failed.
-        progress.remove_failures()
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
 
