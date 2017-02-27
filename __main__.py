@@ -215,6 +215,8 @@ def run():
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
+        # Remove any failed molecules.
+        progress.remove_failures()
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
 
