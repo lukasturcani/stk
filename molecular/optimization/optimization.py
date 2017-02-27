@@ -31,6 +31,7 @@ import rdkit.Chem.AllChem as ac
 import rdkit.Chem as chem
 import multiprocessing as mp
 from functools import partial, wraps
+import numpy as np
 
 from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt,
@@ -128,7 +129,7 @@ class _OptimizationFunc:
 
     def __call__(self, macro_mol, *args,  **kwargs):
         try:
-            if macro_mol.optimized:
+            if macro_mol.optimized or macro_mol.failed:
                 print('Skipping {0}'.format(macro_mol.name))
                 return macro_mol
 
@@ -145,31 +146,6 @@ class _OptimizationFunc:
             MolError(ex, macro_mol, "During optimization.")
             return macro_mol
 
-def rdkit_optimization(macro_mol):
-    """
-    Optimizes the structure of the molecule using rdkit.
-
-    Parameters
-    ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure should be optimized.
-
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute has it's structure
-        changed as a result of the optimization. This means the
-        ``Conformer`` instance held by the rdkit molecule is changed.
-
-    Returns
-    -------
-    None : NoneType
-
-    """
-
-    # Sanitize then optimize the rdkit molecule.
-    chem.SanitizeMol(macro_mol.mol)
-    ac.MMFFOptimizeMolecule(macro_mol.mol)
 
 def do_not_optimize(macro_mol):
     """
@@ -191,6 +167,36 @@ def do_not_optimize(macro_mol):
     """
 
     return
+
+def partial_raiser(macro_mol, opt_func):
+    """
+    Raises and optimizes at random.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule being optimized.
+
+    opt_func : FunctionData
+        A FunctionData object representing the optimization function
+        to be used.
+
+    Modifies
+    --------
+    macro_mol.mol
+        The rdkit instance is optimized.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    if not np.random.choice([0,1]):
+        raise Exception('Partial raiser.')
+
+    ofunc = global()[opt_func.name]
+    ofunc(macro_mol, **opt_func.params)
 
 def raiser(macro_mol, param1, param2=2):
     """
@@ -219,3 +225,30 @@ def raiser(macro_mol, param1, param2=2):
     """
 
     raise Exception('Raiser optimization function used.')
+
+
+def rdkit_optimization(macro_mol):
+    """
+    Optimizes the structure of the molecule using rdkit.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure should be optimized.
+
+    Modifies
+    --------
+    macro_mol.mol
+        The rdkit molecule held in this attribute has it's structure
+        changed as a result of the optimization. This means the
+        ``Conformer`` instance held by the rdkit molecule is changed.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    # Sanitize then optimize the rdkit molecule.
+    chem.SanitizeMol(macro_mol.mol)
+    ac.MMFFOptimizeMolecule(macro_mol.mol)
