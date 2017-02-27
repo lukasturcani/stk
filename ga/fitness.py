@@ -254,10 +254,17 @@ class _FitnessFunc:
     def __call__(self, macro_mol, *args,  **kwargs):
         func_name = self.__wrapped__.func.__name__
         try:
-            if (macro_mol.failed or
-                func_name in macro_mol.unscaled_fitness):
+            # If the fitness function has already been applied to this
+            # molecule, return.
+            if func_name in macro_mol.unscaled_fitness:
+                print('Skipping {}'.format(macro_mol.name))
+                return macro_mol
 
-                print('Skipping {0}'.format(macro_mol.name))
+            # If the molecule failed, make sure that the
+            # `unscaled_fitness` value is ``None``, and return.
+            elif macro_mol.failed:
+                print('Skipping {}'.format(macro_mol.name))
+                macro_mol.unscaled_fitness[func_name] = None
                 return macro_mol
 
             val = self.__wrapped__(macro_mol, *args, **kwargs)

@@ -278,7 +278,7 @@ class Population:
 
                 except TypeError:
                     continue
-
+                    
             pop.members.append(Cage({bb, lk}, topology))
 
         return pop

@@ -7,4 +7,4 @@ from .normalization import *
 from .plotting import *
 from .population import *
 from .selection import *
-from .exit import *
+from .ga_exit import *
