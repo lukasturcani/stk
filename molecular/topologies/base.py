@@ -49,6 +49,7 @@ from itertools import chain
 from ..fg_info import double_bond_combs
 from ...convenience_tools import dedupe, flatten
 
+
 class Topology:
     """
     Builds macromolecules.
@@ -202,6 +203,7 @@ class Topology:
     def __hash__(self):
         return id(self)
 
+
 class Linear(Topology):
     """
     A class represting linear polymers.
@@ -308,15 +310,22 @@ class Linear(Topology):
                                   macro_mol.building_blocks):
             mapping[label] = monomer
 
+
+        # Make a que for holding bonder atom ids.
+        self.bonders = deque(maxlen=2)
+        # Make string representing the entire polymer, not just the
+        # repeating unit.
+        polymer = self.repeating_unit*self.n
+        # Make a string holding the orientation of each monomer in the
+        # entire polymer, not just the repeating unit.
+        dirs = ",".join(str(x) for x in self.orientation) + ','
+        dirs *= self.n
+        # Turn the string into a list of numbers.
+        dirs = [int(x) for x in dirs.split(',') if x]
+
         # Go through the repeating unit. Place each monomer 50 A apart.
         # Also create a bond.
-        self.bonders = deque(maxlen=2)
         macro_mol.mol = chem.Mol()
-        polymer = self.repeating_unit*self.n
-        dirs = ",".join(str(x) for x in self.orientation)
-        dirs *= self.n
-        dirs = [int(x) for x in dirs.split(',')]
-
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             self.bonders.append([
                 macro_mol.mol.GetNumAtoms() + id_ for
