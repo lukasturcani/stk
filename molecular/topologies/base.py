@@ -40,8 +40,7 @@ topology is at the origin.
 
 """
 
-import rdkit
-import rdkit.Chem as chem
+import rdkit.Chem as rdkit
 from collections import deque
 import numpy as np
 from itertools import chain
@@ -125,7 +124,7 @@ class Topology:
 
         """
 
-        mol = chem.EditableMol(macro_mol.mol)
+        mol = rdkit.EditableMol(macro_mol.mol)
         # Delete atoms with largest id last, so that when deleting
         # later atoms their ids do not change.
         for atom in reversed(macro_mol.mol.GetAtoms()):
@@ -184,9 +183,9 @@ class Topology:
                                tup in double_bond_combs)
 
         if any(double_bond_present):
-            return rdkit.Chem.rdchem.BondType.DOUBLE
+            return rdkit.rdchem.BondType.DOUBLE
         else:
-            return rdkit.Chem.rdchem.BondType.SINGLE
+            return rdkit.rdchem.BondType.SINGLE
 
     def __str__(self):
         return repr(self)
@@ -226,14 +225,27 @@ class Linear(Topology):
         The number of repeating units which are used to make the
         polymer.
 
+    ends : str (default = 'h')
+        The string represents how the end groups of the polymer are
+        treated. If 'h' the functional groups at the end of the polymer
+        are converted into hydrogem atoms. If 'fg' they are kept as the
+        original functional group.
+
     """
 
-    def __init__(self, repeating_unit, orientation, n):
+    def __init__(self, repeating_unit, orientation, n, ends='h'):
         self.repeating_unit = repeating_unit
         self.orientation = tuple(orientation)
         self.n = n
+        self.ends = ends
 
     def del_atoms(self, macro_mol):
+        if self.ends == 'h':
+            self.hygrogen_ends(macro_mol)
+        elif self.ends == 'fg':
+            self.fg_ends(macro_mol)
+
+    def fg_ends(self, macro_mol):
         """
         Removes almost all atoms tagged for deletion.
 
@@ -260,7 +272,7 @@ class Linear(Topology):
         # Get all atoms tagged for deletion, held in tuples
         # corresponding to individual functional groups.
         for bb in macro_mol.building_blocks:
-            delmol = chem.MolFromSmarts(bb.func_grp.del_smarts)
+            delmol = rdkit.MolFromSmarts(bb.func_grp.del_smarts)
             fgs = fgs.union(macro_mol.mol.GetSubstructMatches(delmol))
 
         # Get the functional groups which hold the atoms with the
@@ -279,6 +291,36 @@ class Linear(Topology):
             atom.ClearProp('del')
 
         super().del_atoms(macro_mol)
+
+    def hygrogen_ends(self, macro_mol):
+        """
+        Removes all atoms tagged for deletion and adds Hs.
+
+        In polymers, you want to replace the functional groups at the
+        ends with hydrogen atoms.
+
+        Parameters
+        ----------
+        macro_mol : Polymer
+            The polymer being assembled.
+
+        Modifies
+        --------
+        macro_mol.mol : rdkit.Chem.rdchem.Mol
+            Redundant atoms are removed.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        # Remove all extra atoms.
+        super().del_atoms(macro_mol)
+        # Add hydrogens.
+        for atom in macro_mol.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+        macro_mol.mol = rdkit.AddHs(macro_mol.mol, addCoords=True)
 
     def place_mols(self, macro_mol):
         """
@@ -310,7 +352,6 @@ class Linear(Topology):
                                   macro_mol.building_blocks):
             mapping[label] = monomer
 
-
         # Make a que for holding bonder atom ids.
         self.bonders = deque(maxlen=2)
         # Make string representing the entire polymer, not just the
@@ -325,7 +366,7 @@ class Linear(Topology):
 
         # Go through the repeating unit. Place each monomer 50 A apart.
         # Also create a bond.
-        macro_mol.mol = chem.Mol()
+        macro_mol.mol = rdkit.Mol()
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             self.bonders.append([
                 macro_mol.mol.GetNumAtoms() + id_ for
@@ -333,7 +374,7 @@ class Linear(Topology):
 
             mdir = np.random.choice([-1, 1]) if not mdir else mdir
             mapping[label].set_orientation2([mdir, 0, 0])
-            macro_mol.mol = chem.CombineMols(macro_mol.mol,
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                             mapping[label].set_position([i*50, 0, 0]))
             if i != 0:
                 self.join(macro_mol)
@@ -365,7 +406,7 @@ class Linear(Topology):
         (macro_mol.atom_distance(bonder1, bonder2), bonder1, bonder2))
 
         _, bonder1, bonder2 = min(distances)
-        emol = chem.EditableMol(macro_mol.mol)
+        emol = rdkit.EditableMol(macro_mol.mol)
         emol.AddBond(bonder1, bonder2,
                 self.determine_bond_type(macro_mol, bonder1, bonder2))
 
