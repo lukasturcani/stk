@@ -170,8 +170,7 @@ provided in the docstring of ``EMeta``.
 """
 
 import os
-import rdkit.Chem as chem
-import rdkit.Chem.AllChem as ac
+import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
 from uuid import uuid4
 from types import MethodType
@@ -596,12 +595,12 @@ class Energy(metaclass=EMeta):
 
         if forcefield == 'uff':
             self.molecule.mol.UpdatePropertyCache()
-            ff = ac.UFFGetMoleculeForceField(self.molecule.mol)
+            ff = rdkit.UFFGetMoleculeForceField(self.molecule.mol)
         if forcefield == 'mmff':
-            chem.GetSSSR(self.molecule.mol)
+            rdkit.GetSSSR(self.molecule.mol)
             self.molecule.mol.UpdatePropertyCache()
-            ff = ac.MMFFGetMoleculeForceField(self.molecule.mol,
-                  ac.MMFFGetMoleculeProperties(self.molecule.mol))
+            ff = rdkit.MMFFGetMoleculeForceField(self.molecule.mol,
+                  rdkit.MMFFGetMoleculeProperties(self.molecule.mol))
 
         eng = ff.CalcEnergy()
         return eng
