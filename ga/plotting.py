@@ -113,7 +113,6 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
         fig = plt.figure()
         plt.xlabel(xlabel)
         plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
-        plt.title('Population Comparison', fontsize=18)
 
         y_mean = [array[x] for array in mean_params]
         y_max = [array[x] for array in max_params]

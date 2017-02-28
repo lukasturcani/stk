@@ -553,13 +553,15 @@ class Molecule:
 
         """
 
-        maxid1, maxid2 = max(x for x in
-                    it.combinations(range(self.mol.GetNumAtoms()), 2),
+        maxid1, maxid2 = max((x for x in
+                    it.combinations(range(self.mol.GetNumAtoms()), 2)),
                     key=lambda x : self.atom_distance(*x))
 
         maxd = self.atom_distance(maxid1, maxid2)
         maxd += (atom_vdw_radii[self.atom_symbol(maxid1)] +
                  atom_vdw_radii[self.atom_symbol(maxid2)])
+
+        return maxd, maxid1, maxid2
 
     def mdl_mol_block(self):
         """

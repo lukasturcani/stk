@@ -132,7 +132,7 @@ def test_graph():
     assert len(graph.edges()) == expected_edges
 
 def test_max_diameter():
-    assert np.isclose(mol.max_diameter(),  6.028867583551658,
+    assert np.isclose(mol.max_diameter()[0],  8.208867583551658,
                       atol=1e-4)
 
 def test_position_matrix():
