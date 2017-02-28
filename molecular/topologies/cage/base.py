@@ -2,7 +2,7 @@ import itertools
 from collections import deque
 from scipy.spatial.distance import euclidean
 import numpy as np
-import rdkit.Chem as chem
+import rdkit.Chem.AllChem as rdkit
 
 from ..base import Topology
 from ....convenience_tools import (centroid, vector_theta,
@@ -444,7 +444,7 @@ class _CageTopology(Topology):
 
         """
 
-        editable_mol = chem.EditableMol(macro_mol.mol)
+        editable_mol = rdkit.EditableMol(macro_mol.mol)
         macro_mol.bonds_made = 0
 
         # This loop finds all the distances between an atom paired with
@@ -569,7 +569,7 @@ class _CageTopology(Topology):
 
         """
 
-        macro_mol.mol = chem.Mol()
+        macro_mol.mol = rdkit.Mol()
 
         # Get the StructUnit instances of the building blocks.
         bb1, bb2 = macro_mol.building_blocks
@@ -610,7 +610,7 @@ class _CageTopology(Topology):
             # Position the molecule on the vertex.
             bb.set_position_from_matrix(bb_pos)
             bb_mol = position.place_mol(bb, aligner)
-            macro_mol.mol = chem.CombineMols(macro_mol.mol, bb_mol)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
 
@@ -647,7 +647,7 @@ class _CageTopology(Topology):
             # atom will get aligned if the position is a Vertex.
             lk.set_position_from_matrix(lk_pos)
             lk_mol = position.place_mol(lk, int(not self.alignment))
-            macro_mol.mol = chem.CombineMols(macro_mol.mol, lk_mol)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, lk_mol)
             # Update the counter each time a linker is added.
             macro_mol.bb_counter.update([lk])
 
@@ -669,7 +669,7 @@ class _VertexOnlyCageTopology(_CageTopology):
 
     def place_mols(self, macro_mol):
 
-        macro_mol.mol = chem.Mol()
+        macro_mol.mol = rdkit.Mol()
 
         if self.random_placement:
             return self.place_mols_random(macro_mol)
@@ -680,7 +680,7 @@ class _VertexOnlyCageTopology(_CageTopology):
             bb = np.random.choice(list(macro_mol.building_blocks))
             n_bb = len(bb.functional_group_atoms())
 
-            macro_mol.mol = chem.CombineMols(
+            macro_mol.mol = rdkit.CombineMols(
                                             macro_mol.mol,
                                             position.place_mol(bb))
             macro_mol.bb_counter.update([bb])

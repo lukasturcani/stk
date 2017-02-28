@@ -118,7 +118,7 @@ each of the `progress_params` and they will have their y-axes labelled
 """
 
 import numpy as np
-import rdkit.Chem as chem
+import rdkit.Chem.AllChem as rdkit
 import copy
 from functools import partial, wraps
 import networkx as nx
@@ -722,7 +722,7 @@ def _cage_target(macro_mol, target_mol_file,
     binding_energy = (min_eng_cmplx.energy.values[ekey] -
                                                     energy_separate)
 
-    frag1, frag2 = chem.GetMolFrags(min_eng_cmplx.mol,
+    frag1, frag2 = rdkit.GetMolFrags(min_eng_cmplx.mol,
                                     asMols=True,
                                     sanitizeFrags=False)
 
@@ -838,7 +838,7 @@ def _generate_complexes(macro_mol, target, number=1):
 
         rot_target.set_position_from_matrix(new_pos_mat)
 
-        yield chem.CombineMols(macro_mol.mol, rot_target.mol)
+        yield rdkit.CombineMols(macro_mol.mol, rot_target.mol)
 
 def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """
@@ -896,4 +896,4 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
             buckyball = copy.deepcopy(aligned_c60)
             buckyball.rotate(angle5, [0,0,1])
             buckyball.rotate(angle2, [0,1,0])
-            yield chem.CombineMols(macro_mol.mol, buckyball.mol)
+            yield rdkit.CombineMols(macro_mol.mol, buckyball.mol)
