@@ -6,8 +6,7 @@ Defines optimization functions which use MacroModel.
 import os
 import subprocess as sp
 import time
-import rdkit.Chem as chem
-import rdkit.Chem.AllChem as ac
+import rdkit.Chem.AllChem as rdkit
 import warnings
 import psutil
 import re
@@ -1005,7 +1004,7 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     # dummy bonds. This substructure will match with any 3 atoms which
     # are bonded together with any combination of bonds. These 3 atoms
     # will therefore have a bond angle.
-    ba_mol = chem.MolFromSmarts('[*]~[*]~[*]')
+    ba_mol = rdkit.MolFromSmarts('[*]~[*]~[*]')
 
     # Get the indices of all atoms which have a bond angle.
     # ``ba_atoms`` is a tuple of tuples of the form ((1,2,3), (4,5,6),
@@ -1029,7 +1028,7 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
             atom3_id in macro_mol.bonder_ids):
             continue
 
-        ba = ac.GetAngleDeg(conf, atom1_id, atom2_id, atom3_id)
+        ba = rdkit.GetAngleDeg(conf, atom1_id, atom2_id, atom3_id)
 
         fix_block += (fix_ba.format(atom1_id+1, atom2_id+1,
                                     atom3_id+1, ba) + "\n")
@@ -1085,7 +1084,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     # dummy bonds. This substructure will match with any 4 atoms which
     # are bonded together with any combination of bonds. These 4 atoms
     # will therefore have a torsinal angle.
-    ta_mol = chem.MolFromSmarts('[*]~[*]~[*]~[*]')
+    ta_mol = rdkit.MolFromSmarts('[*]~[*]~[*]~[*]')
 
     # Get the indices of all atoms which have a torsional angle.
     # ``ta_atoms`` is a tuple of tuples of the form ((1,2,3,4),
@@ -1109,7 +1108,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
             atom4_id in macro_mol.bonder_ids):
             continue
 
-        ta = ac.GetDihedralDeg(conf, atom1_id, atom2_id,
+        ta = rdkit.GetDihedralDeg(conf, atom1_id, atom2_id,
                                      atom3_id, atom4_id)
 
         fix_block += (fix_ta.format(atom1_id+1, atom2_id+1,
