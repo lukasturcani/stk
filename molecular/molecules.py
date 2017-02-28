@@ -132,9 +132,8 @@ import numpy as np
 import warnings
 from functools import total_ordering, partial
 import itertools as it
-from rdkit import Chem as chem
-from rdkit.Chem import AllChem as ac
 import rdkit.Geometry.rdGeometry as rdkit_geo
+import rdkit.Chem.AllChem as rdkit
 from rdkit import DataStructs
 import os
 import networkx as nx
@@ -470,7 +469,7 @@ class Molecule:
 
         obj = c.__new__(c)
         # Initialize attributes.
-        obj.mol = chem.MolFromMolBlock(json_dict['mol_block'],
+        obj.mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
                                        sanitize=False, removeHs=False)
         obj.optimized = optimized
         obj.failed = False
@@ -554,8 +553,13 @@ class Molecule:
 
         """
 
-        return max(self.atom_distance(*x) for x in
-                    it.combinations(range(self.mol.GetNumAtoms()), 2))
+        maxid1, maxid2 = max(x for x in
+                    it.combinations(range(self.mol.GetNumAtoms()), 2),
+                    key=lambda x : self.atom_distance(*x))
+
+        maxd = self.atom_distance(maxid1, maxid2)
+        maxd += (atom_vdw_radii[self.atom_symbol(maxid1)] +
+                 atom_vdw_radii[self.atom_symbol(maxid2)])
 
     def mdl_mol_block(self):
         """
@@ -867,7 +871,7 @@ class Molecule:
 
         # The function does not modify the existing conformer, as a
         # result a new instance is created and used for modification.
-        conformer = chem.Conformer(self.mol.GetConformer())
+        conformer = rdkit.Conformer(self.mol.GetConformer())
 
         # For each atom, get the atomic positions from the conformer
         # and shift them. Create a new geometry instance from these new
@@ -900,7 +904,7 @@ class Molecule:
 
         # Create a new copy of the rdkit molecule instance representing
         # the molecule - the original instance is not to be modified.
-        new_mol = chem.Mol(self.mol)
+        new_mol = rdkit.Mol(self.mol)
 
         # The new rdkit molecule was copied from the one held in the
         # `mol` attribute, as result it has a copy of its conformer. To
@@ -1010,7 +1014,7 @@ class Molecule:
         """
 
         # First write the file using rdkit.
-        chem.MolToPDBFile(self.mol, path)
+        rdkit.MolToPDBFile(self.mol, path)
 
         # Edit the file because rkdit does poor atom labelling.
         new_content = ''
@@ -1098,17 +1102,17 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     """
 
-    init_funcs = {'.mol' : partial(chem.MolFromMolFile,
+    init_funcs = {'.mol' : partial(rdkit.MolFromMolFile,
                                    sanitize=False, removeHs=False),
 
-                  '.sdf' : partial(chem.MolFromMolFile,
+                  '.sdf' : partial(rdkit.MolFromMolFile,
                                    sanitize=False, removeHs=False),
 
-                  '.mol2' : partial(chem.MolFromMol2File,
+                  '.mol2' : partial(rdkit.MolFromMol2File,
                                  sanitize=False, removeHs=False),
                   '.mae' : mol_from_mae_file,
 
-                  '.pdb' : partial(chem.MolFromPDBFile,
+                  '.pdb' : partial(rdkit.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
 
     def __init__(self, file, functional_group=None, note="", name=""):
@@ -1293,7 +1297,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # Generate a ``rdkit.Chem.rdchem.Mol`` instance which
         # represents the functional group of the molecule.
-        func_grp_mol = chem.MolFromSmarts(self.func_grp.fg_smarts)
+        func_grp_mol = rdkit.MolFromSmarts(self.func_grp.fg_smarts)
 
         # Do a substructure search on the the molecule in `mol` to find
         # which atoms match the functional group. Return the atom ids
@@ -1377,7 +1381,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        return frozenset([chem.MolToInchi(rdkit_mol),
+        return frozenset([rdkit.MolToInchi(rdkit_mol),
                           functional_group])
 
     def rotate2(self, theta, axis):
@@ -1546,9 +1550,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
 
         # First get the fingerprint of `self`.
-        chem.GetSSSR(self.mol)
+        rdkit.GetSSSR(self.mol)
         self.mol.UpdatePropertyCache(strict=False)
-        fp = ac.GetMorganFingerprint(self.mol, 4)
+        fp = rdkit.GetMorganFingerprint(self.mol, 4)
 
         # For every structure file in the database create a rdkit
         # molecule. Place these in a list.
@@ -1562,9 +1566,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                 continue
 
             mol = self.init_funcs[ext](path)
-            chem.GetSSSR(mol)
+            rdkit.GetSSSR(mol)
             mol.UpdatePropertyCache(strict=False)
-            mol_fp = ac.GetMorganFingerprint(mol, 4)
+            mol_fp = rdkit.GetMorganFingerprint(mol, 4)
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
             mols.append((similarity, path))
 
@@ -1609,7 +1613,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # Give all atoms which form bonds during reactions the tag
         # 'bonder' and set its value to '1'. Add their ids to
         # `bonder_ids`.
-        bond_mol = chem.MolFromSmarts(self.func_grp.target_smarts)
+        bond_mol = rdkit.MolFromSmarts(self.func_grp.target_smarts)
         bond_atoms = self.mol.GetSubstructMatches(bond_mol)
         for atom_id in flatten(bond_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
@@ -1618,7 +1622,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # Give all atoms which form bonds during reactions the tag
         # 'del' and set its value to '1'.
-        del_mol = chem.MolFromSmarts(self.func_grp.del_smarts)
+        del_mol = rdkit.MolFromSmarts(self.func_grp.del_smarts)
         del_atoms = self.mol.GetSubstructMatches(del_mol)
         for atom_id in flatten(del_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
@@ -2039,7 +2043,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
             self.save_bonders()
 
         except Exception as ex:
-            self.mol = chem.Mol()
+            self.mol = rdkit.Mol()
             self.failed = True
             MolError(ex, self, 'During initialization.')
 
