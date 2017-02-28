@@ -4,7 +4,7 @@ Defines cage topologies of building blocks with 3 functional groups.
 """
 
 import numpy as np
-import rdkit.Chem as chem
+import rdkit.Chem.AllChem as rdkit
 
 from .base import _VertexOnlyCageTopology,  Vertex
 
@@ -30,7 +30,7 @@ class OnePlusOne(_VertexOnlyCageTopology):
 
     def join_mols(self, macro_mol):
 
-        editable_mol = chem.EditableMol(macro_mol.mol)
+        editable_mol = rdkit.EditableMol(macro_mol.mol)
 
         for position in self.positions_A:
             other_position = next(x for x in self.positions_A if
