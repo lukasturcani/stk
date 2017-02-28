@@ -87,13 +87,27 @@
       anything just yet.<br>
       <code class="whole_file">
         ####################################################################<br>
+        # Variable declartions.<br>
+        ####################################################################<br>
+<br>
+        $$bb_db='/home/username/aldehydes_3f'<br>
+        $$lk_db='/home/username/amines_2f'<br>
+        $$mm_path=''/home/username/program_files/schrodinger2016-3'
+<br><br>
+        ####################################################################<br>
+        # Databases to use.<br>
+        ####################################################################<br>
+<br>
+        databses=['path/to/database1.json',<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'path/to/database2.json',<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'path/to/database3.json']<br>
+<br>
+        ####################################################################<br>
         # Population initialization function.<br>
         ####################################################################<br>
 <br>
         init_func; init_random_cages;<br>
-        bb_db="/home/username/aldehydes_3f";<br>
-        lk_db="/home/username/amines_2f";<br>
-        topologies=[FourPlusSix, EightPlusTwelve]<br>
+        bb_db=$bb_db; lk_db=$lk_db; topologies=[FourPlusSix(), EightPlusTwelve()]<br>
 <br>
         ####################################################################<br>
         # Selection function for selecting the next generation.<br>
@@ -123,15 +137,13 @@
         # Mutation function 1.<br>
         ####################################################################<br>
 <br>
-        mutation_func; similar_bb;<br>
-        database="/home/username/aldehydes_3f"<br>
+        mutation_func; cage_similar_bb; database=$bb_db<br>
 <br>
         ####################################################################<br>
         # Mutation function 2.<br>
         ####################################################################<br>
 <br>
-        mutation_func; similar_lk;<br>
-        database="/home/username/amines_2f"<br>
+        mutation_func; cage_similar_lk; database=$lk_db<br>
 <br>
         ####################################################################<br>
         # When carrying mutations, chance that a given mutation function will be used.<br>
@@ -143,16 +155,36 @@
         # Optimization function.<br>
         ####################################################################<br>
 <br>
-        opt_func; macromodel_cage_opt;<br>
-        macromodel_path="/home/username/program_files/schrodinger2016-3"<br>
+        opt_func; macromodel_cage_opt; macromodel_path=$mm_path<br>
 <br>
         ####################################################################<br>
         # Fitness function.<br>
         ####################################################################<br>
 <br>
-        fitness_func; cage; target_cavity=8; coeffs=[1,1,5,0,0];<br>
-        energy_params={"key":("macromodel", 16, "/home/username/schrodinger2016-3")}<br>
+        fitness_func; cage; target_cavity=8;<br>
+        pseudoformation_params={'func' :<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FunctionData('macromodel',
+        forcefield=16, macromodel_path=$mm_path)}<br>
+<br><br>
+####################################################################<br>
+# Normalization functions.<br>
+####################################################################<br>
 <br>
+# First shift all energy values so that they are always positive.<br>
+normalization_func; shift_elements; indices=[-1]<br>
+<br>
+# Second, make sure that the magnitudes of all fitness parameters<br>
+# are comparable.<br>
+normalization_func; magnitudes<br>
+<br>
+# Third, combine the fitness parameter into a single fitness value.<br>
+normalization_func; combine; coefficients=[1,1,1,1];<br>
+exponents=[1,1,1,1]<br>
+<br>
+# Last, invert the fitness value because all fitness parameters<br>
+# are inversely proportional to fitness.<br>
+normalization_func; invert<br>
+<br><br>
         ####################################################################<br>
         # Number of generations to create.<br>
         ####################################################################<br>
@@ -358,6 +390,32 @@
         of crossover operations carried out during each generation and so on. It
         is merely the keyword, a <span class="value">=</span> and the value. No
         spaces, no semicolons.
+    </p><p>
+        Finally, MMEA input files also support the use of variables.
+        These are declared using the <b>constant definition format</b>.
+        Variable declartions are preceded by <span class="value">$$</span>,
+        <code>
+            $$hello=1<br>
+            $$world='hi'<br>
+            $$var3=FunctionData('somefunc', param1=$hello, param2=$world)
+        </code>
+        The variables can hold anything and can be nested. For example,
+        <span class="value">$$var3</span> above can be re-written:
+        <code>
+            $$PART1=FunctionData<br>
+            $$PART2=('somefunc', param1=$hello, param2=$world)<br>
+            $$var3=$PART1$PART2<br>
+        </code>
+        Variables do not have to be defined before they are used,
+            <code>
+            $$var3=FunctionData('somefunc', param1=$hello, param2=$world)<br>
+            $$hello=1<br>
+            $$world='hi'
+        </code>
+
+        is as valid as the first example.
+
+        They essentially just perform the most basic text replacement.
     </p>
     <h2>Valid input values.</h2>
     <p>
@@ -393,6 +451,10 @@ For example, once a given fittness has been reached or a certian molecule has be
 <span class="value">num_mutations</span>  - <b>constant definition format</b> - The number of mutations MMEA will carry out each generation.<br><br>
 <span class="value">num_crossovers</span>  - <b>constant definition format</b> - The number of crossover operations MMEA will carry out each generation.<br><br>
 <span class="value">pop_size</span>  - <b>constant definition format</b> - The size of the population.<br><br>
+<span class="value">databases</span>  - <b>constant definition format</b> - A list holding strings. Each string is the full path to a .json file
+holding MMEA molecules. The molecules are loaded into MMEA's memory on startup and as a result do not have to be reoptimized or have fitness
+values recalculated.  This can dramatically improve MMEA's performance. The .json files are generated by MMEA after each run and can also be
+made manually. See the <b>Output Files</b> section and the MMEA ipython notebook, respectively.<br><br>
 <span class="value">mutation_weights</span>  - <b>constant definition format</b> - The probability with which each mutation function defined in the input
 file will be used when a mutation operation is performed. Note that the form of this constant is a list. For example<br><br>
     <code>
@@ -423,8 +485,8 @@ file will be used when a mutation operation is performed. Note that the form of 
         MMEA will then output a list of valid functions, their description, and
         a list of their parameters.
         <code class="mmea_output">
-            random_bb<br>
-            ---------<br>
+            cage_random_bb<br>
+            --------------<br>
 <br>
                     &emsp;Substitutes a building-block* with a random one from a database.<br>
 <br>
@@ -471,8 +533,8 @@ file will be used when a mutation operation is performed. Note that the form of 
                         &emsp;&emsp;&emsp;topology.<br>
 <br>
 <br>
-            similar_bb<br>
-            ----------<br>
+            cage_similar_bb<br>
+            ---------------<br>
 <br>
                     &emsp;Substitute the building-block* with similar one from `database`.<br>
 <br>
@@ -507,8 +569,8 @@ file will be used when a mutation operation is performed. Note that the form of 
                         &emsp;&emsp;&emsp;according to the description in this docstring.<br>
 <br>
 <br>
-            similar_lk<br>
-            ----------<br>
+            cage_similar_lk<br>
+            ---------------<br>
 <br>
                     &emsp;Substitute the linker with a similar one from `database`.<br>
 <br>
@@ -543,8 +605,8 @@ file will be used when a mutation operation is performed. Note that the form of 
                         &emsp;&emsp;&emsp;description in this docstring.<br>
 <br>
 <br>
-            random_lk<br>
-            ---------<br>
+            cage_random_lk<br>
+            --------------<br>
 <br>
                     &emsp;Substitutes a linker with a random one from a database.<br>
 <br>
