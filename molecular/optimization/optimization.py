@@ -27,8 +27,7 @@ helper functions or classes.
 
 """
 
-import rdkit.Chem.AllChem as ac
-import rdkit.Chem as chem
+import rdkit.Chem.AllChem as rdkit
 import multiprocessing as mp
 from functools import partial, wraps
 import numpy as np
@@ -249,5 +248,5 @@ def rdkit_optimization(macro_mol):
     """
 
     # Sanitize then optimize the rdkit molecule.
-    chem.SanitizeMol(macro_mol.mol)
-    ac.MMFFOptimizeMolecule(macro_mol.mol)
+    rdkit.SanitizeMol(macro_mol.mol)
+    rdkit.MMFFOptimizeMolecule(macro_mol.mol)
