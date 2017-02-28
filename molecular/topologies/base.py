@@ -40,7 +40,7 @@ topology is at the origin.
 
 """
 
-import rdkit.Chem as rdkit
+import rdkit.Chem.AllChem as rdkit
 from collections import deque
 import numpy as np
 from itertools import chain
