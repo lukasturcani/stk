@@ -103,8 +103,8 @@ class GAInput:
         $$world='hi'
         $$var3=FunctionData('somefunc', param1=$hello, param2=$world)
 
-    The variables can hold anything. For example, $$var3 above can
-    be re-written:
+    The variables can hold anything and can be nested. For example,
+    $$var3 above can be re-written:
 
         $$PART1=FunctionData
         $$PART2=('somefunc', param1=$hello, param2=$world)
