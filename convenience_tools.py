@@ -274,6 +274,9 @@ class MAEExtractor:
         the macromodel conformer search. This holds other data such as
         their energies too.
 
+    min_energy : float
+        The minimum energy found in the .mae file.
+
     path : str
         The full path of the .mae file holding the extracted lowest
         energy conformer.
@@ -354,8 +357,10 @@ class MAEExtractor:
 
             prev_block.append(block)
 
+        e, conf = min(energies)
+        self.min_energy = e
         # Return the id of the lowst energy conformer.
-        return min(energies)[1]
+        return conf
 
     def maegz_to_mae(self):
         """
