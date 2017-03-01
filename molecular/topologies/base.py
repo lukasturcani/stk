@@ -60,9 +60,11 @@ class TopologyMeta(type):
 
         # Get the arguments, keyword arguments and defulat initialized
         # arguments used to make an instance of Topology.
-        sig = signature(self.__init__).bind_partial(*args, **kwargs)
+        sig = signature(self.__init__).bind_partial(self,
+                                                    *args, **kwargs)
         sig.apply_defaults()
-        sig = sig.arguments
+        sig = dict(sig.arguments)
+        sig.pop('self')
         # Create the Topology instance.
         obj = super().__call__(*args, **kwargs)
         # Use the arguments the object was initialized with to make
