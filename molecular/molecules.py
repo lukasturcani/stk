@@ -2173,7 +2173,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        return frozenset(x.key for x in building_blocks), topology
+        return (frozenset(x.key for x in building_blocks),
+                repr(topology))
 
     def same(self, other):
         """
