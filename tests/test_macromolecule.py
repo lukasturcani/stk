@@ -2,8 +2,7 @@ from types import SimpleNamespace
 from os.path import join
 import json
 from ..molecular import (MacroMolecule, Molecule, FourPlusSix,
-                         StructUnit,
-                         StructUnit2, StructUnit3, MacroMolKey)
+                         StructUnit, StructUnit2, StructUnit3)
 from ..ga import Population
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'))
@@ -55,7 +54,7 @@ def test_caching():
     # Make a MacroMolecule the regular way.
     bb1 = StructUnit2(join('data', 'struct_unit2', 'amine.mol2'))
     bb2 = StructUnit3(join('data', 'struct_unit3', 'amine.mol2'))
-    mol1 = MacroMolecule({bb1, bb2}, FourPlusSix())
+    mol1 = MacroMolecule([bb1, bb2], FourPlusSix())
 
     # Make a MacroMolecule using JSON.
     mol2 = pop[0]
@@ -83,7 +82,7 @@ def test_json_init():
         assert mol.fitness == None
         assert all(isinstance(x, StructUnit) for x in
                                         mol.building_blocks)
-        assert isinstance(mol.key, MacroMolKey)
+        assert isinstance(mol.key, tuple)
         assert mol.optimized == True
         assert mol.unscaled_fitness == {}
         assert mol.bonder_ids == [6, 15, 24, 59, 68, 77, 112, 121, 130,
