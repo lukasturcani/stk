@@ -246,7 +246,7 @@ class CachedStructUnit(type):
             obj.key = key
             self.cache[key] = obj
             return obj
-
+            
 
 class Molecule:
     """
