@@ -153,8 +153,8 @@ class Population:
             The full path to the file holding the building block of the
             cage.
 
-        topology : _CageTopology child class
-            An object of the topology to be made.
+        topology : type
+            A _CageTopology child class.
 
         ga_tools : GATools
             The GATools instance to be used by created population.
@@ -191,8 +191,7 @@ class Population:
 
         pop = cls(ga_tools)
         for i, align in enumerate(alignments):
-            topology.alignment = align
-            cage = Cage((lk, bb), topology)
+            cage = Cage((lk, bb), topology(align))
             pop.members.append(cage)
 
         return pop
@@ -278,7 +277,7 @@ class Population:
 
                 except TypeError:
                     continue
-                    
+
             pop.members.append(Cage({bb, lk}, topology))
 
         return pop
