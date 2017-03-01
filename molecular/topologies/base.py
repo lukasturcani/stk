@@ -191,9 +191,8 @@ class Topology:
         return repr(self)
 
     def __repr__(self):
-        c = ""
-        for key, value in sorted(self.__dict__.items()):
-            c += "{!s}={!r}".format(key, value)
+        c = ', '.join("{!s}={!r}".format(key, value) for key, value in
+                                        sorted(self.__dict__.items()))
         return "{}({})".format(self.__class__.__name__, c)
 
     def __eq__(self, other):
