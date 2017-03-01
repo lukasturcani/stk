@@ -170,6 +170,7 @@ class Cached(type):
         sig.apply_defaults()
         sig = sig.arguments
         key = self.gen_key(sig['building_blocks'], sig['topology'])
+
         if key in self.cache:
             return self.cache[key]
         else:
@@ -472,25 +473,9 @@ class Molecule:
         """
         # Get the class of the object.
         c = globals()[json_dict['class']]
-        # Check if the Molecule already exists in the cache, if so
-        # return it.
-        key = eval(json_dict['key'])
-        if key in c.cache:
-            return c.cache[key]
-
-        obj = c.__new__(c)
-        # Initialize attributes.
-        obj.mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
-                                       sanitize=False, removeHs=False)
-        obj.optimized = optimized
-        obj.failed = False
-        obj.energy = Energy(obj)
-        obj.note = json_dict['note']
-        obj.name = json_dict['name'] if load_names else ""
-        obj.key = key
-        obj._json_init(json_dict)
-        c.cache[key] = obj
-        return obj
+        json_dict['optimized'] = optimized
+        json_dict['load_names'] = load_names
+        return c._json_init(json_dict)
 
     def graph(self):
         """
@@ -550,7 +535,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.fromdict(json_dict, optimized, load_names)
+        return cls.fromdict(json_dict)
 
     def max_diameter(self):
         """
@@ -1342,15 +1327,16 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return {
 
-        'key' : repr(self.key),
         'class' : self.__class__.__name__,
+        'func_grp' : self.func_grp.name,
         'mol_block' : self.mdl_mol_block(),
         'note' : self.note,
         'name' : self.name
 
         }
 
-    def _json_init(self, json_dict):
+    @classmethod
+    def _json_init(cls, json_dict):
         """
         Completes a JSON initialization.
 
@@ -1369,10 +1355,27 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        self.file = 'JSON'
-        self.func_grp = next((x for x in functional_groups if
-                                x.name in self.key), None)
-        self.tag_atoms()
+        mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
+                                       sanitize=False, removeHs=False)
+        key = cls.gen_key(mol, json_dict['func_grp'])
+
+        if key in cls.cache:
+            return cls.cache[key]
+
+        obj = cls.__new__(cls)
+        obj.file = 'JSON'
+        obj.mol = mol
+        obj.func_grp = next((x for x in functional_groups if
+                                x.name == json_dict['func_grp']), None)
+        obj.energy = Energy(obj)
+        obj.optimized = json_dict['optimized']
+        obj.failed = False
+        obj.key = key
+        obj.note = json_dict['note']
+        obj.name = json_dict['name'] if json_dict['load_names'] else ""
+        obj.tag_atoms()
+        cls.cache[key] = obj
+        return obj
 
     @staticmethod
     def gen_key(rdkit_mol, functional_group):
@@ -1390,13 +1393,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        frozenset
+        tuple
             The key used for caching the molecule.
 
         """
 
-        return frozenset([rdkit.MolToInchi(rdkit_mol),
-                          functional_group])
+        return functional_group, rdkit.MolToInchi(rdkit_mol)
 
     def rotate2(self, theta, axis):
         """
@@ -1876,10 +1878,6 @@ class StructUnit3(StructUnit):
         start = self.bonder_plane_normal()
         return self._set_orientation2(start, end)
 
-# This class used to form the key in the cache of MacroMolecules.
-MacroMolKey = namedtuple('MacroMolKey',
-                         ['building_blocks', 'topology'])
-
 
 @total_ordering
 class MacroMolecule(Molecule, metaclass=Cached):
@@ -2099,13 +2097,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
         'building_blocks' : [x.json() for x in self.building_blocks],
         'topology' : repr(self.topology),
         'unscaled_fitness' : repr(self.unscaled_fitness),
-        'key' : repr(self.key),
         'note' : self.note,
         'name' : self.name
 
         }
 
-    def _json_init(self, json_dict):
+    @classmethod
+    def _json_init(cls, json_dict):
         """
         Completes a JSON initialization.
 
@@ -2124,19 +2122,36 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        self.building_blocks = [Molecule.fromdict(x) for x in
+        bbs = [Molecule.fromdict(x) for x in
                                     json_dict['building_blocks']]
-        self.topology = eval(json_dict['topology'],
-                             topologies.__dict__)
-        self.unscaled_fitness = eval(json_dict['unscaled_fitness'],
+
+        topology = eval(json_dict['topology'],  topologies.__dict__)
+
+        key = cls.gen_key(bbs, topology)
+        if key in cls.cache:
+            return cls.cache[key]
+
+        obj = cls.__new__(cls)
+        obj.mol =  rdkit.MolFromMolBlock(json_dict['mol_block'],
+                                       sanitize=False, removeHs=False)
+        obj.topology = topology
+        obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
                                      np.__dict__)
-        self.fitness = None
-        self.progress_params = None
-        self.bb_counter = Counter({Molecule.fromdict(key) : val for
+        obj.fitness = None
+        obj.progress_params = None
+        obj.bb_counter = Counter({Molecule.fromdict(key) : val for
                                 key, val in json_dict['bb_counter']})
-        self.bonds_made = json_dict['bonds_made']
-        self.energy = Energy(self)
-        self.bonder_ids = json_dict['bonder_ids']
+        obj.bonds_made = json_dict['bonds_made']
+        obj.energy = Energy(obj)
+        obj.bonder_ids = json_dict['bonder_ids']
+        obj.optimized = json_dict['optimized']
+        obj.note = json_dict['note']
+        obj.name = json_dict['name'] if json_dict['load_names'] else ""
+        obj.failed = False
+        obj.key = key
+        obj.building_blocks = bbs
+        cls.cache[key] = obj
+        return obj
 
     @staticmethod
     def gen_key(building_blocks, topology):
@@ -2153,18 +2168,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         Returns
         -------
-        MacroMolKey
+        tuple
             The key used for caching the macromolecule.
 
         """
 
-        tkey = set(topology.__dict__.items())
-        tkey.add(topology.__class__.__name__)
-        tkey = frozenset(tkey)
-
-        return MacroMolKey(
-            building_blocks=frozenset(x.key for x in building_blocks),
-            topology=tkey)
+        return frozenset(x.key for x in building_blocks), topology
 
     def same(self, other):
         """
@@ -2184,14 +2193,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        t1 = self.topology
-        t2 = other.topology
         # Compare the building blocks and topology making up the
         # macromolecule. If these are the same then the molecules
         # have the same structure.
         return (self.building_blocks == other.building_blocks and
-                t1.__class__ == t2.__class__ and
-                t1.__dict__.items() == t2.__dict__.items())
+                repr(self.topology) == repr(other.topology))
 
     def update_cache(self):
         """
@@ -2242,19 +2248,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
     @classmethod
     def testing_init(cls, bb1, bb2, topology):
 
-        tkey = set(topology.__dict__.items())
-        tkey.add(topology.__class__.__name__)
-        tkey = frozenset(tkey)
-
-        key = MacroMolKey(
-                    building_blocks=frozenset([bb1, bb2]),
-                           topology=tkey)
+        key = frozenset({bb1, bb2}), repr(topology)
 
         if key in MacroMolecule.cache.keys():
             return MacroMolecule.cache[key]
         else:
             macro_mol = cls.__new__(cls)
-            macro_mol.building_blocks = {bb1, bb2}
+            macro_mol.building_blocks = [bb1, bb2]
             macro_mol.topology = topology
             MacroMolecule.cache[key] = macro_mol
             return macro_mol
