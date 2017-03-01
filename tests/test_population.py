@@ -72,9 +72,8 @@ def test_init():
 def test_init_cage_isomers():
     lk_file = join('data', 'struct_unit2', 'amine.mol2')
     bb_file = join('data', 'struct_unit3', 'amine.mol2')
-    pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix(),
+    pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix,
                                        GATools.init_empty())
-
     pop.remove_duplicates()
     assert len(pop) == 81
 
