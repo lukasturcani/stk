@@ -3,8 +3,9 @@ import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 import rdkit.Chem as chem
+import json
 
-from ..molecular import StructUnit
+from ..molecular import StructUnit, Molecule
 from ..convenience_tools import normalize_vector
 
 data_dir = join('data', 'struct_unit', 'amine.mol')
@@ -27,30 +28,30 @@ def test_all_bonder_distances():
         conf_ds.append(euclidean(a1_coord, a2_coord))
 
     assert len(conf_ds) == sum(1 for _ in mol.all_bonder_distances())
-    assert np.allclose(list(x for *_, x in mol.all_bonder_distances()), 
+    assert np.allclose(list(x for *_, x in mol.all_bonder_distances()),
                        conf_ds, atol=1e-8)
 
 def test_bonder_centroid():
     position = np.array([0.,0.,0.])
     for id_ in mol.bonder_ids:
         position += np.array([*conf.GetAtomPosition(id_)])
-        
-    assert np.allclose((position/len(mol.bonder_ids)), 
+
+    assert np.allclose((position/len(mol.bonder_ids)),
                        mol.bonder_centroid(), atol=1e-8)
-                       
+
 def test_bonder_direction_vectors():
     vs = []
     for atom1_id, atom2_id in it.combinations(mol.bonder_ids, 2):
         p1 = np.array([*conf.GetAtomPosition(atom1_id)])
         p2 = np.array([*conf.GetAtomPosition(atom2_id)])
-        
+
         vs.append(normalize_vector(p1-p2))
-        
+
     assert len(vs) == sum(1 for _ in mol.bonder_direction_vectors())
     assert np.allclose(
         list(x for *_, x in mol.bonder_direction_vectors()), vs,
             atol=1e-8)
-            
+
 def test_bonder_position_matrix():
         pos_array = np.array([])
 
@@ -59,20 +60,67 @@ def test_bonder_position_matrix():
             pos_array = np.append(pos_array, pos_vect)
 
         m = np.matrix(pos_array.reshape(-1,3).T)
-    
+
         assert np.allclose(m, mol.bonder_position_matrix(), atol=1e-8)
-        
+
 def test_centroid_centroid_dir_vector():
     c1 = mol.bonder_centroid()
     c2 = mol.centroid()
-    assert np.allclose(normalize_vector(c2-c1), 
+    assert np.allclose(normalize_vector(c2-c1),
                        mol.centroid_centroid_dir_vector(),
                        atol=1e-8)
-                       
-def test_functional_group_atoms():  
+
+def test_functional_group_atoms():
         func_grp_mol = chem.MolFromSmarts(mol.func_grp.fg_smarts)
-        assert (mol.mol.GetSubstructMatches(func_grp_mol)  == 
+        assert (mol.mol.GetSubstructMatches(func_grp_mol)  ==
                 mol.functional_group_atoms())
+
+def test_json_init():
+    bb1 = Molecule.load(join('data', 'struct_unit', 'su.json'))
+    assert bb1.file == 'JSON'
+    assert bb1.optimized == True
+    assert bb1.bonder_ids == [7, 10]
+    assert bb1.energy.__class__.__name__ == 'Energy'
+    assert bb1.failed == False
+    assert bb1.key == frozenset({'amine',
+        ('InChI=1S/C15H15N3O4/c1-2-21-14(19)10-9-7-5-3-4-6-8(7)2'
+         '2-15(20)11(9)13(17)18-12(10)16/h3-6,9,18H,2,16-17H2,1H3'
+         '/t9-/m0/s1')})
+    assert bb1.func_grp.name == 'amine'
+
+    assert 2 == sum(1 for x in bb1.mol.GetAtoms() if
+                                                x.HasProp('bonder'))
+
+def test_caching():
+    og_c = dict(StructUnit.cache)
+    try:
+        # Clear the cache first.
+        StructUnit.cache = {}
+        # Make a StructUnit.
+        mol = StructUnit(data_dir)
+        # Make a StructUnit using JSON.
+        mol2 = Molecule.load(join('data', 'struct_unit', 'su.json'))
+
+        # Try to remake them and check that caching was fine.
+        assert mol2 is not mol
+        assert Molecule.fromdict(mol.json()) is mol
+        assert StructUnit(data_dir) is mol
+        assert Molecule.fromdict(mol2.json()) is mol2
+
+        # Make an alteration and make sure new molecules were
+        # generated.
+        mol3 = StructUnit(data_dir, 'aldehyde')
+        mol2dict = mol2.json()
+        mol2dict['key'] = mol2dict['key'].replace('amine', 'aldehyde')
+        mol4 = Molecule.fromdict(mol2dict)
+        assert mol3 is not mol
+        assert mol3 is not mol2
+        assert mol3 is not mol4
+        assert mol3.func_grp.name == 'aldehyde'
+        assert mol4.func_grp.name == 'aldehyde'
+
+    finally:
+        StructUnit.cache = og_c
 
 def test_set_bonder_centroid():
     og = mol.bonder_centroid()
