@@ -44,6 +44,7 @@ import rdkit.Chem.AllChem as rdkit
 from collections import deque
 import numpy as np
 from itertools import chain
+from inspect import signature
 
 from ..fg_info import double_bond_combs
 from ...convenience_tools import dedupe, flatten
