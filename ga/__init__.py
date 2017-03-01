@@ -6,6 +6,5 @@ from .mutation import *
 from .normalization import *
 from .plotting import *
 from .population import *
-from .progress import *
 from .selection import *
-from .exit import *
+from .ga_exit import *

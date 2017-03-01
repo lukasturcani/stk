@@ -8,14 +8,15 @@ import os
 import numpy as np
 import pickle
 from collections import Counter
+import json
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..molecular import (MacroMolecule, Cage, 
+from ..molecular import (MacroMolecule, Cage, Molecule,
                                StructUnit, StructUnit2, StructUnit3)
-from ..molecular.optimization.optimization import (_optimize_all, 
+from ..molecular.optimization.optimization import (_optimize_all,
                                         _optimize_all_serial)
 
 class Population:
@@ -30,43 +31,44 @@ class Population:
     Any functionality related to the GA should be delegated to this
     attribute. The ``gen_offspring`` and ``gen_mutants`` methods can
     serve as a guide to how this should be done. A comphrehensive
-    account of how the interaction between these two classes is provided
-    in the developer's guide.
+    account of how the interaction between these two classes is
+    provided in the developer's guide.
 
     For consistency and maintainability, collections of
     ``MacroMolecule`` or ``Population`` instances should always be
-    placed in a ``Population`` instance. As a result, any function which
-    should return multiple ``MacroMolecule`` or ``Population`` instances
-    can be expected to return a single ``Population`` instance holding
-    the desired instances. Some functions may have to return the
-    population organized in a specific way, depending on use.
+    placed in a ``Population`` instance. As a result, any function
+    which should return multiple ``MacroMolecule`` or ``Population``
+    instances can be expected to return a single ``Population``
+    instance holding the desired instances. Some functions may have to
+    return the population organized in a specific way, depending on
+    use.
 
     The only operations directly addressed by this class and definined
-    within it are those relevant to its role as a container. It supports
-    all expected and necessary container operations such as iteration,
-    indexing, membership checks (via the ``is in`` operator) as would be
-    expected. Additional operations such as comparison via the ``==``,
-    ``>``, etc. operators is also supported. Details of the various
-    implementations and a full list of supported operations can be found
-    by examining the included methods. Note that all comparison
-    operations are accounted for with the ``total_ordering`` decorator,
-    even if they are not explicity defined.
+    within it are those relevant to its role as a container. It
+    supports all expected and necessary container operations such as
+    iteration, indexing, membership checks (via the ``is in`` operator)
+    as would be expected. Additional operations such as comparison via
+    the ``==``, ``>``, etc. operators is also supported. Details of the
+    various implementations and a full list of supported operations can
+    be found by examining the included methods. Note that all
+    comparison operations are accounted for with the ``total_ordering``
+    decorator, even if they are not explicity defined.
 
     Attributes
     ----------
     populations : list of ``Population`` instances
         A list of other instances of the ``Population`` class. This
         allows the implementation of subpopulations or evolutionary
-        islands. This attribute is also used for grouping macromolecules
-        within a given population for organizational purposes if need
-        be.
+        islands. This attribute is also used for grouping
+        macromolecules within a given population for organizational
+        purposes if need be.
 
     members : list of ``MacroMolecule`` instances
         A list of ``MacroMolecule`` instances. These are the members of
         the population which are not held within any subpopulations.
-        This means that not all members of a population are stored here.
-        To access all members of a population the generator method
-        ``all_members`` should be used.
+        This means that not all members of a population are stored
+        here. To access all members of a population the generator
+        method ``all_members`` should be used.
 
     ga_tools : GATools, optional
         An instance of the ``GATools`` class. Calls to preform GA
@@ -81,7 +83,7 @@ class Population:
 
         This initializer creates a new population from the
         ``Population`` and ``MacroMolecule`` instances given as
-        arguments. It also accepts a ``GATools`` instance if the 
+        arguments. It also accepts a ``GATools`` instance if the
         population is to have GA operations performed on it.
 
         The arguments can be provided in any order regardless of type.
@@ -139,8 +141,8 @@ class Population:
         Creates a population holding all structural isomers of a cage.
 
         Structural isomers here means that the building blocks are
-        rotated in position so that every possible bond combination with
-        linkers is formed.
+        rotated in position so that every possible bond combination
+        with linkers is formed.
 
         Parameters
         ----------
@@ -150,54 +152,55 @@ class Population:
         bb_file : str
             The full path to the file holding the building block of the
             cage.
-            
-        topology : Topology
-            The topology of the cage.
-        
+
+        topology : _CageTopology child class
+            An object of the topology to be made.
+
         ga_tools : GATools
             The GATools instance to be used by created population.
-            
+
         lk_fg : str (default = None)
             The name of the linker's functional group. If ``None`` then
             `lk_file` is checked for a name.
-            
+
         bb_fg : str (default = None)
             The name of the building block's functional group. If
             ``None`` then `bb_file` is checked for a name.
-            
+
         Returns
         -------
         Population
             A population filled with isomers of a cage.
-            
+
         """
-        
-        n = len(topology.positions_A)       
+
+        n = len(topology.positions_A)
         alignments = set()
-        
+
         for x in it.combinations_with_replacement([0,1,2], n):
             for y in it.permutations(x, n):
                 alignments.add(y)
-         
+
         lk = StructUnit(lk_file, lk_fg)
         if len(lk.functional_group_atoms()) > 2:
             lk = StructUnit3(lk_file, lk_fg)
         else:
             lk = StructUnit2(lk_file, lk_fg)
-        
-        bb = StructUnit3(bb_file, bb_fg)        
-         
+
+        bb = StructUnit3(bb_file, bb_fg)
+
         pop = cls(ga_tools)
         for i, align in enumerate(alignments):
-            cage = Cage((lk, bb), topology, 
-                       'isomer_{}.mol'.format(i), {'alignment' : align})
+            topology.alignment = align
+            cage = Cage((lk, bb), topology)
             pop.members.append(cage)
-            
+
         return pop
 
     @classmethod
     def init_random_cages(cls, bb_db, lk_db,
-                          topologies, size, ga_tools):
+                          topologies, size, ga_tools,
+                          bb_fg=None, lk_fg=None):
         """
         Creates a population of cages built from provided databases.
 
@@ -225,7 +228,19 @@ class Population:
 
         ga_tools : GATools
             The GATools instance to be used by created population.
-            
+
+        bb_fg : str (default = None)
+            The name of the functional group present in molecules in
+            `bb_db`. It is the name of the functional group used to
+            build the macromolecules. If ``None`` it is assumed that
+            the name is present in `bb_db`.
+
+        lk_fg : str (default = None)
+            The name of the functional group present in molecules in
+            `lk_db`. It is the name of the functional group used to
+            build the macromolecules. If ``None`` it is assumed that
+            the name is present in `lk_db`.
+
         Returns
         -------
         Population
@@ -233,54 +248,40 @@ class Population:
 
         """
 
-        cage_gen = iter(Cage.init_random(bb_db, lk_db, topologies,
-                    os.path.join(os.getcwd(),"init_{}.mol".format(x)))
-                        for x in range(size))
+        pop = cls(ga_tools)
+        for x in range(size):
+            topology = np.random.choice(topologies)
+            # Make a building block.
+            while True:
+                try:
+                    bb_file = np.random.choice(os.listdir(bb_db))
+                    bb_file = os.path.join(bb_db, bb_file)
+                    bb = StructUnit3(bb_file, bb_fg)
+                    break
 
-        return cls(*cage_gen, ga_tools)
+                except TypeError:
+                    continue
 
-    @classmethod
-    def init_fixed_bb_cages(cls, bb_file, lk_db,
-                            topologies, size, ga_tools):
-        """
-        Creates a population of random cages sharing a building-block*.
-        
-        The population created consists of cages where the linkers are
-        randomly selected from the database `lk_db`. The building-block*
-        of all cages corresponds to molecule in the file `bb_file`.
-        
-        Parameters
-        ----------
-        bb_file : str
-            The full path of the molecular structure file holding 
-            building-block* used by all cages.
-            
-        lk_db : str
-            The full path to the directory which holds the database of 
-            linker molecules.
-            
-        topologies : iterable of ``Topology`` child classes.
-            An iterable holding topologies which should be randomly
-            selected for cage initialization.
+            # Make a linker.
+            while True:
+                try:
+                    lk_file = np.random.choice(os.listdir(lk_db))
+                    lk_file = os.path.join(lk_db, lk_file)
+                    lk = StructUnit(lk_file, lk_fg)
 
-        size : int
-            The size of the population.
+                    if len(lk.bonder_ids) >= 3:
+                        lk = StructUnit3(lk_file, lk_fg)
+                    else:
+                        lk = StructUnit2(lk_file, lk_fg)
 
-        ga_tools : GATools
-            The GATools instance to be used by created population.
-            
-        Returns
-        -------
-        Population
-            A population of cages which all have the same building block
-            but different linkers.
-        
-        """
-        
-        cage_gen = iter(Cage.init_fixed_bb(bb_file, lk_db, topologies,
-                    os.path.join(os.getcwd(),"init_{}.mol".format(x)))
-                        for x in range(size))
-        return cls(*cage_gen, ga_tools)
+                    break
+
+                except TypeError:
+                    continue
+                    
+            pop.members.append(Cage({bb, lk}, topology))
+
+        return pop
 
     def add_members(self, population, duplicates=False):
         """
@@ -300,8 +301,8 @@ class Population:
         population. Note that the sameness of a macromolecule is judged
         by the `same` method of the ``MacroMolecule`` class, which is
         invoked by the ``in`` operator within this method. See the
-        `__contains__` method of the ``Population`` class for details on
-        how the ``in`` operator uses the `same` method.
+        `__contains__` method of the ``Population`` class for details
+        on how the ``in`` operator uses the `same` method.
 
         Parameters
         ----------
@@ -355,7 +356,7 @@ class Population:
 
         """
 
-        self.populations.append(population)                
+        self.populations.append(population)
 
     def all_members(self):
         """
@@ -374,34 +375,43 @@ class Population:
         for ind in self.members:
             yield ind
 
-        # Go thorugh `populations` attribute and for each ``Population``
-        # instance within, yield ``MacroMolecule`` instances from its
-        # `all_members` generator.
+        # Go thorugh `populations` attribute and for each
+        # ``Population`` instance within, yield ``MacroMolecule``
+        # instances from its `all_members` generator.
         for pop in self.populations:
             yield from pop.all_members()
 
     def calculate_member_fitness(self):
         """
         Applies the fitness function on all members.
-        
+
         Returns
         -------
         list
             The a copy of the members in `self` with the fitness
             calculated.
-        
-        
-        """
-        
-        return _calc_fitness(self.ga_tools.fitness, self)            
 
-    def dump(self, file_name):
+
         """
-        Write the population object to a file.
+
+        return _calc_fitness(self.ga_tools.fitness, self)
+
+    def dump(self, path):
+        """
+        Write the population to a file.
+
+        The population is written in the JSON format in the following
+        way. The population is represented as a list,
+
+            [mem1.json(), mem2.json(), [mem3.json(), [mem4.json()]]]
+
+        where each member of the population held directly in the
+        `members` attribute is placed an an element in the list. Any
+        subpopulations are held as  sublists.
 
         Parameters
         ----------
-        file_name : str
+        path : str
             The full path of the file to which the population should
             be written.
 
@@ -411,29 +421,70 @@ class Population:
 
         """
 
-        with open(file_name, 'wb') as dump_file:
-            pickle.dump(self, dump_file)
+        with open(path, 'w') as f:
+            json.dump(self.tolist(), f, indent=4)
 
     def exit(self):
         """
         Checks the if the exit criterion has been satisfied.
-        
+
         Returns
         -------
         bool
-            ``True`` if the exit criterion is satisfied, else ``False``.
-        
+            ``True`` if the exit criterion is satisfied, else
+            ``False``.
+
         """
-        
+
         return self.ga_tools.exit(self)
-            
-    def gen_mutants(self):
+
+    @classmethod
+    def fromlist(cls, pop_list, load_names=True):
+        """
+        Initializes a population from a list representation of one.
+
+        Parameters
+        ----------
+        pop_list : list of str and lists
+            A list which represents a population. Like the ones created
+            by `tolist()`.
+
+        load_names : bool (default = True)
+            If ``True`` then the `name` attribute stored in the JSON
+            objects is loaded. If ``False`` then it's not.
+
+        Returns
+        -------
+        Population
+            The population represented by `pop_list`.
+
+        """
+
+        pop = cls()
+        for item in pop_list:
+            if isinstance(item, dict):
+                pop.members.append(Molecule.fromdict(item, load_names))
+            elif isinstance(item, list):
+                pop.populations.append(cls.fromlist(item, load_names))
+
+            else:
+                raise TypeError(('Population list must consist only'
+                                 ' of strings and lists.'))
+        return pop
+
+    def gen_mutants(self, counter_name='mutation_counter.png'):
         """
         Returns a population of mutant ``MacroMolecule`` instances.
 
         This is a GA operation and as a result this method merely
         delegates the request to the ``Mutation`` instance held in the
         `ga_tools` attribute.
+
+        Parameters
+        ----------
+        counter_name : str (default='mutation_counter.png')
+            The name of the .png file showing which members were
+            selected for mutation.
 
         Returns
         -------
@@ -443,9 +494,9 @@ class Population:
 
         """
 
-        return self.ga_tools.mutation(self)
+        return self.ga_tools.mutation(self, counter_name)
 
-    def gen_next_gen(self, pop_size):
+    def gen_next_gen(self, pop_size, counter_name='gen_select.png'):
         """
         Returns a population hodling the next generation of structures.
 
@@ -456,6 +507,10 @@ class Population:
         ----------
         pop_size : int
             The size of the next generation.
+
+        counter_name : str (default='gen_select.png')
+            The name of the .png file showing which members were
+            selected for the next generation.
 
         Returns
         -------
@@ -475,11 +530,10 @@ class Population:
             if member not in counter.keys():
                 counter.update({member : 0})
 
-        plot_counter(counter, os.path.join(os.getcwd(),
-                                           'gen_select.png'))
+        plot_counter(counter, counter_name)
         return new_gen
 
-    def gen_offspring(self):
+    def gen_offspring(self, counter_name='crossover_counter.png'):
         """
         Returns a population of offspring ``MacroMolecule`` instances.
 
@@ -487,41 +541,51 @@ class Population:
         delegates the request to the ``Crossover`` instance held in the
         `ga_tools` attribute. The ``Crossover`` instance takes care of
         selecting parents and combining them to form offspring. The
-        ``Crossover`` instance delegates the selection to the 
-        ``Selection`` instance as would be expected. The request to 
-        perform crossovers is done by calling the ``Crossover`` instance 
-        with the population as the argument. Calling of the 
-        ``Crossover``instance returns a ``Population`` instance holding 
-        the generated offspring. All details regarding the crossover 
+        ``Crossover`` instance delegates the selection to the
+        ``Selection`` instance as would be expected. The request to
+        perform crossovers is done by calling the ``Crossover``
+        instance with the population as the argument. Calling of the
+        ``Crossover``instance returns a ``Population`` instance holding
+        the generated offspring. All details regarding the crossover
         procedure are handled by the ``Crossover`` instance.
 
         For more details about how crossover is implemented see the
         ``Crossover`` class documentation.
 
+        Parameters
+        ----------
+        counter_name : str (default='crossover_counter.png')
+            The name of the .png file showing which members were
+            selected for crossover.
+
         Returns
         -------
         Population
-            A population holding offspring created by crossing contained
-            the ``MacroMolecule`` instances.
+            A population holding offspring created by crossing
+            contained the ``MacroMolecule`` instances.
 
         """
 
-        return self.ga_tools.crossover(self)
-            
-    @staticmethod
-    def load(file_name, ga_tools=None):
+        return self.ga_tools.crossover(self, counter_name)
+
+    @classmethod
+    def load(cls, path, ga_tools=None, load_names=True):
         """
-        Initializes a Population from one dumped to a file with pickle.
+        Initializes a Population from one dumped to a file.
 
         Parameters
         ----------
-        file_name : str
+        path : str
             The full path of the file holding the dumped population.
 
         ga_tools : GATools (default = None)
             A GATools instance to be used by the loaded population. If
             ``None`` the ``GATools`` instance of the loaded population
             is used.
+
+        load_names : bool (default = True)
+            If ``True`` then the `name` attribute stored in the JSON
+            objects is loaded. If ``False`` then it's not.
 
         Returns
         -------
@@ -530,61 +594,111 @@ class Population:
 
         """
 
-        # Read the pickle file, load it into the `pop` variable. If
-        # `ga_tools` parameter was supplied, place it into the
-        # `ga_tools` attribute of `pop`.
-        with open(file_name, 'rb') as dump_file:
-            pop = pickle.load(dump_file)
-            if ga_tools is not None:
-                pop.ga_tools = ga_tools
+        with open(path, 'r') as f:
+            pop_list = json.load(f)
 
-            # Make sure the the cache is updated with the loaded
-            # population.
-            for member in pop:
-                member.update_cache()
+        pop = cls.fromlist(pop_list, load_names)
+        pop.ga_tools = ga_tools
+        return pop
 
-            return pop
+    def max(self, key):
+        """
+        Calculates the max given a key.
+
+        This method applies key(member) on every member of the
+        population and returns the max of returned values.
+
+        For example, if the max value of the attribute `cavity_size`
+        was desired:
+
+            population.max(
+                 lambda macro_mol : macro_mol.topology.cavity_size())
+
+        Parameters
+        ----------
+        key : function
+            A function which should take a MacroMolecule instance as
+            its argument and return a value.
+
+        Returns
+        -------
+        float
+            The max of the values returned by the function `key` when
+            its applied to all members of the population.
+
+        """
+
+        return np.max([key(member) for member in self], axis=0)
 
     def mean(self, key):
         """
         Calculates the mean given a key.
 
-        This method applies key(member) on every member of the 
+        This method applies key(member) on every member of the
         population and returns the mean of returned values.
 
         For example, if the mean value of the attribute `cavity_size`
         was desired:
-            
+
             population.mean(
-                    lambda macro_mol : macro_mol.topology.cavity_size())
+                 lambda macro_mol : macro_mol.topology.cavity_size())
 
         Parameters
         ----------
         key : function
-            A function which should take a MacroMolecule instance as its
-            argument and return a value.
+            A function which should take a MacroMolecule instance as
+            its argument and return a value.
 
         Returns
         -------
         float
-            The mean of the values returned by the function `key` when 
+            The mean of the values returned by the function `key` when
             its applied to all members of the population.
 
         """
 
-        return np.mean([key(member) for member in self], axis=0)  
+        return np.mean([key(member) for member in self], axis=0)
+
+    def min(self, key):
+        """
+        Calculates the min given a key.
+
+        This method applies key(member) on every member of the
+        population and returns the min of returned values.
+
+        For example, if the min value of the attribute `cavity_size`
+        was desired:
+
+            population.min(
+                 lambda macro_mol : macro_mol.topology.cavity_size())
+
+        Parameters
+        ----------
+        key : function
+            A function which should take a MacroMolecule instance as
+            its argument and return a value.
+
+        Returns
+        -------
+        float
+            The min of the values returned by the function `key` when
+            its applied to all members of the population.
+
+        """
+
+        return np.min([key(member) for member in self], axis=0)
 
     def normalize_fitness_values(self):
         """
         Applies the normalization function.
-        
+
         Returns
         -------
         None : NoneType
-        
+
         """
-        
-        return self.ga_tools.normalization(self)         
+
+        return self.ga_tools.normalization(self)
 
     def optimize_population(self):
         """
@@ -597,25 +711,27 @@ class Population:
         to use the serial version unless debugging.
 
         The parallel optimization creates cloned instances of the
-        population's members. It is these that are optimized. This means
-        that the ``.mol`` files are changed but any instance attributes
-        are not. See ``optimize_all()`` function documentation in
-        ``optimization.py`` for more details.
+        population's members. It is these that are optimized. This
+        means that the ``.mol`` files are changed but any instance
+        attributes are not. See ``optimize_all()`` function
+        documentation in ``optimization.py`` for more details.
 
         Modifies
         --------
         MacroMolecule
-            This function replaces the pristine rdkit molecule instances
-            with optimizes versions. It also replaces the content of the
-            pristine ``.mol`` files with pristine structures.
+            This function replaces the pristine rdkit molecule
+            instances with optimizes versions. It also replaces the
+            content of the pristine ``.mol`` files with pristine
+            structures.
 
         Returns
         -------
         iterator of MacroMolecule objects
             If a parallel optimization was chosen, this iterator yields
-            the ``MacroMolecule`` objects that have had their attributes
-            changed as a result of the optimization. They are modified
-            clones of the original population's macromolecules.
+            the ``MacroMolecule`` objects that have had their
+            attributes changed as a result of the optimization. They
+            are modified clones of the original population's
+            macromolecules.
 
             If a serial optimization is done the iterator does not yield
             clones.
@@ -623,10 +739,10 @@ class Population:
         """
 
         return _optimize_all(self.ga_tools.optimization, self)
-        
+
     def remove_duplicates(self, between_subpops=True, top_seen=None):
         """
-        Removes duplicates from a population while preserving structure.
+        Removes duplicates from a population and preserves structure.
 
         The question of which ``MacroMolecule`` instance is preserved
         from a choice of two is difficult to answer. The iteration
@@ -637,8 +753,8 @@ class Population:
 
         However, this question is only relevant if duplicates in
         different subpopulations are being removed. In this case it is
-        assumed that it is more important to have a single instance than
-        to worry about which subpopulation it is in.
+        assumed that it is more important to have a single instance
+        than to worry about which subpopulation it is in.
 
         If the duplicates are being removed from within subpopulations,
         each subpopulation will end up with a single instance of all
@@ -648,14 +764,14 @@ class Population:
         ----------
         between_subpops : bool (default = False)
             When ``False`` duplicates are only removed from within a
-            given subpopulation. If ``True`` all duplicates are removed,
-            regardless of which subpopulation they are in.
+            given subpopulation. If ``True`` all duplicates are
+            removed, regardless of which subpopulation they are in.
 
         Modifies
         --------
         members
-            Duplicate instances are removed from the `members` attribute
-            of the population or subpopulations.
+            Duplicate instances are removed from the `members`
+            attribute of the population or subpopulations.
 
         Returns
         -------
@@ -681,7 +797,8 @@ class Population:
 
             self.members = list(dedupe(self.members, seen=seen))
             for subpop in self.populations:
-                subpop.remove_duplicates(between_subpops, top_seen=seen)
+                subpop.remove_duplicates(between_subpops,
+                                             top_seen=seen)
 
         # If duplicates are only removed from within the same
         # subpopulation, only the `members` attribute of each
@@ -692,20 +809,42 @@ class Population:
             for subpop in self.populations:
                 subpop.remove_duplicates(between_subpops=False)
 
+    def remove_failures(self):
+        """
+        Removes all members where `failed` is ``True``.
+
+        The structure of the population is preserved.
+
+        Modifies
+        --------
+        self : Population
+            All members of the population which have their `failed`
+            attribute set to ``True`` are removed.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        self.members = [ind for ind in self.members if not ind.failed]
+        for subpop in self.populations:
+            subpop.remove_failures()
+
     def select(self, type_='generational'):
         """
         Returns a generator field yielding selected members of `self`.
 
         Selection is a GA procedure and as a result this method merely
         delegates the selection request to the ``Selection`` instance
-        held within the `ga_tools` attribute. The ``Selection`` instance
-        then returns a generator which yields ``MacroMolecule``
-        instances held within the population. Which macromolecules are
-        yielded depends on the selection algorithm which was chosen
-        during initialization and when calling this method. The
-        selection instance (`self.ga_tools.selection`) returns the
-        generator when it is called. See ``Selection`` class
-        documentation for more information.
+        held within the `ga_tools` attribute. The ``Selection``
+        instance then returns a generator which yields
+        ``MacroMolecule`` instances held within the population. Which
+        macromolecules are yielded depends on the selection algorithm
+        which was chosen during initialization and when calling this
+        method. The selection instance (`self.ga_tools.selection`)
+        returns the generator when it is called. See ``Selection``
+        class documentation for more information.
 
         Because selection is required in a number of different ways,
         such as selecting the parents, ``MacroMolecule`` instances for
@@ -730,8 +869,8 @@ class Population:
         type_ : str (default = 'generational')
             A string specifying the type of selection to be performed.
             Valid values will correspond to names of attributes of the
-            ``Selection`` class. Check ``Selection`` class documentation
-            for details.
+            ``Selection`` class. Check ``Selection`` class
+            documentation for details.
 
             Valid values include:
                 'generational' - selects the next generation
@@ -751,17 +890,41 @@ class Population:
 
         return self.ga_tools.selection(self, type_)
 
-    def write(self, dir_path):
+    def tolist(self):
+        """
+        Converts the population to a list representation.
+
+        The population and any subpopulations are represented as lists
+        (and sublists), while members are represented by their JSON
+        dictionaries (as strings).
+
+        Returns
+        -------
+        str
+            A JSON string representing the population.
+
+        """
+
+        pop = [x.json() for x in self.members]
+        for sp in self.populations:
+            pop.append(sp.tolist())
+        return pop
+
+    def write(self, dir_path, use_name=False):
         """
         Writes the ``.mol`` files of members to a directory.
-
-        This writes the pristine version of the ``.mol`` file.
 
         Parameters
         ----------
         dir_path : str
             The full path of the directory into which the ``.mol`` file
-            is copied.
+            is written.
+
+        use_name : bool (default = False)
+            When ``True`` the `name` attribute of the population's
+            members is used to make the name of the .mol file. If
+            ``False`` the files are just named after the member's
+            index in the population.
 
         Returns
         -------
@@ -773,17 +936,15 @@ class Population:
         if not os.path.exists(dir_path):
             os.mkdir(dir_path)
 
-        for member in self:
+        for i, member in enumerate(self):
+            if use_name:
+                fname = os.path.join(dir_path, '{}.mol'.format(
+                                                        member.name))
+            else:
+                fname = os.path.join(dir_path, '{}.mol'.format(i))
 
-            name = os.path.split(member.file)[1]
-            
-            struct_file = os.path.join(dir_path, name)
-            member.write(struct_file)
-            
-            dump_file = os.path.splitext(name)[0] + '.dmp'
-            dump_file = os.path.join(dir_path, dump_file)
-            member.dump(dump_file)
-        
+            member.write(fname)
+
     def __iter__(self):
         """
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.
@@ -792,7 +953,8 @@ class Population:
         ``MacroMolecule`` instances generated by the `all_members`
         method. It also means that a ``Population`` instance can be
         unpacked with the ``*`` operator. This will produce the
-        ``MacroMolecule`` instances yielded by the `all_members` method.
+        ``MacroMolecule`` instances yielded by the `all_members`
+        method.
 
         Returns
         -------
@@ -813,16 +975,16 @@ class Population:
         a new ``Population`` instance holding the ``MacroMolecule``
         instances with the requested indices. Using slices will return
         a flat ``Population`` instance meaing no subpopulation
-        information is preserved. All of the ``MacroMolecule`` instances
-        are placed into the `members` attribute of the returned
-        ``Population`` instance.
+        information is preserved. All of the ``MacroMolecule``
+        instances are placed into the `members` attribute of the
+        returned ``Population`` instance.
 
         The index corresponds to the ``MacroMolecule`` yielded by the
         `all_members` method.
 
         This can be exploited if one desired to remove all
-        subpopulations and transfer all the ``MacroMolecules`` instances
-        into the members attribute. For example,
+        subpopulations and transfer all the ``MacroMolecules``
+        instances into the members attribute. For example,
 
         >>> pop2 = pop[:]
 
@@ -843,13 +1005,13 @@ class Population:
         -------
         MacroMolecule
             If the supplied `key` is an ``int``. Returns the
-            ``MacroMolecule`` instance with the corresponding index from
-            the `all_members` generator.
+            ``MacroMolecule`` instance with the corresponding index
+            from the `all_members` generator.
 
         Population
             If the supplied `key` is a ``slice``. The returned
-            ``Population`` instance holds ``MacroMolecule`` instances in
-            its `members` attribute. The ``MacroMolecule`` instances
+            ``Population`` instance holds ``MacroMolecule`` instances
+            in its `members` attribute. The ``MacroMolecule`` instances
             correspond to indices defined by the slice. The slice is
             implemented on the `all_members` generator.
 
@@ -873,7 +1035,9 @@ class Population:
         if isinstance(key, slice):
             mols = it.islice(self.all_members(),
                                      key.start, key.stop, key.step)
-            return Population(*mols, self.ga_tools)
+            pop = Population(*mols)
+            pop.ga_tools = self.ga_tools
+            return pop
 
         # If `key` is not ``int`` or ``slice`` raise ``TypeError``.
         raise TypeError("Index must be an integer or slice, not"
@@ -901,11 +1065,11 @@ class Population:
 
             pop3 = pop1 - pop2,
 
-        returns a new population, pop3. The returned population contains
-        all the ``MacroMolecule`` instances in pop1 except those also in
-        pop2. This refers to all of the ``MacroMolecule`` instances,
-        including those held within any subpopulations. The returned
-        population is flat. This means all information about
+        returns a new population, pop3. The returned population
+        contains all the ``MacroMolecule`` instances in pop1 except
+        those also in pop2. This refers to all of the ``MacroMolecule``
+        instances, including those held within any subpopulations. The
+        returned population is flat. This means all information about
         subpopulations in pop1 is lost as all the ``MacroMolecule``
         instances are held in the `members` attribute of pop3.
 
@@ -937,8 +1101,8 @@ class Population:
 
         Creates a new ``Population`` instance which holds two
         subpopulations and no direct members. The two subpopulations
-        are the two ``Population`` instances on which the ``+`` operator
-        was applied.
+        are the two ``Population`` instances on which the ``+``
+        operator was applied.
 
         Parameters
         ----------

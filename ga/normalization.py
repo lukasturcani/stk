@@ -1,44 +1,46 @@
 """
 Defines normalization functions via the Normalization class.
 
-Normalization functions are functions that recalculate the fitness 
-values of members in a population. The difference between fitness 
+Normalization functions are functions that recalculate the fitness
+values of members in a population. The difference between fitness
 and normalization functions is that fitness functions are only use the
 MacroMolecule to calculate its fitness. Normalzation functions have
-access to all MacroMolecules in a population however. As a result they
-can scale the fitness values across the entire population. This is 
-useful if you want to ensure a spread of fitness values in the 
-population.
+access to all MacroMolecules in a population. As a result they can
+scale the fitness values across the entire population. This is useful
+if you want to ensure a spread of fitness values in the population.
+
+Each generation, a number of normalizatoin functions can be applied
+in sequence.
 
 Extending MMEA: Adding normalization functions.
 -----------------------------------------------
-If a new normalization function is to be added to MMEA it should be 
-added as a method in the ``Normalization`` class defined in this module. 
-The only requirements are that the first argument is ``population`` 
-(excluding ``self``).
+If a new normalization function is to be added to MMEA it should be
+added as a method in the ``Normalization`` class defined in this
+module. The only requirements are that the first argument is
+``population`` (excluding ``self``).
 
-The naming requirement exists to help users identify which arguments are 
-handled automatically by MMEA and which they need to define in the input 
-file. The convention is that if the normalization function takes an 
-argument called  ``population`` it does not have to be specified in the 
-input file.
+The naming requirement exists to help users identify which arguments
+are handled automatically by MMEA and which they need to define in the
+input file. The convention is that if the normalization function takes
+an argument called  ``population`` it does not have to be specified in
+the input file.
+
+Normalization functions should not interact with the `unscaled_fitness`
+attribute in any way. They should only modify the value in `fitness`.
+Before the first normalization function is applied each generation, the
+value in `unscaled_fitness` is copied into `fitness`. This happens
+automatically.
 
 Normalization functions calculate the fitness value of a molecule and
-place it in the `fitness` attribute.
-
-Note that fitness functions are only executed once per MacroMolecule, 
-while normalization functions can be executed multiple times. Because 
-fitness functions are only executed once, the value they calculate 
-should never be overwritten. As a result when using normalization 
-functions, the fitness functions should write to the `unscaled_fitness` 
-attribute of MacroMolecules. This will be unchanged once calculated. The 
-normalization functions can then use the value in `unscaled_fitness`
-to calculate a value for `fitness`. The calculated `fitness` value may
-change each generation, depending on the scaling procedure used.
+place it in the `fitness` attribute. Multiple normalization functions
+can be applied in sequence. Only the last normalization function
+applied needs to place a value between 0 (exlusive) and infinity in the
+`fitness` attribute. The others can do whatever scaling is necessary
+to for the problem at hand.
 
 If a normalization function does not fit neatly into a single function
-make sure that any helper functions are private, ie that their names 
-start with a leading underscore. 
+make sure that any helper functions are private, ie that their names
+start with a leading underscore.
 
 """
 
@@ -46,221 +48,277 @@ start with a leading underscore.
 from functools import partial
 import numpy as np
 import sys
+import copy
+
+from .population import Population
 
 class Normalization:
     """
     A class for carrying out normalization of fitness values.
-    
+
     Attributes
     ----------
     scaling_func : functools. partial
-    
+
     """
-    
-    def __init__(self, func_data):
+
+    def __init__(self, funcs):
         """
         Initializes a Normalization instance.
-        
+
         Parameters
         ----------
-        func_data : FunctionData
-            A FunctionData 
-        
+        funcs : list of FunctionData instances
+            Holds all the normalization functions to be applied each
+            generation, in the order in which they are to be applied.
+
         """
-        
-        self.scaling_func = partial(getattr(self, func_data.name),
-                                    **func_data.params)
-                                    
+
+        self.funcs = funcs
+
     def __call__(self, population):
         """
-        Applies the normalization function on `populatoin`.
-        
+        Applies the normalization function on `population`.
+
         Parameters
         ----------
         population : Population
             The population whose members need to have their fitness
             values normalized.
-        
+
         """
-        
-        self.scaling_func(population)        
-        
-    @staticmethod
-    def carrots_and_sticks(population, carrot_coeffs, stick_coeffs,
-                           carrot_exponents, stick_exponents):
+
+        fitness_func = population.ga_tools.fitness.name
+        # First make sure that all the fitness values are reset and
+        # hold the value of the approraite fitness function.
+        for macro_mol in population:
+            if macro_mol.failed:
+                macro_mol.fitness = 1e-4
+            else:
+                macro_mol.fitness = copy.deepcopy(
+                            macro_mol.unscaled_fitness[fitness_func])
+
+        # Make a population of members where all fitness values are
+        # valid. No point in normalizing molecules whose `fitness_fail`
+        # attribute is ``True``. The advantage of this is that when
+        # writing normalization functions you can assume all molecuels
+        # have the same type in their `fitness` attribute.
+
+        # Otherwise, if a fitness function calculated numpy arrays
+        # but the calculation on some molecules failed, the result
+        # would be that some molecules would have an array in their
+        # `fitness` attribute while others would have a float
+        # (1e-4 as a result of running the fail() method). The code of
+        # the normalization function would then have to accomadate
+        # this. By making sure only molecules with valid fitness values
+        # are present in the population provided to the normalization
+        # function, coding does not have to accomodate annoying
+        # outliers.
+
+        valid_pop = Population(*(mol for mol in population if not
+                                 mol.failed))
+
+        # If there were no valid molecules, no need to normalize.
+        if len(valid_pop) == 0:
+            return
+
+        for func_data in self.funcs:
+            getattr(self, func_data.name)(valid_pop,
+                                          **func_data.params)
+
+    def combine(self, population, coefficients, exponents):
         """
-        Applies the ``carrots and sticks`` normalization.
-        
-        This function requires that the fitness functions places a tuple
-        of 2 arrays in the `unscaled_fitness` attribute of members.
-        
-            mem.unscaled_fitness =  (carrots, sticks)
-        
-        where
-        
-            carrots = np.array([c1, c2, c3])
-            
-        and 
-        
-            sticks = np.array([s1, s2])
-            
-        Note that the arrays can be of any size.
-        
-        The goal is to maximize the carrot values and minimize the 
-        stick values. As a result, the fitness of an individual is given 
-        by
-        
-            (1) fitness = sum(carrots) + 1/sum(sticks)
-            
-        What if c1 is 1000 and c2 is 0.01?
-    
-        This means that the fitness value is dominated by c1 and c2
-        is barely getting optimized. To fix this the values of all
-        elements are recalculated
-        
-            (2) Se = e / <e>
-            
-        where ``e`` can represent a carrot or stick parameter (c1, s2 
-        etc.). The <e> is the average of that parameter across all 
-        members in the population.
-        
-        This scaling means that c1 and c2 are rescaled to be around the
-        same order of magnitude.
-        
-        What if we want c1 to twice as important to fitness as c3?
-        
-        After equation (2) the elements are rescaled again
-        
-            (3) Ne = A*(Se^a)
-        
-        Here the ``Ne`` represents the parameter ``e`` after the second 
-        rescaling.
-        
-        This means that the sums showin in equation (1) are
-        
-            (4) sum(carrots) = A*(Nc1^a) + B*(Nc2^b) + C*(Nc3^b)
-            
-        The prefix ``N`` in front of c1, c1 and c3 means that the 
-        operations in equations (2) and (3) have been applied to the
-        parameters.
-        
-        So if you want c1 to be twice as important to fitness as c2
-        set
-        
-            A = 1 and B = 2
-            
-        This is done via the `coeff` and `exponents` parameters.
-        
+        Combines elements in the `fitness` attribute of members.
+
+        This function assumes that the `fitness` attribute
+        of the population's members is an array. It raises the members
+        of the array to the values in `exponents` and then multiplies
+        them with the values in `coefficients`. Lastly, the individual
+        array elements are summed to create a final value.
+
+        Parameters
+        ----------
+        population : Population
+            The population whose members need to have their fitness
+            values normalized.
+
+        coefficients : list of ints or floats
+            Before summing all the elements in the `fitness` attribute,
+            their values are multiplied by the numbers in this list.
+
+        exponents : list of ints or floats
+            Before summing all the elements in the `fitness` attribute,
+            their values are raised to the numbers in this list.
+
+        Modifies
+        --------
+        fitness : numpy.array
+            This attribute is altered for the populations members. It
+            is changed from an array to a float.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for macro_mol in population:
+            new_array = np.power(macro_mol.fitness, exponents)
+            new_array = np.multiply(new_array, coefficients)
+            macro_mol.fitness = sum(new_array)
+
+    def magnitudes(self, population):
+        """
+        Normalizes the relative values of elements in `fitness`.
+
+        This normalization function assumes that the value in `fitness`
+        is a numpy array:
+
+            macro_mol.fitness = np.array([1000, 5e-5, 25])
+
+        Notice that each element has a very different order of
+        magnitude. For example if the fitness function calculated the
+        energy value of the molecule, its radius and the number of
+        atoms in it, this could be the data placed in the `fitness`
+        attribute.
+
+        When calculating the total fitness based on these values, it
+        would be useful to make them comparable. As it is, you can't
+        compare 10,000 kJ mol-1 and 5e-5 Angstroms. However what you
+        can do is check how much bigger or smaller than average
+        10,000 kJ mol-1 and 5e-5 Angstrom are. Then replace these
+        values with the size relative to the average. For example:
+
+            macro_mol.fitness = np.array([2, 0.5, 3])
+
+        This would be the output of this function. It shows that the
+        energy of a given `macro_mol` is twice as large as the mean
+        energy of the population. The radius is half the average
+        molecular radius of the population and so on.
+
+        Now these values can be combined in a reasonable way. However,
+        that will have to be done by other normalization functions.
+        This one only scales relative to the population average.
+
         Parameters
         ----------
         population : Population
             The population whose fitness values are normalized.
-            
-        carrot_coeffs : numpy.array
-            The coeffients of the carrot parameters.
-        
-        stick_coeffs : numpy.array
-            The coefficients of the stick parameters.
-        
-        carrot_exponents : numpy.array
-            The exponents of the carrot parameters.
-        
-        stick_exponents : numpy.array
-            The exponents of the stick parameters.
-        
+
         Modifies
         --------
-        fitness : float
-            This attribute in all of the population's members is
-            modified.
-        
+        fitness : numpy.array
+            This attribute is altered for the populations members.
+
         Returns
         -------
         None : NoneType
-        
+
         """
-        
-        unscaled_carrots = [x.unscaled_fitness[0] for x in population if
-                            isinstance(x.unscaled_fitness, tuple)]
-                            
-        unscaled_sticks = [x.unscaled_fitness[1] for x in population if
-                           isinstance(x.unscaled_fitness, tuple)]
-                           
-        _carrot_means = np.mean(unscaled_carrots, axis=0)
-        if not isinstance(_carrot_means, np.ndarray):
-            raise TypeError(('Unscaled fitness values do not have'
-                             ' appropriate type.')) 
-            
-        carrot_means = []
-        for x in _carrot_means:
-            if x == 0:
-                carrot_means.append(1)
-            else:
-                carrot_means.append(x)
-        
-        _stick_means = np.mean(unscaled_sticks, axis=0)
-        if not isinstance(_carrot_means, np.ndarray):
-            raise TypeError(('Unscaled fitness values do not have'
-                             ' appropriate type.'))
-                             
-        stick_means = []
-        for x in _stick_means:
-            if x == 0:
-                stick_means.append(1)
-            else:
-                stick_means.append(x)
-        
-        for macro_mol in population:        
-        
-            # If one or more of the fitness parameters failed, 
-            # return minimum fitness. 
-            if macro_mol.fitness_fail:
-                macro_mol.fitness = 1e-4
-                continue
-        
-            # Calculate the scaled fitness parameters by dividing the 
-            # unscaled ones by the fitness.
-            scaled_carrots = np.divide(macro_mol.unscaled_fitness[0], 
-                                       carrot_means)
-              
-            scaled_sticks = np.divide(macro_mol.unscaled_fitness[1],
-                                      stick_means)        
-              
-            try:  
-                scaled_carrots = np.power(scaled_carrots, 
-                                          carrot_exponents)
-                scaled_sticks = np.power(scaled_sticks, 
-                                         stick_exponents)
-                                         
-                scaled_carrots = np.multiply(scaled_carrots, 
-                                             carrot_coeffs)
-                scaled_sticks = np.multiply(scaled_sticks, 
-                                            stick_coeffs)
 
-            # If the user forgot put the wrong number values in the 
-            # exponent or coefficient arrays MMEA will tell them and 
-            # exit gracefully.
-            except  ValueError:
-                print(('Fitness function calculates carrot array of '
-                       'size {} and stick array of size {}. This does '
-                       'not match the array sizes given to the '
-                       'normalization function:\n'
-                       '\tcarrot_coeffs : {}\n'
-                       '\tcarrot_exponents : {}\n'
-                       '\tstick_coeffs : {}\n'
-                       '\tstick_exponents : {}\n').format(
-                                   len(scaled_carrots),
-                                   len(scaled_sticks),
-                                   len(carrot_coeffs),
-                                   len(carrot_exponents),
-                                   len(stick_coeffs),
-                                   len(stick_exponents)))
-                sys.exit()
+        # Get the mean of each element.
+        means = population.mean(lambda x : x.fitness)
 
-            carrot_term = np.sum(scaled_carrots)
-            penalty_term = np.sum(scaled_sticks)
-            penalty_term =  np.divide(1,penalty_term)
-            if penalty_term > 1e101:
-                penalty_term = 1e101
-                        
-            macro_mol.fitness = penalty_term + carrot_term    
+        for macro_mol in population:
+            macro_mol.fitness = macro_mol.fitness / means
+
+    def shift_elements(self, population, indices):
+        """
+        Maps elements in `fitness` array to positive values.
+
+        Assumy you have a fitness array,
+
+            macro_mol.fitness = [1, -10, 1]
+
+        One way to convert the fitness array into a fitness value is
+        by summing the elements (see the combine() normalization
+        function for this)
+
+            macro_mol.fitness = -8
+
+        Clearly this doesn't work, because the resulting fitness value
+        is not a positive number. To fix this the -10 should be shifted
+        to a positive value.
+
+        This normalization function looks at the elements specified by
+        by `indices`. It then finds the minimum value of these elements
+        in the population. It then shifts the elements by this value.
+
+        For example, take a population of
+
+            mol1.fitness = [1, -5, 5]
+            mol2.fitness = [3, -10, 2]
+            mol3.fitness = [2, 20, 1]
+
+        If the value of `indices` was [1] the after this normalization
+        function was applied the result would be
+
+            mol1.fitness = [1, 5.1, 5]
+            mol2.fitness = [3, 0.1, 2]
+            mol3.fitness = [2, 30.1, 1]
+
+        If `indices` was [0,1]
+
+            mol1.fitness = [2.01, 5.1, 5]
+            mol2.fitness = [4.01, 0.1, 2]
+            mol3.fitness = [3.01, 30.1, 1]
+
+        The shift is  1.01 * magnitude of smallest value. This prevents
+        0s in the array.
+
+        Parameters
+        ----------
+        indices : list of ints
+            This holds the indices of elements in the `fitness`
+            array which should be shifted to positive values.
+
+        Modifies
+        --------
+        fitness : numpy.array
+            The `fitness` atttribute of the population's members is
+            changed in accordance to the docstring.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        # Get all the fitness arrays a matrix.
+        fmat = np.array([x.fitness for x in population])
+
+        # Get the minimum values of each element in the population.
+        mins = np.min(fmat, axis=0)
+        # Convert all the ones which are not to be shifted to 0 and
+        # multiply the which are to be shifted by 1.01.
+        shift = np.zeros(len(mins))
+        for ind in indices:
+            shift[ind] = 1.01
+        shift = abs(np.multiply(mins, shift))
+
+        for macro_mol in population:
+            macro_mol.fitness += shift
+
+    def invert(self, population):
+        """
+        Convertes a fitness value to 1/fitness.
+
+        Parameters
+        ----------
+        population : Population
+            The population to be normalized.
+
+        Modifies
+        --------
+        fitness : float
+            The `fitness` attribute of the population's members is
+            changed to 1/`fitness`.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for macro_mol in population:
+            macro_mol.fitness = 1 / macro_mol.fitness
