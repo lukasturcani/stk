@@ -199,6 +199,7 @@ class Cached(type):
 
         self.cache[mol.key] = mol
 
+
 class CachedStructUnit(type):
     """
     A metaclass for making StructUnit create cached instances.
@@ -235,6 +236,7 @@ class CachedStructUnit(type):
             obj.key = key
             self.cache[key] = obj
             return obj
+
 
 class Molecule:
     """
@@ -1034,6 +1036,7 @@ class Molecule:
         with open(path, 'w') as pdb:
             pdb.write(new_content)
 
+
 class StructUnit(Molecule, metaclass=CachedStructUnit):
     """
     Represents the building blocks of macromolecules examined by MMEA.
@@ -1662,6 +1665,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def __repr__(self):
         return str(self)
 
+
 class StructUnit2(StructUnit):
     """
     Represents building blocks with 2 functional groups.
@@ -1866,6 +1870,7 @@ class StructUnit3(StructUnit):
 # This class used to form the key in the cache of MacroMolecules.
 MacroMolKey = namedtuple('MacroMolKey',
                          ['building_blocks', 'topology'])
+
 
 @total_ordering
 class MacroMolecule(Molecule, metaclass=Cached):
