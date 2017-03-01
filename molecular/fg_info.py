@@ -4,27 +4,39 @@ A module for the FGInfo class.
 Extending MMEA: Adding  more functional groups.
 -----------------------------------------------
 
-If MMEA is to incorporate a new functional group, a new ``FGInfo`` 
-instance should be added to the `functional_groups` list. 
+If MMEA is to incorporate a new functional group, a new ``FGInfo``
+instance should be added to the `functional_groups` list.
 
 Adding a new ``FGInfo`` instance to `functional_groups` will allow the
-``Topology.join_mols()`` method to connect this functional group to 
-(all) others during assembly. Nothing except adding this instance should 
-be necessary in order to incorporate new functional groups.
+``Topology.join_mols()`` method to connect this functional group to
+(all) others during assembly. Nothing except adding this instance
+should be necessary in order to incorporate new functional groups.
 
-If this new functional group is to connect to another functional group 
+Note that when adding SMARTS if you want to make a SMARTS that targets
+an atom in an environment, for example a bromine connected to a carbon
+
+    [$([Br][C]);$([Br])]
+
+The atom you are targeting needs to be written first. The above SMARTS
+works but
+
+    [$([C][Br]);$([Br])]
+
+doesn't. This is an rkdit issue or feature.
+
+If this new functional group is to connect to another functional group
 with a double bond during assembly, the names of the functional groups
-should be added to the `double_bond_combs` list. The order in 
-which they are placed in the tuple does not matter. Again, this is all 
-that needs to be done for MMEA to create double bonds between given 
-functional groups.  
+should be added to the `double_bond_combs` list. The order in
+which they are placed in the tuple does not matter. Again, this is all
+that needs to be done for MMEA to create double bonds between given
+functional groups.
 
 """
 
 class FGInfo:
     """
     Contains key information about functional groups.
-    
+
     The point of this class is to register which atoms of a functional
     group form bonds, and which are deleted during assembly of
     macromolecules.
@@ -33,22 +45,22 @@ class FGInfo:
     ----------
     name : str
         The name of the functional group.
-    
+
     fg_smarts : str
         A SMARTS string which matches the functional group.
 
-    target_smarts : 
+    target_smarts :
         A SMARTS string which matches the atom on the functional group
-        which forms bonds during reactions.        
-        
+        which forms bonds during reactions.
+
     del_smarts : str
-        A SMARTS string, which matches the atoms removed when the 
+        A SMARTS string, which matches the atoms removed when the
         functional group reacts.
-    
+
     """
-    
-    __slots__ = ['name', 'fg_smarts', 'target_smarts', 'del_smarts'] 
-    
+
+    __slots__ = ['name', 'fg_smarts', 'target_smarts', 'del_smarts']
+
     def __init__(self, name, fg_smarts, target_smarts, del_smarts):
          self.name = name
          self.fg_smarts = fg_smarts
@@ -57,54 +69,43 @@ class FGInfo:
 
 functional_groups = [
 
-                FGInfo("amine", 
-                       "[N]([H])[H]", 
-                       "[$([N]([H])[H]);$([N])]", 
-                       "[$([H][N][H]);$([H])].[$([H][N][H]);$([H])]"),                        
+                FGInfo("amine",
+                       "[N]([H])[H]",
+                       "[$([N]([H])[H]);$([N])]",
+                       "[$([H][N][H]);$([H])].[$([H][N][H]);$([H])]"),
 
-                FGInfo("aldehyde", "[C](=[O])[H]", 
-                                   "[$([C](=[O])[H]);$([C])]", 
-                                   "[$([O]=[C][H]);$([O])]"), 
+                FGInfo("aldehyde", "[C](=[O])[H]",
+                                   "[$([C](=[O])[H]);$([C])]",
+                                   "[$([O]=[C][H]);$([O])]"),
 
-                FGInfo("carboxylic_acid", 
-                       "[C](=[O])[O][H]", 
-                       "[$([C](=[O])[O][H]);$([C])]", 
+                FGInfo("carboxylic_acid",
+                       "[C](=[O])[O][H]",
+                       "[$([C](=[O])[O][H]);$([C])]",
                        "[$([H][O][C](=[O]));$([H])][O]"),
 
                 FGInfo("amide", "[C](=[O])[N]([H])[H]",
-                       "[$([C](=[O])[N]([H])[H]);$([C])]", 
+                       "[$([C](=[O])[N]([H])[H]);$([C])]",
                        "[$([N]([H])([H])[C](=[O]));$([N])]([H])[H]"),
 
-                FGInfo("thioacid", 
-                       "[C](=[O])[S][H]", 
-                       "[$([C](=[O])[O][H]);$([C])]", 
+                FGInfo("thioacid",
+                       "[C](=[O])[S][H]",
+                       "[$([C](=[O])[O][H]);$([C])]",
                        "[$([H][O][C](=[O]));$([H])][S]"),
 
-                FGInfo("alcohol", "[O][H]", 
+                FGInfo("alcohol", "[O][H]",
                                   "[$([O][H]);$([O])]",
                                   "[$([H][O]);$([H])]"),
 
-                FGInfo("thiol", "[S][H]", 
-                                "[$([S][H]);$([S])]",   
-                                "[$([H][S]);$([H])]")
-                           
+                FGInfo("thiol", "[S][H]",
+                                "[$([S][H]);$([S])]",
+                                "[$([H][S]);$([H])]"),
+
+                FGInfo("bromine", "[C][Br]",
+                                  "[$([C][Br]);$([C])]",
+                                  "[$([Br][C]);$([Br])]")
+
                     ]
 
-double_bond_combs = [('amine','aldehyde'), 
-                     ('amide','aldehyde'), 
+double_bond_combs = [('amine','aldehyde'),
+                     ('amide','aldehyde'),
                      ('amide','amine')]
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
