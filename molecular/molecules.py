@@ -166,7 +166,9 @@ class Cached(type):
 
     def __call__(self, *args, **kwargs):
         sig = signature(self.__init__)
-        sig = sig.bind_partial(self, *args, **kwargs).arguments
+        sig = sig.bind_partial(self, *args, **kwargs)
+        sig.apply_defaults()
+        sig = sig.arguments
         key = self.gen_key(sig['building_blocks'], sig['topology'])
         if key in self.cache:
             return self.cache[key]
@@ -210,29 +212,36 @@ class CachedStructUnit(type):
         super().__init__(*args, **kwargs)
         self.cache = dict()
 
-    def __call__(self, file, functional_group=None, note='', name=''):
-        _, ext = os.path.splitext(file)
+    def __call__(self, *args, **kwargs):
+        # Get the arguments given to the initializer as a dictionary
+        # mapping argument name to argument value.
+        sig = signature(self.__init__)
+        sig = sig.bind_partial(self, *args, **kwargs)
+        sig.apply_defaults()
+        sig = sig.arguments
+
+        _, ext = os.path.splitext(sig['file'])
 
         # Ensure a valid file type was provided.
         if ext not in self.init_funcs:
             raise TypeError(
             'Unable to initialize from "{}" files.'.format(ext))
 
-        mol = self.init_funcs[ext](file)
+        mol = self.init_funcs[ext](sig['file'])
 
-        # Assign the FGInfo instance from `functional_groups` which
-        # describes the functional group provided in `functional_group`
-        # or is found in the path name.
-        if not functional_group:
-            functional_group = next((x.name for x in
-                                     functional_groups if
-                                     x.name in file), None)
+        # Get the name of the functional group provided to the
+        # initializer or get it from the path.
+        if sig['functional_group']:
+            fg = sig['functional_group']
+        else:
+            fg = next((x.name for x in functional_groups if
+                                        x.name in sig['file']), None)
 
-        key = self.gen_key(mol, functional_group)
+        key = self.gen_key(mol, fg)
         if key in self.cache:
             return self.cache[key]
         else:
-            obj = super().__call__(file, functional_group, note, name)
+            obj = super().__call__(*args, **kwargs)
             obj.key = key
             self.cache[key] = obj
             return obj
@@ -1137,8 +1146,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             to this parameter and the name of one is not present in
             `file`, no tagging is done.
 
-        note : str (defaulat = None)
-            A note or comment about the molecule
+        note : str (default = None)
+            A note or comment about the molecule.
 
         name : str (default = "")
             A name which can be optionally given to the molcule for
