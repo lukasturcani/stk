@@ -246,7 +246,7 @@ class CachedStructUnit(type):
             obj.key = key
             self.cache[key] = obj
             return obj
-            
+
 
 class Molecule:
     """
@@ -1131,7 +1131,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             to this parameter and the name of one is not present in
             `file`, no tagging is done.
 
-        note : str (default = None)
+        note : str (default = "")
             A note or comment about the molecule.
 
         name : str (default = "")
@@ -1589,6 +1589,58 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             mols.append((similarity, path))
 
         return sorted(mols, reverse=True)
+
+    @classmethod
+    def smarts_init(cls, smarts,
+                    functional_group=None, note="", name=""):
+        """
+        Initialize from a SMARTS string.
+
+        Parameters
+        ----------
+        smiles : str
+            A SMARTS string of the molecule.
+
+        functional_group : str (default = None)
+            The name of the functional group which is to have atoms
+            tagged. If no functional group is provided to this
+            parameter, no tagging is done.
+
+        note : str (default = "")
+            A note or comment about the molecule.
+
+        name : str (default = "")
+            A name which can be optionally given to the molcule for
+            easy identification.
+
+        Returns
+        -------
+        StructUnit
+            The StructUnit instance of the molecule represented by
+            `smarts`.
+
+        """
+
+        mol = rdkit.MolFromSmarts(smarts)
+        rdkit.SanitizeMol(mol)
+        mol = rdkit.AddHs(mol)
+        key = cls.gen_key(mol, functional_group)
+        if key in cls.cache:
+            return cls.cache[key]
+
+        rdkit.EmbedMolecule(mol)
+        obj = cls.__new__(cls)
+        Molecule.__init__(obj, note, name)
+        obj.file = smarts
+        obj.key = key
+        obj.mol = mol
+        obj.func_grp = next((x for x in functional_groups if
+                                  x.name == functional_group), None)
+        if obj.func_grp:
+            obj.tag_atoms()
+
+        cls.cache[key] = obj
+        return obj
 
     def tag_atoms(self):
         """
