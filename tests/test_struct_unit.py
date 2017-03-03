@@ -87,6 +87,17 @@ def test_json_init():
     assert 2 == sum(1 for x in bb1.mol.GetAtoms() if
                                                 x.HasProp('bonder'))
 
+def test_smarts_init():
+
+    # Initialize a molecule from smarts.
+    mol1 = StructUnit.smarts_init('[Br][C][Br]')
+
+    # Check that the second time its being inited, its retrieved from
+    # cache.
+    mol2 = StructUnit.smarts_init('[C]([Br])[Br]')
+
+    assert mol1 is mol2
+
 def test_caching():
     og_c = dict(StructUnit.cache)
     try:
