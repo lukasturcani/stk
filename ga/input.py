@@ -643,6 +643,7 @@ class InputHelp:
                               topologies.__dict__.items() if
                               not name.startswith('_') and
                               not isinstance(cls, ModuleType) and
+                              hasattr(cls, '__mro__') and
                               topologies.base.Topology in getmro(cls)),
 
                 'exit_func' : (func for name, func in
