@@ -82,14 +82,21 @@ def test_json_init():
     assert bb1.bonder_ids == [7, 10]
     assert bb1.energy.__class__.__name__ == 'Energy'
     assert bb1.failed == False
-    assert bb1.key == frozenset({'amine',
-        ('InChI=1S/C15H15N3O4/c1-2-21-14(19)10-9-7-5-3-4-6-8(7)2'
-         '2-15(20)11(9)13(17)18-12(10)16/h3-6,9,18H,2,16-17H2,1H3'
-         '/t9-/m0/s1')})
     assert bb1.func_grp.name == 'amine'
 
     assert 2 == sum(1 for x in bb1.mol.GetAtoms() if
                                                 x.HasProp('bonder'))
+
+def test_smarts_init():
+
+    # Initialize a molecule from smarts.
+    mol1 = StructUnit.smarts_init('[Br][C][Br]')
+
+    # Check that the second time its being inited, its retrieved from
+    # cache.
+    mol2 = StructUnit.smarts_init('[C]([Br])[Br]')
+
+    assert mol1 is mol2
 
 def test_caching():
     og_c = dict(StructUnit.cache)
@@ -111,7 +118,8 @@ def test_caching():
         # generated.
         mol3 = StructUnit(data_dir, 'aldehyde')
         mol2dict = mol2.json()
-        mol2dict['key'] = mol2dict['key'].replace('amine', 'aldehyde')
+        mol2dict['func_grp'] = mol2dict['func_grp'].replace('amine',
+                                                            'aldehyde')
         mol4 = Molecule.fromdict(mol2dict)
         assert mol3 is not mol
         assert mol3 is not mol2
