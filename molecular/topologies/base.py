@@ -44,12 +44,39 @@ import rdkit.Chem.AllChem as rdkit
 from collections import deque
 import numpy as np
 from itertools import chain
+from inspect import signature
 
 from ..fg_info import double_bond_combs
 from ...convenience_tools import dedupe, flatten
 
 
-class Topology:
+class TopologyMeta(type):
+    """
+    Makes a repr of an instance, based on __init__ arguments used.
+
+    """
+
+    def __call__(self, *args, **kwargs):
+
+        # Get the arguments, keyword arguments and defulat initialized
+        # arguments used to make an instance of Topology.
+        sig = signature(self.__init__).bind_partial(self,
+                                                    *args, **kwargs)
+        sig.apply_defaults()
+        sig = dict(sig.arguments)
+        sig.pop('self')
+        # Create the Topology instance.
+        obj = super().__call__(*args, **kwargs)
+        # Use the arguments the object was initialized with to make
+        # a repr of the object and place it in the `repr` attribute.
+        # The __repr__() function in Topology will then just return
+        # this attribute.
+        c = ', '.join("{!s}={!r}".format(key, value) for key, value in
+                                                sorted(sig.items()))
+        obj._repr = "{}({})".format(self.__name__, c)
+        return obj
+
+class Topology(metaclass=TopologyMeta):
     """
     Builds macromolecules.
 
@@ -191,10 +218,9 @@ class Topology:
         return repr(self)
 
     def __repr__(self):
-        c = ""
-        for key, value in sorted(self.__dict__.items()):
-            c += "{!s}={!r}".format(key, value)
-        return "{}({})".format(self.__class__.__name__, c)
+        # The `_repr` attribute is made in the TopologyMeta __call__()
+        # method, when the Topology object is instantiated.
+        return self._repr
 
     def __eq__(self, other):
         return repr(self) == repr(other)

@@ -100,9 +100,9 @@ functional_groups = [
                                 "[$([S][H]);$([S])]",
                                 "[$([H][S]);$([H])]"),
 
-                FGInfo("bromine", "[C][Br]",
-                                  "[$([C][Br]);$([C])]",
-                                  "[$([Br][C]);$([Br])]")
+                FGInfo("bromine", "*[Br]",
+                                  "[$(*[Br]);$(*)]",
+                                  "[$([Br]*);$([Br])]")
 
                     ]
 
