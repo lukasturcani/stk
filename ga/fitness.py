@@ -364,8 +364,7 @@ def raiser(macro_mol, param1, param2=2):
 # Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Energy per Bond ')
-def cage(macro_mol, target_cavity, target_window=None,
-         pseudoformation_params=
+def cage(macro_mol, pseudoformation_params=
          { 'func' : FunctionData('rdkit', forcefield='mmff') }):
     """
     Returns the fitness vector of a cage.
@@ -373,10 +372,8 @@ def cage(macro_mol, target_cavity, target_window=None,
     The fitness vector consists of the following properties in the
     listed order
 
-        1) `cavity_diff` - the difference between the cavity of
-           `macro_mol` and the `target_cavity`.
-        2) `window_diff` - the difference between the largest window of
-           `macro_mol` and `target_window`.
+        1) `cavity` - the diameter of the cage pore.
+        2) `window` - the diameter of the largest cage window.
         3) `asymmetry` - the sum of the size differences of all the
            windows in `macro_mol`.
         4) `eng_per_bond` - The formation energy of `macro_mol` per
@@ -386,13 +383,6 @@ def cage(macro_mol, target_cavity, target_window=None,
     ----------
     macro_mol : Cage
         The cage whose fitness is to be calculated.
-
-    target_cavity : float
-        The desired diameter of the cage's pore.
-
-    target_window : float (default = None)
-        The desired diameter of the largest window of the cage. If
-        ``None`` then `target_cavity` is used.
 
     pseudoformation_params : dict (default =
           { 'func' : FunctionData('rdkit', forcefield='uff') })
@@ -438,18 +428,8 @@ def cage(macro_mol, target_cavity, target_window=None,
     # multiprocessing.
     warnings.filterwarnings('ignore')
 
-    if target_window is None:
-        target_window = target_cavity
-
-    cavity_diff = abs(target_cavity -
-                      macro_mol.cavity_size())
-
-    if macro_mol.windows is not None:
-        window_diff = abs(target_window -
-                          max(macro_mol.windows))
-    else:
-        window_diff  = None
-
+    cavity = macro_mol.cavity_size()
+    window = max(macro_mol.windows)
     asymmetry = macro_mol.window_difference()
 
     print('\n\nCalculating complex energies.\n')
@@ -457,14 +437,13 @@ def cage(macro_mol, target_cavity, target_window=None,
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
 
-    macro_mol.progress_params = [cavity_diff, window_diff,
-                                 asymmetry, e_per_bond]
+    macro_mol.progress_params = [cavity, window, asymmetry, e_per_bond]
 
     if None in macro_mol.progress_params:
         macro_mol.failed = True
         return None
 
-    return np.array([cavity_diff, window_diff, asymmetry, e_per_bond])
+    return np.array([cavity, window, asymmetry, e_per_bond])
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_target(macro_mol,
