@@ -15,11 +15,11 @@ def test_cage():
 def test_cage_target():
     assert np.allclose(cage_target(cagemol, target,
         FunctionData('rdkit', forcefield='mmff'),
-        FunctionData('rdkit_optimization')),
-        [  1.99425829e+02, 7.80441714e-04], atol=1e-8)
+        FunctionData('do_not_optimize')),
+        [ 1.71134290e+12,   7.80441714e-04], atol=1e-8)
 
 def test_cage_c60():
     assert np.allclose(cage_c60(cagemol, target,
             FunctionData('rdkit', forcefield='mmff'),
-            FunctionData('rdkit_optimization'), 1, 1),
-            [ 1.99443688e+02, 7.80441714e-04], atol=1e-8)
+            FunctionData('do_not_optimize'), 1, 1),
+            [1.71134290e+12,   7.80441714e-04], atol=1e-8)
