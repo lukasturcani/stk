@@ -24,11 +24,6 @@ dirs = [r'C:\Program Files\Schrodinger2016-3',
         '/home/lukas/program_files/schrodinger2016-4']
 mm_path = next(x for x in dirs if os.path.exists(x))
 
-# Possible locations of the target file. If not present, fail.
-targets = [ r'C:\Users\lukas\Dropbox\GA\targets\C60_OPLS3.pdb',
-           '/home/lukas/Dropbox/GA/targets/C60_OPLS3.pdb']
-target = next(x for x in targets if os.path.exists(x))
-
 c1 = Molecule.load(join('data', 'macromodel', 'cage.json'))
 c2 = Molecule.load(join('data', 'macromodel', 'small_mol.json'))
 outdir = 'macromodel_tests_output'
@@ -36,6 +31,7 @@ try:
     os.mkdir(outdir)
 except:
     ...
+
 
 @macromodel
 def test_macromodel_opt():
@@ -46,6 +42,7 @@ def test_macromodel_opt():
     {'md' : True, 'gradient' : 1, 'restricted' : False},
     {'gradient' : 1, 'sim_time' : 20, 'eq_time' : 2, 'confs' : 2})
 
+
 @macromodel
 def test_macromodel_cage_opt():
     if outdir not in os.getcwd():
@@ -54,6 +51,7 @@ def test_macromodel_cage_opt():
     macromodel_cage_opt(c1, mm_path,
     {'md' : True, 'gradient' : 1, 'restricted' : False},
     {'gradient' : 1, 'sim_time' : 20, 'eq_time' : 2, 'confs' : 2})
+
 
 @macromodel
 def test_macromodel_eng():
