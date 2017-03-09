@@ -38,7 +38,7 @@ except:
     ...
 
 @macromodel
-def test_macromodel_cage_opt():
+def test_macromodel_opt():
     if outdir not in os.getcwd():
         os.chdir(outdir)
 
