@@ -102,7 +102,20 @@ functional_groups = [
 
                 FGInfo("bromine", "*[Br]",
                                   "[$(*[Br]);$(*)]",
-                                  "[$([Br]*);$([Br])]")
+                                  "[$([Br]*);$([Br])]"),
+
+                # This amine functional group only deletes one of the
+                # hydrogen atoms when a bond is formed.
+                FGInfo("amine2",
+                       "[N]([H])[H]",
+                       "[$([N]([H])[H]);$([N])]",
+                       "[$([H][N][H]);$([H])]"),
+
+                FGInfo("secondary_amine",
+                       "[H][N]([#6])[#6]",
+                       "[$([N]([H])([#6])[#6]);$([N])]",
+                       "[$([H][N]([#6])[#6]);$([H])]")
+
 
                     ]
 
