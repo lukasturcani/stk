@@ -278,23 +278,23 @@ class Molecule:
         True if the fitness function or optimization function failed
         when trying to evaluate the molecule.
 
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
-
     name : str (default = "")
         A name which can be optionally given to the molecule for easy
         identification.
 
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
+
     """
 
-    def __init__(self, note="", name=""):
+    def __init__(self, name="", note=""):
         self.failed = False
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
-        self.note = note
         self.name = name
+        self.note = note
 
     def all_atom_coords(self):
         """
@@ -1091,13 +1091,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     key : MacroMolKey
         The key used for caching the molecule.
 
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
-
     name : str (default = "")
         A name which can be optionally given to the molcule for easy
         identification.
+
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
 
     """
 
@@ -1114,7 +1114,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   '.pdb' : partial(rdkit.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
 
-    def __init__(self, file, functional_group=None, note="", name=""):
+    def __init__(self, file, functional_group=None, name="", note=""):
         """
         Initializes a ``StructUnit`` instance.
 
@@ -1140,7 +1140,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        super().__init__(note, name)
+        super().__init__(name, note)
         self.file = file
         _, ext = os.path.splitext(file)
 
@@ -2055,17 +2055,17 @@ class MacroMolecule(Molecule, metaclass=Cached):
         `update_cache` to work. This attribute is assigned by the
         `__call__()` method of the ``Cached`` metaclass.
 
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
-
     name : str (default = "")
         A name which can be optionally given to the molcule for easy
         identification.
 
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
+
     """
 
-    def __init__(self, building_blocks, topology, note="", name=""):
+    def __init__(self, building_blocks, topology, name="", note=""):
         """
         Initialize a ``MacroMolecule`` instance.
 
@@ -2093,7 +2093,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        super().__init__(note, name)
+        super().__init__(name, note)
         self.fitness = None
         self.unscaled_fitness = {}
         self.progress_params = None
