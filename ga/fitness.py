@@ -662,7 +662,7 @@ def _cage_target(macro_mol, target_mol_file,
 
     # Create rdkit instances of the target in the cage for each
     # rotation.
-    rdkit_complexes = rot_func(macro_mol, target,
+    rdkit_complexes = rot_func(unopt_macro_mol, target,
                                **rotation_func.params)
 
     # Optimize the strcuture of the cage/target complexes.
