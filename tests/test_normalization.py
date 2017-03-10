@@ -9,6 +9,16 @@ from .test_population import generate_population
 
 population = generate_population()
 
+
+def test_cage():
+    for i, mem in enumerate(population):
+        mem.fitness = [i,i,i,i]
+
+    Normalization.cage(None, population, 2, 3)
+
+    for i, mem in enumerate(population):
+        assert mem.fitness == [abs(i-2), abs(i-3), i, i] 
+
 def test_combine():
 
     # Each member will have a fitness value of form:
@@ -23,6 +33,7 @@ def test_combine():
     for i, mem in enumerate(population, 1):
         assert mem.fitness == i*4
 
+
 def test_magnitudes():
 
     for mem in population:
@@ -32,6 +43,7 @@ def test_magnitudes():
 
     for mem in population:
         assert all(x == 1 for x in mem.fitness)
+
 
 def test_shift_elements():
 
@@ -43,6 +55,7 @@ def test_shift_elements():
     for mem in population:
         assert mem.fitness[2] > 0
         assert mem.fitness[3] > 0
+
 
 def test_invert():
 
