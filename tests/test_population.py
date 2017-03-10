@@ -9,6 +9,7 @@ from ..ga import Population, GATools
 
 Population.load(join('data', 'population', 'population.json'))
 
+
 def generate_population(offset=False):
     """
     Returns a population of subpopulations and direct members.
@@ -42,6 +43,7 @@ def generate_population(offset=False):
 
 pop = generate_population()
 
+
 def test_init():
     """
     Tests the __init__ method of the Population class.
@@ -69,6 +71,7 @@ def test_init():
                    Population.__new__(Population),
                    GATools.__new__(GATools), 12)
 
+
 def test_init_cage_isomers():
     lk_file = join('data', 'struct_unit2', 'amine.mol2')
     bb_file = join('data', 'struct_unit3', 'amine.mol2')
@@ -76,6 +79,7 @@ def test_init_cage_isomers():
                                        GATools.init_empty())
     pop.remove_duplicates()
     assert len(pop) == 81
+
 
 def test_add_members_duplicates():
     """
@@ -113,6 +117,7 @@ def test_add_members_duplicates():
 
     # No other frequency should be present.
     assert all(freq == 1 or freq == 2 for freq in count.values())
+
 
 def test_add_members_no_duplicates():
     """
@@ -156,6 +161,7 @@ def test_add_members_no_duplicates():
     receiver.add_members(supplier_different)
     assert receiver_size + len(supplier_different) == len(receiver)
 
+
 def test_add_subpopulation():
     """
     Add a population as a subpopulation to another.
@@ -166,6 +172,23 @@ def test_add_subpopulation():
     pop2 = generate_population()
     pop1.add_subpopulation(pop2)
     assert pop2 in pop1.populations
+
+
+def test_load():
+
+    og_cache = dict(Cage.cache)
+
+    pname = join('data', 'population', 'pop2.json')
+    p = Population.load(pname, load_names=False)
+    for mem in p:
+        assert not mem.name
+
+    Cage.cache = og_cache
+
+    p = Population.load(pname, load_names=True)
+    for mem in p:
+        assert mem.name
+
 
 def test_all_members():
     """
@@ -205,6 +228,7 @@ def test_all_members():
     with pytest.raises(AssertionError):
         assert all(cage in all_members for cage in cages)
 
+
 def test_max():
     pop = generate_population()
 
@@ -218,6 +242,7 @@ def test_max():
 
     assert np.max([x.fitness for x in pop]) == maxf
     assert np.allclose(np.max(m, axis=0), maxuf, atol=1e-8)
+
 
 def test_mean():
     pop = generate_population()
@@ -233,6 +258,7 @@ def test_mean():
     assert np.mean([x.fitness for x in pop]) == avgf
     assert np.allclose(np.mean(m, axis=0), avguf, atol=1e-8)
 
+
 def test_min():
     pop = generate_population()
 
@@ -246,6 +272,7 @@ def test_min():
 
     assert np.min([x.fitness for x in pop]) == minf
     assert np.allclose(np.min(m, axis=0), minuf, atol=1e-8)
+
 
 def test_remove_duplicates_between_subpops():
     """
@@ -277,6 +304,7 @@ def test_remove_duplicates_between_subpops():
     assert main.populations[0].populations[0].populations
     subsubsubpop = main.populations[0].populations[0].populations[0]
     assert not subsubsubpop.populations
+
 
 def test_remove_duplicates_not_between_subpops():
     """
@@ -329,6 +357,7 @@ def test_remove_duplicates_not_between_subpops():
     assert subpop1.populations[0].populations[0].members
     assert not subpop1.populations[0].populations[0].populations
 
+
 def remove_failures():
     pop = generate_population()
     og_length = len(pop)
@@ -339,6 +368,7 @@ def remove_failures():
     pop.remove_failures()
 
     assert len(pop) == og_length - 5
+
 
 def test_getitem():
     """
@@ -365,6 +395,7 @@ def test_getitem():
     with pytest.raises(TypeError):
         pop[5.5]
 
+
 def test_sub():
     """
     Exclude members of one population from another.
@@ -389,6 +420,7 @@ def test_sub():
     # Removing cages present in a population should get rid of them.
     result_pop2 = subtractee - subtractor_same
     assert len(result_pop2) == 0
+
 
 def test_add():
     """
@@ -415,6 +447,7 @@ def test_add():
     assert result.populations[0].populations[0].populations[0].members
     subsubsub_pop = result.populations[0].populations[0].populations[0]
     assert not subsubsub_pop.populations
+
 
 def test_contains():
     """
