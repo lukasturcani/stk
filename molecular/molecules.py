@@ -641,27 +641,6 @@ class Molecule:
 
         return np.matrix(pos_array.reshape(-1,3).T)
 
-    def save_bonders(self):
-        """
-        Adds atoms tagged with 'bonder' to `bonder_ids`.
-
-        Modifies
-        --------
-        bonder_ids : list of ints
-            Updates this set with the ids of atoms tagged 'bonder'.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        # Clear the set in case the method is run twice.
-        self.bonder_ids = []
-        for atom in self.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                self.bonder_ids.append(atom.GetIdx())
-
     def rotate(self, theta, axis):
         """
         Rotates the molecule by `theta` about `axis`.
@@ -702,6 +681,27 @@ class Molecule:
         self.set_position_from_matrix(new_pos_mat)
         # Return the centroid of the molecule to the origin position.
         self.set_position(og_position)
+
+    def save_bonders(self):
+        """
+        Adds atoms tagged with 'bonder' to `bonder_ids`.
+
+        Modifies
+        --------
+        bonder_ids : list of ints
+            Updates this set with the ids of atoms tagged 'bonder'.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        # Clear the set in case the method is run twice.
+        self.bonder_ids = []
+        for atom in self.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                self.bonder_ids.append(atom.GetIdx())
 
     def set_orientation(self, start, end):
         """
