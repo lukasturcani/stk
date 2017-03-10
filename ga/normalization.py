@@ -126,6 +126,40 @@ class Normalization:
             getattr(self, func_data.name)(valid_pop,
                                           **func_data.params)
 
+    def cage(self, population, cavity, window):
+        """
+        A normalization function for the `cage` fitness function.
+
+        Parameters
+        ----------
+        population : Population
+            The population whose members need to have their fitness
+            values normalized.
+
+        cavity : float
+            The desired size of the cage cavity.
+
+        window : float
+            The desired size of the largest cage window.
+
+        Modifies
+        --------
+        fitness : numpy.array
+            The fitness attribute of members is updated.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for mem in population:
+            cavity_diff = abs(mem.fitness[0] - cavity)
+            window_diff = abs(mem.fitness[1] - window)
+            mem.fitness = [cavity_diff, window_diff,
+                           mem.fitness[2], mem.fitness[3]]
+
+
     def combine(self, population, coefficients, exponents):
         """
         Combines elements in the `fitness` attribute of members.
