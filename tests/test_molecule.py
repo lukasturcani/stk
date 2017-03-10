@@ -8,11 +8,13 @@ from scipy.spatial.distance import euclidean
 from ..molecular import Molecule
 from ..convenience_tools import periodic_table
 
-data_dir = join('data', 'molecule')
-f = join(data_dir, 'molecule.mol')
+# Load the test molecule into a Molecule instance.
+# This instance can be used in unit tests which do not change the state
+# of the instance. Unit tests which change state should create their
+# own local instance.
+molfile = join('data', 'molecule', 'molecule.mol')
 mol = Molecule.__new__(Molecule)
-mol.mol = rdkit.MolFromMolFile(f, removeHs=False, sanitize=False)
-og = mol.position_matrix()
+mol.mol = rdkit.MolFromMolFile(molfile, removeHs=False, sanitize=False)
 
 
 def test_all_atom_coords():
@@ -105,24 +107,17 @@ def test_centroid_functions():
 
     """
 
-    try:
-        # Get the centroid.
-        prist_centroid = mol.centroid()
-        # Position the centroid.
-        new_pos = np.array([25,15,10])
-        mol.set_position(new_pos)
-        # Check that the centroid is at the desired position and that
-        # it's different to the original position.
-        assert not np.allclose(prist_centroid,
-                               mol.centroid(), atol=1e-8)
-        assert np.allclose(new_pos, mol.centroid(),
-                           atol = 1e-8)
+    # Initialize the test molecule.
+    mol = Molecule.__new__(Molecule)
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
 
-        mol.set_position_from_matrix(og)
-
-    except Exception as ex:
-        mol.set_position_from_matrix(og)
-        raise ex
+    # Save the coordinates of the new centroid.
+    new_centroid = mol.centroid() + np.array([10, 20, 4])
+    mol.set_position(new_centroid)
+    # Check that the centroid is at the desired position.
+    assert np.allclose(new_centroid, mol.centroid(), atol=1e-8)
 
 
 def test_graph():
@@ -130,17 +125,33 @@ def test_graph():
     Tests the output of the `graph` method.
 
     """
-    # Test the pristine version first.
+
     graph = mol.graph()
-    expected_nodes = 24
-    expected_edges = 24
-    assert len(graph.nodes()) == expected_nodes
-    assert len(graph.edges()) == expected_edges
+    assert len(graph.nodes()) == mol.mol.GetNumAtoms()
+    assert len(graph.edges()) == mol.mol.GetNumBonds()
 
 
 def test_max_diameter():
-    assert np.isclose(mol.max_diameter()[0],  8.208867583551658,
-                      atol=1e-4)
+    # Make a new test molecule.
+    mol = Molecule.__new__(Molecule)
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
+    # Make a position matrix which sets all atoms to the origin except
+    # 2 and 13. These should be placed a distance of 100 apart.
+    pos_mat = [[0 for x in range(3)] for
+                                    y in range(mol.mol.GetNumAtoms())]
+
+    pos_mat[1] = [0, 100, 10]
+    pos_mat[12] = [0, 0, 10]
+
+    # Set the coordinates of atom 1 and atom 13 to a distance of 100.
+
+
+    d, id1, id2 = mol.max_diameter()
+    assert np.isclose(d,  9.607329322149909, atol=1e-8)
+    assert id1 == 4
+    assert id2 == 20
 
 
 def test_position_matrix():
@@ -164,6 +175,15 @@ def test_position_matrix():
 
 
 def test_save_bonders():
+    mol = Molecule.__new__(Molecule)
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
+
+    # Give the first five atoms the 'bonder' tag. Then check if five
+    # atoms are tagged as bonders. Add 'del' tags to all other atoms
+    # to make sure only 'bonder' tags are gettting counted and none
+    # others.
     mol.bonder_ids = []
     for i, atom in enumerate(mol.mol.GetAtoms()):
         if i < 5:
@@ -175,26 +195,26 @@ def test_save_bonders():
 
     mol.save_bonders()
     assert len(mol.bonder_ids) == 5
-    for atom in mol.mol.GetAtoms():
-        atom.ClearProp('bonder')
-        atom.ClearProp('del')
 
 
 def test_set_position_from_matrix():
-    try:
-        new_pos_mat = np.matrix([[0 for x in range(3)] for y in
-                                        range(mol.mol.GetNumAtoms())])
-        mol.set_position_from_matrix(new_pos_mat.T)
-        for _, atom_coord in mol.all_atom_coords():
-            assert np.allclose(atom_coord, [0,0,0], atol=1e-8)
+    mol = Molecule.__new__(Molecule)
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
 
-        mol.set_position_from_matrix(og)
-    except Exception as ex:
-        mol.set_position_from_matrix(og)
-        raise ex
+    # The new position matrix just sets all atomic positions to origin.
+    new_pos_mat = np.matrix([[0 for x in range(3)] for y in
+                              range(mol.mol.GetNumAtoms())])
+    mol.set_position_from_matrix(new_pos_mat.T)
+    for _, atom_coord in mol.all_atom_coords():
+        assert np.allclose(atom_coord, [0,0,0], atol=1e-8)
+
+    mol.set_position_from_matrix(og)
 
 
 def test_shift():
+
     s= np.array([10,-20,5])
     mol2 = mol.shift(s)
     conf = mol2.GetConformer()
@@ -202,20 +222,15 @@ def test_shift():
         atomid = atom.GetIdx()
         pos = conf.GetAtomPosition(atomid)
         should_be = mol.atom_coords(atomid) + s
-        assert np.allclose(should_be, pos,atol=1e-8)
-
-    mol.set_position_from_matrix(og)
+        assert np.allclose(should_be, pos, atol=1e-8)
 
 
 def test_update_from_mae():
-    try:
-        mol2 = Molecule.__new__(Molecule)
-        mol2.mol = rdkit.MolFromMolFile(f, removeHs=False,
-                                          sanitize=False)
-        mol2.update_from_mae(f.replace('.mol', '.mae'))
-        assert mol2.mol.GetNumAtoms() == 272
-        assert mol2.mol.GetNumBonds() == 288
-        mol.write(f)
-    except Exception as ex:
-        mol.write(f)
-        raise ex
+    mol = Molecule.__new__(Molecule)
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
+
+    mol.update_from_mae(molfile.replace('.mol', '.mae'))
+    assert mol.mol.GetNumAtoms() == 272
+    assert mol.mol.GetNumBonds() == 288
