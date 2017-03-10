@@ -1,4 +1,4 @@
-import rdkit.Chem as chem
+import rdkit.Chem.AllChem as rdkit
 from os.path import join
 import itertools as it
 import numpy as np
@@ -11,8 +11,9 @@ from ..convenience_tools import periodic_table
 data_dir = join('data', 'molecule')
 f = join(data_dir, 'molecule.mol')
 mol = Molecule.__new__(Molecule)
-mol.mol = chem.MolFromMolFile(f, removeHs=False, sanitize=False)
+mol.mol = rdkit.MolFromMolFile(f, removeHs=False, sanitize=False)
 og = mol.position_matrix()
+
 
 def test_all_atom_coords():
     """
@@ -29,6 +30,7 @@ def test_all_atom_coords():
         conf_coord = np.array(conf.GetAtomPosition(atom_id))
         assert np.allclose(coord, conf_coord, atol=1e-8)
 
+
 def test_atom_coords():
     """
     Tests `atom_coords`.
@@ -42,6 +44,7 @@ def test_atom_coords():
         coords = mol.atom_coords(atom_id)
         conf_coords = conf.GetAtomPosition(atom_id)
         assert np.allclose(coords, conf_coords, atol=1e-8)
+
 
 def test_atom_distance():
     """
@@ -59,6 +62,7 @@ def test_atom_distance():
         assert (mol.atom_distance(atom1_id, atom2_id) ==
                euclidean(conf.GetAtomPosition(atom1_id),
                          conf.GetAtomPosition(atom2_id)))
+
 
 def test_atom_symbol():
     """
@@ -90,6 +94,7 @@ def test_center_of_mass():
     com = np.divide(coord_sum, total_mass)
     assert np.allclose(mol.center_of_mass(), com, atol=1e-6)
 
+
 def test_centroid_functions():
     """
     Tests functions related to centroid manipulation of the molecule.
@@ -119,6 +124,7 @@ def test_centroid_functions():
         mol.set_position_from_matrix(og)
         raise ex
 
+
 def test_graph():
     """
     Tests the output of the `graph` method.
@@ -131,9 +137,11 @@ def test_graph():
     assert len(graph.nodes()) == expected_nodes
     assert len(graph.edges()) == expected_edges
 
+
 def test_max_diameter():
     assert np.isclose(mol.max_diameter()[0],  8.208867583551658,
                       atol=1e-4)
+
 
 def test_position_matrix():
     """
@@ -154,6 +162,7 @@ def test_position_matrix():
 
         assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
 
+
 def test_save_bonders():
     mol.bonder_ids = []
     for i, atom in enumerate(mol.mol.GetAtoms()):
@@ -170,6 +179,7 @@ def test_save_bonders():
         atom.ClearProp('bonder')
         atom.ClearProp('del')
 
+
 def test_set_position_from_matrix():
     try:
         new_pos_mat = np.matrix([[0 for x in range(3)] for y in
@@ -183,6 +193,7 @@ def test_set_position_from_matrix():
         mol.set_position_from_matrix(og)
         raise ex
 
+
 def test_shift():
     s= np.array([10,-20,5])
     mol2 = mol.shift(s)
@@ -195,10 +206,11 @@ def test_shift():
 
     mol.set_position_from_matrix(og)
 
+
 def test_update_from_mae():
     try:
         mol2 = Molecule.__new__(Molecule)
-        mol2.mol = chem.MolFromMolFile(f, removeHs=False,
+        mol2.mol = rdkit.MolFromMolFile(f, removeHs=False,
                                           sanitize=False)
         mol2.update_from_mae(f.replace('.mol', '.mae'))
         assert mol2.mol.GetNumAtoms() == 272
