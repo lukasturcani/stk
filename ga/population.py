@@ -462,9 +462,11 @@ class Population:
         pop = cls()
         for item in pop_list:
             if isinstance(item, dict):
-                pop.members.append(Molecule.fromdict(item, load_names))
+                pop.members.append(
+                    Molecule.fromdict(item, load_names=load_names))
             elif isinstance(item, list):
-                pop.populations.append(cls.fromlist(item, load_names))
+                pop.populations.append(
+                    cls.fromlist(item, load_names=load_names))
 
             else:
                 raise TypeError(('Population list must consist only'
