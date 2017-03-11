@@ -210,8 +210,6 @@ def test_set_position_from_matrix():
     for _, atom_coord in mol.all_atom_coords():
         assert np.allclose(atom_coord, [0,0,0], atol=1e-8)
 
-    mol.set_position_from_matrix(og)
-
 
 def test_shift():
 
