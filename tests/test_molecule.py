@@ -11,6 +11,7 @@ from ..convenience_tools import periodic_table
 # Make a loader for a test Molecule object.
 def make_mol():
     mol = Molecule.__new__(Molecule)
+    molfile = join('data', 'molecule', 'molecule.mol')
     mol.mol = rdkit.MolFromMolFile(molfile,
                                    removeHs=False,
                                    sanitize=False)
@@ -20,7 +21,6 @@ def make_mol():
 # This instance can be used in unit tests which do not change the state
 # of the instance. Unit tests which change state should create their
 # own local instance.
-molfile = join('data', 'molecule', 'molecule.mol')
 mol = make_mol()
 
 
@@ -222,6 +222,6 @@ def test_shift():
 def test_update_from_mae():
     mol = make_mol()
 
-    mol.update_from_mae(molfile.replace('.mol', '.mae'))
+    mol.update_from_mae(join('data', 'molecule', 'molecule.mae'))
     assert mol.mol.GetNumAtoms() == 272
     assert mol.mol.GetNumBonds() == 288
