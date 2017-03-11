@@ -8,13 +8,20 @@ from scipy.spatial.distance import euclidean
 from ..molecular import Molecule
 from ..convenience_tools import periodic_table
 
+# Make a loader for a test Molecule object.
+def make_mol():
+    mol = Molecule.__new__(Molecule)
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
+    return mol
+
 # Load the test molecule into a Molecule instance.
 # This instance can be used in unit tests which do not change the state
 # of the instance. Unit tests which change state should create their
 # own local instance.
 molfile = join('data', 'molecule', 'molecule.mol')
-mol = Molecule.__new__(Molecule)
-mol.mol = rdkit.MolFromMolFile(molfile, removeHs=False, sanitize=False)
+mol = make_mol()
 
 
 def test_all_atom_coords():
@@ -108,10 +115,7 @@ def test_centroid_functions():
     """
 
     # Initialize the test molecule.
-    mol = Molecule.__new__(Molecule)
-    mol.mol = rdkit.MolFromMolFile(molfile,
-                                   removeHs=False,
-                                   sanitize=False)
+    mol = make_mol()
 
     # Save the coordinates of the new centroid.
     new_centroid = mol.centroid() + np.array([10, 20, 4])
@@ -133,25 +137,21 @@ def test_graph():
 
 def test_max_diameter():
     # Make a new test molecule.
-    mol = Molecule.__new__(Molecule)
-    mol.mol = rdkit.MolFromMolFile(molfile,
-                                   removeHs=False,
-                                   sanitize=False)
+    mol = make_mol()
     # Make a position matrix which sets all atoms to the origin except
     # 2 and 13. These should be placed a distance of 100 apart.
     pos_mat = [[0 for x in range(3)] for
                                     y in range(mol.mol.GetNumAtoms())]
-
-    pos_mat[1] = [0, 100, 10]
-    pos_mat[12] = [0, 0, 10]
-
-    # Set the coordinates of atom 1 and atom 13 to a distance of 100.
-
+    pos_mat[1] = [0, -50, 0]
+    pos_mat[12] = [0, 50, 0]
+    mol.set_position_from_matrix(np.matrix(pos_mat).T)
 
     d, id1, id2 = mol.max_diameter()
-    assert np.isclose(d,  9.607329322149909, atol=1e-8)
-    assert id1 == 4
-    assert id2 == 20
+    # Note that it is not exactly 100 because of the Van der Waals
+    # radii of the atoms.
+    assert np.isclose(d,  102.79, atol=1e-8)
+    assert id1 == 1
+    assert id2 == 12
 
 
 def test_position_matrix():
@@ -174,12 +174,11 @@ def test_position_matrix():
         assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
 
 
-def test_save_bonders():
-    mol = Molecule.__new__(Molecule)
-    mol.mol = rdkit.MolFromMolFile(molfile,
-                                   removeHs=False,
-                                   sanitize=False)
+def test_rotate():
+    mol = make_mol()
 
+def test_save_bonders():
+    mol = make_mol()
     # Give the first five atoms the 'bonder' tag. Then check if five
     # atoms are tagged as bonders. Add 'del' tags to all other atoms
     # to make sure only 'bonder' tags are gettting counted and none
@@ -198,10 +197,7 @@ def test_save_bonders():
 
 
 def test_set_position_from_matrix():
-    mol = Molecule.__new__(Molecule)
-    mol.mol = rdkit.MolFromMolFile(molfile,
-                                   removeHs=False,
-                                   sanitize=False)
+    mol = make_mol()
 
     # The new position matrix just sets all atomic positions to origin.
     new_pos_mat = np.matrix([[0 for x in range(3)] for y in
@@ -224,10 +220,7 @@ def test_shift():
 
 
 def test_update_from_mae():
-    mol = Molecule.__new__(Molecule)
-    mol.mol = rdkit.MolFromMolFile(molfile,
-                                   removeHs=False,
-                                   sanitize=False)
+    mol = make_mol()
 
     mol.update_from_mae(molfile.replace('.mol', '.mae'))
     assert mol.mol.GetNumAtoms() == 272
