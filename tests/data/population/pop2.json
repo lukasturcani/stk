@@ -2,7 +2,7 @@
     {
         "unscaled_fitness": "{'cage': array([  4.72221943,   4.27613448,   0.23467035,  73.00040833])}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             4,
@@ -75,7 +75,7 @@
     {
         "unscaled_fitness": "{'cage': None}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             4,
@@ -148,7 +148,7 @@
     {
         "unscaled_fitness": "{'cage': array([ 24.71879618,  24.50107999,   2.90621905, -92.10063333])}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             31,
@@ -221,7 +221,7 @@
     {
         "unscaled_fitness": "{'cage': array([  8.12330043,   7.61421399,   0.73028646, -86.78341667])}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             12,
@@ -294,7 +294,7 @@
     {
         "unscaled_fitness": "{'cage': None}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             20,
@@ -367,7 +367,7 @@
     {
         "unscaled_fitness": "{'cage': array([  2.43510594,   2.90920416,   0.52410316, -82.79030833])}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             4,
@@ -440,7 +440,7 @@
     {
         "unscaled_fitness": "{'cage': None}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             14,
@@ -513,7 +513,7 @@
     {
         "unscaled_fitness": "{'cage': array([  8.03788154,   7.81762004,   0.26061217, -43.03104167])}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             12,
@@ -586,7 +586,7 @@
     {
         "unscaled_fitness": "{'cage': array([  9.84131493,  16.8751795 ,   1.12627314,  -0.58744167])}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             27,
@@ -659,7 +659,7 @@
     {
         "unscaled_fitness": "{'cage': None}",
         "note": "",
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             12,

@@ -44,7 +44,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             6,
             15,
@@ -117,7 +117,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             6,
             15,
@@ -190,7 +190,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             6,
             15,
@@ -263,7 +263,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -336,7 +336,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -409,7 +409,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -482,7 +482,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             6,
@@ -555,7 +555,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             6,
@@ -628,7 +628,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 12,
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             0,
             6,
@@ -701,7 +701,7 @@
         ],
         "unscaled_fitness": "{}",
         "bonds_made": 24,
-        "topology": "EightPlusTwelve(alignment=None)",
+        "topology": "EightPlusTwelve(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
             6,
             15,

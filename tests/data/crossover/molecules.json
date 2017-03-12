@@ -42,7 +42,7 @@
             170,
             176
         ],
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "note": "",
         "name": "",
         "unscaled_fitness": "{}",
@@ -115,7 +115,7 @@
             285,
             288
         ],
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "note": "",
         "name": "",
         "unscaled_fitness": "{}",
@@ -188,7 +188,7 @@
             302,
             308
         ],
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "note": "",
         "name": "",
         "unscaled_fitness": "{}",
@@ -261,7 +261,7 @@
             153,
             156
         ],
-        "topology": "FourPlusSix(alignment=None)",
+        "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "note": "",
         "name": "",
         "unscaled_fitness": "{}",

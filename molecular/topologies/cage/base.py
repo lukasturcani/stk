@@ -339,7 +339,7 @@ class Edge(Vertex):
         v2.connected.append(self)
 
 
-    def place_mol(self, linker, flip=True):
+    def place_mol(self, linker, alignment):
         """
         Places a linker molecule on the coordinates of an edge.
 
@@ -353,10 +353,10 @@ class Edge(Vertex):
             The linker which is to be placed and orientated as
             described in the docstring.
 
-        flip : bool (default = True)
-            If ``True`` the linker has a 50% chance of being rotated
-            so that its direction vector runs in the opposite direction
-            to the edge's direction vector.
+        alignment : int
+            1 for parallel alignment with `self.direction` and -1 for
+            anti-parallel alignment with `self.direction`.
+
 
         Modifies
         --------
@@ -380,14 +380,7 @@ class Edge(Vertex):
         # position of the edge, then the direction of the linker is
         # aligned with the direction of the edge.
         linker.set_bonder_centroid(self.coord)
-
-        # If `flip` is ``True`` the linker rotated at randomly chosen
-        # to align either with the edge direction vector or its
-        # opposite direction.
-        f = 1
-        if flip:
-            f = np.random.choice([1,-1])
-        linker.set_orientation2(np.multiply(self.direction, f))
+        linker.set_orientation2(np.multiply(self.direction, alignment))
 
         # Ensure the centroid of the linker is placed on the outside of
         # the cage.
@@ -404,20 +397,58 @@ class _CageTopology(Topology):
     In addition to all the attributes defined within ``Topology`` this
     class has the following attributes:
 
-    alignment : list of ints or None
-        This length of this list must be equal to the number of
-        vertices in the cage. When cages are built one of the bonder
-        atoms is aligned with an edge during placement. The int
-        indicates which bonder atom is aligned. The int corresponds to
-        an index in `bonder_ids`.
+    A_alignments : list of ints (default = None)
+        The length of this list must be equal to the number of
+        building blocks in the cage. When cages are built one of the
+        bonder atoms of each building block is aligned with an edge
+        during placement. The int indicates which bonder atom is
+        aligned. The int corresponds to an index in `bonder_ids`.
 
         If ``None`` the first atom in `bonder_ids` is always aligned.
 
+        For example,
+
+            A_alignments = [0,2,1,2]
+
+        In this case there must be 4 building blocks in the cage. The
+        the first building block has its first (index 0) bonder atom
+        aligned. The 2nd building block has the 3rd (index 2) atom
+        aligned. The 3rd building block has the 2nd (index 1) atom
+        aligned. The 4th building block has the 3rd (index 2) atom
+        aligned.
+
+
+    B_alignments : list of ints (default = None)
+        The length of this list should be euqal to the number of
+        linkers in the cage. The linkers of a cage can have either 2
+        functional groups or 3 or more, depending on the topology.
+
+        When the linkers have 2 functional groups the list should hold
+        either 1 or -1. The value indicates that the linker is aligned
+        parallel or antiparallel with the edge its placed on. For
+        example in a tetrahedral topology,
+
+            B_alignments = [-1, 1, 1, -1, 1, -1]
+
+        It indicates that the first linker is aligned anti parallel and
+        the second is aligned in parallel, and so on.
+
+        If the linkers have 3 or more functional groups, the values
+        in B_alignments have the same role as `A_alignments`. The only
+        difference is that by default the second atom is aligned,
+        rather than the first.
+
     """
 
-    def __init__(self, alignment=None):
+    def __init__(self, A_alignments=None, B_alignments=None):
+        if A_alignments is None:
+            A_alignments = np.zeros(len(self.positions_A))
+        if B_alignments is None:
+            B_alignments = np.ones(len(self.positions_B))
+
         super().__init__()
-        self.alignment = alignment
+        self.A_alignments = A_alignments
+        self.B_alignments = B_alignments
 
     def join_mols(self, macro_mol):
         """
@@ -603,13 +634,9 @@ class _CageTopology(Topology):
         # counts the nubmer of building-blocks* which make up the
         # structure.
         for i, position in enumerate(self.positions_A):
-
-            # Get the id of atom which to be aligned with an edge.
-            aligner = (0 if self.alignment is None else
-                       self.alignment[i])
             # Position the molecule on the vertex.
             bb.set_position_from_matrix(bb_pos)
-            bb_mol = position.place_mol(bb, aligner)
+            bb_mol = position.place_mol(bb, int(self.A_alignments[i]))
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
@@ -629,24 +656,9 @@ class _CageTopology(Topology):
         # It then saves all atoms which form a new bond to the position
         # they are found at. It also counts the number of linkers which
         # make up the structure.
-        for position in self.positions_B:
-
-            # Here `place_mol` can either belong to an Edge object
-            # or a Vertex object. `self.alignment` can be either
-            # ``None`` or a list of ints. If it is ``None`` it means
-            # that a linker placed on the Edge should be flipped at
-            # random. This means the second argument should be 1 to
-            # turn on the flipping. If its ``None`` and `place_mol`
-            # belongs to a Vertex it just means the second bonder atom
-            # gets aligned. This has no practical effect. By default
-            # the first bonder atom gets aligned, but this has no
-            # objective benefit.
-
-            # If `self.alignment` is a list of ints it means that
-            # flipping should be turned off for edges and that the 0th
-            # atom will get aligned if the position is a Vertex.
+        for i, position in enumerate(self.positions_B):
             lk.set_position_from_matrix(lk_pos)
-            lk_mol = position.place_mol(lk, int(not self.alignment))
+            lk_mol = position.place_mol(lk,  int(self.B_alignments[i]))
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, lk_mol)
             # Update the counter each time a linker is added.
             macro_mol.bb_counter.update([lk])
