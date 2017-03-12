@@ -2,7 +2,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -75,7 +75,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -148,7 +148,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -221,7 +221,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -294,7 +294,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -367,7 +367,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -440,7 +440,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -513,7 +513,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -586,7 +586,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -659,7 +659,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -732,7 +732,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -805,7 +805,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -878,7 +878,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -951,7 +951,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1024,7 +1024,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1097,7 +1097,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1170,7 +1170,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1243,7 +1243,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1316,7 +1316,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1389,7 +1389,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1462,7 +1462,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1535,7 +1535,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1608,7 +1608,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1681,7 +1681,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1754,7 +1754,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1827,7 +1827,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1900,7 +1900,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1973,7 +1973,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2046,7 +2046,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2119,7 +2119,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2192,7 +2192,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2265,7 +2265,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2338,7 +2338,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2411,7 +2411,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2484,7 +2484,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2557,7 +2557,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2630,7 +2630,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2703,7 +2703,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2776,7 +2776,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2849,7 +2849,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2922,7 +2922,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2995,7 +2995,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3068,7 +3068,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3141,7 +3141,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3214,7 +3214,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3287,7 +3287,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3360,7 +3360,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3433,7 +3433,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3506,7 +3506,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3579,7 +3579,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3652,7 +3652,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3725,7 +3725,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3798,7 +3798,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3871,7 +3871,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3944,7 +3944,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4017,7 +4017,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4090,7 +4090,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4163,7 +4163,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4236,7 +4236,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4309,7 +4309,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4382,7 +4382,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4455,7 +4455,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4528,7 +4528,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4601,7 +4601,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4674,7 +4674,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4747,7 +4747,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4820,7 +4820,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4893,7 +4893,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4966,7 +4966,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5039,7 +5039,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5112,7 +5112,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5185,7 +5185,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5258,7 +5258,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5331,7 +5331,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5404,7 +5404,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5477,7 +5477,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5550,7 +5550,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5623,7 +5623,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5696,7 +5696,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5769,7 +5769,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5842,7 +5842,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
