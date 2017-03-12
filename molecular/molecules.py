@@ -1798,32 +1798,39 @@ class StructUnit2(StructUnit):
 
         """
 
-        vector = normalize_vector(vector)
-        axis = normalize_vector(axis)
+        # Save the initial position and change the origin to the
+        # center of the bonder atoms.
+        iposition = self.centroid()
+        self.set_bonder_centroid([0,0,0])
 
-        theta = vector_theta(self.centroid_centroid_dir_vector(),
-                             vector)
+        # 1. First transform the problem.
+        # 2. The rotation axis is set equal to the z-axis.
+        # 3. Apply this transformation to all vectors in the problem.
+        # 4. Take only the x and y components of the bonder vector and
+        #    `vector`.
+        # 5. Work out the angle between them.
+        # 6. Apply that rotation along the original rotation axis.
 
-        # First determine the direction in which iteration should
-        # occur.
-        self.rotate2(step, axis)
-        theta2 = vector_theta(self.centroid_centroid_dir_vector(),
-                             vector)
-        if theta2 > theta:
-            axis = np.multiply(axis, -1)
+        rotmat = rotation_matrix(axis, [0,0,1])
+        tstart = np.dot(rotmat, self.centroid_centroid_dir_vector())
+        tstart = np.array([tstart[0], tstart[1], 0])
+        tend = np.dot(rotmat, vector)
+        tend = np.array([tend[0], tend[1], 0])
+        angle = vector_theta(tstart, tend)
 
-        prev_theta = theta2
-        while True:
-            self.rotate2(step, axis)
-            theta = vector_theta(self.centroid_centroid_dir_vector(),
-                             vector)
 
-            if theta >= prev_theta:
-                axis = np.multiply(axis, -1)
-                self.rotate2(step, axis)
-                break
+        # Check in which direction the rotation should go
+        r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
+        t1 = vector_theta(np.dot(r1, tstart), tend)
+        r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
+        t2 = vector_theta(np.dot(r2, tstart), tend)
+        if t2 < t1:
+            angle *= -1
 
-            prev_theta = theta
+        rotmat = rotation_matrix_arbitrary_axis(angle, axis)
+        posmat = np.dot(rotmat, self.position_matrix())
+        self.set_position_from_matrix(posmat)
+        self.set_position(iposition)
 
 
 class StructUnit3(StructUnit):
