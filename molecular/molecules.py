@@ -1811,6 +1811,14 @@ class StructUnit2(StructUnit):
         rotmat = rotation_matrix(axis, [0,0,1])
         tstart = np.dot(rotmat, self.centroid_centroid_dir_vector())
         tstart = np.array([tstart[0], tstart[1], 0])
+
+        # If the `tstart` vector is 0 after these transformations it
+        # means that the molecule is flat. Return, no need to do any
+        # more work.
+        if np.allclose(tstart, [0,0,0], atol=1e-8):
+            self.set_position(iposition)
+            return
+
         tend = np.dot(rotmat, vector)
         tend = np.array([tend[0], tend[1], 0])
         angle = vector_theta(tstart, tend)
