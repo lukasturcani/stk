@@ -1815,8 +1815,9 @@ class StructUnit2(StructUnit):
         tend = np.array([tend[0], tend[1], 0])
         angle = vector_theta(tstart, tend)
 
-
-        # Check in which direction the rotation should go
+        # Check in which direction the rotation should go.
+        # This is done by apply the rotation in each direction and
+        # seeing which one leads to a smaller theta.
         r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
         t1 = vector_theta(np.dot(r1, tstart), tend)
         r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
