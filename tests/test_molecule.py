@@ -174,11 +174,6 @@ def test_position_matrix():
         assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
 
 
-def test_rotate():
-    mol = make_mol()
-    
-
-
 def test_save_bonders():
     mol = make_mol()
     # Give the first five atoms the 'bonder' tag. Then check if five
