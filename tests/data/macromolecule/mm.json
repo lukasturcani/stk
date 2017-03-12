@@ -22,7 +22,7 @@
             4
         ]
     ],
-    "topology": "FourPlusSix(alignment=None)",
+    "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
     "building_blocks": [
         {"class": "StructUnit2",
          "note" : "",
@@ -109,7 +109,7 @@
             "note" : ""
         }
     ],
-    "topology": "FourPlusSix(alignment=None)",
+    "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
     "unscaled_fitness": "{}",
     "bonder_ids": [
         3,

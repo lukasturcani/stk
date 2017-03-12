@@ -44,7 +44,7 @@
     ],
     "name": "cc3",
     "class": "Cage",
-    "topology": "FourPlusSix(alignment=None)",
+    "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
     "bonds_made": 12,
     "note": "",
     "bb_counter": [
