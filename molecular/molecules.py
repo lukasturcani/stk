@@ -1766,13 +1766,13 @@ class StructUnit2(StructUnit):
         *_, start = next(self.bonder_direction_vectors())
         return self._set_orientation2(start, end)
 
-    def minimize_theta(self, vector, axis, step=0.17):
+    def minimize_theta(self, vector, axis):
         """
         Rotates molecule about `axis` to minimze theta with `vector`.
 
-        The molecule is iteratively rotated about `axis` so that the
-        vector between its bonder atoms is as close as possible to
-        `vector`.
+        The molecule is rotated about `axis` passing through the bonder
+        centroid. It is rotated so that the vector between the bonder
+        and molecular centroids lies on the same plane as `vector`.
 
         Parameters
         ----------
@@ -1781,9 +1781,6 @@ class StructUnit2(StructUnit):
 
         axis : numpy.array
             The direction vector along which the rotation happens.
-
-        step : float
-            The size of the iterative step in radians.
 
         Modifies
         --------
