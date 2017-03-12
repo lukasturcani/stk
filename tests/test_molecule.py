@@ -176,6 +176,8 @@ def test_position_matrix():
 
 def test_rotate():
     mol = make_mol()
+    
+
 
 def test_save_bonders():
     mol = make_mol()
