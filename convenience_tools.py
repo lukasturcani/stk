@@ -808,7 +808,12 @@ def rotation_matrix(vector1, vector2):
 
     # Handle the case where the rotation is 180 degrees.
     if np.array_equal(vector1, np.multiply(vector2, -1)):
-        return np.multiply(np.identity(3), -1)
+        # Get a vector orthogonal to `vector1` by finding the smallest
+        # component of `vector1` and making that a vector.
+        ortho = [0,0,0]
+        ortho[list(vector1).index(min(abs(vector1)))] = 1
+        axis = np.cross(vector1, ortho)
+        return rotation_matrix_arbitrary_axis(np.pi, axis)
 
     v = np.cross(vector1, vector2)
 
