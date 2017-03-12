@@ -82,6 +82,7 @@ class ChargedMolError(Exception):
         self.mol_file = mol_file
         self.msg = msg
 
+
 class MolError(Exception):
     """
     A class for raising errors when using ``Molecule`` instances.
@@ -177,14 +178,17 @@ class MolError(Exception):
             f.write('\n'+'='*240)
             f.write('\n\n\n')
 
+
 class MolFileError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
         self.msg = msg
 
+
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
+
 
 class FunctionData:
     """
@@ -230,6 +234,7 @@ class FunctionData:
     def __repr__(self):
         return str(self)
 
+
 class LazyAttr:
     """
     A descriptor for creating lazy attributes.
@@ -245,6 +250,7 @@ class LazyAttr:
         val = self.func(obj)
         setattr(obj, self.func.__name__, val)
         return val
+
 
 class MAEExtractor:
     """
@@ -373,6 +379,7 @@ class MAEExtractor:
             with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())
 
+
 def archive_output():
     """
     Places the ``output`` folder into ``old_output``.
@@ -400,6 +407,7 @@ def archive_output():
         shutil.copytree('output', new_dir)
         shutil.rmtree('output')
 
+
 def centroid(*coords):
     """
     Calculates the centroid of a group of coordinates.
@@ -420,6 +428,7 @@ def centroid(*coords):
     for coord in coords:
         total = np.add(total, coord)
     return np.divide(total, len(coords))
+
 
 def dedupe(iterable, seen=None):
     """
@@ -450,6 +459,7 @@ def dedupe(iterable, seen=None):
         if x not in seen:
             seen.add(x)
             yield x
+
 
 def flatten(iterable, excluded_types={str}):
     """
@@ -492,6 +502,7 @@ def flatten(iterable, excluded_types={str}):
             yield from flatten(x)
         else:
             yield x
+
 
 def kabsch(coords1, coords2):
     """
@@ -538,6 +549,7 @@ def kabsch(coords1, coords2):
 
     return np.dot(v, u)
 
+
 def kill_macromodel():
     """
     Kills any applications left open as a result running MacroModel.
@@ -565,6 +577,7 @@ def kill_macromodel():
         sp.run(["pkill", "jserver-watcher"],
                stdout=sp.PIPE, stderr=sp.PIPE)
 
+
 def matrix_centroid(matrix):
     """
     Returns the centroid of the coordinates held in `matrix`.
@@ -585,6 +598,7 @@ def matrix_centroid(matrix):
 
 
     return np.array(np.sum(matrix, axis=0) / len(matrix))[0]
+
 
 def mol_from_mae_file(mae_path):
     """
@@ -671,6 +685,7 @@ def mol_from_mae_file(mae_path):
     mol.AddConformer(conf)
     return mol
 
+
 def mol_from_mol_file(mol_file):
     """
     Creates a rdkit molecule from a ``.mol`` (V3000) file.
@@ -750,6 +765,7 @@ def mol_from_mol_file(mol_file):
     mol.AddConformer(conf)
     return mol
 
+
 def normalize_vector(vector):
     """
     Normalizes the given vector.
@@ -770,6 +786,7 @@ def normalize_vector(vector):
 
     v = np.divide(vector, np.linalg.norm(vector))
     return np.round(v, decimals=4)
+
 
 def rotation_matrix(vector1, vector2):
     """
@@ -829,6 +846,7 @@ def rotation_matrix(vector1, vector2):
 
     return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
 
+
 def rotation_matrix_arbitrary_axis(angle, axis):
     """
 
@@ -872,6 +890,7 @@ def rotation_matrix_arbitrary_axis(angle, axis):
                      [e21, e22, e23],
                      [e31, e32, e33]])
 
+
 def tar_output():
     """
     Places all the content in the `output` folder into a .tgz file.
@@ -885,6 +904,7 @@ def tar_output():
     tname = os.path.join('output','output.tgz')
     with tarfile.open(tname, 'w:gz') as tar:
         tar.add('output')
+
 
 @contextmanager
 def time_it():
