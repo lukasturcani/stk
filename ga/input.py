@@ -223,6 +223,22 @@ class GAInput:
                      key != 'NAME'})
         return Exit(func_data)
 
+    def fitnessor(self):
+        """
+        Returns a FunctionData of fitness func in input file.
+
+        Returns
+        -------
+        FunctionData
+            A FunctionData object which represents the fitness
+            function.
+
+        """
+
+        return FunctionData(self.fitness_func['NAME'],
+            **{key : val for key, val in self.fitness_func.items() if
+                key != 'NAME'})
+
     def ga_tools(self):
         """
         Return a GATools instance loaded with data from the input file.
@@ -237,8 +253,24 @@ class GAInput:
 
         return GATools(self.selector(), self.crosser(),
                        self.mutator(), self.normalizer(),
-                       self.opt_func, self.fitness_func,
+                       self.opter(), self.fitnessor(),
                        self.exiter(), self)
+
+    def initer(self):
+        """
+        Returns a FunctionData object of init function in input file.
+
+        Returns
+        -------
+        FunctionData
+            A FunctionData object which represents the initialization
+            function.
+
+        """
+
+        return FunctionData(self.init_func['NAME'],
+            **{key : val for key, val in self.init_func.items() if
+                key != 'NAME'})
 
     def mutator(self):
         """
@@ -277,6 +309,22 @@ class GAInput:
                     **{k:v for k,v in x.items() if k != 'NAME'})
                                      for x in self.normalization_funcs]
         return Normalization(funcs)
+
+    def opter(self):
+        """
+        Returns a FunctionData of optimization func in input file.
+
+        Returns
+        -------
+        FunctionData
+            A FunctionData object which represents the optimization
+            function.
+
+        """
+
+        return FunctionData(self.opt_func['NAME'],
+            **{key : val for key, val in self.opt_func.items() if
+                key != 'NAME'})
 
     def selector(self):
         """

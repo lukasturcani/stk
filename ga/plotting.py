@@ -88,7 +88,7 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
 
     """
 
-    func_name = pop.ga_tools.input.fitness_func.name
+    func_name = pop.ga_tools.input.fitnessor().name
     fitness_func = globals()[func_name]
 
     # Exit if a function which does not have param_labels was used.
