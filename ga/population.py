@@ -339,6 +339,9 @@ class Population:
         """
         Appends a population into the `populations` attribute.
 
+        The `population` instance itself is not added, only a copy.
+        However the items it holds are not copied.
+
         Parameters
         ----------
         population : Population
@@ -356,7 +359,11 @@ class Population:
 
         """
 
-        self.populations.append(population)
+        pop = Population(*population.members)
+        for sp in population.populations:
+            pop.add_subpopulation(sp)
+
+        self.populations.append(pop)
 
     def all_members(self):
         """
@@ -794,7 +801,7 @@ class Population:
         if between_subpops:
             if top_seen is None:
                 seen = set()
-            if type(top_seen) == set:
+            if isinstance(top_seen, set):
                 seen = top_seen
 
             self.members = list(dedupe(self.members, seen=seen))
