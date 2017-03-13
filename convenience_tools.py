@@ -43,11 +43,11 @@ atom_vdw_radii = {
                  }
 
 # This dictionary gives easy access to the rdkit bond types.
-bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
-             'am' : rdkit.Chem.rdchem.BondType.SINGLE,
-             '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
-             '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
-             'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
+bond_dict = {'1' : rdkit.rdchem.BondType.SINGLE,
+             'am' : rdkit.rdchem.BondType.SINGLE,
+             '2' : rdkit.rdchem.BondType.DOUBLE,
+             '3' : rdkit.rdchem.BondType.TRIPLE,
+             'ar' : rdkit.rdchem.BondType.AROMATIC}
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
