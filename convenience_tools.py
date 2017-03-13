@@ -6,7 +6,6 @@ part of MMEA. They must be completely self-sufficient.
 
 """
 
-
 import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
 import numpy as np

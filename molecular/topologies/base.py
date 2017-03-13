@@ -76,6 +76,7 @@ class TopologyMeta(type):
         obj._repr = "{}({})".format(self.__name__, c)
         return obj
 
+
 class Topology(metaclass=TopologyMeta):
     """
     Builds macromolecules.
