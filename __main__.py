@@ -212,6 +212,12 @@ def run():
     # open. This closes them. If this is not done, directories may not
     # be possible to move.
     kill_macromodel()
+
+    os.chdir(root_dir)
+    # Dump the `progress` and `run_db` populations.
+    progress.dump('progress.json')
+    run_db.dump('run_db.json')
+
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
@@ -220,13 +226,9 @@ def run():
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
 
-        plot.fitness_epp(progress, os.path.join(root_dir, 'epp.png'))
-        plot.parameter_epp(progress, os.path.join(root_dir, 'epp.png'))
+        plot.fitness_epp(progress, 'epp.png')
+        plot.parameter_epp(progress, 'epp.png')
 
-    os.chdir(root_dir)
-    # Dump the `progress` and `run_db` populations.
-    progress.dump('progress.json')
-    run_db.dump('run_db.json')
     # Remove the ``scratch`` directory.
     shutil.rmtree('scratch')
     # Write the .mol files of the final population.
