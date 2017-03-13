@@ -5,6 +5,7 @@ from os.path import join
 
 i = GAInput(join('data', 'gainput', 'test.py'))
 
+
 def test_init():
     assert i.init_func == {'NAME' : 'init_random_cages',
                            'bb_db' : 'path1',
@@ -45,15 +46,23 @@ def test_init():
     assert i.exit_func == {'NAME' : 'no_exit'}
     assert i.databases == ['1', '2']
 
+
 def test_crosser():
     crosser = i.crosser()
     assert crosser.func_data == FunctionData('bb_lk_exchange')
     assert crosser.num_crossovers == i.num_crossovers
     assert crosser.n_calls == 0
 
+
 def test_exiter():
     exiter = i.exiter()
     assert exiter.func_data == FunctionData('no_exit')
+
+
+def test_fitnessor():
+    fitnessor = i.fitnessor()
+    assert fitnessor.name == 'random_fitness_vector'
+
 
 def test_selector():
     sel = i.selector()
@@ -62,6 +71,7 @@ def test_selector():
     assert sel.crossover == FunctionData('crossover_roulette')
     assert sel.mutation == FunctionData('stochastic_sampling',
                                           duplicates=True)
+
 
 def test_mutator():
     mut = i.mutator()
@@ -72,10 +82,16 @@ def test_mutator():
     assert mut.num_mutations == 2
     assert mut.n_calls == 0
 
+
 def test_normalizer():
     norm = i.normalizer()
     assert norm.funcs == [FunctionData('shift_elements',
     indices=[-1]), FunctionData('magnitudes')]
+
+
+def test_opter():
+    opter = i.opter()
+    assert opter.name == 'do_not_optimize'
 
 
 def test_ga_tools():
