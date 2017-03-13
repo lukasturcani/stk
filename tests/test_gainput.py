@@ -3,31 +3,46 @@ from ..convenience_tools import FunctionData
 from ..molecular import FourPlusSix
 from os.path import join
 
-i = GAInput(join('data', 'gainput', 'test.in'))
+i = GAInput(join('data', 'gainput', 'test.py'))
 
 def test_init():
-    assert i.init_func == FunctionData('init_random_cages',
-            bb_db='path1', lk_db='path2', topologies=[FourPlusSix()])
-    assert i.generational_select_func == FunctionData(
-    'stochastic_sampling', use_rank=True)
-    assert i.parent_select_func == FunctionData('crossover_roulette')
-    assert i.mutant_select_func == FunctionData('stochastic_sampling',
-    duplicates=True)
-    assert i.crossover_func == FunctionData('bb_lk_exchange')
-    assert i.mutation_func == [FunctionData('cage_random_bb',
-    database='path1'),
-    FunctionData('cage_random_lk', database='path2')]
+    assert i.init_func == {'NAME' : 'init_random_cages',
+                           'bb_db' : 'path1',
+                           'lk_db' : 'path2',
+                           'topologies' : [FourPlusSix()]}
+
+    assert i.generational_select_func == {
+                'NAME' : 'stochastic_sampling',
+                'use_rank' : True}
+
+    assert i.parent_select_func == {'NAME' : 'crossover_roulette'}
+
+    assert i.mutant_select_func == {'NAME' : 'stochastic_sampling',
+                                    'duplicates' : True}
+
+    assert i.crossover_func == {'NAME' : 'bb_lk_exchange'}
+
+    assert i.mutation_funcs == [
+        {'NAME' : 'cage_random_bb',
+         'database' : 'path1'},
+        {'NAME' : 'cage_random_lk',
+        'database' : 'path2'}]
+
     assert i.mutation_weights == [1/4,1/4,1/4,1/4]
-    assert i.opt_func == FunctionData('do_not_optimize')
-    assert i.fitness_func == FunctionData('random_fitness_vector')
-    assert i.normalization_func == [FunctionData('shift_elements',
-    indices=[-1]), FunctionData('magnitudes')]
+    assert i.opt_func == {'NAME' : 'do_not_optimize'}
+    assert i.fitness_func == {'NAME' : 'random_fitness_vector'}
+
+    assert i.normalization_funcs == [
+        {'NAME' : 'shift_elements',
+         'indices' : [-1]},
+        {'NAME' : 'magnitudes'}]
+
     assert i.num_generations == 5
     assert i.num_mutations == 2
     assert i.num_crossovers == 2
     assert i.pop_size == 5
     assert i.comparison_pops == ['pop1', 'pop2']
-    assert i.exit_func == FunctionData('no_exit')
+    assert i.exit_func == {'NAME' : 'no_exit'}
     assert i.databases == ['1', '2']
 
 def test_crosser():
