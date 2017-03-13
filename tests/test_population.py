@@ -171,7 +171,8 @@ def test_add_subpopulation():
     pop1 = generate_population()
     pop2 = generate_population()
     pop1.add_subpopulation(pop2)
-    assert pop2 in pop1.populations
+    assert not pop2 in pop1.populations
+    assert all(x in pop1 for x in pop2)
 
 
 def test_load():
