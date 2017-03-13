@@ -279,6 +279,10 @@ class MAEExtractor:
         the macromodel conformer search. This holds other data such as
         their energies too.
 
+    energies : list of tuples of (float, int)
+        The list holds the id and energy of every conformer in the .mae
+        file.
+
     min_energy : float
         The minimum energy found in the .mae file.
 
@@ -350,19 +354,19 @@ class MAEExtractor:
         # energy block extract the energy and store it in the
         # `energies` list. Store the `index`  (conformer id) along with
         # each extracted energy.
-        energies = []
+        self.energies = []
         prev_block = deque([""], maxlen=1)
         index = 1
         for block in content_split:
             if ("f_m_ct" in prev_block[0] and
                                 "r_mmod_Potential_Energy" in block):
                 energy = self.extract_energy(block)
-                energies.append((energy, index))
+                self.energies.append((energy, index))
                 index += 1
 
             prev_block.append(block)
 
-        e, conf = min(energies)
+        e, conf = min(self.energies)
         self.min_energy = e
         # Return the id of the lowst energy conformer.
         return conf
