@@ -6,8 +6,8 @@ part of MMEA. They must be completely self-sufficient.
 
 """
 
-import rdkit.Chem as chem
-import rdkit
+
+import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
 import numpy as np
 import time
@@ -617,8 +617,8 @@ def mol_from_mae_file(mae_path):
 
     """
 
-    mol = chem.EditableMol(chem.Mol())
-    conf = chem.Conformer()
+    mol = rdkit.EditableMol(rdkit.Mol())
+    conf = rdkit.Conformer()
 
     with open(mae_path, 'r') as mae:
         content = re.split(r'[{}]', mae.read())
@@ -658,7 +658,7 @@ def mol_from_mae_file(mae_path):
 
         atom_sym = periodic_table[atom_num]
         atom_coord = Point3D(x,y,z)
-        atom_id = mol.AddAtom(chem.Atom(atom_sym))
+        atom_id = mol.AddAtom(rdkit.Atom(atom_sym))
         conf.SetAtomPosition(atom_id, atom_coord)
 
     labels, data_block, *_ = bond_block.split(':::')
@@ -712,8 +712,8 @@ def mol_from_mol_file(mol_file):
 
     """
 
-    e_mol = chem.EditableMol(chem.Mol())
-    conf = chem.Conformer()
+    e_mol = rdkit.EditableMol(rdkit.Mol())
+    conf = rdkit.Conformer()
 
     with open(mol_file, 'r') as f:
         take_atom = False
@@ -749,7 +749,7 @@ def mol_from_mol_file(mol_file):
                 _, _, _, atom_sym, *coords, _ = words
                 coords = [float(x) for x in coords]
                 atom_coord = Point3D(*coords)
-                atom_id = e_mol.AddAtom(chem.Atom(atom_sym))
+                atom_id = e_mol.AddAtom(rdkit.Atom(atom_sym))
                 conf.SetAtomPosition(atom_id, atom_coord)
                 continue
 
