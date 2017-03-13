@@ -19,6 +19,7 @@ from ..molecular import (MacroMolecule, Cage, Molecule,
 from ..molecular.optimization.optimization import (_optimize_all,
                                         _optimize_all_serial)
 
+
 class Population:
     """
     A container for instances of ``MacroMolecule`` and ``Population``.

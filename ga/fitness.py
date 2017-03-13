@@ -143,6 +143,7 @@ from ..molecular import (MacroMolecule,
                          StructUnit, Energy, optimization,
                          func_key)
 
+
 def _calc_fitness(func_data, population):
     """
     Calculates the fitness values of all members of a population.
@@ -180,6 +181,7 @@ def _calc_fitness(func_data, population):
             member.update_cache()
 
     return evaluated
+
 
 def _calc_fitness_serial(func_data, population):
     """
@@ -239,6 +241,7 @@ def _param_labels(*labels):
 
     return add_labels
 
+
 class _FitnessFunc:
     """
     A decorator for fitness functions.
@@ -283,6 +286,7 @@ class _FitnessFunc:
             MolError(ex, macro_mol, "During fitness calculation")
             return macro_mol
 
+
 def random_fitness(macro_mol):
     """
     Returns a random fitness value.
@@ -300,6 +304,7 @@ def random_fitness(macro_mol):
     """
 
     return abs(np.random.normal(50,20))
+
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
 def random_fitness_vector(macro_mol):
@@ -331,6 +336,7 @@ def random_fitness_vector(macro_mol):
     f = np.multiply(f, np.array([0.01, 1, 10, -100]))
     macro_mol.progress_params = f.tolist()
     return f
+
 
 def raiser(macro_mol, param1, param2=2):
     """
@@ -445,6 +451,7 @@ def cage(macro_mol, pseudoformation_params=
 
     return np.array([cavity, window, asymmetry, e_per_bond])
 
+
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_target(macro_mol,
                 target_mol_file, efunc, ofunc, rotations=0):
@@ -508,6 +515,7 @@ def cage_target(macro_mol,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1))
+
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_c60(macro_mol, target_mol_file,
@@ -576,6 +584,7 @@ def cage_c60(macro_mol, target_mol_file,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold))
+
 
 def _cage_target(macro_mol, target_mol_file,
                  efunc, ofunc, rotation_func):
@@ -740,6 +749,7 @@ def _cage_target(macro_mol, target_mol_file,
 
     return np.array([binding_energy, asymmetry])
 
+
 def _make_cage_target_folder():
     """
     Creates a folder to store molecules made by _cage_target().
@@ -823,6 +833,7 @@ def _generate_complexes(macro_mol, target, number=1):
         rot_target.set_position_from_matrix(new_pos_mat)
 
         yield rdkit.CombineMols(macro_mol.mol, rot_target.mol)
+
 
 def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """

@@ -29,6 +29,7 @@ from .plotting import plot_counter
 from ..convenience_tools import MolError
 from ..molecular.molecules import Cage
 
+
 class Crossover:
     """
     Carries out crossover operations on the population.
