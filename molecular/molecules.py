@@ -2325,6 +2325,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
             MacroMolecule.cache[key] = macro_mol
             return macro_mol
 
+
 class Cage(MacroMolecule):
     """
     Used to represent molecular cages.
@@ -2467,6 +2468,7 @@ class Cage(MacroMolecule):
                 return None
 
         return all_windows
+
 
 class Polymer(MacroMolecule):
     """

@@ -36,6 +36,7 @@ from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
 
+
 def _optimize_all(func_data, population):
     """
     Run opt function on all population members in parallel.
@@ -75,6 +76,7 @@ def _optimize_all(func_data, population):
             member.update_cache()
         return optimized
 
+
 def _optimize_all_serial(func_data, population):
     """
     Run opt function on all population members sequentially.
@@ -108,6 +110,7 @@ def _optimize_all_serial(func_data, population):
 
     # Apply the function to every member of the population.
     return (p_func(member) for member in population)
+
 
 class _OptimizationFunc:
     """
@@ -167,6 +170,7 @@ def do_not_optimize(macro_mol):
 
     return
 
+
 def partial_raiser(macro_mol, ofunc):
     """
     Raises and optimizes at random.
@@ -195,6 +199,7 @@ def partial_raiser(macro_mol, ofunc):
         raise Exception('Partial raiser.')
 
     globals()[ofunc.name](macro_mol, **ofunc.params)
+
 
 def raiser(macro_mol, param1, param2=2):
     """

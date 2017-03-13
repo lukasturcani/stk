@@ -9,9 +9,11 @@ from ....convenience_tools import (centroid, vector_theta,
                                       rotation_matrix_arbitrary_axis,
                                       normalize_vector)
 
+
 class WindowError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 class Vertex:
     """
@@ -314,6 +316,7 @@ class Vertex:
         return (sum(edge.coord for edge in self.connected) /
                 len(self.connected))
 
+
 class Edge(Vertex):
     """
     Used to represent the edges of Cage polyhedra.
@@ -387,6 +390,7 @@ class Edge(Vertex):
         linker.minimize_theta(self.coord, self.direction)
 
         return linker.mol
+
 
 class _CageTopology(Topology):
     """
@@ -671,6 +675,7 @@ class _CageTopology(Topology):
 
             # Save the ids of atoms which form new bonds.
             position.bonder_ids = list(bonder_ids)
+
 
 class _VertexOnlyCageTopology(_CageTopology):
 
