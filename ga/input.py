@@ -165,7 +165,7 @@ class GAInput:
         """
 
         with open(input_file, 'r') as inp:
-            exec(inp.read(), {}, self.__dict__)
+            exec(inp.read(), globals(), self.__dict__)
 
         # If the input file did not specify some values, default
         # initialize them.
@@ -182,7 +182,7 @@ class GAInput:
             self.normalization_func = []
 
         if not hasattr(self, 'exit_func'):
-            self.exit_func = FunctionData('no_exit')
+            self.exit_func = {'NAME' : 'no_exit'}
 
         if not hasattr(self, 'databases'):
             self.databases = []
@@ -199,8 +199,10 @@ class GAInput:
 
         """
 
-        func_data = FunctionData(self.crossover_func.pop('NAME'),
-                                 **self.crossover_func)
+        func_data = FunctionData(self.crossover_func['NAME'],
+            **{key : val for key, val in self.crossover_func.items() if
+                key != 'NAME'})
+
         return Crossover(func_data, self.num_crossovers)
 
     def exiter(self):
@@ -216,8 +218,9 @@ class GAInput:
 
         """
 
-        func_data = FunctionData(self.exit_func.pop('NAME'),
-                                 **self.exit_func)
+        func_data = FunctionData(self.exit_func['NAME'],
+                 **{key : val for key, val in self.exit_func.items() if
+                     key != 'NAME'})
         return Exit(func_data)
 
     def ga_tools(self):
@@ -249,8 +252,10 @@ class GAInput:
 
         """
 
-        funcs = [FunctionData(x.pop('NAME'), **x)
-                                         for x in self.mutation_funcs]
+        funcs = [FunctionData(x['NAME'],
+                    **{k:v for k,v in x.items() if k != 'NAME'})
+
+                    for x in self.mutation_funcs]
 
         return Mutation(funcs,
                         self.num_mutations,
@@ -268,7 +273,8 @@ class GAInput:
 
         """
 
-        funcs = [FunctionData(x.pop('NAME'), **x)
+        funcs = [FunctionData(x['NAME'],
+                    **{k:v for k,v in x.items() if k != 'NAME'})
                                      for x in self.normalization_funcs]
         return Normalization(funcs)
 
@@ -284,12 +290,17 @@ class GAInput:
 
         """
 
-        gen = FunctionData(self.generational_select_func.pop('NAME'),
-                           **self.generational_select_func)
-        parent = FunctionData(self.parent_select_func.pop('NAME'),
-                              **self.parent_select_func)
-        mutant = FunctionData(self.mutant_select_func.pop('NAME'),
-                              **self.mutant_select_func)
+        gen = FunctionData(self.generational_select_func['NAME'],
+            **{key : val for key, val in
+              self.generational_select_func.items() if key != 'NAME'})
+
+        parent = FunctionData(self.parent_select_func['NAME'],
+             **{key : val for key, val in
+               self.parent_select_func.items() if key != 'NAME'})
+
+        mutant = FunctionData(self.mutant_select_func['NAME'],
+              **{key : val for key, val in
+                self.mutant_select_func.items() if key != 'NAME'})
 
         return Selection(gen, parent, mutant)
 
