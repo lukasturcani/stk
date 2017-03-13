@@ -83,13 +83,13 @@ def run():
 
     # Generate the initial population.
     with time_it():
-        pop_init = getattr(Population, ga_input.init_func.name)
+        pop_init = getattr(Population, ga_input.initer().name)
         print_info('Generating initial population.')
 
         # If the initialization function is ``load()`` a restart run is
         # assumed.
         if pop_init.__name__ == 'load':
-            pop = pop_init(**ga_input.init_func.params,
+            pop = pop_init(**ga_input.initer().params,
                            ga_tools=ga_input.ga_tools())
             ga_input.pop_size = len(pop)
 
@@ -99,7 +99,7 @@ def run():
                 mem.file = os.path.join(os.getcwd(), name)
 
         else:
-            pop = pop_init(**ga_input.init_func.params,
+            pop = pop_init(**ga_input.initer().params,
                            size=ga_input.pop_size,
                            ga_tools=ga_input.ga_tools())
 
