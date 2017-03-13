@@ -28,7 +28,6 @@ from ..molecular import Energy
 from ..molecular.optimization import optimization
 
 
-
 class GAInput:
     """
     A class for concisely holding information from MMEA's input file.
@@ -567,6 +566,7 @@ class GAInput:
 
     def __str__(self):
         return repr(self)
+
 
 class InputHelp:
     """

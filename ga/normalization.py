@@ -52,6 +52,7 @@ import copy
 
 from .population import Population
 
+
 class Normalization:
     """
     A class for carrying out normalization of fitness values.

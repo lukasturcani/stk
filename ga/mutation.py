@@ -34,6 +34,7 @@ from ..molecular import StructUnit3, Cage
 class MutationError(Exception):
     ...
 
+
 class Mutation:
     """
     Carries out mutations operations on a population.

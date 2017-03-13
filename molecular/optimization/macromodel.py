@@ -14,6 +14,7 @@ from uuid import uuid4
 
 from ...convenience_tools import MAEExtractor
 
+
 class _ConversionError(Exception):
     def __init__(self, message):
         self.message = message
@@ -33,6 +34,7 @@ class _OptimizationError(Exception):
 class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 def macromodel_opt(macro_mol, macromodel_path, settings={}, md={}):
     """
@@ -169,6 +171,7 @@ def macromodel_opt(macro_mol, macromodel_path, settings={}, md={}):
         else:
             raise ex
 
+
 def macromodel_md_opt(macro_mol, macromodel_path, settings={}):
     """
     Runs a MD conformer search on `macro_mol`.
@@ -294,6 +297,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, settings={}):
                                      macromodel_path, vals)
         else:
             raise ex
+
 
 def macromodel_cage_opt(macro_mol,
                         macromodel_path, settings={}, md={}):
@@ -440,6 +444,7 @@ def macromodel_cage_opt(macro_mol,
         else:
             raise ex
 
+
 def _run_bmin(macro_mol, macromodel_path, timeout=0):
 
     print("", time.ctime(time.time()),
@@ -511,6 +516,7 @@ def _run_bmin(macro_mol, macromodel_path, timeout=0):
         raise _OptimizationError(('The .log and/or .maegz '
                      'files were not created by the optimization.'))
 
+
 def _kill_bmin(macro_mol, macromodel_path):
     name, ext = os.path.splitext(macro_mol._file)
     name = re.split(r'\\|/', name)[-1]
@@ -537,6 +543,7 @@ def _kill_bmin(macro_mol, macromodel_path):
         if time.time() - start > 600:
             break
 
+
 def _run_applyhtreat(macro_mol, macromodel_path):
     name, ext = os.path.splitext(macro_mol._file)
     mae = name + '.mae'
@@ -553,6 +560,7 @@ def _run_applyhtreat(macro_mol, macromodel_path):
         return _run_applyhtreat(macro_mol, macromodel_path)
 
     macro_mol.update_from_mae(mae_out)
+
 
 def _license_found(output, macro_mol=None):
     """
@@ -600,10 +608,12 @@ def _license_found(output, macro_mol=None):
 
     return True
 
+
 def _com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
     return (" {:<5}{:>7}{:>7}{:>7}{:>7}{:>11.4f}{:>11.4f}"
             "{:>11.4f}{:>11.4f}").format(arg1, arg2, arg3, arg4,
                                          arg5, arg6, arg7, arg8, arg9)
+
 
 def _generate_com(macro_mol, settings):
     """
@@ -683,6 +693,7 @@ def _generate_com(macro_mol, settings):
         # ``main_string``.
         com.write(main_string)
 
+
 def _generate_md_com(macro_mol, settings):
     print('Creating .com file - {}.'.format(macro_mol.name))
 
@@ -725,6 +736,7 @@ def _generate_md_com(macro_mol, settings):
         # details of the macromodel run
         com.write(main_string)
 
+
 def _create_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.
@@ -765,6 +777,7 @@ def _create_mae(macro_mol, macromodel_path):
     mae_file = macro_mol._file.replace(ext, '.mae')
     _structconvert(macro_mol._file, mae_file, macromodel_path)
     return mae_file
+
 
 def _convert_maegz_to_mae(macro_mol, macromodel_path):
     """
@@ -810,6 +823,7 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
     mae = name + '.mae'
     return _structconvert(maegz, mae, macromodel_path)
 
+
 def _structconvert(iname, oname, macromodel_path):
 
     convrt_app = os.path.join(macromodel_path, 'utilities',
@@ -842,6 +856,7 @@ def _structconvert(iname, oname, macromodel_path):
         ' Console output was {}.').format(oname, convrt_return.stdout))
 
     return convrt_return
+
 
 def _fix_params_in_com_file(macro_mol, main_string, restricted):
     """
@@ -894,6 +909,7 @@ def _fix_params_in_com_file(macro_mol, main_string, restricted):
 
     return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                 "COMES_HERE!!!\n"), fix_block)
+
 
 def _fix_distance_in_com_file(macro_mol, fix_block):
     """
@@ -955,6 +971,7 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
                                          bond_len) + "\n")
 
     return fix_block
+
 
 def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     """
@@ -1034,6 +1051,7 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
                                     atom3_id+1, ba) + "\n")
 
     return fix_block
+
 
 def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     """
@@ -1115,6 +1133,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
                                 atom3_id+1, atom4_id+1, ta) + "\n")
 
     return fix_block
+
 
 def _wait_for_file(file_name, timeout=10):
     """

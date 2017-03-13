@@ -11,6 +11,7 @@ from operator import attrgetter
 
 from .fitness import *
 
+
 def fitness_epp(pop, plot_name, xlabel='Generation'):
     """
     Plots the min, max and avg fitness values of each subpopulation.
@@ -59,6 +60,7 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
     fig.savefig(plot_name, dpi=1000,
                 bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close('all')
+
 
 def parameter_epp(pop, plot_name, xlabel='Generation'):
     """
@@ -132,6 +134,7 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
         fig.savefig(new_plot_name, dpi=1000,
                     bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.close('all')
+
 
 def plot_counter(counter, plot_name):
     """
