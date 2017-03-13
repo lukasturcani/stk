@@ -139,9 +139,8 @@ from ..convenience_tools import (matrix_centroid,
                                  FunctionData, MolError,
                                  rotation_matrix_arbitrary_axis)
 
-from ..molecular import (MacroMolecule,
-                         StructUnit, Energy, optimization,
-                         func_key)
+from ..molecular import (Cage, StructUnit,
+                         Energy, optimization, func_key)
 
 
 def _calc_fitness(func_data, population):
@@ -679,9 +678,9 @@ def _cage_target(macro_mol, target_mol_file,
     print('\n\nOptimizing complex structures.\n')
     for i, complex_ in enumerate(rdkit_complexes):
         # In order to use the optimization functions, first the data
-        # is loaded into a ``MacroMolecule`` instance and its .mol
+        # is loaded into a ``Cage`` instance and its .mol
         # file is written to the disk.
-        mm_complex = MacroMolecule.__new__(MacroMolecule)
+        mm_complex = Cage.__new__(Cage)
         mm_complex.mol = complex_
         mm_complex.name = name + '_COMPLEX_{0}'.format(i)
         mm_complex.optimized = False
@@ -730,7 +729,7 @@ def _cage_target(macro_mol, target_mol_file,
     cmplx_cage_mol = next(frag for frag, counter in frag_counters if
                         counter == cage_counter)
 
-    cmplx_cage = MacroMolecule.__new__(MacroMolecule)
+    cmplx_cage = Cage.__new__(Cage)
     cmplx_cage.mol = cmplx_cage_mol
     cmplx_cage.topology = macro_mol.topology
     cmplx_cage.name = min_eng_cmplx.name + '_no_target'
