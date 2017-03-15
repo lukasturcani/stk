@@ -122,7 +122,7 @@ num_generations = 5
 num_mutations = 2
 
 ##################################################################################
-# Number of crossover/mating operations to perform each generation.
+# Number of crossover operations to perform each generation.
 ##################################################################################
 
 num_crossovers = 2
@@ -132,5 +132,3 @@ num_crossovers = 2
 ##################################################################################
 
 pop_size = 5
-
-comparison_pops = ['pop1', 'pop2']
