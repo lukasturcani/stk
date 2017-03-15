@@ -4,8 +4,8 @@
     <title>MMEA User's Guide</title>
     <meta name="author" content="Lukas Turcani">
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu+Mono" />
+    <!--link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu+Mono" /-->
 
     <style>
 
@@ -58,6 +58,26 @@
         display: block;
     }
 
+    .python {
+        background-color: rgb(210,210,210);
+    }
+    .string {
+        color: green;
+    }
+
+    .comment {
+        color: gray;
+        font-style: italic;
+    }
+
+    .literal {
+        color: red;
+    }
+
+    .statement {
+        color : purple;
+    }
+
     </style>
 
   </head>
@@ -86,137 +106,154 @@
       a quick look at the example input file below, no need to understand
       anything just yet.<br>
       <code class="whole_file">
-        ####################################################################<br>
-        # Variable declartions.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Define basic GA constants.<br>
+          #############################################################<br></span>
 <br>
-        $$bb_db='/home/username/aldehydes_3f'<br>
-        $$lk_db='/home/username/amines_2f'<br>
-        $$mm_path=''/home/username/program_files/schrodinger2016-3'
-<br><br>
-        ####################################################################<br>
-        # Databases to use.<br>
-        ####################################################################<br>
+          num_generations = <span class="python literal">250</span><br>
 <br>
-        databases=['path/to/database1.json',<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'path/to/database2.json',<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'path/to/database3.json']<br>
+          <span class="python comment"># Number of mutation operations to perform each generation.<br></span>
+          num_mutations = <span class="python literal">10</span><br>
 <br>
-        ####################################################################<br>
-        # Population initialization function.<br>
-        ####################################################################<br>
+          <span class="python comment"># Number of crossover operations to perform each generation.<br></span>
+          num_crossovers = <span class="python literal">5</span><br>
 <br>
-        init_func; init_random_cages;<br>
-        bb_db=$bb_db; lk_db=$lk_db; topologies=[FourPlusSix(), EightPlusTwelve()]<br>
+          <span class="python comment"># Size of the population.<br></span>
+          pop_size = <span class="python literal">25</span><br>
 <br>
-        ####################################################################<br>
-        # Selection function for selecting the next generation.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Define variables.<br>
+          #############################################################<br></span>
 <br>
-        generational_select_func; stochastic_sampling; use_rank=True<br>
+          monomer_database = <span class="python string">'/path/to/monomer/database'</span><br>
+          polymer_db1 = <span class="python string">'path/to/previously/made/polymers1.json'</span><br>
+          polymer_db2 = <span class="python string">'/path/to/previously/made/polymers2.json'</span><br>
 <br>
-        ####################################################################<br>
-        # Selection function for selecting parents.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Databases of stored molecules to use.<br>
+          #############################################################<br></span>
 <br>
-        parent_select_func; crossover_roulette<br>
+          databases = [polymer_db1, polymer_db1]<br>
 <br>
-        ####################################################################<br>
-        # Selection function for selecting molecules for mutation.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Population initialization function.<br>
+          #############################################################<br></span>
 <br>
-        mutant_select_func; stochastic_sampling; duplicates=True<br>
+          init_func =  {<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span class="python string">'NAME'</span> : <span class="python string">'init_random_polymers'</span>,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span class="python string">'monomer_db'</span> : monomer_database,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span class="python string">'topologies'</span> :
+                        [Linear(<span class="python string">'AB'</span>,
+                        [<span class="python literal">0</span>,<span class="python literal"> 1</span>],
+                            <span class="python literal">24</span>),<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Linear(<span class="python string">'ABBC'</span>,
+            [<span class="python literal">0</span>,<span class="python literal"> 1</span>
+            , <span class="python literal">-1</span>,
+             <span class="python literal">0</span>],
+                <span class="python literal">12</span>)]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            }<br>
 <br>
-        ####################################################################<br>
-        # Crossover function.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Selection function for selecting the next generation.<br>
+          #############################################################<br></span>
 <br>
-        crossover_func; bb_lk_exchange<br>
+           generational_select_func =  {<br>
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       <span class="python string">'NAME'</span> : <span class="python string">'stochastic_sampling'</span>,<br>
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       <span class="python string">'use_rank'</span> : <span class="python literal"> True</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+             }<br>
 <br>
-        ####################################################################<br>
-        # Mutation function 1.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Selection function for selecting parents.<br>
+          #############################################################<br></span>
 <br>
-        mutation_func; cage_similar_bb; database=$bb_db<br>
+          parent_select_func =  {<span class="python string">'NAME'</span> : <span class="python string">'crossover_roulette'</span>}<br>
+            <br>
+          <span class="python comment">#############################################################<br>
+          # Selection function for selecting molecules for mutation.<br>
+          #############################################################<br></span>
 <br>
-        ####################################################################<br>
-        # Mutation function 2.<br>
-        ####################################################################<br>
+        mutant_select_func =  {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="python string">'NAME'</span> : <span class="python string">'stochastic_sampling'</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span class="python string">'duplicates'</span> : <span class="python literal"> True</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          }<br>
 <br>
-        mutation_func; cage_similar_lk; database=$lk_db<br>
+          <span class="python comment">#############################################################<br>
+          # Crossover functions.<br>
+          #############################################################<br></span>
 <br>
-        ####################################################################<br>
-        # When carrying mutations, chance that a given mutation function will be used.<br>
-        ####################################################################<br>
+          <span class="python comment"># Crossover function 1.</span><br>
+          crossover_func1 =  {<span class="python string">'NAME'</span> : <span class="python string">'polymer_monomer_shuffle'</span>}<br>
 <br>
-        mutation_weights=[1/2,1/2]<br>
+<span class="python comment"># Crossover function 2.</span><br>
+crossover_func2 =  {<span class="python string">'NAME'</span> : <span class="python string">'polymer_topology_shuffle'</span>}<br>
 <br>
-        ####################################################################<br>
-        # Optimization function.<br>
-        ####################################################################<br>
+
+          <span class="python comment">#############################################################<br>
+          # Mutation function 1.<br>
+          #############################################################<br></span>
 <br>
-        opt_func; macromodel_cage_opt; macromodel_path=$mm_path<br>
+          mutation_func1 =  {'NAME' : 'cage_random_bb',<br>
+                            'database' : bb_db_path}<br>
 <br>
-        ####################################################################<br>
-        # Fitness function.<br>
-        ####################################################################<br>
+          <span class="python comment">#############################################################<br>
+          # Mutation function 2.<br>
+          #############################################################<br></span>
 <br>
-        fitness_func; cage; target_cavity=8;<br>
-        pseudoformation_params={'func' :<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FunctionData('macromodel',
-        forcefield=16, macromodel_path=$mm_path)}<br>
-<br><br>
-####################################################################<br>
-# Normalization functions.<br>
-####################################################################<br>
+          mutation_func2 = {'NAME' : 'cage_random_lk',<br>
+                          'database' : lk_db_path}<br>
+
+          mutation_funcs = [mutation_func1, mutation_func2]<br>
 <br>
-# First shift all energy values so that they are always positive.<br>
-normalization_func; shift_elements; indices=[-1]<br>
+          <span class="python comment">#############################################################<br>
+          # When carrying mutations, chance that a given mutation function will be used.<br>
+          #############################################################<br></span>
 <br>
-# Second, make sure that the magnitudes of all fitness parameters<br>
-# are comparable.<br>
-normalization_func; magnitudes<br>
+          mutation_weights = [1/4,1/4,1/4,1/4]<br>
 <br>
-# Third, combine the fitness parameter into a single fitness value.<br>
-normalization_func; combine; coefficients=[1,1,1,1];<br>
-exponents=[1,1,1,1]<br>
+          <span class="python comment">#############################################################<br>
+          # Optimization function.<br>
+          #############################################################<br></span>
 <br>
-# Last, invert the fitness value because all fitness parameters<br>
-# are inversely proportional to fitness.<br>
-normalization_func; invert<br>
-<br><br>
-        ####################################################################<br>
-        # Number of generations to create.<br>
-        ####################################################################<br>
+          opt_func =  {'NAME' : 'do_not_optimize'}<br>
 <br>
-        num_generations=10<br>
+          <span class="python comment">#############################################################<br>
+          # Fitness function.<br>
+          #############################################################<br></span>
 <br>
-        ####################################################################<br>
-        # Number of mutation operations to perform each generation.<br>
-        ####################################################################<br>
+          fitness_func =  {'NAME' : 'random_fitness_vector'}<br>
 <br>
-        num_mutations=10<br>
+          <span class="python comment">#############################################################<br>
+          # Normalization functions.<br>
+          #############################################################<br></span>
 <br>
-        ####################################################################<br>
-        # Number of crossover operations to perform each generation.<br>
-        ####################################################################<br>
+          # First shift all energy values so that they are always positive.<br>
+          normalization_func1 = {'NAME' : 'shift_elements',<br>
+                                'indices' : [-1]}<br>
 <br>
-        num_crossovers=15<br>
+          # Second, make sure that the magnitudes of all fitness parameters<br>
+          # are comparable.<br>
+          normalization_func2 =  {'NAME' : 'magnitudes'}<br>
 <br>
-        ####################################################################<br>
-        # Size of the population.<br>
-        ####################################################################<br>
 <br>
-        pop_size=20<br>
+          normalization_funcs = [normalization_func1, normalization_func2]<br>
+
       </code>
 
     <h2>Format and structure.</h2>
     <p>
-        The input file consists of a sequence of commands. Each command defines
-        a variable or function used by MMEA. If the command defines a function
-        used by MMEA, it must also define any parameters necessary to use the
-        function. It does not have to define any default initialized parameters,
-        though it may if desired.
+        An MMEA input file is a Python script. To be a valid input file, the
+        script must define a number of variables.
     </p><p>
         Commands can be written across multiple lines
         and terminate when the last parameter is defined. This means that
