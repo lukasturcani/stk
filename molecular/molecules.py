@@ -2149,7 +2149,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
             # Ask the ``Topology`` instance to assemble/build the
             # macromolecule. This creates the `mol` attribute.
             topology.build(self)
-            self.save_bonders()
 
         except Exception as ex:
             self.mol = rdkit.Mol()
@@ -2157,6 +2156,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
             MolError(ex, self, 'During initialization.')
 
         super().__init__(self.mol, name, note)
+        self.save_bonders()
 
     def json(self):
         """
