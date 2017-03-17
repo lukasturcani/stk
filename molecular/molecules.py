@@ -266,6 +266,9 @@ class Molecule:
     mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance representing the molecule.
 
+    inchikey : str
+        The InChIKey of the molecule.
+
     energy : Energy
         An instance of the ``Energy`` class. It handles all things
         energy.
@@ -288,13 +291,14 @@ class Molecule:
 
     """
 
-    def __init__(self, name="", note=""):
+    def __init__(self, mol, name="", note=""):
         self.failed = False
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
         self.name = name
         self.note = note
+        self.inchikey = rdkit.MolToInchi(mol)
 
     def all_atom_coords(self):
         """
@@ -640,6 +644,26 @@ class Molecule:
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1,3).T)
+
+    def same(self, other):
+        """
+        Check if `other` has the same molecular structure.
+
+        Parameterss.getcwd()
+        ----------
+        other : MacroMolecule
+            The ``MacroMolecule`` instance you are checking has
+            the same structure.
+
+        Returns
+        -------
+        bool
+            Returns ``True`` if the building blocks and topology
+            of the macromolecules are the same.
+
+        """
+
+        return self.inchikey == other.inchikey
 
     def rotate(self, theta, axis):
         """
@@ -1067,6 +1091,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     mol : rdkit.Chem.rdchem.Mol
         The rdkit instance of the molecule held in `file`.
 
+    inchikey : str
+        The InChIKey of the molecule.
+
     func_grp : FGInfo
         The ``FGInfo`` instance holding information about the
         functional group which will react when the building block
@@ -1140,7 +1167,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        super().__init__(name, note)
         self.file = file
         _, ext = os.path.splitext(file)
 
@@ -1149,6 +1175,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             'Unable to initialize from "{}" files.'.format(ext))
 
         self.mol = self.init_funcs[ext](file)
+        super().__init__(self.mol, name, note)
 
         # Define a generator which yields an ``FGInfo`` instance from
         # `functional_groups`. The yielded ``FGInfo``instance
@@ -2027,6 +2054,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
     mol : rdkit.Chem.rdchem.Mol
         An rdkit instance representing the macromolecule.
 
+    inchikey : str
+        The InChIKey of the molecule.
+
     optimized : bool (default = False)
         This is a flag to indicate if a molecule has been previously
         optimized. Optimization functions set this flag to ``True``
@@ -2106,7 +2136,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        super().__init__(name, note)
         self.fitness = None
         self.unscaled_fitness = {}
         self.progress_params = None
@@ -2125,6 +2154,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
             self.mol = rdkit.Mol()
             self.failed = True
             MolError(ex, self, 'During initialization.')
+
+        super().__init__(self.mol, name, note)
 
     def json(self):
         """
@@ -2240,30 +2271,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         return (frozenset(x.key for x in building_blocks),
                 repr(topology))
-
-    def same(self, other):
-        """
-        Check if `other` has the same molecular structure.
-
-        Parameterss.getcwd()
-        ----------
-        other : MacroMolecule
-            The ``MacroMolecule`` instance you are checking has
-            the same structure.
-
-        Returns
-        -------
-        bool
-            Returns ``True`` if the building blocks and topology
-            of the macromolecules are the same.
-
-        """
-
-        # Compare the building blocks and topology making up the
-        # macromolecule. If these are the same then the molecules
-        # have the same structure.
-        return (self.building_blocks == other.building_blocks and
-                repr(self.topology) == repr(other.topology))
 
     def update_cache(self):
         """
