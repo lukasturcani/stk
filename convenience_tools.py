@@ -433,7 +433,7 @@ def centroid(*coords):
     return np.divide(total, len(coords))
 
 
-def dedupe(iterable, seen=None):
+def dedupe(iterable, seen=None, key=None):
     """
     Yields items from `iterable` barring duplicates.
 
@@ -448,6 +448,11 @@ def dedupe(iterable, seen=None):
     seen : set (default = None)
         Holds items which are not to be yielded.
 
+    key : callable
+        A function which gets applied to every member of `iterable`.
+        The return of this function is checked for duplication rather
+        than the member itself.
+
     Yields
     ------
     object
@@ -459,8 +464,9 @@ def dedupe(iterable, seen=None):
     if seen is None:
         seen = set()
     for x in iterable:
-        if x not in seen:
-            seen.add(x)
+        val = key(x) if key is not None else x
+        if val not in seen:
+            seen.add(val)
             yield x
 
 
