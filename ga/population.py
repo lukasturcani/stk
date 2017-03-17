@@ -15,7 +15,8 @@ from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
 from ..molecular import (MacroMolecule, Cage, Molecule,
-                               StructUnit, StructUnit2, StructUnit3)
+                        StructUnit, StructUnit2, StructUnit3)
+from ..molecular.topologies.cage.base import _VertexOnlyCageTopology
 from ..molecular.optimization.optimization import (_optimize_all,
                                         _optimize_all_serial)
 
@@ -185,7 +186,8 @@ class Population:
 
         n_B = len(topology.positions_B)
         B_alignments = set()
-        orientations = [0, 1, 2] if isinstance() else [1, -1]
+        orientations = ([0, 1, 2] if
+            issubclass(topology, _VertexOnlyCageTopology) else [1, -1])
         for x in it.combinations_with_replacement(orientations, n_B):
             for y in it.permutations(x, n_B):
                 B_alignments.add(y)
@@ -199,9 +201,12 @@ class Population:
         bb = StructUnit3(bb_file, bb_fg)
 
         pop = cls(ga_tools)
-        for i, align in enumerate(alignments):
-            cage = Cage((lk, bb), topology(align))
-            pop.members.append(cage)
+        inchikeys = set()
+        for A_align, B_align in zip(A_alignments, B_alignments):
+            cage = Cage((lk, bb), topology(A_align, B_align))
+            if cage.inchikey not in inchikeys:
+                pop.members.append(cage)
+                inchikeys.add(cage.inchikey)
 
         return pop
 
