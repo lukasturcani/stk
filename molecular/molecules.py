@@ -1401,7 +1401,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
         obj.tag_atoms()
-        obj.inchikey = rkdit.MolToInchi(obj.mol)
+        obj.inchikey = rdkit.MolToInchi(obj.mol)
         cls.cache[key] = obj
         return obj
 
@@ -2247,7 +2247,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.failed = False
         obj.key = key
         obj.building_blocks = bbs
-        obj.inchikey = rkdit.MolToInchi(obj.mol)
+        obj.inchikey = rdkit.MolToInchi(obj.mol)
         cls.cache[key] = obj
         return obj
 
