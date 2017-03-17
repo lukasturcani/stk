@@ -4,12 +4,7 @@ Defines classes which deal with input.
 """
 
 from types import ModuleType
-import sys
-import re
-from inspect import getmro
-# Unused but may be used in input files. So needs to be present here as
-# eval() is run parts of the input file.
-import numpy as np
+from inspect import isclass
 
 from . import fitness
 from .crossover import Crossover
@@ -432,11 +427,10 @@ class InputHelp:
                                     name.startswith('_')),
 
                 'topologies' : (cls for name, cls in
-                              topologies.__dict__.items() if
-                              not name.startswith('_') and
-                              not isinstance(cls, ModuleType) and
-                              hasattr(cls, '__mro__') and
-                              topologies.base.Topology in getmro(cls)),
+                          topologies.__dict__.items() if
+                          not name.startswith('_') and
+                          isclass(cls) and
+                          issubclass(cls, topologies.base.Topology)),
 
                 'exit_func' : (func for name, func in
                               Exit.__dict__.items() if not

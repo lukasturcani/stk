@@ -136,7 +136,8 @@ class Population:
                      " ``MacroMolecule`` and ``GATools`` types."), arg)
 
     @classmethod
-    def init_cage_isomers(cls, lk_file, bb_file, topology, ga_tools,
+    def init_cage_isomers(cls, lk_file, bb_file, topology,
+                          ga_tools=GATools.init_empty(),
                           lk_fg=None, bb_fg=None):
         """
         Creates a population holding all structural isomers of a cage.
@@ -157,7 +158,7 @@ class Population:
         topology : type
             A _CageTopology child class.
 
-        ga_tools : GATools
+        ga_tools : GATools (default = GATools.init_empty())
             The GATools instance to be used by created population.
 
         lk_fg : str (default = None)
@@ -175,12 +176,19 @@ class Population:
 
         """
 
-        n = len(topology.positions_A)
-        alignments = set()
+        n_A = len(topology.positions_A)
+        A_alignments = set()
 
-        for x in it.combinations_with_replacement([0,1,2], n):
-            for y in it.permutations(x, n):
-                alignments.add(y)
+        for x in it.combinations_with_replacement([0,1,2], n_A):
+            for y in it.permutations(x, n_A):
+                A_alignments.add(y)
+
+        n_B = len(topology.positions_B)
+        B_alignments = set()
+        orientations = [0, 1, 2] if isinstance() else [1, -1]
+        for x in it.combinations_with_replacement(orientations, n_B):
+            for y in it.permutations(x, n_B):
+                B_alignments.add(y)
 
         lk = StructUnit(lk_file, lk_fg)
         if len(lk.functional_group_atoms()) > 2:
