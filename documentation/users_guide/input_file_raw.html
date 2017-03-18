@@ -1,0 +1,142 @@
+<div class="highlight"><pre><span></span><span class="c1">#############################################################</span>
+<span class="c1"># Define basic GA constants.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">num_generations</span> <span class="o">=</span> <span class="mi">250</span>
+
+<span class="c1"># Number of mutation operations to perform each generation.</span>
+<span class="n">num_mutations</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Number of crossover operations to perform each generation.</span>
+<span class="n">num_crossovers</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Size of the population.</span>
+<span class="n">pop_size</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Define variables.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">monomer_database</span> <span class="o">=</span> <span class="s1">&#39;/path/to/monomer/database&#39;</span>
+<span class="n">polymer_db1</span> <span class="o">=</span> <span class="s1">&#39;path/to/previously/made/polymers1.json&#39;</span>
+<span class="n">polymer_db2</span> <span class="o">=</span> <span class="s1">&#39;/path/to/previously/made/polymers2.json&#39;</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Databases of stored molecules to use.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="n">polymer_db1</span><span class="p">,</span> <span class="n">polymer_db1</span><span class="p">]</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Population initialization function.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">init_func</span> <span class="o">=</span>  <span class="p">{</span>
+
+              <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;init_random_polymers&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;monomer_db&#39;</span> <span class="p">:</span> <span class="n">monomer_database</span><span class="p">,</span>
+              <span class="s1">&#39;topologies&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">24</span><span class="p">),</span>
+                              <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;ABBC&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">12</span><span class="p">)]</span>
+            <span class="p">}</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Selection function for selecting the next generation.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">generational_select_func</span> <span class="o">=</span>  <span class="p">{</span>
+                             <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;use_rank&#39;</span> <span class="p">:</span> <span class="bp">True</span>
+                            <span class="p">}</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Selection function for selecting parents.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">parent_select_func</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;NAME&#39;</span> <span class="p">:</span><span class="s1">&#39;crossover_roulette&#39;</span><span class="p">}</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Selection function for selecting molecules for mutation.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">mutant_select_func</span> <span class="o">=</span>  <span class="p">{</span>
+                       <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;duplicates&#39;</span><span class="p">:</span><span class="bp">True</span>
+                      <span class="p">}</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Crossover functions.</span>
+<span class="c1">#############################################################</span>
+
+<span class="c1"># Crossover function 1.</span>
+<span class="n">crossover_func1</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;polymer_monomer_shuffle&#39;</span><span class="p">}</span>
+
+<span class="c1"># Crossover function 2.</span>
+<span class="n">crossover_func2</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;polymer_topology_shuffle&#39;</span><span class="p">}</span>
+
+<span class="c1"># Tell MMEA which crossover functions to use.</span>
+<span class="n">crossover_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">crossover_func1</span><span class="p">,</span> <span class="n">crossover_func2</span><span class="p">]</span>
+
+<span class="c1"># Probability that each crossover function is selected.</span>
+<span class="n">crossover_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Mutation functions</span>
+<span class="c1">#############################################################</span>
+
+<span class="c1"># Mutation function 1.</span>
+<span class="n">mutation_func1</span> <span class="o">=</span>  <span class="p">{</span>
+                   <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;cage_random_bb&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;database&#39;</span> <span class="p">:</span> <span class="n">bb_db_path</span>
+                  <span class="p">}</span>
+
+<span class="c1"># Mutation function 2.</span>
+<span class="n">mutation_func2</span> <span class="o">=</span> <span class="p">{</span>
+                  <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;cage_random_lk&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;database&#39;</span> <span class="p">:</span> <span class="n">lk_db_path</span>
+                 <span class="p">}</span>
+
+<span class="c1"># Tell MMEA which mutation functions to use.</span>
+<span class="n">mutation_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">mutation_func1</span><span class="p">,</span> <span class="n">mutation_func2</span><span class="p">]</span>
+
+<span class="c1"># Probability that each mutation function is selected.</span>
+<span class="n">mutation_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Optimization function.</span>
+<span class="c1">#############################################################</span>
+
+<span class="n">opt_func</span> <span class="o">=</span>  <span class="p">{</span>
+              <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;rdkit_optimization&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;embed&#39;</span> <span class="p">:</span> <span class="bp">True</span>
+            <span class="p">}</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Fitness function.</span>
+<span class="c1">#############################################################</span>
+
+<span class="c1"># Calculates the polymer&#39;s energy and surface area.</span>
+<span class="n">fitness_func</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;polymer_E_and_SA&#39;</span><span class="p">}</span>
+
+<span class="c1">#############################################################</span>
+<span class="c1"># Normalization functions.</span>
+<span class="c1">#############################################################</span>
+
+<span class="c1"># First shift all energy values so that they are always positive.</span>
+<span class="n">norm_func1</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;shift_elements&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;indices&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+             <span class="p">}</span>
+
+<span class="c1"># Second, make sure that the magnitudes of all fitness parameters</span>
+<span class="c1"># are comparable.</span>
+<span class="n">norm_func2</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;magnitudes&#39;</span><span class="p">}</span>
+
+<span class="c1"># Combine the fitness parameters into a single fitness value.</span>
+<span class="n">norm_func3</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;combine&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;coefficients&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+              <span class="s1">&#39;exponents&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+             <span class="p">}</span>
+
+<span class="n">normalization_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm_func1</span><span class="p">,</span> <span class="n">norm_func2</span><span class="p">,</span> <span class="n">norm_func3</span><span class="p">]</span>
+</pre></div>
