@@ -251,275 +251,103 @@
 <span class="n">normalization_funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">norm_func1</span><span class="p">,</span> <span class="n">norm_func2</span><span class="p">,</span> <span class="n">norm_func3</span><span class="p">]</span>
 </pre></div>
 
-
     <h2>Format and structure.</h2>
     <p>
         An MMEA input file is a Python script. To be a valid input file, the
-        script must define a number of variables.
+        script must define a number of variables. These variables define
+        various functions or constants which are used by the GA. The script
+        is run by MMEA so any valid Python construct can be used. For
+        example the use of loops or iteraters to construct input parameters
+        is completely valid. Modules can be imported as well. The namespace
+        of MMEA is valid within the input file without the need of additional
+        import statements.
     </p><p>
-        Commands can be written across multiple lines
-        and terminate when the last parameter is defined. This means that
-    <code>
-          generational_select_func;<br>
-          stochastic_sampling;<br>
-          use_rank=True
-    </code>
-    and
-    <code>
-        mutant_select_func; stochastic_sampling; duplicates=True
-    </code>
-    define the same command.
+        The variables which an input script must define are listed in the
+        section below, along with what an explantation of the variable and the
+        data type it must hold. The script can define any number of variables
+        but the ones listed in the following section have a meaning within
+        MMEA, while any others are ignored. However definition of
+        additional variables is useful for making an input file maintainable
+        and readable.
     </p><p>
-    Any lines consiting of only whitespace or begging with
-    <span class="value">#</span> are ignored. This
-    can be useful for separating the input file into sections or explaining what
-    a command is doing. For example,
-    <code>
-        ####################################################################<br>
-        # Selection function for selecting molecules for mutation.<br>
-        ####################################################################<br>
-<br>
-        mutant_select_func; stochastic_sampling; duplicates=True
-    </code></p>
-    <p>
-        There are two kinds of command in the input file. The first kind has the
-        form
-      <code>
-            keyword; function_name; param1=val1; param2=val2; param3=val3
-      </code>
-        For example,
-      <code>
-            generational_select_func; stochastic_sampling; use_rank=True
-      </code>
-        This means that the keyword is
-        <span class="value">generational_select_func</span>, the
-        function name is <span class="value">stochastic_sampling</span>,
-        parameter 1's name is <span class="value">use_rank</span> and its value
-        is <span class="value">True</span>. As you can see, in this case
-        there is only 1 parameter name-value pair. The words which
-        make up the command are separated by a semicolon. Notice that last
-        word of a command is not followed by one.
+        There are two main categories of variable.
+        One which holds simple constants such as numbers, strings or lists.
+        These usually correspond to constants the GA uses, such as population
+        size. The other type of variable holds information on functions which the
+        GA must use. These are defined via a dictionary.
+        <pre><span class="n">generational_select_func</span> <span class="o">=</span>  <span class="p">{</span>
+                       <span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;stochastic_sampling&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;use_rank&#39;</span> <span class="p">:</span> <span class="bp">True</span>
+                      <span class="p">}</span></pre>
     </p><p>
-        Commands with this format define functions used by MMEA. As a result,
-        it is called the <b>function definition format</b>.
-        The function will correspond to the
-        various GA operations, such as crossover, mutation and selection, or to
-        things like the fitness function or optimization function (which
-        optimizes the geometry of molecules created by MMEA).
+        The dictionary always has a key <span class="value s1">'NAME'</span>. The value
+        this key holds is the name of the function used to perform a given role.
+        The variable name itself defines the role. In the example above
+        <span class="value">generational_select_func</span> indicates that
+        the function which selects population members for the next generation
+        is being defined. The key - value pair
+        <span class="value s1">'NAME'</span><span class="value"> : </span><span class="value s1">'stochastic_sampling'</span>
+        indicates that the stochastic sampling function used to carry out this role.
     </p><p>
-        The keyword defines which GA operation the command describes. In the
-        command above the keyword
-        <span class="value">generational_select_func</span>
-        signifies that the command defines which function is to be used for
-        selecting members of the next generation. The keyword in the command
-      <code>
-        parent_select_func; crossover_roulette
-      </code>
-        is <span class="value">parent_select_func</span>, which signifies that
-        the command defines the
-        function used for selecting parents for crossover. A list of valid
-        keywords is described in a following section.
+        In
+        <pre><span class="n">fitness_func</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;NAME&#39;</span> <span class="p">:</span> <span class="s1">&#39;polymer_E_and_SA&#39;</span><span class="p">}</span></pre>
     </p><p>
-        The parameter <span class="value">function_name</span> immediately
-        follows the keyword (not counting the semicolon of course). It is the name
-        of the function which carries out the role defined by the keyword. In
-        a GA there are many tools for the same job. For example, if you wanted to
-        select members of the next generation you could select the 4 with the
-        highest fitness. Alternatively, you could select 4 completely at random.
-        In both cases you fulfill the same role and would therefore use the
-        keyword
-        <span class="value">generational_select_func</span> but you use different
-        functions to do it, hence different values would go into the
-        <span class="value">function_name</span> parameter.
+        The role is given by <span class="value">fitness_func</span> which
+        indicates that the fitness function is being defined.
+        <span class="value s1">'NAME'</span><span class="value"> : </span><span class="value s1">'polymer_E_and_SA'</span>
+        indicates that the function <span class="value s1">'polymer_E_and_SA'</span>
+        is used to calculate the fitness.
     </p><p>
-        Unsurprisingly, <span class="value">function_name</span> must correspond to
-        the name of a function defined within MMEA. Not only that, but the
-        function must also fulfill the role designated by the keyword. For
-        example, if the keyword is
-        <span class="value">generational_select_func</span> then
-        <span class="value">fittest</span> and
-        <span class="value">roulette</span> are both valid values.
-        How MMEA can give you the names and descriptions of valid functions
-        is described later in this guide.
-    </p><p>
-        Coming back to the command outline,
-        <code>
-              keyword; function_name; param1=val1; param2=val2; param3=val3
-        </code>
-        there is one part which still needs to be discussed. The
-        <span class="value">param</span> and
-        <span class="value">val</span> fields. These form a tuple separated by
-        <span class="value">=</span> and no space. Individual
-        <span class="value">param=val</span> tuples are then sperated by
-        semicolons and can be placed on individual lines.
-    </p><p>
-        As is relatively
-        normal for
-        functions, functions in MMEA take parameters. The names and number of
-        parameters will vary depending on the function. Some may take none.
-        Others may require you to input the values of some parameters and allow
-         you to omit others. When a function has a parameter that
-        it does not force you to define in the input file, it is <b> default
-        initialized</b>. This means that if you don't define the parameter
-        in the input file it defaults to some predetermined value. Once again,
-        if you want to know the valid parameters for a given function, a
-        description of how MMEA will give you this is given later.
-    </p><p>
-        Valid <span class="value">val</span> values depend on the parameter.
-        These follow Python syntax. So if a parameter wants you to
-        input some numerical value,
-        <code>
-            some_keyword; some_function_name; some_param=1.2
-        </code>
-        would be perfectly fine. On the other hand, if a parameter wanted a
-        string,
-        <code>
-            some_keyword; some_function_name; some_param="this is a string"
-        </code>
-    </p><p>
-        What if a numpy array is desired or some user-defined type buried deep
-        within the source code?
-        <code>
-            some_keyword; some_function_name; some_param=np.array([12, 3, 4])
-        </code>
-        and
-        <code>
-            some_keyword; some_function_name; some_param=SomeUsrType(12.1, "asd")
-        </code>
-        would both work! As long as the parameter says it needs a give type,
-        you can safely enter it, as long as you stick to Python syntax. Note
-        that the order in which you give the parameter-value tuples does not
-        matter.
-    </p><p>
-        All keywords should be defined in the input file once. The exceptions to
-        this are <span class="value">mutation_func</span> and
-        <span class="value">normalization_func</span> . It is quite possible
-        that during a GA run the
-        user wishes to use multiple mutation operations. As a result it is
-        perfectly reasonable to include multiple commands with the keyword
-        <span class="value">mutation_func</span>. When this is done, the user
-        must also include the line
-      <code>
-        mutation_weights=[0.1, 0.45, 0.45]
-      </code>
-        This line tells MMEA that when a mutation is to be performed it should
-        select the first mutation function defined in the input file with a 0.1
-        probability and the second and third mutation functions defined in the
-        input file with a 0.45 probability. The probabilities can of course be
-        modified by the user. The only requirements are that the probabilities
-        sum to 1 and that the number of elements in the list and the number of
-        mutation functions defined in the input file is the same.
-    </p><p>
-        Multiple normalization functions can also be defined. This allows
-        the user to preform multiple normalizations of the fitness values
-        in succession. When multiple normalization functions are defined,
-        the first one is applied first, followed by the second one defined
-        and so on.
+        The dictionary also defines any parameters that the function needs. These
+        are given as key - value pairs. If a function takes optional
+        parameters they maybe be ommited from the diciontary, in which
+        case they will be default initialized.
     </p>
 
+
+    <h2>Constructing input files.</h2>
     <p>
-        There is a second kind of non-comment line in the input file of MMEA.
-        These lines have the form
-      <code>
-        keyword=val
-      </code>
-        As you can see, these are much simpler. They define basic constants
-        relevant to the GA. As a result, this is called the <b>constant
-        definition format</b>. This includes things like population size, number
-        of crossover operations carried out during each generation and so on. It
-        is merely the keyword, a <span class="value">=</span> and the value. No
-        spaces, no semicolons.
+        To build an input file you need to know that names of all variables
+        which need to be defined for MMEA to launch a GA run. You also need
+        to know what data type the variable must hold. For variables which
+        define functions, you need to know which functions can be paired with
+        a given variable. For example you can't put the name of a
+        fitness or mutation function when defining
+        <span class="value">generational_select_func</span>.
     </p><p>
-        Finally, MMEA input files also support the use of variables.
-        These are declared using the <b>constant definition format</b>.
-        Variable declartions are preceded by <span class="value">$$</span>,
-        <code>
-            $$hello=1<br>
-            $$world='hi'<br>
-            $$var3=FunctionData('somefunc', param1=$hello, param2=$world)
-        </code>
-        The variables can hold anything and can be nested. For example,
-        <span class="value">$$var3</span> above can be re-written:
-        <code>
-            $$PART1=FunctionData<br>
-            $$PART2=('somefunc', param1=$hello, param2=$world)<br>
-            $$var3=$PART1$PART2<br>
-        </code>
-        Variables do not have to be defined before they are used,
-            <code>
-            $$var3=FunctionData('somefunc', param1=$hello, param2=$world)<br>
-            $$hello=1<br>
-            $$world='hi'
-        </code>
-
-        is as valid as the first example.
-
-        They essentially just perform the most basic text replacement.
-    </p>
-    <h2>Valid input values.</h2>
-    <p>
-        In order to prevent the need to continuously update this documentation
-        when a new function is added to MMEA, only valid keywords are described
-        here. However, this does not mean a user has to go into the source code
-        to find out what functions they have at their disposal. This section
-        also describes how MMEA can be made to output valid function names and
-        parameters for each keyword.
-    </p>
-    <h3>List and explanation of valid keywords.</h3>
-
-    <p>
-        The keywords are given here with the following format<br><br>
-        <span class="value">keyword</span> - <b>line format</b> - <i>excluded_param1</i>, <i>excluded_param2</i> - Explantion of keyword.<br><br>
-        Excluded parameters are those that the function documentation may state
-        as required, but which do not need to be provided in the input file.
+        One way to make all of this information available is to list it all
+        in this documentation. This is problematic because it would require
+        updating it each time a new function is added to MMEA. Instead,
+        only the names of variables which need to be defined are given.
+        An explantion of the role of the variable and the data type it
+        must hold is also provided.
     </p><p>
+        A guide on how to figure out which functions can be paired with which
+        variable, and what parameters each function requires, is
+        given in section below.
+    </p>
 
-The keywords are:<br><br>
-<span class="value">init_func</span> - <b>function definition format</b> - <i>ga_tools</i> - The function used to create the initial population.<br><br>
-<span class="value">generational_select_func</span> - <b>function definition format</b> -  <i>population</i> - The function used to select members of the next generation.<br><br>
-<span class="value">parent_select_func</span> - <b>function definition format</b> -  <i>population</i>  - The function used to select parents for crossover.<br><br>
-<span class="value">mutant_select_func</span> - <b>function definition format</b> -  <i>population</i>  - The function used to select individuals for mutation.<br><br>
-<span class="value">crossover_func</span>  - <b>function definition format</b> -  <i>marco_mol1</i> , <i>macro_mol2</i>  - The function which carries out the crossover operation.<br><br>
-<span class="value">mutation_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which carries out the mutation operation.<br><br>
-<span class="value">opt_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which optimizes the geometry of the molecules.<br><br>
-<span class="value">fitness_func</span>  - <b>function definition format</b> -  <i>macro_mol</i>  - The function which calculates fitness.<br><br>
-<span class="value">normalization_func</span>  - <b>function definition format</b> -  <i>population</i>  - The function which normalizes fitness values. This keyword is optional.<br><br>
-<span class="value">exit_func</span>  - <b>function definition format</b> - <i>population</i> - This is an optional keyword. It defines functions which cause the GA to stop before all the generations have been made.
-For example, once a given fittness has been reached or a certian molecule has been made.<br><br>
-<span class="value">num_generations</span>  - <b>constant definition format</b> - The number of generations which MMEA will create.<br><br>
-<span class="value">num_mutations</span>  - <b>constant definition format</b> - The number of mutations MMEA will carry out each generation.<br><br>
-<span class="value">num_crossovers</span>  - <b>constant definition format</b> - The number of crossover operations MMEA will carry out each generation.<br><br>
-<span class="value">pop_size</span>  - <b>constant definition format</b> - The size of the population.<br><br>
-<span class="value">databases</span>  - <b>constant definition format</b> - A list holding strings. Each string is the full path to a .json file
-holding MMEA molecules. The molecules are loaded into MMEA's memory on startup and as a result do not have to be reoptimized or have fitness
-values recalculated.  This can dramatically improve MMEA's performance. The .json files are generated by MMEA after each run and can also be
-made manually. See the <b>Output Files</b> section and the MMEA ipython notebook, respectively.<br><br>
-<span class="value">mutation_weights</span>  - <b>constant definition format</b> - The probability with which each mutation function defined in the input
-file will be used when a mutation operation is performed. Note that the form of this constant is a list. For example<br><br>
-    <code>
-        mutation_weights=[0.1, 0.45, 0.45]
-    </code>
-</p>
     <h3>Finding available functions and their arguments.</h3>
 
     <p>
-        In order to find out what functions MMEA offers for a given keyword,
-        using the console go into the directory containing MMEA.<br>
-        Run the command
+        In order to find out what functions can be used
+        for a given variable,
+        using the console go into the directory containing MMEA. Run the command
     <code class="mmea_output">
-        python -m MMEA -h keyword
+        python -m MMEA -h variable_name
     </code>
-        where <span class="value">keyword</span> is one of the valid keywords defined
-        in the previous section or <span class="value">energy</span> or
+        where <span class="value">variable_name</span> is one of the name of a
+        variable defined
+        in the following section or <span class="value">energy</span> or
         <span class="value">topologies</span>. <span class="value">energy</span>
         lists the functions available for energy
-        calculations while the <span class="value">topology</span> lists the
+        calculations while the <span class="value">topologies</span> lists the
         macromolecules MMEA can construct. These values are often used as
         parameters in functions.
     </p><p>
         Let's see an example,
         <code class="mmea_output">
-            python -m MMEA -h mutation_func
+            python -m MMEA -h mutation_funcs
         </code>
         MMEA will then output a list of valid functions, their description, and
         a list of their parameters.
@@ -671,13 +499,68 @@ file will be used when a mutation operation is performed. Note that the form of 
     </p>
 
     <p>
-        In this example, the keyword <span class="value">mutation_func</span> was
+        In this example, the variable <span class="value">mutation_funcs</span> was
         used. Now we can select one of the mutation functions MMEA supports and
-        add a line into the input file,
-      <code>
-        mutation_func; random_bb; database="path/to/some/database"
-      </code>
+        add it to the list  <span class="value">mutation_funcs</span>.
+<pre>
+m1 = { <span class="s1">'NAME'</span> : <span class="s1">cage_similar_lk</span>,
+        <span class="s1">'database'</span> : <span class="s1">'some/data/base/path'</span>
+      }
+mutation_funcs = [m1]</pre>
+
+
   </p>
+
+    <h3>List and explanation of required variables.</h3>
+
+    <p>
+        The variables are given here with the following format<br><br>
+        <span class="value">variable_name</span> - <b>data type</b> - <i>excluded_param1</i>, <i>excluded_param2</i> -
+        Explanation of variable role.<br><br>
+        Excluded parameters are those that the function documentation may state
+        as required, but which do not need to be provided in the input file.
+    </p><p>
+
+The keywords are:<br><br>
+<span class="value">init_func</span> - <b>dictionary</b> - <i>ga_tools</i> - The function used to create the initial population.<br><br>
+<span class="value">generational_select_func</span> - <b>dictionary</b> -  <i>population</i> - The function used to select members of the next generation.<br><br>
+<span class="value">parent_select_func</span> - <b>dictionary</b> -  <i>population</i>  - The function used to select parents for crossover.<br><br>
+<span class="value">mutant_select_func</span> - <b>dictionary</b> -  <i>population</i>  - The function used to select individuals for mutation.<br><br>
+<span class="value">crossover_funcs</span>  - <b>list of dictionaries</b> -  <i>marco_mol1</i> , <i>macro_mol2</i>  -
+Each dictionary represents a funciton used for crossover.<br><br>
+<span class="value">mutation_funcs</span>  - <b>list of dictionaries</b> -  <i>macro_mol</i>  -
+Each dictionary represents a funciton used for mutation.<br><br>
+<span class="value">opt_func</span>  - <b>dictionary</b> -  <i>macro_mol</i>  - The function which optimizes the geometry of the molecules.<br><br>
+<span class="value">fitness_func</span>  - <b>dictionary</b> -  <i>macro_mol</i>  - The function which calculates fitness. Some
+fitness functions may calculate a list of fitness parameters which are then transformed and combined into a single
+fitness value by normalization functions.<br><br>
+<span class="value">normalization_funcs</span>  - <b>list of dictionaries</b> -  <i>population</i>  -
+Each dictionary represents a normalization function. Each normalization function is applied every
+genertion, in the order in which they are given in this list. This variable is optional,
+assuming that the fitness function returns a number.<br><br>
+<span class="value">exit_func</span>  - <b>dictionary</b> - <i>population</i> -
+This is an optional variable. It defines a function which causes the GA to stop before all generations have been made.
+For example, once a given fittness has been reached or a certian molecule has been made.<br><br>
+<span class="value">num_generations</span>  - <b>int</b> - The number of generations which MMEA will create.<br><br>
+<span class="value">num_mutations</span>  - <b>int</b> - The number of mutations MMEA will carry out each generation.<br><br>
+<span class="value">num_crossovers</span>  - <b>int</b> - The number of crossover operations MMEA will carry out each generation.<br><br>
+<span class="value">pop_size</span>  - <b>int</b> - The size of the population.<br><br>
+<span class="value">databases</span>  - <b>list of strings</b> - This is an optional variable. Each string is the full path to a .json file
+holding an MMEA database of molecules. The molecules in each database
+ are loaded into MMEA's memory when the GA is started. As a result, they do not have to be
+reoptimized or have fitness values recalculated during the GA.  This can dramatically improve MMEA's
+performance. The .json files are generated by MMEA after each run and can also be
+made manually. See the <b>Working with databases.</b> section.<br><br>
+<span class="value">mutation_weights</span>  - <b>list of floats</b> - The probability with which each mutation function defined in
+<span class="value">mutation_funcs</span> will be used when a mutation operation is performed.
+The order of the probabilities corresponds to the order in which
+the mutations functions are given in <span class="value">mutation_funcs</span>.<br><br>
+<span class="value">crossover_weights</span>  - <b>list of floats</b> - The probability with which each mutation function defined in
+<span class="value">crossover_funcs</span> will be used when a crossover operation is performed.
+The order of the probabilities corresponds to the order in which
+the crossover functions are given in <span class="value">crossover_funcs</span>.<br><br>
+</p>
+
 
     <h2>Example</h2>
 
