@@ -7,25 +7,6 @@ from ..ga import Population
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'))
 
-def test_same():
-    """
-    Tests the `same_cage` method.
-
-    Cages initialized from the same arguments should return ``True``
-    through this method, even if the ``Cage`` class stops being cached.
-
-    """
-
-    a = MacroMolecule.testing_init('a', 'b', SimpleNamespace(a=1))
-    b = MacroMolecule.testing_init('a', 'a', SimpleNamespace(a=2))
-    c = MacroMolecule.testing_init('a', 'a', SimpleNamespace(a=2))
-    d = MacroMolecule.testing_init('a', 'b', SimpleNamespace(b=1))
-
-    assert not a.same(b)
-    assert b.same(c)
-    assert c.same(b)
-    assert not d.same(c)
-
 def test_comparison():
     """
     Checks ``==``, ``>``, ``>=``, etc. operators.
