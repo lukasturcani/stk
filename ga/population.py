@@ -591,6 +591,26 @@ class Population:
 
         return self.ga_tools.crossover(self, counter_name)
 
+    def has_structure(self, mol):
+        """
+        Returns ``True`` if molecule with `mol` structure is held.
+
+        Parameters
+        ----------
+        mol : Molecule
+            A molecule whose structure is being evaluated for presence
+            in the population.
+
+        Returns
+        -------
+        bool
+            ``True`` if a molecule with the same structure as `mol`
+            is held by the population.
+
+        """
+
+        return any(x.same(mol) for x in self)
+
     @classmethod
     def load(cls, path, ga_tools=None, load_names=True):
         """
