@@ -73,12 +73,11 @@ def test_init():
 
 
 def test_init_cage_isomers():
+    Population.load('data/population/init_cage_isomers.json')
     lk_file = join('data', 'struct_unit2', 'amine.mol2')
     bb_file = join('data', 'struct_unit3', 'amine.mol2')
-    pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix,
-                                       GATools.init_empty())
-    pop.remove_duplicates()
-    assert len(pop) == 81
+    pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix)
+    assert len(pop) == 50
 
 
 def test_add_members_duplicates():
@@ -325,7 +324,7 @@ def test_remove_duplicates_not_between_subpops():
     # Removing duplicates should not change the size of the population
     # as all the duplicates are in different subpopulations.
     main_size = len(main)
-    main.remove_duplicates(between_subpops=False)
+    main.remove_duplicates(False)
     assert len(main) == main_size
 
     # Add one of the subpopulations in the `members` attribute of
