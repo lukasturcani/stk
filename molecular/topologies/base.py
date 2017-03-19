@@ -133,9 +133,17 @@ class Topology(metaclass=TopologyMeta):
         for bb in macro_mol.building_blocks:
             bb.tag_atoms()
 
+        # Building should return building blocks to original positions
+        # when done.
+        ipositions = [x.position_matrix() for x in
+                                    macro_mol.building_blocks]
+
         self.place_mols(macro_mol)
         self.join_mols(macro_mol)
         self.del_atoms(macro_mol)
+
+        for x, pos_mat in zip(macro_mol.building_blocks, ipositions):
+            x.set_position_from_matrix(pos_mat)
 
     def del_atoms(self, macro_mol):
         """
