@@ -298,6 +298,14 @@ class Molecule:
         self.bonder_ids = []
         self.name = name
         self.note = note
+
+        # Make sure that stereochemistry of atoms is properly labelled.
+        for atom in mol.GetAtoms():
+            atom.UpdatePropertyCache()
+        rdkit.AssignAtomChiralTagsFromStructure(mol)
+        rdkit.AssignStereochemistry(mol, True, True, True)
+        
+        self.mol = mol
         self.inchikey = rdkit.MolToInchi(mol)
 
     def all_atom_coords(self):
