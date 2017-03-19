@@ -4,7 +4,7 @@ import numpy as np
 from types import SimpleNamespace
 from os.path import join
 
-from ..molecular import Cage, MacroMolecule, FourPlusSix
+from ..molecular import Cage, MacroMolecule, FourPlusSix, Molecule
 from ..ga import Population, GATools
 
 Population.load(join('data', 'population', 'population.json'))
@@ -172,6 +172,33 @@ def test_add_subpopulation():
     pop1.add_subpopulation(pop2)
     assert not pop2 in pop1.populations
     assert all(x in pop1 for x in pop2)
+
+
+def test_has_structure():
+
+    pop = Population()
+    a1 = Molecule.__new__(Molecule)
+    a1.inchikey = 'a'
+
+    a2 = Molecule.__new__(Molecule)
+    a2.inchikey = 'a'
+
+    b1 = Molecule.__new__(Molecule)
+    b1.inchikey = 'b'
+
+    b2 = Molecule.__new__(Molecule)
+    b2.inchikey = 'b'
+
+    pop.members.extend([a1])
+    pop.populations.append(Population())
+    pop.populations[0].members.append(b1)
+
+    assert a1 in pop
+    assert a2 not in pop
+    assert pop.has_structure(a2)
+    assert b1 in pop
+    assert b2 not in pop
+    assert pop.has_structure(b2)
 
 
 def test_load():
