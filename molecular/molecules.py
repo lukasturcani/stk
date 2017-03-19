@@ -649,7 +649,7 @@ class Molecule:
         """
         Check if `other` has the same molecular structure.
 
-        Parameterss.getcwd()
+        Parameters
         ----------
         other : MacroMolecule
             The ``MacroMolecule`` instance you are checking has
@@ -1658,7 +1658,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         rdkit.EmbedMolecule(mol)
         obj = cls.__new__(cls)
-        Molecule.__init__(obj, note, name)
+        Molecule.__init__(obj, mol, note, name)
         obj.file = smarts
         obj.key = key
         obj.mol = mol

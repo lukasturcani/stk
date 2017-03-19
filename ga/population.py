@@ -201,12 +201,13 @@ class Population:
         bb = StructUnit3(bb_file, bb_fg)
 
         pop = cls(ga_tools)
-        inchikeys = set()
-        for A_align, B_align in zip(A_alignments, B_alignments):
-            cage = Cage((lk, bb), topology(A_align, B_align))
-            if cage.inchikey not in inchikeys:
-                pop.members.append(cage)
-                inchikeys.add(cage.inchikey)
+        seen = set()
+        for A_align in A_alignments:
+            for B_align in B_alignments:
+                c = Cage([bb, lk], topology(A_align, B_align))
+                if c.inchikey not in seen:
+                    pop.members.append(c)
+                    seen.add(c.inchikey)
 
         return pop
 
@@ -762,7 +763,8 @@ class Population:
 
         return _optimize_all(self.ga_tools.optimization, self)
 
-    def remove_duplicates(self, between_subpops=True, top_seen=None):
+    def remove_duplicates(self, between_subpops=True,
+                                key=lambda x : id(x), top_seen=None):
         """
         Removes duplicates from a population and preserves structure.
 
@@ -788,6 +790,10 @@ class Population:
             When ``False`` duplicates are only removed from within a
             given subpopulation. If ``True`` all duplicates are
             removed, regardless of which subpopulation they are in.
+
+        key : callable (default = lambda x : id)
+            Duplicates are removed by on the value returned by this
+            function.
 
         Modifies
         --------
@@ -817,19 +823,18 @@ class Population:
             if isinstance(top_seen, set):
                 seen = top_seen
 
-            self.members = list(dedupe(self.members, seen=seen))
+            self.members = list(dedupe(self.members, seen, key))
             for subpop in self.populations:
-                subpop.remove_duplicates(between_subpops,
-                                             top_seen=seen)
+                subpop.remove_duplicates(True, key, seen)
 
         # If duplicates are only removed from within the same
         # subpopulation, only the `members` attribute of each
         # subpopulation needs to be cleared of duplicates. To do this,
         # each `members` attribute is deduped recursively.
         if not between_subpops:
-            self.members = list(dedupe(self.members))
+            self.members = list(dedupe(self.members, key=key))
             for subpop in self.populations:
-                subpop.remove_duplicates(between_subpops=False)
+                subpop.remove_duplicates(False, key)
 
     def remove_failures(self):
         """
@@ -1153,7 +1158,7 @@ class Population:
 
         """
 
-        return any(item.same(mol) for mol in self.all_members())
+        return any(item is mol for mol in self.all_members())
 
     def __str__(self):
         output_string = (" Population " + str(id(self)) + "\n" +
