@@ -174,6 +174,27 @@ def test_position_matrix():
         assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
 
 
+def test_same():
+    """
+    Tests the `same()` method.
+
+    """
+    
+    a = Molecule.__new__(Molecule)
+    a.inchikey = 'a'
+    b = Molecule.__new__(Molecule)
+    b.inchikey = 'b'
+    c = Molecule.__new__(Molecule)
+    c.inchikey = 'b'
+    d = Molecule.__new__(Molecule)
+    d.inchikey = 'c'
+
+    assert not a.same(b)
+    assert b.same(c)
+    assert c.same(b)
+    assert not d.same(c)
+
+
 def test_save_bonders():
     mol = make_mol()
     # Give the first five atoms the 'bonder' tag. Then check if five
