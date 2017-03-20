@@ -21,7 +21,7 @@ def test_init():
     assert i.mutant_select_func == {'NAME' : 'stochastic_sampling',
                                     'duplicates' : True}
 
-    assert i.crossover_func == {'NAME' : 'bb_lk_exchange'}
+    assert i.crossover_funcs == [{'NAME' : 'bb_lk_exchange'}]
 
     assert i.mutation_funcs == [
         {'NAME' : 'cage_random_bb',
@@ -49,9 +49,10 @@ def test_init():
 
 def test_crosser():
     crosser = i.crosser()
-    assert crosser.func_data == FunctionData('bb_lk_exchange')
+    assert crosser.funcs == [FunctionData('bb_lk_exchange')]
     assert crosser.num_crossovers == i.num_crossovers
     assert crosser.n_calls == 0
+    assert crosser.weights == [1]
 
 
 def test_exiter():
