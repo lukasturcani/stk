@@ -3,12 +3,13 @@ from collections import Counter
 import numpy as np
 from types import SimpleNamespace
 from os.path import join
+import copy
 
-from ..molecular import Cage, MacroMolecule, FourPlusSix, Molecule
+from ..molecular import Cage, MacroMolecule, FourPlusSix, StructUnit
 from ..ga import Population, GATools
 
-Population.load(join('data', 'population', 'population.json'))
-
+pop = Population.load(join('data', 'population', 'population.json'))
+pop2 = Population.load('data/population/init_cage_isomers.json')
 
 def generate_population(offset=False):
     """
@@ -73,7 +74,6 @@ def test_init():
 
 
 def test_init_cage_isomers():
-    Population.load('data/population/init_cage_isomers.json')
     lk_file = join('data', 'struct_unit2', 'amine.mol2')
     bb_file = join('data', 'struct_unit3', 'amine.mol2')
     pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix)
@@ -176,29 +176,21 @@ def test_add_subpopulation():
 
 def test_has_structure():
 
-    pop = Population()
-    a1 = Molecule.__new__(Molecule)
-    a1.inchikey = 'a'
+    a1, b1 = pop2[:2]
+    a2 = copy.deepcopy(a1)
+    b2 = copy.deepcopy(b1)
 
-    a2 = Molecule.__new__(Molecule)
-    a2.inchikey = 'a'
+    pop3 = Population()
+    pop3.members.append(a1)
+    pop3.populations.append(Population())
+    pop3.populations[0].members.append(b1)
 
-    b1 = Molecule.__new__(Molecule)
-    b1.inchikey = 'b'
-
-    b2 = Molecule.__new__(Molecule)
-    b2.inchikey = 'b'
-
-    pop.members.extend([a1])
-    pop.populations.append(Population())
-    pop.populations[0].members.append(b1)
-
-    assert a1 in pop
-    assert a2 not in pop
-    assert pop.has_structure(a2)
-    assert b1 in pop
-    assert b2 not in pop
-    assert pop.has_structure(b2)
+    assert a1 in pop3
+    assert a2 not in pop3
+    assert pop3.has_structure(a2)
+    assert b1 in pop3
+    assert b2 not in pop3
+    assert pop3.has_structure(b2)
 
 
 def test_load():

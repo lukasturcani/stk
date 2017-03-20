@@ -179,20 +179,19 @@ def test_same():
     Tests the `same()` method.
 
     """
-    
-    a = Molecule.__new__(Molecule)
-    a.inchikey = 'a'
-    b = Molecule.__new__(Molecule)
-    b.inchikey = 'b'
-    c = Molecule.__new__(Molecule)
-    c.inchikey = 'b'
-    d = Molecule.__new__(Molecule)
-    d.inchikey = 'c'
 
-    assert not a.same(b)
-    assert b.same(c)
-    assert c.same(b)
-    assert not d.same(c)
+    mol2 = make_mol()
+    assert mol is not mol2
+    assert mol.same(mol2)
+
+    mol3 =  Molecule.__new__(Molecule)
+    molfile = join('data', 'molecule', 'molecule2.mol')
+    mol3.mol = rdkit.MolFromMolFile(molfile,
+                                    removeHs=False,
+                                    sanitize=False)
+    assert mol is not mol3
+    assert not mol.same(mol3)
+    assert not mol2.same(mol3)
 
 
 def test_save_bonders():
