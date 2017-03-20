@@ -679,46 +679,13 @@ class _CageTopology(Topology):
 
 class _VertexOnlyCageTopology(_CageTopology):
 
-    def __init__(self, random_placement=True):
-        super().__init__()
-        self.random_placement = random_placement
-        self.connect()
+    def __init__(self, A_alignments=None, B_alignments=None):
 
-    def place_mols(self, macro_mol):
 
-        macro_mol.mol = rdkit.Mol()
+        if A_alignments is None:
+            A_alignments = np.zeros(len(self.positions_A))
+        if B_alignments is None:
+            B_alignments = np.zeros(len(self.positions_B))
 
-        if self.random_placement:
-            return self.place_mols_random(macro_mol)
-        return self.place_mols_assigned(macro_mol)
-
-    def place_mols_random(self, macro_mol):
-        for position in self.positions_A:
-            bb = np.random.choice(list(macro_mol.building_blocks))
-            n_bb = len(bb.functional_group_atoms())
-
-            macro_mol.mol = rdkit.CombineMols(
-                                            macro_mol.mol,
-                                            position.place_mol(bb))
-            macro_mol.bb_counter.update([bb])
-
-            bonder_ids = deque(maxlen=n_bb)
-            for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('bonder'):
-                    bonder_ids.append(atom.GetIdx())
-
-            position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(macro_mol, position)
-
-    @classmethod
-    def connect(cls):
-        if getattr(cls, 'connected', False):
-            return
-
-        for v1, v2 in cls.connections:
-            v1.connected.append(v2)
-            v2.connected.append(v1)
-        cls.connected = True
-
-    def place_mols_assigned(self):
-        pass
+        self.A_alignments = A_alignments
+        self.B_alignments = B_alignments
