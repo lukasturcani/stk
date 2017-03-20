@@ -58,7 +58,8 @@ mutant_select_func = {'NAME' : 'stochastic_sampling',
 # Crossover function.
 ##################################################################################
 
-crossover_func = {'NAME' : 'bb_lk_exchange'}
+crossover_func1 = {'NAME' : 'bb_lk_exchange'}
+crossover_funcs = [crossover_func1]
 
 ##################################################################################
 # Mutation function 1.
