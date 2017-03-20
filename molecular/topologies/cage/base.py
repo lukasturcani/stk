@@ -734,7 +734,7 @@ class _NoLinkerCageTopology(_CageTopology):
             n_bb = len(bb.functional_group_atoms())
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
-                                   position.place_mol(bb, orientation))
+                             position.place_mol(bb, int(orientation)))
             macro_mol.bb_counter.update([bb])
 
             bonder_ids = deque(maxlen=n_bb)
