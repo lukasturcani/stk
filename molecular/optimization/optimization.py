@@ -230,14 +230,21 @@ def raiser(macro_mol, param1, param2=2):
     raise Exception('Raiser optimization function used.')
 
 
-def rdkit_optimization(macro_mol):
+def rdkit_optimization(macro_mol, embed=False):
     """
     Optimizes the structure of the molecule using rdkit.
+
+    Uses the MMFF forcefield.
 
     Parameters
     ----------
     macro_mol : MacroMolecule
         The macromolecule who's structure should be optimized.
+
+    embed : bool (default = False)
+        When ``True`` the structure is guessed before an optimization
+        is carried out. This guess structure overrides any previous
+        structure.
 
     Modifies
     --------
@@ -251,6 +258,9 @@ def rdkit_optimization(macro_mol):
     None : NoneType
 
     """
+
+    if embed:
+        rdkit.EmbedMolecule(macro_mol.mol)
 
     # Sanitize then optimize the rdkit molecule.
     rdkit.SanitizeMol(macro_mol.mol)
