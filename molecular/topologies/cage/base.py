@@ -697,7 +697,70 @@ class _NoLinkerCageTopology(_CageTopology):
     """
     Cage topologies where all building units have equal number of fgs.
 
+    Attributes
+    ----------
+    alignments : list of ints
+        Same meaning as `A_alignments` in _CageTopology.
+
+    placement : str
+        The name of the placement type to be used. Valid options are
+
+            'random' - For each vertex, a building block is picked
+             randomly from `macro_mol.building_blocks` and placed on
+             the vertex.
+
     """
 
-    def __init__(self, alignments):
+    def __init__(self, alignments=None, placement='random'):
+        if alignments is None:
+            alignments = np.zeros(len(self.positions_A))
+
         self.alignments = alignments
+        self.placement = placement
+        self.connect()
+
+    def place_mols(self, macro_mol):
+
+        macro_mol.mol = rdkit.Mol()
+
+        if self.placement == 'random':
+            return self.place_mols_random(macro_mol)
+
+    def place_mols_random(self, macro_mol):
+        for position, orientation in zip(self.positions_A,
+                                         self.alignments):
+            bb = np.random.choice(list(macro_mol.building_blocks))
+            ipos = bb.position_matrix()
+            n_bb = len(bb.functional_group_atoms())
+
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
+                                   position.place_mol(bb, orientation))
+            macro_mol.bb_counter.update([bb])
+
+            bonder_ids = deque(maxlen=n_bb)
+            for atom in macro_mol.mol.GetAtoms():
+                if atom.HasProp('bonder'):
+                    bonder_ids.append(atom.GetIdx())
+
+            position.bonder_ids = sorted(bonder_ids)
+            self.pair_bonders_with_positions(macro_mol, position)
+            bb.set_position_from_matrix(ipos)
+
+    @classmethod
+    def connect(cls):
+        """
+        Updates each Vertex with a list of its neighbors.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if getattr(cls, 'connected', False):
+            return
+
+        for v1, v2 in cls.connections:
+            v1.connected.append(v2)
+            v2.connected.append(v1)
+        cls.connected = True
