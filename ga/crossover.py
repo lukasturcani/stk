@@ -23,6 +23,7 @@ start with a leading underscore.
 
 import os
 from collections import Counter
+import numpy as np
 
 from .population import Population
 from .plotting import plot_counter
