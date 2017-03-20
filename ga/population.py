@@ -612,7 +612,7 @@ class Population:
         return any(x.same(mol) for x in self)
 
     @classmethod
-    def load(cls, path, ga_tools=None, load_names=True):
+    def load(cls, path, load_names=True):
         """
         Initializes a Population from one dumped to a file.
 
@@ -620,11 +620,6 @@ class Population:
         ----------
         path : str
             The full path of the file holding the dumped population.
-
-        ga_tools : GATools (default = None)
-            A GATools instance to be used by the loaded population. If
-            ``None`` the ``GATools`` instance of the loaded population
-            is used.
 
         load_names : bool (default = True)
             If ``True`` then the `name` attribute stored in the JSON
@@ -641,7 +636,7 @@ class Population:
             pop_list = json.load(f)
 
         pop = cls.fromlist(pop_list, load_names)
-        pop.ga_tools = ga_tools
+        pop.ga_tools = GATools.init_empty()
         return pop
 
     def max(self, key):
