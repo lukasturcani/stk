@@ -147,6 +147,10 @@ class Population:
         rotated in position so that every possible bond combination
         with linkers is formed.
 
+        This only works for cage topologies which have both building
+        blocks and linkers. It will not with topologies where all
+        building blocks have the same number of functional groups.
+
         Parameters
         ----------
         lk_file : str
