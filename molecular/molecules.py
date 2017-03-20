@@ -266,8 +266,8 @@ class Molecule:
     mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance representing the molecule.
 
-    inchikey : str
-        The InChIKey of the molecule.
+    inchi : str
+        The InChI of the molecule.
 
     energy : Energy
         An instance of the ``Energy`` class. It handles all things
@@ -291,22 +291,13 @@ class Molecule:
 
     """
 
-    def __init__(self, mol, name="", note=""):
+    def __init__(self, name="", note=""):
         self.failed = False
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
         self.name = name
         self.note = note
-
-        # Make sure that stereochemistry of atoms is properly labelled.
-        for atom in mol.GetAtoms():
-            atom.UpdatePropertyCache()
-        rdkit.AssignAtomChiralTagsFromStructure(mol)
-        rdkit.AssignStereochemistry(mol, True, True, True)
-        
-        self.mol = mol
-        self.inchikey = rdkit.MolToInchi(mol)
 
     def all_atom_coords(self):
         """
@@ -516,6 +507,20 @@ class Molecule:
 
         return graph
 
+    @property
+    def inchi(self):
+        """
+        Returns the InChi of the molecule.
+
+        """
+
+        # Make sure that stereochemistry of atoms is properly labelled.
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+        rdkit.AssignAtomChiralTagsFromStructure(self.mol)
+        rdkit.AssignStereochemistry(self.mol, True, True, True)
+        return rdkit.MolToInchi(self.mol)
+
     @classmethod
     def load(cls, path, optimized=True, load_names=True):
         """
@@ -671,7 +676,7 @@ class Molecule:
 
         """
 
-        return self.inchikey == other.inchikey
+        return self.inchi == other.inchi
 
     def rotate(self, theta, axis):
         """
@@ -1099,8 +1104,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     mol : rdkit.Chem.rdchem.Mol
         The rdkit instance of the molecule held in `file`.
 
-    inchikey : str
-        The InChIKey of the molecule.
+    inchi : str
+        The InChI of the molecule.
 
     func_grp : FGInfo
         The ``FGInfo`` instance holding information about the
@@ -1183,7 +1188,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             'Unable to initialize from "{}" files.'.format(ext))
 
         self.mol = self.init_funcs[ext](file)
-        super().__init__(self.mol, name, note)
+        super().__init__(name, note)
 
         # Define a generator which yields an ``FGInfo`` instance from
         # `functional_groups`. The yielded ``FGInfo``instance
@@ -1345,7 +1350,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         The representation has the following form:
 
             {
-                'key' : 'frozenset({'amine', 'InChiKey=[...]'})',
                 'class' : 'StructUnit',
                 'mol_block' : 'A string holding the V3000 mol
                                block of the molecule.',
@@ -1409,7 +1413,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
         obj.tag_atoms()
-        obj.inchikey = rdkit.MolToInchi(obj.mol)
         cls.cache[key] = obj
         return obj
 
@@ -1666,7 +1669,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         rdkit.EmbedMolecule(mol)
         obj = cls.__new__(cls)
-        Molecule.__init__(obj, mol, note, name)
+        Molecule.__init__(obj, note, name)
         obj.file = smarts
         obj.key = key
         obj.mol = mol
@@ -2063,8 +2066,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
     mol : rdkit.Chem.rdchem.Mol
         An rdkit instance representing the macromolecule.
 
-    inchikey : str
-        The InChIKey of the molecule.
+    inchi : str
+        The InChI of the molecule.
 
     optimized : bool (default = False)
         This is a flag to indicate if a molecule has been previously
@@ -2163,7 +2166,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
             self.failed = True
             MolError(ex, self, 'During initialization.')
 
-        super().__init__(self.mol, name, note)
+        super().__init__(name, note)
         self.save_bonders()
 
     def json(self):
@@ -2255,7 +2258,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.failed = False
         obj.key = key
         obj.building_blocks = bbs
-        obj.inchikey = rdkit.MolToInchi(obj.mol)
         cls.cache[key] = obj
         return obj
 
