@@ -157,7 +157,8 @@ class Population:
             cage.
 
         topology : type
-            A _CageTopology child class.
+            A _CageTopology child class. Exluding child classes of
+            _NoLinkerCageTopology.
 
         ga_tools : GATools (default = GATools.init_empty())
             The GATools instance to be used by created population.
