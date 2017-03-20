@@ -1367,7 +1367,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         return {
 
         'class' : self.__class__.__name__,
-        'func_grp' : self.func_grp.name,
+        'func_grp' : (self.func_grp if
+                      self.func_grp is None else self.func_grp.name),
         'mol_block' : self.mdl_mol_block(),
         'note' : self.note,
         'name' : self.name
