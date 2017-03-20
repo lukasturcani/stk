@@ -70,12 +70,8 @@ class Mutation:
     funcs : list of FunctionData instances
         This lists holds all the mutation functions which are to be
         applied by the GA. One will be chosen at random when a mutation
-        is desired. The likelihood can be modified by the optionally
-        supplied `weights` argument.
-
-        The ``FunctionData`` object holding the name of the function
-        chosen for mutation and any additional paramters and
-        corresponding values the function may require.
+        is desired. The likelihood that each is selected is given by
+        `weights`.
 
     num_mutations : int
         The number of mutations that needs to be performed each

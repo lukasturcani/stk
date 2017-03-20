@@ -103,10 +103,10 @@ class GAInput:
         method used to select ``MacroMolecule`` instances for mutation
         from the current generation's population.
 
-    crossover_func : dict
-        The key 'NAME' must hold the name of the ``Crossover`` class
-        method used to cross ``MacroMolecule`` instances to generate
-        offspring.
+    crossover_funcs : list of dicts
+        This list holds a dict for each crossover function which is to
+        be used by the GA. The key 'NAME' in each dict must hold the
+        name of a method of the ``Crossover`` class.
 
     mutation_funcs : list of dicts
         This list holds a dict for each mutation function which is to
@@ -173,8 +173,8 @@ class GAInput:
         if not hasattr(self, 'mutation_weights'):
             self.mutation_weights = [1]
 
-        if not hasattr(self, 'normalization_func'):
-            self.normalization_func = []
+        if not hasattr(self, 'normalization_funcs'):
+            self.normalization_funcs = []
 
         if not hasattr(self, 'exit_func'):
             self.exit_func = {'NAME' : 'no_exit'}

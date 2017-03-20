@@ -58,24 +58,31 @@ class Crossover:
 
     Attributes
     ----------
-    func_data : FunctionData
-        The ``FunctionData`` object holding the name of the function
-        chosen for crossover and any additional paramters and
-        corresponding values the function may require.
+    funcs : list of FunctionData instances
+        This lists holds all the crossover functions which are to be
+        applied by the GA. One will be chosen at random when a
+        crossover is desired. The likelihood that each is selected is
+        given by `weights`.
 
-    num_crossovers : int
-        The number of crossover operations that need to be performed
-        each generation.
+    num_mutations : int
+        The number of crossovers that needs to be performed each
+        generation.
 
     n_calls : int
         The total number of times an instance of ``Crossover`` has been
         called during its lifetime.
 
+    weights : None or list of floats (default = None)
+        When ``None`` each crossover function has equal likelihood of
+        being picked. If `weights` is a list each float corresponds to
+        the probability of selecting the crossover function at the
+        corresponding index.
+
     """
 
-
-    def __init__(self, func_data, num_crossovers):
-        self.func_data = func_data
+    def __init__(self, funcs, num_crossovers, weights=None):
+        self.funcs = funcs
+        self.weights = weights
         self.num_crossovers = num_crossovers
         self.n_calls = 0
 
@@ -117,20 +124,19 @@ class Crossover:
         offspring_pop = Population(population.ga_tools)
         counter = Counter()
 
-        # Get the crossover function object using the name of the
-        # crossover function supplied during initialization of the
-        # ``Crossover`` instance.
-        func = getattr(self, self.func_data.name)
-
         # Keep a count of the number of successful crossovers.
         num_crossovers = 0
         for parents in parent_pool:
             counter.update(parents)
+            # Get the crossover function.
+            func_data = np.random.choice(self.funcs, p=self.weights)
+            func = getattr(self, func_data.name)
+
             try:
                 self.n_calls += 1
                 # Apply the crossover function and supply any
                 # additional arguments to it.
-                offspring = func(*parents, **self.func_data.params)
+                offspring = func(*parents, **func_data.params)
 
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
