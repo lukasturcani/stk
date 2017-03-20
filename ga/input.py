@@ -398,11 +398,11 @@ class InputHelp:
                                  not name.startswith('crossover') and
                                  not name.startswith('_')),
 
-               'crossover_func' : (func for name, func in
+               'crossover_funcs' : (func for name, func in
                                    Crossover.__dict__.items() if
                                    not name.startswith('_')),
 
-               'mutation_func' : (func for name, func in
+               'mutation_funcs' : (func for name, func in
                                   Mutation.__dict__.items() if
                                   not name.startswith('_')),
 
@@ -418,7 +418,7 @@ class InputHelp:
                                  not isinstance(func, ModuleType) and
                                  'fitness' in func.__module__),
 
-               'normalization_func' :  (func for name, func in
+               'normalization_funcs' :  (func for name, func in
                                         Normalization.__dict__.items()
                                         if not name.startswith('_')),
 
