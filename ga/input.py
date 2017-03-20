@@ -173,6 +173,9 @@ class GAInput:
         if not hasattr(self, 'mutation_weights'):
             self.mutation_weights = [1]
 
+        if not hasattr(self, 'crossover_weights'):
+            self.crossover_weights = [1]
+
         if not hasattr(self, 'normalization_funcs'):
             self.normalization_funcs = []
 
@@ -194,11 +197,14 @@ class GAInput:
 
         """
 
-        func_data = FunctionData(self.crossover_func['NAME'],
-            **{key : val for key, val in self.crossover_func.items() if
-                key != 'NAME'})
+        funcs = [FunctionData(x['NAME'],
+                    **{k:v for k,v in x.items() if k != 'NAME'})
 
-        return Crossover(func_data, self.num_crossovers)
+                    for x in self.crossover_funcs]
+
+        return Crossover(funcs,
+                        self.num_crossovers,
+                        self.crossover_weights)
 
     def exiter(self):
         """
