@@ -678,9 +678,12 @@ class _CageTopology(Topology):
 
 
 class _VertexOnlyCageTopology(_CageTopology):
+    """
+    Cage topolgies where all building block/linker mols have 3+ fgs.
+
+    """
 
     def __init__(self, A_alignments=None, B_alignments=None):
-
 
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
@@ -689,3 +692,12 @@ class _VertexOnlyCageTopology(_CageTopology):
 
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
+
+class _NoLinkerCageTopology(_CageTopology):
+    """
+    Cage topologies where all building units have equal number of fgs.
+
+    """
+
+    def __init__(self, alignments):
+        self.alignments = alignments
