@@ -4,141 +4,114 @@ import os
 from os.path import join
 
 test_dir = 'cage_topology_tests'
-os.mkdir(test_dir)
-data_dir = os.path.join(os.path.getcwd(), 'data', 'cage_topologies')
+if not os.path.exists(test_dir):
+    os.mkdir(test_dir)
+data_dir = os.path.join(os.getcwd(), 'data', 'cage_topologies')
 
 # 3 + 4 topology tests.
 def test_SixPlusEight():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], SixPlusEight())
+    c.write(join(test_dir, 'SixPlusEight.mol'))
+
 
 # 2 + 4 topolgy tests.
 def test_TwoPlusFour():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
-    bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
+    c = Cage([bb1, bb2], TwoPlusFour())
+    c.write(join(test_dir, 'TwoPlusFour.mol'))
 
 
 def test_ThreePlusSix():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
-    bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
+    c = Cage([bb1, bb2], ThreePlusSix())
+    c.write(join(test_dir, 'ThreePlusSix.mol'))
 
 
 def test_FourPlusEight():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
-    bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
+    c = Cage([bb1, bb2], FourPlusEight())
+    c.write(join(test_dir, 'FourPlusEight.mol'))
 
 
 def test_SixPlusTwelve():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
-    bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
+    c = Cage([bb1, bb2], SixPlusTwelve())
+    c.write(join(test_dir, 'SixPlusTwelve.mol'))
 
 
 def test_TenPlusTwenty():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
-    bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
+    c = Cage([bb1, bb2], TenPlusTwenty())
+    c.write(join(test_dir, 'TenPlusTwenty.mol'))
+
 
 # 3 + 3 cage topologies.
 def test_OnePlusOne():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], OnePlusOne())
+    c.write(join(test_dir, 'OnePlusOne.mol'))
 
 
 def test_TwoPlusTwo():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], TwoPlusTwo())
+    c.write(join(test_dir, 'TwoPlusTwo.mol'))
 
 
 def test_FourPlusFour():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], FourPlusFour())
+    c.write(join(test_dir, 'FourPlusFour.mol'))
 
 
 # 2 + 3 cage topologies.
 def test_TwoPlusThree():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], TwoPlusThree())
+    c.write(join(test_dir, 'TwoPlusThree.mol'))
 
 
 def test_FourPlusSix():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], FourPlusSix())
+    c.write(join(test_dir, 'FourPlusSix.mol'))
 
 
 def test_FourPlusSix2():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], FourPlusSix2())
+    c.write(join(test_dir, 'FourPlusSix2.mol'))
 
 
 def test_SixPlusNine():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], SixPlusNine())
+    c.write(join(test_dir, 'SixPlusNine.mol'))
 
 
 def test_EightPlusTwelve():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], EightPlusTwelve())
+    c.write(join(test_dir, 'EightPlusTwelve.mol'))
 
 
 def test_Dodecahedron():
-    if test_dir not in os.getcwd():
-        os.chdir(test_dir)
-
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
-    c = Cage([bb1, bb2], SixPlusEight())
+    c = Cage([bb1, bb2], Dodecahedron())
+    c.write(join(test_dir, 'Dodecahedron.mol'))
