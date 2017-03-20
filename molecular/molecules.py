@@ -1413,7 +1413,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         obj.key = key
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
-        obj.tag_atoms()
+        if obj.func_grp:
+            obj.tag_atoms()
         cls.cache[key] = obj
         return obj
 
