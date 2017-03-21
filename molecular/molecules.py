@@ -617,13 +617,8 @@ class Molecule:
                                          self.mol.GetNumBonds())
         # Kekulize the mol, which means that each aromatic bond is
         # converted to a single or double. This is necessary because
-        # .mol V3000 only supports integer bonds. Before kekulization,
-        # the property cache of each atom must be updated so that its
-        # valence is known.
-        for atom in self.mol.GetAtoms():
-            atom.UpdatePropertyCache()
+        # .mol V3000 only supports integer bonds.
         rdkit.Kekulize(self.mol)
-
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
@@ -1196,6 +1191,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             'Unable to initialize from "{}" files.'.format(ext))
 
         self.mol = self.init_funcs[ext](file)
+        # Update the property cache of each atom. This updates things
+        # like valence.
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+
         super().__init__(name, note)
 
         # Define a generator which yields an ``FGInfo`` instance from
