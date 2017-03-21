@@ -390,6 +390,23 @@ class Molecule:
         atomic_num = atom.GetAtomicNum()
         return periodic_table[atomic_num]
 
+    def cavity_size(self):
+        """
+        Returns the diameter of the cage cavity.
+
+        Returns
+        -------
+        float
+            The size of the cage cavity.
+
+        """
+
+        center_of_mass = self.center_of_mass()
+        min_dist = min((euclidean(coord, center_of_mass) -
+                atom_vdw_radii[self.atom_symbol(atom_id)])
+                       for atom_id, coord in self.all_atom_coords())
+        return 2 * abs(min_dist)
+
     def center_of_mass(self):
         """
         Returns the centre of mass of the molecule.
@@ -2361,23 +2378,6 @@ class Cage(MacroMolecule):
     Used to represent molecular cages.
 
     """
-
-    def cavity_size(self):
-        """
-        Returns the diameter of the cage cavity.
-
-        Returns
-        -------
-        float
-            The size of the cage cavity.
-
-        """
-
-        center_of_mass = self.center_of_mass()
-        min_dist = min((euclidean(coord, center_of_mass) -
-                atom_vdw_radii[self.atom_symbol(atom_id)])
-                       for atom_id, coord in self.all_atom_coords())
-        return 2 * abs(min_dist)
 
     def window_difference(self):
         """
