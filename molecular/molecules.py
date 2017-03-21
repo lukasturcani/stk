@@ -615,6 +615,14 @@ class Molecule:
 
         main_string = main_string.format(self.mol.GetNumAtoms(),
                                          self.mol.GetNumBonds())
+        # Kekulize the mol, which means that each aromatic bond is
+        # converted to a single or double. This is necessary because
+        # .mol V3000 only supports integer bonds. Before kekulization,
+        # the property cache of each atom must be updated so that its
+        # valence is known.
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+        rdkit.Kekulize(self.mol)
 
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
@@ -627,7 +635,7 @@ class Molecule:
             bond_id = bond.GetIdx()
             atom1_id = bond.GetBeginAtomIdx() + 1
             atom2_id = bond.GetEndAtomIdx() + 1
-            bond_order = int(bond.GetBondTypeAsDouble())
+            bond_order = bond.GetBondTypeAsDouble()
             bond_block += bond_line.format(bond_id, bond_order,
                                            atom1_id, atom2_id)
 
