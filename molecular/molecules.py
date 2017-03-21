@@ -142,6 +142,7 @@ import json
 from collections import namedtuple, Counter
 from inspect import signature
 import io
+from math import isnan
 
 from . import topologies
 from ..addons.pyWindow import window_sizes
@@ -1879,6 +1880,7 @@ class StructUnit2(StructUnit):
         t1 = vector_theta(np.dot(r1, tstart), tend)
         r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
         t2 = vector_theta(np.dot(r2, tstart), tend)
+        
         if t2 < t1:
             angle *= -1
 
