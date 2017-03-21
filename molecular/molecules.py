@@ -531,11 +531,7 @@ class Molecule:
 
         """
 
-        # Make sure that stereochemistry of atoms is properly labelled.
-        for atom in self.mol.GetAtoms():
-            atom.UpdatePropertyCache()
-        rdkit.AssignAtomChiralTagsFromStructure(self.mol)
-        rdkit.AssignStereochemistry(self.mol, True, True, True)
+        self.update_stereochemistry()
         return rdkit.MolToInchi(self.mol)
 
     @classmethod
@@ -994,6 +990,28 @@ class Molecule:
         """
 
         self.mol = mol_from_mae_file(mae_path)
+
+    def update_stereochemistry(self):
+        """
+        Updates stereochemistry tags on `mol` attribute.
+
+        Modifies
+        --------
+        mol : rdkit.Chem.rdchem.Mol
+            The '_CIPCode' property on each atom of the rkdit molecule
+            is updated to reflect the R or S configuration of the atom
+            in the current geometry.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+        rdkit.AssignAtomChiralTagsFromStructure(self.mol)
+        rdkit.AssignStereochemistry(self.mol, True, True, True)
 
     def write(self, path):
         """
