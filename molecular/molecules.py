@@ -630,8 +630,13 @@ class Molecule:
                                          self.mol.GetNumBonds())
         # Kekulize the mol, which means that each aromatic bond is
         # converted to a single or double. This is necessary because
-        # .mol V3000 only supports integer bonds.
+        # .mol V3000 only supports integer bonds. Before kekulization,
+        # UpdatePropertyCache() of atoms to make sure they are aware
+        # of their valence.
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
         rdkit.Kekulize(self.mol)
+        
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
