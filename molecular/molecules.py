@@ -647,7 +647,7 @@ class Molecule:
             bond_id = bond.GetIdx()
             atom1_id = bond.GetBeginAtomIdx() + 1
             atom2_id = bond.GetEndAtomIdx() + 1
-            bond_order = bond.GetBondTypeAsDouble()
+            bond_order = int(bond.GetBondTypeAsDouble())
             bond_block += bond_line.format(bond_id, bond_order,
                                            atom1_id, atom2_id)
 
