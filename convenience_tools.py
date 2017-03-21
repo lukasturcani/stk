@@ -963,5 +963,8 @@ def vector_theta(vector1, vector2):
     numerator = np.dot(vector1, vector2)
     denominator = (np.linalg.norm(vector1) *
                     np.linalg.norm(vector2))
-
+    # This if statement prevents returns of NaN due to floating point
+    # incurracy.
+    if np.isclose(numerator, denominator, atol=1e-8):
+        return 0.0
     return np.arccos(numerator/denominator)
