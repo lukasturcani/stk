@@ -142,6 +142,10 @@ class Topology(metaclass=TopologyMeta):
         self.join_mols(macro_mol)
         self.del_atoms(macro_mol)
 
+        # Make sure that the property cache of each atom is up to date.
+        for atom in macro_mol.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+
         for x, pos_mat in zip(macro_mol.building_blocks, ipositions):
             x.set_position_from_matrix(pos_mat)
 
