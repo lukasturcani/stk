@@ -88,6 +88,7 @@ def test_atom_symbol():
 def test_cavity_size():
     assert np.isclose(mol.cavity_size(), 1.886811385152262, atol=1e-8)
 
+
 def test_center_of_mass():
     """
     Tests `center_of_mass`.
