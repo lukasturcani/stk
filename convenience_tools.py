@@ -876,23 +876,23 @@ def rotation_matrix_arbitrary_axis(angle, axis):
         A 3x3 array representing a rotation matrix.
 
     """
-    # Calculation of the rotation matrix
+
+
     axis = normalize_vector(axis)
 
     a = np.cos(angle/2)
-
-    b,c,d = np.multiply(axis, np.sin(angle/2))
+    b,c,d = axis * np.sin(angle/2)
 
     e11 = np.square(a) + np.square(b) - np.square(c) - np.square(d)
-    e12 = 2*(np.multiply(b,c) - np.multiply(a,d))
-    e13 = 2*(np.multiply(b,d) + np.multiply(a,c))
+    e12 = 2*(b*c - a*d)
+    e13 = 2*(b*d + a*c)
 
-    e21 = 2*(np.multiply(b,c) + np.multiply(a,d))
+    e21 = 2*(b*c + a*d)
     e22 = np.square(a) + np.square(c) - np.square(b) - np.square(d)
-    e23 = 2*(np.multiply(c,d) - np.multiply(a,b))
+    e23 = 2*(c*d - a*b)
 
-    e31 = 2*(np.multiply(b,d) - np.multiply(a,c))
-    e32 =  2*(np.multiply(c,d) + np.multiply(a,b))
+    e31 = 2*(b*d - a*c)
+    e32 =  2*(c*d + a*b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
     return np.array([[e11, e12, e13],
