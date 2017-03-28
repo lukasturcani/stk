@@ -383,12 +383,12 @@ class Edge(Vertex):
         # position of the edge, then the direction of the linker is
         # aligned with the direction of the edge.
         linker.set_bonder_centroid(self.coord)
-        linker.set_orientation2(np.multiply(self.direction, alignment))
+        linker.set_orientation2(self.direction * alignment)
 
         # Ensure the centroid of the linker is placed on the outside of
         # the cage.
         linker.minimize_theta(self.coord, self.direction)
-
+        
         return linker.mol
 
 
