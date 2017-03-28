@@ -227,7 +227,7 @@ class Vertex:
         theta = vector_theta(normal, self.connected[0].coord)
 
         if theta > np.pi/2:
-            normal = np.multiply(normal, -1)
+            normal *= -1
 
         return normal
 
@@ -261,8 +261,7 @@ class Vertex:
         """
 
         edge_coord = self.edges[0].coord
-        d = np.multiply(np.sum(np.multiply(self.edge_plane_normal(),
-                                           edge_coord)), -1)
+        d = -np.sum(self.edge_plane_normal() * edge_coord)
         return np.append(self.edge_plane_normal(), d)
 
     def edge_direction_vectors(self):
@@ -388,7 +387,7 @@ class Edge(Vertex):
         # Ensure the centroid of the linker is placed on the outside of
         # the cage.
         linker.minimize_theta(self.coord, self.direction)
-        
+
         return linker.mol
 
 
