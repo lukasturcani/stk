@@ -1370,7 +1370,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             minc = min(vec2)
             vec2[vec2.index(min(vec2))] = 0 if abs(minc) >= 1e-5 else 1
             # Get a vector orthogonal to bvec and vec2.
-            a= normalize_vector(np.cross(bvec, vec2))
+            a = normalize_vector(np.cross(bvec, vec2))
             return a
 
         else:
