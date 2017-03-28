@@ -340,7 +340,6 @@ class Edge(Vertex):
         v1.connected.append(self)
         v2.connected.append(self)
 
-
     def place_mol(self, linker, alignment):
         """
         Places a linker molecule on the coordinates of an edge.
