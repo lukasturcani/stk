@@ -1358,8 +1358,25 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        return normalize_vector(self.centroid() -
-                                self.bonder_centroid())
+        # If the bonder centroid and centroid are in the same position,
+        # the centroid - centroid vector should be orthogonal to the
+        # bonder direction vector.
+        if np.allclose(self.centroid(),
+                       self.bonder_centroid(), atol=1e-5):
+            *_, bvec = next(self.bonder_direction_vectors())
+            # Construct a secondary vector by finding the minimum
+            # component of bvec and setting it to 0.
+            vec2 = list(bvec)
+            minc = min(vec2)
+            vec2[vec2.index(min(vec2))] = 0 if minc
+            # Get a vector orthogonal to bvec and vec2.
+            a= normalize_vector(np.cross(bvec, vec2))
+            print(bvec, vec2, np.cross(bvec, vec2))
+            return a
+
+        else:
+            return normalize_vector(self.centroid() -
+                                    self.bonder_centroid())
 
     def functional_group_atoms(self):
         """
