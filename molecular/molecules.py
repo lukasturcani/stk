@@ -427,7 +427,7 @@ class Molecule:
         for atom_id, coord in self.all_atom_coords():
             mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
-            center = np.add(center, np.multiply(mass, coord))
+            center = np.add(center, mass*coord)
 
         return np.divide(center, total_mass)
 
@@ -1960,8 +1960,7 @@ class StructUnit3(StructUnit):
         """
 
         bonder_coord = self.atom_coords(self.bonder_ids[0])
-        d = np.multiply(np.sum(np.multiply(self.bonder_plane_normal(),
-                                           bonder_coord)), -1)
+        d = -np.sum(self.bonder_plane_normal() * bonder_coord)
         return np.append(self.bonder_plane_normal(), d)
 
     def bonder_plane_normal(self):
@@ -1992,7 +1991,7 @@ class StructUnit3(StructUnit):
                              self.centroid_centroid_dir_vector())
 
         if theta > np.pi/2:
-            normal_v = np.multiply(normal_v, -1)
+            normal_v *= -1
 
         return normal_v
 
