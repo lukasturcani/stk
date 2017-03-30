@@ -308,7 +308,7 @@ def random_fitness(macro_mol):
 @_param_labels('var1', 'var2', 'var3', 'var4')
 def random_fitness_vector(macro_mol):
     """
-    Returns an array of random numbers.
+    Returns a size 4 array of random numbers.
 
     Parameters
     ----------
