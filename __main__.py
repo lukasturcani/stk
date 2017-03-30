@@ -163,7 +163,7 @@ def run():
         # Make sure that every population member has a name.
         for mem in pop:
             if not mem.name:
-                mem.name = id_
+                mem.name = str(id_)
                 id_ += 1
 
         # Dump the population before attempting any operations.
