@@ -278,7 +278,8 @@ class Population:
                     bb = StructUnit3(bb_file, bb_fg)
                     break
 
-                except TypeError:
+                except Exception:
+                    print('Issue with: {}.'.format(bb_file))
                     continue
 
             # Make a linker.
@@ -295,7 +296,8 @@ class Population:
 
                     break
 
-                except TypeError:
+                except Exception:
+                    print('Issue with: {}.'.format(lk_file))
                     continue
 
             pop.members.append(Cage({bb, lk}, topology))
