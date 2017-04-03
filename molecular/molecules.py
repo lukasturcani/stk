@@ -138,6 +138,8 @@ from rdkit import DataStructs
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
+from scipy.optimize import minimize
+from sklearn.metrics.pairwise import euclidean_distances
 import json
 from collections import namedtuple, Counter
 from inspect import signature
@@ -385,22 +387,62 @@ class Molecule:
         atomic_num = atom.GetAtomicNum()
         return periodic_table[atomic_num]
 
-    def cavity_size(self):
+    def _cavity_size(self, origin):
         """
-        Returns the diameter of the cage cavity.
+        Calculates diameter of the molecule's from `origin`.
+
+        The cavity is measured by finding the atom nearest to
+        `origin`, correcting for van der Waals diameter and multiplying
+        by -2.
+
+        This function should not be used. Use cavity_size() instead.
+        cavity_size() finds the optimal value of `origin` to use.
+
+        Parameters
+        ----------
+        origin : numpy.array
+            Holds the x, y and z coordinate of the position from which
+            the cavity is measured.
 
         Returns
         -------
         float
-            The size of the cage cavity.
+            The (negative) diameter of the molecules cavity.
 
         """
 
-        center_of_mass = self.center_of_mass()
-        min_dist = min((euclidean(coord, center_of_mass) -
-                atom_vdw_radii[self.atom_symbol(atom_id)])
-                       for atom_id, coord in self.all_atom_coords())
-        return 2 * abs(min_dist)
+        atom_vdw = np.array([atom_vdw_radii[x.GetSymbol()] for x
+                            in self.mol.GetAtoms()])
+
+        distances = euclidean_distances(self.position_matrix().T,
+                                       np.matrix(origin))
+        distances = distances.flatten() - atom_vdw
+        return -2*min(distances)
+
+    def cavity_size(self):
+        """
+        Calculates the diameter of the molecule's cavity.
+
+        Returns
+        -------
+        The diameter of the molecule's cavity in Angstroms.
+
+        """
+
+        # This function uses _cavity_size() to calculate the cavity
+        # size. _cavity_size() finds the closest atom to `origin` to
+        # get its value of the cavity.
+
+        # What this function does is finds the value of `origin` which
+        # causes _cavity_size() to calculate the largest possible
+        # cavity.
+        ref = self.center_of_mass()
+        icavity = 0.5*self._cavity_size(ref)
+        bounds = [(coord+icavity, coord-icavity) for coord in ref]
+        cavity_origin = minimize(self._cavity_size,
+                                 x0=ref,
+                                 bounds=bounds).x
+        return -self._cavity_size(cavity_origin)
 
     def center_of_mass(self):
         """
