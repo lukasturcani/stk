@@ -221,10 +221,10 @@ def run():
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
-        # Remove any molecules where the fitness failed to calcluate.
+        # Remove any molecules where the progress_params failed to
+        # calcluate.
         progress.remove_members(lambda x :
-                                    x.progress_params is None or
-                                    None in x.progress_params)
+                  None in x.progress_params[pop.ga_tools.fitness.name])
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
         plot.fitness_epp(progress, 'epp.png')
