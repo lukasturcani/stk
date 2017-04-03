@@ -20,15 +20,15 @@ function and normalization functions.
 The case when only a fitness function is used is simple. All fitness
 functions take a MacroMoleule instance as an argument and return the
 value of its fitness. MMEA then automatically puts this returned value
-into the `unscaled_fitness` attribute. Next MMEA copies this value into
-the `fitness` attribute.
+into the `unscaled_fitness` attribute. Next, MMEA copies this value
+into the `fitness` attribute at the start of each generation.
 
 So what happens if normalization functions are used?
 
 The first thing to note is that multiple normalization functions can
 be applied sequentially. Each normalization function replaces the
 previous value in the `fitness` attribute. Normalization functions do
-not manipulate or intarct with the `unscaled_fitness` attribute in any
+not manipulate or interact with the `unscaled_fitness` attribute in any
 way. Before the first normalization function is applied, MMEA
 automatically copies the value in `unscaled_fitness` into `fitness`.
 
@@ -61,17 +61,11 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input
 file.
 
-Also make sure that none of the arguments have a name equal to the name
-of any input file keyword. For example ``opt_func``, ```fitness_func``,
-``num_generations``, etc. cannot be used as parameter names in your
-functions. This requirment exists due to the way the input file is
-parsed my MMEA.
-
-A fitness function must return the value which holds the fitness of the
-molecule taken as an argument. If a fitness function is meant to be
-paired with a normalization funtion it can return any value or object
-it likes. Just as long as the normalization functions know how to deal
-with it and convert it to a number.
+A fitness function must return the value which represents the fitness
+of the molecule received as an argument. If a fitness function is meant
+to be paired with a normalization funtion it can return any value or
+object it likes. Just as long as the normalization functions know how
+to deal with it and convert it to a number.
 
 A fitness function may be complex and may not fit neatly into a single
 function. For example, the ``cage_target()`` fitness function needs to
@@ -261,28 +255,22 @@ class _FitnessFunc:
 
     def __call__(self, macro_mol, *args,  **kwargs):
         func_name = self.__wrapped__.func.__name__
-        try:
-            # If the fitness function has already been applied to this
-            # molecule, return.
-            if func_name in macro_mol.unscaled_fitness:
-                print('Skipping {}'.format(macro_mol.name))
-                return macro_mol
 
-            # If the molecule failed, make sure that the
-            # `unscaled_fitness` value is ``None``, and return.
-            elif macro_mol.failed:
-                print('Skipping {}'.format(macro_mol.name))
-                macro_mol.unscaled_fitness[func_name] = None
-                return macro_mol
-
-            val = self.__wrapped__(macro_mol, *args, **kwargs)
-            macro_mol.unscaled_fitness[func_name] = val
+        # If the fitness function has already been applied to this
+        # molecule, return.
+        if func_name in macro_mol.unscaled_fitness:
+            print('Skipping {}'.format(macro_mol.name))
             return macro_mol
 
+        try:
+            val = self.__wrapped__(macro_mol, *args, **kwargs)
+
         except Exception as ex:
-            macro_mol.failed = True
-            macro_mol.unscaled_fitness[func_name] = None
-            MolError(ex, macro_mol, "During fitness calculation")
+            val = None
+            MolError(ex, macro_mol, "During fitness calculation.")
+
+        finally:
+            macro_mol.unscaled_fitness[func_name] = val
             return macro_mol
 
 
@@ -409,10 +397,6 @@ def cage(macro_mol, pseudoformation_params=
 
     Modifies
     --------
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
-
     macro_mol.progress_params : list
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
@@ -424,8 +408,10 @@ def cage(macro_mol, pseudoformation_params=
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
 
@@ -445,8 +431,8 @@ def cage(macro_mol, pseudoformation_params=
     macro_mol.progress_params = [cavity, window, asymmetry, e_per_bond]
 
     if None in macro_mol.progress_params:
-        macro_mol.failed = True
-        return None
+        raise ValueError(('At least one'
+                         ' fitness parameter not calculated.'))
 
     return np.array([cavity, window, asymmetry, e_per_bond])
 
@@ -495,18 +481,16 @@ def cage_target(macro_mol,
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
 
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
-
     Returns
     -------
     numpy.array
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
 
@@ -564,18 +548,16 @@ def cage_c60(macro_mol, target_mol_file,
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
 
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
-
     Returns
     -------
     numpy.array
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
     return _cage_target(macro_mol,
@@ -625,18 +607,16 @@ def _cage_target(macro_mol, target_mol_file,
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
 
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
-
     Returns
     -------
     numpy.array
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
 
@@ -741,10 +721,9 @@ def _cage_target(macro_mol, target_mol_file,
 
     macro_mol.progress_params = [binding_energy, asymmetry]
 
-
     if None in macro_mol.progress_params:
-        macro_mol.failed = True
-        return None
+        raise ValueError(('At least one'
+                         ' fitness parameter not calculated.'))
 
     return np.array([binding_energy, asymmetry])
 
