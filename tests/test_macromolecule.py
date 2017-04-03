@@ -69,7 +69,6 @@ def test_json_init():
         assert mol.bonder_ids == [6, 15, 24, 59, 68, 77, 112, 121, 130,
                               165, 174, 183, 219, 222, 252, 255, 285,
                               288, 318, 321, 351, 354, 384, 387]
-        assert mol.failed == False
         assert mol.energy.__class__.__name__ == 'Energy'
         assert mol.topology.__class__.__name__ == 'FourPlusSix'
         assert len(mol.mol.GetAtoms()) == 410
