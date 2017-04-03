@@ -858,11 +858,19 @@ class Population:
             for subpop in self.populations:
                 subpop.remove_duplicates(False, key)
 
-    def remove_failures(self):
+    def remove_members(self, key):
         """
-        Removes all members where `failed` is ``True``.
+        Removes all members where key(member) is ``True``.
 
         The structure of the population is preserved.
+
+        Parameters
+        ----------
+        key : callable
+            A callable which takes 1 argument. Each member of the
+            population is passed as the argument to `key` in turn. If
+            the result is ``True`` then the member is removed from the
+            population.
 
         Modifies
         --------
@@ -876,9 +884,9 @@ class Population:
 
         """
 
-        self.members = [ind for ind in self.members if not ind.failed]
+        self.members = [ind for ind in self.members if not key(ind)]
         for subpop in self.populations:
-            subpop.remove_failures()
+            subpop.remove_members(key)
 
     def select(self, type_='generational'):
         """
