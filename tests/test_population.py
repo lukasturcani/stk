@@ -377,15 +377,14 @@ def test_remove_duplicates_not_between_subpops():
     assert not subpop1.populations[0].populations[0].populations
 
 
-def remove_failures():
+def remove_members():
     pop = generate_population()
     og_length = len(pop)
 
     for x in range(5):
-        pop[x].failed = True
+        pop[x].remove_me = True
 
-    pop.remove_failures()
-
+    pop.remove_members(lambda x : hasattr('remove_me'))
     assert len(pop) == og_length - 5
 
 
