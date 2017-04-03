@@ -102,8 +102,9 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
 
     for sp in pop.populations:
 
-        unscaled_var_mat = np.matrix([x.progress_params for x in sp])
-
+        unscaled_var_mat = np.matrix(
+                    [x.progress_params[func_name] for x in sp])
+                    
         max_params.append(np.max(unscaled_var_mat,
                                     axis=0).tolist()[0])
         min_params.append(np.min(unscaled_var_mat,
