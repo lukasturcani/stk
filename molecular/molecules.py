@@ -277,10 +277,6 @@ class Molecule:
         Indicates whether a Molecule has been passed through an
         optimization function or not.
 
-    failed : bool
-        True if the fitness function or optimization function failed
-        when trying to evaluate the molecule.
-
     name : str (default = "")
         A name which can be optionally given to the molecule for easy
         identification.
@@ -292,7 +288,6 @@ class Molecule:
     """
 
     def __init__(self, name="", note=""):
-        self.failed = False
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
@@ -1162,9 +1157,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         A flag to monitor whether an optimization has been performed on
         the molecule.
 
-    failed : bool
-        True if an optimization function failed to run on the molecule.
-
     key : MacroMolKey
         The key used for caching the molecule.
 
@@ -1467,7 +1459,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                                 x.name == json_dict['func_grp']), None)
         obj.energy = Energy(obj)
         obj.optimized = json_dict['optimized']
-        obj.failed = False
         obj.key = key
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
@@ -2150,10 +2141,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         key and the value it calculated for unscaled_fitness as the
         value.
 
-    failed : bool (default = False)
-        ``True`` if the fitness or optimization function failed to
-        evaluate the molecule.
-
     progress_params : list (default = None)
         Holds the fitness parameters which the GA should track to make
         progress plots. If the default ``None`` is used, the fitness
@@ -2223,7 +2210,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         except Exception as ex:
             self.mol = rdkit.Mol()
-            self.failed = True
             MolError(ex, self, 'During initialization.')
 
         super().__init__(name, note)
@@ -2315,7 +2301,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.optimized = json_dict['optimized']
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
-        obj.failed = False
         obj.key = key
         obj.building_blocks = bbs
         cls.cache[key] = obj
