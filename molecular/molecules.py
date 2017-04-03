@@ -2141,10 +2141,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
         key and the value it calculated for unscaled_fitness as the
         value.
 
-    progress_params : list (default = None)
+    progress_params : dict (default = {})
         Holds the fitness parameters which the GA should track to make
-        progress plots. If the default ``None`` is used, the fitness
-        value will be used.
+        progress plots. The key is the name of a fitness function.
 
     bonds_made : int
         The number of bonds created during assembly.
@@ -2197,7 +2196,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         self.fitness = None
         self.unscaled_fitness = {}
-        self.progress_params = None
+        self.progress_params = {}
         self.building_blocks = building_blocks
         self.bb_counter = Counter()
         self.topology = topology
@@ -2251,6 +2250,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         'building_blocks' : [x.json() for x in self.building_blocks],
         'topology' : repr(self.topology),
         'unscaled_fitness' : repr(self.unscaled_fitness),
+        'progress_params' : self.progress_params,
         'note' : self.note,
         'name' : self.name
 
@@ -2292,7 +2292,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
                                      np.__dict__)
         obj.fitness = None
-        obj.progress_params = None
+        obj.progress_params = json_dict['progress_params']
         obj.bb_counter = Counter({Molecule.fromdict(key) : val for
                                 key, val in json_dict['bb_counter']})
         obj.bonds_made = json_dict['bonds_made']
