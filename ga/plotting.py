@@ -99,18 +99,20 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
     max_params = []
     mean_params = []
     xvals = list(range(1, len(pop.populations)+1 ))
+    nparams = len(pop[0].progress_params[func_name])
 
     for sp in pop.populations:
 
-        unscaled_var_mat = np.matrix(
-                    [x.progress_params[func_name] for x in sp])
-                    
-        max_params.append(np.max(unscaled_var_mat,
-                                    axis=0).tolist()[0])
-        min_params.append(np.min(unscaled_var_mat,
-                                    axis=0).tolist()[0])
-        mean_params.append(np.mean(unscaled_var_mat,
-                                    axis=0).tolist()[0])
+        p_mat = np.array([x.progress_params[func_name] for x in sp])
+
+        # Each element of this list holds an array of all the valid
+        # values of a particular progress_param.
+        p_arrays = [p_mat[:,x] for x in range(nparams)]
+        p_arrays = [[x for x in a if x is not None] for a in p_arrays]
+
+        min_params.append([min(x) for x in p_arrays])
+        mean_params.append([np.mean(x) for x in p_arrays])
+        max_params.append([max(x) for x in p_arrays])
 
     for x in range(len(min_params[0])):
         fig = plt.figure()
