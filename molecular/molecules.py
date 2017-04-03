@@ -464,7 +464,7 @@ class Molecule:
         for atom_id, coord in self.all_atom_coords():
             mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
-            center = np.add(center, mass*coord)
+            center +=  mass*coord)
         return np.divide(center, total_mass)
 
     def centroid(self):
