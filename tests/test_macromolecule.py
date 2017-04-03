@@ -74,6 +74,6 @@ def test_json_init():
         assert len(mol.mol.GetAtoms()) == 410
         assert mol.bonds_made == 12
         assert set(mol.bb_counter.values()) == {4, 6}
-        assert mol.progress_params == None
+        assert mol.progress_params == {}
     finally:
         MacroMolecule.cache = og_c
