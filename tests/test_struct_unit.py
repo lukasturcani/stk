@@ -89,7 +89,6 @@ def test_json_init():
     assert bb1.optimized == True
     assert bb1.bonder_ids == [7, 10]
     assert bb1.energy.__class__.__name__ == 'Energy'
-    assert bb1.failed == False
     assert bb1.func_grp.name == 'amine'
 
     assert 2 == sum(1 for x in bb1.mol.GetAtoms() if
