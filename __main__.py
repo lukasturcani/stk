@@ -224,6 +224,7 @@ def run():
         # Remove any molecules where the progress_params failed to
         # calcluate.
         progress.remove_members(lambda x :
+                  not x.progress_params[pop.ga_tools.fitness.name] or
                   None in x.progress_params[pop.ga_tools.fitness.name])
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
