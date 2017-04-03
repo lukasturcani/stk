@@ -93,31 +93,23 @@ class Normalization:
         # First make sure that all the fitness values are reset and
         # hold the value of the approraite fitness function.
         for macro_mol in population:
-            if macro_mol.failed:
+            # If the unscaled fitness value is None it means that the
+            # fitness calculation failed - assign the minimum fitness
+            # value.
+            if macro_mol.unscaled_fitness[fitness_func] is None:
                 macro_mol.fitness = 1e-4
             else:
                 macro_mol.fitness = copy.deepcopy(
                             macro_mol.unscaled_fitness[fitness_func])
 
         # Make a population of members where all fitness values are
-        # valid. No point in normalizing molecules whose `fitness_fail`
-        # attribute is ``True``. The advantage of this is that when
-        # writing normalization functions you can assume all molecuels
-        # have the same type in their `fitness` attribute.
+        # valid. No point in normalizing molecules whose fitness value
+        # was ``None``. The advantage of this is that when writing
+        # normalization functions you can assume all fitness values
+        # have the same type.
 
-        # Otherwise, if a fitness function calculated numpy arrays
-        # but the calculation on some molecules failed, the result
-        # would be that some molecules would have an array in their
-        # `fitness` attribute while others would have a float
-        # (1e-4 as a result of running the fail() method). The code of
-        # the normalization function would then have to accomadate
-        # this. By making sure only molecules with valid fitness values
-        # are present in the population provided to the normalization
-        # function, coding does not have to accomodate annoying
-        # outliers.
-
-        valid_pop = Population(*(mol for mol in population if not
-                                 mol.failed))
+        valid_pop = Population(*(mol for mol in population if
+                      mol.unscaled_fitness[fitness_func] is not None))
 
         # If there were no valid molecules, no need to normalize.
         if len(valid_pop) == 0:
