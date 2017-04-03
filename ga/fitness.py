@@ -397,8 +397,8 @@ def cage(macro_mol, pseudoformation_params=
 
     Modifies
     --------
-    macro_mol.progress_params : list
-        Places the calculated parameters in the list. The order
+    macro_mol.progress_params : dict
+        Places the calculated parameters in the dict. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
 
@@ -428,7 +428,8 @@ def cage(macro_mol, pseudoformation_params=
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
 
-    macro_mol.progress_params = [cavity, window, asymmetry, e_per_bond]
+    macro_mol.progress_params['cage'] = [cavity, window,
+                                         asymmetry, e_per_bond]
 
     if None in macro_mol.progress_params:
         raise ValueError(('At least one'
@@ -476,7 +477,7 @@ def cage_target(macro_mol,
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
@@ -494,7 +495,7 @@ def cage_target(macro_mol,
 
     """
 
-    return _cage_target(macro_mol,
+    return _cage_target('cage_target', macro_mol,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1))
@@ -543,7 +544,7 @@ def cage_c60(macro_mol, target_mol_file,
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
@@ -560,14 +561,14 @@ def cage_c60(macro_mol, target_mol_file,
         If the calculation of a fitness parameter fails.
 
     """
-    return _cage_target(macro_mol,
+    return _cage_target('cage_c60', macro_mol,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold))
 
 
-def _cage_target(macro_mol, target_mol_file,
+def _cage_target(func_name, macro_mol, target_mol_file,
                  efunc, ofunc, rotation_func):
     """
     A general fitness function for calculating fitness of complexes.
@@ -581,6 +582,10 @@ def _cage_target(macro_mol, target_mol_file,
 
     Parameters
     ----------
+    func_name : str
+        The name of the external fitness function calling this one.
+        Used for the key in the `progress_params` dict.
+
     macro_mol : Cage
         The cage which is to have its fitness calculated.
 
@@ -602,7 +607,7 @@ def _cage_target(macro_mol, target_mol_file,
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
@@ -719,7 +724,7 @@ def _cage_target(macro_mol, target_mol_file,
 
     asymmetry = macro_mol.window_difference()
 
-    macro_mol.progress_params = [binding_energy, asymmetry]
+    macro_mol.progress_params[func_name] = [binding_energy, asymmetry]
 
     if None in macro_mol.progress_params:
         raise ValueError(('At least one'
