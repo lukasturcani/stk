@@ -86,14 +86,15 @@ interesting plot the evolution of energies across generations too. If
 this is the case the fitness function may assign to the
 `progress_params` attribute of `macro_mol`:
 
-    macro_mol.progress_params = [mol_energy]
+    macro_mol.progress_params['example_func'] = [mol_energy]
 
 Now a plot showing the change in `mol_energy` across generations will
-be made too, along with the plot showing the changes in fitness.
+be made too, along with the plot showing the changes in fitness. In
+this case the name of the fitness function was ``example_func``.
 
 What if two things are needed to be kept track of?
 
-    macro_mol.progress_params = [mol_energy, mol_radius]
+    macro_mol.progress_params['example_func'] = [mol_energy, mol_radius]
 
 Great, now a progress plot for each of the variables will be made.
 
@@ -107,7 +108,8 @@ Let's create a basic outline of a some fitness function:
         ...
         calculate_stuff()
         ...
-        macro_mol.progress_params = [mol_energy, mol_radius]
+        macro_mol.progress_params['this_is_the_fitness_function'] = [
+                                                mol_energy, mol_radius]
         ...
         return fitness_value
 
