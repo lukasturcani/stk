@@ -7,12 +7,14 @@ from .convenience_tools import (time_it, tar_output,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
 
+
 def print_info(info):
     """
     Prints `info` and underlines it.
 
     """
     print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')
+
 
 def run():
     """
@@ -221,14 +223,12 @@ def run():
     # Plot the results of the GA run.
     with time_it():
         print_info('Plotting EPP.')
-        # Remove any molecules where the progress_params failed to
-        # calcluate.
-        progress.remove_members(lambda x :
-                  not x.progress_params[pop.ga_tools.fitness.name] or
-                  None in x.progress_params[pop.ga_tools.fitness.name])
         # Make sure all fitness values are normalized.
         progress.normalize_fitness_values()
         plot.fitness_epp(progress, 'epp.png')
+
+        progress.remove_members(lambda x :
+              progress.ga_tools.fitness.name not in x.progress_params)
         plot.parameter_epp(progress, 'epp.png')
 
     # Remove the ``scratch`` directory.
@@ -246,6 +246,7 @@ def run():
     with time_it():
         archive_output()
 
+
 def helper():
     """
     Takes care of the -h option.
@@ -253,6 +254,7 @@ def helper():
     """
 
     InputHelp(sys.argv[-1])
+
 
 def compare():
     """
@@ -330,6 +332,7 @@ def compare():
 
     os.chdir(launch_dir)
     archive_output()
+
 
 if __name__ == '__main__':
     if '-h' in sys.argv:
