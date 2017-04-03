@@ -11,10 +11,8 @@ The convention is that if the optimization function takes an argument
 called ``macro_mol`` the user does not have to specify that argument in
 the input file.
 
-An optimization function should update both the file of the molecule
-and the `mol` attribute.
-
-The return values of optimization functions are discarded.
+An optimization function should update the rdkit molecule in the `mol`
+attribute. The return values of optimization functions are discarded.
 
 Optimizations can be complicated. If the use of helper functions is
 required make sure that they are private, ie that their names begin
@@ -130,22 +128,22 @@ class _OptimizationFunc:
         wraps(func)(self)
 
     def __call__(self, macro_mol, *args,  **kwargs):
-        try:
-            if macro_mol.optimized or macro_mol.failed:
-                print('Skipping {0}'.format(macro_mol.name))
-                return macro_mol
 
+        if macro_mol.optimized:
+            print('Skipping {0}'.format(macro_mol.name))
+            return macro_mol
+
+        try:
             print('\nOptimizing {0}.'.format(macro_mol.name))
             self.__wrapped__(macro_mol, *args, **kwargs)
-            macro_mol.optimized = True
-            return macro_mol
 
         except Exception as ex:
             # Prevents the error from being raised, but records it in
             # ``failures.txt``.
-            macro_mol.optimized = True
-            macro_mol.failed = True
             MolError(ex, macro_mol, "During optimization.")
+
+        finally:
+            macro_mol.optimized = True
             return macro_mol
 
 
