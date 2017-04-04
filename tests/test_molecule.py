@@ -86,7 +86,12 @@ def test_atom_symbol():
 
 
 def test_cavity_size():
-    assert np.isclose(mol.cavity_size(), 1.886811385152262, atol=1e-8)
+    mol = Molecule.__new__(Molecule)
+    molfile = join('data', 'molecule', 'cc3.mol')
+    mol.mol = rdkit.MolFromMolFile(molfile,
+                                   removeHs=False,
+                                   sanitize=False)
+    assert np.isclose(mol.cavity_size(), 6.3056946563975966, atol=1e-8)
 
 
 def test_center_of_mass():
