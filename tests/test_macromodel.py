@@ -58,4 +58,4 @@ def test_macromodel_eng():
     if outdir not in os.getcwd():
         os.chdir(outdir)
     assert np.allclose(
-        c2.energy.macromodel(16, mm_path), 23.4814, atol=1e-8)
+        c2.energy.macromodel(16, mm_path), 23.48, atol=1e-2)
