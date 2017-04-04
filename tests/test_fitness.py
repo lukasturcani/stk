@@ -8,7 +8,7 @@ target = join('data', 'fitness', 'target.pdb')
 
 def test_cage():
     assert np.allclose(cage(cagemol),
-        [5.71526484e+00, 3.91281587e+00,
+        [ 5.71657888e+00, 3.91281587e+00,
          7.80441714e-04, 1.16913326e+00],
         atol=1e-8)
 
