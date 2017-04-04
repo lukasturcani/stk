@@ -307,7 +307,7 @@ def random_fitness_vector(macro_mol):
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         The random numbers are also placed into this attribute.
 
     Returns
@@ -323,7 +323,7 @@ def random_fitness_vector(macro_mol):
     # vector all have different oraders of magnitude and that some
     # are negative.
     f = np.multiply(f, np.array([0.01, 1, 10, -100]))
-    macro_mol.progress_params = f.tolist()
+    macro_mol.progress_params['random_fitness_vector'] = f.tolist()
     return f
 
 
@@ -354,6 +354,38 @@ def raiser(macro_mol, param1, param2=2):
     """
 
     raise Exception('Raiser fitness function used.')
+
+
+@_param_labels('var1', 'var2', 'var3', 'var4')
+def partial_raiser(macro_mol):
+    """
+    Calculates fitness or raises at random.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The molecule having its fitness calculated, maybe.
+
+    Returns
+    -------
+    numpy.array
+        The value of applying random_fitness_vector() to `macro_mol`.
+
+    Raises
+    ------
+    Exception
+        Raised at random.
+
+    """
+
+    if not np.random.choice([0,1]):
+        raise Exception('Partial raiser.')
+
+    r = random_fitness_vector(macro_mol)
+    n1 = 'partial_raiser'
+    n2 = 'random_fitness_vector'
+    macro_mol.progress_params[n1] = macro_mol.progress_params[n2]
+    return r
 
 
 # Provides labels for the progress plotter.
