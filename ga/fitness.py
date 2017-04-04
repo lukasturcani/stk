@@ -465,7 +465,7 @@ def cage(macro_mol, pseudoformation_params=
     macro_mol.progress_params['cage'] = [cavity, window,
                                          asymmetry, e_per_bond]
 
-    if None in macro_mol.progress_params:
+    if None in macro_mol.progress_params['cage']:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
@@ -760,7 +760,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     macro_mol.progress_params[func_name] = [binding_energy, asymmetry]
 
-    if None in macro_mol.progress_params:
+    if None in macro_mol.progress_params[func_name]:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
