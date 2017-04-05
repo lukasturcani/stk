@@ -61,6 +61,9 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
                 bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.close('all')
 
+    # Save the plot data.
+    basename, ext = os.path.splitext(plot_name)
+    np.array([mins, means, maxs]).dump(basename + '.dmp')
 
 def parameter_epp(pop, plot_name, xlabel='Generation'):
     """
@@ -138,6 +141,10 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
                     bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.close('all')
 
+        # Save the plot data.
+        basename, ext = os.path.splitext(plot_name)
+        np.array([y_min, y_mean, y_max]).dump(
+                                           basename+'{}.dmp'.format(x))
 
 def plot_counter(counter, plot_name):
     """
