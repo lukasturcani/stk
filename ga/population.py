@@ -422,7 +422,9 @@ class Population:
 
         """
 
-        return _calc_fitness(self.ga_tools.fitness, self)
+        if self.ga_tools.parallel:
+            return _calc_fitness(self.ga_tools.fitness, self)
+        return _calc_fitness_serial(self.ga_tools.fitness, self)
 
     def dump(self, path):
         """
@@ -783,7 +785,9 @@ class Population:
 
         """
 
-        return _optimize_all(self.ga_tools.optimization, self)
+        if self.ga_tools.parallel:
+            return _optimize_all(self.ga_tools.optimization, self)
+        return _optimize_all_serial(self.ga_tools.optimization, self)
 
     def remove_duplicates(self, between_subpops=True,
                                 key=lambda x : id(x), top_seen=None):

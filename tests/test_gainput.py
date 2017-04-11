@@ -7,6 +7,9 @@ i = GAInput(join('data', 'gainput', 'test.py'))
 
 
 def test_init():
+
+    assert i.parallel == False
+
     assert i.init_func == {'NAME' : 'init_random_cages',
                            'bb_db' : 'path1',
                            'lk_db' : 'path2',

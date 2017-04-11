@@ -45,17 +45,21 @@ class GATools:
         exit criterion to stop the GA before all generations have been
         made.
 
+    parallel : bool
+        If ``True`` optimizations and fitness calculations are done on
+        each molecule in parallel.
+
     input : GAInput
         The GAInput object holding data gathered from the input file.
 
     """
 
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
-                 'optimization', 'fitness', 'exit', 'input']
+                'optimization', 'fitness', 'exit', 'parallel', 'input']
 
     def __init__(self, selection, crossover,
-                       mutation, normalization,
-                       optimization, fitness, exit_, ga_input):
+                    mutation, normalization, optimization,
+                         fitness, exit_, parallel, ga_input):
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
@@ -63,8 +67,10 @@ class GATools:
         self.optimization = optimization
         self.fitness = fitness
         self.input = ga_input
+        self.parallel = parallel
         self.exit = exit_
 
     @classmethod
     def init_empty(cls):
-        return cls(None, None, None, None, None, None, None, None)
+        return cls(None, None, None, None,
+                   None, None, None, None, None)
