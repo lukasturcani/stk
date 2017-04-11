@@ -194,18 +194,16 @@ def _calc_fitness_serial(func_data, population):
 
     Returns
     -------
-    None : NoneType
+    list
+        The members of `population` which have had their fitness
+        calculated.
 
     """
 
     # Get the fitness function object.
     func = globals()[func_data.name]
-
-
-    # Apply the function to every member of the population.
-    for macro_mol in population:
-        _FitnessFunc(func(macro_mol, **func_data.params))
-
+    return [_FitnessFunc(func(x, **func_data.params)) for
+                                                      x in population]
 
 def _param_labels(*labels):
     """

@@ -146,6 +146,10 @@ class GAInput:
         molecules have to be remade and optimized or have their
         fitness value recalculated.
 
+    parallel : bool (default = True)
+        If ``True`` mmea does optimization and fitness calculation of
+        each molecule in parallel.
+
     """
 
     def __init__(self, input_file):
@@ -184,6 +188,9 @@ class GAInput:
 
         if not hasattr(self, 'databases'):
             self.databases = []
+
+        if not hasattr(self, 'parallel'):
+            self.parallel = True
 
     def crosser(self):
         """
@@ -255,7 +262,7 @@ class GAInput:
         return GATools(self.selector(), self.crosser(),
                        self.mutator(), self.normalizer(),
                        self.opter(), self.fitnessor(),
-                       self.exiter(), self)
+                       self.exiter(), self.parallel, self)
 
     def initer(self):
         """
