@@ -545,6 +545,8 @@ For example, once a given fittness has been reached or a certian molecule has be
 <span class="value">num_mutations</span>  - <b>int</b> - The number of mutations MMEA will carry out each generation.<br><br>
 <span class="value">num_crossovers</span>  - <b>int</b> - The number of crossover operations MMEA will carry out each generation.<br><br>
 <span class="value">pop_size</span>  - <b>int</b> - The size of the population.<br><br>
+<span class="value">parallel</span>  - <b>bool</b> - An optional variable, it's default value is <span class="value">True</span>.
+It toggles whether optimization and fitness calculation of molecules is done in parallel.<br><br>
 <span class="value">databases</span>  - <b>list of strings</b> - This is an optional variable. Each string is the full path to a .json file
 holding an MMEA database of molecules. The molecules in each database
  are loaded into MMEA's memory when the GA is started. As a result, they do not have to be
