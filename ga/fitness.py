@@ -202,8 +202,9 @@ def _calc_fitness_serial(func_data, population):
 
     # Get the fitness function object.
     func = globals()[func_data.name]
-    return [_FitnessFunc(func(x, **func_data.params)) for
-                                                      x in population]
+    p_func = _FitnessFunc(partial(func, **func_data.params))
+    # Apply the function to every member of the population.
+    return [p_func(member) for member in population]
 
 def _param_labels(*labels):
     """
