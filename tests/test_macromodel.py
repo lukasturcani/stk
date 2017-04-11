@@ -21,8 +21,9 @@ macromodel = pytest.mark.skipif(
 # Possible installation directories of MacroModel. Your computer's
 # must be present in order for this test to run successfully.
 dirs = [r'C:\Program Files\Schrodinger2016-3',
-        '/home/lukas/program_files/schrodinger2016-4']
-mm_path = next(x for x in dirs if os.path.exists(x))
+        '/home/lukas/program_files/schrodinger2016-4',
+        '/opt/schrodinger2016-4']
+mm_path = next((x for x in dirs if os.path.exists(x)), None)
 
 c1 = Molecule.load(join('data', 'macromodel', 'cage.json'))
 c2 = Molecule.load(join('data', 'macromodel', 'small_mol.json'))
