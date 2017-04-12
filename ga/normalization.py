@@ -111,6 +111,10 @@ class Normalization:
         valid_pop = Population(*(mol for mol in population if
                       mol.unscaled_fitness[fitness_func] is not None))
 
+        # Remove duplicates, otherwise the normalization function may
+        # be applied to the same molecule twice in a single step.
+        valid_pop.remove_duplicates()
+
         # If there were no valid molecules, no need to normalize.
         if len(valid_pop) == 0:
             return

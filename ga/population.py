@@ -413,18 +413,30 @@ class Population:
         """
         Applies the fitness function on all members.
 
+        The calculation will be performed serially or in parallel
+        depending on the flag `ga_tools.parallel`. The serial version
+        may be faster in cases where all molecules have already had
+        their fitness calcluated. This is because all calcluations will
+        be skipped. In this case creating a parallel process pool
+        creates unncessary overhead.
+
+        Modifies
+        --------
+        MarcroMolecule
+            The MacroMolecule instances held by the population have
+            fitness values calculated and placed in the
+            `unscaled_fitness` attribute.
+
         Returns
         -------
-        list
-            The a copy of the members in `self` with the fitness
-            calculated.
-
+        None : NoneType
 
         """
 
         if self.ga_tools.parallel:
-            return _calc_fitness(self.ga_tools.fitness, self)
-        return _calc_fitness_serial(self.ga_tools.fitness, self)
+            _calc_fitness(self.ga_tools.fitness, self)
+        else:
+            _calc_fitness_serial(self.ga_tools.fitness, self)
 
     def dump(self, path):
         """
@@ -751,43 +763,29 @@ class Population:
         """
         Optimizes all the members of the population.
 
-        This function should invoke either the ``optimize_all()`` or
-        ``optimize_all_serial()`` functions. ``optimize_all()``
-        optimizes all members of the population in parallel.
-        ``optimize_all_serial()`` does them serially. Probably best not
-        to use the serial version unless debugging.
-
-        The parallel optimization creates cloned instances of the
-        population's members. It is these that are optimized. This
-        means that the ``.mol`` files are changed but any instance
-        attributes are not. See ``optimize_all()`` function
-        documentation in ``optimization.py`` for more details.
+        The population is optimized serially or in parallel depending
+        on the flag `ga_tools.parallel`. The serial version may be
+        faster in cases where all molecules have already been
+        optimized. This is because all optimizations will be skipped.
+        In this case creating a parallel process pool creates
+        unncessary overhead.
 
         Modifies
         --------
-        MacroMolecule
-            This function replaces the pristine rdkit molecule
-            instances with optimizes versions. It also replaces the
-            content of the pristine ``.mol`` files with pristine
-            structures.
+        Molecule
+            The Molecule instances held by the population have their
+            structures optimized.
 
         Returns
         -------
-        iterator of MacroMolecule objects
-            If a parallel optimization was chosen, this iterator yields
-            the ``MacroMolecule`` objects that have had their
-            attributes changed as a result of the optimization. They
-            are modified clones of the original population's
-            macromolecules.
-
-            If a serial optimization is done the iterator does not yield
-            clones.
+        None : NoneType
 
         """
 
         if self.ga_tools.parallel:
-            return _optimize_all(self.ga_tools.optimization, self)
-        return _optimize_all_serial(self.ga_tools.optimization, self)
+            _optimize_all(self.ga_tools.optimization, self)
+        else:
+            _optimize_all_serial(self.ga_tools.optimization, self)
 
     def remove_duplicates(self, between_subpops=True,
                                 key=lambda x : id(x), top_seen=None):
