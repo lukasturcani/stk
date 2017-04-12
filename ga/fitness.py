@@ -155,9 +155,7 @@ def _calc_fitness(func_data, population):
 
     Returns
     -------
-    list
-        The members of `population` which have had their fitness
-        calculated.
+    None : NoneType
 
     """
 
@@ -171,11 +169,9 @@ def _calc_fitness(func_data, population):
     with mp.get_context('spawn').Pool() as pool:
         evaluated = pool.map(p_func, population)
 
-        # Make sure the cache is updated with the evaluated versions.
-        for member in evaluated:
-            member.update_cache()
-
-    return evaluated
+    # Make sure the cache is updated with the evaluated versions.
+    for member in evaluated:
+        member.update_cache()
 
 
 def _calc_fitness_serial(func_data, population):
@@ -194,9 +190,7 @@ def _calc_fitness_serial(func_data, population):
 
     Returns
     -------
-    list
-        The members of `population` which have had their fitness
-        calculated.
+    None : NoneType
 
     """
 
@@ -204,7 +198,8 @@ def _calc_fitness_serial(func_data, population):
     func = globals()[func_data.name]
     p_func = _FitnessFunc(partial(func, **func_data.params))
     # Apply the function to every member of the population.
-    return [p_func(member) for member in population]
+    for member in population:
+        p_func(member)
 
 def _param_labels(*labels):
     """
