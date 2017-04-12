@@ -181,29 +181,6 @@ class Cached(type):
             self.cache[key] = obj
             return obj
 
-    def _update_cache(self, mol):
-        """
-        Updates the cache of stored molecule.
-
-        Parallel processes, such as optimization, return a copy of the
-        optimized molecule. The original molecule, stored in `_cache`,
-        does not have its attributes updated. In order to replace the
-        molecule with the optimized copy within the cache this function
-        should be used.
-
-        Parameters
-        ----------
-        mol : Moleulce
-            A molecule which should replace the one held in `_cache`.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        self.cache[mol.key] = mol
-
 
 class CachedStructUnit(type):
     """
@@ -2373,14 +2350,14 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def update_cache(self):
         """
-        Updates caching dictionary so that it contains `self`.
+        Set cached molecule with same 'key' to have equal attributes.
 
         When an instance of ``MacroMolecule`` is first created it
-        is cached. Using multiprocessing to perform optimizations
-        returns modified copies of the cached molecules. In order
-        to ensure that the cache holds to the modified copies,
-        not to the originally initialized molecule, this method
-        must be run.
+        is cached. Using multiprocessing to perform optimizations or
+        calculate fitness returns modified copies of the cached
+        molecules. In order to ensure that the cached molecules have
+        their attributes updated to the values of the copies, this
+        method must be run on the copies.
 
         Returns
         -------
@@ -2388,9 +2365,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        # The caching is done by the class. Access it and use its
-        # ``_update_cache()`` method.
-        self.__class__._update_cache(self)
+        self.__class__.cache[self.key].__dict__ = dict(self.__dict__)
 
     def __eq__(self, other):
         return self.fitness == other.fitness
