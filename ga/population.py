@@ -540,21 +540,19 @@ class Population:
 
         return self.ga_tools.mutation(self, counter_name)
 
-    def gen_next_gen(self, pop_size, counter_name='gen_select.png'):
+    def gen_next_gen(self, pop_size, counter_path=None):
         """
         Returns a population hodling the next generation of structures.
-
-        This function also creates a .png plot of the selection
-        distribution.
 
         Parameters
         ----------
         pop_size : int
             The size of the next generation.
 
-        counter_name : str (default='gen_select.png')
+        counter_path : str (default=None)
             The name of the .png file showing which members were
-            selected for the next generation.
+            selected for the next generation. If ``None`` then no file
+            is made.
 
         Returns
         -------
@@ -570,11 +568,13 @@ class Population:
             new_gen.add_members([member])
             if len(new_gen) == pop_size:
                 break
-        for member in self:
-            if member not in counter.keys():
-                counter.update({member : 0})
 
-        plot_counter(counter, counter_name)
+        if counter_path:
+            for member in self:
+                if member not in counter.keys():
+                    counter.update({member : 0})
+            plot_counter(counter, counter_path)
+
         return new_gen
 
     def gen_offspring(self, counter_name='crossover_counter.png'):
