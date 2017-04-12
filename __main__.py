@@ -116,11 +116,11 @@ def run():
 
     with time_it():
         print_info('Optimizing the population.')
-        pop = Population(pop.ga_tools, *pop.optimize_population())
+        pop.optimize_population()
 
     with time_it():
         print_info('Calculating the fitness of population members.')
-        pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
+        pop.calculate_member_fitness()
 
     with time_it():
         print_info('Normalizing fitness values.')
@@ -174,13 +174,12 @@ def run():
 
         with time_it():
             print_info('Optimizing the population.')
-            pop = Population(pop.ga_tools, *pop.optimize_population())
+            pop.optimize_population()
 
         with time_it():
             print_info(('Calculating the fitness'
                         ' of population members.'))
-            pop = Population(pop.ga_tools,
-                             *pop.calculate_member_fitness())
+            pop.calculate_member_fitness()
 
         with time_it():
             print_info('Normalizing fitness values.')
