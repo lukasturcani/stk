@@ -52,8 +52,7 @@ def _optimize_all(func_data, population):
 
     Returns
     -------
-    iterator of Molecule objects
-        This iterator yields the optimized molecule objects.
+    None : NoneType
 
     """
 
@@ -69,10 +68,9 @@ def _optimize_all(func_data, population):
     # parallel.
     with mp.get_context('spawn').Pool() as pool:
         optimized = pool.map(p_func, population)
-        # Make sure the cache is updated with the optimized versions.
-        for member in optimized:
-            member.update_cache()
-        return optimized
+    # Make sure the cache is updated with the optimized versions.
+    for member in optimized:
+        member.update_cache()
 
 
 def _optimize_all_serial(func_data, population):
@@ -92,8 +90,7 @@ def _optimize_all_serial(func_data, population):
 
     Returns
     -------
-    iterator of Molecule objects
-        This iterator yields the optimized molecule objects.
+    None : NoneType
 
 
     """
@@ -107,7 +104,8 @@ def _optimize_all_serial(func_data, population):
     p_func = _OptimizationFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population.
-    return (p_func(member) for member in population)
+    for member in population:
+        p_func(member)
 
 
 class _OptimizationFunc:
