@@ -95,8 +95,7 @@ class Mutation:
         self.num_mutations = num_mutations
         self.n_calls = 0
 
-    def __call__(self, population,
-                 counter_name='mutation_counter.png'):
+    def __call__(self, population, counter_path=None):
         """
         Carries out mutation operations on the supplied population.
 
@@ -115,9 +114,9 @@ class Mutation:
         population : Population
             The population who's members are to be mutated.
 
-        counter_name : str (default='mutation_counter.png')
-            The name of the .png file showing which members were
-            selected for mutation.
+        counter_path : str (default=None)
+            The path to the .png file showing which members were
+            selected for mutation. If ``None`` then no file is made.
 
         Returns
         -------
@@ -155,11 +154,13 @@ class Mutation:
 
         mutant_pop -= population
 
-        # Update counter with unselected members.
-        for member in population:
-            if member not in counter.keys():
-                counter.update({member : 0})
-        plot_counter(counter, counter_name)
+        if counter_path:
+            # Update counter with unselected members.
+            for member in population:
+                if member not in counter.keys():
+                    counter.update({member : 0})
+            plot_counter(counter, counter_path)
+
         return mutant_pop
 
     def cage_random_bb(self, macro_mol, database, fg=None):

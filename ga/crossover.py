@@ -88,7 +88,7 @@ class Crossover:
         self.n_calls = 0
 
     def __call__(self, population,
-                 counter_name='crossover_counter.png'):
+                 counter_path=None):
         """
         Carries out crossover operations on the supplied population.
 
@@ -107,9 +107,9 @@ class Crossover:
         population : Population
             The population instance who's members are to crossed.
 
-        counter_name : str (default='crossover_counter.png')
+        counter_path : str (default=None)
             The name of the .png file showing which members were
-            selected for crossover.
+            selected for crossover. If ``None`` then no file is made.
 
         Returns
         -------
@@ -154,11 +154,14 @@ class Crossover:
         # Make sure that only original molecules are left in the
         # offspring population.
         offspring_pop -= population
-        # Update counter with unselected members and plot counter.
-        for member in population:
-            if member not in counter.keys():
-                counter.update({member : 0})
-        plot_counter(counter, counter_name)
+
+        if counter_path:
+            # Update counter with unselected members and plot counter.
+            for member in population:
+                if member not in counter.keys():
+                    counter.update({member : 0})
+            plot_counter(counter, counter_path)
+
         return offspring_pop
 
     """
