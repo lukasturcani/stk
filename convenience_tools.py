@@ -396,19 +396,18 @@ def archive_output():
 
     """
 
-    if 'output' in os.listdir():
-        # Make the ``old_output`` folder if it does not exist already.
-        if 'old_output' not in os.listdir():
-            os.mkdir('old_output')
+    if 'output' not in os.listdir():
+        return
 
-        # Find out with what number the ``output`` folder should be
-        # labelled within ``old_output``.
-        num = len(os.listdir('old_output'))
-        new_dir = os.path.join('old_output', str(num))
-        s = 'Moving old output dir.'
-        print('\n'+s + '\n' + '-'*len(s) + '\n\n')
-        shutil.copytree('output', new_dir)
-        shutil.rmtree('output')
+    # Make the ``old_output`` folder if it does not exist already.
+    if 'old_output' not in os.listdir():
+        os.mkdir('old_output')
+
+    # Find out with what number the ``output`` folder should be
+    # labelled within ``old_output``.
+    num = len(os.listdir('old_output'))
+    new_dir = os.path.join('old_output', str(num))
+    os.rename('output', new_dir)
 
 
 def centroid(*coords):
