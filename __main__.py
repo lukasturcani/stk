@@ -1,4 +1,4 @@
-import warnings, os, shutil, sys
+import warnings, os, shutil, sys, logging
 warnings.filterwarnings("ignore")
 
 from .ga import (Population, GATools,
@@ -6,6 +6,17 @@ from .ga import (Population, GATools,
 from .convenience_tools import (time_it, tar_output,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
+
+
+class ProgressHandler(logging.Handler):
+    ...
+
+class DBHandler(logging.Handler):
+    ...
+
+
+logger = logging.getLogger(__name__)
+
 
 
 def print_info(info):
@@ -22,29 +33,24 @@ def run():
 
     """
 
-    # Save the current directory as the `launch_dir`.
+    *_, ifile = sys.argv
     launch_dir = os.getcwd()
-
     # Running MacroModel optimizations sometimes leaves applications
     # open.This closes them. If this is not done, directories may not
     # be possible to move.
     kill_macromodel()
-
     # If an output folder of MMEA exists, archive it. This just moves
     # any ``output`` folder in the cwd to the ``old_output`` folder.
     archive_output()
-
-    # Create a new output directory and move into it. Save its path as
-    # the root directory.
+    # Create a new ``output`` directory.
     os.mkdir('output')
-
     # Copy the input script into the output folder - this is useful for
     # keeping track of what input was used to generate the output.
-    shutil.copyfile(sys.argv[1], os.path.join('output',
-                                     os.path.split(sys.argv[1])[-1]))
-
+    shutil.copyfile(ifile, join('output', os.path.basename(ifile)))
     os.chdir('output')
     root_dir = os.getcwd()
+
+
     os.mkdir('counters')
     # Make template names for the counters which are created showing
     # which members get selected.
@@ -58,7 +64,7 @@ def run():
     # Get the name of the input file and load its contents into a
     # ``GAInput`` instance. Info about input file structure is
     # documented in ``GAInput`` docstring.
-    ga_input = GAInput(os.path.basename(sys.argv[1]))
+    ga_input = GAInput(os.path.basename(ifile))
     # Load all molecules stored in databases into memory.
     for db in ga_input.databases:
         Population.load(db, load_names=False)
@@ -86,7 +92,7 @@ def run():
     # Generate the initial population.
     with time_it():
         pop_init = getattr(Population, ga_input.initer().name)
-        print_info('Generating initial population.')
+        logger.info('Generating initial population.')
 
         # If the initialization function is ``load()`` a restart run is
         # assumed.
