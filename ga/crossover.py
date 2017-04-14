@@ -90,8 +90,7 @@ class Crossover:
         self.num_crossovers = num_crossovers
         self.n_calls = 0
 
-    def __call__(self, population,
-                 counter_path=None):
+    def __call__(self, population, counter_path=''):
         """
         Carries out crossover operations on the supplied population.
 
@@ -110,9 +109,9 @@ class Crossover:
         population : Population
             The population instance who's members are to crossed.
 
-        counter_path : str (default=None)
+        counter_path : str (default = '')
             The name of the .png file showing which members were
-            selected for crossover. If ``None`` then no file is made.
+            selected for crossover. If '' then no file is made.
 
         Returns
         -------

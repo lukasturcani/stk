@@ -137,7 +137,7 @@ from ..molecular import (Cage, StructUnit,
                          Energy, optimization, func_key)
 
 
-logger = loggin.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _calc_fitness(func_data, population):
