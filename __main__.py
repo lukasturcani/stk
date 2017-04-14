@@ -268,9 +268,7 @@ def run():
           pop.ga_tools.fitness.name not in x.progress_params)
     plot.parameter_epp(progress.progress, 'epp.png')
 
-    # Remove the ``scratch`` directory.
     shutil.rmtree('scratch')
-    # Write the .mol files of the final population.
     pop.write('final_pop', True)
     os.chdir(launch_dir)
     if logger.isEnabledFor(logging.DEBUG):
