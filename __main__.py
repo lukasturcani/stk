@@ -81,11 +81,13 @@ class GAProgress:
         """
 
         with open('progress.log', 'w') as logfile:
-            for mem in self.progress:
-                logfile.write('{} {} {}\n'.format(mem.name,
-                                                  str(mem.key),
-                                                  mem.fitness))
-            logfile.write('\n')
+            for sp in self.progress.populations:
+                for mem in sp:
+                    logfile.write('{} {} {}\n'.format(mem.name,
+                                                      str(mem.key),
+                                                      mem.fitness))
+                logfile.write('\n')
+
         if self.progress_dump:
             self.progress.dump('progress.json')
         if self.db_pop is not None:
