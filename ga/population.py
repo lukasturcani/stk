@@ -409,6 +409,43 @@ class Population:
         for pop in self.populations:
             yield from pop.all_members()
 
+    def assign_names_from(self, n, overwrite=False):
+        """
+        Give each member of the population a name starting from `n`.
+
+        `n` is a number which is incremented. Each population member
+        will have a unique name as a result.
+
+        Parameters
+        ----------
+        n : int
+            A number. Members of this population are given a unique
+            number as a name, starting from this number.
+
+        overwrite : bool (default = False)
+            If ``True`` existing names are replaced.
+
+
+        Modifies
+        --------
+        name : str
+            The `name` attribute of the population's members is
+            modified.
+
+        Returns
+        -------
+        int
+            The final value of `n`.
+
+        """
+
+        for mem in self:
+            if not mem.name or overwrite:
+                mem.name = str(n)
+                n += 1
+
+        return n
+
     def calculate_member_fitness(self):
         """
         Applies the fitness function on all members.

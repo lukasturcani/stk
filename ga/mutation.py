@@ -20,16 +20,16 @@ start with a leading underscore.
 
 """
 
-import os
+import os, sys, logging
 import numpy as np
 from collections import Counter
-import sys
 
 from .population import Population
 from .plotting import plot_counter
 from ..convenience_tools import MolError
 from ..molecular import StructUnit3, Cage
 
+logger = logging.getLogger(__name__)
 
 class MutationError(Exception):
     ...
@@ -142,8 +142,9 @@ class Mutation:
                 mutant = func(parent, **func_data.params)
                 mutant_pop.members.append(mutant)
                 num_mutations += 1
-                print('Mutation number {0}. Finish when {1}.'.format(
-                                num_mutations, self.num_mutations))
+                logger.info(
+                    'Mutation number {}. Finish when {}.'.format(
+                                    num_mutations, self.num_mutations))
 
                 if num_mutations == self.num_mutations:
                     break

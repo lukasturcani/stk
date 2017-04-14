@@ -21,7 +21,7 @@ start with a leading underscore.
 
 """
 
-import os
+import os, logging
 from collections import Counter
 import numpy as np
 
@@ -29,6 +29,9 @@ from .population import Population
 from .plotting import plot_counter
 from ..convenience_tools import MolError
 from ..molecular.molecules import Cage
+
+
+logger = logging.getLogger(__name__)
 
 
 class Crossover:
@@ -142,7 +145,8 @@ class Crossover:
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
                 num_crossovers += 1
-                print('Crossover number {0}. Finish when {1}.'.format(
+                logger.info(
+                    'Crossover number {}. Finish when {}.'.format(
                                 num_crossovers, self.num_crossovers))
                 if num_crossovers == self.num_crossovers:
                     break

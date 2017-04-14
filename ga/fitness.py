@@ -121,13 +121,11 @@ each of the `progress_params` and they will have their y-axes labelled
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
-import copy
+import copy, os, logging, warnings
 from functools import partial, wraps
 import networkx as nx
 import multiprocessing as mp
-import warnings
 from collections import Counter
-import os
 from os.path import join
 from uuid import uuid4
 
@@ -137,6 +135,9 @@ from ..convenience_tools import (matrix_centroid,
 
 from ..molecular import (Cage, StructUnit,
                          Energy, optimization, func_key)
+
+
+logger = loggin.getLogger(__name__)
 
 
 def _calc_fitness(func_data, population):
@@ -255,7 +256,7 @@ class _FitnessFunc:
         # If the fitness function has already been applied to this
         # molecule, return.
         if func_name in macro_mol.unscaled_fitness:
-            print('Skipping {}'.format(macro_mol.name))
+            logger.info('Skipping {}'.format(macro_mol.name))
             return macro_mol
 
         try:
@@ -451,7 +452,7 @@ def cage(macro_mol, pseudoformation_params=
     window = max(macro_mol.windows)
     asymmetry = macro_mol.window_difference()
 
-    print('\n\nCalculating complex energies.\n')
+    logger.debug('\n\nCalculating complex energies.\n')
     e_per_bond = macro_mol.energy.pseudoformation(
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
@@ -688,7 +689,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     # Optimize the strcuture of the cage/target complexes.
     macromol_complexes = []
-    print('\n\nOptimizing complex structures.\n')
+    logger.debug('\n\nOptimizing complex structures.\n')
     for i, complex_ in enumerate(rdkit_complexes):
         # In order to use the optimization functions, first the data
         # is loaded into a ``Cage`` instance and its .mol
@@ -713,7 +714,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     energy_separate = mm_energy + target_energy
 
-    print('\n\nCalculating complex energies.\n')
+    logger.debug('\n\nCalculating complex energies.\n')
     min_eng_cmplx = min(macromol_complexes,
                     key=lambda x :
             getattr(x.energy, efunc.name)(**efunc.params))
