@@ -1,4 +1,5 @@
 import warnings, os, shutil, sys, logging
+from rdkit import RDLogger
 from os.path import join, basename, abspath
 warnings.filterwarnings("ignore")
 
@@ -7,6 +8,8 @@ from .ga import (Population, GATools,
 from .convenience_tools import (time_it, tar_output,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
+
+RDLogger.logger().setLevel(RDLogger.CRITICAL)
 
 
 class GAProgress:
@@ -24,7 +27,7 @@ class GAProgress:
         A population where each subpopulation is a generation of the
         GA.
 
-    db : Population or None
+    db_pop : Population or None
         A population which holds every molecule made by the GA.
 
     """
