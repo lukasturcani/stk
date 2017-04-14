@@ -174,7 +174,7 @@ def plot_counter(counter, plot_name):
 
     for ind, value in sorted(counter.items(), reverse=True):
         y_vals.append(value)
-        labels.append(ind.fitness)
+        labels.append(ind.name + ' - ' + str(ind.fitness))
 
     plt.bar(x_vals, y_vals, color='blue')
     plt.xticks([x for x in x_vals], labels, rotation='vertical')
