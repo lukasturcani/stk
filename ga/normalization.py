@@ -47,10 +47,12 @@ start with a leading underscore.
 
 from functools import partial
 import numpy as np
-import sys
-import copy
+import sys, copy, logging
 
 from .population import Population
+
+
+logger = logging.getLogger(__name__)
 
 
 class Normalization:
@@ -249,6 +251,7 @@ class Normalization:
 
         # Get the mean of each element.
         means = population.mean(lambda x : x.fitness)
+        logger.debug('Means used in magnitudes: {}'.format(means))
 
         for macro_mol in population:
             macro_mol.fitness = macro_mol.fitness / means

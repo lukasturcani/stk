@@ -577,7 +577,7 @@ class Population:
 
         return self.ga_tools.mutation(self, counter_name)
 
-    def gen_next_gen(self, pop_size, counter_path=None):
+    def gen_next_gen(self, pop_size, counter_path=''):
         """
         Returns a population hodling the next generation of structures.
 
@@ -586,9 +586,9 @@ class Population:
         pop_size : int
             The size of the next generation.
 
-        counter_path : str (default=None)
+        counter_path : str (default= '')
             The name of the .png file showing which members were
-            selected for the next generation. If ``None`` then no file
+            selected for the next generation. If '' then no file
             is made.
 
         Returns
@@ -602,7 +602,7 @@ class Population:
         counter = Counter()
         for member in self.select('generational'):
             counter.update([member])
-            new_gen.add_members([member])
+            new_gen.members.append(member)
             if len(new_gen) == pop_size:
                 break
 
