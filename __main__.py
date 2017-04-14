@@ -9,15 +9,145 @@ from .convenience_tools import (time_it, tar_output,
 from .ga import plotting as plot
 
 
-class ProgressHandler(logging.Handler):
-    ...
+class GAProgress:
+    """
+    Deals with logging the GA's progress.
 
-class DBHandler(logging.Handler):
-    ...
+    Attributes
+    ----------
+    progress_dump : bool
+        If ``True`` a population dump file `progress.json` is made in
+        the output directory. Each subpopulation of this population
+        represents a generation of the GA.
 
+    progress : Population
+        A population where each subpopulation is a generation of the
+        GA.
+
+    db : Population or None
+        A population which holds every molecule made by the GA.
+
+    """
+
+    def __init__(self, progress_dump, db, ga_tools):
+        self.progress_dump = progress_dump
+        self.progress = Population(ga_tools)
+        self.db = Population() if db else None
+
+    def db(self, mols):
+        """
+        Adds `mols` to `db`.
+
+        Only molecules not already present are added.
+
+        Parameters
+        ----------
+        mols : Population
+            A group of molecules made by the GA.
+
+        Modifies
+        --------
+        db : Population
+            `mols` are added to this population.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if self.db is not None:
+            self.db.add_members(mols)
+
+    def dump(self):
+        """
+        Creates output files for the GA run.
+
+        Modifies
+        --------
+        progress.log
+            This file holds the progress of the GA in text form. Each
+            generation is reprented by the names of the molecules and
+            their key and fitness.
+
+        progress.json
+            A population dump file holding `progress`. Only made if
+            `progress_dump` is ``True``.
+
+        database.json
+            A population dump file holding every molecule made by the
+            GA. Only made if `db` is not ``None``.
+
+        """
+
+        with open('progress.log', 'w') as logfile:
+            for mem in pop:
+                logfile.write('{} {} {}\n'.format(mem.name,
+                                                  str(mem.key),
+                                                  mem.fitness))
+            logfile.write('\n')
+        if self.progress_dump:
+            self.progress.dump('progress.json')
+        if self.db is not None:
+            self.db.dump('database.json')
+
+    def log_pop(self, logger, pop):
+        """
+        Writes `pop` to `logger` at level INFO.
+
+        Parameters
+        ----------
+        logger : Logger
+            The logger object recording the GA.
+
+        pop : Population
+            A population which is to be added to the log.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if not logger.isEnabledFor(logging.INFO):
+            return
+
+        s = 'Population log:\n'
+        for mem in pop:
+            s += '\n{.fitness} {.unscaled_fitness}'.format(mem)
+
+        logger.info(s)
+
+    def debug_dump(self, pop, dump_path):
+        """
+        Creates a population dump file.
+
+        The dump file is made only if logging level is DEBUG or below.
+
+        Parameters
+        ----------
+        pop : Population
+            The population to be dumped.
+
+        dump_path : str
+            The path of the file to which the population should be
+            dumped.
+
+        Modifies
+        --------
+        dump_path
+            A population dump file is made at this location.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
+            pop.dump(dump_path)
 
 logger = logging.getLogger(__name__)
-
 
 def run():
     """
@@ -59,6 +189,10 @@ def run():
     # 2. Initialize the population.
 
     ga_input = GAInput(ifile)
+    progress = GAProgress(ga_input.progress_dump,
+                          ga_input.db_dump,
+                          ga_input.ga_tools())
+
     logger.info('Loading molecules from any provided databases.')
     for db in ga_input.databases:
         Population.load(db)
@@ -68,97 +202,63 @@ def run():
     pop = init_func(**ga_input.initer().params,
                       size=ga_input.pop_size,
                       ga_tools=ga_input.ga_tools())
-    # The variable `id_` is used to give each molecule a unique name
-    # during the GA run. Assuming they are not loaded from a database
-    # with a name.
-    id_ = 0
-    for mem in pop:
-        if not mem.name:
-            mem.name = str(id_)
-            id_ += 1
+    id_ = pop.assign_names_from(0)
 
-    # Dump the population before attempting any operations.
-    pop.dump(join(pop_dump_path, 'init_pop.json'))
+    progress.debug_dump(pop, 'init_pop.json')
     logger.info('Optimizing the population.')
     pop.optimize_population()
-    print_info('Calculating the fitness of population members.')
+    logger.info('Calculating the fitness of population members.')
     pop.calculate_member_fitness()
     logger.info('Normalizing fitness values.')
     pop.normalize_fitness_values()
-
-    # Print the scaled and unscaled fitness values.
-    for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.name)
-        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
-        print('\n')
-
+    progress.log_pop(logger, pop)
     logger.info('Recording progress.')
-    progress.add_subpopulation(pop)
-    run_db.add_members(pop)
+    progress.progress.add_subpopulation(pop)
+    progress.db(pop)
 
     # 3. Run the GA.
 
     for x in range(1, ga_input.num_generations+1):
         # Check that the population has the correct size.
         assert len(pop) == ga_input.pop_size
-        logger.info('Generation {} of {}.'.format(x, ga_input.num_generations))
+        logger.info('Generation {} of {}.'.format(x,
+                                            ga_input.num_generations))
         logger.info('Starting crossovers.')
-        offspring = pop.gen_offspring(crossover_counter.format(x))
+        offspring = pop.gen_offspring(ccounter.format(x))
         logger.info('Starting mutations.')
-        mutants = pop.gen_mutants(mutation_counter.format(x))
+        mutants = pop.gen_mutants(mcounter.format(x))
         logger.info('Adding offsping and mutants to population.')
         pop += offspring + mutants
         logger.info('Removing duplicates, if any.')
         pop.remove_duplicates()
-
-        # Make sure that every population member has a name.
-        for mem in pop:
-            if not mem.name:
-                mem.name = str(id_)
-                id_ += 1
-
-        # Dump the population before attempting any operations.
-        pop.dump(join(pop_dump_path, 'gen_{}_unselected.json'.format(x)))
-
+        id_ = pop.assign_names_from(id_)
+        progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x)))
         logger.info('Optimizing the population.')
         pop.optimize_population()
         logger.info('Calculating the fitness of population members.')
         pop.calculate_member_fitness()
         logger.info('Normalizing fitness values.')
         pop.normalize_fitness_values()
-
-        # Print the scaled and unscaled fitness values.
-        for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.name)
-            print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
-            print('\n')
-
+        progress.log_pop(logger, pop)
+        progress.db(pop)
         logger.info('Selecting members of the next generation.')
-        pop = pop.gen_next_gen(ga_input.pop_size, gen_counter.format(x))
+        pop = pop.gen_next_gen(ga_input.pop_size, gcounter.format(x))
         logger.info('Recording progress.')
-        progress.add_subpopulation(pop)
-        run_db.add_members(pop)
-        pop.dump(join(pop_dump_path, 'gen_{}_selected.json'.format(x)))
-
-        # If the user defined some premature exit function, check if
-        # the exit criterion has been fulfilled.
+        progress.progress.add_subpopulation(pop)
+        progress.debug_dump(pop, 'gen_{}_selected.json'.format(x))
+        # Check if any user-defined exit criterion has been fulfilled.
         if pop.exit():
             break
 
     kill_macromodel()
     os.chdir(root_dir)
-    # Dump the `progress` and `run_db` populations.
-    progress.dump('progress.json')
-    run_db.dump('run_db.json')
-
-    # Plot the results of the GA run.
     logger.info('Plotting EPP.')
-    # Make sure all fitness values are normalized.
-    progress.normalize_fitness_values()
-    plot.fitness_epp(progress, 'epp.png')
-    progress.remove_members(lambda x :
-          progress.ga_tools.fitness.name not in x.progress_params)
-    plot.parameter_epp(progress, 'epp.png')
+    progress.progress.normalize_fitness_values()
+    progress.dump()
+    plot.fitness_epp(progress.progress, 'epp.png')
+    progress.progress.remove_members(lambda x :
+          pop.ga_tools.fitness.name not in x.progress_params)
+    plot.parameter_epp(progress.progress, 'epp.png')
 
     # Remove the ``scratch`` directory.
     shutil.rmtree('scratch')
