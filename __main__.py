@@ -1,5 +1,5 @@
 import warnings, os, shutil, sys, logging
-from os.path import join, basname, abspath
+from os.path import join, basename, abspath
 warnings.filterwarnings("ignore")
 
 from .ga import (Population, GATools,
@@ -32,11 +32,11 @@ class GAProgress:
     def __init__(self, progress_dump, db, ga_tools):
         self.progress_dump = progress_dump
         self.progress = Population(ga_tools)
-        self.db = Population() if db else None
+        self.db_pop = Population() if db else None
 
     def db(self, mols):
         """
-        Adds `mols` to `db`.
+        Adds `mols` to `db_pop`.
 
         Only molecules not already present are added.
 
@@ -47,7 +47,7 @@ class GAProgress:
 
         Modifies
         --------
-        db : Population
+        db_pop : Population
             `mols` are added to this population.
 
         Returns
@@ -56,8 +56,8 @@ class GAProgress:
 
         """
 
-        if self.db is not None:
-            self.db.add_members(mols)
+        if self.db_pop is not None:
+            self.db_pop.add_members(mols)
 
     def dump(self):
         """
@@ -81,15 +81,15 @@ class GAProgress:
         """
 
         with open('progress.log', 'w') as logfile:
-            for mem in pop:
+            for mem in self.progress:
                 logfile.write('{} {} {}\n'.format(mem.name,
                                                   str(mem.key),
                                                   mem.fitness))
             logfile.write('\n')
         if self.progress_dump:
             self.progress.dump('progress.json')
-        if self.db is not None:
-            self.db.dump('database.json')
+        if self.db_pop is not None:
+            self.db_pop.dump('database.json')
 
     def log_pop(self, logger, pop):
         """
@@ -112,13 +112,13 @@ class GAProgress:
         if not logger.isEnabledFor(logging.INFO):
             return
 
-        s = 'Population log:\n'
-        for mem in pop:
-            s += '\n{.fitness} {.unscaled_fitness}'.format(mem)
-
+        s = 'Population log:'
+        for mem in sorted(pop, reverse=True):
+            s += ('\n{0.name} {0.fitness}'
+                  ' {0.unscaled_fitness}').format(mem)
         logger.info(s)
 
-    def debug_dump(self, pop, dump_path):
+    def debug_dump(self, pop, dump_name):
         """
         Creates a population dump file.
 
@@ -129,8 +129,8 @@ class GAProgress:
         pop : Population
             The population to be dumped.
 
-        dump_path : str
-            The path of the file to which the population should be
+        dump_name : str
+            The name of the file to which the population should be
             dumped.
 
         Modifies
@@ -145,9 +145,8 @@ class GAProgress:
         """
 
         if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
-            pop.dump(dump_path)
+            pop.dump(join('../pop_dumps', dump_name))
 
-logger = logging.getLogger(__name__)
 
 def run():
     """
@@ -159,6 +158,11 @@ def run():
 
     *_, ifile = sys.argv
     ifile = abspath(ifile)
+    ga_input = GAInput(ifile)
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=ga_input.logging_level)
+    logger.setLevel(ga_input.logging_level)
+
     launch_dir = os.getcwd()
     # Running MacroModel optimizations sometimes leaves applications
     # open.This closes them. If this is not done, directories may not
@@ -171,7 +175,7 @@ def run():
     root_dir = os.getcwd()
     # If logging level is DEBUG or less, make population dumps as the
     # GA progresses and save images of selection counters.
-    mcounter = ccounter = gcounter = None
+    mcounter = ccounter = gcounter = ''
     if logger.isEnabledFor(logging.DEBUG):
         os.mkdir('counters')
         os.mkdir('pop_dumps')
@@ -188,7 +192,6 @@ def run():
 
     # 2. Initialize the population.
 
-    ga_input = GAInput(ifile)
     progress = GAProgress(ga_input.progress_dump,
                           ga_input.db_dump,
                           ga_input.ga_tools())
@@ -232,7 +235,7 @@ def run():
         logger.info('Removing duplicates, if any.')
         pop.remove_duplicates()
         id_ = pop.assign_names_from(id_)
-        progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x)))
+        progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
         logger.info('Optimizing the population.')
         pop.optimize_population()
         logger.info('Calculating the fitness of population members.')
@@ -265,8 +268,9 @@ def run():
     # Write the .mol files of the final population.
     pop.write('final_pop', True)
     os.chdir(launch_dir)
-    logger.info('Compressing output.')
-    tar_output()
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.info('Compressing output.')
+        tar_output()
     archive_output()
 
 

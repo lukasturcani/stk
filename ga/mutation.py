@@ -95,7 +95,7 @@ class Mutation:
         self.num_mutations = num_mutations
         self.n_calls = 0
 
-    def __call__(self, population, counter_path=None):
+    def __call__(self, population, counter_path=''):
         """
         Carries out mutation operations on the supplied population.
 
@@ -114,9 +114,9 @@ class Mutation:
         population : Population
             The population who's members are to be mutated.
 
-        counter_path : str (default=None)
+        counter_path : str (default = '')
             The path to the .png file showing which members were
-            selected for mutation. If ``None`` then no file is made.
+            selected for mutation. If '' then no file is made.
 
         Returns
         -------
