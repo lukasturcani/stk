@@ -200,6 +200,33 @@ class Normalization:
             new_array = np.multiply(new_array, coefficients)
             macro_mol.fitness = sum(new_array)
 
+    def divide(self, population, val):
+        """
+        Divides each fitness value by `val`.
+
+        Parameters
+        ----------
+        population : Population
+            The population being normalized.
+
+        val : numerical or numpy.array of numericals
+            The value by which each fitness value is divided.
+
+        Modifies
+        --------
+        fitness : numerical or numpy.array of numericals
+            Each fitness value of a population member is divided by
+            `val`.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for mem in population:
+            mem.fitness /= val
+
     def magnitudes(self, population):
         """
         Normalizes the relative values of elements in `fitness`.
