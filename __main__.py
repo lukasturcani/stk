@@ -1,4 +1,4 @@
-import warnings, os, shutil, sys, logging
+import warnings, os, shutil, sys, logging, time, argparse
 from rdkit import RDLogger
 from os.path import join, basename, abspath
 warnings.filterwarnings("ignore")
@@ -8,6 +8,7 @@ from .ga import (Population, GATools,
 from .convenience_tools import (time_it, tar_output,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
+
 
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
 
@@ -32,10 +33,10 @@ class GAProgress:
 
     """
 
-    def __init__(self, progress_dump, db, ga_tools):
+    def __init__(self, progress_dump, db_dump, ga_tools):
         self.progress_dump = progress_dump
         self.progress = Population(ga_tools)
-        self.db_pop = Population() if db else None
+        self.db_pop = Population() if db_dump else None
 
     def db(self, mols):
         """
@@ -150,10 +151,10 @@ class GAProgress:
         """
 
         if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
-            pop.dump(join('../pop_dumps', dump_name))
+            pop.dump(join('..', 'pop_dumps', dump_name))
 
 
-def run():
+def ga_run(ifile):
     """
     Runs the GA.
 
@@ -161,11 +162,12 @@ def run():
 
     # 1. Set up the directory structure.
 
-    *_, ifile = sys.argv
     ifile = abspath(ifile)
     ga_input = GAInput(ifile)
     logger = logging.getLogger(__name__)
-    logging.basicConfig(level=ga_input.logging_level)
+    logging.basicConfig(level=ga_input.logging_level,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s',
+    datefmt='%H : %M : %S')
     logger.setLevel(ga_input.logging_level)
 
     launch_dir = os.getcwd()
@@ -277,97 +279,34 @@ def run():
     archive_output()
 
 
-def helper():
-    """
-    Takes care of the -h option.
-
-    """
-
-    InputHelp(sys.argv[-1])
-
-
-def compare():
-    """
-    Takes care of the -c option.
-
-    """
-
-    launch_dir = os.getcwd()
-
-    # If an output folder of MMEA exists, archive it. This moves any
-    # ``output`` folder in the cwd to the ``old_output`` folder.
-    archive_output()
-
-    # Create a new output directory.
-    os.mkdir('output')
-
-    # Copy the input script into the output folder - this is useful for
-    # keeping track of what input was used to generate the output.
-    shutil.copyfile(sys.argv[2], join('output',
-                                   os.path.split(sys.argv[2])[-1]))
-
-    # Get the fitness and normaliztion function data from the input
-    # file.
-    inp = GAInput(sys.argv[2])
-
-    # Create the encapsulating population.
-    pop = Population()
-    # Load the fitness and normalization functions into the population.
-    pop.ga_tools.input = inp
-    pop.ga_tools.fitness = inp.fitness_func
-    pop.ga_tools.normalization = (
-                            Normalization(inp.normalization_func) if
-                            inp.normalization_func else None)
-
-    # Load the populations you want to compare, calculate the fitness
-    # of members and place them into the encapsulating population.
-    os.chdir('output')
-    for i, pop_path in enumerate(inp.comparison_pops):
-        sp_dir = join(os.getcwd(), 'pop{}'.format(i))
-        sp = Population.load(pop_path, GATools.init_empty())
-        sp.ga_tools.fitness = pop.ga_tools.fitness
-        sp.ga_tools.normalization = pop.ga_tools.normalization
-
-        # Before calculating fitness, remove data from previous fitness
-        # calculations. Also update the file name with the new
-        # directory.
-        for ind in sp:
-            _, name = os.path.split(ind.file)
-            ind.file = join(sp_dir, name)
-            ind.unscaled_fitness = None
-            ind.fitness_fail = True
-            ind.fitness = None
-            ind.progress_params = None
-
-        sp.write(sp_dir)
-
-        # Calculation of fitness is done here, not in the overall pop,
-        # to maintain structure.
-        sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
-        pop.add_subpopulation(sp)
-
-    # Only try to run a normalization function if one was defined in
-    # the input file.
-    if inp.normalization_func:
-        pop.normalize_fitness_values()
-        plot.progress_params(pop, 'param_comparison.png')
-
-    plot.subpopulations(pop, 'fitness_comparison.png')
-
-    # Print the scaled and unscaled fitness values.
-    for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.file)
-        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
-        print('\n')
-
-    os.chdir(launch_dir)
-    archive_output()
-
-
 if __name__ == '__main__':
-    if '-h' in sys.argv:
-        helper()
-    elif '-c' in sys.argv:
-        compare()
-    else:
-        run()
+    parser = argparse.ArgumentParser(prog='python -m mmea',
+    description=('MMEA in can be run in a number of ways.'
+    ' Each type of run can be invoked by one of the listed commands.'
+    ' For details on a command use: command -h.'))
+    commands = parser.add_subparsers(help='commands')
+
+    run = commands.add_parser('run', description='Runs the GA.')
+    run.add_argument('INPUT_FILE', type=str)
+    run.add_argument('-l', '--loops', type=int, default=1,
+                     help='The number times the GA should be run.')
+
+    helper = commands.add_parser('helper',
+             description=('Provides a description variables which'
+                          ' need to be defined in an input file.'))
+    helper.add_argument('KEYWORD', type=str,
+            choices=list(InputHelp.modules.keys()),
+            help=('The name of a variable which needs to be defined'
+                  ' in an input file.'))
+
+    args = parser.parse_args()
+
+    if isinstance(args, str):
+        print(args)
+
+    elif sys.argv[1] == 'run':
+        for x in range(args.loops):
+            ga_run(args.INPUT_FILE)
+
+    elif sys.argv[1] == 'helper':
+        InputHelp(args.KEYWORD)
