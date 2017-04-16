@@ -120,8 +120,8 @@ class GAProgress:
 
         s = 'Population log:'
         for mem in sorted(pop, reverse=True):
-            s += ('\n{0.name} {0.fitness}'
-                  ' {0.unscaled_fitness}').format(mem)
+            uf = {n : str(v) for n, v in mem.unscaled_fitness.items()}
+            s += ('\n\t{0.name} {0.fitness} {1}').format(mem, uf)
         logger.info(s)
 
     def debug_dump(self, pop, dump_name):
@@ -166,8 +166,8 @@ def ga_run(ifile):
     ga_input = GAInput(ifile)
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=ga_input.logging_level,
-    format='%(asctime)s %(levelname)s %(name)s %(message)s',
-    datefmt='%H : %M : %S')
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+    datefmt='%H:%M:%S')
     logger.setLevel(ga_input.logging_level)
 
     launch_dir = os.getcwd()
