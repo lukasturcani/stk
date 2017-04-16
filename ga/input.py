@@ -5,6 +5,7 @@ Defines classes which deal with input.
 
 from types import ModuleType
 from inspect import isclass
+import logging
 
 from . import fitness
 from .crossover import Crossover
@@ -134,10 +135,6 @@ class GAInput:
         fitness values. The order reflects the order in which they are
         applied each generation.
 
-    comparison_pops : list of strings
-        A list of the full paths to pop_dump files which are to be
-        compared. Only needed when using the `-c` option.
-
     databases : list of strings
         A list which holds the paths to any number JSON files. These
         files must hold the JSON representations of Population
@@ -147,8 +144,21 @@ class GAInput:
         fitness value recalculated.
 
     parallel : bool (default = True)
-        If ``True`` mmea does optimization and fitness calculation of
+        If ``True`` MMEA does optimization and fitness calculation of
         each molecule in parallel.
+
+    progress_dump : bool (default = True)
+        If ``True`` a .json Population dump is made at the end of the
+        GA run called ``progress`.json`. The population holds each
+        generation as a subpopulation.
+
+    db_dump : bool (default = True)
+        If ``True`` a .json Population dump is made at the end of the
+        GA run called ``database.json``. The population holds every
+        molecule made by the GA as a member.
+
+    logging_level : int (default = logging.DEBUG)
+        The logging level for logging messages to the screen.
 
     """
 
@@ -191,6 +201,15 @@ class GAInput:
 
         if not hasattr(self, 'parallel'):
             self.parallel = True
+
+        if not hasattr(self, 'progress_dump'):
+            self.progress_dump = True
+
+        if not hasattr(self, 'db_dump'):
+            self.db_dump = True
+
+        if not hasattr(self, 'logging_level'):
+            self.logging_level = logging.DEBUG
 
     def crosser(self):
         """
