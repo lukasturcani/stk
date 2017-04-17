@@ -152,7 +152,7 @@ class GAInput:
         GA run called ``progress`.json`. The population holds each
         generation as a subpopulation.
 
-    db_dump : bool (default = True)
+    database_dump : bool (default = True)
         If ``True`` a .json Population dump is made at the end of the
         GA run called ``database.json``. The population holds every
         molecule made by the GA as a member.
@@ -205,8 +205,8 @@ class GAInput:
         if not hasattr(self, 'progress_dump'):
             self.progress_dump = True
 
-        if not hasattr(self, 'db_dump'):
-            self.db_dump = True
+        if not hasattr(self, 'database_dump'):
+            self.database_dump = True
 
         if not hasattr(self, 'logging_level'):
             self.logging_level = logging.DEBUG
