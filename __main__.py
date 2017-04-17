@@ -200,7 +200,7 @@ def ga_run(ifile):
     # 2. Initialize the population.
 
     progress = GAProgress(ga_input.progress_dump,
-                          ga_input.db_dump,
+                          ga_input.database_dump,
                           ga_input.ga_tools())
 
     logger.info('Loading molecules from any provided databases.')
