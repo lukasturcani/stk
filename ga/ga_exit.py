@@ -52,6 +52,28 @@ class Exit:
             return True
         return False
 
+    def mol_name_present(self, population, name):
+        """
+        Returns ``True`` if molecule with `name` in `population`.
+
+        Parameters
+        ----------
+        population : Population
+            The GA population.
+
+        name : str
+            The name of a molecule.
+
+        Returns
+        -------
+        bool
+            ``True`` if a molecule with `name` is found in
+             `population`.
+
+        """
+
+        return any(x.name == name for x in population)
+
     def no_exit(self, population):
         """
         Returns ``False``.
