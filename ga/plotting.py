@@ -162,7 +162,8 @@ def parameter_epp(pop, plot_name=False,
         # Save the plot data.
         if plot_name and dump_name is None:
             basename, ext = os.path.splitext(plot_name)
-            dump_name = basename+'{}.dmp'.format(x)
+            dump_name = basename+'.dmp'
+        dump_name.replace('.dmp', '{}.dmp'.format(x))
         np.array([y_min, y_mean, y_max]).dump(dump_name)
 
         if plot_name:
