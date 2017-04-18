@@ -67,12 +67,12 @@ class Exit:
         Returns
         -------
         bool
-            ``True`` if a molecule with `name` is found in
-             `population`.
+            ``True`` if a molecule with `name` of  `mol_name` is found
+            in `population`.
 
         """
 
-        return any(x.name == name for x in population)
+        return any(x.name == mol_name for x in population)
 
     def no_exit(self, population):
         """
