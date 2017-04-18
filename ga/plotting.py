@@ -12,9 +12,16 @@ from operator import attrgetter
 from .fitness import *
 
 
-def fitness_epp(pop, plot_name, xlabel='Generation'):
+def fitness_epp(pop, plot_name=False, dump_name=None, xlabel='Generation'):
     """
     Plots the min, max and avg fitness values of each subpopulation.
+
+    Also saves the plot data. The min, mean and max values for each
+    generation are placed in an array:
+
+        >>> dmp_array = np.array(mins, means, maxs)
+
+    which is then dumped to the file `dump_name`.
 
     Parameters
     ----------
@@ -22,8 +29,13 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
         A population containing any number of subpopulations and no
         direct members.
 
-    plot_name : str
-        The full path of where the plot should be saved.
+    plot_name : str (default = False)
+        The full path of where the plot should be saved. If ``False``
+        then no plot is made. Useful if you only want the dump file.
+
+    dump_name : str (default = None)
+        If ``None`` then `plot_name` is used only with the extension
+        ``.dmp``.
 
     xlabel : str (default = 'Generation')
         The label on the x-axis.
@@ -50,22 +62,30 @@ def fitness_epp(pop, plot_name, xlabel='Generation'):
             means.append(subpop.mean(lambda x : x.fitness))
             mins.append(min(x.fitness for x in subpop))
 
-    fig = plt.figure()
-    plt.xlabel(xlabel)
-    plt.ylabel('Fitness')
-    plt.scatter(xvals, maxs, color='red', marker='x', label='max')
-    plt.scatter(xvals, means, color='green', marker='x', label='mean')
-    plt.scatter(xvals, mins, color='blue', marker='x', label='min')
-    lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-    fig.savefig(plot_name, dpi=1000,
-                bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.close('all')
-
     # Save the plot data.
-    basename, ext = os.path.splitext(plot_name)
-    np.array([mins, means, maxs]).dump(basename + '.dmp')
+    if plot_name and dump_name is None:
+        dump_name = plot_name
+    basename, ext = os.path.splitext(dump_name)
+    np.array([mins, means, maxs]).dump(basename +'.dmp')
 
-def parameter_epp(pop, plot_name, xlabel='Generation'):
+    if plot_name:
+        fig = plt.figure()
+        plt.xlabel(xlabel)
+        plt.ylabel('Fitness')
+        plt.scatter(xvals, maxs, color='red', marker='x', label='max')
+        plt.scatter(xvals, means,
+                    color='green', marker='x', label='mean')
+        plt.scatter(xvals, mins, color='blue', marker='x', label='min')
+        lgd = plt.legend(bbox_to_anchor=(1.05, 1),
+                         loc=2, borderaxespad=0.)
+        fig.savefig(plot_name, dpi=1000,
+                    bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.close('all')
+
+
+
+def parameter_epp(pop, plot_name=False,
+                  dump_name=None, xlabel='Generation'):
     """
     Plots the progress_params values across subpopulations.
 
@@ -73,14 +93,26 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
     subpopulations on the x-axis and the min, max and avg values
     of that progress param on the y axis.
 
+    Also saves the plot data. The min, mean and max values for each
+    generation are placed in an array:
+
+        >>> dmp_array = np.array(mins, means, maxs)
+
+    which is then dumped to the file `dump_name`.
+
     Parameters
     ----------
     pop : Population
         A population holding any number of subpopulations and no
         direct members.
 
-    plot_name : str
-        The full path of where the plots should be saved.
+    plot_name : str (default = False)
+        The full path of where the plot should be saved. If ``False``
+        then no plot is made. Useful if you only want the dump file.
+
+    dump_name : str (default = None)
+        If ``None`` then `plot_name` is used only with the extension
+        ``.dmp``.
 
     xlabel : str (default = 'Generation')
         The label on the x-axis.
@@ -126,25 +158,29 @@ def parameter_epp(pop, plot_name, xlabel='Generation'):
         y_max = [array[x] for array in max_params]
         y_min = [array[x] for array in min_params]
 
-        plt.scatter(xvals, y_mean,
-                    color='green', marker='x', label='mean')
-        plt.scatter(xvals, y_min,
-                    color='blue', marker='x', label='min')
-        plt.scatter(xvals, y_max,
-                    color='red', marker='x', label='max')
-        lgd=plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
-                        borderaxespad=0.)
-
-        new_plot_name = str(x).join(os.path.splitext(plot_name))
-
-        fig.savefig(new_plot_name, dpi=1000,
-                    bbox_extra_artists=(lgd,), bbox_inches='tight')
-        plt.close('all')
-
         # Save the plot data.
+        if plot_name and dump_name is None:
+            dump_name = plot_name
         basename, ext = os.path.splitext(plot_name)
         np.array([y_min, y_mean, y_max]).dump(
                                            basename+'{}.dmp'.format(x))
+
+        if plot_name:
+            plt.scatter(xvals, y_mean,
+                        color='green', marker='x', label='mean')
+            plt.scatter(xvals, y_min,
+                        color='blue', marker='x', label='min')
+            plt.scatter(xvals, y_max,
+                        color='red', marker='x', label='max')
+            lgd=plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
+                            borderaxespad=0.)
+
+            new_plot_name = str(x).join(os.path.splitext(plot_name))
+
+            fig.savefig(new_plot_name, dpi=1000,
+                        bbox_extra_artists=(lgd,), bbox_inches='tight')
+            plt.close('all')
+
 
 def plot_counter(counter, plot_name):
     """
