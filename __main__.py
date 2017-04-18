@@ -264,12 +264,11 @@ def ga_run(ifile):
     os.chdir(root_dir)
     progress.progress.normalize_fitness_values()
     progress.dump()
-    if ga_input.plot_epp:
-        logger.info('Plotting EPP.')
-        plot.fitness_epp(progress.progress, 'epp.png')
-        progress.progress.remove_members(lambda x :
-              pop.ga_tools.fitness.name not in x.progress_params)
-        plot.parameter_epp(progress.progress, 'epp.png')
+    logger.info('Plotting EPP.')
+    plot.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+    progress.progress.remove_members(lambda x :
+          pop.ga_tools.fitness.name not in x.progress_params)
+    plot.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
 
     shutil.rmtree('scratch')
     pop.write('final_pop', True)
