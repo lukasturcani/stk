@@ -64,9 +64,10 @@ def fitness_epp(pop, plot_name=False, dump_name=None, xlabel='Generation'):
 
     # Save the plot data.
     if plot_name and dump_name is None:
-        dump_name = plot_name
-    basename, ext = os.path.splitext(dump_name)
-    np.array([mins, means, maxs]).dump(basename +'.dmp')
+        basename, ext = os.path.splitext(plot_name)
+        dump_name = basename + '.dmp'
+
+    np.array([mins, means, maxs]).dump(dump_name)
 
     if plot_name:
         fig = plt.figure()
@@ -160,10 +161,9 @@ def parameter_epp(pop, plot_name=False,
 
         # Save the plot data.
         if plot_name and dump_name is None:
-            dump_name = plot_name
-        basename, ext = os.path.splitext(plot_name)
-        np.array([y_min, y_mean, y_max]).dump(
-                                           basename+'{}.dmp'.format(x))
+            basename, ext = os.path.splitext(plot_name)
+            dump_name = basename+'{}.dmp'.format(x)
+        np.array([y_min, y_mean, y_max]).dump(dump_name)
 
         if plot_name:
             plt.scatter(xvals, y_mean,
