@@ -157,6 +157,9 @@ class GAInput:
         GA run called ``database.json``. The population holds every
         molecule made by the GA as a member.
 
+    plot_epp : bool (default = True)
+        If ``True`` an EPP is made at the end of the GA run.
+
     logging_level : int (default = logging.DEBUG)
         The logging level for logging messages to the screen.
 
@@ -210,6 +213,9 @@ class GAInput:
 
         if not hasattr(self, 'logging_level'):
             self.logging_level = logging.DEBUG
+
+        if not hasattr(self, 'plot_epp'):
+            self.plot_epp = True
 
     def crosser(self):
         """
