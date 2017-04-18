@@ -12,6 +12,7 @@ data_dir = join('data', 'struct_unit', 'amine.mol')
 mol = StructUnit(data_dir)
 conf = mol.mol.GetConformer()
 
+
 def test_init():
     f = join('data', 'struct_unit', 'amine2.mol2')
     mol2 = StructUnit(f)
@@ -19,6 +20,7 @@ def test_init():
     print(mol2.func_grp.name)
     assert len(mol2.functional_group_atoms()) == 3
     assert len(mol3.functional_group_atoms()) == 2
+
 
 def test_all_bonder_distances():
     conf_ds = []
@@ -31,6 +33,7 @@ def test_all_bonder_distances():
     assert np.allclose(list(x for *_, x in mol.all_bonder_distances()),
                        conf_ds, atol=1e-8)
 
+
 def test_bonder_centroid():
     position = np.array([0.,0.,0.])
     for id_ in mol.bonder_ids:
@@ -38,6 +41,7 @@ def test_bonder_centroid():
 
     assert np.allclose((position/len(mol.bonder_ids)),
                        mol.bonder_centroid(), atol=1e-8)
+
 
 def test_bonder_direction_vectors():
     vs = []
@@ -52,6 +56,7 @@ def test_bonder_direction_vectors():
         list(x for *_, x in mol.bonder_direction_vectors()), vs,
             atol=1e-8)
 
+
 def test_bonder_position_matrix():
         pos_array = np.array([])
 
@@ -63,6 +68,7 @@ def test_bonder_position_matrix():
 
         assert np.allclose(m, mol.bonder_position_matrix(), atol=1e-8)
 
+
 def test_centroid_centroid_dir_vector():
     c1 = mol.bonder_centroid()
     c2 = mol.centroid()
@@ -70,10 +76,12 @@ def test_centroid_centroid_dir_vector():
                        mol.centroid_centroid_dir_vector(),
                        atol=1e-8)
 
+
 def test_functional_group_atoms():
         func_grp_mol = chem.MolFromSmarts(mol.func_grp.fg_smarts)
         assert (mol.mol.GetSubstructMatches(func_grp_mol)  ==
                 mol.functional_group_atoms())
+
 
 def test_json_init():
     bb1 = Molecule.load(join('data', 'struct_unit', 'su.json'))
@@ -81,11 +89,11 @@ def test_json_init():
     assert bb1.optimized == True
     assert bb1.bonder_ids == [7, 10]
     assert bb1.energy.__class__.__name__ == 'Energy'
-    assert bb1.failed == False
     assert bb1.func_grp.name == 'amine'
 
     assert 2 == sum(1 for x in bb1.mol.GetAtoms() if
                                                 x.HasProp('bonder'))
+
 
 def test_smarts_init():
 
@@ -97,6 +105,7 @@ def test_smarts_init():
     mol2 = StructUnit.smarts_init('[C]([Br])[Br]')
 
     assert mol1 is mol2
+
 
 def test_caching():
     og_c = dict(StructUnit.cache)
@@ -130,11 +139,13 @@ def test_caching():
     finally:
         StructUnit.cache = og_c
 
+
 def test_set_bonder_centroid():
     og = mol.bonder_centroid()
     mol.set_bonder_centroid([1,2,3])
     assert np.allclose(mol.bonder_centroid(), [1,2,3], atol=1e-8)
     mol.set_bonder_centroid(og)
+
 
 def test_untag_atoms():
     f = join('data', 'struct_unit', 'amine2.mol2')

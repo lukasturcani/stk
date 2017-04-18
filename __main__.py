@@ -1,4 +1,6 @@
-import warnings, os, shutil, sys
+import warnings, os, shutil, sys, logging, time, argparse
+from rdkit import RDLogger
+from os.path import join, basename, abspath
 warnings.filterwarnings("ignore")
 
 from .ga import (Population, GATools,
@@ -7,330 +9,304 @@ from .convenience_tools import (time_it, tar_output,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
 
-def print_info(info):
+
+RDLogger.logger().setLevel(RDLogger.CRITICAL)
+
+
+class GAProgress:
     """
-    Prints `info` and underlines it.
+    Deals with logging the GA's progress.
+
+    Attributes
+    ----------
+    progress_dump : bool
+        If ``True`` a population dump file `progress.json` is made in
+        the output directory. Each subpopulation of this population
+        represents a generation of the GA.
+
+    progress : Population
+        A population where each subpopulation is a generation of the
+        GA.
+
+    db_pop : Population or None
+        A population which holds every molecule made by the GA.
 
     """
-    print('\n\n' + info + '\n' + '-'*len(info), end='\n\n')
 
-def run():
+    def __init__(self, progress_dump, db_dump, ga_tools):
+        self.progress_dump = progress_dump
+        self.progress = Population(ga_tools)
+        self.db_pop = Population() if db_dump else None
+
+    def db(self, mols):
+        """
+        Adds `mols` to `db_pop`.
+
+        Only molecules not already present are added.
+
+        Parameters
+        ----------
+        mols : Population
+            A group of molecules made by the GA.
+
+        Modifies
+        --------
+        db_pop : Population
+            `mols` are added to this population.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if self.db_pop is not None:
+            self.db_pop.add_members(mols)
+
+    def dump(self):
+        """
+        Creates output files for the GA run.
+
+        Modifies
+        --------
+        progress.log
+            This file holds the progress of the GA in text form. Each
+            generation is reprented by the names of the molecules and
+            their key and fitness.
+
+        progress.json
+            A population dump file holding `progress`. Only made if
+            `progress_dump` is ``True``.
+
+        database.json
+            A population dump file holding every molecule made by the
+            GA. Only made if `db` is not ``None``.
+
+        """
+
+        with open('progress.log', 'w') as logfile:
+            for sp in self.progress.populations:
+                for mem in sp:
+                    logfile.write('{} {} {}\n'.format(mem.name,
+                                                      str(mem.key),
+                                                      mem.fitness))
+                logfile.write('\n')
+
+        if self.progress_dump:
+            self.progress.dump('progress.json')
+        if self.db_pop is not None:
+            self.db_pop.dump('database.json')
+
+    def log_pop(self, logger, pop):
+        """
+        Writes `pop` to `logger` at level INFO.
+
+        Parameters
+        ----------
+        logger : Logger
+            The logger object recording the GA.
+
+        pop : Population
+            A population which is to be added to the log.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if not logger.isEnabledFor(logging.INFO):
+            return
+
+        s = 'Population log:'
+        for mem in sorted(pop, reverse=True):
+            uf = {n : str(v) for n, v in mem.unscaled_fitness.items()}
+            s += ('\n\t{0.name} {0.fitness} {1}').format(mem, uf)
+        logger.info(s)
+
+    def debug_dump(self, pop, dump_name):
+        """
+        Creates a population dump file.
+
+        The dump file is made only if logging level is DEBUG or below.
+
+        Parameters
+        ----------
+        pop : Population
+            The population to be dumped.
+
+        dump_name : str
+            The name of the file to which the population should be
+            dumped.
+
+        Modifies
+        --------
+        dump_path
+            A population dump file is made at this location.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
+            pop.dump(join('..', 'pop_dumps', dump_name))
+
+
+def ga_run(ifile):
     """
     Runs the GA.
 
     """
 
-    # Save the current directory as the `launch_dir`.
-    launch_dir = os.getcwd()
+    # 1. Set up the directory structure.
 
+    ifile = abspath(ifile)
+    ga_input = GAInput(ifile)
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=ga_input.logging_level,
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
+    datefmt='%H:%M:%S')
+    logger.setLevel(ga_input.logging_level)
+
+    launch_dir = os.getcwd()
     # Running MacroModel optimizations sometimes leaves applications
     # open.This closes them. If this is not done, directories may not
     # be possible to move.
     kill_macromodel()
-
-    # If an output folder of MMEA exists, archive it. This just moves
-    # any ``output`` folder in the cwd to the ``old_output`` folder.
+    # Move any ``output`` dir in the cwd into ``old_output``.
     archive_output()
-
-    # Create a new output directory and move into it. Save its path as
-    # the root directory.
     os.mkdir('output')
-
-    # Copy the input script into the output folder - this is useful for
-    # keeping track of what input was used to generate the output.
-    shutil.copyfile(sys.argv[1], os.path.join('output',
-                                     os.path.split(sys.argv[1])[-1]))
-
     os.chdir('output')
     root_dir = os.getcwd()
-    os.mkdir('counters')
-    # Make template names for the counters which are created showing
-    # which members get selected.
-    mutation_counter = os.path.join(root_dir, 'counters',
-                            "gen_{}_mutation_counter.png")
-    crossover_counter = os.path.join(root_dir, 'counters',
-                                "gen_{}_crossover_counter.png")
-    gen_counter = os.path.join(root_dir, 'counters',
-                                "gen_{}_selection_counter.png")
-
-    # Get the name of the input file and load its contents into a
-    # ``GAInput`` instance. Info about input file structure is
-    # documented in ``GAInput`` docstring.
-    ga_input = GAInput(os.path.basename(sys.argv[1]))
-    # Load all molecules stored in databases into memory.
-    for db in ga_input.databases:
-        Population.load(db, load_names=False)
-
-    # Make a Population which stores all previous generations to keep
-    # track of progress.
-    progress = Population(ga_input.ga_tools())
-    # Make a Population which stores every molecule, selected or not,
-    # made during the GA run.
-    run_db = Population()
-    # The variable `id_` is used to give each molecule a unique name
-    # during the GA run.
-    id_ = 0
-
-    # Make a ``pop_dumps`` directory for string populations as the GA
-    # progresses. For debugging, allows the restoration of state before
-    # a crash.
-    os.mkdir('pop_dumps')
-    pop_dump_path = os.path.join(root_dir, 'pop_dumps')
+    # If logging level is DEBUG or less, make population dumps as the
+    # GA progresses and save images of selection counters.
+    mcounter = ccounter = gcounter = ''
+    if logger.isEnabledFor(logging.DEBUG):
+        os.mkdir('counters')
+        os.mkdir('pop_dumps')
+        cstr = join(root_dir, 'counters', 'gen_{}_')
+        mcounter = cstr + 'mutation_counter.png'
+        ccounter = cstr + 'crossover_counter.png'
+        gcounter = cstr + 'selection_counter.png'
+    # Copy the input script into the ``output`` folder.
+    shutil.copyfile(ifile, basename(ifile))
     # Make the ``scratch`` directory which acts as the working
     # directory during the GA run.
     os.mkdir('scratch')
     os.chdir('scratch')
 
-    # Generate the initial population.
-    with time_it():
-        pop_init = getattr(Population, ga_input.init_func.name)
-        print_info('Generating initial population.')
+    # 2. Initialize the population.
 
-        # If the initialization function is ``load()`` a restart run is
-        # assumed.
-        if pop_init.__name__ == 'load':
-            pop = pop_init(**ga_input.init_func.params,
-                           ga_tools=ga_input.ga_tools())
-            ga_input.pop_size = len(pop)
+    progress = GAProgress(ga_input.progress_dump,
+                          ga_input.database_dump,
+                          ga_input.ga_tools())
 
-            for mem in pop:
-                name = os.path.basename(mem.file)
+    logger.info('Loading molecules from any provided databases.')
+    for db in ga_input.databases:
+        Population.load(db)
 
-                mem.file = os.path.join(os.getcwd(), name)
+    logger.info('Generating initial population.')
+    init_func = getattr(Population, ga_input.initer().name)
+    pop = init_func(**ga_input.initer().params,
+                      size=ga_input.pop_size,
+                      ga_tools=ga_input.ga_tools())
+    id_ = pop.assign_names_from(0)
 
-        else:
-            pop = pop_init(**ga_input.init_func.params,
-                           size=ga_input.pop_size,
-                           ga_tools=ga_input.ga_tools())
+    progress.debug_dump(pop, 'init_pop.json')
+    logger.info('Optimizing the population.')
+    pop.optimize_population()
+    logger.info('Calculating the fitness of population members.')
+    pop.calculate_member_fitness()
+    logger.info('Normalizing fitness values.')
+    pop.normalize_fitness_values()
+    progress.log_pop(logger, pop)
+    logger.info('Recording progress.')
+    progress.progress.add_subpopulation(pop)
+    progress.db(pop)
 
-    # Give each population member a name for easy identification when
-    # logging.
-    for mem in pop:
-        mem.name = str(id_)
-        id_ += 1
+    # 3. Run the GA.
 
-    # Dump the population before attempting any operations.
-    pop.dump(os.path.join(pop_dump_path, 'init_pop.json'))
-
-    with time_it():
-        print_info('Optimizing the population.')
-        pop = Population(pop.ga_tools, *pop.optimize_population())
-
-    with time_it():
-        print_info('Calculating the fitness of population members.')
-        pop = Population(pop.ga_tools, *pop.calculate_member_fitness())
-
-    with time_it():
-        print_info('Normalizing fitness values.')
-        pop.normalize_fitness_values()
-
-    # Print the scaled and unscaled fitness values.
-    for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.name)
-        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
-        print('\n')
-
-    # Save the generation.
-    with time_it():
-        print_info('Recording progress.')
-        progress.add_subpopulation(pop)
-        run_db.add_members(pop)
-
-    # Run the GA.
     for x in range(1, ga_input.num_generations+1):
         # Check that the population has the correct size.
         assert len(pop) == ga_input.pop_size
-
-        print_info('Generation {} of {}.'.format(x,
-                                             ga_input.num_generations))
-
-        with time_it():
-            print_info('Starting crossovers.')
-            offspring = pop.gen_offspring(crossover_counter.format(x))
-
-        with time_it():
-            print_info('Starting mutations.')
-            mutants = pop.gen_mutants(mutation_counter.format(x))
-
-        with time_it():
-            print_info('Adding offsping and mutants to population.')
-            pop += offspring + mutants
-
-        with time_it():
-            print_info('Removing duplicates, if any.')
-            pop.remove_duplicates()
-
-        # Make sure that every population member has a name.
-        for mem in pop:
-            if not mem.name:
-                mem.name = id_
-                id_ += 1
-
-        # Dump the population before attempting any operations.
-        pop.dump(os.path.join(pop_dump_path,
-                              'gen_{}_unselected.json'.format(x)))
-
-        with time_it():
-            print_info('Optimizing the population.')
-            pop = Population(pop.ga_tools, *pop.optimize_population())
-
-        with time_it():
-            print_info(('Calculating the fitness'
-                        ' of population members.'))
-            pop = Population(pop.ga_tools,
-                             *pop.calculate_member_fitness())
-
-        with time_it():
-            print_info('Normalizing fitness values.')
-            pop.normalize_fitness_values()
-
-        # Print the scaled and unscaled fitness values.
-        for macro_mol in sorted(pop, reverse=True):
-            print(macro_mol.name)
-            print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
-            print('\n')
-
-        with time_it():
-            print_info('Selecting members of the next generation.')
-            pop = pop.gen_next_gen(ga_input.pop_size,
-                                   gen_counter.format(x))
-
-        # Save the generation.
-        with time_it():
-            print_info('Recording progress.')
-            progress.add_subpopulation(pop)
-            run_db.add_members(pop)
-            pop.dump(os.path.join(pop_dump_path,
-                                  'gen_{}_selected.json'.format(x)))
-
-        # If the user defined some premature exit function, check if
-        # the exit criterion has been fulfilled.
+        logger.info('Generation {} of {}.'.format(x,
+                                            ga_input.num_generations))
+        logger.info('Starting crossovers.')
+        offspring = pop.gen_offspring(ccounter.format(x))
+        logger.info('Starting mutations.')
+        mutants = pop.gen_mutants(mcounter.format(x))
+        logger.info('Adding offsping and mutants to population.')
+        pop += offspring + mutants
+        logger.info('Removing duplicates, if any.')
+        pop.remove_duplicates()
+        id_ = pop.assign_names_from(id_)
+        progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
+        logger.info('Optimizing the population.')
+        pop.optimize_population()
+        logger.info('Calculating the fitness of population members.')
+        pop.calculate_member_fitness()
+        logger.info('Normalizing fitness values.')
+        pop.normalize_fitness_values()
+        progress.log_pop(logger, pop)
+        progress.db(pop)
+        logger.info('Selecting members of the next generation.')
+        pop = pop.gen_next_gen(ga_input.pop_size, gcounter.format(x))
+        logger.info('Recording progress.')
+        progress.progress.add_subpopulation(pop)
+        progress.debug_dump(pop, 'gen_{}_selected.json'.format(x))
+        # Check if any user-defined exit criterion has been fulfilled.
         if pop.exit():
             break
 
-    # Running MacroModel optimizations sometimes leaves applications
-    # open. This closes them. If this is not done, directories may not
-    # be possible to move.
     kill_macromodel()
-    # Plot the results of the GA run.
-    with time_it():
-        print_info('Plotting EPP.')
-        # Remove any failed molecules.
-        progress.remove_failures()
-        # Make sure all fitness values are normalized.
-        progress.normalize_fitness_values()
-
-        plot.fitness_epp(progress, os.path.join(root_dir, 'epp.png'))
-        plot.parameter_epp(progress, os.path.join(root_dir, 'epp.png'))
-
     os.chdir(root_dir)
-    # Dump the `progress` and `run_db` populations.
-    progress.dump('progress.json')
-    run_db.dump('run_db.json')
-    # Remove the ``scratch`` directory.
+    progress.progress.normalize_fitness_values()
+    progress.dump()
+    logger.info('Plotting EPP.')
+    plot.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+    progress.progress.remove_members(lambda x :
+          pop.ga_tools.fitness.name not in x.progress_params)
+    plot.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+
     shutil.rmtree('scratch')
-    # Write the .mol files of the final population.
     pop.write('final_pop', True)
-
-    # Move the ``output`` folder into the ``old_output`` folder.
     os.chdir(launch_dir)
-
-    with time_it():
-        print_info('Compressing output.')
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.info('Compressing output.')
         tar_output()
-
-    with time_it():
-        archive_output()
-
-def helper():
-    """
-    Takes care of the -h option.
-
-    """
-
-    InputHelp(sys.argv[-1])
-
-def compare():
-    """
-    Takes care of the -c option.
-
-    """
-
-    launch_dir = os.getcwd()
-
-    # If an output folder of MMEA exists, archive it. This moves any
-    # ``output`` folder in the cwd to the ``old_output`` folder.
     archive_output()
 
-    # Create a new output directory.
-    os.mkdir('output')
-
-    # Copy the input script into the output folder - this is useful for
-    # keeping track of what input was used to generate the output.
-    shutil.copyfile(sys.argv[2], os.path.join('output',
-                                   os.path.split(sys.argv[2])[-1]))
-
-    # Get the fitness and normaliztion function data from the input
-    # file.
-    inp = GAInput(sys.argv[2])
-
-    # Create the encapsulating population.
-    pop = Population()
-    # Load the fitness and normalization functions into the population.
-    pop.ga_tools.input = inp
-    pop.ga_tools.fitness = inp.fitness_func
-    pop.ga_tools.normalization = (
-                            Normalization(inp.normalization_func) if
-                            inp.normalization_func else None)
-
-    # Load the populations you want to compare, calculate the fitness
-    # of members and place them into the encapsulating population.
-    os.chdir('output')
-    for i, pop_path in enumerate(inp.comparison_pops):
-        sp_dir = os.path.join(os.getcwd(), 'pop{}'.format(i))
-        sp = Population.load(pop_path, GATools.init_empty())
-        sp.ga_tools.fitness = pop.ga_tools.fitness
-        sp.ga_tools.normalization = pop.ga_tools.normalization
-
-        # Before calculating fitness, remove data from previous fitness
-        # calculations. Also update the file name with the new
-        # directory.
-        for ind in sp:
-            _, name = os.path.split(ind.file)
-            ind.file = os.path.join(sp_dir, name)
-            ind.unscaled_fitness = None
-            ind.fitness_fail = True
-            ind.fitness = None
-            ind.progress_params = None
-
-        sp.write(sp_dir)
-
-        # Calculation of fitness is done here, not in the overall pop,
-        # to maintain structure.
-        sp = Population(*sp.calculate_member_fitness(), sp.ga_tools)
-        pop.add_subpopulation(sp)
-
-    # Only try to run a normalization function if one was defined in
-    # the input file.
-    if inp.normalization_func:
-        pop.normalize_fitness_values()
-        plot.progress_params(pop, 'param_comparison.png')
-
-    plot.subpopulations(pop, 'fitness_comparison.png')
-
-    # Print the scaled and unscaled fitness values.
-    for macro_mol in sorted(pop, reverse=True):
-        print(macro_mol.file)
-        print(macro_mol.fitness, '-', macro_mol.unscaled_fitness)
-        print('\n')
-
-    os.chdir(launch_dir)
-    archive_output()
 
 if __name__ == '__main__':
-    if '-h' in sys.argv:
-        helper()
-    elif '-c' in sys.argv:
-        compare()
-    else:
-        run()
+    parser = argparse.ArgumentParser(prog='python -m mmea',
+    description=('MMEA in can be run in a number of ways.'
+    ' Each type of run can be invoked by one of the listed commands.'
+    ' For details on a command use: command -h.'))
+    commands = parser.add_subparsers(help='commands')
+
+    run = commands.add_parser('run', description='Runs the GA.')
+    run.add_argument('INPUT_FILE', type=str)
+    run.add_argument('-l', '--loops', type=int, default=1,
+                     help='The number times the GA should be run.')
+
+    helper = commands.add_parser('helper',
+             description=('Provides a description variables which'
+                          ' need to be defined in an input file.'))
+    helper.add_argument('KEYWORD', type=str,
+            choices=list(InputHelp.modules.keys()),
+            help=('The name of a variable which needs to be defined'
+                  ' in an input file.'))
+
+    args = parser.parse_args()
+
+    if isinstance(args, str):
+        print(args)
+
+    elif sys.argv[1] == 'run':
+        for x in range(args.loops):
+            ga_run(args.INPUT_FILE)
+
+    elif sys.argv[1] == 'helper':
+        InputHelp(args.KEYWORD)

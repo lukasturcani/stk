@@ -138,6 +138,8 @@ from rdkit import DataStructs
 import os
 import networkx as nx
 from scipy.spatial.distance import euclidean
+from scipy.optimize import minimize
+from sklearn.metrics.pairwise import euclidean_distances
 import json
 from collections import namedtuple, Counter
 from inspect import signature
@@ -178,29 +180,6 @@ class Cached(type):
             obj.key = key
             self.cache[key] = obj
             return obj
-
-    def _update_cache(self, mol):
-        """
-        Updates the cache of stored molecule.
-
-        Parallel processes, such as optimization, return a copy of the
-        optimized molecule. The original molecule, stored in `_cache`,
-        does not have its attributes updated. In order to replace the
-        molecule with the optimized copy within the cache this function
-        should be used.
-
-        Parameters
-        ----------
-        mol : Moleulce
-            A molecule which should replace the one held in `_cache`.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        self.cache[mol.key] = mol
 
 
 class CachedStructUnit(type):
@@ -266,6 +245,9 @@ class Molecule:
     mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance representing the molecule.
 
+    inchi : str
+        The InChI of the molecule.
+
     energy : Energy
         An instance of the ``Energy`` class. It handles all things
         energy.
@@ -274,27 +256,22 @@ class Molecule:
         Indicates whether a Molecule has been passed through an
         optimization function or not.
 
-    failed : bool
-        True if the fitness function or optimization function failed
-        when trying to evaluate the molecule.
+    name : str (default = "")
+        A name which can be optionally given to the molecule for easy
+        identification.
 
     note : str (default = "")
         A note or comment about the molecule. Purely optional but can
         be useful for labelling and debugging.
 
-    name : str (default = "")
-        A name which can be optionally given to the molecule for easy
-        identification.
-
     """
 
-    def __init__(self, note="", name=""):
-        self.failed = False
+    def __init__(self, name="", note=""):
         self.optimized = False
         self.energy = Energy(self)
         self.bonder_ids = []
-        self.note = note
         self.name = name
+        self.note = note
 
     def all_atom_coords(self):
         """
@@ -387,6 +364,63 @@ class Molecule:
         atomic_num = atom.GetAtomicNum()
         return periodic_table[atomic_num]
 
+    def _cavity_size(self, origin):
+        """
+        Calculates diameter of the molecule's from `origin`.
+
+        The cavity is measured by finding the atom nearest to
+        `origin`, correcting for van der Waals diameter and multiplying
+        by -2.
+
+        This function should not be used. Use cavity_size() instead.
+        cavity_size() finds the optimal value of `origin` to use.
+
+        Parameters
+        ----------
+        origin : numpy.array
+            Holds the x, y and z coordinate of the position from which
+            the cavity is measured.
+
+        Returns
+        -------
+        float
+            The (negative) diameter of the molecules cavity.
+
+        """
+
+        atom_vdw = np.array([atom_vdw_radii[x.GetSymbol()] for x
+                            in self.mol.GetAtoms()])
+
+        distances = euclidean_distances(self.position_matrix().T,
+                                       np.matrix(origin))
+        distances = distances.flatten() - atom_vdw
+        return -2*min(distances)
+
+    def cavity_size(self):
+        """
+        Calculates the diameter of the molecule's cavity.
+
+        Returns
+        -------
+        The diameter of the molecule's cavity in Angstroms.
+
+        """
+
+        # This function uses _cavity_size() to calculate the cavity
+        # size. _cavity_size() finds the closest atom to `origin` to
+        # get its value of the cavity.
+
+        # What this function does is finds the value of `origin` which
+        # causes _cavity_size() to calculate the largest possible
+        # cavity.
+        ref = self.center_of_mass()
+        icavity = 0.5*self._cavity_size(ref)
+        bounds = [(coord+icavity, coord-icavity) for coord in ref]
+        cavity_origin = minimize(self._cavity_size,
+                                 x0=ref,
+                                 bounds=bounds).x
+        return -self._cavity_size(cavity_origin)
+
     def center_of_mass(self):
         """
         Returns the centre of mass of the molecule.
@@ -402,13 +436,12 @@ class Molecule:
 
         """
 
-        center = np.array([0,0,0])
-        total_mass = 0
+        center = np.array([0.,0.,0.])
+        total_mass = 0.
         for atom_id, coord in self.all_atom_coords():
             mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
-            center = np.add(center, np.multiply(mass, coord))
-
+            center +=  mass*coord
         return np.divide(center, total_mass)
 
     def centroid(self):
@@ -504,6 +537,16 @@ class Molecule:
 
         return graph
 
+    @property
+    def inchi(self):
+        """
+        Returns the InChi of the molecule.
+
+        """
+
+        self.update_stereochemistry()
+        return rdkit.MolToInchi(self.mol)
+
     @classmethod
     def load(cls, path, optimized=True, load_names=True):
         """
@@ -598,7 +641,10 @@ class Molecule:
 
         main_string = main_string.format(self.mol.GetNumAtoms(),
                                          self.mol.GetNumBonds())
-
+        # Kekulize the mol, which means that each aromatic bond is
+        # converted to a single or double. This is necessary because
+        # .mol V3000 only supports integer bonds.
+        rdkit.Kekulize(self.mol)
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
@@ -641,26 +687,25 @@ class Molecule:
 
         return np.matrix(pos_array.reshape(-1,3).T)
 
-    def save_bonders(self):
+    def same(self, other):
         """
-        Adds atoms tagged with 'bonder' to `bonder_ids`.
+        Check if `other` has the same molecular structure.
 
-        Modifies
-        --------
-        bonder_ids : list of ints
-            Updates this set with the ids of atoms tagged 'bonder'.
+        Parameters
+        ----------
+        other : MacroMolecule
+            The ``MacroMolecule`` instance you are checking has
+            the same structure.
 
         Returns
         -------
-        None : NoneType
+        bool
+            Returns ``True`` if the building blocks and topology
+            of the macromolecules are the same.
 
         """
 
-        # Clear the set in case the method is run twice.
-        self.bonder_ids = []
-        for atom in self.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                self.bonder_ids.append(atom.GetIdx())
+        return self.inchi == other.inchi
 
     def rotate(self, theta, axis):
         """
@@ -702,6 +747,27 @@ class Molecule:
         self.set_position_from_matrix(new_pos_mat)
         # Return the centroid of the molecule to the origin position.
         self.set_position(og_position)
+
+    def save_bonders(self):
+        """
+        Adds atoms tagged with 'bonder' to `bonder_ids`.
+
+        Modifies
+        --------
+        bonder_ids : list of ints
+            Updates this set with the ids of atoms tagged 'bonder'.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        # Clear the set in case the method is run twice.
+        self.bonder_ids = []
+        for atom in self.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                self.bonder_ids.append(atom.GetIdx())
 
     def set_orientation(self, start, end):
         """
@@ -938,6 +1004,28 @@ class Molecule:
 
         self.mol = mol_from_mae_file(mae_path)
 
+    def update_stereochemistry(self):
+        """
+        Updates stereochemistry tags on `mol` attribute.
+
+        Modifies
+        --------
+        mol : rdkit.Chem.rdchem.Mol
+            The '_CIPCode' property on each atom of the rkdit molecule
+            is updated to reflect the R or S configuration of the atom
+            in the current geometry.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+        rdkit.AssignAtomChiralTagsFromStructure(self.mol)
+        rdkit.AssignStereochemistry(self.mol, True, True, True)
+
     def write(self, path):
         """
         Writes a molecular structure file of the molecule.
@@ -1067,6 +1155,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     mol : rdkit.Chem.rdchem.Mol
         The rdkit instance of the molecule held in `file`.
 
+    inchi : str
+        The InChI of the molecule.
+
     func_grp : FGInfo
         The ``FGInfo`` instance holding information about the
         functional group which will react when the building block
@@ -1085,19 +1176,16 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         A flag to monitor whether an optimization has been performed on
         the molecule.
 
-    failed : bool
-        True if an optimization function failed to run on the molecule.
-
     key : MacroMolKey
         The key used for caching the molecule.
-
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
 
     name : str (default = "")
         A name which can be optionally given to the molcule for easy
         identification.
+
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
 
     """
 
@@ -1114,7 +1202,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                   '.pdb' : partial(rdkit.MolFromPDBFile,
                                  sanitize=False, removeHs=False)}
 
-    def __init__(self, file, functional_group=None, note="", name=""):
+    def __init__(self, file, functional_group=None, name="", note=""):
         """
         Initializes a ``StructUnit`` instance.
 
@@ -1140,7 +1228,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        super().__init__(note, name)
         self.file = file
         _, ext = os.path.splitext(file)
 
@@ -1149,6 +1236,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             'Unable to initialize from "{}" files.'.format(ext))
 
         self.mol = self.init_funcs[ext](file)
+        # Update the property cache of each atom. This updates things
+        # like valence.
+        for atom in self.mol.GetAtoms():
+            atom.UpdatePropertyCache()
+
+        super().__init__(name, note)
 
         # Define a generator which yields an ``FGInfo`` instance from
         # `functional_groups`. The yielded ``FGInfo``instance
@@ -1276,8 +1369,24 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        return normalize_vector(self.centroid() -
-                                self.bonder_centroid())
+        # If the bonder centroid and centroid are in the same position,
+        # the centroid - centroid vector should be orthogonal to the
+        # bonder direction vector.
+        if np.allclose(self.centroid(),
+                       self.bonder_centroid(), atol=1e-5):
+            *_, bvec = next(self.bonder_direction_vectors())
+            # Construct a secondary vector by finding the minimum
+            # component of bvec and setting it to 0.
+            vec2 = list(bvec)
+            minc = min(vec2)
+            vec2[vec2.index(min(vec2))] = 0 if abs(minc) >= 1e-5 else 1
+            # Get a vector orthogonal to bvec and vec2.
+            a = normalize_vector(np.cross(bvec, vec2))
+            return a
+
+        else:
+            return normalize_vector(self.centroid() -
+                                    self.bonder_centroid())
 
     def functional_group_atoms(self):
         """
@@ -1310,7 +1419,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         The representation has the following form:
 
             {
-                'key' : 'frozenset({'amine', 'InChiKey=[...]'})',
                 'class' : 'StructUnit',
                 'mol_block' : 'A string holding the V3000 mol
                                block of the molecule.',
@@ -1328,7 +1436,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         return {
 
         'class' : self.__class__.__name__,
-        'func_grp' : self.func_grp.name,
+        'func_grp' : (self.func_grp if
+                      self.func_grp is None else self.func_grp.name),
         'mol_block' : self.mdl_mol_block(),
         'note' : self.note,
         'name' : self.name
@@ -1369,11 +1478,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                                 x.name == json_dict['func_grp']), None)
         obj.energy = Energy(obj)
         obj.optimized = json_dict['optimized']
-        obj.failed = False
         obj.key = key
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
-        obj.tag_atoms()
+        if obj.func_grp:
+            obj.tag_atoms()
         cls.cache[key] = obj
         return obj
 
@@ -1766,13 +1875,13 @@ class StructUnit2(StructUnit):
         *_, start = next(self.bonder_direction_vectors())
         return self._set_orientation2(start, end)
 
-    def minimize_theta(self, vector, axis, step=0.17):
+    def minimize_theta(self, vector, axis):
         """
         Rotates molecule about `axis` to minimze theta with `vector`.
 
-        The molecule is iteratively rotated about `axis` so that the
-        vector between its bonder atoms is as close as possible to
-        `vector`.
+        The molecule is rotated about `axis` passing through the bonder
+        centroid. It is rotated so that the vector between the bonder
+        and molecular centroids lies on the same plane as `vector`.
 
         Parameters
         ----------
@@ -1781,9 +1890,6 @@ class StructUnit2(StructUnit):
 
         axis : numpy.array
             The direction vector along which the rotation happens.
-
-        step : float
-            The size of the iterative step in radians.
 
         Modifies
         --------
@@ -1798,32 +1904,49 @@ class StructUnit2(StructUnit):
 
         """
 
-        vector = normalize_vector(vector)
-        axis = normalize_vector(axis)
+        # Save the initial position and change the origin to the
+        # center of the bonder atoms.
+        iposition = self.centroid()
+        self.set_bonder_centroid([0,0,0])
 
-        theta = vector_theta(self.centroid_centroid_dir_vector(),
-                             vector)
+        # 1. First transform the problem.
+        # 2. The rotation axis is set equal to the z-axis.
+        # 3. Apply this transformation to all vectors in the problem.
+        # 4. Take only the x and y components of the bonder vector and
+        #    `vector`.
+        # 5. Work out the angle between them.
+        # 6. Apply that rotation along the original rotation axis.
 
-        # First determine the direction in which iteration should
-        # occur.
-        self.rotate2(step, axis)
-        theta2 = vector_theta(self.centroid_centroid_dir_vector(),
-                             vector)
-        if theta2 > theta:
-            axis = np.multiply(axis, -1)
+        rotmat = rotation_matrix(axis, [0,0,1])
+        tstart = np.dot(rotmat, self.centroid_centroid_dir_vector())
+        tstart = np.array([tstart[0], tstart[1], 0])
 
-        prev_theta = theta2
-        while True:
-            self.rotate2(step, axis)
-            theta = vector_theta(self.centroid_centroid_dir_vector(),
-                             vector)
+        # If the `tstart` vector is 0 after these transformations it
+        # means that the molecule is flat. Return, no need to do any
+        # more work.
+        if np.allclose(tstart, [0,0,0], atol=1e-8):
+            self.set_position(iposition)
+            return
 
-            if theta >= prev_theta:
-                axis = np.multiply(axis, -1)
-                self.rotate2(step, axis)
-                break
+        tend = np.dot(rotmat, vector)
+        tend = np.array([tend[0], tend[1], 0])
+        angle = vector_theta(tstart, tend)
 
-            prev_theta = theta
+        # Check in which direction the rotation should go.
+        # This is done by apply the rotation in each direction and
+        # seeing which one leads to a smaller theta.
+        r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
+        t1 = vector_theta(np.dot(r1, tstart), tend)
+        r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
+        t2 = vector_theta(np.dot(r2, tstart), tend)
+
+        if t2 < t1:
+            angle *= -1
+
+        rotmat = rotation_matrix_arbitrary_axis(angle, axis)
+        posmat = np.dot(rotmat, self.position_matrix())
+        self.set_position_from_matrix(posmat)
+        self.set_position(iposition)
 
 
 class StructUnit3(StructUnit):
@@ -1862,8 +1985,7 @@ class StructUnit3(StructUnit):
         """
 
         bonder_coord = self.atom_coords(self.bonder_ids[0])
-        d = np.multiply(np.sum(np.multiply(self.bonder_plane_normal(),
-                                           bonder_coord)), -1)
+        d = -np.sum(self.bonder_plane_normal() * bonder_coord)
         return np.append(self.bonder_plane_normal(), d)
 
     def bonder_plane_normal(self):
@@ -1894,7 +2016,7 @@ class StructUnit3(StructUnit):
                              self.centroid_centroid_dir_vector())
 
         if theta > np.pi/2:
-            normal_v = np.multiply(normal_v, -1)
+            normal_v *= -1
 
         return normal_v
 
@@ -2014,6 +2136,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
     mol : rdkit.Chem.rdchem.Mol
         An rdkit instance representing the macromolecule.
 
+    inchi : str
+        The InChI of the molecule.
+
     optimized : bool (default = False)
         This is a flag to indicate if a molecule has been previously
         optimized. Optimization functions set this flag to ``True``
@@ -2035,14 +2160,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
         key and the value it calculated for unscaled_fitness as the
         value.
 
-    failed : bool (default = False)
-        ``True`` if the fitness or optimization function failed to
-        evaluate the molecule.
-
-    progress_params : list (default = None)
+    progress_params : dict (default = {})
         Holds the fitness parameters which the GA should track to make
-        progress plots. If the default ``None`` is used, the fitness
-        value will be used.
+        progress plots. The key is the name of a fitness function.
 
     bonds_made : int
         The number of bonds created during assembly.
@@ -2055,17 +2175,17 @@ class MacroMolecule(Molecule, metaclass=Cached):
         `update_cache` to work. This attribute is assigned by the
         `__call__()` method of the ``Cached`` metaclass.
 
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
-
     name : str (default = "")
         A name which can be optionally given to the molcule for easy
         identification.
 
+    note : str (default = "")
+        A note or comment about the molecule. Purely optional but can
+        be useful for labelling and debugging.
+
     """
 
-    def __init__(self, building_blocks, topology, note="", name=""):
+    def __init__(self, building_blocks, topology, name="", note=""):
         """
         Initialize a ``MacroMolecule`` instance.
 
@@ -2093,10 +2213,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        super().__init__(note, name)
         self.fitness = None
         self.unscaled_fitness = {}
-        self.progress_params = None
+        self.progress_params = {}
         self.building_blocks = building_blocks
         self.bb_counter = Counter()
         self.topology = topology
@@ -2106,12 +2225,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
             # Ask the ``Topology`` instance to assemble/build the
             # macromolecule. This creates the `mol` attribute.
             topology.build(self)
-            self.save_bonders()
 
         except Exception as ex:
             self.mol = rdkit.Mol()
-            self.failed = True
             MolError(ex, self, 'During initialization.')
+
+        super().__init__(name, note)
+        self.save_bonders()
 
     def json(self):
         """
@@ -2149,6 +2269,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         'building_blocks' : [x.json() for x in self.building_blocks],
         'topology' : repr(self.topology),
         'unscaled_fitness' : repr(self.unscaled_fitness),
+        'progress_params' : self.progress_params,
         'note' : self.note,
         'name' : self.name
 
@@ -2190,7 +2311,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
                                      np.__dict__)
         obj.fitness = None
-        obj.progress_params = None
+        obj.progress_params = json_dict['progress_params']
         obj.bb_counter = Counter({Molecule.fromdict(key) : val for
                                 key, val in json_dict['bb_counter']})
         obj.bonds_made = json_dict['bonds_made']
@@ -2199,7 +2320,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.optimized = json_dict['optimized']
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
-        obj.failed = False
         obj.key = key
         obj.building_blocks = bbs
         cls.cache[key] = obj
@@ -2228,40 +2348,16 @@ class MacroMolecule(Molecule, metaclass=Cached):
         return (frozenset(x.key for x in building_blocks),
                 repr(topology))
 
-    def same(self, other):
-        """
-        Check if `other` has the same molecular structure.
-
-        Parameterss.getcwd()
-        ----------
-        other : MacroMolecule
-            The ``MacroMolecule`` instance you are checking has
-            the same structure.
-
-        Returns
-        -------
-        bool
-            Returns ``True`` if the building blocks and topology
-            of the macromolecules are the same.
-
-        """
-
-        # Compare the building blocks and topology making up the
-        # macromolecule. If these are the same then the molecules
-        # have the same structure.
-        return (self.building_blocks == other.building_blocks and
-                repr(self.topology) == repr(other.topology))
-
     def update_cache(self):
         """
-        Updates caching dictionary so that it contains `self`.
+        Set cached molecule with same 'key' to have equal attributes.
 
         When an instance of ``MacroMolecule`` is first created it
-        is cached. Using multiprocessing to perform optimizations
-        returns modified copies of the cached molecules. In order
-        to ensure that the cache holds to the modified copies,
-        not to the originally initialized molecule, this method
-        must be run.
+        is cached. Using multiprocessing to perform optimizations or
+        calculate fitness returns modified copies of the cached
+        molecules. In order to ensure that the cached molecules have
+        their attributes updated to the values of the copies, this
+        method must be run on the copies.
 
         Returns
         -------
@@ -2269,9 +2365,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        # The caching is done by the class. Access it and use its
-        # ``_update_cache()`` method.
-        self.__class__._update_cache(self)
+        self.__class__.cache[self.key].__dict__ = dict(self.__dict__)
 
     def __eq__(self, other):
         return self.fitness == other.fitness
@@ -2312,28 +2406,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
             MacroMolecule.cache[key] = macro_mol
             return macro_mol
 
+
 class Cage(MacroMolecule):
     """
     Used to represent molecular cages.
 
     """
-
-    def cavity_size(self):
-        """
-        Returns the diameter of the cage cavity.
-
-        Returns
-        -------
-        float
-            The size of the cage cavity.
-
-        """
-
-        center_of_mass = self.center_of_mass()
-        min_dist = min((euclidean(coord, center_of_mass) -
-                atom_vdw_radii[self.atom_symbol(atom_id)])
-                       for atom_id, coord in self.all_atom_coords())
-        return 2 * abs(min_dist)
 
     def window_difference(self):
         """
@@ -2454,6 +2532,7 @@ class Cage(MacroMolecule):
                 return None
 
         return all_windows
+
 
 class Polymer(MacroMolecule):
     """
