@@ -262,13 +262,14 @@ def ga_run(ifile):
 
     kill_macromodel()
     os.chdir(root_dir)
-    logger.info('Plotting EPP.')
     progress.progress.normalize_fitness_values()
     progress.dump()
-    plot.fitness_epp(progress.progress, 'epp.png')
-    progress.progress.remove_members(lambda x :
-          pop.ga_tools.fitness.name not in x.progress_params)
-    plot.parameter_epp(progress.progress, 'epp.png')
+    if ga_input.plot_epp:
+        logger.info('Plotting EPP.')
+        plot.fitness_epp(progress.progress, 'epp.png')
+        progress.progress.remove_members(lambda x :
+              pop.ga_tools.fitness.name not in x.progress_params)
+        plot.parameter_epp(progress.progress, 'epp.png')
 
     shutil.rmtree('scratch')
     pop.write('final_pop', True)
