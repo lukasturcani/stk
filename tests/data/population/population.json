@@ -2,7 +2,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -29,7 +29,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -75,7 +75,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -102,7 +102,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -148,7 +148,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -175,7 +175,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -221,7 +221,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -248,7 +248,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -294,7 +294,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -321,7 +321,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -367,7 +367,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -394,7 +394,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -440,7 +440,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -467,7 +467,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -513,7 +513,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -540,7 +540,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -586,7 +586,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -613,7 +613,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -659,7 +659,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -686,7 +686,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -732,7 +732,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -759,7 +759,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -805,7 +805,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -832,7 +832,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -878,7 +878,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -905,7 +905,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -951,7 +951,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -978,7 +978,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1024,7 +1024,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1051,7 +1051,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1097,7 +1097,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1124,7 +1124,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1170,7 +1170,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1197,7 +1197,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1243,7 +1243,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1270,7 +1270,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1316,7 +1316,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1343,7 +1343,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1389,7 +1389,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1416,7 +1416,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1462,7 +1462,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1489,7 +1489,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1535,7 +1535,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1562,7 +1562,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1608,7 +1608,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1635,7 +1635,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1681,7 +1681,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1708,7 +1708,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1754,7 +1754,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1781,7 +1781,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1827,7 +1827,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1854,7 +1854,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1900,7 +1900,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -1927,7 +1927,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -1973,7 +1973,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2000,7 +2000,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2046,7 +2046,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2073,7 +2073,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2119,7 +2119,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2146,7 +2146,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2192,7 +2192,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2219,7 +2219,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2265,7 +2265,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2292,7 +2292,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2338,7 +2338,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2365,7 +2365,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2411,7 +2411,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2438,7 +2438,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2484,7 +2484,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2511,7 +2511,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2557,7 +2557,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2584,7 +2584,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2630,7 +2630,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2657,7 +2657,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2703,7 +2703,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2730,7 +2730,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2776,7 +2776,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2803,7 +2803,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2849,7 +2849,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2876,7 +2876,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2922,7 +2922,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -2949,7 +2949,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -2995,7 +2995,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3022,7 +3022,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3068,7 +3068,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3095,7 +3095,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3141,7 +3141,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3168,7 +3168,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3214,7 +3214,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3241,7 +3241,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3287,7 +3287,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3314,7 +3314,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3360,7 +3360,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3387,7 +3387,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3433,7 +3433,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3460,7 +3460,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3506,7 +3506,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3533,7 +3533,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3579,7 +3579,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3606,7 +3606,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3652,7 +3652,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3679,7 +3679,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3725,7 +3725,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3752,7 +3752,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3798,7 +3798,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3825,7 +3825,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3871,7 +3871,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3898,7 +3898,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -3944,7 +3944,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -3971,7 +3971,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4017,7 +4017,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4044,7 +4044,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4090,7 +4090,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4117,7 +4117,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4163,7 +4163,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4190,7 +4190,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4236,7 +4236,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4263,7 +4263,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4309,7 +4309,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 2, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 2, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4336,7 +4336,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4382,7 +4382,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 2, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 2, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4409,7 +4409,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4455,7 +4455,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4482,7 +4482,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4528,7 +4528,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4555,7 +4555,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4601,7 +4601,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4628,7 +4628,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4674,7 +4674,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4701,7 +4701,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4747,7 +4747,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4774,7 +4774,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4820,7 +4820,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 2, 1, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 2, 1, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4847,7 +4847,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4893,7 +4893,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4920,7 +4920,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -4966,7 +4966,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 0, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(1, 0, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -4993,7 +4993,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5039,7 +5039,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5066,7 +5066,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5112,7 +5112,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5139,7 +5139,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5185,7 +5185,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5212,7 +5212,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5258,7 +5258,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 0, 0, 0))",
+        "topology": "FourPlusSix(A_alignments=(0, 0, 0, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5285,7 +5285,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5331,7 +5331,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(1, 1, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(1, 1, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5358,7 +5358,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5404,7 +5404,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 1, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 1, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5431,7 +5431,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5477,7 +5477,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 1, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 1, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5504,7 +5504,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5550,7 +5550,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 0, 1))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 0, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5577,7 +5577,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5623,7 +5623,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 0, 2, 1))",
+        "topology": "FourPlusSix(A_alignments=(2, 0, 2, 1), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5650,7 +5650,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5696,7 +5696,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(2, 1, 2, 0))",
+        "topology": "FourPlusSix(A_alignments=(2, 1, 2, 0), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5723,7 +5723,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5769,7 +5769,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 2, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 2, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5796,7 +5796,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",
@@ -5842,7 +5842,7 @@
     {
         "note": "",
         "name": "",
-        "topology": "FourPlusSix(alignment=(0, 1, 0, 2))",
+        "topology": "FourPlusSix(A_alignments=(0, 1, 0, 2), B_alignments=None)",
         "bonder_ids": [
             3,
             6,
@@ -5869,7 +5869,7 @@
             104,
             107
         ],
-        "unscaled_fitness": "{}",
+        "progress_params" : {}, "unscaled_fitness": "{}",
         "building_blocks": [
             {
                 "mol_block": "\n     RDKit          3D\n\n  0  0  0  0  0  0  0  0  0  0999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 15 14 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 0.5921 0.0122 71.6326 0\nM  V30 2 C 0.1840 -1.4373 71.9404 0\nM  V30 3 C -0.4840 0.8310 70.9025 0\nM  V30 4 H 1.5198 0.0191 71.0576 0\nM  V30 5 H 0.8283 0.4991 72.5796 0\nM  V30 6 N 0.0000 2.1855 70.7108 0\nM  V30 7 H -0.6814 2.7399 70.2089 0\nM  V30 8 H 0.1345 2.6447 71.6016 0\nM  V30 9 H -1.4154 0.8394 71.4728 0\nM  V30 10 H -0.7092 0.3878 69.9306 0\nM  V30 11 N -0.0000 -2.1855 70.7106 0\nM  V30 12 H 0.8510 -2.1722 70.1646 0\nM  V30 13 H -0.7083 -1.7484 70.1379 0\nM  V30 14 H -0.7388 -1.4606 72.5244 0\nM  V30 15 H 0.9515 -1.9245 72.5456 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 0 1 1 2\nM  V30 1 1 1 3\nM  V30 2 1 1 4\nM  V30 3 1 1 5\nM  V30 4 1 2 11\nM  V30 5 1 2 14\nM  V30 6 1 2 15\nM  V30 7 1 3 6\nM  V30 8 1 3 9\nM  V30 9 1 3 10\nM  V30 10 1 6 7\nM  V30 11 1 6 8\nM  V30 12 1 11 12\nM  V30 13 1 11 13\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n\n$$$$\n",

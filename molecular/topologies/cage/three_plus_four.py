@@ -1,22 +1,23 @@
 """
-Defines cage topologies from building blocks of 3 and 4 func groups. 
+Defines cage topologies from building blocks of 3 and 4 func groups.
 
 """
 
-from .base import _CageTopology, Vertex
+from .base import _VertexOnlyCageTopology, Vertex
 
-class SixPlusEight(_CageTopology):
+
+class SixPlusEight(_VertexOnlyCageTopology):
     """
     A cage topology of 3 and 4 functional group building blocks.
-    
+
     """
-    
-    positions_A = [Vertex(-50, 50, 0), 
-                    Vertex(-50, -50, 0), 
-                    Vertex(50, 50, 0), 
+
+    positions_A = [Vertex(-50, 50, 0),
+                    Vertex(-50, -50, 0),
+                    Vertex(50, 50, 0),
                     Vertex(50, -50, 0),
-    
-                    Vertex(0, 0, 50), 
+
+                    Vertex(0, 0, 50),
                     Vertex(0, 0, -50)]
 
     a,b,c,d,e,f = positions_A
@@ -25,11 +26,11 @@ class SixPlusEight(_CageTopology):
                  Vertex.vertex_init(b,e,d),
                 Vertex.vertex_init(e,d,c),
                 Vertex.vertex_init(e,c,a),
-    
+
                 Vertex.vertex_init(a,f,b),
                 Vertex.vertex_init(f,b,d),
                 Vertex.vertex_init(d,f,c),
                 Vertex.vertex_init(c,f,a)]
-                
+
     n_windows = 12
     n_window_types = 1

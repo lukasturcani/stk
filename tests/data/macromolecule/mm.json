@@ -1,5 +1,5 @@
 [{
-    "unscaled_fitness": "{}",
+    "unscaled_fitness": "{}", "progress_params": {},
     "bonds_made": 12,
     "note" : "",
     "name": "",
@@ -22,7 +22,7 @@
             4
         ]
     ],
-    "topology": "FourPlusSix(alignment=None)",
+    "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
     "building_blocks": [
         {"class": "StructUnit2",
          "note" : "",
@@ -109,8 +109,8 @@
             "note" : ""
         }
     ],
-    "topology": "FourPlusSix(alignment=None)",
-    "unscaled_fitness": "{}",
+    "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
+    "unscaled_fitness": "{}", "progress_params": {},
     "bonder_ids": [
         3,
         6,

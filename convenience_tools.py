@@ -6,8 +6,7 @@ part of MMEA. They must be completely self-sufficient.
 
 """
 
-import rdkit.Chem as chem
-import rdkit
+import rdkit.Chem.AllChem as rdkit
 from rdkit.Geometry import Point3D
 import numpy as np
 import time
@@ -43,11 +42,11 @@ atom_vdw_radii = {
                  }
 
 # This dictionary gives easy access to the rdkit bond types.
-bond_dict = {'1' : rdkit.Chem.rdchem.BondType.SINGLE,
-             'am' : rdkit.Chem.rdchem.BondType.SINGLE,
-             '2' : rdkit.Chem.rdchem.BondType.DOUBLE,
-             '3' : rdkit.Chem.rdchem.BondType.TRIPLE,
-             'ar' : rdkit.Chem.rdchem.BondType.AROMATIC}
+bond_dict = {'1' : rdkit.rdchem.BondType.SINGLE,
+             'am' : rdkit.rdchem.BondType.SINGLE,
+             '2' : rdkit.rdchem.BondType.DOUBLE,
+             '3' : rdkit.rdchem.BondType.TRIPLE,
+             'ar' : rdkit.rdchem.BondType.AROMATIC}
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
@@ -81,6 +80,7 @@ class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
         self.msg = msg
+
 
 class MolError(Exception):
     """
@@ -177,14 +177,17 @@ class MolError(Exception):
             f.write('\n'+'='*240)
             f.write('\n\n\n')
 
+
 class MolFileError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
         self.msg = msg
 
+
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
+
 
 class FunctionData:
     """
@@ -230,6 +233,7 @@ class FunctionData:
     def __repr__(self):
         return str(self)
 
+
 class LazyAttr:
     """
     A descriptor for creating lazy attributes.
@@ -245,6 +249,7 @@ class LazyAttr:
         val = self.func(obj)
         setattr(obj, self.func.__name__, val)
         return val
+
 
 class MAEExtractor:
     """
@@ -273,6 +278,10 @@ class MAEExtractor:
         The content of the .mae file hodling all the conformers from
         the macromodel conformer search. This holds other data such as
         their energies too.
+
+    energies : list of tuples of (float, int)
+        The list holds the id and energy of every conformer in the .mae
+        file.
 
     min_energy : float
         The minimum energy found in the .mae file.
@@ -345,19 +354,19 @@ class MAEExtractor:
         # energy block extract the energy and store it in the
         # `energies` list. Store the `index`  (conformer id) along with
         # each extracted energy.
-        energies = []
+        self.energies = []
         prev_block = deque([""], maxlen=1)
         index = 1
         for block in content_split:
             if ("f_m_ct" in prev_block[0] and
                                 "r_mmod_Potential_Energy" in block):
                 energy = self.extract_energy(block)
-                energies.append((energy, index))
+                self.energies.append((energy, index))
                 index += 1
 
             prev_block.append(block)
 
-        e, conf = min(energies)
+        e, conf = min(self.energies)
         self.min_energy = e
         # Return the id of the lowst energy conformer.
         return conf
@@ -373,6 +382,7 @@ class MAEExtractor:
             with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())
 
+
 def archive_output():
     """
     Places the ``output`` folder into ``old_output``.
@@ -386,19 +396,19 @@ def archive_output():
 
     """
 
-    if 'output' in os.listdir():
-        # Make the ``old_output`` folder if it does not exist already.
-        if 'old_output' not in os.listdir():
-            os.mkdir('old_output')
+    if 'output' not in os.listdir():
+        return
 
-        # Find out with what number the ``output`` folder should be
-        # labelled within ``old_output``.
-        num = len(os.listdir('old_output'))
-        new_dir = os.path.join('old_output', str(num))
-        s = 'Moving old output dir.'
-        print('\n'+s + '\n' + '-'*len(s) + '\n\n')
-        shutil.copytree('output', new_dir)
-        shutil.rmtree('output')
+    # Make the ``old_output`` folder if it does not exist already.
+    if 'old_output' not in os.listdir():
+        os.mkdir('old_output')
+
+    # Find out with what number the ``output`` folder should be
+    # labelled within ``old_output``.
+    num = len(os.listdir('old_output'))
+    new_dir = os.path.join('old_output', str(num))
+    os.rename('output', new_dir)
+
 
 def centroid(*coords):
     """
@@ -421,7 +431,8 @@ def centroid(*coords):
         total = np.add(total, coord)
     return np.divide(total, len(coords))
 
-def dedupe(iterable, seen=None):
+
+def dedupe(iterable, seen=None, key=None):
     """
     Yields items from `iterable` barring duplicates.
 
@@ -436,6 +447,11 @@ def dedupe(iterable, seen=None):
     seen : set (default = None)
         Holds items which are not to be yielded.
 
+    key : callable
+        A function which gets applied to every member of `iterable`.
+        The return of this function is checked for duplication rather
+        than the member itself.
+
     Yields
     ------
     object
@@ -447,9 +463,11 @@ def dedupe(iterable, seen=None):
     if seen is None:
         seen = set()
     for x in iterable:
-        if x not in seen:
-            seen.add(x)
+        val = key(x) if key is not None else x
+        if val not in seen:
+            seen.add(val)
             yield x
+
 
 def flatten(iterable, excluded_types={str}):
     """
@@ -492,6 +510,7 @@ def flatten(iterable, excluded_types={str}):
             yield from flatten(x)
         else:
             yield x
+
 
 def kabsch(coords1, coords2):
     """
@@ -538,6 +557,7 @@ def kabsch(coords1, coords2):
 
     return np.dot(v, u)
 
+
 def kill_macromodel():
     """
     Kills any applications left open as a result running MacroModel.
@@ -565,6 +585,7 @@ def kill_macromodel():
         sp.run(["pkill", "jserver-watcher"],
                stdout=sp.PIPE, stderr=sp.PIPE)
 
+
 def matrix_centroid(matrix):
     """
     Returns the centroid of the coordinates held in `matrix`.
@@ -586,6 +607,7 @@ def matrix_centroid(matrix):
 
     return np.array(np.sum(matrix, axis=0) / len(matrix))[0]
 
+
 def mol_from_mae_file(mae_path):
     """
     Creates a rdkit molecule from a ``.mae`` file.
@@ -603,8 +625,8 @@ def mol_from_mae_file(mae_path):
 
     """
 
-    mol = chem.EditableMol(chem.Mol())
-    conf = chem.Conformer()
+    mol = rdkit.EditableMol(rdkit.Mol())
+    conf = rdkit.Conformer()
 
     with open(mae_path, 'r') as mae:
         content = re.split(r'[{}]', mae.read())
@@ -644,7 +666,7 @@ def mol_from_mae_file(mae_path):
 
         atom_sym = periodic_table[atom_num]
         atom_coord = Point3D(x,y,z)
-        atom_id = mol.AddAtom(chem.Atom(atom_sym))
+        atom_id = mol.AddAtom(rdkit.Atom(atom_sym))
         conf.SetAtomPosition(atom_id, atom_coord)
 
     labels, data_block, *_ = bond_block.split(':::')
@@ -670,6 +692,7 @@ def mol_from_mae_file(mae_path):
     mol = mol.GetMol()
     mol.AddConformer(conf)
     return mol
+
 
 def mol_from_mol_file(mol_file):
     """
@@ -697,8 +720,8 @@ def mol_from_mol_file(mol_file):
 
     """
 
-    e_mol = chem.EditableMol(chem.Mol())
-    conf = chem.Conformer()
+    e_mol = rdkit.EditableMol(rdkit.Mol())
+    conf = rdkit.Conformer()
 
     with open(mol_file, 'r') as f:
         take_atom = False
@@ -734,7 +757,7 @@ def mol_from_mol_file(mol_file):
                 _, _, _, atom_sym, *coords, _ = words
                 coords = [float(x) for x in coords]
                 atom_coord = Point3D(*coords)
-                atom_id = e_mol.AddAtom(chem.Atom(atom_sym))
+                atom_id = e_mol.AddAtom(rdkit.Atom(atom_sym))
                 conf.SetAtomPosition(atom_id, atom_coord)
                 continue
 
@@ -749,6 +772,7 @@ def mol_from_mol_file(mol_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
+
 
 def normalize_vector(vector):
     """
@@ -770,6 +794,7 @@ def normalize_vector(vector):
 
     v = np.divide(vector, np.linalg.norm(vector))
     return np.round(v, decimals=4)
+
 
 def rotation_matrix(vector1, vector2):
     """
@@ -808,7 +833,12 @@ def rotation_matrix(vector1, vector2):
 
     # Handle the case where the rotation is 180 degrees.
     if np.array_equal(vector1, np.multiply(vector2, -1)):
-        return np.multiply(np.identity(3), -1)
+        # Get a vector orthogonal to `vector1` by finding the smallest
+        # component of `vector1` and making that a vector.
+        ortho = [0,0,0]
+        ortho[list(vector1).index(min(abs(vector1)))] = 1
+        axis = np.cross(vector1, ortho)
+        return rotation_matrix_arbitrary_axis(np.pi, axis)
 
     v = np.cross(vector1, vector2)
 
@@ -823,6 +853,7 @@ def rotation_matrix(vector1, vector2):
     mult_factor = (1-c)/np.square(s)
 
     return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
+
 
 def rotation_matrix_arbitrary_axis(angle, axis):
     """
@@ -844,28 +875,29 @@ def rotation_matrix_arbitrary_axis(angle, axis):
         A 3x3 array representing a rotation matrix.
 
     """
-    # Calculation of the rotation matrix
+
+
     axis = normalize_vector(axis)
 
     a = np.cos(angle/2)
-
-    b,c,d = np.multiply(axis, np.sin(angle/2))
+    b,c,d = axis * np.sin(angle/2)
 
     e11 = np.square(a) + np.square(b) - np.square(c) - np.square(d)
-    e12 = 2*(np.multiply(b,c) - np.multiply(a,d))
-    e13 = 2*(np.multiply(b,d) + np.multiply(a,c))
+    e12 = 2*(b*c - a*d)
+    e13 = 2*(b*d + a*c)
 
-    e21 = 2*(np.multiply(b,c) + np.multiply(a,d))
+    e21 = 2*(b*c + a*d)
     e22 = np.square(a) + np.square(c) - np.square(b) - np.square(d)
-    e23 = 2*(np.multiply(c,d) - np.multiply(a,b))
+    e23 = 2*(c*d - a*b)
 
-    e31 = 2*(np.multiply(b,d) - np.multiply(a,c))
-    e32 =  2*(np.multiply(c,d) + np.multiply(a,b))
+    e31 = 2*(b*d - a*c)
+    e32 =  2*(c*d + a*b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
     return np.array([[e11, e12, e13],
                      [e21, e22, e23],
                      [e31, e32, e33]])
+
 
 def tar_output():
     """
@@ -880,6 +912,7 @@ def tar_output():
     tname = os.path.join('output','output.tgz')
     with tarfile.open(tname, 'w:gz') as tar:
         tar.add('output')
+
 
 @contextmanager
 def time_it():
@@ -929,5 +962,8 @@ def vector_theta(vector1, vector2):
     numerator = np.dot(vector1, vector2)
     denominator = (np.linalg.norm(vector1) *
                     np.linalg.norm(vector2))
-
+    # This if statement prevents returns of NaN due to floating point
+    # incurracy.
+    if np.isclose(numerator, denominator, atol=1e-8):
+        return 0.0
     return np.arccos(numerator/denominator)

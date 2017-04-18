@@ -11,10 +11,8 @@ The convention is that if the optimization function takes an argument
 called ``macro_mol`` the user does not have to specify that argument in
 the input file.
 
-An optimization function should update both the file of the molecule
-and the `mol` attribute.
-
-The return values of optimization functions are discarded.
+An optimization function should update the rdkit molecule in the `mol`
+attribute. The return values of optimization functions are discarded.
 
 Optimizations can be complicated. If the use of helper functions is
 required make sure that they are private, ie that their names begin
@@ -31,10 +29,15 @@ import rdkit.Chem.AllChem as rdkit
 import multiprocessing as mp
 from functools import partial, wraps
 import numpy as np
+import logging
 
 from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
+
+
+logger = logging.getLogger(__name__)
+
 
 def _optimize_all(func_data, population):
     """
@@ -53,8 +56,7 @@ def _optimize_all(func_data, population):
 
     Returns
     -------
-    iterator of Molecule objects
-        This iterator yields the optimized molecule objects.
+    None : NoneType
 
     """
 
@@ -70,10 +72,10 @@ def _optimize_all(func_data, population):
     # parallel.
     with mp.get_context('spawn').Pool() as pool:
         optimized = pool.map(p_func, population)
-        # Make sure the cache is updated with the optimized versions.
-        for member in optimized:
-            member.update_cache()
-        return optimized
+    # Make sure the cache is updated with the optimized versions.
+    for member in optimized:
+        member.update_cache()
+
 
 def _optimize_all_serial(func_data, population):
     """
@@ -92,8 +94,7 @@ def _optimize_all_serial(func_data, population):
 
     Returns
     -------
-    iterator of Molecule objects
-        This iterator yields the optimized molecule objects.
+    None : NoneType
 
 
     """
@@ -107,7 +108,9 @@ def _optimize_all_serial(func_data, population):
     p_func = _OptimizationFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population.
-    return (p_func(member) for member in population)
+    for member in population:
+        p_func(member)
+
 
 class _OptimizationFunc:
     """
@@ -127,22 +130,22 @@ class _OptimizationFunc:
         wraps(func)(self)
 
     def __call__(self, macro_mol, *args,  **kwargs):
-        try:
-            if macro_mol.optimized or macro_mol.failed:
-                print('Skipping {0}'.format(macro_mol.name))
-                return macro_mol
 
-            print('\nOptimizing {0}.'.format(macro_mol.name))
-            self.__wrapped__(macro_mol, *args, **kwargs)
-            macro_mol.optimized = True
+        if macro_mol.optimized:
+            logger.info('Skipping {0}'.format(macro_mol.name))
             return macro_mol
+
+        try:
+            logger.info('\nOptimizing {0}.'.format(macro_mol.name))
+            self.__wrapped__(macro_mol, *args, **kwargs)
 
         except Exception as ex:
             # Prevents the error from being raised, but records it in
             # ``failures.txt``.
-            macro_mol.optimized = True
-            macro_mol.failed = True
             MolError(ex, macro_mol, "During optimization.")
+
+        finally:
+            macro_mol.optimized = True
             return macro_mol
 
 
@@ -166,6 +169,7 @@ def do_not_optimize(macro_mol):
     """
 
     return
+
 
 def partial_raiser(macro_mol, ofunc):
     """
@@ -196,6 +200,7 @@ def partial_raiser(macro_mol, ofunc):
 
     globals()[ofunc.name](macro_mol, **ofunc.params)
 
+
 def raiser(macro_mol, param1, param2=2):
     """
     Doens't optimize, raises an error instead.
@@ -225,14 +230,21 @@ def raiser(macro_mol, param1, param2=2):
     raise Exception('Raiser optimization function used.')
 
 
-def rdkit_optimization(macro_mol):
+def rdkit_optimization(macro_mol, embed=False):
     """
     Optimizes the structure of the molecule using rdkit.
+
+    Uses the MMFF forcefield.
 
     Parameters
     ----------
     macro_mol : MacroMolecule
         The macromolecule who's structure should be optimized.
+
+    embed : bool (default = False)
+        When ``True`` the structure is guessed before an optimization
+        is carried out. This guess structure overrides any previous
+        structure.
 
     Modifies
     --------
@@ -246,6 +258,9 @@ def rdkit_optimization(macro_mol):
     None : NoneType
 
     """
+
+    if embed:
+        rdkit.EmbedMolecule(macro_mol.mol)
 
     # Sanitize then optimize the rdkit molecule.
     rdkit.SanitizeMol(macro_mol.mol)

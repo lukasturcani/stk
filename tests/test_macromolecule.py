@@ -7,25 +7,6 @@ from ..ga import Population
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'))
 
-def test_same():
-    """
-    Tests the `same_cage` method.
-
-    Cages initialized from the same arguments should return ``True``
-    through this method, even if the ``Cage`` class stops being cached.
-
-    """
-
-    a = MacroMolecule.testing_init('a', 'b', SimpleNamespace(a=1))
-    b = MacroMolecule.testing_init('a', 'a', SimpleNamespace(a=2))
-    c = MacroMolecule.testing_init('a', 'a', SimpleNamespace(a=2))
-    d = MacroMolecule.testing_init('a', 'b', SimpleNamespace(b=1))
-
-    assert not a.same(b)
-    assert b.same(c)
-    assert c.same(b)
-    assert not d.same(c)
-
 def test_comparison():
     """
     Checks ``==``, ``>``, ``>=``, etc. operators.
@@ -88,12 +69,11 @@ def test_json_init():
         assert mol.bonder_ids == [6, 15, 24, 59, 68, 77, 112, 121, 130,
                               165, 174, 183, 219, 222, 252, 255, 285,
                               288, 318, 321, 351, 354, 384, 387]
-        assert mol.failed == False
         assert mol.energy.__class__.__name__ == 'Energy'
         assert mol.topology.__class__.__name__ == 'FourPlusSix'
         assert len(mol.mol.GetAtoms()) == 410
         assert mol.bonds_made == 12
         assert set(mol.bb_counter.values()) == {4, 6}
-        assert mol.progress_params == None
+        assert mol.progress_params == {}
     finally:
         MacroMolecule.cache = og_c
