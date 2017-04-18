@@ -52,7 +52,7 @@ class Exit:
             return True
         return False
 
-    def mol_name_present(self, population, name):
+    def mol_name_present(self, population, mol_name):
         """
         Returns ``True`` if molecule with `name` in `population`.
 
@@ -61,7 +61,7 @@ class Exit:
         population : Population
             The GA population.
 
-        name : str
+        mol_name : str
             The name of a molecule.
 
         Returns
