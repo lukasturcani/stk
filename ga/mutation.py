@@ -219,7 +219,7 @@ class Mutation:
                   'block:\n\n{}\n\nReplacement building block:\n\n'
                   '{}\n\n').format(og_bb, bb))
 
-        return Cage({bb, lk}, macro_mol.topology)
+        return Cage([bb, lk], macro_mol.topology)
 
     def cage_random_lk(self, macro_mol, database, fg=None):
         """
@@ -276,7 +276,7 @@ class Mutation:
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
                   'Replacement linker:\n\n{}\n\n').format(og_lk, lk))
 
-        return Cage({bb, lk}, macro_mol.topology)
+        return Cage([bb, lk], macro_mol.topology)
 
     def cage_similar_bb(self, macro_mol, database, fg=None):
         """
@@ -351,9 +351,7 @@ class Mutation:
               'block:\n\n{}\n\nReplacement building block:\n\n'
               '{}\n\n').format(og_bb, new_bb))
 
-        macro_mol._similar_bb_mols = sim_mols, cur_index + 1
-
-        return Cage({new_bb, lk}, macro_mol.topology)
+        return Cage([new_bb, lk], macro_mol.topology)
 
     def cage_similar_lk(self, macro_mol, database, fg=None):
         """
@@ -428,8 +426,7 @@ class Mutation:
               ' original linker.\n\nOriginal linker:\n\n{}\n\n'
               'Replacement linker:\n\n{}\n\n').format(og_lk, new_lk))
 
-        macro_mol._similar_lk_mols = sim_mols, cur_index + 1
-        return Cage({new_lk, bb}, macro_mol.topology)
+        return Cage([new_lk, bb], macro_mol.topology)
 
     def random_topology(self, macro_mol, topologies):
         """
