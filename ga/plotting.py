@@ -135,7 +135,7 @@ def parameter_epp(pop, plot_name=False,
     max_params = []
     mean_params = []
     xvals = list(range(1, len(pop.populations)+1 ))
-    nparams = len(pop[0].progress_params[func_name])
+    nparams = len(fitness_func.param_labels)
 
     for sp in pop.populations:
 
