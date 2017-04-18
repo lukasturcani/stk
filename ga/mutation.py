@@ -20,19 +20,20 @@ start with a leading underscore.
 
 """
 
-import os
+import os, sys, logging
 import numpy as np
 from collections import Counter
-import sys
 
 from .population import Population
 from .plotting import plot_counter
 from ..convenience_tools import MolError
 from ..molecular import StructUnit3, Cage
 
+logger = logging.getLogger(__name__)
 
 class MutationError(Exception):
     ...
+
 
 class Mutation:
     """
@@ -69,12 +70,8 @@ class Mutation:
     funcs : list of FunctionData instances
         This lists holds all the mutation functions which are to be
         applied by the GA. One will be chosen at random when a mutation
-        is desired. The likelihood can be modified by the optionally
-        supplied `weights` argument.
-
-        The ``FunctionData`` object holding the name of the function
-        chosen for mutation and any additional paramters and
-        corresponding values the function may require.
+        is desired. The likelihood that each is selected is given by
+        `weights`.
 
     num_mutations : int
         The number of mutations that needs to be performed each
@@ -98,8 +95,7 @@ class Mutation:
         self.num_mutations = num_mutations
         self.n_calls = 0
 
-    def __call__(self, population,
-                 counter_name='mutation_counter.png'):
+    def __call__(self, population, counter_path=''):
         """
         Carries out mutation operations on the supplied population.
 
@@ -118,9 +114,9 @@ class Mutation:
         population : Population
             The population who's members are to be mutated.
 
-        counter_name : str (default='mutation_counter.png')
-            The name of the .png file showing which members were
-            selected for mutation.
+        counter_path : str (default = '')
+            The path to the .png file showing which members were
+            selected for mutation. If '' then no file is made.
 
         Returns
         -------
@@ -146,8 +142,9 @@ class Mutation:
                 mutant = func(parent, **func_data.params)
                 mutant_pop.members.append(mutant)
                 num_mutations += 1
-                print('Mutation number {0}. Finish when {1}.'.format(
-                                num_mutations, self.num_mutations))
+                logger.info(
+                    'Mutation number {}. Finish when {}.'.format(
+                                    num_mutations, self.num_mutations))
 
                 if num_mutations == self.num_mutations:
                     break
@@ -158,11 +155,13 @@ class Mutation:
 
         mutant_pop -= population
 
-        # Update counter with unselected members.
-        for member in population:
-            if member not in counter.keys():
-                counter.update({member : 0})
-        plot_counter(counter, counter_name)
+        if counter_path:
+            # Update counter with unselected members.
+            for member in population:
+                if member not in counter.keys():
+                    counter.update({member : 0})
+            plot_counter(counter, counter_path)
+
         return mutant_pop
 
     def cage_random_bb(self, macro_mol, database, fg=None):

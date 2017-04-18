@@ -47,10 +47,13 @@ start with a leading underscore.
 
 from functools import partial
 import numpy as np
-import sys
-import copy
+import sys, copy, logging
 
 from .population import Population
+
+
+logger = logging.getLogger(__name__)
+
 
 class Normalization:
     """
@@ -92,31 +95,27 @@ class Normalization:
         # First make sure that all the fitness values are reset and
         # hold the value of the approraite fitness function.
         for macro_mol in population:
-            if macro_mol.failed:
+            # If the unscaled fitness value is None it means that the
+            # fitness calculation failed - assign the minimum fitness
+            # value.
+            if macro_mol.unscaled_fitness[fitness_func] is None:
                 macro_mol.fitness = 1e-4
             else:
                 macro_mol.fitness = copy.deepcopy(
                             macro_mol.unscaled_fitness[fitness_func])
 
         # Make a population of members where all fitness values are
-        # valid. No point in normalizing molecules whose `fitness_fail`
-        # attribute is ``True``. The advantage of this is that when
-        # writing normalization functions you can assume all molecuels
-        # have the same type in their `fitness` attribute.
+        # valid. No point in normalizing molecules whose fitness value
+        # was ``None``. The advantage of this is that when writing
+        # normalization functions you can assume all fitness values
+        # have the same type.
 
-        # Otherwise, if a fitness function calculated numpy arrays
-        # but the calculation on some molecules failed, the result
-        # would be that some molecules would have an array in their
-        # `fitness` attribute while others would have a float
-        # (1e-4 as a result of running the fail() method). The code of
-        # the normalization function would then have to accomadate
-        # this. By making sure only molecules with valid fitness values
-        # are present in the population provided to the normalization
-        # function, coding does not have to accomodate annoying
-        # outliers.
+        valid_pop = Population(*(mol for mol in population if
+                      mol.unscaled_fitness[fitness_func] is not None))
 
-        valid_pop = Population(*(mol for mol in population if not
-                                 mol.failed))
+        # Remove duplicates, otherwise the normalization function may
+        # be applied to the same molecule twice in a single step.
+        valid_pop.remove_duplicates()
 
         # If there were no valid molecules, no need to normalize.
         if len(valid_pop) == 0:
@@ -125,6 +124,40 @@ class Normalization:
         for func_data in self.funcs:
             getattr(self, func_data.name)(valid_pop,
                                           **func_data.params)
+
+    def cage(self, population, cavity, window):
+        """
+        A normalization function for the `cage` fitness function.
+
+        Parameters
+        ----------
+        population : Population
+            The population whose members need to have their fitness
+            values normalized.
+
+        cavity : float
+            The desired size of the cage cavity.
+
+        window : float
+            The desired size of the largest cage window.
+
+        Modifies
+        --------
+        fitness : numpy.array
+            The fitness attribute of members is updated.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for mem in population:
+            cavity_diff = abs(mem.fitness[0] - cavity)
+            window_diff = abs(mem.fitness[1] - window)
+            mem.fitness = [cavity_diff, window_diff,
+                           mem.fitness[2], mem.fitness[3]]
+
 
     def combine(self, population, coefficients, exponents):
         """
@@ -166,6 +199,33 @@ class Normalization:
             new_array = np.power(macro_mol.fitness, exponents)
             new_array = np.multiply(new_array, coefficients)
             macro_mol.fitness = sum(new_array)
+
+    def divide(self, population, val):
+        """
+        Divides each fitness value by `val`.
+
+        Parameters
+        ----------
+        population : Population
+            The population being normalized.
+
+        val : numerical or numpy.array of numericals
+            The value by which each fitness value is divided.
+
+        Modifies
+        --------
+        fitness : numerical or numpy.array of numericals
+            Each fitness value of a population member is divided by
+            `val`.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        for mem in population:
+            mem.fitness /= val
 
     def magnitudes(self, population):
         """
@@ -218,6 +278,7 @@ class Normalization:
 
         # Get the mean of each element.
         means = population.mean(lambda x : x.fitness)
+        logger.debug('Means used in magnitudes: {}'.format(means))
 
         for macro_mol in population:
             macro_mol.fitness = macro_mol.fitness / means

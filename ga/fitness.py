@@ -20,15 +20,15 @@ function and normalization functions.
 The case when only a fitness function is used is simple. All fitness
 functions take a MacroMoleule instance as an argument and return the
 value of its fitness. MMEA then automatically puts this returned value
-into the `unscaled_fitness` attribute. Next MMEA copies this value into
-the `fitness` attribute.
+into the `unscaled_fitness` attribute. Next, MMEA copies this value
+into the `fitness` attribute at the start of each generation.
 
 So what happens if normalization functions are used?
 
 The first thing to note is that multiple normalization functions can
 be applied sequentially. Each normalization function replaces the
 previous value in the `fitness` attribute. Normalization functions do
-not manipulate or intarct with the `unscaled_fitness` attribute in any
+not manipulate or interact with the `unscaled_fitness` attribute in any
 way. Before the first normalization function is applied, MMEA
 automatically copies the value in `unscaled_fitness` into `fitness`.
 
@@ -61,17 +61,11 @@ The convention is that if the fitness function takes an argument called
 ``macro_mol`` they do not have to specify that argument in the input
 file.
 
-Also make sure that none of the arguments have a name equal to the name
-of any input file keyword. For example ``opt_func``, ```fitness_func``,
-``num_generations``, etc. cannot be used as parameter names in your
-functions. This requirment exists due to the way the input file is
-parsed my MMEA.
-
-A fitness function must return the value which holds the fitness of the
-molecule taken as an argument. If a fitness function is meant to be
-paired with a normalization funtion it can return any value or object
-it likes. Just as long as the normalization functions know how to deal
-with it and convert it to a number.
+A fitness function must return the value which represents the fitness
+of the molecule received as an argument. If a fitness function is meant
+to be paired with a normalization funtion it can return any value or
+object it likes. Just as long as the normalization functions know how
+to deal with it and convert it to a number.
 
 A fitness function may be complex and may not fit neatly into a single
 function. For example, the ``cage_target()`` fitness function needs to
@@ -92,14 +86,15 @@ interesting plot the evolution of energies across generations too. If
 this is the case the fitness function may assign to the
 `progress_params` attribute of `macro_mol`:
 
-    macro_mol.progress_params = [mol_energy]
+    macro_mol.progress_params['example_func'] = [mol_energy]
 
 Now a plot showing the change in `mol_energy` across generations will
-be made too, along with the plot showing the changes in fitness.
+be made too, along with the plot showing the changes in fitness. In
+this case the name of the fitness function was ``example_func``.
 
 What if two things are needed to be kept track of?
 
-    macro_mol.progress_params = [mol_energy, mol_radius]
+    macro_mol.progress_params['example_func'] = [mol_energy, mol_radius]
 
 Great, now a progress plot for each of the variables will be made.
 
@@ -113,7 +108,8 @@ Let's create a basic outline of a some fitness function:
         ...
         calculate_stuff()
         ...
-        macro_mol.progress_params = [mol_energy, mol_radius]
+        macro_mol.progress_params['this_is_the_fitness_function'] = [
+                                                mol_energy, mol_radius]
         ...
         return fitness_value
 
@@ -125,13 +121,11 @@ each of the `progress_params` and they will have their y-axes labelled
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
-import copy
+import copy, os, logging, warnings
 from functools import partial, wraps
 import networkx as nx
 import multiprocessing as mp
-import warnings
 from collections import Counter
-import os
 from os.path import join
 from uuid import uuid4
 
@@ -139,9 +133,12 @@ from ..convenience_tools import (matrix_centroid,
                                  FunctionData, MolError,
                                  rotation_matrix_arbitrary_axis)
 
-from ..molecular import (MacroMolecule,
-                         StructUnit, Energy, optimization,
-                         func_key)
+from ..molecular import (Cage, StructUnit,
+                         Energy, optimization, func_key)
+
+
+logger = logging.getLogger(__name__)
+
 
 def _calc_fitness(func_data, population):
     """
@@ -159,9 +156,7 @@ def _calc_fitness(func_data, population):
 
     Returns
     -------
-    list
-        The members of `population` which have had their fitness
-        calculated.
+    None : NoneType
 
     """
 
@@ -175,11 +170,10 @@ def _calc_fitness(func_data, population):
     with mp.get_context('spawn').Pool() as pool:
         evaluated = pool.map(p_func, population)
 
-        # Make sure the cache is updated with the evaluated versions.
-        for member in evaluated:
-            member.update_cache()
+    # Make sure the cache is updated with the evaluated versions.
+    for member in evaluated:
+        member.update_cache()
 
-    return evaluated
 
 def _calc_fitness_serial(func_data, population):
     """
@@ -203,12 +197,10 @@ def _calc_fitness_serial(func_data, population):
 
     # Get the fitness function object.
     func = globals()[func_data.name]
-
-
+    p_func = _FitnessFunc(partial(func, **func_data.params))
     # Apply the function to every member of the population.
-    for macro_mol in population:
-        _FitnessFunc(func(macro_mol, **func_data.params))
-
+    for member in population:
+        p_func(member)
 
 def _param_labels(*labels):
     """
@@ -239,6 +231,7 @@ def _param_labels(*labels):
 
     return add_labels
 
+
 class _FitnessFunc:
     """
     A decorator for fitness functions.
@@ -259,29 +252,24 @@ class _FitnessFunc:
 
     def __call__(self, macro_mol, *args,  **kwargs):
         func_name = self.__wrapped__.func.__name__
+
+        # If the fitness function has already been applied to this
+        # molecule, return.
+        if func_name in macro_mol.unscaled_fitness:
+            logger.info('Skipping {}'.format(macro_mol.name))
+            return macro_mol
+
         try:
-            # If the fitness function has already been applied to this
-            # molecule, return.
-            if func_name in macro_mol.unscaled_fitness:
-                print('Skipping {}'.format(macro_mol.name))
-                return macro_mol
-
-            # If the molecule failed, make sure that the
-            # `unscaled_fitness` value is ``None``, and return.
-            elif macro_mol.failed:
-                print('Skipping {}'.format(macro_mol.name))
-                macro_mol.unscaled_fitness[func_name] = None
-                return macro_mol
-
             val = self.__wrapped__(macro_mol, *args, **kwargs)
+
+        except Exception as ex:
+            val = None
+            MolError(ex, macro_mol, "During fitness calculation.")
+
+        finally:
             macro_mol.unscaled_fitness[func_name] = val
             return macro_mol
 
-        except Exception as ex:
-            macro_mol.failed = True
-            macro_mol.unscaled_fitness[func_name] = None
-            MolError(ex, macro_mol, "During fitness calculation")
-            return macro_mol
 
 def random_fitness(macro_mol):
     """
@@ -301,10 +289,11 @@ def random_fitness(macro_mol):
 
     return abs(np.random.normal(50,20))
 
+
 @_param_labels('var1', 'var2', 'var3', 'var4')
 def random_fitness_vector(macro_mol):
     """
-    Returns an array of random numbers.
+    Returns a size 4 array of random numbers.
 
     Parameters
     ----------
@@ -313,7 +302,7 @@ def random_fitness_vector(macro_mol):
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         The random numbers are also placed into this attribute.
 
     Returns
@@ -329,8 +318,9 @@ def random_fitness_vector(macro_mol):
     # vector all have different oraders of magnitude and that some
     # are negative.
     f = np.multiply(f, np.array([0.01, 1, 10, -100]))
-    macro_mol.progress_params = f.tolist()
+    macro_mol.progress_params['random_fitness_vector'] = f.tolist()
     return f
+
 
 def raiser(macro_mol, param1, param2=2):
     """
@@ -361,11 +351,42 @@ def raiser(macro_mol, param1, param2=2):
     raise Exception('Raiser fitness function used.')
 
 
+@_param_labels('var1', 'var2', 'var3', 'var4')
+def partial_raiser(macro_mol):
+    """
+    Calculates fitness or raises at random.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The molecule having its fitness calculated, maybe.
+
+    Returns
+    -------
+    numpy.array
+        The value of applying random_fitness_vector() to `macro_mol`.
+
+    Raises
+    ------
+    Exception
+        Raised at random.
+
+    """
+
+    if not np.random.choice([0,1]):
+        raise Exception('Partial raiser.')
+
+    r = random_fitness_vector(macro_mol)
+    n1 = 'partial_raiser'
+    n2 = 'random_fitness_vector'
+    macro_mol.progress_params[n1] = macro_mol.progress_params[n2]
+    return r
+
+
 # Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Energy per Bond ')
-def cage(macro_mol, target_cavity, target_window=None,
-         pseudoformation_params=
+def cage(macro_mol, pseudoformation_params=
          { 'func' : FunctionData('rdkit', forcefield='mmff') }):
     """
     Returns the fitness vector of a cage.
@@ -373,10 +394,8 @@ def cage(macro_mol, target_cavity, target_window=None,
     The fitness vector consists of the following properties in the
     listed order
 
-        1) `cavity_diff` - the difference between the cavity of
-           `macro_mol` and the `target_cavity`.
-        2) `window_diff` - the difference between the largest window of
-           `macro_mol` and `target_window`.
+        1) `cavity` - the diameter of the cage pore.
+        2) `window` - the diameter of the largest cage window.
         3) `asymmetry` - the sum of the size differences of all the
            windows in `macro_mol`.
         4) `eng_per_bond` - The formation energy of `macro_mol` per
@@ -386,13 +405,6 @@ def cage(macro_mol, target_cavity, target_window=None,
     ----------
     macro_mol : Cage
         The cage whose fitness is to be calculated.
-
-    target_cavity : float
-        The desired diameter of the cage's pore.
-
-    target_window : float (default = None)
-        The desired diameter of the largest window of the cage. If
-        ``None`` then `target_cavity` is used.
 
     pseudoformation_params : dict (default =
           { 'func' : FunctionData('rdkit', forcefield='uff') })
@@ -414,12 +426,8 @@ def cage(macro_mol, target_cavity, target_window=None,
 
     Modifies
     --------
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
-
-    macro_mol.progress_params : list
-        Places the calculated parameters in the list. The order
+    macro_mol.progress_params : dict
+        Places the calculated parameters in the dict. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
 
@@ -429,8 +437,10 @@ def cage(macro_mol, target_cavity, target_window=None,
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
 
@@ -438,33 +448,24 @@ def cage(macro_mol, target_cavity, target_window=None,
     # multiprocessing.
     warnings.filterwarnings('ignore')
 
-    if target_window is None:
-        target_window = target_cavity
-
-    cavity_diff = abs(target_cavity -
-                      macro_mol.cavity_size())
-
-    if macro_mol.windows is not None:
-        window_diff = abs(target_window -
-                          max(macro_mol.windows))
-    else:
-        window_diff  = None
-
+    cavity = macro_mol.cavity_size()
+    window = max(macro_mol.windows)
     asymmetry = macro_mol.window_difference()
 
-    print('\n\nCalculating complex energies.\n')
+    logger.debug('\n\nCalculating complex energies.\n')
     e_per_bond = macro_mol.energy.pseudoformation(
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
 
-    macro_mol.progress_params = [cavity_diff, window_diff,
-                                 asymmetry, e_per_bond]
+    macro_mol.progress_params['cage'] = [cavity, window,
+                                         asymmetry, e_per_bond]
 
-    if None in macro_mol.progress_params:
-        macro_mol.failed = True
-        return None
+    if None in macro_mol.progress_params['cage']:
+        raise ValueError(('At least one'
+                         ' fitness parameter not calculated.'))
 
-    return np.array([cavity_diff, window_diff, asymmetry, e_per_bond])
+    return np.array([cavity, window, asymmetry, e_per_bond])
+
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_target(macro_mol,
@@ -505,14 +506,10 @@ def cage_target(macro_mol,
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
-
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
 
     Returns
     -------
@@ -520,15 +517,18 @@ def cage_target(macro_mol,
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
 
-    return _cage_target(macro_mol,
+    return _cage_target('cage_target', macro_mol,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1))
+
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_c60(macro_mol, target_mol_file,
@@ -573,14 +573,10 @@ def cage_c60(macro_mol, target_mol_file,
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
-
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
 
     Returns
     -------
@@ -588,17 +584,20 @@ def cage_c60(macro_mol, target_mol_file,
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
-    return _cage_target(macro_mol,
+    return _cage_target('cage_c60', macro_mol,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold))
 
-def _cage_target(macro_mol, target_mol_file,
+
+def _cage_target(func_name, macro_mol, target_mol_file,
                  efunc, ofunc, rotation_func):
     """
     A general fitness function for calculating fitness of complexes.
@@ -612,6 +611,10 @@ def _cage_target(macro_mol, target_mol_file,
 
     Parameters
     ----------
+    func_name : str
+        The name of the external fitness function calling this one.
+        Used for the key in the `progress_params` dict.
+
     macro_mol : Cage
         The cage which is to have its fitness calculated.
 
@@ -633,14 +636,10 @@ def _cage_target(macro_mol, target_mol_file,
 
     Modifies
     --------
-    macro_mol.progress_params : list
+    macro_mol.progress_params : dict
         Places the calculated parameters in the list. The order
         corresponds to the arguments in the ``_param_labels()``
         decorator applied to this function.
-
-    macro_mol.failed : bool
-        The function sets this to ``True`` if one of the parameters
-        was not calculated.
 
     Returns
     -------
@@ -648,8 +647,10 @@ def _cage_target(macro_mol, target_mol_file,
         The numpy array holds the fitness vector described in this
         docstring.
 
-    None : NoneType
-        Returned if any fitness parameter failed to calculate.
+    Raises
+    ------
+    ValueError
+        If the calculation of a fitness parameter fails.
 
     """
 
@@ -683,17 +684,17 @@ def _cage_target(macro_mol, target_mol_file,
 
     # Create rdkit instances of the target in the cage for each
     # rotation.
-    rdkit_complexes = rot_func(macro_mol, target,
+    rdkit_complexes = rot_func(unopt_macro_mol, target,
                                **rotation_func.params)
 
     # Optimize the strcuture of the cage/target complexes.
     macromol_complexes = []
-    print('\n\nOptimizing complex structures.\n')
+    logger.debug('\n\nOptimizing complex structures.\n')
     for i, complex_ in enumerate(rdkit_complexes):
         # In order to use the optimization functions, first the data
-        # is loaded into a ``MacroMolecule`` instance and its .mol
+        # is loaded into a ``Cage`` instance and its .mol
         # file is written to the disk.
-        mm_complex = MacroMolecule.__new__(MacroMolecule)
+        mm_complex = Cage.__new__(Cage)
         mm_complex.mol = complex_
         mm_complex.name = name + '_COMPLEX_{0}'.format(i)
         mm_complex.optimized = False
@@ -713,7 +714,7 @@ def _cage_target(macro_mol, target_mol_file,
 
     energy_separate = mm_energy + target_energy
 
-    print('\n\nCalculating complex energies.\n')
+    logger.debug('\n\nCalculating complex energies.\n')
     min_eng_cmplx = min(macromol_complexes,
                     key=lambda x :
             getattr(x.energy, efunc.name)(**efunc.params))
@@ -742,7 +743,7 @@ def _cage_target(macro_mol, target_mol_file,
     cmplx_cage_mol = next(frag for frag, counter in frag_counters if
                         counter == cage_counter)
 
-    cmplx_cage = MacroMolecule.__new__(MacroMolecule)
+    cmplx_cage = Cage.__new__(Cage)
     cmplx_cage.mol = cmplx_cage_mol
     cmplx_cage.topology = macro_mol.topology
     cmplx_cage.name = min_eng_cmplx.name + '_no_target'
@@ -752,14 +753,14 @@ def _cage_target(macro_mol, target_mol_file,
 
     asymmetry = macro_mol.window_difference()
 
-    macro_mol.progress_params = [binding_energy, asymmetry]
+    macro_mol.progress_params[func_name] = [binding_energy, asymmetry]
 
-
-    if None in macro_mol.progress_params:
-        macro_mol.failed = True
-        return None
+    if None in macro_mol.progress_params[func_name]:
+        raise ValueError(('At least one'
+                         ' fitness parameter not calculated.'))
 
     return np.array([binding_energy, asymmetry])
+
 
 def _make_cage_target_folder():
     """
@@ -844,6 +845,7 @@ def _generate_complexes(macro_mol, target, number=1):
         rot_target.set_position_from_matrix(new_pos_mat)
 
         yield rdkit.CombineMols(macro_mol.mol, rot_target.mol)
+
 
 def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     """

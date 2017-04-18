@@ -15,9 +15,11 @@ from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
 from ..molecular import (MacroMolecule, Cage, Molecule,
-                               StructUnit, StructUnit2, StructUnit3)
+                        StructUnit, StructUnit2, StructUnit3)
+from ..molecular.topologies.cage.base import _VertexOnlyCageTopology
 from ..molecular.optimization.optimization import (_optimize_all,
                                         _optimize_all_serial)
+
 
 class Population:
     """
@@ -135,7 +137,8 @@ class Population:
                      " ``MacroMolecule`` and ``GATools`` types."), arg)
 
     @classmethod
-    def init_cage_isomers(cls, lk_file, bb_file, topology, ga_tools,
+    def init_cage_isomers(cls, lk_file, bb_file, topology,
+                          ga_tools=GATools.init_empty(),
                           lk_fg=None, bb_fg=None):
         """
         Creates a population holding all structural isomers of a cage.
@@ -143,6 +146,10 @@ class Population:
         Structural isomers here means that the building blocks are
         rotated in position so that every possible bond combination
         with linkers is formed.
+
+        This only works for cage topologies which have both building
+        blocks and linkers. It will not with topologies where all
+        building blocks have the same number of functional groups.
 
         Parameters
         ----------
@@ -154,9 +161,10 @@ class Population:
             cage.
 
         topology : type
-            A _CageTopology child class.
+            A _CageTopology child class. Exluding child classes of
+            _NoLinkerCageTopology.
 
-        ga_tools : GATools
+        ga_tools : GATools (default = GATools.init_empty())
             The GATools instance to be used by created population.
 
         lk_fg : str (default = None)
@@ -174,12 +182,20 @@ class Population:
 
         """
 
-        n = len(topology.positions_A)
-        alignments = set()
+        n_A = len(topology.positions_A)
+        A_alignments = set()
 
-        for x in it.combinations_with_replacement([0,1,2], n):
-            for y in it.permutations(x, n):
-                alignments.add(y)
+        for x in it.combinations_with_replacement([0,1,2], n_A):
+            for y in it.permutations(x, n_A):
+                A_alignments.add(y)
+
+        n_B = len(topology.positions_B)
+        B_alignments = set()
+        orientations = ([0, 1, 2] if
+            issubclass(topology, _VertexOnlyCageTopology) else [1, -1])
+        for x in it.combinations_with_replacement(orientations, n_B):
+            for y in it.permutations(x, n_B):
+                B_alignments.add(y)
 
         lk = StructUnit(lk_file, lk_fg)
         if len(lk.functional_group_atoms()) > 2:
@@ -190,9 +206,13 @@ class Population:
         bb = StructUnit3(bb_file, bb_fg)
 
         pop = cls(ga_tools)
-        for i, align in enumerate(alignments):
-            cage = Cage((lk, bb), topology(align))
-            pop.members.append(cage)
+        seen = set()
+        for A_align in A_alignments:
+            for B_align in B_alignments:
+                c = Cage([bb, lk], topology(A_align, B_align))
+                if c.inchi not in seen:
+                    pop.members.append(c)
+                    seen.add(c.inchi)
 
         return pop
 
@@ -258,7 +278,8 @@ class Population:
                     bb = StructUnit3(bb_file, bb_fg)
                     break
 
-                except TypeError:
+                except Exception:
+                    print('Issue with: {}.'.format(bb_file))
                     continue
 
             # Make a linker.
@@ -275,7 +296,8 @@ class Population:
 
                     break
 
-                except TypeError:
+                except Exception:
+                    print('Issue with: {}.'.format(lk_file))
                     continue
 
             pop.members.append(Cage({bb, lk}, topology))
@@ -338,6 +360,9 @@ class Population:
         """
         Appends a population into the `populations` attribute.
 
+        The `population` instance itself is not added, only a copy.
+        However the items it holds are not copied.
+
         Parameters
         ----------
         population : Population
@@ -355,7 +380,11 @@ class Population:
 
         """
 
-        self.populations.append(population)
+        pop = Population(*population.members)
+        for sp in population.populations:
+            pop.add_subpopulation(sp)
+
+        self.populations.append(pop)
 
     def all_members(self):
         """
@@ -380,20 +409,71 @@ class Population:
         for pop in self.populations:
             yield from pop.all_members()
 
+    def assign_names_from(self, n, overwrite=False):
+        """
+        Give each member of the population a name starting from `n`.
+
+        `n` is a number which is incremented. Each population member
+        will have a unique name as a result.
+
+        Parameters
+        ----------
+        n : int
+            A number. Members of this population are given a unique
+            number as a name, starting from this number.
+
+        overwrite : bool (default = False)
+            If ``True`` existing names are replaced.
+
+
+        Modifies
+        --------
+        name : str
+            The `name` attribute of the population's members is
+            modified.
+
+        Returns
+        -------
+        int
+            The final value of `n`.
+
+        """
+
+        for mem in self:
+            if not mem.name or overwrite:
+                mem.name = str(n)
+                n += 1
+
+        return n
+
     def calculate_member_fitness(self):
         """
         Applies the fitness function on all members.
 
+        The calculation will be performed serially or in parallel
+        depending on the flag `ga_tools.parallel`. The serial version
+        may be faster in cases where all molecules have already had
+        their fitness calcluated. This is because all calcluations will
+        be skipped. In this case creating a parallel process pool
+        creates unncessary overhead.
+
+        Modifies
+        --------
+        MarcroMolecule
+            The MacroMolecule instances held by the population have
+            fitness values calculated and placed in the
+            `unscaled_fitness` attribute.
+
         Returns
         -------
-        list
-            The a copy of the members in `self` with the fitness
-            calculated.
-
+        None : NoneType
 
         """
 
-        return _calc_fitness(self.ga_tools.fitness, self)
+        if self.ga_tools.parallel:
+            _calc_fitness(self.ga_tools.fitness, self)
+        else:
+            _calc_fitness_serial(self.ga_tools.fitness, self)
 
     def dump(self, path):
         """
@@ -462,9 +542,11 @@ class Population:
         pop = cls()
         for item in pop_list:
             if isinstance(item, dict):
-                pop.members.append(Molecule.fromdict(item, load_names))
+                pop.members.append(
+                    Molecule.fromdict(item, load_names=load_names))
             elif isinstance(item, list):
-                pop.populations.append(cls.fromlist(item, load_names))
+                pop.populations.append(
+                    cls.fromlist(item, load_names=load_names))
 
             else:
                 raise TypeError(('Population list must consist only'
@@ -495,21 +577,19 @@ class Population:
 
         return self.ga_tools.mutation(self, counter_name)
 
-    def gen_next_gen(self, pop_size, counter_name='gen_select.png'):
+    def gen_next_gen(self, pop_size, counter_path=''):
         """
         Returns a population hodling the next generation of structures.
-
-        This function also creates a .png plot of the selection
-        distribution.
 
         Parameters
         ----------
         pop_size : int
             The size of the next generation.
 
-        counter_name : str (default='gen_select.png')
+        counter_path : str (default= '')
             The name of the .png file showing which members were
-            selected for the next generation.
+            selected for the next generation. If '' then no file
+            is made.
 
         Returns
         -------
@@ -522,14 +602,16 @@ class Population:
         counter = Counter()
         for member in self.select('generational'):
             counter.update([member])
-            new_gen.add_members([member])
+            new_gen.members.append(member)
             if len(new_gen) == pop_size:
                 break
-        for member in self:
-            if member not in counter.keys():
-                counter.update({member : 0})
 
-        plot_counter(counter, counter_name)
+        if counter_path:
+            for member in self:
+                if member not in counter.keys():
+                    counter.update({member : 0})
+            plot_counter(counter, counter_path)
+
         return new_gen
 
     def gen_offspring(self, counter_name='crossover_counter.png'):
@@ -567,8 +649,28 @@ class Population:
 
         return self.ga_tools.crossover(self, counter_name)
 
+    def has_structure(self, mol):
+        """
+        Returns ``True`` if molecule with `mol` structure is held.
+
+        Parameters
+        ----------
+        mol : Molecule
+            A molecule whose structure is being evaluated for presence
+            in the population.
+
+        Returns
+        -------
+        bool
+            ``True`` if a molecule with the same structure as `mol`
+            is held by the population.
+
+        """
+
+        return any(x.same(mol) for x in self)
+
     @classmethod
-    def load(cls, path, ga_tools=None, load_names=True):
+    def load(cls, path, load_names=True):
         """
         Initializes a Population from one dumped to a file.
 
@@ -576,11 +678,6 @@ class Population:
         ----------
         path : str
             The full path of the file holding the dumped population.
-
-        ga_tools : GATools (default = None)
-            A GATools instance to be used by the loaded population. If
-            ``None`` the ``GATools`` instance of the loaded population
-            is used.
 
         load_names : bool (default = True)
             If ``True`` then the `name` attribute stored in the JSON
@@ -597,7 +694,7 @@ class Population:
             pop_list = json.load(f)
 
         pop = cls.fromlist(pop_list, load_names)
-        pop.ga_tools = ga_tools
+        pop.ga_tools = GATools.init_empty()
         return pop
 
     def max(self, key):
@@ -703,43 +800,32 @@ class Population:
         """
         Optimizes all the members of the population.
 
-        This function should invoke either the ``optimize_all()`` or
-        ``optimize_all_serial()`` functions. ``optimize_all()``
-        optimizes all members of the population in parallel.
-        ``optimize_all_serial()`` does them serially. Probably best not
-        to use the serial version unless debugging.
-
-        The parallel optimization creates cloned instances of the
-        population's members. It is these that are optimized. This
-        means that the ``.mol`` files are changed but any instance
-        attributes are not. See ``optimize_all()`` function
-        documentation in ``optimization.py`` for more details.
+        The population is optimized serially or in parallel depending
+        on the flag `ga_tools.parallel`. The serial version may be
+        faster in cases where all molecules have already been
+        optimized. This is because all optimizations will be skipped.
+        In this case creating a parallel process pool creates
+        unncessary overhead.
 
         Modifies
         --------
-        MacroMolecule
-            This function replaces the pristine rdkit molecule
-            instances with optimizes versions. It also replaces the
-            content of the pristine ``.mol`` files with pristine
-            structures.
+        Molecule
+            The Molecule instances held by the population have their
+            structures optimized.
 
         Returns
         -------
-        iterator of MacroMolecule objects
-            If a parallel optimization was chosen, this iterator yields
-            the ``MacroMolecule`` objects that have had their
-            attributes changed as a result of the optimization. They
-            are modified clones of the original population's
-            macromolecules.
-
-            If a serial optimization is done the iterator does not yield
-            clones.
+        None : NoneType
 
         """
 
-        return _optimize_all(self.ga_tools.optimization, self)
+        if self.ga_tools.parallel:
+            _optimize_all(self.ga_tools.optimization, self)
+        else:
+            _optimize_all_serial(self.ga_tools.optimization, self)
 
-    def remove_duplicates(self, between_subpops=True, top_seen=None):
+    def remove_duplicates(self, between_subpops=True,
+                                key=lambda x : id(x), top_seen=None):
         """
         Removes duplicates from a population and preserves structure.
 
@@ -766,6 +852,10 @@ class Population:
             given subpopulation. If ``True`` all duplicates are
             removed, regardless of which subpopulation they are in.
 
+        key : callable (default = lambda x : id)
+            Duplicates are removed by on the value returned by this
+            function.
+
         Modifies
         --------
         members
@@ -791,28 +881,35 @@ class Population:
         if between_subpops:
             if top_seen is None:
                 seen = set()
-            if type(top_seen) == set:
+            if isinstance(top_seen, set):
                 seen = top_seen
 
-            self.members = list(dedupe(self.members, seen=seen))
+            self.members = list(dedupe(self.members, seen, key))
             for subpop in self.populations:
-                subpop.remove_duplicates(between_subpops,
-                                             top_seen=seen)
+                subpop.remove_duplicates(True, key, seen)
 
         # If duplicates are only removed from within the same
         # subpopulation, only the `members` attribute of each
         # subpopulation needs to be cleared of duplicates. To do this,
         # each `members` attribute is deduped recursively.
         if not between_subpops:
-            self.members = list(dedupe(self.members))
+            self.members = list(dedupe(self.members, key=key))
             for subpop in self.populations:
-                subpop.remove_duplicates(between_subpops=False)
+                subpop.remove_duplicates(False, key)
 
-    def remove_failures(self):
+    def remove_members(self, key):
         """
-        Removes all members where `failed` is ``True``.
+        Removes all members where key(member) is ``True``.
 
         The structure of the population is preserved.
+
+        Parameters
+        ----------
+        key : callable
+            A callable which takes 1 argument. Each member of the
+            population is passed as the argument to `key` in turn. If
+            the result is ``True`` then the member is removed from the
+            population.
 
         Modifies
         --------
@@ -826,9 +923,9 @@ class Population:
 
         """
 
-        self.members = [ind for ind in self.members if not ind.failed]
+        self.members = [ind for ind in self.members if not key(ind)]
         for subpop in self.populations:
-            subpop.remove_failures()
+            subpop.remove_members(key)
 
     def select(self, type_='generational'):
         """
@@ -1130,7 +1227,7 @@ class Population:
 
         """
 
-        return any(item.same(mol) for mol in self.all_members())
+        return any(item is mol for mol in self.all_members())
 
     def __str__(self):
         output_string = (" Population " + str(id(self)) + "\n" +

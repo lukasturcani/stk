@@ -33,6 +33,7 @@ functional groups.
 
 """
 
+
 class FGInfo:
     """
     Contains key information about functional groups.
@@ -66,6 +67,7 @@ class FGInfo:
          self.fg_smarts = fg_smarts
          self.target_smarts = target_smarts
          self.del_smarts = del_smarts
+
 
 functional_groups = [
 

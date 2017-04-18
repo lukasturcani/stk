@@ -14,6 +14,7 @@ from uuid import uuid4
 
 from ...convenience_tools import MAEExtractor
 
+
 class _ConversionError(Exception):
     def __init__(self, message):
         self.message = message
@@ -33,6 +34,7 @@ class _OptimizationError(Exception):
 class _LewisStructureError(Exception):
     def __init__(self, message):
         self.message = message
+
 
 def macromodel_opt(macro_mol, macromodel_path, settings={}, md={}):
     """
@@ -169,6 +171,7 @@ def macromodel_opt(macro_mol, macromodel_path, settings={}, md={}):
         else:
             raise ex
 
+
 def macromodel_md_opt(macro_mol, macromodel_path, settings={}):
     """
     Runs a MD conformer search on `macro_mol`.
@@ -294,6 +297,7 @@ def macromodel_md_opt(macro_mol, macromodel_path, settings={}):
                                      macromodel_path, vals)
         else:
             raise ex
+
 
 def macromodel_cage_opt(macro_mol,
                         macromodel_path, settings={}, md={}):
@@ -440,6 +444,7 @@ def macromodel_cage_opt(macro_mol,
         else:
             raise ex
 
+
 def _run_bmin(macro_mol, macromodel_path, timeout=0):
 
     print("", time.ctime(time.time()),
@@ -511,6 +516,7 @@ def _run_bmin(macro_mol, macromodel_path, timeout=0):
         raise _OptimizationError(('The .log and/or .maegz '
                      'files were not created by the optimization.'))
 
+
 def _kill_bmin(macro_mol, macromodel_path):
     name, ext = os.path.splitext(macro_mol._file)
     name = re.split(r'\\|/', name)[-1]
@@ -537,6 +543,7 @@ def _kill_bmin(macro_mol, macromodel_path):
         if time.time() - start > 600:
             break
 
+
 def _run_applyhtreat(macro_mol, macromodel_path):
     name, ext = os.path.splitext(macro_mol._file)
     mae = name + '.mae'
@@ -553,6 +560,7 @@ def _run_applyhtreat(macro_mol, macromodel_path):
         return _run_applyhtreat(macro_mol, macromodel_path)
 
     macro_mol.update_from_mae(mae_out)
+
 
 def _license_found(output, macro_mol=None):
     """
@@ -600,10 +608,12 @@ def _license_found(output, macro_mol=None):
 
     return True
 
+
 def _com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
     return (" {:<5}{:>7}{:>7}{:>7}{:>7}{:>11.4f}{:>11.4f}"
             "{:>11.4f}{:>11.4f}").format(arg1, arg2, arg3, arg4,
                                          arg5, arg6, arg7, arg8, arg9)
+
 
 def _generate_com(macro_mol, settings):
     """
@@ -683,6 +693,7 @@ def _generate_com(macro_mol, settings):
         # ``main_string``.
         com.write(main_string)
 
+
 def _generate_md_com(macro_mol, settings):
     print('Creating .com file - {}.'.format(macro_mol.name))
 
@@ -725,6 +736,7 @@ def _generate_md_com(macro_mol, settings):
         # details of the macromodel run
         com.write(main_string)
 
+
 def _create_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.
@@ -765,6 +777,7 @@ def _create_mae(macro_mol, macromodel_path):
     mae_file = macro_mol._file.replace(ext, '.mae')
     _structconvert(macro_mol._file, mae_file, macromodel_path)
     return mae_file
+
 
 def _convert_maegz_to_mae(macro_mol, macromodel_path):
     """
@@ -810,6 +823,7 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
     mae = name + '.mae'
     return _structconvert(maegz, mae, macromodel_path)
 
+
 def _structconvert(iname, oname, macromodel_path):
 
     convrt_app = os.path.join(macromodel_path, 'utilities',
@@ -842,6 +856,7 @@ def _structconvert(iname, oname, macromodel_path):
         ' Console output was {}.').format(oname, convrt_return.stdout))
 
     return convrt_return
+
 
 def _fix_params_in_com_file(macro_mol, main_string, restricted):
     """
@@ -895,6 +910,7 @@ def _fix_params_in_com_file(macro_mol, main_string, restricted):
     return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                 "COMES_HERE!!!\n"), fix_block)
 
+
 def _fix_distance_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond distances to ``.com`` body string.
@@ -920,19 +936,8 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
 
     """
 
-    # This line holds the format for a line fixing the bond distance
-    # between two atoms. The first two ``{...}`` are replaced with the
-    # ids of atoms to be fixed. The last ``{...}`` is replaced with the
-    # bond distance. Note that in the ``.mae`` files the indices of
-    # atoms start at 1 while in rdkit they start at 0. As far as I can
-    # tell this corresponds to a shift of one for each atom index, with
-    # the ordering being the same.
-    fix_distance = (" FXDI {0:>7}{1:>7}      0      0"
-                    "   100.0000 {2:>10.4f}     0.0000     0.0000")
-
     # Go through all the bonds in the rdkit molecule. If the bond
-    # is not between bonder atoms get its distance. Add a fix line
-    # using the bond distance and atomic indices to the ``fix_block``.
+    # is not between bonder atoms add a fix line to the ``fix_block``.
     # If the bond does invovle two bonder atoms go to the next bond.
     # This is because a bond between 2 bonder atoms was added during
     # assembly and should therefore not be fixed.
@@ -944,34 +949,21 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
             atom2.GetIdx() in macro_mol.bonder_ids):
             continue
 
-        atom1_id = atom1.GetIdx()
-        atom2_id = atom2.GetIdx()
-
-        bond_len = macro_mol.atom_distance(atom1_id, atom2_id)
-
-        # Make sure that the indices are increased by 1 in the ``.mae``
-        # file from their rdkit value.
-        fix_block += (fix_distance.format(atom1_id+1, atom2_id+1,
-                                         bond_len) + "\n")
+        # Make sure that the indices are increased by 1 in the .mae
+        # file.
+        atom1_id = atom1.GetIdx() + 1
+        atom2_id = atom2.GetIdx() + 1
+        fix_block += (_com_line('FXDI', atom1_id, atom2_id, 0, 0,
+                                99999, 0, 0, 0) + '\n')
 
     return fix_block
+
 
 def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing bond angles to ``.com`` body string.
 
-    Only bond angles which do not involve bonds created during
-    assembly are fixed. The exception to this is for bond angles next
-    to bonds added during assembly. For example, consider:
-
-        A-B-C-D=E
-
-    if the bond between D and E (``=``) represents the bond added
-    during assembly, the bond angle A-B-C will be fixed but B-C-D will
-    not be. This is an artifact of the implementation but is not
-    expected to play a significant role as the vast majority of bond
-    angles which should be fixed, will be. The bond angle C-D=E will
-    also not be fixed as that is the purpose of this function.
+    All bond angles of the molecule are fixed.
 
     Parameters
     ----------
@@ -990,15 +982,6 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
         by this function.
 
     """
-    # This line holds the format for a line fixing the bond angles
-    # between 3 atoms. The first 3 ``{...}`` are replaced with the ids
-    # of atoms. The last ``{...}`` is replaced with the bond angle.
-    # Note that in the ``.mae`` files the indices of atoms start at 1
-    # while in rdkit they start at 0. As far as I can tell this
-    # corresponds to a shift of 1 for each atom index, with the
-    # ordering being the same.
-    fix_ba = (" FXBA {0:>7}{1:>7}{2:>7}      0   100.0000 "
-              "{3:>10.4f}     0.0000     0.0000")
 
     # Create a substructure consisting of 3 dummy atoms bonded with 3
     # dummy bonds. This substructure will match with any 3 atoms which
@@ -1012,45 +995,19 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     # which form a bond angle.
     ba_atoms = macro_mol.mol.GetSubstructMatches(ba_mol)
 
-    # Get the conformer holding the atomic positions.
-    conf = macro_mol.mol.GetConformer()
-
-    # For each bond angle check if a bonder atom is involved in forming
-    # it. If no, a line fixing the bond angle is added to
-    # ``fix_block``. If any atom of the 3 is a bonder atom the bond
-    # angle is not fixed. This means that there will be some bond
-    # angles which consist of 2 bonds not added during assembly which
-    # will not be fixed. However, it is assumed that the effect of this
-    # will be minimal.
-    for atom1_id, atom2_id, atom3_id in ba_atoms:
-        if (atom1_id in macro_mol.bonder_ids or
-            atom2_id in macro_mol.bonder_ids or
-            atom3_id in macro_mol.bonder_ids):
-            continue
-
-        ba = rdkit.GetAngleDeg(conf, atom1_id, atom2_id, atom3_id)
-
-        fix_block += (fix_ba.format(atom1_id+1, atom2_id+1,
-                                    atom3_id+1, ba) + "\n")
+    for atom_ids in ba_atoms:
+        atom_ids = [i+1 for i in atom_ids]
+        fix_block += (_com_line('FXBA', *atom_ids,
+                                99999, 0, 0, 0, 0) + '\n')
 
     return fix_block
+
 
 def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     """
     Adds lines fixing torsional bond angles to ``.com`` body string.
 
-    Only torsional angles which do not involve bonds created during
-    assembly are fixed. The exception to this is for torsional angles
-    next to bonds added during assembly. For example, consider:
-
-        A-B-C-D-E=F
-
-    if the bond between E and F (``=``) represents the bond added
-    during assembly, the torsional angle A-B-C-D will be fixed but
-    B-C-D-E will not be. This is an artifact of the implementation but
-    is not expected to play a significant role as the vast majority of
-    bond angles which should be fixed, will be. The bond angle C-D-E=F
-    will also not be fixed as that is the purpose of this function.
+    All torsional angles of the macromolecule are fixed.
 
     Parameters
     ----------
@@ -1070,16 +1027,6 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
 
     """
 
-    # This line holds the format for a line fixing the torsional angles
-    # between 4 atoms. The first 4 ``{...}`` are replaced with the ids
-    # of atoms. The last ``{...}`` is replaced with the torsional
-    # angle. Note that in the ``.mae`` files the indices of atoms start
-    # at 1 while in rdkit they start at 0. As far as I can tell this
-    # corresponds to a shift of 1 for each atom index, with the
-    # ordering being the same.
-    fix_ta = (" FXTA {0:>7}{1:>7}{2:>7}{3:>7}   100.0000 "
-                "{4:>10.4f}     0.0000     0.0000")
-
     # Create a substructure consisting of 4 dummy atoms bonded with 4
     # dummy bonds. This substructure will match with any 4 atoms which
     # are bonded together with any combination of bonds. These 4 atoms
@@ -1087,34 +1034,19 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     ta_mol = rdkit.MolFromSmarts('[*]~[*]~[*]~[*]')
 
     # Get the indices of all atoms which have a torsional angle.
-    # ``ta_atoms`` is a tuple of tuples of the form ((1,2,3,4),
+    # ``ta_atoms`` as a tuple of tuples of the form ((1,2,3,4),
     # (4,5,6,7), ...). Each inner tuple holds the indicies of the atoms
-    # which form a torsional angle.
+    # which have a torsional angle.
     ta_atoms = macro_mol.mol.GetSubstructMatches(ta_mol)
-    # Get the conformer holding the atomic positions.
-    conf = macro_mol.mol.GetConformer()
 
-    # For each torsional angle check if a bonder atom is involved in
-    # forming it. If no, a line fixing the torsional angle is added to
-    # ``fix_block``. If any atom of the 4 is a bonder atom the bond
-    # angle is not fixed. This means that there will be some bond
-    # angles which consist of 3 bonds not added during assembly which
-    # will not be fixed. However, it is assumed that the effect of this
-    # will be minimal.
-    for atom1_id, atom2_id, atom3_id, atom4_id in ta_atoms:
-        if (atom1_id in macro_mol.bonder_ids or
-            atom2_id in macro_mol.bonder_ids or
-            atom3_id in macro_mol.bonder_ids or
-            atom4_id in macro_mol.bonder_ids):
-            continue
-
-        ta = rdkit.GetDihedralDeg(conf, atom1_id, atom2_id,
-                                     atom3_id, atom4_id)
-
-        fix_block += (fix_ta.format(atom1_id+1, atom2_id+1,
-                                atom3_id+1, atom4_id+1, ta) + "\n")
+    # Apply the fix.
+    for atom_ids in ta_atoms:
+        atom_ids = [i+1 for i in atom_ids]
+        fix_block += (_com_line('FXTA', *atom_ids,
+                                99999, 361, 0, 0) + '\n')
 
     return fix_block
+
 
 def _wait_for_file(file_name, timeout=10):
     """

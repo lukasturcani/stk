@@ -179,6 +179,7 @@ from inspect import signature as sig
 
 from ..convenience_tools import FunctionData
 
+
 class _EnergyError(Exception):
     """
     A class for errors in Energy methods.
@@ -186,6 +187,7 @@ class _EnergyError(Exception):
     """
 
     ...
+
 
 class EMethod:
     """
@@ -241,6 +243,7 @@ class EMethod:
         # instance.
         return e_logger(self.func, obj)
 
+
 class EMeta(type):
     """
     A metaclass for ``Energy``.
@@ -277,6 +280,7 @@ class EMeta(type):
             cls_dict[name] = EMethod(func)
 
         return type.__new__(cls, cls_name, bases, cls_dict)
+
 
 def e_logger(func, obj):
     """
@@ -316,6 +320,7 @@ def e_logger(func, obj):
     # Make sure that the decorated function behaves like a typical
     # method and return.
     return MethodType(inner, obj)
+
 
 def func_key(func, fargs=None, fkwargs=None):
     """
@@ -374,6 +379,7 @@ def func_key(func, fargs=None, fkwargs=None):
     # chosen parameters.
     return FunctionData(func.__name__, **bound)
 
+
 def exclude(*args):
     """
     A decorator to add the `exclude` attribute to methods.
@@ -399,6 +405,7 @@ def exclude(*args):
         return func
 
     return inner
+
 
 class Energy(metaclass=EMeta):
     """
@@ -700,6 +707,7 @@ class Energy(metaclass=EMeta):
         except UnboundLocalError:
             raise _EnergyError('MacroModel energy calculation failed.')
 
+
 def formation_key(fargs, fkwargs):
     """
     Generates the key of the `formation()` method in the `values` dict.
@@ -749,7 +757,9 @@ def formation_key(fargs, fkwargs):
     # chosen parameters.
     return FunctionData('formation', **bound)
 
+
 Energy.formation.key = formation_key
+
 
 def pseudoformation_key(fargs, fkwargs):
     """
@@ -800,5 +810,6 @@ def pseudoformation_key(fargs, fkwargs):
     # Return an FunctionData object representing the function and
     # chosen parameters.
     return FunctionData('pseudoformation', **bound)
+
 
 Energy.pseudoformation.key = pseudoformation_key

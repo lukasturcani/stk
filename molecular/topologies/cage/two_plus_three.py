@@ -8,6 +8,7 @@ import itertools
 
 from .base import _CageTopology, Vertex, Edge
 
+
 class TwoPlusThree(_CageTopology):
     """
     A cage topology from 2 and 3 functionalized building blocks.
@@ -31,6 +32,7 @@ class TwoPlusThree(_CageTopology):
 
     n_windows = 3
     n_window_types = 1
+
 
 class FourPlusSix(_CageTopology):
     """
@@ -58,6 +60,7 @@ class FourPlusSix(_CageTopology):
     n_windows = 4
     n_window_types = 1
 
+
 class FourPlusSix2(_CageTopology):
     """
     Defines the 4+6 topolgy which is not a tetrahedron.
@@ -80,6 +83,7 @@ class FourPlusSix2(_CageTopology):
     e2.coord = np.array([0,100,100])
     e3.coord = np.array([0,-100,-100])
     e4.coord = np.array([0,100, -100])
+
 
 class SixPlusNine(_CageTopology):
     """
@@ -109,6 +113,7 @@ class SixPlusNine(_CageTopology):
 
     n_windows = 5
     n_window_types = 1
+
 
 class EightPlusTwelve(_CageTopology):
     """
@@ -146,6 +151,7 @@ class EightPlusTwelve(_CageTopology):
 
     n_windows = 6
     n_window_types = 1
+
 
 class Dodecahedron(_CageTopology):
     """
