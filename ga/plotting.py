@@ -138,7 +138,14 @@ def parameter_epp(pop, plot_name=False,
 
     for sp in pop.populations:
 
+        if len(sp) == 0:
+            min_params.append([None for x in range(nparams)])
+            mean_params.append([None for x in range(nparams)])
+            max_params.append([None for x in range(nparams)])
+            continue
+
         p_mat = np.array([x.progress_params[func_name] for x in sp])
+
 
         # Each element of this list holds an array of all the valid
         # values of a particular progress_param.
@@ -175,7 +182,7 @@ def parameter_epp(pop, plot_name=False,
         y_mean = [yv for i, yv in enumerate(y_mean) if i not in nones]
         y_max = [yv for i, yv in enumerate(y_max) if i not in nones]
         y_min = [yv for i, yv in enumerate(y_min) if i not in nones]
-        
+
 
         # Save the plot data.
         if plot_name and dump_name is None:
