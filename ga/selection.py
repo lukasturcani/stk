@@ -698,8 +698,8 @@ class Selection:
         Yields
         ------
         tuple of 2 MacroMolecule instances
-            The ``MacroMolecule`` instances which together form a parent
-            pair.
+            The ``MacroMolecule`` instances which together form a
+            parent pair.
 
         """
 
@@ -711,10 +711,16 @@ class Selection:
         """
         Yields all pairings of the `n` fittest individuals.
 
+        The pairings are yielded with in order of fitness, with most
+        fit pair yielded first.
+
         Parameters
         ----------
         population : Population
             The population from which parents should be selected.
+
+        n : int
+            The number of individuals used for making offspring.
 
         Yields
         ------
