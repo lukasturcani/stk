@@ -716,6 +716,9 @@ class Selection:
         population : Population
             The population from which parents should be selected.
 
+        n : int
+            The number of individuals used for making offspring.
+
         Yields
         ------
         tuple of 2 MacroMolecule instances
