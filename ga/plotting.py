@@ -134,21 +134,32 @@ def parameter_epp(pop, plot_name=False,
     min_params = []
     max_params = []
     mean_params = []
-    xvals = list(range(1, len(pop.populations)+1 ))
     nparams = len(fitness_func.param_labels)
 
     for sp in pop.populations:
 
+        if len(sp) == 0:
+            min_params.append([None for x in range(nparams)])
+            mean_params.append([None for x in range(nparams)])
+            max_params.append([None for x in range(nparams)])
+            continue
+
         p_mat = np.array([x.progress_params[func_name] for x in sp])
+
 
         # Each element of this list holds an array of all the valid
         # values of a particular progress_param.
         p_arrays = [p_mat[:,x] for x in range(nparams)]
         p_arrays = [[x for x in a if x is not None] for a in p_arrays]
 
-        min_params.append([min(x) for x in p_arrays])
-        mean_params.append([np.mean(x) for x in p_arrays])
-        max_params.append([max(x) for x in p_arrays])
+        min_params.append([min(x) if len(x) > 0 else None
+                            for x in p_arrays])
+
+        mean_params.append([np.mean(x) if len(x) > 0 else None
+                            for x in p_arrays])
+
+        max_params.append([max(x) if len(x) > 0 else None
+                            for x in p_arrays])
 
     for x in range(len(min_params[0])):
         fig = plt.figure()
@@ -158,6 +169,20 @@ def parameter_epp(pop, plot_name=False,
         y_mean = [array[x] for array in mean_params]
         y_max = [array[x] for array in max_params]
         y_min = [array[x] for array in min_params]
+
+
+        # This loop checks if any y values are ``None`` in which case
+        # they are removed and the corresponding x value as well.
+        nones = set()
+        for i, yval in enumerate(y_min):
+            if yval is None:
+                nones.add(i)
+        xvals = list(range(1, len(pop.populations)+1 ))
+        xvals = [xv for i, xv in enumerate(xvals) if i not in nones]
+        y_mean = [yv for i, yv in enumerate(y_mean) if i not in nones]
+        y_max = [yv for i, yv in enumerate(y_max) if i not in nones]
+        y_min = [yv for i, yv in enumerate(y_min) if i not in nones]
+
 
         # Save the plot data.
         if plot_name and dump_name is None:
