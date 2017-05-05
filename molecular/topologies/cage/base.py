@@ -95,7 +95,7 @@ class Vertex:
             v.connected.append(obj)
         return obj
 
-    def place_mol(self, building_block, aligner=0):
+    def place_mol(self, building_block, aligner=0, aligner_edge=0):
         """
         Place a StructUnit3 building block on the coords of the vertex.
 
@@ -118,9 +118,13 @@ class Vertex:
         building_block : StructUnit3
             The building block molecule to be placed on a vertex.
 
-        aligner : int (default = 0)
+        aligner : int, optional
             The index of the atom within `bonder_ids` which is to be
             aligned with an edge.
+
+        aligner_edge : int, optional
+            The index of an edge in `connected`. It is the edge with
+            which `aligner` is aligned.
 
         Modifies
         --------
@@ -136,6 +140,7 @@ class Vertex:
             described in the docstring.
 
         """
+
         # Flush the list of data from previous molecules.
         self.distances = []
 
@@ -146,16 +151,14 @@ class Vertex:
         building_block.set_orientation2(self.edge_plane_normal())
 
         # Next, the building block must be rotated so that one of the
-        # bonder atoms is perfectly aligned with one of the edges. This
+        # bonder atoms is perfectly aligned with `aligner_edge`. This
         # is a multi-step process:
         #   1) Place the centroid of the bonder atoms at the origin.
-        #   2) Place the centroid of the edges connected to the vertex
-        #      at the origin.
+        #   2) Place the centroid of `aligner_edge` at the origin.
         #   3) Rotate the building block by some amount `theta`, so
         #      so that one of the bonder atoms is perfectly aligned
-        #      with
-        #      one of the edges. The axis of rotation is the normal to
-        #      the plane of bonder atoms.
+        #      with `aligner_edge`. The axis of rotation is the normal
+        #      to the plane of bonder atoms.
         #
         # The rotation is carried out via matrices. This means a
         # coordinate matrix of atoms in the molecule is generated
@@ -172,7 +175,7 @@ class Vertex:
         # centroid to the origin.
         edge_coord_mat = (self.edge_coord_matrix() -
                                                 self.edge_centroid())
-        edge_coord = np.array(edge_coord_mat[0,:])[0]
+        edge_coord = np.array(edge_coord_mat[aligner_edge,:])[0]
 
         # Get the angle between an edge and the atom.
         theta = vector_theta(edge_coord, atom_coord)
@@ -181,6 +184,17 @@ class Vertex:
         # `theta` about the normal to the plane.
         rot_mat = rotation_matrix_arbitrary_axis(theta,
                                            self.edge_plane_normal())
+
+        # Check that the rotation is in the correct direction. It could
+        # be wrong because of the direction in which
+        # `edge_plane_normal` points.
+        new_coord = rot_mat @ atom_coord
+        new_theta = vector_theta(edge_coord, new_coord)
+        if new_theta > theta:
+            theta *= -1
+            rot_mat = rotation_matrix_arbitrary_axis(theta,
+                                              self.edge_plane_normal())
+
         # Apply the rotation to the positions of the atoms and get a
         # position matrix of the new coordinates.
         pos_mat = building_block.position_matrix()
@@ -329,16 +343,18 @@ class Edge(Vertex):
         This vector represents the orientation of the edge. It is a
         normalized direction vector which runs from `v2` to `v1`.
 
-
+    id : object, optional
+        An id to identify the edge. Used by `place_mols()`
 
     """
 
-    def __init__(self, v1, v2):
+    def __init__(self, v1, v2, id_=None):
         Vertex.__init__(self, *centroid(v1.coord, v2.coord))
         self.direction = normalize_vector(v1.coord - v2.coord)
         self.connected.extend([v1, v2])
         v1.connected.append(self)
         v2.connected.append(self)
+        self.id = id_
 
     def place_mol(self, linker, alignment):
         """
@@ -440,17 +456,34 @@ class _CageTopology(Topology):
         difference is that by default the second atom is aligned,
         rather than the first.
 
+    edge_alignments : list of ints, optional
+        The length of the list is equal to the number of building
+        blocks in the cage. Each element is an int which holds the id
+        of an edge. For example,
+
+            edge_alignments = [1, 2, 3, 4]
+
+        then the first building block is aligned with the edge with
+        `id` of 1, the second building block is aligned with the edge
+        with `id` 2 and so on. For this to work the edge defined by
+        the class must have their `id` attributes defined.
+
     """
 
-    def __init__(self, A_alignments=None, B_alignments=None):
+    def __init__(self, A_alignments=None, B_alignments=None,
+                 edge_alignments=None):
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
         if B_alignments is None:
             B_alignments = np.ones(len(self.positions_B))
+        if edge_alignments is None:
+            edge_alignments = [None for x in
+                                        range(len(self.positions_A))]
 
         super().__init__()
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
+        self.edge_alignments = edge_alignments
 
     def join_mols(self, macro_mol):
         """
@@ -638,7 +671,12 @@ class _CageTopology(Topology):
         for i, position in enumerate(self.positions_A):
             # Position the molecule on the vertex.
             bb.set_position_from_matrix(bb_pos)
-            bb_mol = position.place_mol(bb, int(self.A_alignments[i]))
+            aligner_edge_id = self.edge_alignments[i]
+            aligner_edge = next(position.connected.index(x) for x in
+                                position.connected if
+                                x.id == aligner_edge_id)
+            bb_mol = position.place_mol(bb, int(self.A_alignments[i]),
+                                        aligner_edge)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
