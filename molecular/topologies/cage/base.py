@@ -153,7 +153,6 @@ class Vertex:
         # Next, define the direction vector going from the edge
         # centroid to the edge with which the atom is aligned.
         building_block.set_bonder_centroid(self.coord)
-        atom =
         vector = (self.connected[aligner_edge].coord -
                     self.edge_centroid())
         # Get the id of the atom which is being aligned.
