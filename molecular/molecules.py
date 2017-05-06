@@ -1509,6 +1509,80 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return functional_group, rdkit.MolToInchi(rdkit_mol)
 
+    def _minimize_theta(self, v1, v2, axis, centroid):
+        """
+        Rotate mol to minimize angle between `v1` and `v2`.
+
+        The rotation is done about the vector `axis`.
+
+        Parameters
+        ----------
+        v1 : numpy.array
+            The vector which is rotated.
+
+        v2 : numpy.array
+            The vector which is stationary.
+
+        axis : numpy.array
+            The vector about which the rotation happens.
+
+        centroid : numpy.array
+            The position vector at the center of the rotation.
+
+        Modifies
+        --------
+        mol : rdkit.Chem.rdchem.Mol
+            The conformer in this rdkit instance is changed due to the
+            rotation.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        # Save the initial position and change the origin to
+        # `centroid`.
+        iposition = self.centroid()
+        self.mol = self.shift(-centroid)
+
+        # 1. First transform the problem.
+        # 2. The rotation axis is set equal to the z-axis.
+        # 3. Apply this transformation to all vectors in the problem.
+        # 4. Take only the x and y components of `v1` and `v2`.
+        # 5. Work out the angle between them.
+        # 6. Apply that rotation along the original rotation axis.
+
+        rotmat = rotation_matrix(axis, [0,0,1])
+        tstart = np.dot(rotmat, v1)
+        tstart = np.array([tstart[0], tstart[1], 0])
+
+        # If the `tstart` vector is 0 after these transformations it
+        # means that it is parallel to the rotation axis, stop.
+        if np.allclose(tstart, [0,0,0], atol=1e-8):
+            self.set_position(iposition)
+            return
+
+        tend = np.dot(rotmat, v2)
+        tend = np.array([tend[0], tend[1], 0])
+        angle = vector_theta(tstart, tend)
+
+        # Check in which direction the rotation should go.
+        # This is done by applying the rotation in each direction and
+        # seeing which one leads to a smaller theta.
+        r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
+        t1 = vector_theta(np.dot(r1, tstart), tend)
+        r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
+        t2 = vector_theta(np.dot(r2, tstart), tend)
+
+        if t2 < t1:
+            angle *= -1
+
+        rotmat = rotation_matrix_arbitrary_axis(angle, axis)
+        posmat = np.dot(rotmat, self.position_matrix())
+        self.set_position_from_matrix(posmat)
+        self.set_position(iposition)
+
     def rotate2(self, theta, axis):
         """
         Rotates the molecule by `theta` about `axis`.
@@ -1904,49 +1978,8 @@ class StructUnit2(StructUnit):
 
         """
 
-        # Save the initial position and change the origin to the
-        # center of the bonder atoms.
-        iposition = self.centroid()
-        self.set_bonder_centroid([0,0,0])
-
-        # 1. First transform the problem.
-        # 2. The rotation axis is set equal to the z-axis.
-        # 3. Apply this transformation to all vectors in the problem.
-        # 4. Take only the x and y components of the bonder vector and
-        #    `vector`.
-        # 5. Work out the angle between them.
-        # 6. Apply that rotation along the original rotation axis.
-
-        rotmat = rotation_matrix(axis, [0,0,1])
-        tstart = np.dot(rotmat, self.centroid_centroid_dir_vector())
-        tstart = np.array([tstart[0], tstart[1], 0])
-
-        # If the `tstart` vector is 0 after these transformations it
-        # means that the molecule is flat. Return, no need to do any
-        # more work.
-        if np.allclose(tstart, [0,0,0], atol=1e-8):
-            self.set_position(iposition)
-            return
-
-        tend = np.dot(rotmat, vector)
-        tend = np.array([tend[0], tend[1], 0])
-        angle = vector_theta(tstart, tend)
-
-        # Check in which direction the rotation should go.
-        # This is done by apply the rotation in each direction and
-        # seeing which one leads to a smaller theta.
-        r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
-        t1 = vector_theta(np.dot(r1, tstart), tend)
-        r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
-        t2 = vector_theta(np.dot(r2, tstart), tend)
-
-        if t2 < t1:
-            angle *= -1
-
-        rotmat = rotation_matrix_arbitrary_axis(angle, axis)
-        posmat = np.dot(rotmat, self.position_matrix())
-        self.set_position_from_matrix(posmat)
-        self.set_position(iposition)
+        self._minimize_theta(self.centroid_centroid_dir_vector(),
+                             vector, axis, self.bonder_centroid())
 
 
 class StructUnit3(StructUnit):
@@ -2019,6 +2052,38 @@ class StructUnit3(StructUnit):
             normal_v *= -1
 
         return normal_v
+
+    def minimize_theta(self, atom, vector, axis):
+        """
+        Rotates molecule to minimize angle between `atom` and `vector`.
+
+        The rotation is done about `axis` and is centered on the
+        bonder centroid.
+
+        Parameters
+        ----------
+        atom : int
+            The id of atom which is to have angle minimized.
+
+        vector : numpy.array
+            A vector with which the angle is minimized.
+
+        axis : numpy.array
+            The vector about which the rotation happens.
+
+        Modifies
+        --------
+        mol : rdkit.Chem.rdchem.Mol
+            The rdkit molecule is changed to reflect the rotation.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        v1 = self.atom_coords(atom) - self.bonder_centroid()
+        self._minimize_theta(v1, vector, axis, self.bonder_centroid())
 
     def set_orientation2(self, end):
         """
