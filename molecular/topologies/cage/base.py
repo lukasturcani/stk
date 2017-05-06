@@ -52,14 +52,18 @@ class Vertex:
         first int is the bonder atom and the second int is the bonder
         atom on the vertex paired to the first atom.
 
+    id : object, optional
+        An id to identify the vertex. Used by `place_mols()`
+
     """
 
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, id_=None):
         self.coord = np.array([x,y,z])
         self.connected = []
         self.bonder_ids = []
         self.atom_position_pairs = []
         self.distances = []
+        self.id = id_
 
     @classmethod
     def vertex_init(cls, *vertices):
@@ -301,18 +305,14 @@ class Edge(Vertex):
         This vector represents the orientation of the edge. It is a
         normalized direction vector which runs from `v2` to `v1`.
 
-    id : object, optional
-        An id to identify the edge. Used by `place_mols()`
-
     """
 
     def __init__(self, v1, v2, id_=None):
-        Vertex.__init__(self, *centroid(v1.coord, v2.coord))
+        Vertex.__init__(self, *centroid(v1.coord, v2.coord), id_)
         self.direction = normalize_vector(v1.coord - v2.coord)
         self.connected.extend([v1, v2])
         v1.connected.append(self)
         v2.connected.append(self)
-        self.id = id_
 
     def place_mol(self, linker, alignment):
         """
@@ -630,9 +630,9 @@ class _CageTopology(Topology):
             # Position the molecule on the vertex.
             bb.set_position_from_matrix(bb_pos)
             aligner_edge_id = self.edge_alignments[i]
-            aligner_edge = next(position.connected.index(x) for x in
-                                position.connected if
-                                x.id == aligner_edge_id)
+            aligner_edge = next((position.connected.index(x) for x in
+                                 position.connected if
+                                 x.id == aligner_edge_id), 0)
             bb_mol = position.place_mol(bb, int(self.A_alignments[i]),
                                         aligner_edge)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
@@ -677,15 +677,20 @@ class _VertexOnlyCageTopology(_CageTopology):
 
     """
 
-    def __init__(self, A_alignments=None, B_alignments=None):
+    def __init__(self, A_alignments=None, B_alignments=None,
+                        edge_alignments=None):
 
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
         if B_alignments is None:
             B_alignments = np.zeros(len(self.positions_B))
+        if edge_alignments is None:
+            edge_alignments = [None for x in
+                                        range(len(self.positions_A))]
 
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
+        self.edge_alignments = edge_alignments
 
 class _NoLinkerCageTopology(_CageTopology):
     """
