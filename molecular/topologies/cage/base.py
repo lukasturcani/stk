@@ -150,61 +150,20 @@ class Vertex:
         # molecule.
         building_block.set_orientation2(self.edge_plane_normal())
 
-        # Next, the building block must be rotated so that one of the
-        # bonder atoms is perfectly aligned with `aligner_edge`. This
-        # is a multi-step process:
-        #   1) Place the centroid of the bonder atoms at the origin.
-        #   2) Place the centroid of `aligner_edge` at the origin.
-        #   3) Rotate the building block by some amount `theta`, so
-        #      so that one of the bonder atoms is perfectly aligned
-        #      with `aligner_edge`. The axis of rotation is the normal
-        #      to the plane of bonder atoms.
-        #
-        # The rotation is carried out via matrices. This means a
-        # coordinate matrix of atoms in the molecule is generated
-        # and modified.
-
-        # Set the centroid of the bonder atoms to the origin.
-        building_block.set_bonder_centroid([0,0,0])
-        # Get the coordinate of the atom which is to be aligned with an
-        # edge.
-        atom_coord = building_block.atom_coords(
-                                 building_block.bonder_ids[aligner])
-
-        # Get the coordinates of all the edges and translate the
-        # centroid to the origin.
-        edge_coord_mat = (self.edge_coord_matrix() -
-                                                self.edge_centroid())
-        edge_coord = np.array(edge_coord_mat[aligner_edge,:])[0]
-
-        # Get the angle between an edge and the atom.
-        theta = vector_theta(edge_coord, atom_coord)
-
-        # Get the rotation matrix necessary to do the rotation of
-        # `theta` about the normal to the plane.
-        rot_mat = rotation_matrix_arbitrary_axis(theta,
-                                           self.edge_plane_normal())
-
-        # Check that the rotation is in the correct direction. It could
-        # be wrong because of the direction in which
-        # `edge_plane_normal` points.
-        new_coord = rot_mat @ atom_coord
-        new_theta = vector_theta(edge_coord, new_coord)
-        if new_theta > theta:
-            theta *= -1
-            rot_mat = rotation_matrix_arbitrary_axis(theta,
-                                              self.edge_plane_normal())
-
-        # Apply the rotation to the positions of the atoms and get a
-        # position matrix of the new coordinates.
-        pos_mat = building_block.position_matrix()
-        new_pos_mat = np.dot(rot_mat, pos_mat)
-        # Update the atomic positions in the building block.
-        building_block.set_position_from_matrix(new_pos_mat)
-
-        # Finally the well orientated building-block* is placed on the
-        # coords of the vertex.
+        # Next, define the direction vector going from the edge
+        # centroid to the edge with which the atom is aligned.
         building_block.set_bonder_centroid(self.coord)
+        atom =
+        vector = (self.connected[aligner_edge].coord -
+                    self.edge_centroid())
+        # Get the id of the atom which is being aligned.
+        atom = building_block.bonder_ids[aligner]
+        # Minimzee the angle between these things by rotating about the
+        # normal of the edge plane.
+        building_block.minimize_theta(atom,
+                                      vector,
+                                      self.edge_plane_normal())
+
         return building_block.mol
 
     def edge_plane_normal(self):
