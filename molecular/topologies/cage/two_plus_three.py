@@ -71,18 +71,18 @@ class FourPlusSix2(_CageTopology):
 
     """
 
-    positions_A = [Vertex(100, 0 , 100),
-                   Vertex(-100, 0, 100),
-                   Vertex(100, 0, -100),
-                  Vertex(-100,0,-100)]
+    positions_A = a,b,c,d= [Vertex(100, 0 , 100),
+                            Vertex(-100, 0, 100),
+                            Vertex(100, 0, -100),
+                            Vertex(-100,0,-100)]
 
-    a,b,c,d = positions_A
+    positions_B = e1, e2, e3, e4, e5, e6 = [Edge(a,b, 'a'),
+                                            Edge(a,b, 'b'),
+                                            Edge(c,d, 'e'),
+                                            Edge(c,d, 'f'),
+                                            Edge(a,c, 'd'),
+                                            Edge(b,d, 'c')]
 
-    positions_B = [Edge(a,b), Edge(a,b),
-                   Edge(c,d), Edge(c,d),
-                   Edge(a,c), Edge(b,d)]
-
-    e1, e2, e3, e4, *_ = positions_B
     e1.coord = np.array([0,-100,100])
     e2.coord = np.array([0,100,100])
     e3.coord = np.array([0,-100,-100])
