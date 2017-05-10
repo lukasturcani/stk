@@ -34,7 +34,7 @@ import logging
 from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
-from .mopac import (mopac_opt, mopac_out_noupdate)
+from .mopac import mopac_opt
 
 
 logger = logging.getLogger(__name__)

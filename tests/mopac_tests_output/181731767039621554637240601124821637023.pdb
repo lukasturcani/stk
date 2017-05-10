@@ -1,0 +1,25 @@
+HEADER  data-set: 181731767039621554637240601124821637023
+REMARK  MOPAC 2016, Version: 16.175M Date: May 10 2017 12:35
+HETATM    1  C   HET A   1      -0.224  -0.676  74.457  1.00  0.00      PROT C 
+HETATM    2  H   HET A   1      -1.317  -0.530  74.558  1.00  0.00      PROT H 
+HETATM    3  C   HET A   1       0.487   0.683  74.418  1.00  0.00      PROT C 
+HETATM    4  H   HET A   1       0.086  -1.242  75.356  1.00  0.00      PROT H 
+HETATM    5  H   HET A   1       0.235   1.262  75.326  1.00  0.00      PROT H 
+HETATM    6  C   HET A   1       0.099   1.476  73.169  1.00  0.00      PROT C 
+HETATM    7  H   HET A   1       1.583   0.533  74.445  1.00  0.00      PROT H 
+HETATM    8  H   HET A   1      -0.974   1.744  73.199  1.00  0.00      PROT H 
+HETATM    9  C   HET A   1       0.413   0.671  71.891  1.00  0.00      PROT C 
+HETATM   10  H   HET A   1       0.644   2.442  73.142  1.00  0.00      PROT H 
+HETATM   11  C   HET A   1      -0.347  -0.690  71.947  1.00  0.00      PROT C 
+HETATM   12  H   HET A   1       1.512   0.475  71.823  1.00  0.00      PROT H 
+HETATM   13  C   HET A   1       0.080  -1.488  73.194  1.00  0.00      PROT C 
+HETATM   14  H   HET A   1      -1.447  -0.484  72.003  1.00  0.00      PROT H 
+HETATM   15  H   HET A   1       1.156  -1.736  73.138  1.00  0.00      PROT H 
+HETATM   16  H   HET A   1      -0.448  -2.457  73.225  1.00  0.00      PROT H 
+HETATM   17  N   HET A   1       0.021   1.502  70.726  1.00  0.00      PROT N 
+HETATM   18  N   HET A   1      -0.002  -1.485  70.737  1.00  0.00      PROT N 
+HETATM   19  H   HET A   1       0.365   1.104  69.857  1.00  0.00      PROT H 
+HETATM   20  H   HET A   1      -0.988   1.572  70.648  1.00  0.00      PROT H 
+HETATM   21  H   HET A   1      -0.441  -2.397  70.770  1.00  0.00      PROT H 
+HETATM   22  H   HET A   1      -0.332  -1.023  69.898  1.00  0.00      PROT H 
+END
