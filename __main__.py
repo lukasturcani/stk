@@ -154,7 +154,7 @@ class GAProgress:
             pop.dump(join('..', 'pop_dumps', dump_name))
 
 
-def ga_run(ifile):
+def ga_run(ga_input):
     """
     Runs the GA.
 
@@ -162,8 +162,6 @@ def ga_run(ifile):
 
     # 1. Set up the directory structure.
 
-    ifile = abspath(ifile)
-    ga_input = GAInput(ifile)
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=ga_input.logging_level,
     format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
@@ -202,10 +200,6 @@ def ga_run(ifile):
     progress = GAProgress(ga_input.progress_dump,
                           ga_input.database_dump,
                           ga_input.ga_tools())
-
-    logger.info('Loading molecules from any provided databases.')
-    for db in ga_input.databases:
-        Population.load(db)
 
     logger.info('Generating initial population.')
     init_func = getattr(Population, ga_input.initer().name)
@@ -305,8 +299,16 @@ if __name__ == '__main__':
         print(args)
 
     elif sys.argv[1] == 'run':
+
+        ifile = abspath(args.INPUT_FILE)
+        ga_input = GAInput(ifile)
+        logger = logging.getLogger(__name__)
+        logger.info('Loading molecules from any provided databases.')
+        for db in ga_input.databases:
+            c = Population.load(db)
+
         for x in range(args.loops):
-            ga_run(args.INPUT_FILE)
+            ga_run(ga_input)
 
     elif sys.argv[1] == 'helper':
         InputHelp(args.KEYWORD)
