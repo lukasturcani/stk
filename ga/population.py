@@ -210,9 +210,7 @@ class Population:
         for A_align in A_alignments:
             for B_align in B_alignments:
                 c = Cage([bb, lk], topology(A_align, B_align))
-                if c.inchi not in seen:
-                    pop.members.append(c)
-                    seen.add(c.inchi)
+                pop.members.append(c)
 
         return pop
 
