@@ -70,7 +70,7 @@ steps 1 to 4.)
        supplied to the initializer).
 
 What functional groups are recognized by MMEA?
-The module ``/mmea/molecular_tools/fg_info.py`` defines a class called
+The module ``/mmea/molecular/fg_info.py`` defines a class called
 FGInfo. Instances of this class are held in the list
 `functional_groups` (also in that module). If you put an FGInfo
 instance in that list, the functional group will be recognized.
@@ -99,7 +99,7 @@ instance in that list, the functional group will be recognized.
        molecule. Make sure that the building blocks are arranged in the
        shape of the macromolecule. All the manipulations available via
        the StructUnit class are useful here to make sure all the
-       building blocks are orientated correctly when forming the
+       building blocks are oriented correctly when forming the
        macromolecule.
 
     10) Create bonds between all the disjoined building block
@@ -231,7 +231,7 @@ class Molecule:
     """
     The most basic class representing molecules.
 
-    This class defines defines the operations which any class
+    This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
     such classes are ``StructUnit`` and ``MacroMolecule``. This calls
     is unlikely to be useful as in and of itself. It lacks an
