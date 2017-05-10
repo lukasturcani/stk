@@ -219,7 +219,7 @@ class Mutation:
                   'block:\n\n{}\n\nReplacement building block:\n\n'
                   '{}\n\n').format(og_bb, bb))
 
-        return Cage({bb, lk}, macro_mol.topology)
+        return Cage([bb, lk], macro_mol.topology)
 
     def cage_random_lk(self, macro_mol, database, fg=None):
         """
@@ -276,7 +276,7 @@ class Mutation:
                   ' original linker.\n\nOriginal linker:\n\n{}\n\n'
                   'Replacement linker:\n\n{}\n\n').format(og_lk, lk))
 
-        return Cage({bb, lk}, macro_mol.topology)
+        return Cage([bb, lk], macro_mol.topology)
 
     def cage_similar_bb(self, macro_mol, database, fg=None):
         """
@@ -321,19 +321,14 @@ class Mutation:
 
         """
 
+        if not hasattr(self, '_similar_bb_mols'):
+            self._similar_bb_mols = {}
+
         # The idea here is to create a list of molecules from
         # `database` ordered by similarity to the building block of
         # `macro_mol`. Each time this function is called on `macro_mol`
         # the next molecule from this list is used to substitute the
-        # building block of the cage and create a new mutant. The most
-        # elegant way to do this would be with a generator. However,
-        # because generators can't be dumped with ``pickle`` this is
-        # not possible. The idea would be to save the generator into
-        # an attribute of `macro_mol` and yield the next building block
-        # from it each time this function is used on that cage. Instead
-        # of the generator the list is saved to the attribute alongside
-        # the index which is to be accessed the next time this function
-        # is run on the same `macro_mol`.
+        # building block of the cage and create a new mutant.
 
         _, lk = max(zip(macro_mol.bb_counter.values(),
                         macro_mol.bb_counter.keys()))
@@ -341,12 +336,12 @@ class Mutation:
         _, og_bb = min(zip(macro_mol.bb_counter.values(),
                         macro_mol.bb_counter.keys()))
 
-        if not hasattr(macro_mol, '_similar_bb_mols'):
-            macro_mol._similar_bb_mols = (
-                               og_bb.similar_molecules(database), 0)
+        if macro_mol not in self._similar_bb_mols:
+            self._similar_bb_mols[macro_mol] = iter(
+                                    og_bb.similar_molecules(database))
 
-        sim_mols, cur_index = macro_mol._similar_bb_mols
-        new_bb = StructUnit3(sim_mols[cur_index][-1], fg)
+        sim_mol = next(self._similar_bb_mols[macro_mol])[-1]
+        new_bb = StructUnit3(sim_mol, fg)
 
         if len(og_bb.bonder_ids) != len(new_bb.bonder_ids):
             raise MutationError(
@@ -356,9 +351,7 @@ class Mutation:
               'block:\n\n{}\n\nReplacement building block:\n\n'
               '{}\n\n').format(og_bb, new_bb))
 
-        macro_mol._similar_bb_mols = sim_mols, cur_index + 1
-
-        return Cage({new_bb, lk}, macro_mol.topology)
+        return Cage([new_bb, lk], macro_mol.topology)
 
     def cage_similar_lk(self, macro_mol, database, fg=None):
         """
@@ -403,19 +396,14 @@ class Mutation:
 
         """
 
+        if not hasattr(self, '_similar_lk_mols'):
+            self._similar_lk_mols = {}
+
         # The idea here is to create a list of molecules from
         # `database` ordered by similarity to the linker of
         # `macro_mol`. Each time this function is called on `macro_mol`
         # the next molecule from this list is used to substitute the
-        # linker of the cage and create a new mutant. The most elegant
-        # way to do this would be with a generator. However, because
-        # generators can't be dumped with ``pickle`` this is not
-        # possible. The idea would be to save the generator into an
-        # attribute of `macro_mol` and yield the next linker from it
-        # each time this function is used on that cage. Instead of the
-        # generator the list is saved to the attribute alongside the
-        # index which is to be accessed the next time this function is
-        # run on the same `macro_mol`.
+        # linker of the cage and create a new mutant.
 
         _, og_lk = max(zip(macro_mol.bb_counter.values(),
                         macro_mol.bb_counter.keys()))
@@ -424,12 +412,12 @@ class Mutation:
         _, bb = min(zip(macro_mol.bb_counter.values(),
                         macro_mol.bb_counter.keys()))
 
-        if not hasattr(macro_mol, '_similar_lk_mols'):
-            macro_mol._similar_lk_mols = (
-                            og_lk.similar_molecules(database), 0)
+        if macro_mol not in self._similar_lk_mols:
+            self._similar_lk_mols[macro_mol] = iter(
+                                    og_lk.similar_molecules(database))
 
-        sim_mols, cur_index = macro_mol._similar_lk_mols
-        new_lk = lk_type(sim_mols[cur_index][-1], fg)
+        sim_mol = next(self._similar_lk_mols[macro_mol])[-1]
+        new_lk = lk_type(sim_mol, fg)
 
         if len(og_lk.bonder_ids) != len(new_lk.bonder_ids):
             raise MutationError(
@@ -438,8 +426,7 @@ class Mutation:
               ' original linker.\n\nOriginal linker:\n\n{}\n\n'
               'Replacement linker:\n\n{}\n\n').format(og_lk, new_lk))
 
-        macro_mol._similar_lk_mols = sim_mols, cur_index + 1
-        return Cage({new_lk, bb}, macro_mol.topology)
+        return Cage([new_lk, bb], macro_mol.topology)
 
     def random_topology(self, macro_mol, topologies):
         """

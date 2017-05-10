@@ -135,7 +135,7 @@ def parameter_epp(pop, plot_name=False,
     max_params = []
     mean_params = []
     xvals = list(range(1, len(pop.populations)+1 ))
-    nparams = len(pop[0].progress_params[func_name])
+    nparams = len(fitness_func.param_labels)
 
     for sp in pop.populations:
 
@@ -163,8 +163,8 @@ def parameter_epp(pop, plot_name=False,
         if plot_name and dump_name is None:
             basename, ext = os.path.splitext(plot_name)
             dump_name = basename+'.dmp'
-        dump_name = dump_name.replace('.dmp', '{}.dmp'.format(x))
-        np.array([y_min, y_mean, y_max]).dump(dump_name)
+        dname = dump_name.replace('.dmp', '{}.dmp'.format(x))
+        np.array([y_min, y_mean, y_max]).dump(dname)
 
         if plot_name:
             plt.scatter(xvals, y_mean,
