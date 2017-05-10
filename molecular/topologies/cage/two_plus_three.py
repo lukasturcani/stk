@@ -49,13 +49,17 @@ class FourPlusSix(_CageTopology):
 
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    positions_A = [Vertex(100,0,-100/np.sqrt(2)),
-                Vertex(-100,0,-100/np.sqrt(2)),
-                Vertex(0,100,100/np.sqrt(2)),
-                Vertex(0,-100,100/np.sqrt(2))]
+    x = 30
+    positions_A = v0,v1,v2,v3 = [Vertex(0, 0, x*np.sqrt(6)/2),
+                Vertex(-x, -x*np.sqrt(3)/3, -x*np.sqrt(6)/6),
+                Vertex(x, -x*np.sqrt(3)/3, -x*np.sqrt(6)/6),
+                Vertex(0, 2*x*np.sqrt(3)/3, -x*np.sqrt(6)/6)]
 
-    positions_B = [Edge(v1,v2) for v1, v2 in
-                itertools.combinations(positions_A, 2)]
+
+
+    positions_B = [Edge(v0, v1, (0, 1)), Edge(v0, v2, (0, 2)),
+                   Edge(v0, v3, (0, 3)), Edge(v1, v2, (1, 2)),
+                   Edge(v1, v3, (1, 3)), Edge(v2, v3, (2, 3))]
 
     n_windows = 4
     n_window_types = 1
@@ -67,18 +71,18 @@ class FourPlusSix2(_CageTopology):
 
     """
 
-    positions_A = [Vertex(100, 0 , 100),
-                   Vertex(-100, 0, 100),
-                   Vertex(100, 0, -100),
-                  Vertex(-100,0,-100)]
+    positions_A = a,b,c,d= [Vertex(100, 0 , 100),
+                            Vertex(-100, 0, 100),
+                            Vertex(100, 0, -100),
+                            Vertex(-100,0,-100)]
 
-    a,b,c,d = positions_A
+    positions_B = e1, e2, e3, e4, e5, e6 = [Edge(a,b, 'a'),
+                                            Edge(a,b, 'b'),
+                                            Edge(c,d, 'e'),
+                                            Edge(c,d, 'f'),
+                                            Edge(a,c, 'd'),
+                                            Edge(b,d, 'c')]
 
-    positions_B = [Edge(a,b), Edge(a,b),
-                   Edge(c,d), Edge(c,d),
-                   Edge(a,c), Edge(b,d)]
-
-    e1, e2, e3, e4, *_ = positions_B
     e1.coord = np.array([0,-100,100])
     e2.coord = np.array([0,100,100])
     e3.coord = np.array([0,-100,-100])
