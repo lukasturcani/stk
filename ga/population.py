@@ -215,6 +215,96 @@ class Population:
         return pop
 
     @classmethod
+    def init_diverse_cages(cls, bb_db, lk_db,
+                          topologies, size, ga_tools,
+                          bb_fg=None, lk_fg=None):
+        """
+        Creates a population of cages built from provided databases.
+
+        All cages are held in the population's `members` attribute.
+
+        From the supplied databases a random linker and building block
+        molecule is selected to form a cage. The next linker and
+        building block selected are those which have the most different
+        Morgan fingerprints to the first pair. The next pair random
+        again and so on. This is done until `size` cages have been
+        formed.
+
+        Parameters
+        ----------
+        bb_db : str
+            The full path of the database of building-block* molecules.
+
+        lk_db : str
+            The full path of the database of linker molecules.
+
+        topolgies : iterable of ``Topology`` child classes
+            An iterable holding topologies which should be randomly
+            selected for cage initialization.
+
+        size : int
+            The size of the population to be initialized.
+
+        ga_tools : GATools
+            The GATools instance to be used by created population.
+
+        bb_fg : str (default = None)
+            The name of the functional group present in molecules in
+            `bb_db`. It is the name of the functional group used to
+            build the macromolecules. If ``None`` it is assumed that
+            the name is present in `bb_db`.
+
+        lk_fg : str (default = None)
+            The name of the functional group present in molecules in
+            `lk_db`. It is the name of the functional group used to
+            build the macromolecules. If ``None`` it is assumed that
+            the name is present in `lk_db`.
+
+        Returns
+        -------
+        Population
+            A population filled with random cages.
+
+        """
+
+        pop = cls(ga_tools)
+        for x in range(size):
+            topology = np.random.choice(topologies)
+            # Make a building block.
+            while True:
+                try:
+                    bb_file = np.random.choice(os.listdir(bb_db))
+                    bb_file = os.path.join(bb_db, bb_file)
+                    bb = StructUnit3(bb_file, bb_fg)
+                    break
+
+                except Exception:
+                    print('Issue with: {}.'.format(bb_file))
+                    continue
+
+            # Make a linker.
+            while True:
+                try:
+                    lk_file = np.random.choice(os.listdir(lk_db))
+                    lk_file = os.path.join(lk_db, lk_file)
+                    lk = StructUnit(lk_file, lk_fg)
+
+                    if len(lk.bonder_ids) >= 3:
+                        lk = StructUnit3(lk_file, lk_fg)
+                    else:
+                        lk = StructUnit2(lk_file, lk_fg)
+
+                    break
+
+                except Exception:
+                    print('Issue with: {}.'.format(lk_file))
+                    continue
+
+            pop.members.append(Cage([bb, lk], topology))
+
+        return pop
+
+    @classmethod
     def init_random_cages(cls, bb_db, lk_db,
                           topologies, size, ga_tools,
                           bb_fg=None, lk_fg=None):
@@ -298,7 +388,7 @@ class Population:
                     print('Issue with: {}.'.format(lk_file))
                     continue
 
-            pop.members.append(Cage({bb, lk}, topology))
+            pop.members.append(Cage([bb, lk], topology))
 
         return pop
 
