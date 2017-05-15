@@ -23,12 +23,12 @@ from ..molecular.optimization.optimization import (_optimize_all,
 
 class Population:
     """
-    A container for instances of ``MacroMolecule`` and ``Population``.
+    A container of ``Molecule`` and ``Population`` instances.
 
     This is the central class of MMEA. The GA is invoked by calling the
     ``gen_offspring``, ``gen_mutants`` and ``select`` methods of this
     class on a given instance. However, this class is a container of
-    ``MacroMolecule`` and other ``Population`` instances first and
+    ``Molecule`` and other ``Population`` instances first and
     foremost. It delegates GA operations to its `ga_tools` attribute.
     Any functionality related to the GA should be delegated to this
     attribute. The ``gen_offspring`` and ``gen_mutants`` methods can
@@ -37,9 +37,9 @@ class Population:
     provided in the developer's guide.
 
     For consistency and maintainability, collections of
-    ``MacroMolecule`` or ``Population`` instances should always be
+    ``Molecule`` or ``Population`` instances should always be
     placed in a ``Population`` instance. As a result, any function
-    which should return multiple ``MacroMolecule`` or ``Population``
+    which should return multiple ``Molecule`` or ``Population``
     instances can be expected to return a single ``Population``
     instance holding the desired instances. Some functions may have to
     return the population organized in a specific way, depending on
@@ -62,15 +62,15 @@ class Population:
         A list of other instances of the ``Population`` class. This
         allows the implementation of subpopulations or evolutionary
         islands. This attribute is also used for grouping
-        macromolecules within a given population for organizational
-        purposes if need be.
+        molecules within a given population for organizational
+        purposes.
 
-    members : list of ``MacroMolecule`` instances
-        A list of ``MacroMolecule`` instances. These are the members of
+    members : list of ``Molecule`` instances
+        A list of ``Molecule`` instances. These are the members of
         the population which are not held within any subpopulations.
         This means that not all members of a population are stored
         here. To access all members of a population the generator
-        method ``all_members`` should be used.
+        method ``all_members()`` should be used.
 
     ga_tools : GATools, optional
         An instance of the ``GATools`` class. Calls to preform GA
@@ -84,7 +84,7 @@ class Population:
         Initializer for ``Population`` class.
 
         This initializer creates a new population from the
-        ``Population`` and ``MacroMolecule`` instances given as
+        ``Population`` and ``Molecule`` instances given as
         arguments. It also accepts a ``GATools`` instance if the
         population is to have GA operations performed on it.
 
@@ -92,8 +92,8 @@ class Population:
 
         Parameters
         ----------
-        *args : MacroMolecule, Population, GATools
-            A population is initialized with as many ``MacroMolecule``
+        *args : Molecule, Population, GATools
+            A population is initialized with as many ``Molecule``
             or ``Population`` arguments as required. These are placed
             into the `members` or `populations` attributes,
             respectively. A ``GATools`` instance may be included
@@ -103,7 +103,7 @@ class Population:
         ------
         TypeError
             If the instance is initialized with something other than
-            ``MacroMolecule``, ``Population`` or ``GATools`` object.
+            ``Molecule``, ``Population`` or ``GATools`` object.
 
         """
 
@@ -114,16 +114,16 @@ class Population:
 
         # Determine type of supplied arguments and place in the
         # appropriate attribute.  ``Population`` types added to
-        # `populations` attribute, ``MacroMolecule`` into `members` and
+        # `populations` attribute, ``Molecule`` into `members` and
         # if ``GATools`` is supplied it is placed into `ga_tools`.
         # Raise a ``TypeError``  if an argument was not ``GATools``,
-        # ``MacroMolecule`` or ``Population`` type.
+        # ``Molecule`` or ``Population`` type.
         for arg in args:
             if isinstance(arg, Population):
                 self.populations.append(arg)
                 continue
 
-            if isinstance(arg, MacroMolecule):
+            if isinstance(arg, Molecule):
                 self.members.append(arg)
                 continue
 
@@ -134,7 +134,7 @@ class Population:
             raise TypeError(
                     ("Population can only be"
                      " initialized with ``Population``,"
-                     " ``MacroMolecule`` and ``GATools`` types."), arg)
+                     " ``Molecule`` and ``GATools`` types."), arg)
 
     @classmethod
     def init_cage_isomers(cls, lk_file, bb_file, topology,
@@ -394,39 +394,39 @@ class Population:
 
     def add_members(self, population, duplicates=False):
         """
-        Adds ``MacroMolecule`` instances into `members`.
+        Adds ``Molecule`` instances into `members`.
 
-        The ``MacroMolecule`` instances held within the supplied
+        The ``Molecule`` instances held within the supplied
         ``Population`` instance, `population`, are added into the
         `members` attribute of `self`. The supplied `population` itself
         is not added. This means that any information the `population`
         instance had about subpopulations is lost. This is because all
-        of its ``MacroMolecule`` instances are added into the `members`
+        of its ``Molecule`` instances are added into the `members`
         attribute, regardless of which subpopulation they were
         originally in.
 
         The `duplicates` parameter indicates whether multiple instances
-        of the same macromolecule are allowed to be added into the
-        population. Note that the sameness of a macromolecule is judged
-        by the `same` method of the ``MacroMolecule`` class, which is
+        of the same molecule are allowed to be added into the
+        population. Note that the sameness of a molecule is judged
+        by the `same` method of the ``Molecule`` class, which is
         invoked by the ``in`` operator within this method. See the
         `__contains__` method of the ``Population`` class for details
         on how the ``in`` operator uses the `same` method.
 
         Parameters
         ----------
-        population : Population (or iterable of ``MacroMolecule``s)
-            ``MacroMolecule`` instances to be added to the `members`
+        population : Population (or iterable of ``Molecule``s)
+            ``Molecule`` instances to be added to the `members`
             attribute and/or ``Population`` instances who's members, as
             generated by `all_members`, will be added to the `members`
             attribute.
 
         duplicates : bool (default = False)
-            When ``False`` only macromolecules which are not already
+            When ``False`` only molecules which are not already
             held by the population will be added. ``True`` allows more
-            than one instance of the same macromolecule to be added.
-            Whether two macromolecules are the same is defined by the
-            `same` method of the ``MacroMolecule`` class.
+            than one instance of the same molecule to be added.
+            Whether two molecules are the same is defined by the
+            `same()` method of the ``Molecule`` class.
 
         Modifies
         --------
@@ -480,19 +480,19 @@ class Population:
 
         Yields
         ------
-        MacroMolecule
-            The next ``MacroMolecule`` instance held within the
+        Molecule
+            The next ``Molecule`` instance held within the
             population or its subpopulations.
 
         """
 
-        # Go through `members` attribute and yield ``MacroMolecule``
+        # Go through `members` attribute and yield ``Molecule``
         # instances held within one by one.
         for ind in self.members:
             yield ind
 
         # Go thorugh `populations` attribute and for each
-        # ``Population`` instance within, yield ``MacroMolecule``
+        # ``Population`` instance within, yield ``Molecule``
         # instances from its `all_members` generator.
         for pop in self.populations:
             yield from pop.all_members()
@@ -536,12 +536,12 @@ class Population:
 
     def calculate_member_fitness(self):
         """
-        Applies the fitness function on all members.
+        Applies the fitness function to all members.
 
         The calculation will be performed serially or in parallel
         depending on the flag `ga_tools.parallel`. The serial version
         may be faster in cases where all molecules have already had
-        their fitness calcluated. This is because all calcluations will
+        their fitness calcluated. This is because all calculations will
         be skipped. In this case creating a parallel process pool
         creates unncessary overhead.
 
@@ -801,7 +801,7 @@ class Population:
         Parameters
         ----------
         key : function
-            A function which should take a MacroMolecule instance as
+            A function which should take a Molecule instance as
             its argument and return a value.
 
         Returns
@@ -830,7 +830,7 @@ class Population:
         Parameters
         ----------
         key : function
-            A function which should take a MacroMolecule instance as
+            A function which should take a Molecule instance as
             its argument and return a value.
 
         Returns
@@ -859,7 +859,7 @@ class Population:
         Parameters
         ----------
         key : function
-            A function which should take a MacroMolecule instance as
+            A function which should take a Molecule instance as
             its argument and return a value.
 
         Returns
@@ -917,11 +917,11 @@ class Population:
         """
         Removes duplicates from a population and preserves structure.
 
-        The question of which ``MacroMolecule`` instance is preserved
+        The question of which ``Molecule`` instance is preserved
         from a choice of two is difficult to answer. The iteration
         through a population is depth-first, so a rule such as ``the
-        macromolecule in the topmost population is preserved`` is not
-        the case here. Rather, the first ``MacroMolecule`` instance
+        molecule in the topmost population is preserved`` is not
+        the case here. Rather, the first ``Molecule`` instance
         iterated through is preserved.
 
         However, this question is only relevant if duplicates in
@@ -931,7 +931,7 @@ class Population:
 
         If the duplicates are being removed from within subpopulations,
         each subpopulation will end up with a single instance of all
-        macromolecules held before. There is no ``choice``.
+        molecules held before. There is no ``choice``.
 
         Parameters
         ----------
@@ -1134,10 +1134,10 @@ class Population:
         Allows the use of ``for`` loops, ``*`` and ``iter`` function.
 
         When ``Population`` instances are iterated through they yield
-        ``MacroMolecule`` instances generated by the `all_members`
+        ``Molecule`` instances generated by the `all_members`
         method. It also means that a ``Population`` instance can be
         unpacked with the ``*`` operator. This will produce the
-        ``MacroMolecule`` instances yielded by the `all_members`
+        ``Molecule`` instances yielded by the `all_members`
         method.
 
         Returns
@@ -1154,27 +1154,27 @@ class Population:
         """
         Allows the use of ``[]`` operator.
 
-        Macromolecules held by the ``Population`` instance can be
+        Molecules held by the ``Population`` instance can be
         accesed by their index. Slices are also supported. These return
-        a new ``Population`` instance holding the ``MacroMolecule``
+        a new ``Population`` instance holding the ``Molecule``
         instances with the requested indices. Using slices will return
         a flat ``Population`` instance meaing no subpopulation
-        information is preserved. All of the ``MacroMolecule``
+        information is preserved. All of the ``Molecule``
         instances are placed into the `members` attribute of the
         returned ``Population`` instance.
 
-        The index corresponds to the ``MacroMolecule`` yielded by the
+        The index corresponds to the ``Molecule`` yielded by the
         `all_members` method.
 
         This can be exploited if one desired to remove all
-        subpopulations and transfer all the ``MacroMolecules``
+        subpopulations and transfer all the ``Molecules``
         instances into the members attribute. For example,
 
         >>> pop2 = pop[:]
 
         ``pop2`` is a ``Population`` instance with all the same
-        ``MacroMolecule`` instances as ``pop``, however all
-        ``MacroMolecule`` instances are held within its `members`
+        ``Molecule`` instances as ``pop``, however all
+        ``Molecule`` instances are held within its `members`
         attribute and its `populations` attribute is empty. This may or
         may not be the case for the ``pop`` instance.
 
@@ -1182,20 +1182,20 @@ class Population:
         ----------
         key : int, slice
             An int or slice can be used depending on if a single
-            ``MacroMolecule`` instance needs to be returned or a
-            collection of ``MacroMolecule`` instances.
+            ``Molecule`` instance needs to be returned or a
+            collection of ``Molecule`` instances.
 
         Returns
         -------
-        MacroMolecule
+        Molecule
             If the supplied `key` is an ``int``. Returns the
-            ``MacroMolecule`` instance with the corresponding index
+            ``Molecule`` instance with the corresponding index
             from the `all_members` generator.
 
         Population
             If the supplied `key` is a ``slice``. The returned
-            ``Population`` instance holds ``MacroMolecule`` instances
-            in its `members` attribute. The ``MacroMolecule`` instances
+            ``Population`` instance holds ``Molecule`` instances
+            in its `members` attribute. The ``Molecule`` instances
             correspond to indices defined by the slice. The slice is
             implemented on the `all_members` generator.
 
@@ -1207,13 +1207,13 @@ class Population:
         """
 
         # Determine if provided key was an ``int`` or a ``slice``.
-        # If ``int``, return the corresponding ``MacroMolecule``
+        # If ``int``, return the corresponding ``Molecule``
         # instance from the `all_members` generator.
         if isinstance(key, int):
             return list(self.all_members())[key]
 
         # If ``slice`` return a ``Population`` of the corresponding
-        # ``MacroMolecule`` instances. The returned ``Population`` will
+        # ``Molecule`` instances. The returned ``Population`` will
         # have the same `ga_tools` attribute as original ``Population``
         # instance.
         if isinstance(key, slice):
@@ -1250,11 +1250,11 @@ class Population:
             pop3 = pop1 - pop2,
 
         returns a new population, pop3. The returned population
-        contains all the ``MacroMolecule`` instances in pop1 except
-        those also in pop2. This refers to all of the ``MacroMolecule``
+        contains all the ``Molecule`` instances in pop1 except
+        those also in pop2. This refers to all of the ``Molecule``
         instances, including those held within any subpopulations. The
         returned population is flat. This means all information about
-        subpopulations in pop1 is lost as all the ``MacroMolecule``
+        subpopulations in pop1 is lost as all the ``Molecule``
         instances are held in the `members` attribute of pop3.
 
         The resulting population, pop3, will inherit the `ga_tools`
@@ -1263,13 +1263,13 @@ class Population:
         Parameters
         ----------
         other : Population
-            A collection of ``MacroMolecule`` instances to be removed
+            A collection of ``Molecule`` instances to be removed
             from `self`, if held by it.
 
         Returns
         -------
         Population
-            A flat population of ``MacroMolecule`` instances which are
+            A flat population of ``Molecule`` instances which are
             not also held in `other`.
 
         """
@@ -1307,7 +1307,7 @@ class Population:
 
         Parameters
         ----------
-        item : MacroMolecule
+        item : Molecule
 
         Returns
         -------
