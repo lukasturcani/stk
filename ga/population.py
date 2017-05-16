@@ -237,7 +237,7 @@ class Population:
         lk_db : str
             The full path of the database of linker molecules.
 
-        topolgies : iterable of ``Topology`` child classes
+        topolgies : iterable of Topology objects
             An iterable holding topologies which should be randomly
             selected for cage initialization.
 
@@ -289,7 +289,7 @@ class Population:
                 lk = StructUnit3(lk.file, lk_fg)
             else:
                 lk = StructUnit2(lk.file, lk_fg)
-            pop.members.append(Cage([bb, lk], topology()))
+            pop.members.append(Cage([bb, lk], topology))
 
         return pop
 
@@ -315,7 +315,7 @@ class Population:
         lk_db : str
             The full path of the database of linker molecules.
 
-        topolgies : iterable of ``Topology`` child classes
+        topolgies : iterable of Topology objects
             An iterable holding topologies which should be randomly
             selected for cage initialization.
 
@@ -354,7 +354,7 @@ class Population:
             else:
                 lk = StructUnit2(lk.file, lk_fg)
 
-            pop.members.append(Cage([bb, lk], topology()))
+            pop.members.append(Cage([bb, lk], topology))
 
         return pop
 
