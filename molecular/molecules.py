@@ -129,7 +129,7 @@ by the macromolecular class.
 """
 
 import numpy as np
-import warnings
+import warnings, logging
 from functools import total_ordering, partial
 import itertools as it
 import rdkit.Geometry.rdGeometry as rdkit_geo
@@ -154,6 +154,9 @@ from ..convenience_tools import (flatten, periodic_table, MolError,
                                  atom_vdw_radii)
 from .fg_info import functional_groups
 from .energy import Energy
+
+
+logger = logging.getLogger(__name__)
 
 
 class Cached(type):
@@ -1274,6 +1277,50 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if self.func_grp:
             self.tag_atoms()
 
+    @classmethod
+    def init_random(cls, db, fg=None, name="", note=""):
+        """
+        Picks a random file from `db` to initialize from.
+
+        If initialization from the randomly chosen file fails, another
+        file is picked at random. Note that if there are no valid files
+        this will result in an infinite loop.
+
+        Parameters
+        ----------
+        db : str
+            A path to a database of molecular files.
+
+        fg : str, optional
+            The name of a functional group which the molecules in `db`
+            have. By default it is assumed the name is present in the
+            path of the files.
+
+        name : str, optional
+            The name to be given to the created molecule.
+
+        note : str, optional
+            A note to be given to the created molecule.
+
+        Returns
+        -------
+        StructUnit
+            A random molecule from `db`.
+
+        """
+
+        while True:
+            try:
+                molfile = np.random.choice(os.listdir(db))
+                molfile = os.path.join(db, molfile)
+                return cls(molfile, fg, name, note)
+
+            except Exception:
+                logger.error(
+                    'Could not initialize {} from {}.'.format(
+                                                cls.__name__, molfile))
+                continue
+
     def all_bonder_distances(self):
         """
         Yield distances between all pairs of bonder atoms.
@@ -1729,6 +1776,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def similar_molecules(self, database):
         """
         Returns molecules from `database` ordered by similarity.
+
+        The most similar molecule is at index 0.
 
         This method uses the Morgan fingerprints of radius 4 to
         evaluate how similar the molecules in `database` are.
