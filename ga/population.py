@@ -268,38 +268,28 @@ class Population:
         """
 
         pop = cls(ga_tools)
+        # On each even iteration of the for loop it randomly selects
+        # a building block and linker and saves the choices. On each
+        # odd iteration the choices have their morgan fingerprints
+        # evaluated and the most different files in `bb_db`/`lk_db` are
+        # chosen.
         for x in range(size):
             topology = np.random.choice(topologies)
-            # Make a building block.
-            while True:
-                try:
-                    bb_file = np.random.choice(os.listdir(bb_db))
-                    bb_file = os.path.join(bb_db, bb_file)
-                    bb = StructUnit3(bb_file, bb_fg)
-                    break
+            if x % 2 == 0:
+                bb = StructUnit3.init_random(bb_db, bb_fg)
+                lk = StructUnit.init_random(lk_db, lk_fg)
 
-                except Exception:
-                    print('Issue with: {}.'.format(bb_file))
-                    continue
+            else:
+                bb_file = bb.similar_molecules(bb_db)[-1][1]
+                bb = StructUnit3(bb_file, bb_fg)
 
-            # Make a linker.
-            while True:
-                try:
-                    lk_file = np.random.choice(os.listdir(lk_db))
-                    lk_file = os.path.join(lk_db, lk_file)
-                    lk = StructUnit(lk_file, lk_fg)
+                lk_file = lk.similar_molecules(lk_db)[-1][1]
+                lk = StructUnit(lk_file, lk_fg)
 
-                    if len(lk.bonder_ids) >= 3:
-                        lk = StructUnit3(lk_file, lk_fg)
-                    else:
-                        lk = StructUnit2(lk_file, lk_fg)
-
-                    break
-
-                except Exception:
-                    print('Issue with: {}.'.format(lk_file))
-                    continue
-
+            if len(lk.bonder_ids) >= 3:
+                lk = StructUnit3(lk.file, lk_fg)
+            else:
+                lk = StructUnit2(lk.file, lk_fg)
             pop.members.append(Cage([bb, lk], topology))
 
         return pop
@@ -358,35 +348,12 @@ class Population:
         pop = cls(ga_tools)
         for x in range(size):
             topology = np.random.choice(topologies)
-            # Make a building block.
-            while True:
-                try:
-                    bb_file = np.random.choice(os.listdir(bb_db))
-                    bb_file = os.path.join(bb_db, bb_file)
-                    bb = StructUnit3(bb_file, bb_fg)
-                    break
-
-                except Exception:
-                    print('Issue with: {}.'.format(bb_file))
-                    continue
-
-            # Make a linker.
-            while True:
-                try:
-                    lk_file = np.random.choice(os.listdir(lk_db))
-                    lk_file = os.path.join(lk_db, lk_file)
-                    lk = StructUnit(lk_file, lk_fg)
-
-                    if len(lk.bonder_ids) >= 3:
-                        lk = StructUnit3(lk_file, lk_fg)
-                    else:
-                        lk = StructUnit2(lk_file, lk_fg)
-
-                    break
-
-                except Exception:
-                    print('Issue with: {}.'.format(lk_file))
-                    continue
+            bb = StructUnit3.init_random(bb_db, bb_fg)
+            lk = StructUnit.init_random(lk_db, lk_fg)
+            if len(lk.bonder_ids) >= 3:
+                lk = StructUnit3(lk.file, lk_fg)
+            else:
+                lk = StructUnit2(lk.file, lk_fg)
 
             pop.members.append(Cage([bb, lk], topology))
 
