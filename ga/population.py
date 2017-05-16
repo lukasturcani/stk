@@ -6,7 +6,6 @@ Defines the Population class.
 import itertools as it
 import os
 import numpy as np
-import pickle
 from collections import Counter
 import json
 
@@ -14,11 +13,11 @@ from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..molecular import (MacroMolecule, Cage, Molecule,
-                        StructUnit, StructUnit2, StructUnit3)
+from ..molecular import (Molecule, Cage,
+                         StructUnit, StructUnit2, StructUnit3)
 from ..molecular.topologies.cage.base import _VertexOnlyCageTopology
-from ..molecular.optimization.optimization import (_optimize_all,
-                                        _optimize_all_serial)
+from ..molecular.optimization.optimization import (
+                                   _optimize_all_serial, _optimize_all)
 
 
 class Population:
@@ -185,14 +184,15 @@ class Population:
         n_A = len(topology.positions_A)
         A_alignments = set()
 
-        for x in it.combinations_with_replacement([0,1,2], n_A):
+        for x in it.combinations_with_replacement([0, 1, 2], n_A):
             for y in it.permutations(x, n_A):
                 A_alignments.add(y)
 
         n_B = len(topology.positions_B)
         B_alignments = set()
         orientations = ([0, 1, 2] if
-            issubclass(topology, _VertexOnlyCageTopology) else [1, -1])
+                        issubclass(topology, _VertexOnlyCageTopology)
+                        else [1, -1])
         for x in it.combinations_with_replacement(orientations, n_B):
             for y in it.permutations(x, n_B):
                 B_alignments.add(y)
@@ -206,7 +206,6 @@ class Population:
         bb = StructUnit3(bb_file, bb_fg)
 
         pop = cls(ga_tools)
-        seen = set()
         for A_align in A_alignments:
             for B_align in B_alignments:
                 c = Cage([bb, lk], topology(A_align, B_align))
@@ -216,8 +215,8 @@ class Population:
 
     @classmethod
     def init_diverse_cages(cls, bb_db, lk_db,
-                          topologies, size, ga_tools,
-                          bb_fg=None, lk_fg=None):
+                           topologies, size, ga_tools,
+                           bb_fg=None, lk_fg=None):
         """
         Creates a population of cages built from provided databases.
 
@@ -290,7 +289,7 @@ class Population:
                 lk = StructUnit3(lk.file, lk_fg)
             else:
                 lk = StructUnit2(lk.file, lk_fg)
-            pop.members.append(Cage([bb, lk], topology))
+            pop.members.append(Cage([bb, lk], topology()))
 
         return pop
 
@@ -355,7 +354,7 @@ class Population:
             else:
                 lk = StructUnit2(lk.file, lk_fg)
 
-            pop.members.append(Cage([bb, lk], topology))
+            pop.members.append(Cage([bb, lk], topology()))
 
         return pop
 
@@ -409,8 +408,9 @@ class Population:
         if duplicates:
             self.members.extend(mol for mol in population)
         else:
-            self.members.extend(mol for mol in population
-                                                    if mol not in self)
+            self.members.extend(mol for mol in population if
+                                mol not in self)
+
     def add_subpopulation(self, population):
         """
         Appends a population into the `populations` attribute.
@@ -664,7 +664,7 @@ class Population:
         if counter_path:
             for member in self:
                 if member not in counter.keys():
-                    counter.update({member : 0})
+                    counter.update({member: 0})
             plot_counter(counter, counter_path)
 
         return new_gen
@@ -880,7 +880,7 @@ class Population:
             _optimize_all_serial(self.ga_tools.optimization, self)
 
     def remove_duplicates(self, between_subpops=True,
-                                key=lambda x : id(x), top_seen=None):
+                          key=lambda x: id(x), top_seen=None):
         """
         Removes duplicates from a population and preserves structure.
 
@@ -1185,7 +1185,7 @@ class Population:
         # instance.
         if isinstance(key, slice):
             mols = it.islice(self.all_members(),
-                                     key.start, key.stop, key.step)
+                             key.start, key.stop, key.step)
             pop = Population(*mols)
             pop.ga_tools = self.ga_tools
             return pop
@@ -1242,8 +1242,7 @@ class Population:
         """
 
         new_pop = Population(self.ga_tools)
-        new_pop.add_members(mol for mol in self
-                                                if mol not in other)
+        new_pop.add_members(mol for mol in self if mol not in other)
         return new_pop
 
     def __add__(self, other):
@@ -1286,11 +1285,11 @@ class Population:
 
     def __str__(self):
         output_string = (" Population " + str(id(self)) + "\n" +
-                            "--------------------------\n" +
-                            "\tMembers\n" + "   ---------\n")
+                         "--------------------------\n" +
+                         "\tMembers\n" + "   ---------\n")
 
         for mol in self.members:
-            output_string += "\t"  + str(mol) + "\n"
+            output_string += "\t" + str(mol) + "\n"
 
         if len(self.members) == 0:
             output_string += "\tNone\n\n"
@@ -1308,7 +1307,6 @@ class Population:
 
         for pop in self.populations:
             output_string += str(pop)
-
 
         return output_string
 
