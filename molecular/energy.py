@@ -170,6 +170,7 @@ provided in the docstring of ``EMeta``.
 """
 
 import os
+from weakref import ref
 import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
 from uuid import uuid4
@@ -229,7 +230,6 @@ class EMethod:
             descriptor.
 
         """
-
 
         # If the Energy method is accessed as a class attribute return
         # the unbound method.
@@ -313,7 +313,7 @@ def e_logger(func, obj):
 
         # Update the `values` dictionary with the results of the
         # calculation.
-        obj.values.update({key:result})
+        obj.values.update({key: result})
         # Return the result.
         return result
 
@@ -361,8 +361,9 @@ def func_key(func, fargs=None, fkwargs=None):
     # Get a dictionary of all the supplied parameters.
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
-    default = {key : value.default for key,value in
-              dict(fsig.parameters).items() if key not in bound.keys()}
+    default = {key: value.default for key, value in
+               dict(fsig.parameters).items() if
+               key not in bound.keys()}
 
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
@@ -399,7 +400,6 @@ def exclude(*args):
 
     """
 
-
     def inner(func):
         func.exclude = args
         return func
@@ -427,7 +427,7 @@ class Energy(metaclass=EMeta):
     """
 
     def __init__(self, molecule):
-        self.molecule = molecule
+        self.molecule = ref(molecule)
         self.values = {}
 
     @exclude('force_e_calc')
