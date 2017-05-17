@@ -128,32 +128,37 @@ by the macromolecular class.
 
 """
 
+import tempfile
+import warnings
+import logging
+import json
+import os
+import io
+
 import numpy as np
-import warnings, logging
-from functools import total_ordering, partial
+import networkx as nx
 import itertools as it
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
+
 from rdkit import DataStructs
-import os
-import networkx as nx
+from functools import total_ordering, partial
 from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
-import json
-from collections import namedtuple, Counter
+
+from collections import Counter
 from inspect import signature
-import io
 
 from . import topologies
+from .fg_info import functional_groups
+from .energy import Energy
 from ..addons.pyWindow import window_sizes
 from ..convenience_tools import (flatten, periodic_table, MolError,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
                                  atom_vdw_radii)
-from .fg_info import functional_groups
-from .energy import Energy
 
 
 logger = logging.getLogger(__name__)
@@ -1511,27 +1516,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
-                                       sanitize=False, removeHs=False)
-        key = cls.gen_key(mol, json_dict['func_grp'])
-
-        if key in cls.cache:
-            return cls.cache[key]
-
-        obj = cls.__new__(cls)
-        obj.file = 'JSON'
-        obj.mol = mol
-        obj.func_grp = next((x for x in functional_groups if
-                                x.name == json_dict['func_grp']), None)
-        obj.energy = Energy(obj)
-        obj.optimized = json_dict['optimized']
-        obj.key = key
-        obj.note = json_dict['note']
-        obj.name = json_dict['name'] if json_dict['load_names'] else ""
-        if obj.func_grp:
-            obj.tag_atoms()
-        cls.cache[key] = obj
-        return obj
+        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
+            f.write(json_dict['mol_block'])
+            f.seek(0)
+            return cls(f.name, json_dict['func_grp'],
+                       (json_dict['name'] if
+                        json_dict['load_names'] else ""),
+                       json_dict['note'])
 
     @staticmethod
     def gen_key(rdkit_mol, functional_group):
