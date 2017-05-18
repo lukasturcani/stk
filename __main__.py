@@ -258,17 +258,12 @@ def ga_run(ga_input):
     os.chdir(root_dir)
     progress.progress.normalize_fitness_values()
     progress.dump()
-
-    del pop
-    del progress
-    return
-
-
     logger.info('Plotting EPP.')
     plot.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
     progress.progress.remove_members(lambda x :
           pop.ga_tools.fitness.name not in x.progress_params)
     plot.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
+
     shutil.rmtree('scratch')
     pop.write('final_pop', True)
     os.chdir(launch_dir)
@@ -309,16 +304,11 @@ if __name__ == '__main__':
         ga_input = GAInput(ifile)
         logger = logging.getLogger(__name__)
         logger.info('Loading molecules from any provided databases.')
-        dbs = []
         for db in ga_input.databases:
-            dbs.append(Population.load(db))
+            c = Population.load(db)
 
-        import objgraph
         for x in range(args.loops):
-            print(x)
             ga_run(ga_input)
-            objgraph.show_most_common_types()
-            print()
 
     elif sys.argv[1] == 'helper':
         InputHelp(args.KEYWORD)
