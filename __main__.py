@@ -304,8 +304,9 @@ if __name__ == '__main__':
         ga_input = GAInput(ifile)
         logger = logging.getLogger(__name__)
         logger.info('Loading molecules from any provided databases.')
+        dbs = []
         for db in ga_input.databases:
-            c = Population.load(db)
+            dbs.append(Population.load(db))
 
         for x in range(args.loops):
             ga_run(ga_input)
