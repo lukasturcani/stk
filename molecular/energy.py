@@ -170,7 +170,6 @@ provided in the docstring of ``EMeta``.
 """
 
 import os
-from weakref import ref
 import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
 from uuid import uuid4
@@ -427,7 +426,7 @@ class Energy(metaclass=EMeta):
     """
 
     def __init__(self, molecule):
-        self.molecule = ref(molecule)
+        self.molecule = molecule
         self.values = {}
 
     @exclude('force_e_calc')
