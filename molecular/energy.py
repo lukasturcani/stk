@@ -1228,12 +1228,12 @@ def pseudoformation_key(fargs, fkwargs):
 
 Energy.pseudoformation.key = pseudoformation_key
 
-def _run_mopac(file_root, mopac_path, timeout=600):
+def _run_mopac(file_root, mopac_path, timeout=3600):
 
     mop_file = file_root + '.mop'
 
     print("", time.ctime(time.time()),
-          'Running MOPAC - {}.'.format(mop_file, sep='\n'))
+          'Running MOPAC - {}.'.format(file_root), sep='\n')
 
     # To run MOPAC a command is issued to the console via
     # ``subprocess.Popen``. The command is the full path of the
@@ -1329,7 +1329,7 @@ def _create_mop(file_root, molecule, settings):
     mop_file = file_root + '.mop'
     mol = molecule.mol
 
-    print('Creating .mop file - {}.'.format(mop_file))
+    print('Creating .mop file - {}.'.format(file_root))
 
     # Generate the mop file containing the MOPAC run info
     with open(mop_file, 'w') as mop:

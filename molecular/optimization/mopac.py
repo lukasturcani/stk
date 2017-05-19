@@ -119,13 +119,13 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
     _convert_mopout_to_mol(macro_mol)
 
 
-def _run_mopac(macro_mol, mopac_path, settings, timeout=1200):
+def _run_mopac(macro_mol, mopac_path, settings, timeout=3600):
 
     name, ext = os.path.splitext(macro_mol._file)
     mop_file = name + '.mop'
 
     print("", time.ctime(time.time()),
-          'Running MOPAC - {}.'.format(mop_file, sep='\n'))
+          'Running MOPAC - {}.'.format(macro_mol.name), sep='\n')
 
     # To run MOPAC a command is issued to the console via
     # ``subprocess.Popen``. The command is the full path of the
@@ -143,7 +143,7 @@ def _run_mopac(macro_mol, mopac_path, settings, timeout=1200):
             proc_out, _ = opt_proc.communicate()
     except sp.TimeoutExpired:
         print(('\nMinimization took too long and was terminated '
-               'by force - {}\n').format(mop_file))
+               'by force - {}\n').format(macro_mol.name))
         _kill_mopac(macro_mol)
 
     return
@@ -154,7 +154,7 @@ def _kill_mopac(macro_mol):
     To kill a MOPAC run for a specific structure it is enough to generate
     a non empty file with the molecule's name with the `.end` extension.
     """
-    name, ext = os.path.splitext(macro_mol)
+    name, ext = os.path.splitext(macro_mol._file)
     end_file = name + '.end'
 
     with open(end_file, 'w') as end:
@@ -236,7 +236,7 @@ def _create_mop(macro_mol, settings):
     mop_file = name + '.mop'
     mol = macro_mol.mol
 
-    print('Creating .mop file - {}.'.format(name))
+    print('\nCreating .mop file - {}.'.format(macro_mol.name))
 
     # Generate the mop file containing the MOPAC run info
     with open(mop_file, 'w') as mop:
@@ -279,10 +279,10 @@ def _convert_mopout_to_mol(macro_mol):
     None : NoneType
 
     """
-    print("Updating molecule with MOPAC optimized one - {}.".format(macro_mol._file))
-
     name, ext = os.path.splitext(macro_mol._file)
     pdb_file = name + ".pdb"
+
+    print("\nUpdating molecule with MOPAC optimized one - {}.\n".format(macro_mol.name))
 
     new_mol = rdkit.MolFromPDBFile(pdb_file, sanitize=False,
                                    removeHs=False)
