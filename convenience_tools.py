@@ -16,9 +16,9 @@ import subprocess as sp
 import gzip
 import re
 from collections import deque
-import shutil
 import tarfile
 import traceback
+
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
@@ -42,11 +42,11 @@ atom_vdw_radii = {
                  }
 
 # This dictionary gives easy access to the rdkit bond types.
-bond_dict = {'1' : rdkit.rdchem.BondType.SINGLE,
-             'am' : rdkit.rdchem.BondType.SINGLE,
-             '2' : rdkit.rdchem.BondType.DOUBLE,
-             '3' : rdkit.rdchem.BondType.TRIPLE,
-             'ar' : rdkit.rdchem.BondType.AROMATIC}
+bond_dict = {'1': rdkit.rdchem.BondType.SINGLE,
+             'am': rdkit.rdchem.BondType.SINGLE,
+             '2': rdkit.rdchem.BondType.DOUBLE,
+             '3': rdkit.rdchem.BondType.TRIPLE,
+             'ar': rdkit.rdchem.BondType.AROMATIC}
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
@@ -138,7 +138,6 @@ class MolError(Exception):
         self.ex = ex
         self.notes = notes
         self.write_to_file(mol)
-        print('\n\nMolError written to ``failures.txt``.\n\n')
 
     def write_to_file(self, mol):
         """
