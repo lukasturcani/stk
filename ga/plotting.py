@@ -162,14 +162,10 @@ def parameter_epp(pop, plot_name=False,
                             for x in p_arrays])
 
     for x in range(len(min_params[0])):
-        fig = plt.figure()
-        plt.xlabel(xlabel)
-        plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
 
         y_mean = [array[x] for array in mean_params]
         y_max = [array[x] for array in max_params]
         y_min = [array[x] for array in min_params]
-
 
         # This loop checks if any y values are ``None`` in which case
         # they are removed and the corresponding x value as well.
@@ -183,7 +179,6 @@ def parameter_epp(pop, plot_name=False,
         y_max = [yv for i, yv in enumerate(y_max) if i not in nones]
         y_min = [yv for i, yv in enumerate(y_min) if i not in nones]
 
-
         # Save the plot data.
         if plot_name and dump_name is None:
             basename, ext = os.path.splitext(plot_name)
@@ -192,14 +187,17 @@ def parameter_epp(pop, plot_name=False,
         np.array([y_min, y_mean, y_max]).dump(dname)
 
         if plot_name:
+            fig = plt.figure()
+            plt.xlabel(xlabel)
+            plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
             plt.scatter(xvals, y_mean,
                         color='green', marker='x', label='mean')
             plt.scatter(xvals, y_min,
                         color='blue', marker='x', label='min')
             plt.scatter(xvals, y_max,
                         color='red', marker='x', label='max')
-            lgd=plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
-                            borderaxespad=0.)
+            lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
+                             borderaxespad=0.)
 
             new_plot_name = str(x).join(os.path.splitext(plot_name))
 
