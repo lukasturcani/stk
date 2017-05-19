@@ -121,7 +121,10 @@ each of the `progress_params` and they will have their y-axes labelled
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
-import copy, os, logging, warnings
+import copy
+import os
+import logging
+import warnings
 from functools import partial, wraps
 import networkx as nx
 import multiprocessing as mp
@@ -130,7 +133,7 @@ from os.path import join
 from uuid import uuid4
 
 from ..convenience_tools import (matrix_centroid,
-                                 FunctionData, MolError,
+                                 FunctionData,
                                  rotation_matrix_arbitrary_axis)
 
 from ..molecular import (Cage, StructUnit,
@@ -202,6 +205,7 @@ def _calc_fitness_serial(func_data, population):
     for member in population:
         p_func(member)
 
+
 def _param_labels(*labels):
     """
     Adds the `param_labels` attribute to a fitness function.
@@ -264,7 +268,10 @@ class _FitnessFunc:
 
         except Exception as ex:
             val = None
-            MolError(ex, macro_mol, "During fitness calculation.")
+            errormsg = ('Fitness function "{}()" '
+                        'failed on molecule "{}".').format(
+                        func_name, macro_mol.name)
+            logger.error(errormsg, exc_info=True)
 
         finally:
             macro_mol.unscaled_fitness[func_name] = val
