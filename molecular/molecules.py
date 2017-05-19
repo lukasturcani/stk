@@ -142,6 +142,7 @@ import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
 
 from rdkit import DataStructs
+from glob import glob
 from functools import total_ordering, partial
 from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
@@ -154,7 +155,7 @@ from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
 from ..addons.pyWindow import window_sizes
-from ..convenience_tools import (flatten, periodic_table, MolError,
+from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
@@ -1241,7 +1242,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         if ext not in self.init_funcs:
             raise TypeError(
-            'Unable to initialize from "{}" files.'.format(ext))
+                   'Unable to initialize from "{}" files.'.format(ext))
 
         self.mol = self.init_funcs[ext](file)
         # Update the property cache of each atom. This updates things
@@ -1265,7 +1266,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # generator will return the functional group which appears
         # first in `functional_groups`.
 
-
         # Assign the FGInfo instance from `functional_groups` which
         # describes the functional group provided in `functional_group`
         # or is found in the path name.
@@ -1286,10 +1286,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def init_random(cls, db, fg=None, name="", note=""):
         """
         Picks a random file from `db` to initialize from.
-
-        If initialization from the randomly chosen file fails, another
-        file is picked at random. Note that if there are no valid files
-        this will result in an infinite loop.
 
         Parameters
         ----------
@@ -1312,19 +1308,22 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         StructUnit
             A random molecule from `db`.
 
+        None : NoneType
+            If no files in `db` could be initialized from.
+
         """
 
-        while True:
+        files = glob(os.path.join(db, '*'))
+        np.random.shuffle(files)
+
+        for molfile in files:
             try:
-                molfile = np.random.choice(os.listdir(db))
-                molfile = os.path.join(db, molfile)
                 return cls(molfile, fg, name, note)
 
             except Exception:
                 logger.error(
                     'Could not initialize {} from {}.'.format(
                                                 cls.__name__, molfile))
-                continue
 
     def all_bonder_distances(self):
         """
@@ -2333,7 +2332,23 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         except Exception as ex:
             self.mol = rdkit.Mol()
-            MolError(ex, self, 'During initialization.')
+            errormsg = ('Build failure.\n'
+                        '\n'
+                        'topology\n'
+                        '--------\n'
+                        '{}\n'
+                        '\n'
+                        'building blocks\n'
+                        '---------------\n').format(topology)
+
+            bb_blocks = []
+            for bb in building_blocks:
+                bb_blocks.append(('{.__class__.__name__}\n'
+                                  '{}').format(bb, bb.mdl_mol_block()))
+
+            errormsg += '\n'.join(bb_blocks)
+
+            logger.error(errormsg, exc_info=True)
 
         super().__init__(name, note)
         self.save_bonders()
