@@ -135,7 +135,7 @@ class _OptimizationFunc:
             return macro_mol
 
         try:
-            logger.info('\nOptimizing {0}.'.format(macro_mol.name))
+            logger.info('Optimizing {0}.'.format(macro_mol.name))
             self.__wrapped__(macro_mol, *args, **kwargs)
 
         except Exception as ex:
