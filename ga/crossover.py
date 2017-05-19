@@ -21,13 +21,12 @@ start with a leading underscore.
 
 """
 
-import os, logging
+import logging
 from collections import Counter
 import numpy as np
 
 from .population import Population
 from .plotting import plot_counter
-from ..convenience_tools import MolError
 from ..molecular.molecules import Cage
 
 
@@ -149,10 +148,16 @@ class Crossover:
                                 num_crossovers, self.num_crossovers))
                 if num_crossovers == self.num_crossovers:
                     break
+
             except Exception as ex:
-                for i, parent in enumerate(parents):
-                    MolError(ex, parent,
-                    'Error during crossover. Parent {0}.'.format(i))
+                errormsg = ('Crossover function "{}()" failed on '
+                            'molecules PARENTS.').format(
+                            func_data.name)
+
+                pnames = ' and '.join('"{}"'.format(p.name) for
+                                      p in parents)
+                errormsg = errormsg.replace('PARENTS', pnames)
+                logger.error(errormsg, exc_info=True)
 
         # Make sure that only original molecules are left in the
         # offspring population.
