@@ -173,6 +173,7 @@ import os
 import time
 import psutil
 import copy
+from weakref import ref
 import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
 from uuid import uuid4
@@ -365,7 +366,6 @@ def func_key(func, fargs=None, fkwargs=None):
     # Get a dictionary of all the default initialized parameters.
     default = {key: value.default for key, value in
               dict(fsig.parameters).items() if key not in bound.keys()}
-
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
     bound.update(default)
@@ -428,7 +428,7 @@ class Energy(metaclass=EMeta):
     """
 
     def __init__(self, molecule):
-        self.molecule = molecule
+        self.molecule = ref(molecule)
         self.values = {}
 
     @exclude('force_e_calc')
