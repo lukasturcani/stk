@@ -31,7 +31,6 @@ from functools import partial, wraps
 import numpy as np
 import logging
 
-from ...convenience_tools import MolError
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
 
@@ -140,9 +139,10 @@ class _OptimizationFunc:
             self.__wrapped__(macro_mol, *args, **kwargs)
 
         except Exception as ex:
-            # Prevents the error from being raised, but records it in
-            # ``failures.txt``.
-            MolError(ex, macro_mol, "During optimization.")
+            errormsg = ('Optimization function "{}()" '
+                        'failed on molecule "{}".').format(
+                        self.__wrapped__.func.__name__, macro_mol.name)
+            logger.error(errormsg, exc_info=True)
 
         finally:
             macro_mol.optimized = True
