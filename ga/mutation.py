@@ -20,16 +20,17 @@ start with a leading underscore.
 
 """
 
-import os, sys, logging
+import os
+import logging
 import numpy as np
 from collections import Counter
 
 from .population import Population
 from .plotting import plot_counter
-from ..convenience_tools import MolError
 from ..molecular import StructUnit3, Cage
 
 logger = logging.getLogger(__name__)
+
 
 class MutationError(Exception):
     ...
@@ -150,8 +151,10 @@ class Mutation:
                     break
 
             except Exception as ex:
-                MolError(ex, parent, ('Error during mutation'
-                    ' with {}.').format(func.__name__))
+                errormsg = ('Mutation function "{}()" '
+                            'failed on molecule "{}".').format(
+                             func_data.name, parent.name)
+                logger.error(errormsg, exc_info=True)
 
         mutant_pop -= population
 
@@ -159,7 +162,7 @@ class Mutation:
             # Update counter with unselected members.
             for member in population:
                 if member not in counter.keys():
-                    counter.update({member : 0})
+                    counter.update({member: 0})
             plot_counter(counter, counter_path)
 
         return mutant_pop
