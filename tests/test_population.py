@@ -11,6 +11,7 @@ from ..ga import Population, GATools
 pop = Population.load(join('data', 'population', 'population.json'))
 pop2 = Population.load('data/population/init_cage_isomers.json')
 
+
 def generate_population(offset=False):
     """
     Returns a population of subpopulations and direct members.
@@ -77,7 +78,7 @@ def test_init_cage_isomers():
     lk_file = join('data', 'struct_unit2', 'amine.mol2')
     bb_file = join('data', 'struct_unit3', 'amine.mol2')
     pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix)
-    assert len(pop) == 50
+    assert len(pop) == 5184
 
 
 def test_add_members_duplicates():
