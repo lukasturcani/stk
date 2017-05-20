@@ -162,7 +162,7 @@ class GAProgress:
 
         """
 
-        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
+        if pop.ga_tools.input.pop_dumps:
             pop.dump(join('..', 'pop_dumps', dump_name))
 
 
@@ -187,13 +187,15 @@ def ga_run(ga_input):
     # If logging level is DEBUG or less, make population dumps as the
     # GA progresses and save images of selection counters.
     mcounter = ccounter = gcounter = ''
-    if logger.isEnabledFor(logging.DEBUG):
+    if ga_input.counters:
         os.mkdir('counters')
-        os.mkdir('pop_dumps')
         cstr = join(root_dir, 'counters', 'gen_{}_')
         mcounter = cstr + 'mutation_counter.png'
         ccounter = cstr + 'crossover_counter.png'
         gcounter = cstr + 'selection_counter.png'
+    if ga_input.pop_dumps:
+        os.mkdir('pop_dumps')
+
     # Copy the input script into the ``output`` folder.
     shutil.copyfile(ifile, basename(ifile))
     # Make the ``scratch`` directory which acts as the working
@@ -276,7 +278,7 @@ def ga_run(ga_input):
     shutil.rmtree('scratch')
     pop.write('final_pop', True)
     os.chdir(launch_dir)
-    if logger.isEnabledFor(logging.DEBUG):
+    if ga_input.tar_output:
         logger.info('Compressing output.')
         tar_output()
     archive_output()
