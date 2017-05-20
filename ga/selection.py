@@ -176,37 +176,6 @@ class Selection:
     """
 
     @staticmethod
-    def _elites(population, n):
-        """
-        Returns the `n` fittest members of `population`.
-
-        This is used internally by selection functions when applying
-        elitism. This is not a selection function in and of itself. As
-        a result, this method is private. Use ``fittest()`` if you want
-        a selection function which yields the fittest individuals first.
-
-        Parameters
-        ----------
-        population : Population
-            The population from which the fittest members are selected.
-
-        n : int
-            The number of members to be returned.
-
-        Returns
-        -------
-        list
-            A list holding the `n` fittest members of `population`.
-
-
-
-        """
-
-        pop = sorted(population,
-                     key=attrgetter('fitness'), reverse=True)[:n]
-        return pop
-
-    @staticmethod
     def fittest(population):
         """
         Yields members of the population, fittest first.
@@ -261,7 +230,7 @@ class Selection:
         Yields
         ------
         MacroMolecule
-            The next selected invidual.
+            The next selected population member.
 
         References
         ----------
@@ -289,11 +258,13 @@ class Selection:
             yielded.add(selected) if not duplicates else None
             yield selected
 
-    def deterministic_sampling(self, population, elitism=False,
-                               truncation=False, duplicates=False,
-                               carrot_and_stick_elitism=False):
+    def deterministic_sampling(self, population, truncation=None):
         """
         Yields individuals using deterministic sampling.
+
+        This algorithm can only be used for selection of mutants. It
+        will return duplicates. The results of ``fittest()`` are
+        equivalent to algorithm without duplicates.
 
         In determnistic sampling the mean fitness value of the
         population is calculated, <f>. For each individual a
@@ -302,109 +273,38 @@ class Selection:
             fn = f / <f>
 
         where fn is the normalized fitness value and f is the original
-        fitness value. If f is greater than 1 then the individual is
-        guaranteed to be selected. If duplicates are allowed the
-        individuals is guaranteed to be selected n times where n is the
-        integer part of fn.
-
-        Once all the guarnteed individuals have been yielded, the
-        remaining individuals are yielded according to their decimal
-        values, largest first.
-
-        Note that this algorithm is the same as `fittest` when no
-        duplicates are allowed.
-
-        This method supports the application of elitism and truncation.
-        Elitism means that the n fittest individuals are guaranteed to
-        be selected at least once. Truncation means that only the n
-        fittest individuals are subject to selection by the algorithm,
-        the rest are not going to be selected.
+        fitness value. An individual will be selected n times, where
+        n is the integer value of fn. After all individuals where
+        n > 0 are yielded, all inidividuals are yielded again. Largest
+        decimal part of fn first.
 
         Parameters
         ----------
         population : Population
             The population from which individuals are to be selected.
 
-        elitism : bool (default = False) or int
-            If ``False`` elitism does not take place. If an ``int`` then
-            that number of individuals is subject to elitism.
-
-        truncation : bool (default = False) or int
-            If ``False`` truncation does not take place. If an ``int``
-            then that number of individuals is kept and the rest are
-            truncated.
-
-        duplicates : bool (default = False)
-            If ``True`` the same individual can be selected more than
-            once with the selection mechanism. This option is
-            appropriate when selecting for mutation. If ``False`` a
-            selected individual cannot be selected again. This option is
-            suitable for generational selecitons.
-
-        carrot_and_stick_elitism : bool (default = False) or int
-            This option should only be used when the
-            ``carrots_and_sticks()`` normalization function is being
-            used. This option works just like elitism but instead of
-            considering the overall fitness, each carrot and stick
-            parameter is considered individually. The elites for each
-            parameter are then guaranteed to be yieled.
+        truncation : int, optional
+            The number of least fit members which will never be
+            yielded.
 
         Yields
         ------
         MacroMolecule
-            The next selected invidual.
+            The next selected population member.
 
         """
 
-        pop = sorted(population,
-                     key=attrgetter('fitness'), reverse=True)
+        pop = sorted(population, reverse=True)[:-truncation]
+        mean = np.mean([mem.fitness for mem in pop])
+        decimals = []
+        for mem in pop:
+            q, r = divmod(mem.fitness, mean)
+            decimals.append((r, mem))
+            for i in range(q):
+                yield mem
 
-        # Apply truncation if desired.
-        if truncation:
-            pop = pop[:-truncation]
-
-        elite_pop = []
-        if elitism:
-            elite_pop = self._elites(pop, elitism)
-            for ind in elite_pop:
-                yield ind
-                if not duplicates:
-                    pop.remove(ind)
-
-        if carrot_and_stick_elitism:
-            norm_func = population.ga_tools.input.normalization_func
-            cs_elites = self._carrot_and_stick_elites(
-                               pop, carrot_and_stick_elitism, norm_func)
-            elite_pop.extend(cs_elites)
-            for ind in cs_elites:
-                yield ind
-                if not duplicates and ind in pop:
-                    pop.remove(ind)
-
-        mean_fitness = population.mean(lambda x : x.fitness)
-        fns = {ind : ind.fitness/mean_fitness for ind in pop}
-
-        if duplicates:
-            for ind in pop:
-                # Yield decimal fitnesses once. If they were elite they
-                # have already been yielded.
-                if fns[ind] < 1 and ind not in elite_pop:
-                    yield ind
-                    continue
-
-                # If the inidividual was elite it has already been
-                # yielded once. Account for this.
-                if ind in elite_pop:
-                    n_yields = int(fns[ind] - 1)
-                else:
-                    n_yields = int(fns[ind])
-
-                for x in range(n_yields):
-                    yield ind
-
-        else:
-            for x in pop:
-                yield x
+        for r, mem in sorted(decimals):
+            yield mem
 
     def stochastic_sampling(self, population, elitism=False,
                             truncation=False, duplicates=False,
