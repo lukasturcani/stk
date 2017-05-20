@@ -29,13 +29,12 @@ import rdkit.Chem.AllChem as rdkit
 import multiprocessing as mp
 from functools import partial, wraps
 import numpy as np
-import logging
 
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
 
 
-logger = logging.getLogger(__name__)
+logger = mp.get_logger()
 
 
 def _optimize_all(func_data, population):
@@ -131,11 +130,11 @@ class _OptimizationFunc:
     def __call__(self, macro_mol, *args,  **kwargs):
 
         if macro_mol.optimized:
-            logger.info('Skipping {0}'.format(macro_mol.name))
+            logger.info('Skipping {}.'.format(macro_mol.name))
             return macro_mol
 
         try:
-            logger.info('Optimizing {0}.'.format(macro_mol.name))
+            logger.info('Optimizing {}.'.format(macro_mol.name))
             self.__wrapped__(macro_mol, *args, **kwargs)
 
         except Exception as ex:
