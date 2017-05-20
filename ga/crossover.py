@@ -24,6 +24,7 @@ start with a leading underscore.
 import logging
 from collections import Counter
 import numpy as np
+from itertools import islice
 
 from .population import Population
 from .plotting import plot_counter
@@ -119,9 +120,9 @@ class Crossover:
         offspring_pop = Population(population.ga_tools)
         counter = Counter()
 
-        # Keep a count of the number of successful crossovers.
-        num_crossovers = 0
-        for parents in population.select('crossover'):
+        parent_pool = islice(population.select('crossover'),
+                             self.num_crossovers)
+        for i, parents in enumerate(parent_pool, 1):
             counter.update(parents)
             # Get the crossover function.
             func_data = np.random.choice(self.funcs, p=self.weights)
@@ -141,12 +142,9 @@ class Crossover:
 
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
-                num_crossovers += 1
                 logger.info(
                     'Crossover number {}. Finish when {}.'.format(
-                                num_crossovers, self.num_crossovers))
-                if num_crossovers == self.num_crossovers:
-                    break
+                                      i, self.num_crossovers))
 
             except Exception as ex:
                 errormsg = ('Crossover function "{}()" failed on '
@@ -166,7 +164,7 @@ class Crossover:
             # Update counter with unselected members and plot counter.
             for member in population:
                 if member not in counter.keys():
-                    counter.update({member : 0})
+                    counter.update({member: 0})
             plot_counter(counter, counter_path)
 
         return offspring_pop
