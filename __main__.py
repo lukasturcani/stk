@@ -8,8 +8,7 @@ from os.path import join, basename, abspath
 
 from .ga import (Population,
                  GAInput, InputHelp)
-from .convenience_tools import (tar_output, errorhandler,
-                                streamhandler,
+from .convenience_tools import (tar_output,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
 
@@ -126,9 +125,15 @@ class GAProgress:
             return
 
         s = 'Population log:\n'
+        s += '-'*os.get_terminal_size().columns
+        s += '{:<10}\t{:<40}\t{}\n'.format('molecule', 'fitness',
+                                           'unscaled_fitness')
+        s += '-'*os.get_terminal_size().columns
         for mem in sorted(pop, reverse=True):
             uf = {n: str(v) for n, v in mem.unscaled_fitness.items()}
-            s += ('\n{0.name} {0.fitness} {1}').format(mem, uf)
+            memstring = ('\n{0.name:<10}\t'
+                         '{0.fitness:<40}\t{1}').format(mem, uf)
+            s += memstring + '\n' + '-'*os.get_terminal_size().columns
         logger.info(s)
 
     def debug_dump(self, pop, dump_name):
