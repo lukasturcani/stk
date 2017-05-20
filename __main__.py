@@ -240,10 +240,13 @@ def ga_run(ga_input):
         offspring = pop.gen_offspring(ccounter.format(x))
         logger.info('Starting mutations.')
         mutants = pop.gen_mutants(mcounter.format(x))
+        logger.debug('Population size is {}.'.format(len(pop)))
         logger.info('Adding offsping and mutants to population.')
         pop += offspring + mutants
+        logger.debug('Population size is {}.'.format(len(pop)))
         logger.info('Removing duplicates, if any.')
         pop.remove_duplicates()
+        logger.debug('Population size is {}.'.format(len(pop)))
         id_ = pop.assign_names_from(id_)
         progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
         logger.info('Optimizing the population.')
