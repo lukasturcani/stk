@@ -2485,7 +2485,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        self.__class__.cache[self.key].__dict__ = dict(self.__dict__)
+        self.__class__.cache[self.key].__dict__ = dict(vars(self))
 
     def __eq__(self, other):
         return self.fitness == other.fitness
