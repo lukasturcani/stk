@@ -128,12 +128,12 @@ class Mutation:
 
         """
 
-        parent_pool = population.select('mutation')
         mutant_pop = Population(population.ga_tools)
         counter = Counter()
 
+        # Keep a count of the number of successful mutations.
         num_mutations = 0
-        for parent in parent_pool:
+        for parent in population.select('mutation'):
             counter.update([parent])
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)

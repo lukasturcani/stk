@@ -121,14 +121,12 @@ class Crossover:
 
         """
 
-        # Create the parent pool by using `select('crossover')`.
-        parent_pool = population.select('crossover')
         offspring_pop = Population(population.ga_tools)
         counter = Counter()
 
         # Keep a count of the number of successful crossovers.
         num_crossovers = 0
-        for parents in parent_pool:
+        for parents in population.select('crossover'):
             counter.update(parents)
             # Get the crossover function.
             func_data = np.random.choice(self.funcs, p=self.weights)

@@ -11,8 +11,8 @@ parents for crossover begin with ``crossover_``. For example,
 ``crossover_roulette``.
 
 The naming requirement of ``population`` exists to help users identify
-which arguments are handled automatically by MMEA and which they need to
-defined in the input file. The convention is that if the mutation
+which arguments are handled automatically by MMEA and which they need
+to defined in the input file. The convention is that if the mutation
 function takes an argument called  ``macro_mol`` it does not have to be
 specified in the input file.
 
@@ -37,15 +37,15 @@ class Selection:
 
     Whenever a population needs to have some of its members selected
     for the creation of a parent pool or the next generation it
-    delegates this task to an instance of this class. The population has
-    this instance stored in its `ga_tools.selection` attribute.
+    delegates this task to an instance of this class. The population
+    has this instance stored in its `ga_tools.selection` attribute.
 
-    Each instance of this class supports being called. What a calling an
-    instance does depends on the arguments the instance was initialized
-    with and what arguments were supplied during the call. In all cases
-    the call implements returns a generator. This generator yields
-    members of a ``Population`` instance in accordance to some selection
-    algorithm.
+    Each instance of this class supports being called. What a calling
+    an instance does depends on the arguments the instance was
+    initialized with and what arguments were supplied during the call.
+    In all cases the call implements returns a generator. This
+    generator yields members of a ``Population`` instance in accordance
+    to some selection algorithm.
 
     Initialization of this class takes the names of methods defined in
     this class (as strings) and saves them into the instance's
@@ -67,9 +67,9 @@ class Selection:
 
     The method `select` invoked in the code automatically provides
     the instance ``pop`` to the ``Selection`` instance it contains. The
-    function then calls the ``Selection`` instance. This means that each
-    time `select` is called on a population, the ``Selection`` instance
-    will always act on the population it is held by. Different
+    function then calls the ``Selection`` instance. This means that
+    each time `select` is called on a population, the ``Selection``
+    instance will always act on the population it is held by. Different
     populations can use different selection algorithms by holding
     different ``Selection`` instances. Alternatively, they can perform
     the same selection algorithms by sharing a ``Selection`` instance.
@@ -79,13 +79,13 @@ class Selection:
     argument a ``Selection`` instance requires when it is being called.
     This is the string `generational` in the code example above. The
     string should be the name of one of the attributes of the
-    ``Selection`` class. This means that 'generational', 'crossover' and
-    'mutation' are valid strings at the time of this being written. If
-    more types of selection are added to MMEA, an attribute named after
-    that type of selection should be added to the ``Selection`` class.
-    If one wishes to invoke that type of selection on a population,
-    `select` must be called with the name of that attribute as a
-    parameter.
+    ``Selection`` class. This means that 'generational', 'crossover'
+    and 'mutation' are valid strings at the time of this being written.
+    If more types of selection are added to MMEA, an attribute named
+    after that type of selection should be added to the ``Selection``
+    class. If one wishes to invoke that type of selection on a
+    population, `select` must be called with the name of that attribute
+    as a parameter.
 
     There was a slight simplifcation in the paragraph describing
     initialization. When the ``Selection`` instance is initialzed it
@@ -101,6 +101,10 @@ class Selection:
     ``MacroMolecule`` instances. Selection algorithms should be grouped
     together by their expected use when written into the class body.
 
+    Note that duplicates are not considered during selection. If a
+    molecule is present in the population twice, its chance of
+    selection does not double.
+
     Attributes
     ----------
     generational : FunctionData
@@ -115,8 +119,8 @@ class Selection:
 
     mutation : FunctionData
         Holds the ``FunctionData`` object representing the selection
-        function used for selection individuals for mutation, along with
-        any parameters the function may require.
+        function used for selection individuals for mutation, along
+        with any parameters the function may require.
 
     """
 
@@ -127,7 +131,7 @@ class Selection:
 
     def __call__(self, population, type_):
         """
-        Implements the selection algorithm chosen during initializaiton.
+        Yields members from population.
 
         Parameters
         ----------
@@ -136,30 +140,33 @@ class Selection:
 
         type_ : str
             The name of a ``Selection`` attribute. The name corresponds
-            to the type of selection that is desired, ie generational,
-            crossover or mutation.
+            to the type of selection that is desired: 'generational',
+            'crossover' or 'mutation'.
 
-        Returns
+        Yields
         -------
-        generator
-            A generator which yields selected members of the population.
-            The generator will yield ``MacroMolecule`` instances unless
-            it yields parents for crossover. In this case it yields a
-            tuple of ``MacroMolecule`` instances.
+        MacroMolecule or tuple of MacroMolecules
+            ``MacroMolecule`` instances are yielded unless `type_` is
+            'crossover'. In this case a tuple of ``MacroMolecule``
+            instances is yielded.
 
         """
+
+        # Make a population without any duplicates.
+        unique_pop = population.__class__(*population)
+        unique_pop.remove_duplicates()
 
         # Get the attribute with the name provided as a string in
         # `type_`. This returns a ``FunctionData`` object holding the
         # name of the method which needs to be implemented and any
         # required parameters and their values.
-        func_data = self.__dict__[type_]
+        func_data = getattr(self, type_)
         # Using the name of the method, get the method object with
         # ``getattr``.
         func = getattr(self, func_data.name)
         # Call the method on the population and provide any additional
         # parameters which may be necessary.
-        return func(population, **func_data.params)
+        yield from func(unique_pop, **func_data.params)
 
     """
     The following selection algorithms can be used for generational
@@ -200,71 +207,9 @@ class Selection:
         return pop
 
     @staticmethod
-    def _carrot_and_stick_elites(population, n, norm_func):
-        """
-        Returns `n` fittest members for each carrot and stick parameter.
-
-        Fitness functions which are to be used with the
-        "carrots_and_sticks()" place a tuple into the `unscaled_fitness`
-        attribute of population members. The first element of the tuple
-        holds parameters which should be increased and the second
-        element of the tuple holds elements which should be decreased.
-
-        If a member is in the top `n` values for a given parameter, it
-        will be returned by this function.
-
-        Parameters
-        ----------
-        population : Population
-            The population whose members are being selected.
-
-        n : int
-            The number of members which should be returned for each
-            parameter.
-
-        norm_func : FunctionData
-            The "carrots_and_sticks()" normalization function.
-
-        Returns
-        -------
-        list
-            A list holding macromolecules which are in the `n` best
-            members for a given `unscaled_fitness` carrot or stick
-            parameter.
-
-        """
-
-        pop = [x for x in population if
-                                isinstance(x.unscaled_fitness, tuple)]
-
-        # To get the number of carrot and stick parameters looks at the
-        # normalization function defined in the input file.
-        n_carrots = len(norm_func.params['carrot_coeffs'])
-        n_sticks = len(norm_func.params['stick_coeffs'])
-
-        elites = []
-        # For each carrot parameter get the `n` fittest members and add
-        # them to `elites`.
-        for i in range(n_carrots):
-            elites.extend(sorted(pop,
-                          key=lambda x : x.unscaled_fitness[0][i],
-                          reverse=True)[:n])
-
-        # For each stick parameter get the `n` fittest members and add
-        # them to `elites`.
-        for i in range(n_sticks):
-            elites.extend(sorted(pop,
-                          key=lambda x : x.unscaled_fitness[1][i])[:n])
-
-        return elites
-
-    @staticmethod
     def fittest(population):
         """
         Yields members of the population, fittest first.
-
-        This yields members regardless of which subpopulation they are
-        in.
 
         Parameters
         ----------
@@ -282,55 +227,36 @@ class Selection:
         for ind in sorted(population, reverse=True):
             yield ind
 
-    def roulette(self, population, elitism=False,
-                 truncation=False, duplicates=False,
-                 carrot_and_stick_elitism=False):
+    def roulette(self, population, elites=0,
+                 truncation=None, duplicates=False):
         """
         Yields individuals using roulette selection.
 
-        In roulette selection the chance an individual is selected is
-        given by its fitness. If the total fitness is the sum of all the
-        fitness values in a population, the chance an individuals is
-        selected is given by
+        In roulette selection the probability an individual is selected
+        is given by its fitness. If the total fitness is the sum of all
+        fitness values, the chance an individuals is selected is given
+        by
 
         p = individual fitness / total fitness,
 
         where p is the probability of selection [1].
-
-        This method also supports the application of elitism and
-        truncation. Elitism means that the n fittest individuals are
-        guaranteed to be selected at least once.
-
-        Truncation means that the n least fit individuals are not
-        subject to selection by the algorithm.
 
         Parameters
         ----------
         population : Population
             The population from which individuals are to be selected.
 
-        elitism : bool (default = False) or int
-            If ``False`` elitism does not take place. If an ``int`` then
-            that number of individuals is subject to elitism.
+        elites : int, optional
+            The number of the fittest members which are guaranteed to
+            be yielded first.
 
-        truncation : bool (default = False) or int
-            If ``False`` truncation does not take place. If an ``int``
-            then it corresponds to number of individuals discarded.
+        truncation : int, optional
+            The number of least fit members which will never be
+            yielded.
 
-        duplicates : bool (default = False)
-            If ``True`` the same individual can be selected more than
-            once with the selection mechanism. This option is
-            appropriate when selecting for mutation. If ``False`` a
-            selected individual cannot be selected again. This option is
-            suitable for generational selecitons.
-
-        carrot_and_stick_elitism : bool (default = False) or int
-            This option should only be used when the
-            ``carrots_and_sticks()`` normalization function is being
-            used. This option works just like elitism but instead of
-            considering the overall fitness, each carrot and stick
-            parameter is considered individually. The elites for each
-            parameter are then guaranteed to be yieled.
+        duplicates : bool, optional
+            If ``True`` the same member can be yielded more than
+            once.
 
         Yields
         ------
@@ -343,49 +269,25 @@ class Selection:
 
         """
 
-        pop = sorted(population,
-                     key=attrgetter('fitness'), reverse=True)
+        yielded = set()
+        pop = sorted(population, reverse=True)[:-truncation]
 
-        # Apply truncation if desired.
-        if truncation:
-            pop = pop[:-truncation]
+        for x in range(elites):
+            yielded.add(pop[x]) if not duplicates else None
+            yield pop[x]
 
-        elite_pop = []
-        if elitism:
-            elite_pop = self._elites(pop, elitism)
-            for ind in elite_pop:
-                yield ind
-                if not duplicates:
-                    pop.remove(ind)
+        while True:
+            valid_pop = [ind for ind in pop if ind not in yielded]
 
-        if carrot_and_stick_elitism:
-            norm_func = population.ga_tools.input.normalization_func
-            cs_elites = self._carrot_and_stick_elites(
-                               pop, carrot_and_stick_elitism, norm_func)
-            elite_pop.extend(cs_elites)
-            for ind in cs_elites:
-                yield ind
-                if not duplicates and ind in pop:
-                    pop.remove(ind)
+            if not valid_pop:
+                break
 
-        total_fitness = sum(ind.fitness for ind in pop if
-                               isinstance(ind.fitness, (int,float)))
+            total = sum(ind.fitness for ind in valid_pop)
+            weights = [ind.fitness / total for ind in valid_pop]
 
-        weights = []
-        for ind in pop:
-            if not ind.fitness:
-                weights.append(0)
-            else:
-                weights.append(ind.fitness / total_fitness)
-
-        if duplicates:
-            while True:
-                yield np.random.choice(pop, p=weights, replace=True)
-
-        else:
-            for ind in np.random.choice(pop, size=len(pop),
-                                        p=weights, replace=False):
-                yield ind
+            selected = np.random.choice(valid_pop, p=weights)
+            yielded.add(selected) if not duplicates else None
+            yield selected
 
     def deterministic_sampling(self, population, elitism=False,
                                truncation=False, duplicates=False,
