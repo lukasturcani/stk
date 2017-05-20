@@ -17,7 +17,33 @@ import gzip
 import re
 from collections import deque
 import tarfile
-import traceback
+import logging
+import multiprocessing as mp
+
+# Define the formatter for logging messages.
+f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
+formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
+                                     '%(name)s - %(message)s'),
+                              datefmt='%H:%M:%S')
+
+
+# Define logging handlers.
+errorhandler = logging.FileHandler('errors.log', delay=True)
+errorhandler.setLevel(logging.ERROR)
+
+streamhandler = logging.StreamHandler()
+
+errorhandler.setFormatter(formatter)
+streamhandler.setFormatter(formatter)
+
+# Get the loggers.
+rootlogger = logging.getLogger()
+rootlogger.addHandler(errorhandler)
+rootlogger.addHandler(streamhandler)
+
+mplogger = mp.get_logger()
+mplogger.addHandler(errorhandler)
+mplogger.addHandler(streamhandler)
 
 
 # Holds the elements Van der Waals radii in Angstroms.
