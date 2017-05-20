@@ -140,6 +140,13 @@ class Crossover:
                 # additional arguments to it.
                 offspring = func(*parents, **func_data.params)
 
+                # Print the names of offspring which have been returned
+                # from the cache.
+                for o in offspring:
+                    if o.name:
+                        logger.debug(('Offspring "{}" retrieved '
+                                      'from cache.').format(o.name))
+
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
                 num_crossovers += 1
