@@ -6,9 +6,11 @@ Extending MMEA: Adding selection functions
 If a new selection operation is to be added to MMEA it should be added
 as a method in the ``Selection`` class defined in this module. The only
 requirements are that the first argument is ``population`` (excluding
-any ``self`` or ``cls`` arguments) and that functions which select
-parents for crossover begin with ``crossover_``. For example,
-``crossover_roulette``.
+any ``self`` or ``cls`` arguments) and that the method is decorated
+wit the ``mutation()``, ``crossover()`` and ``generational()``
+decorators to highlight which selection it is to be used for. The
+decorators can be applied in sequence for functional which are suitable
+for more than one kind of selection.
 
 The naming requirement of ``population`` exists to help users identify
 which arguments are handled automatically by MMEA and which they need
@@ -18,7 +20,8 @@ specified in the input file.
 
 All selection functios should be defined as generators, which yield an
 member of ``population``. In the case of crossover selection functions,
-they should yield a tuple of selected parents.
+they should yield a tuple of selected parents. Generational selection
+function should yield each molecule at most once.
 
 If the selection function does not fit neatly into a single function
 make sure that any helper functions are private, ie that their names
@@ -26,9 +29,74 @@ start with a leading underscore.
 
 """
 
-from operator import attrgetter
 import itertools
 import numpy as np
+
+
+def mutation(func):
+    """
+    Identifies a function as suitable for mutation selections.
+
+    Parameters
+    ----------
+    func : function
+        A ``Selection`` class method which can be used for selecting
+        molecules for mutation.
+
+    Returns
+    -------
+    func : function
+        The function received as an argument. The attribute
+        ``mutation`` is added and set to ``True``.
+
+    """
+
+    func.mutation = True
+    return func
+
+
+def crossover(func):
+    """
+    Identifies a function as suitable for crossover selections.
+
+    Parameters
+    ----------
+    func : function
+        A ``Selection`` class method which can be used for selecting
+        molecules for crossover.
+
+    Returns
+    -------
+    func : function
+        The function received as an argument. The attribute
+        ``crossover`` is added and set to ``True``.
+
+    """
+
+    func.crossover = True
+    return func
+
+
+def generational(func):
+    """
+    Identifies a function as suitable for generational selections.
+
+    Parameters
+    ----------
+    func : function
+        A ``Selection`` class method which can be used for selecting
+        molecules for the next generation.
+
+    Returns
+    -------
+    func : function
+        The function received as an argument. The attribute
+        ``generational`` is added and set to ``True``.
+
+    """
+
+    func.generational = True
+    return func
 
 
 class Selection:
@@ -168,15 +236,9 @@ class Selection:
         # parameters which may be necessary.
         yield from func(unique_pop, **func_data.params)
 
-    """
-    The following selection algorithms can be used for generational
-    selection and the selection of mutants. They cannot be used for
-    selection of parents.
-
-    """
-
-    @staticmethod
-    def fittest(population):
+    @mutation
+    @generational
+    def fittest(self, population):
         """
         Yields members of the population, fittest first.
 
@@ -196,6 +258,8 @@ class Selection:
         for ind in sorted(population, reverse=True):
             yield ind
 
+    @mutation
+    @generational
     def roulette(self, population, elites=0,
                  truncation=None, duplicates=False):
         """
@@ -239,7 +303,8 @@ class Selection:
         """
 
         yielded = set()
-        pop = sorted(population, reverse=True)[:-truncation]
+        truncation = truncation if truncation is None else -truncation
+        pop = sorted(population, reverse=True)[:truncation]
 
         for x in range(elites):
             yielded.add(pop[x]) if not duplicates else None
@@ -258,6 +323,7 @@ class Selection:
             yielded.add(selected) if not duplicates else None
             yield selected
 
+    @mutation
     def deterministic_sampling(self, population, truncation=None):
         """
         Yields individuals using deterministic sampling.
@@ -294,7 +360,8 @@ class Selection:
 
         """
 
-        pop = sorted(population, reverse=True)[:-truncation]
+        truncation = truncation if truncation is None else -truncation
+        pop = sorted(population, reverse=True)[:truncation]
         mean = np.mean([mem.fitness for mem in pop])
         decimals = []
         for mem in pop:
@@ -306,185 +373,156 @@ class Selection:
         for r, mem in sorted(decimals):
             yield mem
 
-    def stochastic_sampling(self, population, elitism=False,
-                            truncation=False, duplicates=False,
-                            use_rank=False,
-                            carrot_and_stick_elitism=False):
+    @mutation
+    @generational
+    def stochastic_sampling(self, population,
+                            elites=0, truncation=None,
+                            duplicates=False, use_rank=False):
         """
         Yields individuals via stochastic sampling.
 
-        This selection algorithm combines deterministic sampling and the
-        roulette method. In stochastic sampling the mean fitness value
-        of the population is calculated, <f>. For each individual a
-        normalized fitness value is then calculated via
+        Each fitness value is used to calculate the normalized fitness
+        of an individual
 
             fn = f / <f>
 
-        where fn is the normalized fitness value and f is the original
-        fitness value. If f is greater than 1 then the individual is
-        guaranteed to be selected. If duplicates are allowed the
-        individuals is guaranteed to be selected n times where n is the
-        integer part of fn.
+        where fn is the normalized fitness value, f is the original
+        fitness value and <f> is the mean fitness of the population. If
+        f is greater than 1 then the individual is guaranteed to be
+        selected. If duplicates are allowed, individuals are guaranteed
+        to be selected n times, where n is the integer part of fn.
 
         Once all the guarnteed individuals have been yielded, the
         remaining individuals are yielded via the roulette method. The
         weights in the roulette method are based on the decimal part of
         fn.
 
-        This method supports the application of elitism and truncation.
-        Elitism means that the n fittest individuals are guaranteed to
-        be selected at least once. Truncation means that only the n
-        fittest individuals are subject to selection by the algorithm,
-        the rest are not going to be selected.
-
         Parameters
         ----------
         population : Population
             The population from which individuals are to be selected.
 
-        elitism : bool (default = False) or int
-            If ``False`` elitism does not take place. If an ``int`` then
-            that number of individuals is subject to elitism.
+        elites : int, optional
+            The number of the fittest members which are guaranteed to
+            be yielded first.
 
-        truncation : bool (default = False) or int
-            If ``False`` truncation does not take place. If an ``int``
-            then that number of individuals is kept and the rest are
-            truncated.
+        truncation : int, optional
+            The number of least fit members which will never be
+            yielded.
 
-        duplicates : bool (default = False)
-            If ``True`` the same individual can be selected more than
-            once with the selection mechanism. This option is
-            appropriate when selecting for mutation. If ``False`` a
-            selected individual cannot be selected again. This option is
-            suitable for generational selecitons.
+        duplicates : bool, optional
+            If ``True`` the same member can be yielded more than
+            once.
 
-        use_rank : bool (default = False)
-            When ``True`` the rank is used instead of fitness when
-            selecting. More accurately a provisional fitness value, f,
-            calculated from the rank is used for selection. The formula
-            is
-
-                f = 1/rank.
-
-        carrot_and_stick_elitism : bool (default = False) or int
-            This option should only be used when the
-            ``carrots_and_sticks()`` normalization function is being
-            used. This option works just like elitism but instead of
-            considering the overall fitness, each carrot and stick
-            parameter is considered individually. The elites for each
-            parameter are then guaranteed to be yieled.
+        use_rank : bool, optional
+            When ``True`` the fitness value of an individual is
+            calculated as, f = 1/rank.
 
         Yields
         ------
         MacroMolecule
-            The next selected invidual.
-
-        Raises
-        ------
-        RuntimeError
-            If a normalized weight is 0. This should not happen as all
-            fitness values should be non-zero.
+            The next selected population member.
 
         """
 
-        pop = sorted(population,
-                     key=attrgetter('fitness'), reverse=True)
+        yielded = set()
+        truncation = truncation if truncation is None else -truncation
+        pop = sorted(population, reverse=True)[:truncation]
 
-        # Apply truncation if desired.
-        if truncation:
-            pop = pop[:-truncation]
+        for x in range(elites):
+            yielded.add(pop[x])
+            yield pop[x]
 
-        elite_pop = []
-        if elitism:
-            elite_pop = self._elites(pop, elitism)
-            for ind in elite_pop:
-                yield ind
+        for r, mem in enumerate(pop, 1):
+            mem._ssfitness = 1 / r if use_rank else mem.fitness
+
+        yield from self._stochastic_sampling_guaranteed(pop,
+                                                        yielded,
+                                                        duplicates)
+        yield from self._stochastic_sampling_roulette(pop,
+                                                      yielded,
+                                                      duplicates)
+
+    def _stochastic_sampling_guaranteed(self, pop,
+                                        yielded, duplicates):
+        """
+        Yielded the members guaranteed by stochastic sampling.
+
+        Parameters
+        ----------
+        pop : list of MacroMolecules
+            The molecules which are being selected.
+
+        yielded : set of MacroMolecule instances
+            Holds all previously yielded molecules.
+
+        duplicates : bool
+            Indicates whether a member can be yielded more than once.
+
+        Yields
+        ------
+        MacroMolecule
+            The next member whose normalized fitness integer component
+            is greater than 0.
+
+        """
+
+        mean = np.mean([mem._ssfitness for mem in pop])
+        for mem in pop:
+            q, r = divmod(mem._ssfitness, mean)
+            # Account for the fact that a molecule may have been
+            # yielded due to elitism.
+            q -= 1 if mem in yielded else 0
+            q = 0 if mem in yielded and not duplicates else q
+            for x in range(q):
+                yielded.add(mem)
+                yield mem
                 if not duplicates:
-                    pop.remove(ind)
-
-        if carrot_and_stick_elitism:
-            norm_func = population.ga_tools.input.normalization_func
-            cs_elites = self._carrot_and_stick_elites(
-                               pop, carrot_and_stick_elitism, norm_func)
-            elite_pop.extend(cs_elites)
-            for ind in cs_elites:
-                yield ind
-                if not duplicates and ind in pop:
-                    pop.remove(ind)
-
-        if use_rank:
-            mean_fitness = np.mean([1/r for r, _ in enumerate(pop, 1)])
-            fns = {ind : 1/(r * mean_fitness) for r, ind in
-                                                    enumerate(pop, 1)}
-        else:
-            mean_fitness = population.mean(lambda x : x.fitness)
-            fns = {ind : ind.fitness/mean_fitness for ind in pop}
-
-        if duplicates:
-            for ind in pop:
-                # Stop yielding deterministically when normalized
-                # fitness values < 1 are encountered.
-                if fns[ind] < 1:
                     break
 
-                # If the inidividual was elite it has already been
-                # yielded once. Account for this.
-                if ind in elite_pop:
-                    n_yields = int(fns[ind] - 1)
-                else:
-                    n_yields = int(fns[ind])
+    def _stochastic_sampling_roulette(self, pop,
+                                      yielded, duplicates):
+        """
+        Does the roulette component of stochastic sampling.
 
-                for x in range(n_yields):
-                    yield ind
+        Parameters
+        ----------
+        pop : list of MacroMolecules
+            The molecules which are being selected.
 
-            # Start using roulette.
-            total_decimal = sum(fns[ind] - int(fns[ind]) for ind in pop)
-            if total_decimal == 0:
-                return
+        yielded : set of MacroMolecule instances
+            Holds all previously yielded molecules.
 
-            weights = [(fns[ind] - int(fns[ind])) / total_decimal for
-                                                             ind in pop]
+        duplicates : bool
+            Indicates whether a member can be yielded more than once.
 
-            if 0 in weights:
-                raise RuntimeError(('0 found in normalized weights. '
-                'Likely due to a 0 in the normalized fitness values.'))
+        Yields
+        ------
+        MacroMolecule
+            The seleceted population member.
 
-            while True:
-                yield np.random.choice(pop, replace=True, p=weights)
+        """
 
-        else:
-            for ind in list(pop):
-                # Stop yielding deterministically when normalized
-                # fitness values < 1 are encountered.
-                if fns[ind] < 1:
-                    break
-                yield ind
-                pop.remove(ind)
+        yielded = set() if duplicates else yielded
 
-            # Start using roulette.
-            total_decimal = sum(fns[ind] - int(fns[ind]) for ind in pop)
-            if total_decimal == 0:
-                return
+        while True:
+            valid_pop = [ind for ind in pop if ind not in yielded]
 
-            weights = [(fns[ind] - int(fns[ind])) / total_decimal for
-                                                             ind in pop]
+            if not valid_pop:
+                break
 
-            if 0 in weights:
-                raise RuntimeError(('0 found in normalized weights. '
-                'Likely due to a 0 in the normalized fitness values.'))
+            mean = np.mean([mem._ssfitness for mem in pop])
+            rtotal = sum(divmod(ind._ssfitness, mean)[1] for
+                         ind in valid_pop)
+            weights = [divmod(ind._ssfitness, mean)[1] / rtotal for
+                       ind in valid_pop]
 
-            for ind in np.random.choice(pop, replace=False, p=weights,
-                                        size=len(pop)):
-                yield ind
+            selected = np.random.choice(valid_pop, p=weights)
+            yielded.add(selected) if not duplicates else None
+            yield selected
 
-    """
-    The following selection algorithms can be used for the selection of
-    parents only.
-
-    """
-
-    @staticmethod
-    def crossover_all_combinations(population):
+    @crossover
+    def all_combinations(self, population):
         """
         Yields every possible pairing of individuals from a population.
 
@@ -509,7 +547,8 @@ class Selection:
         for mol1, mol2 in itertools.combinations(population, 2):
             yield mol1, mol2
 
-    def crossover_all_combinations_n_fittest(self, population, n):
+    @crossover
+    def all_combinations_n_fittest(self, population, n):
         """
         Yields all pairings of the `n` fittest individuals.
 
@@ -536,58 +575,50 @@ class Selection:
         for ind1, ind2 in itertools.combinations(n_fittest, 2):
             yield ind1, ind2
 
-    @staticmethod
-    def crossover_roulette(population, truncation=False):
+    @crossover
+    def crossover_roulette(population, truncation=None):
         """
         Yields parents using roulette selection.
 
-        The probability of selection here is the same as in `roulette`.
+        In roulette selection the probability an individual is selected
+        is given by its fitness. If the total fitness is the sum of all
+        fitness values, the chance an individuals is selected is given
+        by
 
-        This method supports the application of truncation. Truncation
-        means that the n least fit individuals are not subject to
-        selection by the algorithm.
+        p = individual fitness / total fitness,
+
+        where p is the probability of selection [1].
 
         Parameters
         ----------
         population : Population
             The population from which parents are selected.
 
-        truncation : bool (default = False) or int
-            If ``False`` truncation does not take place. If an ``int``
-            then it corresponds to the number of individuals truncated.
+        truncation : int, optional
+            The number of least fit members which will never be
+            yielded.
 
         Yields
         ------
-        tuple of MacroMolecule instances
+        numpy.ndarray of MacroMolecule instances
             The selected parent pair.
+
+        References
+        ----------
+        [1] http://tinyurl.com/csc3djm
 
         """
 
-        pop_list = sorted(population,
-                          key=attrgetter('fitness'), reverse=True)
-
-        # Apply truncation if desired.
-        if truncation:
-            pop_list = pop_list[:-truncation]
-
-        total_fitness = sum(ind.fitness for ind in pop_list if
-                               isinstance(ind.fitness, float) or
-                               isinstance(ind.fitness, int))
-
-        weights = []
-        for ind in pop_list:
-            if not ind.fitness:
-                weights.append(0)
-            else:
-                weights.append(ind.fitness / total_fitness)
+        truncation = truncation if truncation is None else -truncation
+        pop = sorted(population, reverse=True)[:truncation]
 
         while True:
-            ind1, ind2 = np.random.choice(pop_list, size=2,
-                                          p=weights, replace=False)
-            yield ind1, ind2
+            total = sum(ind.fitness for ind in pop)
+            weights = [ind.fitness / total for ind in pop]
+            yield np.random.choice(pop, 2, False, weights)
 
-    @staticmethod
-    def crossover_deterministic_sampling(population, truncation=False):
+    @crossover
+    def crossover_deterministic_sampling(population, truncation=None):
         """
         Yields parents according to determnistic sampling.
 
@@ -602,49 +633,39 @@ class Selection:
 
         Deterministic sampling then creates a temporary, parent
         population of the same size as the original population. An
-        individual is guaranteed to be placed into the parent population
-        n times, where n is the integer part of fn. Any remaining slots
-        are to individuals with the largest decimal values.
+        individual is guaranteed to be placed into the parent
+        population n times, where n is the integer part of fn. Any
+        remaining slots are to individuals with the largest decimal
+        values.
 
         Parents are then randomly selected from the parent population.
-
-        This method supports the application of truncation. Truncation
-        means that only the n fittest individuals are subject to
-        selection by the algorithm, the rest are not going to be
-        selected.
 
         Parameters
         ----------
         population : Population
             The population from which parents are selected.
 
-        truncation : bool (default = False) or int
-            If ``False`` truncation does not take place. If an ``int``
-            then that number of individuals is kept and the rest are
-            truncated.
+        truncation : int, optional
+            The number of least fit members which will never be
+            yielded.
 
         Yields
         ------
-        tuple of MacroMolecule instances
+        numpy.ndarray of MacroMolecule instances
             The selected parent pair.
 
         """
 
-        pop = sorted(population,
-                          key=attrgetter('fitness'), reverse=True)
+        truncation = truncation if truncation is None else -truncation
+        pop = sorted(population, reverse=True)[:truncation]
 
-        # Apply truncation if desired.
-        if truncation:
-            pop = pop[:truncation]
-
-        mean_fitness = population.mean(lambda x : x.fitness)
-        fns = [(ind, ind.fitness/mean_fitness) for ind in pop]
+        mean = np.mean([ind.fitness for ind in pop])
 
         parent_pop = []
-        for ind, fn in fns:
+        for ind in pop:
+            fn = ind.fitness / mean
             if int(fn) < 1 and len(parent_pop) >= len(population):
                 break
-
             if int(fn) < 1:
                 parent_pop.append(ind)
 
@@ -652,6 +673,4 @@ class Selection:
                 parent_pop.append(ind)
 
         while True:
-            ind1, ind2 = np.random.choice(parent_pop,
-                                          size=2, replace=False)
-            yield ind1, ind2
+            yield np.random.choice(parent_pop, 2, False)
