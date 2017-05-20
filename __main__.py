@@ -15,13 +15,30 @@ from .ga import plotting as plot
 warnings.filterwarnings("ignore")
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
 
-# fhandler = logging.FileHandler(
-#                     os.path.join(os.getcwd(), 'output/failures.txt'),
-#                     delay=True)
-# fhandler.setLevel = logging.ERROR
+# Define the formatter for logging messages.
+f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
+formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
+                                     '%(name)s - %(message)s'),
+                              datefmt='%H:%M:%S')
+
+# Define logging handlers.
+errorhandler = logging.FileHandler(
+                    os.path.join(os.getcwd(), 'output/failures.txt'),
+                    delay=True)
+errorhandler.setLevel(logging.ERROR)
+
+streamhandler = logging.StreamHandler()
+
+errorhandler.setFormatter(formatter)
+streamhandler.setFormatter(formatter)
+
+# Get the loggers.
+rootlogger = logging.getLogger()
+rootlogger.addHandler(errorhandler)
+rootlogger.addHandler(streamhandler)
+
 
 logger = logging.getLogger(__name__)
-# logger.addHandler(fhandler)
 
 
 class GAProgress:
@@ -309,13 +326,7 @@ if __name__ == '__main__':
 
         ifile = abspath(args.INPUT_FILE)
         ga_input = GAInput(ifile)
-
-        f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
-        logging.basicConfig(level=ga_input.logging_level,
-                            format=f+('%(asctime)s - %(levelname)s - '
-                                      '%(name)s - %(message)s'),
-                            datefmt='%H:%M:%S')
-
+        rootlogger.setLevel(ga_input.logging_level)
         logger.info('Loading molecules from any provided databases.')
         dbs = []
         for db in ga_input.databases:
