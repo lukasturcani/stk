@@ -71,10 +71,6 @@ class Crossover:
         The number of crossovers that needs to be performed each
         generation.
 
-    n_calls : int
-        The total number of times an instance of ``Crossover`` has been
-        called during its lifetime.
-
     weights : None or list of floats (default = None)
         When ``None`` each crossover function has equal likelihood of
         being picked. If `weights` is a list each float corresponds to
@@ -87,7 +83,6 @@ class Crossover:
         self.funcs = funcs
         self.weights = weights
         self.num_crossovers = num_crossovers
-        self.n_calls = 0
 
     def __call__(self, population, counter_path=''):
         """
@@ -133,7 +128,6 @@ class Crossover:
             func = getattr(self, func_data.name)
 
             try:
-                self.n_calls += 1
                 # Apply the crossover function and supply any
                 # additional arguments to it.
                 offspring = func(*parents, **func_data.params)
