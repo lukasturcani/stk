@@ -141,6 +141,13 @@ class Mutation:
             try:
                 self.n_calls += 1
                 mutant = func(parent, **func_data.params)
+
+                # If the mutant was retrieved from the cache, log the
+                # name.
+                if mutant.name:
+                    logger.debug(('Mutant "{}" retrieved from '
+                                  'cache.').format(mutant.name))
+
                 mutant_pop.members.append(mutant)
                 num_mutations += 1
                 logger.info(
