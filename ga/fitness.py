@@ -123,7 +123,6 @@ import numpy as np
 import rdkit.Chem.AllChem as rdkit
 import copy
 import os
-import logging
 import warnings
 from functools import partial, wraps
 import networkx as nx
@@ -140,7 +139,7 @@ from ..molecular import (Cage, StructUnit,
                          Energy, optimization, func_key)
 
 
-logger = logging.getLogger(__name__)
+logger = mp.get_logger()
 
 
 def _calc_fitness(func_data, population):
@@ -264,6 +263,8 @@ class _FitnessFunc:
             return macro_mol
 
         try:
+            logger.info('Calculating fitness of {}.'.format(
+                                                       macro_mol.name))
             val = self.__wrapped__(macro_mol, *args, **kwargs)
 
         except Exception as ex:
@@ -294,7 +295,7 @@ def random_fitness(macro_mol):
 
     """
 
-    return abs(np.random.normal(50,20))
+    return abs(np.random.normal(50, 20))
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
