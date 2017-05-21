@@ -21,7 +21,12 @@ import logging
 import multiprocessing as mp
 
 # Define the formatter for logging messages.
-f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
+try:
+    f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
+except OSError as ex:
+    # When testing os.get_terminal_size() will fail because stdout is
+    # not connceted to a terminal.
+    f = '\n=\n\n'
 formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
                                      '%(name)s - %(message)s'),
                               datefmt='%H:%M:%S')
