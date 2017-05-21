@@ -367,7 +367,7 @@ class Selection:
         for mem in pop:
             q, r = divmod(mem.fitness, mean)
             decimals.append((r, mem))
-            for i in range(q):
+            for i in range(int(q)):
                 yield mem
 
         for r, mem in sorted(decimals):
