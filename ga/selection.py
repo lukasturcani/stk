@@ -665,12 +665,11 @@ class Selection:
         parent_pop = []
         for ind in pop:
             fn = ind.fitness / mean
-            if int(fn) < 1 and len(parent_pop) >= len(population):
+            if int(fn) < 1 and len(parent_pop) >= len(pop):
                 break
-            if int(fn) < 1:
-                parent_pop.append(ind)
 
-            for x in range(int(fn)):
+            fn = 1 if int(fn) < 1 else int(fn)
+            for x in range(fn):
                 parent_pop.append(ind)
 
         while True:
