@@ -191,6 +191,10 @@ class GAInput:
         with open(input_file, 'r') as inp:
             exec(inp.read(), globals(), vars(self))
 
+        if (hasattr(self, 'plot_epp') and
+            getattr(self, 'plot_epp') is True):
+            self.plot_epp = 'epp.png'
+
         # If the input file did not specify some values, default
         # initialize them.
         if not hasattr(self, 'num_crossovers'):
