@@ -2345,8 +2345,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
             bb_blocks = []
             for bb in building_blocks:
-                bb_blocks.append(('{.__class__.__name__}\n'
-                                  '{}').format(bb, bb.mdl_mol_block()))
+                bb_blocks.append(
+                    ('{0.__class__.__name__} {0.func_grp.name}\n'
+                     '{1}').format(bb, bb.mdl_mol_block()))
 
             errormsg += '\n'.join(bb_blocks)
 
