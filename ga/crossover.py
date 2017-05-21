@@ -123,6 +123,8 @@ class Crossover:
         parent_pool = islice(population.select('crossover'),
                              self.num_crossovers)
         for i, parents in enumerate(parent_pool, 1):
+            logger.info('Crossover number {}. Finish when {}.'.format(
+                                           i, self.num_crossovers))
             counter.update(parents)
             # Get the crossover function.
             func_data = np.random.choice(self.funcs, p=self.weights)
@@ -142,9 +144,6 @@ class Crossover:
 
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
-                logger.info(
-                    'Crossover number {}. Finish when {}.'.format(
-                                      i, self.num_crossovers))
 
             except Exception as ex:
                 errormsg = ('Crossover function "{}()" failed on '
