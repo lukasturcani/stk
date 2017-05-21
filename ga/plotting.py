@@ -12,7 +12,8 @@ from . import fitness
 plt.switch_backend('agg')
 
 
-def fitness_epp(pop, plot_name=False, dump_name=None, xlabel='Generation'):
+def fitness_epp(pop, plot_name=False,
+                dump_name=None, xlabel='Generation'):
     """
     Plots the min, max and avg fitness values of each subpopulation.
 
