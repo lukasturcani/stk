@@ -54,7 +54,6 @@ def test_crosser():
     crosser = i.crosser()
     assert crosser.funcs == [FunctionData('bb_lk_exchange')]
     assert crosser.num_crossovers == i.num_crossovers
-    assert crosser.n_calls == 0
     assert crosser.weights == [1]
 
 
@@ -84,7 +83,6 @@ def test_mutator():
     FunctionData('cage_random_lk', database='path2')]
     assert mut.weights == [1/4,1/4,1/4,1/4]
     assert mut.num_mutations == 2
-    assert mut.n_calls == 0
 
 
 def test_normalizer():
