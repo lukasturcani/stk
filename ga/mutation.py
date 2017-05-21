@@ -130,6 +130,8 @@ class Mutation:
         parent_pool = islice(population.select('mutation'),
                              self.num_mutations)
         for i, parent in enumerate(parent_pool, 1):
+            logger.info('Mutation number {}. Finish when {}.'.format(
+                                          i, self.num_mutations))
             counter.update([parent])
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)
@@ -144,9 +146,6 @@ class Mutation:
                                   'cache.').format(mutant.name))
 
                 mutant_pop.members.append(mutant)
-                logger.info(
-                    'Mutation number {}. Finish when {}.'.format(
-                                      i, self.num_mutations))
 
             except Exception as ex:
                 errormsg = ('Mutation function "{}()" '
