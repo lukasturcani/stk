@@ -285,8 +285,8 @@ class Population:
             if i % 2 == 0:
                 # Division by two where so that all indices are
                 # accessed, not just multiples of 2.
-                bb = StructUnit3(bb_files[i/2], bb_fg)
-                lk = StructUnit(lk_files[i/2], lk_fg)
+                bb = StructUnit3(bb_files[int(i/2)], bb_fg)
+                lk = StructUnit(lk_files[int(i/2)], lk_fg)
 
             else:
                 bb_file = bb.similar_molecules(bb_db)[-1][1]
