@@ -587,7 +587,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.fromdict(json_dict)
+        return cls.fromdict(json_dict, optimized, load_names)
 
     def max_diameter(self):
         """
@@ -1518,10 +1518,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
             f.write(json_dict['mol_block'])
             f.seek(0)
-            return cls(f.name, json_dict['func_grp'],
-                       (json_dict['name'] if
-                        json_dict['load_names'] else ""),
-                       json_dict['note'])
+            obj = cls(f.name, json_dict['func_grp'],
+                      (json_dict['name'] if
+                       json_dict['load_names'] else ""),
+                      json_dict['note'])
+            obj.optimized = json_dict['optimized']
+            return obj
 
     @staticmethod
     def gen_key(rdkit_mol, functional_group):
