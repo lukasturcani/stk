@@ -370,7 +370,7 @@ class Selection:
             for i in range(int(q)):
                 yield mem
 
-        for r, mem in sorted(decimals):
+        for r, mem in sorted(decimals, reverse=True):
             yield mem
 
     @mutation
