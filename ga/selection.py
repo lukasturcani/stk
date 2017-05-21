@@ -469,7 +469,7 @@ class Selection:
 
         mean = np.mean([mem._ssfitness for mem in pop])
         for mem in pop:
-            q, r = divmod(mem._ssfitness, mean)
+            q = int(divmod(mem._ssfitness, mean)[0])
             # Account for the fact that a molecule may have been
             # yielded due to elitism.
             q -= 1 if mem in yielded else 0
@@ -576,7 +576,7 @@ class Selection:
             yield ind1, ind2
 
     @crossover
-    def crossover_roulette(population, truncation=None):
+    def crossover_roulette(self, population, truncation=None):
         """
         Yields parents using roulette selection.
 
@@ -618,7 +618,8 @@ class Selection:
             yield np.random.choice(pop, 2, False, weights)
 
     @crossover
-    def crossover_deterministic_sampling(population, truncation=None):
+    def crossover_deterministic_sampling(self, population,
+                                         truncation=None):
         """
         Yields parents according to determnistic sampling.
 
