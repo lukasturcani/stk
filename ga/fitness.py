@@ -131,10 +131,13 @@ from collections import Counter
 from os.path import join
 from uuid import uuid4
 import logging
+from threading import Thread
+from traceback import format_exc
 
 from ..convenience_tools import (matrix_centroid,
                                  FunctionData,
-                                 rotation_matrix_arbitrary_axis)
+                                 rotation_matrix_arbitrary_axis,
+                                 StopLogging, mplogger, FakeLogger)
 
 from ..molecular import (Cage, StructUnit,
                          Energy, optimization, func_key)
@@ -163,10 +166,20 @@ def _calc_fitness(func_data, population):
 
     """
 
+    # In order for logging to work with multiprocessing properly, each
+    # subprocess will log into the que. A thread in the main process
+    # will then log.
+    m = mp.Manager()
+    logq = m.Queue()
+    exit_ = StopLogging()
+    t1 = Thread(target=mplogger, args=(logq, logger))
+    t1.daemon = True
+    t1.start()
+
     # Get the fitness function object.
     func = globals()[func_data.name]
     # Make sure it won't raise errors while using multiprocessing.
-    p_func = _FitnessFunc(partial(func, **func_data.params))
+    p_func = _FitnessFunc(partial(func, **func_data.params), logq)
 
     # Apply the function to every member of the population, in
     # parallel.
@@ -176,6 +189,9 @@ def _calc_fitness(func_data, population):
     # Make sure the cache is updated with the evaluated versions.
     for member in evaluated:
         member.update_cache()
+
+    logq.put((exit_, exit_))
+    t1.join()
 
 
 def _calc_fitness_serial(func_data, population):
@@ -251,10 +267,15 @@ class _FitnessFunc:
 
     """
 
-    def __init__(self, func):
+    def __init__(self, func, logq=None):
         wraps(func)(self)
+        self.logq = logq
 
     def __call__(self, macro_mol, *args,  **kwargs):
+        logger = logging.getLogger(__name__)
+        if self.logq is not None:
+            logger = FakeLogger(self.logq)
+
         func_name = self.__wrapped__.func.__name__
 
         # If the fitness function has already been applied to this
@@ -273,7 +294,7 @@ class _FitnessFunc:
             errormsg = ('Fitness function "{}()" '
                         'failed on molecule "{}".').format(
                         func_name, macro_mol.name)
-            logger.error(errormsg, exc_info=True)
+            logger.error((errormsg+'\n'+format_exc()).strip())
 
         finally:
             macro_mol.unscaled_fitness[func_name] = val
