@@ -6,10 +6,9 @@ Defines the Population class.
 import itertools as it
 import os
 import numpy as np
-from collections import Counter
+from collections import Counter, defaultdict
 import json
 from glob import glob
-import logging
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
@@ -362,16 +361,24 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        # Shuffling and then doing a for loop prevents infinite loops.
         bb_files = glob(os.path.join(bb_db, '*'))
-        np.random.shuffle(bb_files)
         lk_files = glob(os.path.join(lk_db, '*'))
-        np.random.shuffle(lk_files)
 
-        for bb_file, lk_file in zip(bb_files, lk_files):
+        indices = []
+        pairs = defaultdict(list)
+        bbindices = np.random.randint(0, len(bb_files), size)
+        for bbi in bbindices:
+            lkindices = list(range(len(lk_files)))
+            for pairedi in pairs[bbi]:
+                lkindices.remove(pairedi)
+            lki = np.random.choice(lkindices)
+            indices.append((bbi, lki))
+            pairs[bbi].append(lki)
+
+        for bbi, lki in indices:
             topology = np.random.choice(topologies)
-            bb = StructUnit3(bb_file, bb_fg)
-            lk = StructUnit(lk_file, lk_fg)
+            bb = StructUnit3(bb_files[bbi], bb_fg)
+            lk = StructUnit(lk_files[lki], lk_fg)
 
             if len(lk.bonder_ids) >= 3:
                 lk = StructUnit3(lk.file, lk_fg)
