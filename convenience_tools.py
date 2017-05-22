@@ -41,12 +41,6 @@ streamhandler = logging.StreamHandler()
 errorhandler.setFormatter(formatter)
 streamhandler.setFormatter(formatter)
 
-# Get the logger.
-rootlogger = logging.getLogger()
-rootlogger.addHandler(errorhandler)
-rootlogger.addHandler(streamhandler)
-
-
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
               'Al': 2, 'Sb': 2, 'Ar': 1.88, 'As': 1.85, 'Ba': 2,
@@ -119,6 +113,26 @@ class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
 
+
+class FakeLogger:
+    def __init__(self, q):
+        self.q = q
+
+    def debug(self, msg):
+        self.q.put((logging.DEBUG, msg))
+
+    def info(self, msg):
+        self.q.put((logging.INFO, msg))
+
+    def warning(self, msg):
+        self.q.put((logging.WARNING, msg))
+
+    def error(self, msg):
+        self.q.put((logging.ERROR, msg))
+
+    def critical(self, msg):
+        self.q.put((logging.CRITICAL, msg))
+        
 
 class FunctionData:
     """
@@ -312,6 +326,10 @@ class MAEExtractor:
         with gzip.open(self.maegz_path, 'r') as maegz_file:
             with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())
+
+
+class StopLogging:
+    ...
 
 
 def archive_output():
@@ -703,6 +721,14 @@ def mol_from_mol_file(mol_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
+
+
+def mplogger(que, logger):
+    while True:
+        lvl, msg = que.get()
+        if isinstance(lvl, StopLogging):
+            break
+        logger.log(lvl, msg)
 
 
 def normalize_vector(vector):
