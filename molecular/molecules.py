@@ -1579,6 +1579,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        # If the vector being rotated is not finite exit. This is
+        # probably due to a planar molecule.
+        if not all(np.isfinite(x) for x in v1):
+            return
+
         # Save the initial position and change the origin to
         # `centroid`.
         iposition = self.centroid()
