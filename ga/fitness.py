@@ -294,7 +294,7 @@ class _FitnessFunc:
         # If the fitness function has already been applied to this
         # molecule, return.
         if func_name in macro_mol.unscaled_fitness:
-            logger.info('Skipping {}'.format(macro_mol.name))
+            logger.info('Skipping {}.'.format(macro_mol.name))
             return macro_mol
 
         try:
@@ -324,6 +324,9 @@ def random_fitness(macro_mol, logger=logger):
     macro_mol : MacroMolecule
         The macromolecule to which a fitness value is to be assigned.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Returns
     -------
     float
@@ -343,6 +346,9 @@ def random_fitness_vector(macro_mol, logger=logger):
     ----------
     macro_mol : MacroMolecule
         The macromolecule which is to have its fitness calculated.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Modifies
     --------
@@ -381,6 +387,9 @@ def raiser(macro_mol, param1, param2=2, logger=logger):
     param2 : object (default = 2)
         Dummy keyword parameter, does nothing.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Returns
     -------
     This function does not return. It only raises.
@@ -404,6 +413,9 @@ def partial_raiser(macro_mol, logger=logger):
     ----------
     macro_mol : MacroMolecule
         The molecule having its fitness calculated, maybe.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Returns
     -------
@@ -468,6 +480,9 @@ def cage(macro_mol, pseudoformation_params=
         requires, try using the  `-h` option:
 
             python -m mmea -h energy
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Modifies
     --------
@@ -549,6 +564,9 @@ def cage_target(macro_mol, target_mol_file,
         within the cage cavity in order to find the most stable
         conformation.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Modifies
     --------
     macro_mol.progress_params : dict
@@ -617,6 +635,9 @@ def cage_c60(macro_mol, target_mol_file,
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Modifies
     --------
     macro_mol.progress_params : dict
@@ -680,6 +701,9 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     rotation_func : FunctionData
         A FunctionData object representing the rotation function to be
         used.
+
+    logger : FakeLogger or logging.Logger
+        Used for logging. Not used by this function.
 
     Modifies
     --------
