@@ -132,7 +132,7 @@ class FakeLogger:
 
     def critical(self, msg):
         self.q.put((logging.CRITICAL, msg))
-        
+
 
 class FunctionData:
     """
