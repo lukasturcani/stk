@@ -1591,13 +1591,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # 5. Work out the angle between them.
         # 6. Apply that rotation along the original rotation axis.
 
-        rotmat = rotation_matrix(axis, [0,0,1])
+        rotmat = rotation_matrix(axis, [0, 0, 1])
         tstart = np.dot(rotmat, v1)
         tstart = np.array([tstart[0], tstart[1], 0])
 
         # If the `tstart` vector is 0 after these transformations it
         # means that it is parallel to the rotation axis, stop.
-        if np.allclose(tstart, [0,0,0], atol=1e-8):
+        if np.allclose(tstart, [0, 0, 0], atol=1e-8):
             self.set_position(iposition)
             return
 
@@ -1608,9 +1608,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # Check in which direction the rotation should go.
         # This is done by applying the rotation in each direction and
         # seeing which one leads to a smaller theta.
-        r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
+        r1 = rotation_matrix_arbitrary_axis(angle, [0, 0, 1])
         t1 = vector_theta(np.dot(r1, tstart), tend)
-        r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
+        r2 = rotation_matrix_arbitrary_axis(-angle, [0, 0, 1])
         t2 = vector_theta(np.dot(r2, tstart), tend)
 
         if t2 < t1:
