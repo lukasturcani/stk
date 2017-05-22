@@ -30,9 +30,13 @@ import multiprocessing as mp
 from functools import partial, wraps
 import numpy as np
 import logging
+from threading import Thread
+from traceback import format_exc
 
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
+
+from ...convenience_tools import FakeLogger, mplogger, StopLogging
 
 
 logger = logging.getLogger(__name__)
@@ -59,13 +63,24 @@ def _optimize_all(func_data, population):
 
     """
 
+    # In order for logging to work with multiprocessing properly, each
+    # subprocess will log into the que. A thread in the main process
+    # will then log.
+    m = mp.Manager()
+    logq = m.Queue()
+    exit_ = StopLogging()
+    t1 = Thread(target=mplogger, args=(logq, logger))
+    t1.daemon = True
+    t1.start()
+
     # Using the name of the function stored in `func_data` get the
     # function object from one of the functions defined within the
     # module.
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may
     # require.
-    p_func = _OptimizationFunc(partial(func, **func_data.params))
+    p_func = _OptimizationFunc(partial(func, **func_data.params),
+                               logq=logq)
 
     # Apply the function to every member of the population, in
     # parallel.
@@ -74,6 +89,9 @@ def _optimize_all(func_data, population):
     # Make sure the cache is updated with the optimized versions.
     for member in optimized:
         member.update_cache()
+
+    logq.put((exit_, exit_))
+    t1.join()
 
 
 def _optimize_all_serial(func_data, population):
@@ -125,10 +143,14 @@ class _OptimizationFunc:
 
     """
 
-    def __init__(self, func):
+    def __init__(self, func, logq=None):
         wraps(func)(self)
+        self.logq = logq
 
-    def __call__(self, macro_mol, *args,  **kwargs):
+    def __call__(self, macro_mol, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        if self.logq is not None:
+            logger = FakeLogger(self.logq)
 
         if macro_mol.optimized:
             logger.info('Skipping {}.'.format(macro_mol.name))
@@ -142,7 +164,7 @@ class _OptimizationFunc:
             errormsg = ('Optimization function "{}()" '
                         'failed on molecule "{}".').format(
                         self.__wrapped__.func.__name__, macro_mol.name)
-            logger.error(errormsg, exc_info=True)
+            logger.error((errormsg+'\n'+format_exc()).strip())
 
         finally:
             macro_mol.optimized = True

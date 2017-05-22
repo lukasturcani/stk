@@ -8,14 +8,20 @@ from os.path import join, basename, abspath
 
 from .ga import (Population,
                  GAInput, InputHelp)
-from .convenience_tools import (tar_output,
+from .convenience_tools import (tar_output, errorhandler,
+                                streamhandler,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
 
 warnings.filterwarnings("ignore")
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
 
+
+# Get the loggers.
 rootlogger = logging.getLogger()
+rootlogger.addHandler(errorhandler)
+rootlogger.addHandler(streamhandler)
+
 logger = logging.getLogger(__name__)
 
 
