@@ -4,12 +4,24 @@ Defines optimization functions.
 Extending MMEA: Adding optimization functions
 ---------------------------------------------
 New optimization functions are added by writing them into this module.
-The only requirement is that the first argument is ``macro_mol``. The
-requirement allows users to identify which arguments are handled
-automatically by MMEA and which need to be defined in the input file.
-The convention is that if the optimization function takes an argument
-called ``macro_mol`` the user does not have to specify that argument in
-the input file.
+The only requirement is that the first argument is ``macro_mol`` and
+there is a keyword argument ``logger``. This allows users to identify
+which arguments are handled automatically by MMEA and which need to be
+defined in the input file. The convention is that if the optimization
+function takes the arguments ``macro_mol`` and ``logger``, the user
+does not have to specify them argument in the input file.
+
+When defining optimization functions the ``logger`` argument should be
+used for logging as a normal logger from the ``logging`` library would.
+When running the GA a special logger compatible with multiprocessing
+is automatically placed in this argument. It may be useful to define
+the logger argument as a keyword argument::
+
+    opt_func(macro_mol, somearg, logger=logging.getLogger(__name__)):
+        ...
+
+In this way, if the optimization function is used outside of the GA,
+the logger will be provided automatically as well.
 
 An optimization function should update the rdkit molecule in the `mol`
 attribute. The return values of optimization functions are discarded.
@@ -158,7 +170,7 @@ class _OptimizationFunc:
 
         try:
             logger.info('Optimizing {}.'.format(macro_mol.name))
-            self.__wrapped__(macro_mol, *args, **kwargs)
+            self.__wrapped__(macro_mol, *args, **kwargs, logger=logger)
 
         except Exception as ex:
             errormsg = ('Optimization function "{}()" '
@@ -171,7 +183,7 @@ class _OptimizationFunc:
             return macro_mol
 
 
-def do_not_optimize(macro_mol):
+def do_not_optimize(macro_mol, logger=logger):
     """
     Skips the optimization step.
 
@@ -184,6 +196,9 @@ def do_not_optimize(macro_mol):
     macro_mol : MacroMolecule
         A macromolecule which will not be optimized.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Returns
     -------
     None : NoneType
@@ -193,7 +208,7 @@ def do_not_optimize(macro_mol):
     return
 
 
-def partial_raiser(macro_mol, ofunc):
+def partial_raiser(macro_mol, ofunc, logger=logger):
     """
     Raises and optimizes at random.
 
@@ -206,6 +221,9 @@ def partial_raiser(macro_mol, ofunc):
         A FunctionData object representing the optimization function
         to be used.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Modifies
     --------
     macro_mol.mol
@@ -217,13 +235,13 @@ def partial_raiser(macro_mol, ofunc):
 
     """
 
-    if not np.random.choice([0,1]):
+    if not np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
     globals()[ofunc.name](macro_mol, **ofunc.params)
 
 
-def raiser(macro_mol, param1, param2=2):
+def raiser(macro_mol, param1, param2=2, logger=logger):
     """
     Doens't optimize, raises an error instead.
 
@@ -237,6 +255,9 @@ def raiser(macro_mol, param1, param2=2):
 
     param2 : object (default = 2)
         Dummy keyword parameter, does nothing.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Returns
     -------
@@ -252,7 +273,7 @@ def raiser(macro_mol, param1, param2=2):
     raise Exception('Raiser optimization function used.')
 
 
-def rdkit_optimization(macro_mol, embed=False):
+def rdkit_optimization(macro_mol, embed=False, logger=logger):
     """
     Optimizes the structure of the molecule using rdkit.
 
@@ -267,6 +288,9 @@ def rdkit_optimization(macro_mol, embed=False):
         When ``True`` the structure is guessed before an optimization
         is carried out. This guess structure overrides any previous
         structure.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Modifies
     --------
