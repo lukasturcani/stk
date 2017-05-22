@@ -185,9 +185,9 @@ def _calc_fitness(func_data, population):
     m = mp.Manager()
     logq = m.Queue()
     exit_ = StopLogging()
-    t1 = Thread(target=mplogger, args=(logq, logger))
-    t1.daemon = True
-    t1.start()
+    log_thread = Thread(target=mplogger, args=(logq, logger))
+    log_thread.daemon = True
+    log_thread.start()
 
     # Get the fitness function object.
     func = globals()[func_data.name]
@@ -204,7 +204,7 @@ def _calc_fitness(func_data, population):
         member.update_cache()
 
     logq.put((exit_, exit_))
-    t1.join()
+    log_thread.join()
 
 
 def _calc_fitness_serial(func_data, population):
