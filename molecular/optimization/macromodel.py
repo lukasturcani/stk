@@ -502,6 +502,9 @@ def _run_bmin(macro_mol, macromodel_path, logger, timeout=0):
         _kill_bmin(macro_mol, macromodel_path)
         proc_out = ""
 
+    logger.debug('Output of bmin on "{}" was: {}.'.format(
+                                             macro_mol.name, proc_out))
+
     with open(log_file, 'r') as log:
         log_content = log.read()
 
