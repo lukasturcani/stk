@@ -18,7 +18,6 @@ import re
 from collections import deque
 import tarfile
 import logging
-import multiprocessing as mp
 
 # Define the formatter for logging messages.
 try:
@@ -33,7 +32,7 @@ formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
 
 
 # Define logging handlers.
-errorhandler = logging.FileHandler('output/scratch/errors.log',
+errorhandler = logging.FileHandler('errors.log',
                                    delay=True)
 errorhandler.setLevel(logging.ERROR)
 
@@ -42,14 +41,10 @@ streamhandler = logging.StreamHandler()
 errorhandler.setFormatter(formatter)
 streamhandler.setFormatter(formatter)
 
-# Get the loggers.
+# Get the logger.
 rootlogger = logging.getLogger()
 rootlogger.addHandler(errorhandler)
 rootlogger.addHandler(streamhandler)
-
-mplogger = mp.get_logger()
-mplogger.addHandler(errorhandler)
-mplogger.addHandler(streamhandler)
 
 
 # Holds the elements Van der Waals radii in Angstroms.

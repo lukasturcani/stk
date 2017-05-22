@@ -130,6 +130,7 @@ import multiprocessing as mp
 from collections import Counter
 from os.path import join
 from uuid import uuid4
+import logging
 
 from ..convenience_tools import (matrix_centroid,
                                  FunctionData,
@@ -139,7 +140,7 @@ from ..molecular import (Cage, StructUnit,
                          Energy, optimization, func_key)
 
 
-logger = mp.get_logger()
+logger = logging.getLogger(__name__)
 
 
 def _calc_fitness(func_data, population):
