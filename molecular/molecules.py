@@ -350,7 +350,6 @@ class Molecule:
         # function to calculate their distance in Euclidean space.
         atom1_coords = self.atom_coords(atom1_id)
         atom2_coords = self.atom_coords(atom2_id)
-
         return euclidean(atom1_coords, atom2_coords)
 
     def atom_symbol(self, atom_id):
