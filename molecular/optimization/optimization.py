@@ -29,12 +29,13 @@ import rdkit.Chem.AllChem as rdkit
 import multiprocessing as mp
 from functools import partial, wraps
 import numpy as np
+import logging
 
 from .macromodel import (macromodel_opt,
                          macromodel_cage_opt, macromodel_md_opt)
 
 
-logger = mp.get_logger()
+logger = logging.getLogger(__name__)
 
 
 def _optimize_all(func_data, population):
