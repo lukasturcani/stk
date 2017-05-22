@@ -32,7 +32,7 @@ formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
 
 
 # Define logging handlers.
-errorhandler = logging.FileHandler('errors.log',
+errorhandler = logging.FileHandler('output/scratch/errors.log',
                                    delay=True)
 errorhandler.setLevel(logging.ERROR)
 
