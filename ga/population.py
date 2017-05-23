@@ -268,24 +268,37 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        # Shuffling and then doing a for loop prevents infinite loops.
         bb_files = glob(os.path.join(bb_db, '*'))
-        np.random.shuffle(bb_files)
         lk_files = glob(os.path.join(lk_db, '*'))
-        np.random.shuffle(lk_files)
 
-        maxfiles = (len(bb_files) if
-                    len(bb_files) < len(lk_files) else len(lk_files))
+        pairs = defaultdict(list)
+        bbindices = list(range(len(bb_files)))
+        i = -1
+        while bbindices:
+            i += 1
 
-        # Multiplication by 2 because only every other `i` is used as
-        # an index into `bb_files` and `lk_files`.
-        for i in range(2*maxfiles):
             topology = np.random.choice(topologies)
             if i % 2 == 0:
-                # Division by two where so that all indices are
-                # accessed, not just multiples of 2.
-                bb = StructUnit3(bb_files[int(i/2)], bb_fg)
-                lk = StructUnit(lk_files[int(i/2)], lk_fg)
+                # First pick the index of a building block file.
+                bbi = np.random.choice(bbindices)
+                # Next get the indices of all linker files which are
+                # not already used together with `bbi`.
+                lkindices = list(range(len(lk_files)))
+                for pairedi in pairs[bbi]:
+                    lkindices.remove(pairedi)
+                # If `bbi` has been paired with all linkers already,
+                # remove it from the list of possible indices and try
+                # again.
+                if not lkindices:
+                    bbindices.remove(bbi)
+                    i -= 1
+                    continue
+                # Pick a linker index and note the pairing.
+                lki = np.random.choice(lkindices)
+                pairs[bbi].append(lki)
+
+                bb = StructUnit3(bb_files[bbi], bb_fg)
+                lk = StructUnit(lk_files[lki], lk_fg)
 
             else:
                 bb_file = bb.similar_molecules(bb_db)[-1][1]
