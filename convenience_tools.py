@@ -332,6 +332,37 @@ class StopLogging:
     ...
 
 
+def add_fragment_props(mol, bb_index, mol_index):
+    """
+    Adds properties to `mol` of `bb_index` and `mol_index`.
+
+    Properties called 'bb_index' and 'mol_index' are added to every
+    atom in `mol`.
+
+    Parameters
+    ----------
+    mol : rdkit.Chem.rdchem.Mol
+        A molecule which needs to have its atoms tagged.
+
+    bb_index : int
+        The index of `mol` wihthin `building_blocks` of some
+        macromolecule.
+
+    mol_index : int
+        If `mol` is the 5th molecule of building block with `bb_index`
+        to be added to a macromolecule, `mol_index` is 4.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    for atom in mol.GetAtoms():
+        atom.SetIntProp('bb_index', bb_index)
+        atom.SetIntProp('mol_index', mol_index)
+
+
 def archive_output():
     """
     Places the ``output`` folder into ``old_output``.
