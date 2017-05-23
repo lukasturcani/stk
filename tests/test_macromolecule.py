@@ -21,6 +21,10 @@ def test_building_block_cores():
             assert bb1match == nfrag_atoms or bb2match == nfrag_atoms
 
 
+def test_bb_distortion():
+    assert isinstance(pop[0].bb_distortion(), float)
+
+
 def test_comparison():
     """
     Checks ``==``, ``>``, ``>=``, etc. operators.
