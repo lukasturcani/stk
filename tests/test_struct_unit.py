@@ -3,7 +3,6 @@ import numpy as np
 import itertools as it
 from scipy.spatial.distance import euclidean
 import rdkit.Chem as chem
-import json
 
 from ..molecular import StructUnit, Molecule
 from ..convenience_tools import normalize_vector
@@ -35,7 +34,7 @@ def test_all_bonder_distances():
 
 
 def test_bonder_centroid():
-    position = np.array([0.,0.,0.])
+    position = np.array([0., 0., 0.])
     for id_ in mol.bonder_ids:
         position += np.array([*conf.GetAtomPosition(id_)])
 
@@ -54,7 +53,7 @@ def test_bonder_direction_vectors():
     assert len(vs) == sum(1 for _ in mol.bonder_direction_vectors())
     assert np.allclose(
         list(x for *_, x in mol.bonder_direction_vectors()), vs,
-            atol=1e-8)
+        atol=1e-8)
 
 
 def test_bonder_position_matrix():
@@ -64,7 +63,7 @@ def test_bonder_position_matrix():
             pos_vect = np.array([*conf.GetAtomPosition(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
-        m = np.matrix(pos_array.reshape(-1,3).T)
+        m = np.matrix(pos_array.reshape(-1, 3).T)
 
         assert np.allclose(m, mol.bonder_position_matrix(), atol=1e-8)
 
@@ -77,10 +76,23 @@ def test_centroid_centroid_dir_vector():
                        atol=1e-8)
 
 
+def test_core():
+    for atom in mol.core().GetAtoms():
+        assert atom.GetAtomicNum() != 1
+        assert not atom.HasProp('fg')
+
+
 def test_functional_group_atoms():
         func_grp_mol = chem.MolFromSmarts(mol.func_grp.fg_smarts)
-        assert (mol.mol.GetSubstructMatches(func_grp_mol)  ==
+        assert (mol.mol.GetSubstructMatches(func_grp_mol) ==
                 mol.functional_group_atoms())
+
+
+def test_is_core_atom():
+    for atom in mol.mol.GetAtoms():
+        core = (False if atom.HasProp('fg') or atom.GetAtomicNum() == 1
+                else True)
+        assert core is mol.is_core_atom(atom.GetIdx())
 
 
 def test_json_init():
@@ -92,7 +104,7 @@ def test_json_init():
     assert bb1.func_grp.name == 'amine'
 
     assert 2 == sum(1 for x in bb1.mol.GetAtoms() if
-                                                x.HasProp('bonder'))
+                    x.HasProp('bonder'))
 
 
 def test_smarts_init():
@@ -142,8 +154,8 @@ def test_caching():
 
 def test_set_bonder_centroid():
     og = mol.bonder_centroid()
-    mol.set_bonder_centroid([1,2,3])
-    assert np.allclose(mol.bonder_centroid(), [1,2,3], atol=1e-8)
+    mol.set_bonder_centroid([1, 2, 3])
+    assert np.allclose(mol.bonder_centroid(), [1, 2, 3], atol=1e-8)
     mol.set_bonder_centroid(og)
 
 
