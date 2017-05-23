@@ -148,7 +148,7 @@ from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
 
-from collections import Counter
+from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
@@ -1401,7 +1401,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             pos_vect = np.array([*self.atom_coords(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
-        return np.matrix(pos_array.reshape(-1,3).T)
+        return np.matrix(pos_array.reshape(-1, 3).T)
 
     def centroid_centroid_dir_vector(self):
         """
@@ -1438,6 +1438,25 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             return normalize_vector(self.centroid() -
                                     self.bonder_centroid())
 
+    def core(self):
+        """
+        Return the molecule with no H or functional group atoms.
+
+        Returns
+        -------
+        rdkit.Chem.rdchem.Mol
+            The "core" of the molecule.
+
+        """
+
+        emol = rdkit.EditableMol(self.mol)
+        for atom in reversed(self.mol.GetAtoms()):
+            atomid = atom.GetIdx()
+            if not self.is_core_atom(atomid):
+                emol.RemoveAtom(atomid)
+                continue
+        return emol.GetMol()
+
     def functional_group_atoms(self):
         """
         Returns a container of atom ids of atoms in functional groups.
@@ -1461,6 +1480,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # which atoms match the functional group. Return the atom ids
         # of those atoms.
         return self.mol.GetSubstructMatches(func_grp_mol)
+
+    def is_core_atom(self, atomid):
+        """
+        Returns ``True`` if atom is not H or part of the fg.
+
+        Parameters
+        ----------
+        atomid : int
+            The id of the atom being queried.
+
+        Returns
+        -------
+        bool
+            Indicates whether the atom with `atomid` is part of the
+            core.
+
+        """
+
+        atom = self.mol.GetAtomWithIdx(atomid)
+        if atom.HasProp('fg') or atom.GetAtomicNum() == 1:
+            return False
+        return True
 
     def json(self):
         """
@@ -1863,7 +1904,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         obj.key = key
         obj.mol = mol
         obj.func_grp = next((x for x in functional_groups if
-                                  x.name == functional_group), None)
+                            x.name == functional_group), None)
         if obj.func_grp:
             obj.tag_atoms()
 
@@ -2293,6 +2334,17 @@ class MacroMolecule(Molecule, metaclass=Cached):
         A note or comment about the molecule. Purely optional but can
         be useful for labelling and debugging.
 
+    fragments : dict
+        The key in this dictionary is a tuple of form (int, int). The
+        first int is the index of a building block within
+        `building_blocks`. The second int indentifies a molecule of
+        that building block. For example, (1, 3) identifies the 4th
+        molecule of type building_blocks[1] to be added to the
+        macromolecule during assembly.
+
+        The value in the dictionary is a set of ints. These hold the
+        atom ids belonging to a particular molecule - before assmebly.
+
     """
 
     def __init__(self, building_blocks, topology, name="", note=""):
@@ -2330,6 +2382,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.bb_counter = Counter()
         self.topology = topology
         self.bonds_made = 0
+        self.fragments = defaultdict(set)
 
         try:
             # Ask the ``Topology`` instance to assemble/build the
@@ -2359,6 +2412,45 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         super().__init__(name, note)
         self.save_bonders()
+
+    def building_block_cores(self, bb):
+        """
+        Yields the "cores" of a building block molecule.
+
+        The structure of the cores are representative of how they are
+        found in the macromolecule.
+
+        Parameters
+        ----------
+        bb : int
+            The index of a building block molecule within
+            `building_blocks`. The cores of this molecule are yielded.
+
+        Yields
+        ------
+        rdkit.Chem.rdchem.Mol
+            The core of a building block molecule, as found in the
+            macromolecule.
+
+        """
+
+        for (bb_index, mol_index), atoms in self.fragments.items():
+            # Ignore fragments which do not correspond to the molecule
+            # `bb`.
+            if bb_index != bb:
+                continue
+
+            # For each fragment make a new core. To preserver bond
+            # information, start with the macromolecule.
+            coremol = rdkit.EditableMol(self.mol)
+            # Remove any atoms not part of the core - atoms not in the
+            # fragment itself, hydrogens, atoms in the functional
+            # group.
+            for atom in reversed(self.mol.GetAtoms()):
+                if (atom.GetIdx() not in atoms or
+                   atom.HasProp('fg') or atom.GetAtomicNum() == 1):
+                    coremol.RemoveAtom(atom.GetIdx())
+            yield coremol.GetMol()
 
     def json(self):
         """
@@ -2475,6 +2567,40 @@ class MacroMolecule(Molecule, metaclass=Cached):
         return (frozenset(x.key for x in building_blocks),
                 repr(topology))
 
+    def bb_distortion(self):
+        """
+        Rmsd difference of building blocks before and after assembly.
+
+        The function looks at each building block in the macromolecule
+        and calculates the rmsd between the "free" verson and the one
+        present in the macromolecule. The mean of these rmsds is
+        returned.
+
+        Atoms which form the functional group of the building blocks
+        and hydrogens are excluded from the calculation.
+
+        Returns
+        -------
+        float
+            The mean rmsd of the macromole's building blocks to their
+            "free" counterparts.
+
+        """
+
+        # Go through each of the building blocks. For each building
+        # block get the core. Get the corrospending cores in the
+        # macromolecules and add the rmsd to the sum. Increment the
+        # count to calculate the mean later.
+        rmsd = 0
+        n = 0
+        for i, bb in enumerate(self.building_blocks):
+            free = bb.core()
+            am = [(x, x) for x in range(free.GetNumAtoms())]
+            for frag in self.building_block_cores(i):
+                rmsd += rdkit.AlignMol(free, frag, atomMap=am)
+                n += 1
+        return rmsd / n
+
     def update_cache(self):
         """
         Set cached molecule with same 'key' to have equal attributes.
@@ -2493,6 +2619,32 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
 
         self.__class__.cache[self.key].__dict__ = dict(vars(self))
+
+    def update_fragments(self):
+        """
+        Saves rdkit atom properties in `fragments`.
+
+        The properties saved are 'bb_index' and 'mol_index'. These
+        should be added to the atoms by the ``place_mols()`` function
+        during ``build()``.
+
+        Modifies
+        --------
+        fragments : dict
+            The dictionary is updated with the data from the 'bb_index'
+            and 'mol_index' properties.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        self.fragments = defaultdict(set)
+        for atom in self.mol.GetAtoms():
+            molkey = (int(atom.GetProp('bb_index')),
+                      int(atom.GetProp('mol_index')))
+            self.fragments[molkey].add(atom.GetIdx())
 
     def __eq__(self, other):
         return self.fitness == other.fitness
