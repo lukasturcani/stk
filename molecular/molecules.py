@@ -140,7 +140,6 @@ import networkx as nx
 import itertools as it
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
-import ..addons.pyWINDOW.pywindow.molecular as pwm
 
 from rdkit import DataStructs
 from glob import glob
@@ -155,6 +154,7 @@ from inspect import signature
 from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
+from ..addons.pyWINDOW.pywindow import molecular
 from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
@@ -2645,7 +2645,7 @@ class Cage(MacroMolecule):
             warnings.simplefilter("ignore")
             # Modified by Marcin for new pyWINDOW.
             # First load a molecule from rdkit mol block.
-            pw_molecule = pwm.Molecule.load_rdkit_mol(self.mol)
+            pw_molecule = molecular.Molecule.load_rdkit_mol(self.mol)
             # Find windows and get a single array with windows' sizes.
             all_windows = pw_molecule.calculate_windows(output='windows')
 
