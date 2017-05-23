@@ -364,18 +364,25 @@ class Population:
         bb_files = glob(os.path.join(bb_db, '*'))
         lk_files = glob(os.path.join(lk_db, '*'))
 
-        indices = []
         pairs = defaultdict(list)
-        bbindices = np.random.randint(0, len(bb_files), size)
-        for bbi in bbindices:
+        bbindices = list(range(len(bb_files)))
+        while bbindices:
+            # First pick the index of a building block file.
+            bbi = np.random.choice(bbindices)
+            # Next get the indices of all linker files which are not
+            # already used together with `bbi`.
             lkindices = list(range(len(lk_files)))
             for pairedi in pairs[bbi]:
                 lkindices.remove(pairedi)
+            # If `bbi` has been paired with all linkers already, remove
+            # it from the list of possible indices and try again.
+            if not lkindices:
+                bbindices.remove(bbi)
+                continue
+            # Pick a linker index and note the pairing.
             lki = np.random.choice(lkindices)
-            indices.append((bbi, lki))
             pairs[bbi].append(lki)
 
-        for bbi, lki in indices:
             topology = np.random.choice(topologies)
             bb = StructUnit3(bb_files[bbi], bb_fg)
             lk = StructUnit(lk_files[lki], lk_fg)
