@@ -1,5 +1,5 @@
 from .. import FunctionData, Molecule
-from ..ga import cage, cage_target, cage_c60
+from ..ga.fitness import cage, cage_target, cage_c60
 from os.path import join
 import numpy as np
 
@@ -13,11 +13,12 @@ def test_cage():
 
 def test_cage_target():
     assert isinstance(cage_target(cagemol, target,
-        FunctionData('rdkit', forcefield='mmff'),
-        FunctionData('do_not_optimize')), np.ndarray)
+                      FunctionData('rdkit', forcefield='mmff'),
+                      FunctionData('do_not_optimize')), np.ndarray)
 
 
 def test_cage_c60():
     assert isinstance(cage_c60(cagemol, target,
-            FunctionData('rdkit', forcefield='mmff'),
-            FunctionData('do_not_optimize'), 1, 1), np.ndarray)
+                      FunctionData('rdkit', forcefield='mmff'),
+                      FunctionData('do_not_optimize'), 1, 1),
+                      np.ndarray)

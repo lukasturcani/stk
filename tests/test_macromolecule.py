@@ -1,11 +1,29 @@
 from types import SimpleNamespace
 from os.path import join
-import json
 from ..molecular import (MacroMolecule, Molecule, FourPlusSix,
                          StructUnit, StructUnit2, StructUnit3)
 from ..ga import Population
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'))
+
+
+def test_building_block_cores():
+    # Check that the yielded rdkit molecules match the cores of the
+    # building block molecules.
+    macromol = pop[0]
+    for i in range(len(macromol.building_blocks)):
+        for frag in macromol.building_block_cores(i):
+            bb1match = len(frag.GetSubstructMatch(
+                           macromol.building_blocks[0].core()))
+            bb2match = len(frag.GetSubstructMatch(
+                           macromol.building_blocks[1].core()))
+            nfrag_atoms = frag.GetNumAtoms()
+            assert bb1match == nfrag_atoms or bb2match == nfrag_atoms
+
+
+def test_bb_distortion():
+    assert isinstance(pop[0].bb_distortion(), float)
+
 
 def test_comparison():
     """
@@ -14,7 +32,7 @@ def test_comparison():
     """
 
     # Generate cages with various fitnesses.
-    a = MacroMolecule.testing_init('a','a',SimpleNamespace(a=1))
+    a = MacroMolecule.testing_init('a', 'a', SimpleNamespace(a=1))
     a.fitness = 1
 
     b = MacroMolecule.testing_init('b', 'b', SimpleNamespace(b=1))
@@ -29,6 +47,7 @@ def test_comparison():
     assert a == b
     assert c > b
     assert c >= a
+
 
 def test_caching():
 
@@ -53,6 +72,7 @@ def test_caching():
     assert mol2 is mol4
     assert mol2 is not mol3
 
+
 def test_json_init():
     og_c = dict(MacroMolecule.cache)
     try:
@@ -60,13 +80,14 @@ def test_json_init():
         MacroMolecule.cache = {}
         mol = pop[0]
 
-        assert mol.fitness == None
+        assert mol.fitness is None
         assert all(isinstance(x, StructUnit) for x in
-                                        mol.building_blocks)
+                   mol.building_blocks)
         assert isinstance(mol.key, tuple)
-        assert mol.optimized == True
+        assert mol.optimized is True
         assert mol.unscaled_fitness == {}
-        assert mol.bonder_ids == [6, 15, 24, 59, 68, 77, 112, 121, 130,
+        assert mol.bonder_ids == [
+                              6, 15, 24, 59, 68, 77, 112, 121, 130,
                               165, 174, 183, 219, 222, 252, 255, 285,
                               288, 318, 321, 351, 354, 384, 387]
         assert mol.energy.__class__.__name__ == 'Energy'

@@ -78,9 +78,9 @@ def _optimize_all(func_data, population):
     m = mp.Manager()
     logq = m.Queue()
     exit_ = StopLogging()
-    t1 = Thread(target=mplogger, args=(logq, logger))
-    t1.daemon = True
-    t1.start()
+    log_thread = Thread(target=mplogger, args=(logq, logger))
+    log_thread.daemon = True
+    log_thread.start()
 
     # Using the name of the function stored in `func_data` get the
     # function object from one of the functions defined within the
@@ -100,7 +100,7 @@ def _optimize_all(func_data, population):
         member.update_cache()
 
     logq.put((exit_, exit_))
-    t1.join()
+    log_thread.join()
 
 
 def _optimize_all_serial(func_data, population):
