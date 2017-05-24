@@ -440,10 +440,10 @@ def partial_raiser(macro_mol, logger=logger):
 
 
 # Provides labels for the progress plotter.
-@_param_labels('Cavity Difference ','Window Difference ',
-                'Asymmetry ', 'Energy per Bond ')
-def cage(macro_mol, pseudoformation_params=
-         { 'func' : FunctionData('rdkit', forcefield='mmff') },
+@_param_labels('Cavity Difference ', 'Window Difference ',
+               'Asymmetry ', 'Energy per Bond ', 'Strain')
+def cage(macro_mol, pseudoformation_params={
+                     'func': FunctionData('rdkit', forcefield='mmff')},
          logger=logger):
     """
     Returns the fitness vector of a cage.
@@ -457,6 +457,8 @@ def cage(macro_mol, pseudoformation_params=
            windows in `macro_mol`.
         4) `eng_per_bond` - The formation energy of `macro_mol` per
            bond made.
+        5) `strain` - The mean rmsd between the free building blocks
+           and those in the macromolecule.
 
     Parameters
     ----------
@@ -517,17 +519,19 @@ def cage(macro_mol, pseudoformation_params=
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
 
-    macro_mol.progress_params['cage'] = [cavity, window,
-                                         asymmetry, e_per_bond]
+    strain = macro_mol.bb_distortion()
+
+    macro_mol.progress_params['cage'] = [cavity, window, asymmetry,
+                                         e_per_bond, strain]
 
     if None in macro_mol.progress_params['cage']:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
-    return np.array([cavity, window, asymmetry, e_per_bond])
+    return np.array([cavity, window, asymmetry, e_per_bond, strain])
 
 
-@_param_labels('Binding Energy', 'Asymmetry')
+@_param_labels('Binding Energy', 'Asymmetry', 'Strain')
 def cage_target(macro_mol, target_mol_file,
                 efunc, ofunc, rotations=0, logger=logger):
     """
@@ -541,6 +545,7 @@ def cage_target(macro_mol, target_mol_file,
 
             1) binding energy
             2) asymmetry
+            3) strain
 
     Parameters
     ----------
@@ -594,7 +599,7 @@ def cage_target(macro_mol, target_mol_file,
                         logger)
 
 
-@_param_labels('Binding Energy', 'Asymmetry')
+@_param_labels('Binding Energy', 'Asymmetry', 'Strain')
 def cage_c60(macro_mol, target_mol_file,
              efunc, ofunc, n5fold, n2fold, logger=logger):
     """
@@ -610,6 +615,7 @@ def cage_c60(macro_mol, target_mol_file,
 
         1) binding energy
         2) asymmetry
+        3) strain
 
     Parameters
     ----------
@@ -675,7 +681,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     ``cage_target()``.
 
     The function returns a fitness vector consisting of the
-    binding energy and asymmetry.
+    binding energy, asymmetry and strain.
 
     Parameters
     ----------
@@ -787,8 +793,8 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     logger.debug('\n\nCalculating complex energies.\n')
     min_eng_cmplx = min(macromol_complexes,
-                    key=lambda x :
-            getattr(x.energy, efunc.name)(**efunc.params))
+                        key=lambda x:
+                        getattr(x.energy, efunc.name)(**efunc.params))
 
     # Write the most stable complex to a file.
     min_eng_cmplx.write(join(folder_path, min_eng_cmplx.name+'.mol'))
@@ -797,22 +803,22 @@ def _cage_target(func_name, macro_mol, target_mol_file,
                     (min_eng_cmplx.energy, ), efunc.params)
 
     binding_energy = (min_eng_cmplx.energy.values[ekey] -
-                                                    energy_separate)
+                      energy_separate)
 
     frag1, frag2 = rdkit.GetMolFrags(min_eng_cmplx.mol,
-                                    asMols=True,
-                                    sanitizeFrags=False)
+                                     asMols=True,
+                                     sanitizeFrags=False)
 
     cage_counter = Counter(x.GetAtomicNum() for x in
-                            macro_mol.mol.GetAtoms())
+                           macro_mol.mol.GetAtoms())
     frag_counters = [(frag1, Counter(x.GetAtomicNum() for x in
-                            frag1.GetAtoms())),
+                     frag1.GetAtoms())),
 
-                    (frag2, Counter(x.GetAtomicNum() for x in
-                            frag2.GetAtoms()))]
+                     (frag2, Counter(x.GetAtomicNum() for x in
+                      frag2.GetAtoms()))]
 
     cmplx_cage_mol = next(frag for frag, counter in frag_counters if
-                        counter == cage_counter)
+                          counter == cage_counter)
 
     cmplx_cage = Cage.__new__(Cage)
     cmplx_cage.mol = cmplx_cage_mol
@@ -820,17 +826,19 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     cmplx_cage.name = min_eng_cmplx.name + '_no_target'
 
     # Write the cage without the target to a file.
-    cmplx_cage.write(join(folder_path, cmplx_cage.name+'.mol' ))
+    cmplx_cage.write(join(folder_path, cmplx_cage.name+'.mol'))
 
     asymmetry = macro_mol.window_difference()
-
-    macro_mol.progress_params[func_name] = [binding_energy, asymmetry]
+    strain = macro_mol.bb_distortion()
+    macro_mol.progress_params[func_name] = [binding_energy,
+                                            asymmetry,
+                                            strain]
 
     if None in macro_mol.progress_params[func_name]:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
-    return np.array([binding_energy, asymmetry])
+    return np.array([binding_energy, asymmetry, strain])
 
 
 def _make_cage_target_folder():
@@ -891,8 +899,8 @@ def _generate_complexes(macro_mol, target, number=1):
     """
 
     # First place both the target and cage at the origin.
-    macro_mol.set_position([0,0,0])
-    target.set_position([0,0,0])
+    macro_mol.set_position([0, 0, 0])
+    target.set_position([0, 0, 0])
 
     # Get the position matrix of the target molecule.
     og_pos_mat = target.position_matrix()
@@ -905,9 +913,9 @@ def _generate_complexes(macro_mol, target, number=1):
         rot2 = np.random.rand() * 2*np.pi
         rot3 = np.random.rand() * 2*np.pi
 
-        rot_mat1 = rotation_matrix_arbitrary_axis(rot1, [1,0,0])
-        rot_mat2 = rotation_matrix_arbitrary_axis(rot2, [0,1,0])
-        rot_mat3 = rotation_matrix_arbitrary_axis(rot3, [0,0,1])
+        rot_mat1 = rotation_matrix_arbitrary_axis(rot1, [1, 0, 0])
+        rot_mat2 = rotation_matrix_arbitrary_axis(rot2, [0, 1, 0])
+        rot_mat3 = rotation_matrix_arbitrary_axis(rot3, [0, 0, 1])
 
         new_pos_mat = np.dot(rot_mat1, og_pos_mat)
         new_pos_mat = np.dot(rot_mat2, new_pos_mat)
@@ -944,9 +952,8 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
 
     """
 
-
-    macro_mol.set_position([0,0,0])
-    c60.set_position([0,0,0])
+    macro_mol.set_position([0, 0, 0])
+    c60.set_position([0, 0, 0])
 
     # Step 1: Align the 5 membered ring with the z-axis.
 
@@ -959,7 +966,7 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     # Get the centroid of the ring.
     ring_centroid = matrix_centroid(ring_matrix)
     # Align the centroid of the ring with the z-axis.
-    c60.set_orientation(ring_centroid, [0,0,1])
+    c60.set_orientation(ring_centroid, [0, 0, 1])
     aligned_c60 = copy.deepcopy(c60)
 
     # Step 2: Get the rotation angles and apply the rotations. Yield
@@ -972,6 +979,6 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
     for angle5 in angles5fold:
         for angle2 in angles2fold:
             buckyball = copy.deepcopy(aligned_c60)
-            buckyball.rotate(angle5, [0,0,1])
-            buckyball.rotate(angle2, [0,1,0])
+            buckyball.rotate(angle5, [0, 0, 1])
+            buckyball.rotate(angle2, [0, 1, 0])
             yield rdkit.CombineMols(macro_mol.mol, buckyball.mol)
