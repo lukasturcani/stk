@@ -142,6 +142,7 @@ import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
 
 from rdkit import DataStructs
+from glob import glob
 from functools import total_ordering, partial
 from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
@@ -154,7 +155,7 @@ from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
 from ..addons.pyWindow import window_sizes
-from ..convenience_tools import (flatten, periodic_table, MolError,
+from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
@@ -349,7 +350,6 @@ class Molecule:
         # function to calculate their distance in Euclidean space.
         atom1_coords = self.atom_coords(atom1_id)
         atom2_coords = self.atom_coords(atom2_id)
-
         return euclidean(atom1_coords, atom2_coords)
 
     def atom_symbol(self, atom_id):
@@ -586,7 +586,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.fromdict(json_dict)
+        return cls.fromdict(json_dict, optimized, load_names)
 
     def max_diameter(self):
         """
@@ -1241,7 +1241,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         if ext not in self.init_funcs:
             raise TypeError(
-            'Unable to initialize from "{}" files.'.format(ext))
+                   'Unable to initialize from "{}" files.'.format(ext))
 
         self.mol = self.init_funcs[ext](file)
         # Update the property cache of each atom. This updates things
@@ -1265,7 +1265,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # generator will return the functional group which appears
         # first in `functional_groups`.
 
-
         # Assign the FGInfo instance from `functional_groups` which
         # describes the functional group provided in `functional_group`
         # or is found in the path name.
@@ -1286,10 +1285,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     def init_random(cls, db, fg=None, name="", note=""):
         """
         Picks a random file from `db` to initialize from.
-
-        If initialization from the randomly chosen file fails, another
-        file is picked at random. Note that if there are no valid files
-        this will result in an infinite loop.
 
         Parameters
         ----------
@@ -1312,19 +1307,22 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         StructUnit
             A random molecule from `db`.
 
+        None : NoneType
+            If no files in `db` could be initialized from.
+
         """
 
-        while True:
+        files = glob(os.path.join(db, '*'))
+        np.random.shuffle(files)
+
+        for molfile in files:
             try:
-                molfile = np.random.choice(os.listdir(db))
-                molfile = os.path.join(db, molfile)
                 return cls(molfile, fg, name, note)
 
             except Exception:
                 logger.error(
                     'Could not initialize {} from {}.'.format(
                                                 cls.__name__, molfile))
-                continue
 
     def all_bonder_distances(self):
         """
@@ -1519,10 +1517,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
             f.write(json_dict['mol_block'])
             f.seek(0)
-            return cls(f.name, json_dict['func_grp'],
-                       (json_dict['name'] if
-                        json_dict['load_names'] else ""),
-                       json_dict['note'])
+            obj = cls(f.name, json_dict['func_grp'],
+                      (json_dict['name'] if
+                       json_dict['load_names'] else ""),
+                      json_dict['note'])
+            obj.optimized = json_dict['optimized']
+            return obj
 
     @staticmethod
     def gen_key(rdkit_mol, functional_group):
@@ -1579,6 +1579,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        # If the vector being rotated is not finite exit. This is
+        # probably due to a planar molecule.
+        if not all(np.isfinite(x) for x in v1):
+            return
+
         # Save the initial position and change the origin to
         # `centroid`.
         iposition = self.centroid()
@@ -1591,13 +1596,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # 5. Work out the angle between them.
         # 6. Apply that rotation along the original rotation axis.
 
-        rotmat = rotation_matrix(axis, [0,0,1])
+        rotmat = rotation_matrix(axis, [0, 0, 1])
         tstart = np.dot(rotmat, v1)
         tstart = np.array([tstart[0], tstart[1], 0])
 
         # If the `tstart` vector is 0 after these transformations it
         # means that it is parallel to the rotation axis, stop.
-        if np.allclose(tstart, [0,0,0], atol=1e-8):
+        if np.allclose(tstart, [0, 0, 0], atol=1e-8):
             self.set_position(iposition)
             return
 
@@ -1608,9 +1613,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # Check in which direction the rotation should go.
         # This is done by applying the rotation in each direction and
         # seeing which one leads to a smaller theta.
-        r1 = rotation_matrix_arbitrary_axis(angle, [0,0,1])
+        r1 = rotation_matrix_arbitrary_axis(angle, [0, 0, 1])
         t1 = vector_theta(np.dot(r1, tstart), tend)
-        r2 = rotation_matrix_arbitrary_axis(-angle, [0,0,1])
+        r2 = rotation_matrix_arbitrary_axis(-angle, [0, 0, 1])
         t2 = vector_theta(np.dot(r2, tstart), tend)
 
         if t2 < t1:
@@ -2333,7 +2338,24 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         except Exception as ex:
             self.mol = rdkit.Mol()
-            MolError(ex, self, 'During initialization.')
+            errormsg = ('Build failure.\n'
+                        '\n'
+                        'topology\n'
+                        '--------\n'
+                        '{}\n'
+                        '\n'
+                        'building blocks\n'
+                        '---------------\n').format(topology)
+
+            bb_blocks = []
+            for bb in building_blocks:
+                bb_blocks.append(
+                    ('{0.__class__.__name__} {0.func_grp.name}\n'
+                     '{1}').format(bb, bb.mdl_mol_block()))
+
+            errormsg += '\n'.join(bb_blocks)
+
+            logger.error(errormsg, exc_info=True)
 
         super().__init__(name, note)
         self.save_bonders()
@@ -2470,7 +2492,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        self.__class__.cache[self.key].__dict__ = dict(self.__dict__)
+        self.__class__.cache[self.key].__dict__ = dict(vars(self))
 
     def __eq__(self, other):
         return self.fitness == other.fitness

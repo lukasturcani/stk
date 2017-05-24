@@ -16,9 +16,30 @@ import subprocess as sp
 import gzip
 import re
 from collections import deque
-import shutil
 import tarfile
-import traceback
+import logging
+
+# Define the formatter for logging messages.
+try:
+    f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
+except OSError as ex:
+    # When testing os.get_terminal_size() will fail because stdout is
+    # not connceted to a terminal.
+    f = '\n=\n\n'
+formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
+                                     '%(name)s - %(message)s'),
+                              datefmt='%H:%M:%S')
+
+
+# Define logging handlers.
+errorhandler = logging.FileHandler('output/scratch/errors.log',
+                                   delay=True)
+errorhandler.setLevel(logging.ERROR)
+
+streamhandler = logging.StreamHandler()
+
+errorhandler.setFormatter(formatter)
+streamhandler.setFormatter(formatter)
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
@@ -42,11 +63,11 @@ atom_vdw_radii = {
                  }
 
 # This dictionary gives easy access to the rdkit bond types.
-bond_dict = {'1' : rdkit.rdchem.BondType.SINGLE,
-             'am' : rdkit.rdchem.BondType.SINGLE,
-             '2' : rdkit.rdchem.BondType.DOUBLE,
-             '3' : rdkit.rdchem.BondType.TRIPLE,
-             'ar' : rdkit.rdchem.BondType.AROMATIC}
+bond_dict = {'1': rdkit.rdchem.BondType.SINGLE,
+             'am': rdkit.rdchem.BondType.SINGLE,
+             '2': rdkit.rdchem.BondType.DOUBLE,
+             '3': rdkit.rdchem.BondType.TRIPLE,
+             'ar': rdkit.rdchem.BondType.AROMATIC}
 
 # A dictionary which matches atomic number to elemental symbols.
 periodic_table = {
@@ -82,102 +103,6 @@ class ChargedMolError(Exception):
         self.msg = msg
 
 
-class MolError(Exception):
-    """
-    A class for raising errors when using ``Molecule`` instances.
-
-    There are a lot of reason why MMEA might receive an error. The
-    error can originate when rkdit is trying to assembly a molucue,
-    sanitize it or manipulate it in some othe way. Equally,
-    optimizations may go wrong for one reason or another and raise an
-    error.
-
-    However, errors raised by rdkit are not as useful as one would
-    hope. The error gets raised but the user is not told which
-    ``Molecule`` instance was being manipulated. This makes replication
-    of the error difficult.
-
-    In order to address this, all errors should be caught and placed
-    into a ``MolError`` along with the Molecule instance on which the
-    error occured. On initialization of a MolError an entry is made in
-    the file ``failures.txt``. This file is located in the ``output``
-    directory. Writing the entry to the file means that a Molecule can
-    be easily rebuilt as its building blocks, topology and any other
-    parameters are written to this file.
-
-    Every try/except statement in  MMEA should be something like:
-
-        try:
-            raise SomeExceptionByRdkit(...)
-
-        except Exception as ex:
-            MolError(ex, mol, 'error in init')
-
-            # Do some stuff here. Reraise if you want or pass.
-
-    Notice that though an error is not raised, it is recorded in the
-    ``failures.txt`` file. This is because a MolError instance was
-    initialized during error handling.
-
-    Attributes
-    ----------
-    ex : Exception
-        The exception raised by some other part of MMEA such as rdkit,
-        or MacroModel.
-
-    mol : Molecule
-        The Molecule on which the error was raised.
-
-    notes : str
-        Any additional comments about the exception. For example, where
-        it is being raised.
-
-    """
-
-    def __init__(self, ex, mol, notes):
-        self.ex = ex
-        self.notes = notes
-        self.write_to_file(mol)
-        print('\n\nMolError written to ``failures.txt``.\n\n')
-
-    def write_to_file(self, mol):
-        """
-        Writes the exception and Molecule to ``failures.txt``.
-
-        This method is run during initialization. This means that even
-        if an exception is ignored during runtime it will be still
-        recorded in the ``failures.txt`` file.
-
-        """
-
-        # If the ``output`` folder exists (such as when running a GA
-        # run) place the ``failures.txt`` file in it. If the file does
-        # not exist (like when using MMEA as a library) place the
-        # ``failures.txt`` in the same folder as ``MMEA``.
-        cwd = os.getcwd().split('output')[0]
-        if 'output' in os.getcwd():
-            name = os.path.join(cwd, 'output', 'failures.txt')
-        else:
-            name = os.path.join(cwd, 'failures.txt')
-
-        with open(name, 'a') as f:
-            f.write("{} - {}\n\n".format(type(self.ex).__name__,
-                                            self.ex))
-
-            traceback.print_exc(file=f)
-
-            f.write('\nnote = {}\n'.format(self.notes))
-
-            if hasattr(mol, 'building_blocks'):
-                f.write('building blocks = {}\n'.format(
-                                                  mol.building_blocks))
-
-                f.write('topology = {}\n'.format(mol.topology))
-
-            f.write('\n'+'='*240)
-            f.write('\n\n\n')
-
-
 class MolFileError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
@@ -187,6 +112,26 @@ class MolFileError(Exception):
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
+
+
+class FakeLogger:
+    def __init__(self, q):
+        self.q = q
+
+    def debug(self, msg):
+        self.q.put((logging.DEBUG, msg))
+
+    def info(self, msg):
+        self.q.put((logging.INFO, msg))
+
+    def warning(self, msg):
+        self.q.put((logging.WARNING, msg))
+
+    def error(self, msg):
+        self.q.put((logging.ERROR, msg))
+
+    def critical(self, msg):
+        self.q.put((logging.CRITICAL, msg))
 
 
 class FunctionData:
@@ -381,6 +326,10 @@ class MAEExtractor:
         with gzip.open(self.maegz_path, 'r') as maegz_file:
             with open(self.mae_path, 'wb') as mae_file:
                 mae_file.write(maegz_file.read())
+
+
+class StopLogging:
+    ...
 
 
 def archive_output():
@@ -772,6 +721,14 @@ def mol_from_mol_file(mol_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
+
+
+def mplogger(que, logger):
+    while True:
+        lvl, msg = que.get()
+        if isinstance(lvl, StopLogging):
+            break
+        logger.log(lvl, msg)
 
 
 def normalize_vector(vector):

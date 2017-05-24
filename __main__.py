@@ -1,16 +1,28 @@
-import warnings, os, shutil, sys, logging, time, argparse
+import warnings
+import os
+import shutil
+import logging
+import argparse
 from rdkit import RDLogger
 from os.path import join, basename, abspath
-warnings.filterwarnings("ignore")
 
-from .ga import (Population, GATools,
-                 GAInput, InputHelp, Normalization)
-from .convenience_tools import (time_it, tar_output,
+from .ga import (Population,
+                 GAInput, InputHelp)
+from .convenience_tools import (tar_output, errorhandler,
+                                streamhandler,
                                 archive_output, kill_macromodel)
 from .ga import plotting as plot
 
-
+warnings.filterwarnings("ignore")
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
+
+
+# Get the loggers.
+rootlogger = logging.getLogger()
+rootlogger.addHandler(errorhandler)
+rootlogger.addHandler(streamhandler)
+
+logger = logging.getLogger(__name__)
 
 
 class GAProgress:
@@ -118,10 +130,16 @@ class GAProgress:
         if not logger.isEnabledFor(logging.INFO):
             return
 
-        s = 'Population log:'
+        s = 'Population log:\n'
+        s += '-'*os.get_terminal_size().columns
+        s += '{:<10}\t{:<40}\t{}\n'.format('molecule', 'fitness',
+                                           'unscaled_fitness')
+        s += '-'*os.get_terminal_size().columns
         for mem in sorted(pop, reverse=True):
-            uf = {n : str(v) for n, v in mem.unscaled_fitness.items()}
-            s += ('\n\t{0.name} {0.fitness} {1}').format(mem, uf)
+            uf = {n: str(v) for n, v in mem.unscaled_fitness.items()}
+            memstring = ('\n{0.name:<10}\t'
+                         '{0.fitness:<40}\t{1}').format(mem, uf)
+            s += memstring + '\n' + '-'*os.get_terminal_size().columns
         logger.info(s)
 
     def debug_dump(self, pop, dump_name):
@@ -150,7 +168,7 @@ class GAProgress:
 
         """
 
-        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
+        if pop.ga_tools.input.pop_dumps:
             pop.dump(join('..', 'pop_dumps', dump_name))
 
 
@@ -161,12 +179,6 @@ def ga_run(ga_input):
     """
 
     # 1. Set up the directory structure.
-
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(level=ga_input.logging_level,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-    datefmt='%H:%M:%S')
-    logger.setLevel(ga_input.logging_level)
 
     launch_dir = os.getcwd()
     # Running MacroModel optimizations sometimes leaves applications
@@ -181,19 +193,22 @@ def ga_run(ga_input):
     # If logging level is DEBUG or less, make population dumps as the
     # GA progresses and save images of selection counters.
     mcounter = ccounter = gcounter = ''
-    if logger.isEnabledFor(logging.DEBUG):
+    if ga_input.counters:
         os.mkdir('counters')
-        os.mkdir('pop_dumps')
         cstr = join(root_dir, 'counters', 'gen_{}_')
         mcounter = cstr + 'mutation_counter.png'
         ccounter = cstr + 'crossover_counter.png'
         gcounter = cstr + 'selection_counter.png'
+    if ga_input.pop_dumps:
+        os.mkdir('pop_dumps')
+
     # Copy the input script into the ``output`` folder.
     shutil.copyfile(ifile, basename(ifile))
     # Make the ``scratch`` directory which acts as the working
     # directory during the GA run.
     os.mkdir('scratch')
     os.chdir('scratch')
+    open('errors.log', 'w').close()
 
     # 2. Initialize the population.
 
@@ -204,8 +219,8 @@ def ga_run(ga_input):
     logger.info('Generating initial population.')
     init_func = getattr(Population, ga_input.initer().name)
     pop = init_func(**ga_input.initer().params,
-                      size=ga_input.pop_size,
-                      ga_tools=ga_input.ga_tools())
+                    size=ga_input.pop_size,
+                    ga_tools=ga_input.ga_tools())
     id_ = pop.assign_names_from(0)
 
     progress.debug_dump(pop, 'init_pop.json')
@@ -225,16 +240,19 @@ def ga_run(ga_input):
     for x in range(1, ga_input.num_generations+1):
         # Check that the population has the correct size.
         assert len(pop) == ga_input.pop_size
-        logger.info('Generation {} of {}.'.format(x,
-                                            ga_input.num_generations))
+        logger.info('Generation {} of {}.'.format(
+                                x, ga_input.num_generations))
         logger.info('Starting crossovers.')
         offspring = pop.gen_offspring(ccounter.format(x))
         logger.info('Starting mutations.')
         mutants = pop.gen_mutants(mcounter.format(x))
+        logger.debug('Population size is {}.'.format(len(pop)))
         logger.info('Adding offsping and mutants to population.')
         pop += offspring + mutants
+        logger.debug('Population size is {}.'.format(len(pop)))
         logger.info('Removing duplicates, if any.')
         pop.remove_duplicates()
+        logger.debug('Population size is {}.'.format(len(pop)))
         id_ = pop.assign_names_from(id_)
         progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
         logger.info('Optimizing the population.')
@@ -256,28 +274,32 @@ def ga_run(ga_input):
 
     kill_macromodel()
     os.chdir(root_dir)
+    os.rename('scratch/errors.log', 'errors.log')
     progress.progress.normalize_fitness_values()
     progress.dump()
     logger.info('Plotting EPP.')
     plot.fitness_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
-    progress.progress.remove_members(lambda x :
-          pop.ga_tools.fitness.name not in x.progress_params)
+    progress.progress.remove_members(
+                    lambda x:
+                    pop.ga_tools.fitness.name not in x.progress_params)
     plot.parameter_epp(progress.progress, ga_input.plot_epp, 'epp.dmp')
 
     shutil.rmtree('scratch')
     pop.write('final_pop', True)
     os.chdir(launch_dir)
-    if logger.isEnabledFor(logging.DEBUG):
+    if ga_input.tar_output:
         logger.info('Compressing output.')
         tar_output()
     archive_output()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='python -m mmea',
-    description=('MMEA in can be run in a number of ways.'
-    ' Each type of run can be invoked by one of the listed commands.'
-    ' For details on a command use: command -h.'))
+    parser = argparse.ArgumentParser(
+     prog='python -m mmea',
+     description=('MMEA in can be run in a number of ways.'
+                  ' Each type of run can be invoked by one'
+                  ' of the listed commands.'
+                  ' For details on a command use: command -h.'))
     commands = parser.add_subparsers(help='commands')
 
     run = commands.add_parser('run', description='Runs the GA.')
@@ -285,24 +307,23 @@ if __name__ == '__main__':
     run.add_argument('-l', '--loops', type=int, default=1,
                      help='The number times the GA should be run.')
 
-    helper = commands.add_parser('helper',
+    helper = commands.add_parser(
+             'helper',
              description=('Provides a description variables which'
                           ' need to be defined in an input file.'))
-    helper.add_argument('KEYWORD', type=str,
+    helper.add_argument(
+            'KEYWORD', type=str,
             choices=list(InputHelp.modules.keys()),
             help=('The name of a variable which needs to be defined'
                   ' in an input file.'))
 
     args = parser.parse_args()
 
-    if isinstance(args, str):
-        print(args)
-
-    elif sys.argv[1] == 'run':
+    if 'INPUT_FILE' in dir(args):
 
         ifile = abspath(args.INPUT_FILE)
         ga_input = GAInput(ifile)
-        logger = logging.getLogger(__name__)
+        rootlogger.setLevel(ga_input.logging_level)
         logger.info('Loading molecules from any provided databases.')
         dbs = []
         for db in ga_input.databases:
@@ -311,5 +332,5 @@ if __name__ == '__main__':
         for x in range(args.loops):
             ga_run(ga_input)
 
-    elif sys.argv[1] == 'helper':
+    elif 'KEYWORD' in dir(args):
         InputHelp(args.KEYWORD)
