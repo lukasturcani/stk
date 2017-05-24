@@ -746,7 +746,7 @@ class Molecule:
         og_position = self.centroid()
         # Move the centroid of the molecule to the origin, so that the
         # rotation occurs about this point.
-        self.set_position([0,0,0])
+        self.set_position([0, 0, 0])
         # Get the rotation matrix.
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation matrix on the position matrix, to get the
