@@ -601,8 +601,9 @@ class Molecule:
         """
 
         maxid1, maxid2 = max((x for x in
-                    it.combinations(range(self.mol.GetNumAtoms()), 2)),
-                    key=lambda x : self.atom_distance(*x))
+                              it.combinations(
+                                range(self.mol.GetNumAtoms()), 2)),
+                             key=lambda x: self.atom_distance(*x))
 
         maxd = self.atom_distance(maxid1, maxid2)
         maxd += (atom_vdw_radii[self.atom_symbol(maxid1)] +
@@ -1526,12 +1527,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return {
 
-        'class' : self.__class__.__name__,
-        'func_grp' : (self.func_grp if
-                      self.func_grp is None else self.func_grp.name),
-        'mol_block' : self.mdl_mol_block(),
-        'note' : self.note,
-        'name' : self.name
+            'class': self.__class__.__name__,
+            'func_grp': (self.func_grp if
+                         self.func_grp is None else
+                         self.func_grp.name),
+            'mol_block': self.mdl_mol_block(),
+            'note': self.note,
+            'name': self.name
 
         }
 
@@ -2478,19 +2480,22 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
 
         return {
-
-        'bb_counter' : [(key.json(), val) for key, val in
-                                            self.bb_counter.items()],
-        'bonds_made' : self.bonds_made,
-        'bonder_ids' : self.bonder_ids,
-        'class' : self.__class__.__name__,
-        'mol_block' : self.mdl_mol_block(),
-        'building_blocks' : [x.json() for x in self.building_blocks],
-        'topology' : repr(self.topology),
-        'unscaled_fitness' : repr(self.unscaled_fitness),
-        'progress_params' : self.progress_params,
-        'note' : self.note,
-        'name' : self.name
+            'bb_counter': [(key.json(), val) for key, val in
+                           self.bb_counter.items()],
+            'bonds_made': self.bonds_made,
+            'bonder_ids': self.bonder_ids,
+            'class': self.__class__.__name__,
+            'mol_block': self.mdl_mol_block(),
+            'building_blocks': [x.json() for x in
+                                self.building_blocks],
+            'topology': repr(self.topology),
+            'unscaled_fitness': repr(self.unscaled_fitness),
+            'progress_params': self.progress_params,
+            'note': self.note,
+            'name': self.name,
+            'fragments': dict(zip(
+                          (str(x) for x in self.fragments.keys()),
+                          (list(x) for x in self.fragments.values())))
 
         }
 
@@ -2515,7 +2520,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
 
         bbs = [Molecule.fromdict(x) for x in
-                                    json_dict['building_blocks']]
+               json_dict['building_blocks']]
 
         topology = eval(json_dict['topology'],  topologies.__dict__)
 
@@ -2524,15 +2529,15 @@ class MacroMolecule(Molecule, metaclass=Cached):
             return cls.cache[key]
 
         obj = cls.__new__(cls)
-        obj.mol =  rdkit.MolFromMolBlock(json_dict['mol_block'],
-                                       sanitize=False, removeHs=False)
+        obj.mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
+                                        sanitize=False, removeHs=False)
         obj.topology = topology
         obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
-                                     np.__dict__)
+                                    np.__dict__)
         obj.fitness = None
         obj.progress_params = json_dict['progress_params']
-        obj.bb_counter = Counter({Molecule.fromdict(key) : val for
-                                key, val in json_dict['bb_counter']})
+        obj.bb_counter = Counter({Molecule.fromdict(key): val for
+                                  key, val in json_dict['bb_counter']})
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
         obj.bonder_ids = json_dict['bonder_ids']
@@ -2541,6 +2546,12 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
         obj.key = key
         obj.building_blocks = bbs
+        obj.fragments = defaultdict(set)
+        obj.fragments.update(zip(
+            (tuple(int(y) for y in x.strip('()').split(','))
+             for x in json_dict['fragments'].keys()),
+            (set(x) for x in json_dict['fragments'].values())
+        ))
         cls.cache[key] = obj
         return obj
 
