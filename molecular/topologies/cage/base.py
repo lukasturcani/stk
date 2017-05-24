@@ -161,7 +161,7 @@ class Vertex:
                   self.edge_centroid())
         # Get the id of the atom which is being aligned.
         atom = building_block.bonder_ids[aligner]
-        # Minimzee the angle between these things by rotating about the
+        # Minimize the angle between these things by rotating about the
         # normal of the edge plane.
         building_block.minimize_theta(atom,
                                       vector,

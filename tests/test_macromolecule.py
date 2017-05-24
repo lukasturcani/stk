@@ -6,18 +6,20 @@ from ..ga import Population
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'))
 
-
+import rdkit.Chem.AllChem as rdkit
 def test_building_block_cores():
     # Check that the yielded rdkit molecules match the cores of the
     # building block molecules.
-    macromol = pop[0]
+    macromol = pop[1]
     for i in range(len(macromol.building_blocks)):
         for frag in macromol.building_block_cores(i):
             bb1match = len(frag.GetSubstructMatch(
-                           macromol.building_blocks[0]))
+                           macromol.building_blocks[0].core()))
             bb2match = len(frag.GetSubstructMatch(
-                           macromol.building_blocks[1]))
+                           macromol.building_blocks[1].core()))
             nfrag_atoms = frag.GetNumAtoms()
+            print(nfrag_atoms, macromol.building_blocks[1].core().GetNumAtoms())
+            rdkit.MolToMolFile(frag, '1.mol')
             assert bb1match == nfrag_atoms or bb2match == nfrag_atoms
 
 
