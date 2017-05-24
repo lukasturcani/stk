@@ -1206,6 +1206,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
                   '.mol2': partial(rdkit.MolFromMol2File,
                                    sanitize=False, removeHs=False),
+
                   '.mae': mol_from_mae_file,
 
                   '.pdb': partial(rdkit.MolFromPDBFile,
