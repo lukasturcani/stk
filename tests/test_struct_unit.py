@@ -85,8 +85,8 @@ def test_functional_group_atoms():
 
 def test_json_init():
     bb1 = Molecule.load(join('data', 'struct_unit', 'su.json'))
-    assert bb1.file == 'JSON'
-    assert bb1.optimized == True
+    assert isinstance(bb1.file, str)
+    assert bb1.optimized
     assert bb1.bonder_ids == [7, 10]
     assert bb1.energy.__class__.__name__ == 'Energy'
     assert bb1.func_grp.name == 'amine'
