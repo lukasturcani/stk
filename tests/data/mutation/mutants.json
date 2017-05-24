@@ -42,7 +42,7 @@
                 6
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -115,7 +115,7 @@
                 6
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -188,7 +188,7 @@
                 4
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -261,7 +261,7 @@
                 6
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -334,7 +334,7 @@
                 6
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -407,7 +407,7 @@
                 4
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -480,7 +480,7 @@
                 4
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -553,7 +553,7 @@
                 4
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -626,7 +626,7 @@
                 4
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 12,
         "topology": "FourPlusSix(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
@@ -699,7 +699,7 @@
                 12
             ]
         ],
-        "unscaled_fitness": "{}", "progress_params": {},
+        "unscaled_fitness": "{}", "fragments": {}, "progress_params": {},
         "bonds_made": 24,
         "topology": "EightPlusTwelve(A_alignments=None, B_alignments=None)",
         "bonder_ids": [
