@@ -119,7 +119,7 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
     _convert_mopout_to_mol(macro_mol)
 
 
-def _run_mopac(macro_mol, mopac_path, settings, timeout=3600):
+def _run_mopac(macro_mol, mopac_path, settings, timeout=7200):
 
     name, ext = os.path.splitext(macro_mol._file)
     mop_file = name + '.mop'
