@@ -6,8 +6,8 @@ import rdkit.Chem.AllChem as rdkit
 
 from ..base import Topology
 from ....convenience_tools import (centroid, vector_theta,
-                                      rotation_matrix_arbitrary_axis,
-                                      normalize_vector)
+                                   add_fragment_props,
+                                   normalize_vector)
 
 
 class WindowError(Exception):
@@ -161,7 +161,7 @@ class Vertex:
                   self.edge_centroid())
         # Get the id of the atom which is being aligned.
         atom = building_block.bonder_ids[aligner]
-        # Minimzee the angle between these things by rotating about the
+        # Minimize the angle between these things by rotating about the
         # normal of the edge plane.
         building_block.minimize_theta(atom,
                                       vector,
@@ -635,6 +635,10 @@ class _CageTopology(Topology):
                                  x.id == aligner_edge_id), 0)
             bb_mol = position.place_mol(bb, int(self.A_alignments[i]),
                                         aligner_edge)
+            add_fragment_props(bb_mol,
+                               macro_mol.building_blocks.index(bb),
+                               i)
+
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
@@ -657,6 +661,10 @@ class _CageTopology(Topology):
         for i, position in enumerate(self.positions_B):
             lk.set_position_from_matrix(lk_pos)
             lk_mol = position.place_mol(lk,  int(self.B_alignments[i]))
+            add_fragment_props(lk_mol,
+                               macro_mol.building_blocks.index(lk),
+                               i)
+
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, lk_mol)
             # Update the counter each time a linker is added.
             macro_mol.bb_counter.update([lk])
