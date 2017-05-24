@@ -269,7 +269,12 @@ class Population:
 
         pop = cls(ga_tools)
         bb_files = glob(os.path.join(bb_db, '*'))
+        # Remove any files which are not valid structure files.
+        bb_files = [x for x in bb_files if
+                    os.path.splitext(x)[1] in StructUnit.init_funcs]
         lk_files = glob(os.path.join(lk_db, '*'))
+        lk_files = [x for x in lk_files if
+                    os.path.splitext(x)[1] in StructUnit.init_funcs]
 
         pairs = defaultdict(list)
         bbindices = list(range(len(bb_files)))
@@ -375,7 +380,12 @@ class Population:
 
         pop = cls(ga_tools)
         bb_files = glob(os.path.join(bb_db, '*'))
+        # Remove any files which are not valid structure files.
+        bb_files = [x for x in bb_files if
+                    os.path.splitext(x)[1] in StructUnit.init_funcs]
         lk_files = glob(os.path.join(lk_db, '*'))
+        lk_files = [x for x in lk_files if
+                    os.path.splitext(x)[1] in StructUnit.init_funcs]
 
         pairs = defaultdict(list)
         bbindices = list(range(len(bb_files)))
