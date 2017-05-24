@@ -20,16 +20,18 @@ start with a leading underscore.
 
 """
 
-import os, sys, logging
+import os
+import logging
 import numpy as np
 from collections import Counter
+from itertools import islice
 
 from .population import Population
 from .plotting import plot_counter
-from ..convenience_tools import MolError
 from ..molecular import StructUnit3, Cage
 
 logger = logging.getLogger(__name__)
+
 
 class MutationError(Exception):
     ...
@@ -77,10 +79,6 @@ class Mutation:
         The number of mutations that needs to be performed each
         generation.
 
-    n_calls : int
-        The total number of times an instance of ``Mutation`` has been
-        called during its lifetime.
-
     weights : None or list of floats (default = None)
         When ``None`` each mutation function has equal likelihood of
         being picked. If `weights` is a list each float corresponds to
@@ -93,7 +91,6 @@ class Mutation:
         self.funcs = funcs
         self.weights = weights
         self.num_mutations = num_mutations
-        self.n_calls = 0
 
     def __call__(self, population, counter_path=''):
         """
@@ -102,7 +99,7 @@ class Mutation:
         This function selects members of the population to be mutated
         and mutates them. This goes on until either all possible
         molecules have been mutated or the required number of
-        successful mutation operations have been performed.
+        mutation operations have been performed.
 
         The mutants generated are returned together in a ``Population``
         instance. Any molecules that are created as a result of
@@ -127,31 +124,34 @@ class Mutation:
 
         """
 
-        parent_pool = population.select('mutation')
         mutant_pop = Population(population.ga_tools)
         counter = Counter()
 
-        num_mutations = 0
-        for parent in parent_pool:
+        parent_pool = islice(population.select('mutation'),
+                             self.num_mutations)
+        for i, parent in enumerate(parent_pool, 1):
+            logger.info('Mutation number {}. Finish when {}.'.format(
+                                          i, self.num_mutations))
             counter.update([parent])
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)
 
             try:
-                self.n_calls += 1
                 mutant = func(parent, **func_data.params)
-                mutant_pop.members.append(mutant)
-                num_mutations += 1
-                logger.info(
-                    'Mutation number {}. Finish when {}.'.format(
-                                    num_mutations, self.num_mutations))
 
-                if num_mutations == self.num_mutations:
-                    break
+                # If the mutant was retrieved from the cache, log the
+                # name.
+                if mutant.name:
+                    logger.debug(('Mutant "{}" retrieved from '
+                                  'cache.').format(mutant.name))
+
+                mutant_pop.members.append(mutant)
 
             except Exception as ex:
-                MolError(ex, parent, ('Error during mutation'
-                    ' with {}.').format(func.__name__))
+                errormsg = ('Mutation function "{}()" '
+                            'failed on molecule "{}".').format(
+                             func_data.name, parent.name)
+                logger.error(errormsg, exc_info=True)
 
         mutant_pop -= population
 
@@ -159,7 +159,7 @@ class Mutation:
             # Update counter with unselected members.
             for member in population:
                 if member not in counter.keys():
-                    counter.update({member : 0})
+                    counter.update({member: 0})
             plot_counter(counter, counter_path)
 
         return mutant_pop

@@ -164,6 +164,17 @@ class GAInput:
     logging_level : int (default = logging.DEBUG)
         The logging level for logging messages to the screen.
 
+    counters : bool (default = True)
+        If ``True`` plots the which molecules get chosen by selection
+        functions get made.
+
+    pop_dumps : bool (default = True)
+        If ``True`` each generation makes a .json dump file.
+
+    tar_output : bool (default = True)
+        If ``True`` a copy of the output folder is compressed, tarred
+        and placed in the output folder.
+
     """
 
     def __init__(self, input_file):
@@ -178,7 +189,11 @@ class GAInput:
         """
 
         with open(input_file, 'r') as inp:
-            exec(inp.read(), globals(), self.__dict__)
+            exec(inp.read(), globals(), vars(self))
+
+        if (hasattr(self, 'plot_epp') and
+            getattr(self, 'plot_epp') is True):
+            self.plot_epp = 'epp.png'
 
         # If the input file did not specify some values, default
         # initialize them.
@@ -198,7 +213,7 @@ class GAInput:
             self.normalization_funcs = []
 
         if not hasattr(self, 'exit_func'):
-            self.exit_func = {'NAME' : 'no_exit'}
+            self.exit_func = {'NAME': 'no_exit'}
 
         if not hasattr(self, 'databases'):
             self.databases = []
@@ -212,11 +227,20 @@ class GAInput:
         if not hasattr(self, 'database_dump'):
             self.database_dump = True
 
+        if not hasattr(self, 'plot_epp'):
+            self.plot_epp = 'epp.png'
+
         if not hasattr(self, 'logging_level'):
             self.logging_level = logging.DEBUG
 
-        if not hasattr(self, 'plot_epp'):
-            self.plot_epp = 'epp.png'
+        if not hasattr(self, 'counters'):
+            self.counters = True
+
+        if not hasattr(self, 'pop_dumps'):
+            self.pop_dumps = True
+
+        if not hasattr(self, 'tar_output'):
+            self.tar_output = True
 
     def crosser(self):
         """

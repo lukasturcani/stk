@@ -5,14 +5,15 @@ A module for defining plotting functions.
 
 import os
 import matplotlib.pyplot as plt
-plt.switch_backend('agg')
 import numpy as np
-from operator import attrgetter
 
-from .fitness import *
+from . import fitness
+
+plt.switch_backend('agg')
 
 
-def fitness_epp(pop, plot_name=False, dump_name=None, xlabel='Generation'):
+def fitness_epp(pop, plot_name=False,
+                dump_name=None, xlabel='Generation'):
     """
     Plots the min, max and avg fitness values of each subpopulation.
 
@@ -59,7 +60,7 @@ def fitness_epp(pop, plot_name=False, dump_name=None, xlabel='Generation'):
             mins.append(0)
         else:
             maxs.append(max(x.fitness for x in subpop))
-            means.append(subpop.mean(lambda x : x.fitness))
+            means.append(subpop.mean(lambda x: x.fitness))
             mins.append(min(x.fitness for x in subpop))
 
     # Save the plot data.
@@ -82,7 +83,6 @@ def fitness_epp(pop, plot_name=False, dump_name=None, xlabel='Generation'):
         fig.savefig(plot_name, dpi=1000,
                     bbox_extra_artists=(lgd,), bbox_inches='tight')
         plt.close('all')
-
 
 
 def parameter_epp(pop, plot_name=False,
@@ -125,7 +125,7 @@ def parameter_epp(pop, plot_name=False,
     """
 
     func_name = pop.ga_tools.fitness.name
-    fitness_func = globals()[func_name]
+    fitness_func = vars(fitness)[func_name]
 
     # Exit if a function which does not have param_labels was used.
     if not hasattr(fitness_func, 'param_labels'):
@@ -146,20 +146,19 @@ def parameter_epp(pop, plot_name=False,
 
         p_mat = np.array([x.progress_params[func_name] for x in sp])
 
-
         # Each element of this list holds an array of all the valid
         # values of a particular progress_param.
-        p_arrays = [p_mat[:,x] for x in range(nparams)]
+        p_arrays = [p_mat[:, x] for x in range(nparams)]
         p_arrays = [[x for x in a if x is not None] for a in p_arrays]
 
         min_params.append([min(x) if len(x) > 0 else None
-                            for x in p_arrays])
+                           for x in p_arrays])
 
         mean_params.append([np.mean(x) if len(x) > 0 else None
                             for x in p_arrays])
 
         max_params.append([max(x) if len(x) > 0 else None
-                            for x in p_arrays])
+                           for x in p_arrays])
 
     for x in range(len(min_params[0])):
 
@@ -173,7 +172,7 @@ def parameter_epp(pop, plot_name=False,
         for i, yval in enumerate(y_min):
             if yval is None:
                 nones.add(i)
-        xvals = list(range(1, len(pop.populations)+1 ))
+        xvals = list(range(1, len(pop.populations)+1))
         xvals = [xv for i, xv in enumerate(xvals) if i not in nones]
         y_mean = [yv for i, yv in enumerate(y_mean) if i not in nones]
         y_max = [yv for i, yv in enumerate(y_max) if i not in nones]

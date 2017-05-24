@@ -158,7 +158,7 @@ class Vertex:
         # centroid to the edge with which the atom is aligned.
         building_block.set_bonder_centroid(self.coord)
         vector = (self.connected[aligner_edge].coord -
-                    self.edge_centroid())
+                  self.edge_centroid())
         # Get the id of the atom which is being aligned.
         atom = building_block.bonder_ids[aligner]
         # Minimzee the angle between these things by rotating about the
@@ -482,7 +482,7 @@ class _CageTopology(Topology):
                     distance = macro_mol.atom_distance(atom_id,
                                                        atom2_id)
                     position.distances.append((distance,
-                                             atom_id, atom2_id))
+                                               atom_id, atom2_id))
 
         # This loop creates bonds between atoms at two different
         # positions so that each atom only bonds once and so that the

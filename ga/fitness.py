@@ -54,12 +54,25 @@ Example: random_fitness()
 
 To add a new fitness function simply write it as a function in this
 module. It will need to take the ``MacroMolecule`` instance as its
-first argument and this argument should be called ``macro_mol``. The
-purpose of this is to help users identify which arguments are handled
+first argument and this argument should be called ``macro_mol``. It
+should also hold a keyword argument called ``logger``. The purpose of
+this is to help users identify which arguments are handled
 automatically by MMEA and which they need to define in the input file.
 The convention is that if the fitness function takes an argument called
-``macro_mol`` they do not have to specify that argument in the input
-file.
+``macro_mol`` or ``logger`` they do not have to specify that argument
+in the input file.
+
+When defining fitness functions the ``logger`` argument should be
+used for logging as a normal logger from the ``logging`` library would.
+When running the GA a special logger compatible with multiprocessing
+is automatically placed in this argument. It may be useful to define
+the logger argument as a keyword argument::
+
+    fit_func(macro_mol, somearg, logger=logging.getLogger(__name__)):
+        ...
+
+In this way, if the fitness function is used outside of the GA,
+the logger will be provided automatically as well.
 
 A fitness function must return the value which represents the fitness
 of the molecule received as an argument. If a fitness function is meant
@@ -121,17 +134,23 @@ each of the `progress_params` and they will have their y-axes labelled
 
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
-import copy, os, logging, warnings
+import copy
+import os
+import warnings
 from functools import partial, wraps
 import networkx as nx
 import multiprocessing as mp
 from collections import Counter
 from os.path import join
 from uuid import uuid4
+import logging
+from threading import Thread
+from traceback import format_exc
 
 from ..convenience_tools import (matrix_centroid,
-                                 FunctionData, MolError,
-                                 rotation_matrix_arbitrary_axis)
+                                 FunctionData,
+                                 rotation_matrix_arbitrary_axis,
+                                 StopLogging, mplogger, FakeLogger)
 
 from ..molecular import (Cage, StructUnit,
                          Energy, optimization, func_key)
@@ -160,10 +179,20 @@ def _calc_fitness(func_data, population):
 
     """
 
+    # In order for logging to work with multiprocessing properly, each
+    # subprocess will log into the que. A thread in the main process
+    # will then log.
+    m = mp.Manager()
+    logq = m.Queue()
+    exit_ = StopLogging()
+    t1 = Thread(target=mplogger, args=(logq, logger))
+    t1.daemon = True
+    t1.start()
+
     # Get the fitness function object.
     func = globals()[func_data.name]
     # Make sure it won't raise errors while using multiprocessing.
-    p_func = _FitnessFunc(partial(func, **func_data.params))
+    p_func = _FitnessFunc(partial(func, **func_data.params), logq)
 
     # Apply the function to every member of the population, in
     # parallel.
@@ -173,6 +202,9 @@ def _calc_fitness(func_data, population):
     # Make sure the cache is updated with the evaluated versions.
     for member in evaluated:
         member.update_cache()
+
+    logq.put((exit_, exit_))
+    t1.join()
 
 
 def _calc_fitness_serial(func_data, population):
@@ -201,6 +233,7 @@ def _calc_fitness_serial(func_data, population):
     # Apply the function to every member of the population.
     for member in population:
         p_func(member)
+
 
 def _param_labels(*labels):
     """
@@ -247,31 +280,42 @@ class _FitnessFunc:
 
     """
 
-    def __init__(self, func):
+    def __init__(self, func, logq=None):
         wraps(func)(self)
+        self.logq = logq
 
     def __call__(self, macro_mol, *args,  **kwargs):
+        logger = logging.getLogger(__name__)
+        if self.logq is not None:
+            logger = FakeLogger(self.logq)
+
         func_name = self.__wrapped__.func.__name__
 
         # If the fitness function has already been applied to this
         # molecule, return.
         if func_name in macro_mol.unscaled_fitness:
-            logger.info('Skipping {}'.format(macro_mol.name))
+            logger.info('Skipping {}.'.format(macro_mol.name))
             return macro_mol
 
         try:
-            val = self.__wrapped__(macro_mol, *args, **kwargs)
+            logger.info('Calculating fitness of {}.'.format(
+                                                       macro_mol.name))
+            val = self.__wrapped__(macro_mol, *args,
+                                   **kwargs, logger=logger)
 
         except Exception as ex:
             val = None
-            MolError(ex, macro_mol, "During fitness calculation.")
+            errormsg = ('Fitness function "{}()" '
+                        'failed on molecule "{}".').format(
+                        func_name, macro_mol.name)
+            logger.error((errormsg+'\n'+format_exc()).strip())
 
         finally:
             macro_mol.unscaled_fitness[func_name] = val
             return macro_mol
 
 
-def random_fitness(macro_mol):
+def random_fitness(macro_mol, logger=logger):
     """
     Returns a random fitness value.
 
@@ -280,6 +324,9 @@ def random_fitness(macro_mol):
     macro_mol : MacroMolecule
         The macromolecule to which a fitness value is to be assigned.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Returns
     -------
     float
@@ -287,11 +334,11 @@ def random_fitness(macro_mol):
 
     """
 
-    return abs(np.random.normal(50,20))
+    return abs(np.random.normal(50, 20))
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
-def random_fitness_vector(macro_mol):
+def random_fitness_vector(macro_mol, logger=logger):
     """
     Returns a size 4 array of random numbers.
 
@@ -299,6 +346,9 @@ def random_fitness_vector(macro_mol):
     ----------
     macro_mol : MacroMolecule
         The macromolecule which is to have its fitness calculated.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Modifies
     --------
@@ -313,7 +363,7 @@ def random_fitness_vector(macro_mol):
     """
 
     # Make a random fitness vector.
-    f = abs(np.random.normal(50,20,4))
+    f = abs(np.random.normal(50, 20, 4))
     # This multiplication ensures that the elements of the fitness
     # vector all have different oraders of magnitude and that some
     # are negative.
@@ -322,7 +372,7 @@ def random_fitness_vector(macro_mol):
     return f
 
 
-def raiser(macro_mol, param1, param2=2):
+def raiser(macro_mol, param1, param2=2, logger=logger):
     """
     Doens't calculate a fitness value, raises an error instead.
 
@@ -336,6 +386,9 @@ def raiser(macro_mol, param1, param2=2):
 
     param2 : object (default = 2)
         Dummy keyword parameter, does nothing.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Returns
     -------
@@ -352,7 +405,7 @@ def raiser(macro_mol, param1, param2=2):
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
-def partial_raiser(macro_mol):
+def partial_raiser(macro_mol, logger=logger):
     """
     Calculates fitness or raises at random.
 
@@ -360,6 +413,9 @@ def partial_raiser(macro_mol):
     ----------
     macro_mol : MacroMolecule
         The molecule having its fitness calculated, maybe.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Returns
     -------
@@ -373,7 +429,7 @@ def partial_raiser(macro_mol):
 
     """
 
-    if not np.random.choice([0,1]):
+    if not np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
     r = random_fitness_vector(macro_mol)
@@ -387,7 +443,8 @@ def partial_raiser(macro_mol):
 @_param_labels('Cavity Difference ','Window Difference ',
                 'Asymmetry ', 'Energy per Bond ')
 def cage(macro_mol, pseudoformation_params=
-         { 'func' : FunctionData('rdkit', forcefield='mmff') }):
+         { 'func' : FunctionData('rdkit', forcefield='mmff') },
+         logger=logger):
     """
     Returns the fitness vector of a cage.
 
@@ -423,6 +480,9 @@ def cage(macro_mol, pseudoformation_params=
         requires, try using the  `-h` option:
 
             python -m mmea -h energy
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
 
     Modifies
     --------
@@ -468,8 +528,8 @@ def cage(macro_mol, pseudoformation_params=
 
 
 @_param_labels('Binding Energy', 'Asymmetry')
-def cage_target(macro_mol,
-                target_mol_file, efunc, ofunc, rotations=0):
+def cage_target(macro_mol, target_mol_file,
+                efunc, ofunc, rotations=0, logger=logger):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -504,6 +564,9 @@ def cage_target(macro_mol,
         within the cage cavity in order to find the most stable
         conformation.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Modifies
     --------
     macro_mol.progress_params : dict
@@ -527,12 +590,13 @@ def cage_target(macro_mol,
     return _cage_target('cage_target', macro_mol,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
-                                     number=rotations+1))
+                                     number=rotations+1),
+                        logger)
 
 
 @_param_labels('Binding Energy', 'Asymmetry')
 def cage_c60(macro_mol, target_mol_file,
-             efunc, ofunc, n5fold, n2fold):
+             efunc, ofunc, n5fold, n2fold, logger=logger):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
@@ -571,6 +635,9 @@ def cage_c60(macro_mol, target_mol_file,
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
 
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
     Modifies
     --------
     macro_mol.progress_params : dict
@@ -594,11 +661,12 @@ def cage_c60(macro_mol, target_mol_file,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
-                                     n2fold=n2fold))
+                                     n2fold=n2fold),
+                        logger)
 
 
 def _cage_target(func_name, macro_mol, target_mol_file,
-                 efunc, ofunc, rotation_func):
+                 efunc, ofunc, rotation_func, logger):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -633,6 +701,9 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     rotation_func : FunctionData
         A FunctionData object representing the rotation function to be
         used.
+
+    logger : FakeLogger or logging.Logger
+        Used for logging. Not used by this function.
 
     Modifies
     --------

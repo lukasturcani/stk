@@ -8,6 +8,8 @@ import os
 import numpy as np
 from collections import Counter
 import json
+from glob import glob
+import logging
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
@@ -267,16 +269,24 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        # On each even iteration of the for loop it randomly selects
-        # a building block and linker and saves the choices. On each
-        # odd iteration the choices have their morgan fingerprints
-        # evaluated and the most different files in `bb_db`/`lk_db` are
-        # chosen.
-        for x in range(size):
+        # Shuffling and then doing a for loop prevents infinite loops.
+        bb_files = glob(os.path.join(bb_db, '*'))
+        np.random.shuffle(bb_files)
+        lk_files = glob(os.path.join(lk_db, '*'))
+        np.random.shuffle(lk_files)
+
+        maxfiles = (len(bb_files) if
+                    len(bb_files) < len(lk_files) else len(lk_files))
+
+        # Multiplication by 2 because only every other `i` is used as
+        # an index into `bb_files` and `lk_files`.
+        for i in range(2*maxfiles):
             topology = np.random.choice(topologies)
-            if x % 2 == 0:
-                bb = StructUnit3.init_random(bb_db, bb_fg)
-                lk = StructUnit.init_random(lk_db, lk_fg)
+            if i % 2 == 0:
+                # Division by two where so that all indices are
+                # accessed, not just multiples of 2.
+                bb = StructUnit3(bb_files[int(i/2)], bb_fg)
+                lk = StructUnit(lk_files[int(i/2)], lk_fg)
 
             else:
                 bb_file = bb.similar_molecules(bb_db)[-1][1]
@@ -289,8 +299,15 @@ class Population:
                 lk = StructUnit3(lk.file, lk_fg)
             else:
                 lk = StructUnit2(lk.file, lk_fg)
-            pop.members.append(Cage([bb, lk], topology))
 
+            cage = Cage([bb, lk], topology)
+            if cage not in pop:
+                pop.members.append(cage)
+
+            if len(pop) >= size:
+                break
+
+        assert len(pop) == size
         return pop
 
     @classmethod
@@ -345,17 +362,30 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        for x in range(size):
+        # Shuffling and then doing a for loop prevents infinite loops.
+        bb_files = glob(os.path.join(bb_db, '*'))
+        np.random.shuffle(bb_files)
+        lk_files = glob(os.path.join(lk_db, '*'))
+        np.random.shuffle(lk_files)
+
+        for bb_file, lk_file in zip(bb_files, lk_files):
             topology = np.random.choice(topologies)
-            bb = StructUnit3.init_random(bb_db, bb_fg)
-            lk = StructUnit.init_random(lk_db, lk_fg)
+            bb = StructUnit3(bb_file, bb_fg)
+            lk = StructUnit(lk_file, lk_fg)
+
             if len(lk.bonder_ids) >= 3:
                 lk = StructUnit3(lk.file, lk_fg)
             else:
                 lk = StructUnit2(lk.file, lk_fg)
 
-            pop.members.append(Cage([bb, lk], topology))
+            cage = Cage([bb, lk], topology)
+            if cage not in pop:
+                pop.members.append(cage)
 
+            if len(pop) >= size:
+                break
+
+        assert len(pop) == size
         return pop
 
     def add_members(self, population, duplicates=False):

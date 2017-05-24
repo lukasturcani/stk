@@ -21,13 +21,13 @@ start with a leading underscore.
 
 """
 
-import os, logging
+import logging
 from collections import Counter
 import numpy as np
+from itertools import islice
 
 from .population import Population
 from .plotting import plot_counter
-from ..convenience_tools import MolError
 from ..molecular.molecules import Cage
 
 
@@ -72,10 +72,6 @@ class Crossover:
         The number of crossovers that needs to be performed each
         generation.
 
-    n_calls : int
-        The total number of times an instance of ``Crossover`` has been
-        called during its lifetime.
-
     weights : None or list of floats (default = None)
         When ``None`` each crossover function has equal likelihood of
         being picked. If `weights` is a list each float corresponds to
@@ -88,7 +84,6 @@ class Crossover:
         self.funcs = funcs
         self.weights = weights
         self.num_crossovers = num_crossovers
-        self.n_calls = 0
 
     def __call__(self, population, counter_path=''):
         """
@@ -122,37 +117,43 @@ class Crossover:
 
         """
 
-        # Create the parent pool by using `select('crossover')`.
-        parent_pool = population.select('crossover')
         offspring_pop = Population(population.ga_tools)
         counter = Counter()
 
-        # Keep a count of the number of successful crossovers.
-        num_crossovers = 0
-        for parents in parent_pool:
+        parent_pool = islice(population.select('crossover'),
+                             self.num_crossovers)
+        for i, parents in enumerate(parent_pool, 1):
+            logger.info('Crossover number {}. Finish when {}.'.format(
+                                           i, self.num_crossovers))
             counter.update(parents)
             # Get the crossover function.
             func_data = np.random.choice(self.funcs, p=self.weights)
             func = getattr(self, func_data.name)
 
             try:
-                self.n_calls += 1
                 # Apply the crossover function and supply any
                 # additional arguments to it.
                 offspring = func(*parents, **func_data.params)
 
+                # Print the names of offspring which have been returned
+                # from the cache.
+                for o in offspring:
+                    if o.name:
+                        logger.debug(('Offspring "{}" retrieved '
+                                      'from cache.').format(o.name))
+
                 # Add the new offspring to the offspring population.
                 offspring_pop.add_members(offspring)
-                num_crossovers += 1
-                logger.info(
-                    'Crossover number {}. Finish when {}.'.format(
-                                num_crossovers, self.num_crossovers))
-                if num_crossovers == self.num_crossovers:
-                    break
+
             except Exception as ex:
-                for i, parent in enumerate(parents):
-                    MolError(ex, parent,
-                    'Error during crossover. Parent {0}.'.format(i))
+                errormsg = ('Crossover function "{}()" failed on '
+                            'molecules PARENTS.').format(
+                            func_data.name)
+
+                pnames = ' and '.join('"{}"'.format(p.name) for
+                                      p in parents)
+                errormsg = errormsg.replace('PARENTS', pnames)
+                logger.error(errormsg, exc_info=True)
 
         # Make sure that only original molecules are left in the
         # offspring population.
@@ -162,7 +163,7 @@ class Crossover:
             # Update counter with unselected members and plot counter.
             for member in population:
                 if member not in counter.keys():
-                    counter.update({member : 0})
+                    counter.update({member: 0})
             plot_counter(counter, counter_path)
 
         return offspring_pop
