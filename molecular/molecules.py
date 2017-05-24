@@ -2323,6 +2323,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
     bonder_ids : list of ints
         The ids of atoms which have bonds added during assembly.
 
+    fg_ids : set of ints
+        The ids of atoms which were parth of the functional group of
+        the building blocks.
+
     key : MacroMolKey
         The key used for caching the molecule. Necessary for
         `update_cache` to work. This attribute is assigned by the
@@ -2383,6 +2387,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.building_blocks = building_blocks
         self.bb_counter = Counter()
         self.topology = topology
+        self.fg_ids = set()
         self.bonds_made = 0
         self.fragments = defaultdict(set)
 
@@ -2413,7 +2418,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
             logger.error(errormsg, exc_info=True)
 
         super().__init__(name, note)
-        self.save_bonders()
+        self.save_ids()
 
     def building_block_cores(self, bb):
         """
@@ -2449,9 +2454,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
             # fragment itself, hydrogens, atoms in the functional
             # group.
             for atom in reversed(self.mol.GetAtoms()):
-                if (atom.GetIdx() not in atoms or
-                   atom.HasProp('fg') or atom.GetAtomicNum() == 1):
-                    coremol.RemoveAtom(atom.GetIdx())
+                atomid = atom.GetIdx()
+                if (atomid not in atoms or
+                    atomid in self.fg_ids or
+                   atom.GetAtomicNum() == 1):
+                    coremol.RemoveAtom(atomid)
             yield coremol.GetMol()
 
     def json(self):
@@ -2611,6 +2618,35 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 rmsd += rdkit.AlignMol(free, frag, atomMap=am)
                 n += 1
         return rmsd / n
+
+    def save_ids(self):
+        """
+        Updates `bonder_ids` and `fg_ids` attributes.
+
+        Modifies
+        --------
+        bonder_ids : list of ints
+            All molecules tagged 'bonder' have their ids added to this
+            list.
+
+        fg_ids : set of ints
+            All molecules tagged 'fg' have their ids add to
+            this set.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
+        self.bonder_ids = []
+        self.fg_ids = set()
+        for atom in self.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                self.bonder_ids.append(atom.GetIdx())
+            if atom.HasProp('fg'):
+                self.fg_ids.add(atom.GetIdx())
+
 
     def update_cache(self):
         """
