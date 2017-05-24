@@ -25,7 +25,7 @@ try:
 except OSError as ex:
     # When testing os.get_terminal_size() will fail because stdout is
     # not connceted to a terminal.
-    f = '\n=\n\n'
+    f = '\n' + '='*100 + '\n\n'
 formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
                                      '%(name)s - %(message)s'),
                               datefmt='%H:%M:%S')
