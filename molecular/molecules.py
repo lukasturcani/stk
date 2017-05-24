@@ -154,7 +154,7 @@ from inspect import signature
 from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
-from ..addons.pyWindow import window_sizes
+from ..addons.pyWINDOW import pywindow as pywindow
 from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
@@ -2643,8 +2643,10 @@ class Cage(MacroMolecule):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            all_windows = window_sizes(
-                            io.StringIO(self.mdl_mol_block()))
+            # Load an RDKit molecule object to pyWINDOW.
+            pw_molecule = pywindow.molecular.Molecule.load_rdkit_mol(self.mol)
+            # Find windows and get a single array with windows' sizes.
+            all_windows = pw_molecule.calculate_windows(output='windows')
 
         # If pyWindow failed, return ``None``.
         if all_windows is None:
