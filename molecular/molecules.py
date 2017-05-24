@@ -2491,6 +2491,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                            self.bb_counter.items()],
             'bonds_made': self.bonds_made,
             'bonder_ids': self.bonder_ids,
+            'fg_ids': list(self.fg_ids),
             'class': self.__class__.__name__,
             'mol_block': self.mdl_mol_block(),
             'building_blocks': [x.json() for x in
@@ -2548,6 +2549,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
         obj.bonder_ids = json_dict['bonder_ids']
+        obj.fg_ids = json_dict['fg_ids']
         obj.optimized = json_dict['optimized']
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
@@ -2646,7 +2648,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 self.bonder_ids.append(atom.GetIdx())
             if atom.HasProp('fg'):
                 self.fg_ids.add(atom.GetIdx())
-
 
     def update_cache(self):
         """
