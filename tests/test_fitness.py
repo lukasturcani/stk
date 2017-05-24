@@ -1,5 +1,5 @@
 from .. import FunctionData, Molecule
-from ..ga import cage, cage_target, cage_c60
+from ..ga.fitness import cage, cage_target, cage_c60
 from os.path import join
 import numpy as np
 
