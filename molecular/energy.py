@@ -797,7 +797,10 @@ class Energy(metaclass=EMeta):
         # Extract the energy
         energy_val = _extract_MOPAC_en(file_root)
 
-        return energy_val
+        try:
+            return energy_val
+        except UnboundLocalError:
+            raise _EnergyError('MOPAC energy calculation failed.')
 
     @exclude('mopac_path')
     def mopac_dipole(self, mopac_path, settings={}):
@@ -887,7 +890,10 @@ class Energy(metaclass=EMeta):
         # Extract the dipole
         dipole_val = _extract_MOPAC_dipole(file_root)
 
-        return dipole_val
+        try:
+            return dipole_val
+        except UnboundLocalError:
+            raise _EnergyError('MOPAC dipole calculation failed.')
 
     @exclude('mopac_path')
     def mopac_ea(self, mopac_path, settings={}):
@@ -1001,7 +1007,10 @@ class Energy(metaclass=EMeta):
         # Calculate the EA (eV)
         ea = en2 - en1
 
-        return ea
+        try:
+            return ea
+        except UnboundLocalError:
+            raise _EnergyError('MOPAC ea calculation failed.')
 
     @exclude('mopac_path')
     def mopac_ip(self, mopac_path, settings={}):
@@ -1119,7 +1128,10 @@ class Energy(metaclass=EMeta):
         # Calculate the IP (eV)
         ip = en2 - en1
 
-        return ip
+        try:
+            return ip
+        except UnboundLocalError:
+            raise _EnergyError('MOPAC ip calculation failed.')
 
 
 def formation_key(fargs, fkwargs):
