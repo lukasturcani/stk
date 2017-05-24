@@ -69,5 +69,5 @@
             4
         ]
     ],
-    "unscaled_fitness": "{}", "progress_params": {}
+    "unscaled_fitness": "{}", "fg_ids": [], "fragments": {}, "progress_params": {}
 }
