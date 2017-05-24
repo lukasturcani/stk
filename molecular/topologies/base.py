@@ -128,15 +128,15 @@ class Topology(metaclass=TopologyMeta):
         """
 
         # When running ``build()`` in parallel, the atom tags are
-        # cleared by the multiprocessing module. Make sure to readd the
-        # tags before running ``build()``.
+        # cleared by the multiprocessing module. Make sure to reapply
+        # the tags before running ``build()``.
         for bb in macro_mol.building_blocks:
             bb.tag_atoms()
 
         # Building should return building blocks to original positions
         # when done.
         ipositions = [x.position_matrix() for x in
-                                    macro_mol.building_blocks]
+                      macro_mol.building_blocks]
 
         self.place_mols(macro_mol)
         self.join_mols(macro_mol)
@@ -145,6 +145,11 @@ class Topology(metaclass=TopologyMeta):
         # Make sure that the property cache of each atom is up to date.
         for atom in macro_mol.mol.GetAtoms():
             atom.UpdatePropertyCache()
+
+        # Make sure that the tags showing which building block each
+        # atom belongs to are saved in `fragment_assignments` and not
+        # lost due to parallelism.
+        macro_mol.update_fragments()
 
         for x, pos_mat in zip(macro_mol.building_blocks, ipositions):
             x.set_position_from_matrix(pos_mat)
