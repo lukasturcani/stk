@@ -1198,18 +1198,19 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     """
 
-    init_funcs = {'.mol' : partial(rdkit.MolFromMolFile,
+    init_funcs = {'.mol': partial(rdkit.MolFromMolFile,
+                                  sanitize=False, removeHs=False),
+
+                  '.sdf': partial(rdkit.MolFromMolFile,
+                                  sanitize=False, removeHs=False),
+
+                  '.mol2': partial(rdkit.MolFromMol2File,
                                    sanitize=False, removeHs=False),
 
-                  '.sdf' : partial(rdkit.MolFromMolFile,
-                                   sanitize=False, removeHs=False),
+                  '.mae': mol_from_mae_file,
 
-                  '.mol2' : partial(rdkit.MolFromMol2File,
-                                 sanitize=False, removeHs=False),
-                  '.mae' : mol_from_mae_file,
-
-                  '.pdb' : partial(rdkit.MolFromPDBFile,
-                                 sanitize=False, removeHs=False)}
+                  '.pdb': partial(rdkit.MolFromPDBFile,
+                                  sanitize=False, removeHs=False)}
 
     def __init__(self, file, functional_group=None, name="", note=""):
         """
