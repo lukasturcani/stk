@@ -11,6 +11,11 @@ from .utilities import (
 from .io_tools import Input, Output
 
 
+class _MolecularSystemError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 class _NotAModularSystem(Exception):
     def __init__(self, message):
         self.message = message
@@ -27,26 +32,22 @@ class Molecule(object):
         self.coordinates = mol['coordinates']
         self.parent_system = system_name
         self.molecule_id = mol_id
-        self.properties = {}
+        self.properties = {'no_of_atoms': self.no_of_atoms}
 
     @classmethod
     def load_rdkit_mol(cls, mol, system_name='rdkit', mol_id=0):
         return cls(Input().load_rdkit_mol(mol), system_name, mol_id)
 
     def full_analysis(self, ncpus=1, **kwargs):
-        results = {
-            'no_of_atoms': self.no_of_atoms,
-            'mol_weight': self.molecular_weight,
-            'COM': self.calculate_COM(),
-            'maximum_diameter': self.calculate_maximum_diameter(),
-            'void_diameter': self.calculate_void_diameter(),
-            'void_volume': self.calculate_void_volume(),
-            'void_diameter_opt': self.calculate_void_diameter_opt(**kwargs),
-            'void_volume_opt': self.calculate_void_volume_opt(**kwargs),
-            'windows': self.calculate_windows(
-                ncpus=ncpus, **kwargs),
-        }
-        return (results)
+        self.molecular_weight()
+        self.calculate_COM()
+        self.calculate_maximum_diameter()
+        self.calculate_void_diameter()
+        self.calculate_void_volume()
+        self.calculate_void_diameter_opt(**kwargs)
+        self.calculate_void_volume_opt(**kwargs)
+        self.calculate_windows(ncpus=ncpus, **kwargs)
+        return self.properties
 
     def calculate_COM(self):
         self.centre_of_mass = center_of_mass(self.elements, self.coordinates)
@@ -110,10 +111,9 @@ class Molecule(object):
         self.coordinates = shift_com(self.elements, self.coordinates, **kwargs)
         self._update()
 
-    def molecular_weight(self, mol):
-        self.molecular_weight = molecular_weight(mol['elements'])
-        self.properties['windows'] = self.molecular_weight
-        return self.molecular_weight
+    def molecular_weight(self):
+        self.MW = molecular_weight(self.elements)
+        return self.MW
 
     def save_molecule_json(self, filepath=None, molecular=False, **kwargs):
         # We pass a copy of the properties dictionary.
@@ -132,12 +132,11 @@ class Molecule(object):
         # Dump the dictionary to json file.
         self._Output.dump2json(dict_obj, filepath, **kwargs)
 
-    def save_molecule(self, filepath=None, **kwargs):
+    def save_molecule(self, filepath=None, include_coms=False, **kwargs):
         # If no filepath is provided we create one.
         if filepath is None:
             filepath = "_".join(
-                (str(self.parent_system), str(self.molecule_id))
-            )
+                (str(self.parent_system), str(self.molecule_id)))
             filepath = '/'.join((os.getcwd(), filepath))
             filepath = '.'.join((filepath, 'pdb'))
         # Check if there is an 'atom_ids' keyword in the self.mol dict.
@@ -147,7 +146,40 @@ class Molecule(object):
         else:
             atom_ids = 'atom_ids'
         # Dump molecule into a file.
-        self._Output.dump2file(self.mol, filepath, atom_ids=atom_ids, **kwargs)
+        # If coms are to be included additional steps are required.
+        # First deepcopy the molecule
+        if include_coms is True:
+            mmol = deepcopy(self.mol)
+            # add centre of mass (centre of not optimised void) as 'He'.
+            mmol['elements'] = np.concatenate(
+                (mmol['elements'], np.array(['He'])))
+            mmol['atom_ids'] = np.concatenate(
+                (mmol['atom_ids'], np.array(['He'])))
+            mmol['coordinates'] = np.concatenate(
+                (mmol['coordinates'], np.array(
+                    [self.properties['centre_of_mass']])))
+            # add centre of void optimised as 'Ne'.
+            mmol['elements'] = np.concatenate(
+                (mmol['elements'], np.array(['Ne'])))
+            mmol['atom_ids'] = np.concatenate(
+                (mmol['atom_ids'], np.array(['Ne'])))
+            mmol['coordinates'] = np.concatenate(
+                (mmol['coordinates'], np.array(
+                    [self.properties['void_diameter_opt']['void_COM']])))
+            # add centre of windows as 'Ar'.
+            for com in range(len(self.properties['windows']['windows_coms'])):
+                mmol['elements'] = np.concatenate(
+                    (mmol['elements'], np.array(['Ar'])))
+                mmol['atom_ids'] = np.concatenate(
+                    (mmol['atom_ids'], np.array(['Ar{0}'.format(com + 1)])))
+                mmol['coordinates'] = np.concatenate(
+                    (mmol['coordinates'], np.array(
+                        [self.properties['windows']['windows_coms'][com]])))
+            self._Output.dump2file(mmol, filepath, atom_ids=atom_ids, **kwargs)
+
+        else:
+            self._Output.dump2file(
+                self.mol, filepath, atom_ids=atom_ids, **kwargs)
 
     def _update(self):
         self.mol['coordinates'] = self.coordinates
@@ -162,10 +194,10 @@ class MolecularSystem(object):
         self.system_id = 0
 
     @classmethod
-    def load_file(cls, file_path):
+    def load_file(cls, filepath):
         obj = cls()
-        obj.system = obj._Input.load_file(file_path)
-        obj.filename = os.path.basename(file_path)
+        obj.system = obj._Input.load_file(filepath)
+        obj.filename = os.path.basename(filepath)
         obj.system_id = obj.filename.split(".")[0]
         obj.name, ext = os.path.splitext(obj.filename)
         return obj
@@ -177,9 +209,10 @@ class MolecularSystem(object):
         return obj
 
     @classmethod
-    def load_system(cls, dict_):
+    def load_system(cls, dict_, system_id):
         obj = cls()
         obj.system = dict_
+        obj.system_id = system_id
         return obj
 
     def reconstruct_system(self, **kwargs):
@@ -276,15 +309,9 @@ class MolecularSystem(object):
             supercell_333 = None
         dis = discrete_molecules(self.system, supercell=supercell_333)
         self.no_of_discrete_molecules = len(dis)
-        # elements_ = []
-        # coordinates_ = []
         self.molecules = {}
         for i in range(len(dis)):
-            self.molecules[i] = Molecule(dis[i], self.name, i)
-            # [elements_.append(i) for i in dis[i]['elements']]
-            # [coordinates_.append(list(i)) for i in dis[i]['coordinates']]
-        # self.system['modular_elements'] = np.array(elements_)
-        # self.system['modular_coordinates'] = np.array(coordinates_)
+            self.molecules[i] = Molecule(dis[i], self.system_id, i)
 
     def system_to_molecule(self):
         return Molecule(self.system, self.system_id, 0)
