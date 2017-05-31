@@ -78,9 +78,9 @@ def unique(input_list):
 
 def make_JSON_serializable(obj):
     """
-    Return a dictionary with all arrays (two lvls down) changed to lists.
+    Return a dictionary with all arrays (three lvls down) changed to lists.
 
-    It takes a dictionary (and subdictionaries up to second level down) and
+    It takes a dictionary (and subdictionaries up to third level down) and
     searches for numpy.ndarrays that are not json serializable. It exchanges
     these arrays into lists.
 
@@ -107,6 +107,15 @@ def make_JSON_serializable(obj):
                 for key2 in obj[key].keys():
                     if isinstance(obj[key][key2], np.ndarray):
                         obj[key][key2] = obj[key][key2].tolist()
+                    try:
+                        if obj[key][key2].keys() is not None:
+                            for key3 in obj[key][key2].keys():
+                                if isinstance(obj[key][key2][key3],
+                                              np.ndarray):
+                                    obj[key][key2][key3] = obj[key][key2][
+                                        key3].tolist()
+                    except AttributeError:
+                        pass
         except AttributeError:
             pass
     return obj
@@ -624,7 +633,15 @@ def discrete_molecules(system, supercell=None):
     # We create a list containing all atoms, theirs periodic elements and
     # coordinates. As this process is quite complicated, we need a list
     # which we will gradually be reducing.
-    elements = system['elements']
+    try:
+        elements = system['elements']
+        coordinates = system['coordinates']
+    except KeyError:
+        raise _FunctionError(
+            "The 'elements' key is missing in the 'system' dictionary "
+            "attribute of the MolecularSystem object. Which means, you need to"
+            " decipher the forcefield based atom keys first (see manual)."
+        )
     coordinates = system['coordinates']
     args = (elements, coordinates)
     adj = 0
@@ -814,8 +831,8 @@ def window_analysis(window,
                     coordinates,
                     elements_vdw,
                     increment2=0.1,
-                    z_bounds=(None, None),
-                    lb_z=False,
+                    z_bounds=[None, None],
+                    lb_z=True,
                     **kwargs):
     """
     Return window diameter and window's centre.
