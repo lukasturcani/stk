@@ -301,8 +301,8 @@ class Output(object):
                 remark = settings['remarks']
                 string = "\n".join([string, 'REMARK {0}'.format(remark)])
         # If there is a unit cell (crystal data) provided we need to add it.
-        try:
-            if system[settings['cryst']] is not None:
+        if settings['cryst'] in system.keys():
+            if system[settings['cryst']]:
                 cryst_line = "CRYST1"
                 cryst = system[settings['cryst']]
                 # The user have to provide the crystal data as a list/array
@@ -325,8 +325,6 @@ class Output(object):
                 cryst_line = " ".join([cryst_line, space_group])
                 # We add the unit cell parameters to the main string.
                 string = "\n".join([string, cryst_line])
-        except KeyError:
-            pass
         # For the sake of code readability we extract interesting data from the
         # system. Atom_ids are the atom ids written at the third column of a
         # PDB file and the user has here the freedom to use the forcefield
@@ -369,6 +367,9 @@ class Output(object):
         # connectivity is finished
         # "Everything that has a beginning has an end" by Neo. :)
         string = "\n".join([string, 'END'])
+        # Check if .pdb extension is missing from filepath.
+        if filepath[-4:].lower() != '.pdb':
+            filepath = ".".join((filepath, 'pdb'))
         # Write the string to a a PDB file.
         with open(filepath, 'w+') as file:
             file.write(string)

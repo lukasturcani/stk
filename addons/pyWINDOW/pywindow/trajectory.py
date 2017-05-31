@@ -1,15 +1,35 @@
 #!/usr/bin/env python3
+import os
 import numpy as np
+from copy import deepcopy
 from mmap import mmap, ACCESS_READ
 from contextlib import closing
 from multiprocessing import Pool
 
 from .io_tools import Input, Output
-from .utilities import is_number, create_supercell, lattice_matrix_to_unit_cell
+from .utilities import (
+    is_number, create_supercell, lattice_matrix_to_unit_cell,
+    make_JSON_serializable,
+)
 from .molecular import MolecularSystem
 
 
 class _ParallelAnalysisError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class _TrajectoryError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class _FormatError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class _FunctionError(Exception):
     def __init__(self, message):
         self.message = message
 
@@ -21,10 +41,8 @@ def make_supercell(system, matrix, supercell=[1, 1, 1]):
 
 
 class DLPOLY(object):
-    def __init__(self):
-        self.frames = {}
-        self.analysis_output = {}
-        # Image conversion - periodic boundary key.
+    def __init__(self, filepath):
+        # Image conventions - periodic boundary key.
         self._imcon = {
             0: 'nonperiodic',
             1: 'cubic',
@@ -41,13 +59,19 @@ class DLPOLY(object):
             1: 'coordinates and velocities',
             2: 'coordinates, velocities and forces',
         }
+        self.filepath = filepath
+        self.system_id = os.path.basename(filepath)
+        self.frames = {}
+        self.analysis_output = {}
+        # Check the history file at init, if no errors, proceed to mapping.
+        self._check_HISTORY()
+        # Map the trajectory file at init.
+        self._map_HISTORY()
 
-    def load_HISTORY(self, file_path):
-        """ Return file_path as a class attribute"""
-        self.file_path = file_path
+    def _map_HISTORY(self):
+        """ """
         self.trajectory_map = {}
-
-        with open(file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -89,11 +113,10 @@ class DLPOLY(object):
                     progress = progress + len(bline)
             self.no_of_frames = frame
             self.get_frames = self._get_frames
-        return self
 
     def _decode_head(self, header_coordinates):
         start, end = header_coordinates
-        with open(self.file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -135,7 +158,7 @@ class DLPOLY(object):
 
     def _get_frame(self, frame_coordinates, extract_data):
         start, end = frame_coordinates
-        with open(self.file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -202,42 +225,68 @@ class DLPOLY(object):
             frame_data['velocities'] = np.array(velocities, dtype=float)
         if forces:
             frame_data['forces'] = np.array(forces, dtype=float)
-        return MolecularSystem.load_system(frame_data)
+        return MolecularSystem.load_system(frame_data, self.system_id)
 
     def analysis(self, frames='all', ncpus=1, override=False, **kwargs):
-        if override is True:
-            self.analysis_output = {}
+        """ """
+        # If a single frame is passed for analysis it runs by default in
+        # serial, therefore the ncpus parameter is passed to the subfunctions
+        # allowing find_windows() to run in serial/parallel.
         if isinstance(frames, int):
-            analysed_frame = self._analysis_serial(frames, ncpus, **kwargs)
-            if frames not in self.analysis_output.keys():
+            # If override keyword is True, then regardless if the frame was
+            # already in the analysis_output dictionary it will be overridden.
+            if override is True:
+                analysed_frame = self._analysis_serial(frames, ncpus, **kwargs)
                 self.analysis_output[frames] = analysed_frame
-            return analysed_frame
+                return analysed_frame
+            # If override keyword is False and frame was already analysed.
+            if override is False and frames in self.analysis_output.keys():
+                return self.analysis_output[frames]
+            # If override keyword is False and frame was not already analysed
+            if override is False and frames not in self.analysis_output.keys():
+                analysed_frame = self._analysis_serial(frames, ncpus, **kwargs)
+                self.analysis_output[frames] = analysed_frame
+                return analysed_frame
+        # If multiple frames (list, range, etc.) are passed by default they
+        # will be analysed in parallel and the find_windows() in serial. Even
+        # if a single cpu (default) is set it will run through Pool (but in
+        # serial). Option to run multiple frames in serial, but find_windows()
+        # in parallel is not allowed as it is less optimal.
         else:
             frames_for_analysis = []
             if isinstance(frames, list):
                 for frame in frames:
-                    if frame not in self.analysis_output.keys():
+                    if override is False:
+                        if frame not in self.analysis_output.keys():
+                            frames_for_analysis.append(frame)
+                    if override is True:
                         frames_for_analysis.append(frame)
             if isinstance(frames, tuple):
                 for frame in range(frames[0], frames[1]):
-                    if frame not in self.analysis_output.keys():
+                    if override is False:
+                        if frame not in self.analysis_output.keys():
+                            frames_for_analysis.append(frame)
+                    if override is True:
                         frames_for_analysis.append(frame)
             if isinstance(frames, str):
                 if frames in ['all', 'everything']:
                     for frame in range(0, self.no_of_frames):
-                        if frame not in self.analysis_output.keys():
-                            frames_for_analysis.append(frame)
+                        if override is False:
+                            if frame not in self.analysis_output.keys():
+                                frames_for_analysis.append(frame)
+                            if override is True:
+                                frames_for_analysis.append(frame)
             self._analysis_parallel(frames_for_analysis, ncpus, **kwargs)
 
     def _analysis_serial(self, frame, ncpus, **kwargs):
-        frame_ = self._get_frame(self.trajectory_map[frame], extract_data=True)
-        molecular_system = MolecularSystem()
-        molecular_system.load_trajectory_frame(frame_)
+        molecular_system = self._get_frame(
+            self.trajectory_map[frame], extract_data=True
+        )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.separate_discrete_molecules()
+        molecular_system.make_modular()
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
@@ -273,14 +322,14 @@ class DLPOLY(object):
         return results
 
     def _analysis_parallel_execute(self, frame, **kwargs):
-        frame_ = self._get_frame(self.trajectory_map[frame], extract_data=True)
-        molecular_system = MolecularSystem()
-        molecular_system.load_trajectory_frame(frame_)
+        molecular_system = self._get_frame(
+            self.trajectory_map[frame], extract_data=True
+        )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.separate_discrete_molecules()
+        molecular_system.make_modular()
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
@@ -326,30 +375,35 @@ class DLPOLY(object):
             pool.terminate()
             raise _ParallelAnalysisError("Parallel analysis failed.")
 
-    def check_HISTORY_for_errors(self, file_path):
+    def _check_HISTORY(self):
         """
         """
-
+        self.check_log = ""
         line = 0
         binary_step = 0
         timestep = 0
         timestep_flag = 'timestep'
-        frame = 0
-        warnings = []
-        errors = []
         progress = 0
 
-        warning_1 = "Warning 1: No comment line is present as the file header."
-        warning_2 = "Warning 2: Second header line is missing from the file "
-        warning_2 += "that contains information on the system's periodicity "
-        warning_2 += "and the type of the trajectory file."
-        warning_3 = "Warning 3: Comment line encountered in the middle of "
-        warning_3 += "the trajectory file."
+        warning_1 = "No comment line is present as the file header.\n"
+        warning_2 = " ".join(
+            (
+                "Second header line is missing from the file",
+                "that contains information on the system's periodicity",
+                "and the type of the trajectory file.\n"
+             )
+        )
+        warning_3 = " ".join(
+            (
+                "Comment line encountered in the middle of",
+                "the trajectory file.\n"
+            )
+        )
 
-        error_1 = "Error 1: The trajectory is discontinous."
-        error_2 = "Error 2: The file contains an empty line."
+        error_1 = "The trajectory is discontinous.\n"
+        error_2 = "The file contains an empty line.\n"
 
-        with open(self.file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             # We open the HISTORY trajectory file
             with closing(
                     mmap(
@@ -371,56 +425,120 @@ class DLPOLY(object):
                     # Warning 1
                     if line == 1:
                         if string_line[0] != 'DLFIELD':
-                            warnings.append("Line {0}. {1}".format(line,
-                                                                   warning_1))
+                            self.check_log = " ".join(
+                                (self.check_log, "Line {0}:".format(line),
+                                 warning_1)
+                            )
 
                     # Warning 2
                     if line == 2:
                         if len(string_line) != 3:
-                            warnings.append("Line {0}. {1}".format(line,
-                                                                   warning_2))
+                            self.check_log = " ".join(
+                                (self.check_log, "Line {0}:".format(line),
+                                 warning_2)
+                            )
 
                     # Error 1
                     if string_line:
                         if string_line[0] == timestep_flag:
-                            frame += 1
                             old_timestep = timestep
                             timestep = int(string_line[1])
                             if old_timestep > timestep:
-                                errors.append("Line {0}. {1}".format(line,
-                                                                     error_1))
+                                error = " ".join(
+                                    "Line {0}:".format(line), error_1
+                                )
+                                raise _TrajectoryError(error)
 
                     # Error 2
                     if len(string_line) == 0:
-                        errors.append("Line {0}. {1}".format(line, error_2))
+                        error = " ".join(
+                            "Line {0}:".format(line), error_2
+                        )
+                        raise _TrajectoryError(error)
 
-        if len(warnings) == 0 and len(errors) == 0:
-            print('\nTrajectory file check finished. No warnings.')
-            print('Frames: {0}'.format(frame))
+    def save_analysis(self, filepath=None, **kwargs):
+        # We pass a copy of the analysis attribute dictionary.
+        dict_obj = deepcopy(self.analysis_output)
+        # We make sure it is JSON serializable.
+        # We have to do it for each frame separately, otherwise we will
+        # exceed the level how deep the function does it.
+        for frame in dict_obj.keys():
+            dict_obj[frame] = make_JSON_serializable(dict_obj[frame])
+        # If no filepath is provided we create one.
+        if filepath is None:
+            filepath = "_".join(
+                (str(self.system_id), "pywindow_analysis")
+            )
+            filepath = '/'.join((os.getcwd(), filepath))
+        # Dump the dictionary to json file.
+        Output().dump2json(dict_obj, filepath, **kwargs)
+        return
 
-        else:
-            print('\nTrajectory file check finished.')
-            print('Frames: {0}'.format(frame))
-            for i in warnings:
-                print(i)
-            for i in errors:
-                print(i)
-            user_guide = "For more detailed description of warnings and "
-            user_guide += "errors please see the pyWindow User's Guide."
-            print(user_guide)
-        return self
+    def save_frames(self, frames, filepath=None, filetype='pdb', **kwargs):
+        settings = {
+            "pdb": Output()._save_pdb,
+            "xyz": Output()._save_xyz,
+            "decipher": True,
+            "forcefield": None,
+        }
+        settings.update(kwargs)
+        if filetype.lower() not in settings.keys():
+            raise _FormatError("The '{0}' file format is not supported".format(
+                filetype))
+        frames_to_get = []
+        if isinstance(frames, int):
+            frames_to_get.append(frames)
+        if isinstance(frames, list):
+            frames_to_get = frames
+        if isinstance(frames, tuple):
+            for frame in range(frames[0], frames[1]):
+                frames_to_get.append(frame)
+        if isinstance(frames, str):
+            if frames in ['all', 'everything']:
+                for frame in range(0, self.no_of_frames):
+                    frames_to_get.append(frame)
+        for frame in frames_to_get:
+            if frame not in self.frames.keys():
+                _ = self._get_frames(frame)
+        # If no filepath is provided we create one.
+        if filepath is None:
+            filepath = '/'.join((os.getcwd(), str(self.system_id)))
+        for frame in frames_to_get:
+            frame_molsys = self.frames[frame]
+            if settings['decipher'] is True:
+                if "swap_atoms" in settings.keys():
+                    if isinstance(settings["swap_atoms"], dict):
+                        frame_molsys.swap_atom_keys(settings["swap_atoms"])
+                    else:
+                        raise _FunctionError(
+                            "The swap_atom_keys function only accepts "
+                            "'swap_atoms' argument in form of a dictionary.")
+                frame_molsys.decipher_atom_keys(settings["forcefield"])
+            ffilepath = '_'.join((filepath, str(frame)))
+            if 'elements' not in frame_molsys.system.keys():
+                raise _FunctionError(
+                    "The frame (MolecularSystem object) needs to have "
+                    "'elements' attribute within the system dictionary. "
+                    "It is, therefore, neccessary that you set a decipher "
+                    "keyword to True. (see manual)")
+            settings[filetype.lower()](frame_molsys.system, ffilepath, **
+                                       kwargs)
 
 
 class XYZ(object):
-    def __init__(self):
+    def __init__(self, filepath):
+        self.filepath = filepath
+        self.filename = os.path.basename(filepath)
+        self.system_id = self.filename.split(".")[0]
         self.frames = {}
         self.analysis_output = {}
+        # Map the trajectory file at init.
+        self._map_trajectory()
 
-    def load(self, file_path):
-        """ Return file_path as a class attribute"""
-        self.file_path = file_path
+    def _map_trajectory(self):
+        """ Return filepath as a class attribute"""
         self.trajectory_map = {}
-        with open(file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -452,7 +570,6 @@ class XYZ(object):
                     progress = progress + len(bline)
             self.no_of_frames = frame + 1
             self.get_frames = self._get_frames
-        return self
 
     def _get_frames(self, frames, extract_data=True, override=False):
         if override is True:
@@ -481,7 +598,7 @@ class XYZ(object):
 
     def _get_frame(self, frame_coordinates, extract_data):
         start, end = frame_coordinates
-        with open(self.file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -512,7 +629,7 @@ class XYZ(object):
             coordinates.append(frame[i][1:])
         frame_data['atom_ids'] = np.array(elements)
         frame_data['coordinates'] = np.array(coordinates, dtype=float)
-        return MolecularSystem.load_system(frame_data)
+        return MolecularSystem.load_system(frame_data, self.system_id)
 
     def analysis(self, frames='all', ncpus=1, override=False, **kwargs):
         if override is True:
@@ -540,14 +657,14 @@ class XYZ(object):
             self._analysis_parallel(frames_for_analysis, ncpus, **kwargs)
 
     def _analysis_serial(self, frame, ncpus, **kwargs):
-        frame_ = self._get_frame(self.trajectory_map[frame], extract_data=True)
-        molecular_system = MolecularSystem()
-        molecular_system.load_trajectory_frame(frame_)
+        molecular_system = self._get_frame(
+            self.trajectory_map[frame], extract_data=True
+        )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.separate_discrete_molecules()
+        molecular_system.make_modular()
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
@@ -583,14 +700,14 @@ class XYZ(object):
         return results
 
     def _analysis_parallel_execute(self, frame, **kwargs):
-        frame_ = self._get_frame(self.trajectory_map[frame], extract_data=True)
-        molecular_system = MolecularSystem()
-        molecular_system.load_trajectory_frame(frame_)
+        molecular_system = self._get_frame(
+            self.trajectory_map[frame], extract_data=True
+        )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.separate_discrete_molecules()
+        molecular_system.make_modular()
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
@@ -638,15 +755,19 @@ class XYZ(object):
 
 
 class PDB(object):
-    def __init__(self):
+    def __init__(self, filepath):
+        self.filepath = filepath
+        self.filename = os.path.basename(filepath)
+        self.system_id = self.filename.split(".")[0]
         self.frames = {}
         self.analysis_output = {}
+        # Map the trajectory file at init.
+        self._map_trajectory()
 
-    def load(self, file_path):
-        """ Return file_path as a class attribute"""
-        self.file_path = file_path
+    def _map_trajectory(self):
+        """ Return filepath as a class attribute"""
         self.trajectory_map = {}
-        with open(file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -680,7 +801,6 @@ class PDB(object):
                     progress = progress + len(bline)
             self.no_of_frames = frame
             self.get_frames = self._get_frames
-        return self
 
     def _get_frames(self, frames, extract_data=True, override=False):
         if override is True:
@@ -709,7 +829,7 @@ class PDB(object):
 
     def _get_frame(self, frame_coordinates, extract_data):
         start, end = frame_coordinates
-        with open(self.file_path, 'r') as trajectory_file:
+        with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
@@ -747,7 +867,7 @@ class PDB(object):
                     [frame[i][30:38], frame[i][38:46], frame[i][46:54]])
         frame_data['atoms_ids'] = np.array(elements, dtype='<U8')
         frame_data['coordinates'] = np.array(coordinates, dtype=float)
-        return MolecularSystem.load_system(frame_data)
+        return MolecularSystem.load_system(frame_data, self.system_id)
 
     def analysis(self, frames='all', ncpus=1, override=False, **kwargs):
         if override is True:
@@ -775,14 +895,14 @@ class PDB(object):
             self._analysis_parallel(frames_for_analysis, ncpus, **kwargs)
 
     def _analysis_serial(self, frame, ncpus, **kwargs):
-        frame_ = self._get_frame(self.trajectory_map[frame], extract_data=True)
-        molecular_system = MolecularSystem()
-        molecular_system.load_trajectory_frame(frame_)
+        molecular_system = self._get_frame(
+            self.trajectory_map[frame], extract_data=True
+        )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.separate_discrete_molecules()
+        molecular_system.make_modular()
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
@@ -818,14 +938,14 @@ class PDB(object):
         return results
 
     def _analysis_parallel_execute(self, frame, **kwargs):
-        frame_ = self._get_frame(self.trajectory_map[frame], extract_data=True)
-        molecular_system = MolecularSystem()
-        molecular_system.load_trajectory_frame(frame_)
+        molecular_system = self._get_frame(
+            self.trajectory_map[frame], extract_data=True
+        )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.separate_discrete_molecules()
+        molecular_system.make_modular()
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
