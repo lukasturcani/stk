@@ -514,7 +514,7 @@ def cage(macro_mol, pseudoformation_params={
     window = max(macro_mol.windows)
     asymmetry = macro_mol.window_difference()
 
-    logger.debug('\n\nCalculating complex energies.\n')
+    logger.debug('Calculating complex energies.')
     e_per_bond = macro_mol.energy.pseudoformation(
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
