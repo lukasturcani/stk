@@ -1500,6 +1500,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
+        # Tags are removed by multiprocessing - make sure to reapply
+        # them.
+        self.tag_atoms()
         atom = self.mol.GetAtomWithIdx(atomid)
         if atom.HasProp('fg') or atom.GetAtomicNum() == 1:
             return False
@@ -2550,7 +2553,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
         obj.bonder_ids = json_dict['bonder_ids']
-        obj.fg_ids = json_dict['fg_ids']
+        obj.fg_ids = set(json_dict['fg_ids'])
         obj.optimized = json_dict['optimized']
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
