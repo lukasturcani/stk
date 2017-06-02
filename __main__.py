@@ -131,15 +131,23 @@ class GAProgress:
             return
 
         s = 'Population log:\n'
-        s += '-'*os.get_terminal_size().columns
+
+        try:
+            u = '-'*os.get_terminal_size().columns
+        except OSError as ex:
+            # When testing os.get_terminal_size() will fail because
+            # stdout is not connceted to a terminal.
+            u = '-'*100
+
+        s += u
         s += '{:<10}\t{:<40}\t{}\n'.format('molecule', 'fitness',
                                            'unscaled_fitness')
-        s += '-'*os.get_terminal_size().columns
+        s += u
         for mem in sorted(pop, reverse=True):
             uf = {n: str(v) for n, v in mem.unscaled_fitness.items()}
             memstring = ('\n{0.name:<10}\t'
                          '{0.fitness:<40}\t{1}').format(mem, uf)
-            s += memstring + '\n' + '-'*os.get_terminal_size().columns
+            s += memstring + '\n' + u
         logger.info(s)
 
     def debug_dump(self, pop, dump_name):
