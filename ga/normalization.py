@@ -156,7 +156,7 @@ class Normalization:
             cavity_diff = abs(mem.fitness[0] - cavity)
             window_diff = abs(mem.fitness[1] - window)
             mem.fitness = [cavity_diff, window_diff,
-                           mem.fitness[2], mem.fitness[3]]
+                           *mem.fitness[2:]]
 
 
     def combine(self, population, coefficients, exponents):
