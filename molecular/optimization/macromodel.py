@@ -378,13 +378,13 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
                 MD.
 
             'time_step' : float (default = 1.5)
-                The time step for the MD.
+                The time step in fs for the MD.
 
             'eq_time' : float (default = 10)
-                The equilibriation time before the MD is run.
+                The equilibriation time in ps before the MD is run.
 
             'sim_time' : float (default = 200)
-                The simulation time of the MD.
+                The simulation time in ps of the MD.
 
             'max_iter' : int (default = 2500)
                 The maximum number of iterations done during the
