@@ -111,7 +111,8 @@ class Normalization:
         # have the same type.
 
         valid_pop = Population(*(mol for mol in population if
-                      mol.unscaled_fitness[fitness_func] is not None))
+                                 mol.unscaled_fitness[fitness_func]
+                                 is not None))
 
         # Remove duplicates, otherwise the normalization function may
         # be applied to the same molecule twice in a single step.
@@ -122,6 +123,7 @@ class Normalization:
             return
 
         for func_data in self.funcs:
+            logger.debug('Applying "{}()".'.format(func_data.name))
             getattr(self, func_data.name)(valid_pop,
                                           **func_data.params)
 
@@ -156,8 +158,7 @@ class Normalization:
             cavity_diff = abs(mem.fitness[0] - cavity)
             window_diff = abs(mem.fitness[1] - window)
             mem.fitness = [cavity_diff, window_diff,
-                           mem.fitness[2], mem.fitness[3]]
-
+                           *mem.fitness[2:]]
 
     def combine(self, population, coefficients, exponents):
         """
@@ -277,7 +278,7 @@ class Normalization:
         """
 
         # Get the mean of each element.
-        means = population.mean(lambda x : x.fitness)
+        means = population.mean(lambda x: x.fitness)
         logger.debug('Means used in magnitudes: {}'.format(means))
 
         for macro_mol in population:

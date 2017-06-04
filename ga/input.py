@@ -16,11 +16,12 @@ from .population import Population
 from .normalization import Normalization
 from .ga_exit import Exit
 
+from .. import ga
+from .. import molecular
+from .. import convenience_tools
+
 from ..convenience_tools import FunctionData
-from ..molecular import topologies
-from ..molecular.topologies import *
-from ..molecular.molecules import *
-from ..molecular import Energy
+from ..molecular import Energy, topologies
 from ..molecular.optimization import optimization
 
 
@@ -94,12 +95,12 @@ class GAInput:
         The key 'NAME' must hold the name of the ``Selection`` class
         method used to select members of the next generation.
 
-    parent_select_func : dict
+    crossover_select_func : dict
         The key 'NAME' must hold the name of the ``Selection`` class
         method used to select parents from the current generation's
-        population.
+        population for crossover.
 
-    mutant_select_func : dict
+    mutation_select_func : dict
         The key 'NAME' must hold the name of the ``Selection`` class
         method used to select ``MacroMolecule`` instances for mutation
         from the current generation's population.
@@ -189,10 +190,14 @@ class GAInput:
         """
 
         with open(input_file, 'r') as inp:
-            exec(inp.read(), globals(), vars(self))
+            mmea_namespace = {}
+            mmea_namespace.update(vars(convenience_tools))
+            mmea_namespace.update(vars(molecular))
+            mmea_namespace.update(vars(ga))
+            exec(inp.read(), mmea_namespace, vars(self))
 
         if (hasattr(self, 'plot_epp') and
-            getattr(self, 'plot_epp') is True):
+           getattr(self, 'plot_epp') is True):
             self.plot_epp = 'epp.png'
 
         # If the input file did not specify some values, default
@@ -255,13 +260,13 @@ class GAInput:
         """
 
         funcs = [FunctionData(x['NAME'],
-                    **{k:v for k,v in x.items() if k != 'NAME'})
-
-                    for x in self.crossover_funcs]
+                              **{k: v for k, v in x.items() if
+                              k != 'NAME'})
+                 for x in self.crossover_funcs]
 
         return Crossover(funcs,
-                        self.num_crossovers,
-                        self.crossover_weights)
+                         self.num_crossovers,
+                         self.crossover_weights)
 
     def exiter(self):
         """
@@ -277,8 +282,9 @@ class GAInput:
         """
 
         func_data = FunctionData(self.exit_func['NAME'],
-                 **{key : val for key, val in self.exit_func.items() if
-                     key != 'NAME'})
+                                 **{key: val for key, val in
+                                 self.exit_func.items() if
+                                 key != 'NAME'})
         return Exit(func_data)
 
     def fitnessor(self):
@@ -294,8 +300,9 @@ class GAInput:
         """
 
         return FunctionData(self.fitness_func['NAME'],
-            **{key : val for key, val in self.fitness_func.items() if
-                key != 'NAME'})
+                            **{key: val for key, val in
+                            self.fitness_func.items() if
+                            key != 'NAME'})
 
     def ga_tools(self):
         """
@@ -327,8 +334,9 @@ class GAInput:
         """
 
         return FunctionData(self.init_func['NAME'],
-            **{key : val for key, val in self.init_func.items() if
-                key != 'NAME'})
+                            **{key: val for key, val in
+                            self.init_func.items() if
+                            key != 'NAME'})
 
     def mutator(self):
         """
@@ -343,9 +351,8 @@ class GAInput:
         """
 
         funcs = [FunctionData(x['NAME'],
-                    **{k:v for k,v in x.items() if k != 'NAME'})
-
-                    for x in self.mutation_funcs]
+                 **{k: v for k, v in x.items() if k != 'NAME'})
+                 for x in self.mutation_funcs]
 
         return Mutation(funcs,
                         self.num_mutations,
@@ -364,8 +371,8 @@ class GAInput:
         """
 
         funcs = [FunctionData(x['NAME'],
-                    **{k:v for k,v in x.items() if k != 'NAME'})
-                                     for x in self.normalization_funcs]
+                 **{k: v for k, v in x.items() if k != 'NAME'})
+                 for x in self.normalization_funcs]
         return Normalization(funcs)
 
     def opter(self):
@@ -381,8 +388,9 @@ class GAInput:
         """
 
         return FunctionData(self.opt_func['NAME'],
-            **{key : val for key, val in self.opt_func.items() if
-                key != 'NAME'})
+                            **{key: val for key, val in
+                            self.opt_func.items() if
+                            key != 'NAME'})
 
     def selector(self):
         """
@@ -397,22 +405,25 @@ class GAInput:
         """
 
         gen = FunctionData(self.generational_select_func['NAME'],
-            **{key : val for key, val in
-              self.generational_select_func.items() if key != 'NAME'})
+                           **{key: val for key, val in
+                           self.generational_select_func.items() if
+                           key != 'NAME'})
 
-        parent = FunctionData(self.parent_select_func['NAME'],
-             **{key : val for key, val in
-               self.parent_select_func.items() if key != 'NAME'})
+        crossover = FunctionData(self.crossover_select_func['NAME'],
+                                 **{key: val for key, val in
+                                 self.crossover_select_func.items() if
+                                 key != 'NAME'})
 
-        mutant = FunctionData(self.mutant_select_func['NAME'],
-              **{key : val for key, val in
-                self.mutant_select_func.items() if key != 'NAME'})
+        mutation = FunctionData(self.mutation_select_func['NAME'],
+                                **{key: val for key, val in
+                                self.mutation_select_func.items() if
+                                key != 'NAME'})
 
-        return Selection(gen, parent, mutant)
+        return Selection(gen, crossover, mutation)
 
     def __repr__(self):
         return "\n\n".join("{} : {}".format(key, value) for key, value
-                            in self.__dict__.items())
+                           in self.__dict__.items())
 
     def __str__(self):
         return repr(self)
@@ -440,64 +451,62 @@ class InputHelp:
     """
 
     modules = {
-               'init_func' : (func for name, func in
-                              Population.__dict__.items() if
-                              name.startswith('init')),
+               'init_func': (func for name, func in
+                             Population.__dict__.items() if
+                             name.startswith('init')),
 
-               'generational_select_func' : (
+               'generational_select_func': (
                                  func for name, func in
                                  Selection.__dict__.items() if
-                                 not name.startswith('crossover') and
-                                 not name.startswith('_')),
+                                 hasattr(func, 'generational')),
 
-               'parent_select_func' : (
+               'crossover_select_func': (
                                  func for name, func in
                                  Selection.__dict__.items() if
-                                 name.startswith('crossover')),
+                                 hasattr(func, 'crossover')),
 
-               'mutant_select_func' : (
+               'mutation_select_func': (
                                  func for name, func in
                                  Selection.__dict__.items() if
-                                 not name.startswith('crossover') and
-                                 not name.startswith('_')),
+                                 hasattr(func, 'mutation')),
 
-               'crossover_funcs' : (func for name, func in
+               'crossover_funcs': (func for name, func in
                                    Crossover.__dict__.items() if
                                    not name.startswith('_')),
 
-               'mutation_funcs' : (func for name, func in
+               'mutation_funcs': (func for name, func in
                                   Mutation.__dict__.items() if
                                   not name.startswith('_')),
 
-               'opt_func' : (func for name, func in
-                             optimization.__dict__.items() if
-                             not name.startswith('_') and
-                             not isinstance(func, ModuleType) and
-                             'optimization' in func.__module__),
+               'opt_func': (func for name, func in
+                            optimization.__dict__.items() if
+                            not name.startswith('_') and
+                            not isinstance(func, ModuleType) and
+                            'optimization' in func.__module__),
 
-               'fitness_func' : (func for name, func in
-                                 fitness.__dict__.items() if
-                                 not name.startswith('_') and
-                                 not isinstance(func, ModuleType) and
-                                 'fitness' in func.__module__),
+               'fitness_func': (func for name, func in
+                                fitness.__dict__.items() if
+                                not name.startswith('_') and
+                                not isinstance(func, ModuleType) and
+                                'fitness' in func.__module__),
 
-               'normalization_funcs' :  (func for name, func in
+               'normalization_funcs':  (func for name, func in
                                         Normalization.__dict__.items()
                                         if not name.startswith('_')),
 
-                'energy' : (getattr(Energy, name) for name, func in
-                                    Energy.__dict__.items() if not
-                                    name.startswith('_')),
+               'energy': (getattr(Energy, name) for name, func in
+                          Energy.__dict__.items() if not
+                          name.startswith('_')),
 
-                'topologies' : (cls for name, cls in
-                          topologies.__dict__.items() if
-                          not name.startswith('_') and
-                          isclass(cls) and
-                          issubclass(cls, topologies.base.Topology)),
+               'topologies': (cls for name, cls in
+                              topologies.__dict__.items() if
+                              not name.startswith('_') and
+                              isclass(cls) and
+                              issubclass(cls, topologies.base.Topology)),
 
-                'exit_func' : (func for name, func in
-                              Exit.__dict__.items() if not
-                              name.startswith('_'))
+               'exit_func': (func for name, func in
+                             Exit.__dict__.items() if not
+                             name.startswith('_'))
                }
 
     def __init__(self, keyword):
