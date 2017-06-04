@@ -9,7 +9,7 @@ requirements are that the first argument is ``population`` (excluding
 any ``self`` or ``cls`` arguments) and that the method is decorated
 wit the ``mutation()``, ``crossover()`` and ``generational()``
 decorators to highlight which selection it is to be used for. The
-decorators can be applied in sequence for functional which are suitable
+decorators can be applied in sequence for functions which are suitable
 for more than one kind of selection.
 
 The naming requirement of ``population`` exists to help users identify
