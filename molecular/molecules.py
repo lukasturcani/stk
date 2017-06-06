@@ -1702,7 +1702,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         og_position = self.bonder_centroid()
         # Change the position of the centroid of the bonder atoms to
         # the origin so that the rotation occurs about this point.
-        self.set_bonder_centroid([0,0,0])
+        self.set_bonder_centroid([0, 0, 0])
         # Get the rotation matrix.
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation on the original atomic coordinates to get
@@ -2694,6 +2694,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         self.fragments = defaultdict(set)
         for atom in self.mol.GetAtoms():
+            if not atom.HasProp('bb_index'):
+                continue
+
             molkey = (int(atom.GetProp('bb_index')),
                       int(atom.GetProp('mol_index')))
             self.fragments[molkey].add(atom.GetIdx())
