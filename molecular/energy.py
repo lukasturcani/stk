@@ -172,6 +172,8 @@ provided in the docstring of ``EMeta``.
 import os
 import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
+import time
+import psutil
 from uuid import uuid4
 from types import MethodType
 from functools import wraps
