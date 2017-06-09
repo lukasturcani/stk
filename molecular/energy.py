@@ -174,6 +174,7 @@ import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
 import time
 import psutil
+import copy
 from uuid import uuid4
 from types import MethodType
 from functools import wraps
