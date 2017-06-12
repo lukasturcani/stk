@@ -514,7 +514,7 @@ def cage(macro_mol, pseudoformation_params={
     window = max(macro_mol.windows)
     asymmetry = macro_mol.window_difference()
 
-    logger.debug('Calculating complex energies.')
+    logger.debug('Calculating cage energy.')
     e_per_bond = macro_mol.energy.pseudoformation(
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
@@ -766,7 +766,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     # Optimize the strcuture of the cage/target complexes.
     macromol_complexes = []
-    logger.debug('\n\nOptimizing complex structures.\n')
+    logger.debug('Optimizing complex structures.')
     for i, complex_ in enumerate(rdkit_complexes):
         # In order to use the optimization functions, first the data
         # is loaded into a ``Cage`` instance and its .mol
@@ -791,7 +791,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     energy_separate = mm_energy + target_energy
 
-    logger.debug('\n\nCalculating complex energies.\n')
+    logger.debug('Calculating complex energies.')
     min_eng_cmplx = min(macromol_complexes,
                         key=lambda x:
                         getattr(x.energy, efunc.name)(**efunc.params))

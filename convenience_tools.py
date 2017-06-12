@@ -162,7 +162,7 @@ class FunctionData:
 
         same_length = len(self) == len(other)
         same_items = all(x in other.params.items() for x in
-                            self.params.items())
+                         self.params.items())
         same_name = self.name == other.name
 
         return same_length and same_items and same_name
@@ -172,7 +172,7 @@ class FunctionData:
 
     def __str__(self):
         s = ", ".join("{}={!r}".format(key, value) for key, value in
-                                self.params.items())
+                      self.params.items())
         return "FunctionData({!r}, ".format(self.name) + s + ")"
 
     def __repr__(self):
@@ -260,7 +260,8 @@ class MAEExtractor:
 
         # Write the structure block in its own .mae file, named after
         # conformer extracted.
-        new_name = self.mae_path.replace('.mae',
+        new_name = self.mae_path.replace(
+                                    '.mae',
                                     '_EXTRACTED_{}.mae'.format(num))
         with open(new_name, 'w') as mae_file:
             mae_file.write(new_mae)
@@ -294,7 +295,6 @@ class MAEExtractor:
             # various sections of the .mae file.
             content_split = re.split(r"[{}]", self.content)
 
-
         # Go through all the datablocks in the the .mae file. For each
         # energy block extract the energy and store it in the
         # `energies` list. Store the `index`  (conformer id) along with
@@ -304,7 +304,7 @@ class MAEExtractor:
         index = 1
         for block in content_split:
             if ("f_m_ct" in prev_block[0] and
-                                "r_mmod_Potential_Energy" in block):
+               "r_mmod_Potential_Energy" in block):
                 energy = self.extract_energy(block)
                 self.energies.append((energy, index))
                 index += 1
@@ -345,7 +345,7 @@ def add_fragment_props(mol, bb_index, mol_index):
         A molecule which needs to have its atoms tagged.
 
     bb_index : int
-        The index of `mol` wihthin `building_blocks` of some
+        The index of `mol` within `building_blocks` of some
         macromolecule.
 
     mol_index : int
