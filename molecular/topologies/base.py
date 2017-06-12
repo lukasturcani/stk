@@ -47,7 +47,7 @@ from itertools import chain
 from inspect import signature
 
 from ..fg_info import double_bond_combs
-from ...convenience_tools import dedupe, flatten
+from ...convenience_tools import dedupe, flatten, add_fragment_props
 
 
 class TopologyMeta(type):
@@ -72,7 +72,7 @@ class TopologyMeta(type):
         # The __repr__() function in Topology will then just return
         # this attribute.
         c = ', '.join("{!s}={!r}".format(key, value) for key, value in
-                                                sorted(sig.items()))
+                      sorted(sig.items()))
         obj._repr = "{}({})".format(self.__name__, c)
         return obj
 
@@ -221,7 +221,7 @@ class Topology(metaclass=TopologyMeta):
         atom1 = macro_mol.mol.GetAtomWithIdx(atom1_id)
         atom1_grp = atom1.GetProp('fg')
         atom2 = macro_mol.mol.GetAtomWithIdx(atom2_id)
-        atom2_grp= atom2.GetProp('fg')
+        atom2_grp = atom2.GetProp('fg')
 
         double_bond_present = ((atom1_grp, atom2_grp) == tup or
                                (atom2_grp, atom1_grp) == tup for
@@ -323,11 +323,11 @@ class Linear(Topology):
         # smallest and largest values for the x coordinate need to have
         # deletion tags removed.
         maxid = max(flatten(fgs),
-                key=lambda x : macro_mol.atom_coords(x)[0])
+                    key=lambda x: macro_mol.atom_coords(x)[0])
         maxfg = next(fg for fg in fgs if maxid in fg)
 
         minid = min(flatten(fgs),
-                key=lambda x : macro_mol.atom_coords(x)[0])
+                    key=lambda x: macro_mol.atom_coords(x)[0])
         minfg = next(fg for fg in fgs if minid in fg)
 
         for atom_id in chain(flatten(minfg), flatten(maxfg)):
@@ -414,12 +414,17 @@ class Linear(Topology):
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
             self.bonders.append([
                 macro_mol.mol.GetNumAtoms() + id_ for
-                           id_ in mapping[label].bonder_ids])
+                id_ in mapping[label].bonder_ids])
 
             mdir = np.random.choice([-1, 1]) if not mdir else mdir
             mapping[label].set_orientation2([mdir, 0, 0])
+            monomer_mol = mapping[label].set_position([i*50, 0, 0])
+
+            bb_index = macro_mol.building_blocks.index(mapping[label])
+            add_fragment_props(monomer_mol, bb_index, i)
+
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
-                            mapping[label].set_position([i*50, 0, 0]))
+                                              monomer_mol)
             if i != 0:
                 self.join(macro_mol)
 
@@ -447,12 +452,16 @@ class Linear(Topology):
         for bonder1 in self.bonders[0]:
             for bonder2 in self.bonders[1]:
                 distances.append(
-        (macro_mol.atom_distance(bonder1, bonder2), bonder1, bonder2))
+                        (macro_mol.atom_distance(bonder1, bonder2),
+                         bonder1,
+                         bonder2))
 
         _, bonder1, bonder2 = min(distances)
         emol = rdkit.EditableMol(macro_mol.mol)
-        emol.AddBond(bonder1, bonder2,
-                self.determine_bond_type(macro_mol, bonder1, bonder2))
+        emol.AddBond(bonder1, bonder2, self.determine_bond_type(
+                                                            macro_mol,
+                                                            bonder1,
+                                                            bonder2))
 
         macro_mol.mol = emol.GetMol()
 
