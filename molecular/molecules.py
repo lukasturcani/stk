@@ -400,7 +400,7 @@ class Molecule:
                             in self.mol.GetAtoms()])
 
         distances = euclidean_distances(self.position_matrix().T,
-                                       np.matrix(origin))
+                                        np.matrix(origin))
         distances = distances.flatten() - atom_vdw
         return -2*min(distances)
 
@@ -2860,7 +2860,7 @@ class Cage(MacroMolecule):
             return None
 
         all_windows = sorted(all_windows,
-                         reverse=True)[:self.topology.n_windows]
+                             reverse=True)[:self.topology.n_windows]
         for i, x in enumerate(all_windows):
             # Return ``None`` when pyWindow fucks up and outputs
             # a mistakenly large window size.
@@ -2873,6 +2873,15 @@ class Cage(MacroMolecule):
 class Polymer(MacroMolecule):
     """
     Used to represent polymers.
+
+    """
+
+    pass
+
+
+class Periodic(MacroMolecule):
+    """
+    Used to represent periodic structures.
 
     """
 
