@@ -1,5 +1,5 @@
 import rdkit.Chem.AllChem as rdkit
-from functools import partial
+import numpy as np
 from scipy.spatial.distance import euclidean
 
 from .base import Topology
@@ -21,6 +21,8 @@ def is_bonder(macro_mol, atom_id):
 
 
 class Hexagonal(Topology):
+    cell_lengths = [1.7321, 1.7321, 10.0000]
+    cell_angles = [np.pi/2, np.pi/2, 2*np.pi/3]
     vertices = [[0, 0, 0],
                 [10, 10, 0]]
     connections = []
