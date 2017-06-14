@@ -647,7 +647,6 @@ class Molecule:
         bond_line = "M  V30 {0} {1} {2} {3}\n"
         bond_block = ""
 
-
         main_string = main_string.format(self.mol.GetNumAtoms(),
                                          self.mol.GetNumBonds())
         # Kekulize the mol, which means that each aromatic bond is
@@ -1054,8 +1053,8 @@ class Molecule:
 
         """
 
-        write_funcs = {'.mol' : self._write_mdl_mol_file,
-                       '.pdb' : self._write_pdb_file}
+        write_funcs = {'.mol': self._write_mdl_mol_file,
+                       '.pdb': self._write_pdb_file}
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
@@ -2885,4 +2884,16 @@ class Periodic(MacroMolecule):
 
     """
 
-    pass
+    def island(self, dimensions):
+        ...
+
+    def write_island(self, dimensions, path):
+        ...
+
+    def _write_gulp_input(self, path):
+        ...
+
+    def write(self, path):
+        if path.endswith('.gin'):
+            return self._write_gulp_input(path)
+        return super().write(path)
