@@ -2944,25 +2944,19 @@ class Periodic(MacroMolecule):
         iconf = island.GetConformer()
         emol = rdkit.EditableMol(island)
         coords = {}
-        st = []
         for atom in island.GetAtoms():
             atom_id = atom.GetIdx()
             if not self._is_subterminal(atom_id, bonder_map, bonded):
                 continue
             tid = emol.AddAtom(rdkit.Atom(terminator))
             emol.AddBond(tid, atom_id, bond_type)
-            st.append(atom_id)
             bi = self.bonder_ids.index(bonder_map[atom_id])
             tcoords = (np.array(iconf.GetAtomPosition(atom_id)) +
                        self.terminator_coords[bi])
-            print(self.terminator_coords)
             rdkit_coords = rdkit_geo.Point3D(*tcoords)
             coords[tid] = rdkit_coords
 
         mol = emol.GetMol()
-        for x in st:
-            mol.GetAtomWithIdx(x).SetAtomicNum(7)
-
         conf = mol.GetConformer()
         for atom_id, atom_coords in coords.items():
             conf.SetAtomPosition(atom_id, atom_coords)
