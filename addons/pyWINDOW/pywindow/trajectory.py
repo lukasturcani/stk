@@ -227,58 +227,54 @@ class DLPOLY(object):
             frame_data['forces'] = np.array(forces, dtype=float)
         return MolecularSystem.load_system(frame_data, self.system_id)
 
-    def analysis(self, frames='all', ncpus=1, override=False, **kwargs):
+    def analysis(self, frames='all', ncpus=1, _ncpus=1, override=False, **kwargs):
         """ """
-        # If a single frame is passed for analysis it runs by default in
-        # serial, therefore the ncpus parameter is passed to the subfunctions
-        # allowing find_windows() to run in serial/parallel.
+        frames_for_analysis = []
+        # First populate the frames_for_analysis list.
         if isinstance(frames, int):
-            # If override keyword is True, then regardless if the frame was
-            # already in the analysis_output dictionary it will be overridden.
-            if override is True:
-                analysed_frame = self._analysis_serial(frames, ncpus, **kwargs)
-                self.analysis_output[frames] = analysed_frame
-                return analysed_frame
-            # If override keyword is False and frame was already analysed.
-            if override is False and frames in self.analysis_output.keys():
-                return self.analysis_output[frames]
-            # If override keyword is False and frame was not already analysed
-            if override is False and frames not in self.analysis_output.keys():
-                analysed_frame = self._analysis_serial(frames, ncpus, **kwargs)
-                self.analysis_output[frames] = analysed_frame
-                return analysed_frame
-        # If multiple frames (list, range, etc.) are passed by default they
-        # will be analysed in parallel and the find_windows() in serial. Even
-        # if a single cpu (default) is set it will run through Pool (but in
-        # serial). Option to run multiple frames in serial, but find_windows()
-        # in parallel is not allowed as it is less optimal.
-        else:
-            frames_for_analysis = []
-            if isinstance(frames, list):
-                for frame in frames:
-                    if override is False:
-                        if frame not in self.analysis_output.keys():
-                            frames_for_analysis.append(frame)
-                    if override is True:
-                        frames_for_analysis.append(frame)
-            if isinstance(frames, tuple):
+            frames_for_analysis.append(frames)
+        if isinstance(frames, list):
+            for frame in frames:
+                if isinstance(frame, int):
+                    frames_for_analysis.append(frame)
+                else:
+                    raise _FunctionError(
+                        "The list should be populated with integers only."
+                    )
+        if isinstance(frames, tuple):
+            if isinstance(frames[0], int) and isinstance(frames[1], int):
                 for frame in range(frames[0], frames[1]):
-                    if override is False:
-                        if frame not in self.analysis_output.keys():
-                            frames_for_analysis.append(frame)
-                    if override is True:
-                        frames_for_analysis.append(frame)
-            if isinstance(frames, str):
-                if frames in ['all', 'everything']:
-                    for frame in range(0, self.no_of_frames):
-                        if override is False:
-                            if frame not in self.analysis_output.keys():
-                                frames_for_analysis.append(frame)
-                            if override is True:
-                                frames_for_analysis.append(frame)
+                    frames_for_analysis.append(frame)
+                else:
+                    raise _FunctionError(
+                        "The tuple should contain only two integers "
+                        "for the begining and the end of the frames range."
+                    )
+        if isinstance(frames, str):
+            if frames in ['all', 'everything']:
+                for frame in range(0, self.no_of_frames):
+                    frames_for_analysis.append(frame)
+            else:
+                raise _FunctionError(
+                    "Didn't recognise the keyword. (see manual)"
+                )
+        # The override keyword by default is False. So we check if any of the
+        # frames were already analysed and if so we delete them from the list.
+        # However, if the override is set to True, then we just proceed.
+        if override is False:
+            frames_for_analysis_new = []
+            for frame in frames_for_analysis:
+                if frame not in self.analysis_output.keys():
+                    frames_for_analysis_new.append(frame)
+            frames_for_analysis = frames_for_analysis_new
+        if ncpus == 1:
+            for frame in frames_for_analysis:
+                analysed_frame = self._analysis_serial(frame, _ncpus, **kwargs)
+                self.analysis_output[frame] = analysed_frame
+        if ncpus > 1:
             self._analysis_parallel(frames_for_analysis, ncpus, **kwargs)
 
-    def _analysis_serial(self, frame, ncpus, **kwargs):
+    def _analysis_serial(self, frame, _ncpus, **kwargs):
         molecular_system = self._get_frame(
             self.trajectory_map[frame], extract_data=True
         )
@@ -290,35 +286,36 @@ class DLPOLY(object):
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
+            print(mol.no_of_atoms)
             if 'size' in kwargs:
                 size = kwargs['size']
                 if isinstance(size, int):
                     if mol.no_of_atoms == size:
                         results[molecule] = mol.full_analysis(
-                            ncpus=ncpus, **kwargs)
+                            ncpus=_ncpus, **kwargs)
                 if isinstance(size, tuple) and isinstance(size[0], str):
                     if size[0] in ['bigger', 'greater', 'larger', 'more']:
                         if mol.no_of_atoms > size[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=ncpus, **kwargs)
+                                ncpus=_ncpus, **kwargs)
                     if size[0] in ['smaller', 'less']:
                         if mol.no_of_atoms > size[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=ncpus, **kwargs)
+                                ncpus=_ncpus, **kwargs)
                     if size[0] in ['not', 'isnot', 'notequal', 'different']:
                         if mol.no_of_atoms != size[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=ncpus, **kwargs)
+                                ncpus=_ncpus, **kwargs)
                     if size[0] in ['is', 'equal', 'exactly']:
                         if mol.no_of_atoms == size[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=ncpus, **kwargs)
+                                ncpus=_ncpus, **kwargs)
                     if size[0] in ['between', 'inbetween']:
                         if size[1] < mol.no_of_atoms < size[2]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=ncpus, **kwargs)
+                                ncpus=_ncpus, **kwargs)
             else:
-                results[molecule] = mol.full_analysis(ncpus=ncpus, **kwargs)
+                results[molecule] = mol.full_analysis(ncpus=_ncpus, **kwargs)
         return results
 
     def _analysis_parallel_execute(self, frame, **kwargs):
@@ -367,7 +364,15 @@ class DLPOLY(object):
                     args=(frame, ),
                     kwds=kwargs) for frame in frames
             ]
-            results = [p.get() for p in parallel if p.get()[1] is not None]
+            print('print start')
+            for p in parallel:
+                print(p)
+                try:
+                    print(p.get())
+                except TypeError:
+                    print('This one has failed')
+            print('printed all')
+            #results = [p.get() for p in parallel if p.get()]
             pool.terminate()
             for i in results:
                 self.analysis_output[i[0]] = i[1]
