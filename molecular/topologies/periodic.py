@@ -14,8 +14,7 @@ class Connection:
 
 
 def is_bonder(macro_mol, atom_id):
-    atom = macro_mol.mol.GetAtomWithIdx(atom_id)
-    if atom.HasProp('bonder'):
+    if macro_mol.mol.GetAtomWithIdx(atom_id).HasProp('bonder'):
         return True
     return False
 
@@ -32,7 +31,7 @@ class PeriodicPattern(Topology):
                 bi = macro_mol.bonder_ids.index(atom.GetIdx())
                 nid = neighbor.GetIdx()
                 tcoords = (macro_mol.atom_coords(nid) -
-                           macro_mol.atom_coords(bi))
+                           macro_mol.atom_coords(atom.GetIdx()))
                 macro_mol.terminator_coords[bi] = tcoords
 
         super().del_atoms(macro_mol)
