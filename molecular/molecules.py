@@ -147,7 +147,7 @@ from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
 
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, ChainMap
 from inspect import signature
 
 from . import topologies
@@ -2892,7 +2892,27 @@ class Periodic(MacroMolecule):
 
     """
 
-    def _connect_island(self, cells, island):
+    def _is_subterminal(self, atom_id, bonder_map, bonded):
+        if atom_id not in bonder_map:
+            return False
+        bid = bonder_map[atom_id]
+        periodic = {self.bonder_ids[x.atom1] for x in
+                    self.topology.connections}
+        periodic.update(self.bonder_ids[x.atom2] for x in
+                        self.topology.connections)
+
+        if bid not in periodic or atom_id in bonded:
+            return False
+
+        return True
+
+    def island(self, dimensions, terminator=1, bond_type='1'):
+        cells, island, bonder_map = self._place_island(dimensions)
+        island, bonded = self._join_island(cells, island)
+        return self._terminate_island(island, bonded, bonder_map,
+                                      terminator, bond_dict[bond_type])
+
+    def _join_island(self, cells, island):
         emol = rdkit.EditableMol(island)
         bonded = set()
         for cell in flatten(cells):
@@ -2904,8 +2924,10 @@ class Periodic(MacroMolecule):
                 except:
                     continue
 
-                bonder1 = cell.bonders[self.bonder_ids[connection.atom1]]
-                bonder2 = ccell.bonders[self.bonder_ids[connection.atom2]]
+                b1id = self.bonder_ids[connection.atom1]
+                bonder1 = cell.bonders[b1id]
+                b2id = self.bonder_ids[connection.atom2]
+                bonder2 = ccell.bonders[b2id]
                 bond_type = self.topology.determine_bond_type(
                               self,
                               self.bonder_ids[connection.atom1],
@@ -2916,29 +2938,42 @@ class Periodic(MacroMolecule):
 
         return emol.GetMol(), bonded
 
-    def island(self, dimensions, terminator=1, bond_type='1'):
-        cells, island = self._place_island(dimensions)
-        island, bonded = self._connect_island(cells, island)
-        return self._terminate_island(island, bonded,
-                                      terminator, bond_dict[bond_type])
+    def _terminate_island(self, island, bonded,
+                          bonder_map, terminator, bond_type):
 
-    def _terminate_island(self, island, bonded, terminator, bond_type):
+        iconf = island.GetConformer()
         emol = rdkit.EditableMol(island)
-        tcoords = {}
+        coords = {}
+        st = []
         for atom in island.GetAtoms():
             atom_id = atom.GetIdx()
-            if not atom.HasProp('bonder') or atom_id in bonded:
+            if not self._is_subterminal(atom_id, bonder_map, bonded):
                 continue
             tid = emol.AddAtom(rdkit.Atom(terminator))
-            emol.AddBond(atom_id, tid, bond_type)
-            tcoords[tid] = macro
+            emol.AddBond(tid, atom_id, bond_type)
+            st.append(atom_id)
+            bi = self.bonder_ids.index(bonder_map[atom_id])
+            tcoords = (np.array(iconf.GetAtomPosition(atom_id)) +
+                       self.terminator_coords[bi])
+            print(self.terminator_coords)
+            rdkit_coords = rdkit_geo.Point3D(*tcoords)
+            coords[tid] = rdkit_coords
 
-        return emol.GetMol()
+        mol = emol.GetMol()
+        for x in st:
+            mol.GetAtomWithIdx(x).SetAtomicNum(7)
+
+        conf = mol.GetConformer()
+        for atom_id, atom_coords in coords.items():
+            conf.SetAtomPosition(atom_id, atom_coords)
+
+        return mol
 
     def _place_island(self, dimensions):
         a, b, c = self.topology.cell_dimensions
         cells = np.full(dimensions, None, object).tolist()
         island = rdkit.Mol()
+        bonder_map = ChainMap()
         i = 0
         for x in range(dimensions[0]):
             for y in range(dimensions[1]):
@@ -2947,9 +2982,12 @@ class Periodic(MacroMolecule):
                                 island, self.shift(x*a + y*b + z*c))
                     bonders = {bi: i*self.mol.GetNumAtoms() + bi for
                                bi in self.bonder_ids}
+                    inverse_bonders = dict(zip(bonders.values(),
+                                               bonders.keys()))
+                    bonder_map = bonder_map.new_child(inverse_bonders)
                     cells[x][y][z] = Cell((x, y, z), bonders)
                     i += 1
-        return cells, island
+        return cells, island, bonder_map
 
     def write(self, path):
         if path.endswith('.gin'):
