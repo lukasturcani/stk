@@ -1954,7 +1954,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # Give all atoms which form bonds during reactions the tag
         # 'bonder' and set its value to '1'. Add their ids to
         # `bonder_ids`.
-        bond_mol = rdkit.MolFromSmarts(self.func_grp.target_smarts)
+        bond_mol = rdkit.MolFromSmarts(self.func_grp.bonder_smarts)
         bond_atoms = self.mol.GetSubstructMatches(bond_mol)
         for atom_id in flatten(bond_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
