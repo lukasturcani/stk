@@ -133,7 +133,6 @@ import warnings
 import logging
 import json
 import os
-import io
 
 import numpy as np
 import networkx as nx
@@ -159,7 +158,7 @@ from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
-                                 atom_vdw_radii)
+                                 atom_vdw_radii, bond_dict)
 
 
 logger = logging.getLogger(__name__)
@@ -2324,7 +2323,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
         The number of bonds created during assembly.
 
     bonder_ids : list of ints
-        The ids of atoms which have bonds added during assembly.
+        The ids of atoms which have bonds added during assembly. This
+        list is sorted from lowest to highest id.
 
     fg_ids : set of ints
         The ids of atoms which were parth of the functional group of
@@ -2651,6 +2651,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 self.bonder_ids.append(atom.GetIdx())
             if atom.HasProp('fg'):
                 self.fg_ids.add(atom.GetIdx())
+        self.bonder_ids = sorted(self.bonder_ids)
 
     def update_cache(self):
         """
@@ -2878,23 +2879,77 @@ class Polymer(MacroMolecule):
     pass
 
 
+class Cell:
+
+    def __init__(self, id_, bonders):
+        self.id = np.array(id_)
+        self.bonders = bonders
+
+
 class Periodic(MacroMolecule):
     """
     Used to represent periodic structures.
 
     """
 
-    def island(self, dimensions, terminator=1):
+    def _connect_island(self, cells, island):
+        emol = rdkit.EditableMol(island)
+        bonded = set()
+        for cell in flatten(cells):
+            for connection in self.topology.connections:
+                # ccel as in "connected cell".
+                x, y, z = cell.id + connection.direction1
+                try:
+                    ccell = cells[x][y][z]
+                except:
+                    continue
 
+                bonder1 = cell.bonders[self.bonder_ids[connection.atom1]]
+                bonder2 = ccell.bonders[self.bonder_ids[connection.atom2]]
+                bond_type = self.topology.determine_bond_type(
+                              self,
+                              self.bonder_ids[connection.atom1],
+                              self.bonder_ids[connection.atom2])
+                emol.AddBond(bonder1, bonder2, bond_type)
+                bonded.add(bonder1)
+                bonded.add(bonder2)
+
+        return emol.GetMol(), bonded
+
+    def island(self, dimensions, terminator=1, bond_type='1'):
+        cells, island = self._place_island(dimensions)
+        island, bonded = self._connect_island(cells, island)
+        return self._terminate_island(island, bonded,
+                                      terminator, bond_dict[bond_type])
+
+    def _terminate_island(self, island, bonded, terminator, bond_type):
+        emol = rdkit.EditableMol(island)
+        tcoords = {}
+        for atom in island.GetAtoms():
+            atom_id = atom.GetIdx()
+            if not atom.HasProp('bonder') or atom_id in bonded:
+                continue
+            tid = emol.AddAtom(rdkit.Atom(terminator))
+            emol.AddBond(atom_id, tid, bond_type)
+            tcoords[tid] = macro
+
+        return emol.GetMol()
+
+    def _place_island(self, dimensions):
         a, b, c = self.topology.cell_dimensions
+        cells = np.full(dimensions, None, object).tolist()
         island = rdkit.Mol()
+        i = 0
         for x in range(dimensions[0]):
             for y in range(dimensions[1]):
                 for z in range(dimensions[2]):
                     island = rdkit.CombineMols(
                                 island, self.shift(x*a + y*b + z*c))
-
-        return island
+                    bonders = {bi: i*self.mol.GetNumAtoms() + bi for
+                               bi in self.bonder_ids}
+                    cells[x][y][z] = Cell((x, y, z), bonders)
+                    i += 1
+        return cells, island
 
     def write(self, path):
         if path.endswith('.gin'):
