@@ -2884,16 +2884,28 @@ class Periodic(MacroMolecule):
 
     """
 
+
+
     def island(self, dimensions):
-        ...
 
-    def write_island(self, dimensions, path):
-        ...
+        a, b, c = self.topology.cell_dimensions
+        island = rdkit.Mol(self.mol)
+        for x in range(dimensions[0]):
+            for y in range(dimensions[1]):
+                for z in range(dimensions[2]):
+                    island = rdkit.CombineMols(
+                                island, self.shift([x*a, y*b, z*c]))
 
-    def _write_gulp_input(self, path):
-        ...
+        return island
 
     def write(self, path):
         if path.endswith('.gin'):
             return self._write_gulp_input(path)
         return super().write(path)
+
+    def _write_gulp_input(self, path):
+        ...
+
+
+    def write_island(self, dimensions, path):
+        ...
