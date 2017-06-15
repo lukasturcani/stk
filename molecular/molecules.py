@@ -2884,17 +2884,15 @@ class Periodic(MacroMolecule):
 
     """
 
-
-
-    def island(self, dimensions):
+    def island(self, dimensions, terminator=1):
 
         a, b, c = self.topology.cell_dimensions
-        island = rdkit.Mol(self.mol)
+        island = rdkit.Mol()
         for x in range(dimensions[0]):
             for y in range(dimensions[1]):
                 for z in range(dimensions[2]):
                     island = rdkit.CombineMols(
-                                island, self.shift([x*a, y*b, z*c]))
+                                island, self.shift(x*a + y*b + z*c))
 
         return island
 
