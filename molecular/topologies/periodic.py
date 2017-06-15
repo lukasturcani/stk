@@ -21,11 +21,13 @@ def is_bonder(macro_mol, atom_id):
 
 
 class Hexagonal(Topology):
-    cell_dimensions = [1.7321, 1.7321, 10.0000]
-    cell_dimensions = [20.321, 15.321, 10.0000]
-    cell_angles = [np.pi/2, np.pi/2, 2*np.pi/3]
-    vertices = [[0, 0, 0],
-                [10, 10, 0]]
+    x = 1
+    cell_dimensions = a, b, c = [x*np.array([1, 0, 0]),
+                                 x*np.array([0.5, 0.866, 0]),
+                                 np.array([0, 0, 10.0000/1.7321])]
+
+    vertices = [(a/3 + b/3),
+                (2*a/3 + 2*b/3)]
     connections = []
 
     def place_mols(self, macro_mol):
@@ -33,6 +35,9 @@ class Hexagonal(Topology):
         macro_mol.mol = rdkit.Mol()
         # Get the building blocks.
         bb1, bb2 = macro_mol.building_blocks
+        cell_size = bb1.max_diameter()[0] + bb2.max_diameter()[0]
+        self.cell_dimensions = [cell_size*x for x in self.cell_dimensions]
+        self.vertices = [cell_size*x for x in self.vertices]
         # Place and set orientation of the first building block.
         bb1.set_position(self.vertices[0])
         bb1.set_orientation2([0, 0, 1])
