@@ -23,15 +23,17 @@ def is_bonder(macro_mol, atom_id):
 class PeriodicPattern(Topology):
     def del_atoms(self, macro_mol):
         macro_mol.terminator_coords = {}
-        for atom in macro_mol.GetAtoms():
+        for atom in macro_mol.mol.GetAtoms():
             if not atom.HasProp('bonder'):
                 continue
             for neighbor in atom.GetNeighbors():
                 if not neighbor.HasProp('del'):
                     continue
                 bi = macro_mol.bonder_ids.index(atom.GetIdx())
-                macro_mol.terminator_coords[bi] = (
-                                       macro_mol.atom_coords(neighbor))
+                nid = neighbor.GetIdx()
+                tcoords = (macro_mol.atom_coords(nid) -
+                           macro_mol.atom_coords(bi))
+                macro_mol.terminator_coords[bi] = tcoords
 
         super().del_atoms(macro_mol)
 
