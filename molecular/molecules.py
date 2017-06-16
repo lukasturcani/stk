@@ -781,9 +781,9 @@ class Molecule:
         Rotates the molecule by a rotation from `start` to `end`.
 
         Note: The difference between this method and
-        `_set_orientation2()` is about which point the rotation
-        occurs: centroid of entire molecule versus centroid of bonder
-        atoms, respectively.
+        :meth:`StructUnit._set_orientation2()` is about which point the
+        rotation occurs: centroid of entire molecule versus centroid of
+        bonder atoms, respectively.
 
         Given two direction vectors, `start` and `end`, this method
         applies the rotation required transform `start` to `end` on
@@ -934,7 +934,7 @@ class Molecule:
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
+        :class:`rdkit.Chem.rdchem.Mol`
             A copy of the molecule where the coordinates have been
             shifted by `shift`.
 
@@ -2881,10 +2881,29 @@ class Polymer(MacroMolecule):
 
 class Cell:
     """
-    Holds the bonder ids of a unit cell in an periodic island.
+    Represents an individual cell in a supercell.
+
+    Parameters
+    ----------
+    id : :class:`list` of :class:`int`
+        A 3 member :class:`list` holding the x, y and z index
+        of the cell within the supercell.
+
+    bonders : :class:`dict`
+        Maps the bonder atom in the original unit cell to the
+        equivalent bonder atom in the cell.
+
+    Attributes
+    ----------
+    id : :class:`numpy.ndarray` of :class:`int`
+        A 3 member array holding the x, y and z index
+        of the cell within the supercell.
+
+    bonders : :class:`dict`
+        Maps the bonder atom in the original unit cell to the
+        equivalent bonder atom in the cell.
 
     """
-
 
     def __init__(self, id_, bonders):
         self.id = np.array(id_)
@@ -2894,6 +2913,12 @@ class Cell:
 class Periodic(MacroMolecule):
     """
     Used to represent periodic structures.
+
+    This class is essentially the same as :class:`MacroMolecule`,
+    with additional methods and attributes relevant to periodic
+    materials being added. The :meth:`write` method is extended to
+    produce GULP input files when a path ending with the extension
+    ``.gin`` is provided.
 
     Attributes
     ----------
@@ -2907,7 +2932,7 @@ class Periodic(MacroMolecule):
         The index must be used rather than the bonder's id itself
         because this dictionary is filled before atoms are deleted
         during assembly. After deletion, ids of the remaining atoms
-        change and as a result if this dictionary saved the ids it
+        change and as a result, if this dictionary saved the ids, it
         would be inaccurate by the time :meth:`.Topology.build`
         completed.
 
@@ -2915,44 +2940,162 @@ class Periodic(MacroMolecule):
 
     def _is_subterminal(self, atom_id, bonder_map, bonded):
         """
-        
+        ``True`` if atom is bonded to a terminal one.
+
+        Notes
+        -----
+        For internal use by :meth:`island`.
+
+        Parameters
+        ----------
+        atom_id : :class:`int`
+            The id of the atom being checked.
+
+        bonder_map : :class:`dict`
+            A dictionary which maps the atom id in the island to the
+            equivalent bonder atom in the unit cell.
+
+        bonded : :class:`set`
+            A set of atom ids of all bonder atoms which have had a
+            bond added by :meth:`_join_island`.
+
+        Returns
+        -------
+        :class:`bool`
+            ``True`` if atom is bonded to a terminal atom, ``False``
+            otherwise.
 
         """
 
+        # If `atom_id` is not in the `bonder_map` it means that the
+        # atom is not a bonder and therefore no terminal atoms need to
+        # be added to it.
         if atom_id not in bonder_map:
             return False
+
+        # Get id of the equivalent bonder atom in the original unit
+        # cell.
         bid = bonder_map[atom_id]
+        # Make a set of all bonder atoms in the original unit cell
+        # which were registered as having bonds crossing periodic
+        # boundaries.
         periodic = {self.bonder_ids[x.atom1] for x in
                     self.topology.connections}
         periodic.update(self.bonder_ids[x.atom2] for x in
                         self.topology.connections)
-
+        # If that atom does have a periodic bond and has not had a
+        # bond added while building the island - it is subterminal and
+        # needs to have a terminal atom attached.
         if bid not in periodic or atom_id in bonded:
             return False
 
         return True
 
     def island(self, dimensions, terminator=1, bond_type='1'):
+        """
+        Build a terminated supercell.
+
+        Terminated means that the periodic bonds are replaced with
+        bonds to terminating atoms.
+
+        Parameters
+        ----------
+        dimensions : :class:`list` of :class:`int`
+            A 3 member :class:`list`, holding the number of unit cells
+            in the x, y and z directions used to make the supercell.
+
+        terminator : :class:`int`, optional
+            The atomic number of the terminating atoms added to the
+            supercell.
+
+        bond_type : :class:`str`, optional
+            The bond type of bonds to terminating atoms. Valid options
+            include ``'1'``, ``'2'``, ``'3'`` and ``'ar'``.
+
+        Returns
+        -------
+        :class:`rdkit.Chem.rdchem.Mol`
+            An rdkit molecule of the island.
+
+        """
+
         cells, island, bonder_map = self._place_island(dimensions)
         island, bonded = self._join_island(cells, island)
         return self._terminate_island(island, bonded, bonder_map,
                                       terminator, bond_dict[bond_type])
 
     def _join_island(self, cells, island):
+        """
+        Adds bonds between unit cells of `island`.
+
+        Notes
+        -----
+        For internal use by :meth:`island`.
+
+        Parameters
+        ----------
+        cells : nested :class:`list` of :class:`Cell`
+
+        island : :class:`rdkit.Chem.rdchem.Mol`
+            The island molecule holding unit cells placed side by
+            side like in a supercell but with no bonds running between
+            them.
+
+        Returns
+        -------
+        :class:`tuple`
+            The first member of the tuple an rdkit molecule of the
+            island with all bonds between the unit cells added. The
+            second member of the tuple is a :class:`set` of
+            :class:`int`, where each :class:`int` is id of a bonder
+            atom which had a bond added by this function.
+
+        """
+
         emol = rdkit.EditableMol(island)
         bonded = set()
+        # `self.topology.connections` holds objects of the
+        # ``Connection`` class. Each ``Connection`` object has the
+        # ids of two bonder atoms in the unit cell which are connected
+        # by a bond running across the periodic boundary. The
+        # `direction1` and `direction2` attributes descibe the
+        # axes along which the periodic bond goes. For example,
+        # if `direction1` is [1, 0, 0] it means that the bonder atom
+        # in `connection.atom1` has a perdiodic bond connecting it to
+        # `connection.atom2` going in the positive direction along the
+        # x-axis.
+
+        # When iterating through all the unit cells composing the
+        # island, you can use the `direction` vector to get index of
+        # the unit cell which holds atoms connected the present cell.
+        # Then just form bonds between the correct atoms by mapping
+        # the atom ids in the unit cells to the ids of the equivalent
+        # atoms in the original unit cell  and checking the
+        # `connection` to see which atom ids are connected.
         for cell in flatten(cells):
             for connection in self.topology.connections:
-                # ccel as in "connected cell".
+                # Get the indices of the cell which holds the atom
+                # bonded `connection.atom1` in the present `cell`.
                 x, y, z = cell.id + connection.direction1
                 try:
+                    # ccel as in "connected cell".
                     ccell = cells[x][y][z]
                 except:
                     continue
 
+                # `b1id` is the id of bonder atom in the original unit
+                # cell. It is equivalent to the bonder atom in `cell`
+                # hvaing a bond added.
                 b1id = self.bonder_ids[connection.atom1]
+                # `bonder1` is the id of a bonder atom, found in `cell`
+                # and equivalent to `b1id`, having a bond added.
                 bonder1 = cell.bonders[b1id]
+                # `b2id` is the id of the bonder atom in the original
+                # unit cell connected by a perdioc bond to `b1id`
                 b2id = self.bonder_ids[connection.atom2]
+                # `bonder2` is the id of a bonder atom, found in
+                # `ccell` and equivalent to `b2id`, having a bond
+                # added.
                 bonder2 = ccell.bonders[b2id]
                 bond_type = self.topology.determine_bond_type(
                               self,
@@ -2966,17 +3109,64 @@ class Periodic(MacroMolecule):
 
     def _terminate_island(self, island, bonded,
                           bonder_map, terminator, bond_type):
+        """
+        Adds atoms to all bonder atoms at the edges of `island`.
+
+        Notes
+        -----
+        For internal use by :meth:`island`.
+
+        Parameters
+        ----------
+        island : :class:`rdkit.Chem.rdchem.Mol`
+            The island molecule which needs to have terminating atoms
+            added.
+
+        bonded : :class:`set` of :class:`int`
+            Contains all the ids of all bonder atoms in `island` which
+            have already had a bonded added by :methd:`_join_island`.
+
+        bonder_map : :class:`dict`
+            This is a mapping of the ids of bonder atoms in the island
+            back to the id of the equivalent atom in the original unit
+            cell.
+
+        terminator : :class:`int`
+            The atomic number of the terminating atoms added to the
+            supercell.
+
+        bond_type : :class:`str`
+            A string holding the bond type of bonds to the terminating
+            atoms. Valid options include ``'1'``, ``'2'``, ``'3'``
+            and ``'ar'``.
+
+        Returns
+        -------
+        :class:`rdkit.Chem.rdchem.Mol`
+            The rdkit molecule of the final, assembled island.
+
+        """
 
         iconf = island.GetConformer()
         emol = rdkit.EditableMol(island)
         coords = {}
         for atom in island.GetAtoms():
             atom_id = atom.GetIdx()
+            # If the atom is not connected to a terminal atom, move on
+            # to the next one.
             if not self._is_subterminal(atom_id, bonder_map, bonded):
                 continue
             tid = emol.AddAtom(rdkit.Atom(terminator))
             emol.AddBond(tid, atom_id, bond_type)
+            # Get the id of bonder atom in the original unit cell
+            # which is equivalent to `atom`. Don't use the id directly
+            # but get its index within `bonder_ids`.
             bi = self.bonder_ids.index(bonder_map[atom_id])
+            # Using the equivalent bonder atom get the position
+            # of the terminating atom relative to the bonder atom. Add
+            # the relative position of the terminating atom and the
+            # position of `atom` to get the final position of the
+            # terminating atom.
             tcoords = (np.array(iconf.GetAtomPosition(atom_id)) +
                        self.terminator_coords[bi])
             rdkit_coords = rdkit_geo.Point3D(*tcoords)
@@ -2984,39 +3174,148 @@ class Periodic(MacroMolecule):
 
         mol = emol.GetMol()
         conf = mol.GetConformer()
+        # Update the positions of all the terminating atoms in the
+        # conformer.
         for atom_id, atom_coords in coords.items():
             conf.SetAtomPosition(atom_id, atom_coords)
 
         return mol
 
     def _place_island(self, dimensions):
+        """
+        Places unit cells side by side to form an island.
+
+        Notes
+        -----
+        For internal use by :meth:`island`.
+
+        Parameters
+        ----------
+        dimensions : :class:`list` of :class:`int`
+            The number of unit cells in the x, y and z directions to be
+            placed side by side.
+
+        Returns
+        -------
+        :class:`tuple`
+            The first member of the tuple is a :class:`list` holding
+            :class:`Cell` objects, one for each unit cell placed. The
+            :class:`Cell` object is placed within nested lists so that
+            a cell with the coordinates x, y, z can be accessed from
+            the list using ``[x][y][z]``. For example,
+
+                >>> cells, island, bonder_map = \
+periodic._place_island([4, 4, 4])
+                >>> cells[2][1][3]
+                <Cell at 0x7fa0155d54e0>
+
+            where the returned :class:`Cell` object represents the
+            3rd unit cell along the x axis, the second along the y axis
+            and the fourth along the z axis.
+
+            The second member is an rdkit molecule of the island being
+            built. The third member is a :class:`dict` mapping the
+            ids of bonder atoms in the island back to the id of the
+            equivalent atom in the original unit cell.
+
+        """
+
         a, b, c = self.topology.cell_dimensions
         cells = np.full(dimensions, None, object).tolist()
         island = rdkit.Mol()
         bonder_map = ChainMap()
         i = 0
+        # For each dimension place a unit cell.
         for x in range(dimensions[0]):
             for y in range(dimensions[1]):
                 for z in range(dimensions[2]):
                     island = rdkit.CombineMols(
                                 island, self.shift(x*a + y*b + z*c))
+                    # `bonders` maps a bonder id in the original unit
+                    # cell to the one currently being added to the
+                    # island.
                     bonders = {bi: i*self.mol.GetNumAtoms() + bi for
                                bi in self.bonder_ids}
+                    cells[x][y][z] = Cell((x, y, z), bonders)
+                    # 'bonder_map' maps all bonder ids in the island
+                    # to the bonder ids in the original unit cell.
                     inverse_bonders = dict(zip(bonders.values(),
                                                bonders.keys()))
                     bonder_map = bonder_map.new_child(inverse_bonders)
-                    cells[x][y][z] = Cell((x, y, z), bonders)
                     i += 1
         return cells, island, bonder_map
 
     def write(self, path):
+        """
+        Writes a molecular structure file of the molecule.
+
+        Extends :meth:`Molecule.write` to support ``.gin`` extensions
+        which will cause a GULP input file to be written.
+
+        Parameters
+        ----------
+        path : str
+            The `path` to which the molecule should be written.
+
+        Returns
+        -------
+        None : NoneType
+
+        """
+
         if path.endswith('.gin'):
             return self._write_gulp_input(path)
         return super().write(path)
 
     def _write_gulp_input(self, path):
+        """
+        Writes a GULP input file to `path`.
+
+        Notes
+        -----
+        For internal use by :meth:`write`. Use that method directly,
+        not this one.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The `path` to which the molecule should be written.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         ...
 
+    def write_island(self, dimensions, path,
+                     terminator=1, bond_type='1'):
+        """
+        Creates a terminated supercell and writes it to `path`.
 
-    def write_island(self, dimensions, path):
+        Parameters
+        ----------
+        dimensions : :class:`list` of :class:`int`
+            A 3 member :class:`list`, holding the number of unit cells
+            in the x, y and z directions used to make the supercell.
+
+        path : str
+            The `path` of the file to which the molecule should be
+            written.
+
+        terminator : :class:`int`, optional
+            The atomic number of the terminating atoms added to the
+            supercell.
+
+        bond_type : :class:`str`, optional
+            The bond type of bonds to terminating atoms. Valid options
+            include ``'1'``, ``'2'``, ``'3'`` and ``'ar'``.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         ...

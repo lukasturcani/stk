@@ -526,7 +526,7 @@
         <span class="n">atomic_num</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atomic_num</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._cavity_size"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule._cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates diameter of the molecule&#39;s from `origin`.</span>
 
@@ -556,7 +556,7 @@
         <span class="n">distances</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
                                         <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">origin</span><span class="p">))</span>
         <span class="n">distances</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">-</span> <span class="n">atom_vdw</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.cavity_size"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule.cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -936,9 +936,9 @@
 <span class="sd">        Rotates the molecule by a rotation from `start` to `end`.</span>
 
 <span class="sd">        Note: The difference between this method and</span>
-<span class="sd">        `_set_orientation2()` is about which point the rotation</span>
-<span class="sd">        occurs: centroid of entire molecule versus centroid of bonder</span>
-<span class="sd">        atoms, respectively.</span>
+<span class="sd">        :meth:`StructUnit._set_orientation2()` is about which point the</span>
+<span class="sd">        rotation occurs: centroid of entire molecule versus centroid of</span>
+<span class="sd">        bonder atoms, respectively.</span>
 
 <span class="sd">        Given two direction vectors, `start` and `end`, this method</span>
 <span class="sd">        applies the rotation required transform `start` to `end` on</span>
@@ -1089,7 +1089,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
 <span class="sd">            A copy of the molecule where the coordinates have been</span>
 <span class="sd">            shifted by `shift`.</span>
 
@@ -1214,7 +1214,7 @@
         <span class="n">write_func</span> <span class="o">=</span> <span class="n">write_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
         <span class="n">write_func</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._write_mdl_mol_file"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule._write_mdl_mol_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a V3000 .mol file of the molecule</span>
 
@@ -1237,9 +1237,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">())</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">())</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._write_pdb_file"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule._write_pdb_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a .pdb file of the molecule</span>
 
@@ -1278,7 +1278,7 @@
                 <span class="n">new_content</span> <span class="o">+=</span> <span class="n">line</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdb</span><span class="p">:</span>
-            <span class="n">pdb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span></div>
+            <span class="n">pdb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="StructUnit"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit">[docs]</a><span class="k">class</span> <span class="nc">StructUnit</span><span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">CachedStructUnit</span><span class="p">):</span>
@@ -1694,7 +1694,7 @@
 
         <span class="p">}</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="StructUnit._json_init"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit._json_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_json_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Completes a JSON initialization.</span>
@@ -1722,7 +1722,7 @@
                        <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;load_names&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
                       <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;note&#39;</span><span class="p">])</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;optimized&#39;</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">obj</span>
+            <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="StructUnit.gen_key"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit.gen_key">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gen_key</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">,</span> <span class="n">functional_group</span><span class="p">):</span>
@@ -1747,7 +1747,7 @@
 
         <span class="k">return</span> <span class="n">functional_group</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolToInchi</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">centroid</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit._minimize_theta"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit._minimize_theta">[docs]</a>    <span class="k">def</span> <span class="nf">_minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">centroid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotate mol to minimize angle between `v1` and `v2`.</span>
 
@@ -1824,7 +1824,7 @@
         <span class="n">rotmat</span> <span class="o">=</span> <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
         <span class="n">posmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">posmat</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit.rotate2"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit.rotate2">[docs]</a>    <span class="k">def</span> <span class="nf">rotate2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1900,7 +1900,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
-    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit._set_orientation2"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit._set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Note: The difference between this method and</span>
 <span class="sd">        ``set_orientation()`` is about which point the rotation</span>
@@ -1967,7 +1967,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">og_center</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
 <div class="viewcode-block" id="StructUnit.similar_molecules"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.StructUnit.similar_molecules">[docs]</a>    <span class="k">def</span> <span class="nf">similar_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2665,7 +2665,7 @@
 
         <span class="p">}</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="MacroMolecule._json_init"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.MacroMolecule._json_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_json_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Completes a JSON initialization.</span>
@@ -2720,7 +2720,7 @@
             <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;fragments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="p">))</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
-        <span class="k">return</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="MacroMolecule.gen_key"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.gen_key">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gen_key</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
@@ -3035,6 +3035,30 @@
 
 
 <div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents an individual cell in a supercell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    id : :class:`list` of :class:`int`</span>
+<span class="sd">        A 3 member :class:`list` holding the x, y and z index</span>
+<span class="sd">        of the cell within the supercell.</span>
+
+<span class="sd">    bonders : :class:`dict`</span>
+<span class="sd">        Maps the bonder atom in the original unit cell to the</span>
+<span class="sd">        equivalent bonder atom in the cell.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    id : :class:`numpy.ndarray` of :class:`int`</span>
+<span class="sd">        A 3 member array holding the x, y and z index</span>
+<span class="sd">        of the cell within the supercell.</span>
+
+<span class="sd">    bonders : :class:`dict`</span>
+<span class="sd">        Maps the bonder atom in the original unit cell to the</span>
+<span class="sd">        equivalent bonder atom in the cell.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">bonders</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
@@ -3045,6 +3069,12 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Used to represent periodic structures.</span>
 
+<span class="sd">    This class is essentially the same as :class:`MacroMolecule`,</span>
+<span class="sd">    with additional methods and attributes relevant to periodic</span>
+<span class="sd">    materials being added. The :meth:`write` method is extended to</span>
+<span class="sd">    produce GULP input files when a path ending with the extension</span>
+<span class="sd">    ``.gin`` is provided.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    terminator_coords : :class:`dict`</span>
@@ -3054,50 +3084,174 @@
 <span class="sd">        of a deleter atom attached to the bonder. The coordinates</span>
 <span class="sd">        are relative to the bonder atom.</span>
 
-<span class="sd">        The index must be used rather than the bonder id itself</span>
+<span class="sd">        The index must be used rather than the bonder&#39;s id itself</span>
 <span class="sd">        because this dictionary is filled before atoms are deleted</span>
 <span class="sd">        during assembly. After deletion, ids of the remaining atoms</span>
-<span class="sd">        change and as a result if this dictionary saved the ids it</span>
+<span class="sd">        change and as a result, if this dictionary saved the ids, it</span>
 <span class="sd">        would be inaccurate by the time :meth:`.Topology.build`</span>
 <span class="sd">        completed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._is_subterminal"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic._is_subterminal">[docs]</a>    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ``True`` if atom is bonded to a terminal one.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For internal use by :meth:`island`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atom_id : :class:`int`</span>
+<span class="sd">            The id of the atom being checked.</span>
+
+<span class="sd">        bonder_map : :class:`dict`</span>
+<span class="sd">            A dictionary which maps the atom id in the island to the</span>
+<span class="sd">            equivalent bonder atom in the unit cell.</span>
+
+<span class="sd">        bonded : :class:`set`</span>
+<span class="sd">            A set of atom ids of all bonder atoms which have had a</span>
+<span class="sd">            bond added by :meth:`_join_island`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            ``True`` if atom is bonded to a terminal atom, ``False``</span>
+<span class="sd">            otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># If `atom_id` is not in the `bonder_map` it means that the</span>
+        <span class="c1"># atom is not a bonder and therefore no terminal atoms need to</span>
+        <span class="c1"># be added to it.</span>
         <span class="k">if</span> <span class="n">atom_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bonder_map</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Get id of the equivalent bonder atom in the original unit</span>
+        <span class="c1"># cell.</span>
         <span class="n">bid</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="p">[</span><span class="n">atom_id</span><span class="p">]</span>
+        <span class="c1"># Make a set of all bonder atoms in the original unit cell</span>
+        <span class="c1"># which were registered as having bonds crossing periodic</span>
+        <span class="c1"># boundaries.</span>
         <span class="n">periodic</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">connections</span><span class="p">}</span>
         <span class="n">periodic</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">connections</span><span class="p">)</span>
-
+        <span class="c1"># If that atom does have a periodic bond and has not had a</span>
+        <span class="c1"># bond added while building the island - it is subterminal and</span>
+        <span class="c1"># needs to have a terminal atom attached.</span>
         <span class="k">if</span> <span class="n">bid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">periodic</span> <span class="ow">or</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">bonded</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="Periodic.island"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic.island">[docs]</a>    <span class="k">def</span> <span class="nf">island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">terminator</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond_type</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a terminated supercell.</span>
+
+<span class="sd">        Terminated means that the periodic bonds are replaced with</span>
+<span class="sd">        bonds to terminating atoms.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dimensions : :class:`list` of :class:`int`</span>
+<span class="sd">            A 3 member :class:`list`, holding the number of unit cells</span>
+<span class="sd">            in the x, y and z directions used to make the supercell.</span>
+
+<span class="sd">        terminator : :class:`int`, optional</span>
+<span class="sd">            The atomic number of the terminating atoms added to the</span>
+<span class="sd">            supercell.</span>
+
+<span class="sd">        bond_type : :class:`str`, optional</span>
+<span class="sd">            A string holding the bond type of bonds to the terminating</span>
+<span class="sd">            atoms. Valid options include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;``</span>
+<span class="sd">            and ``&#39;ar&#39;``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            An rdkit molecule of the island.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_island</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
         <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_island</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span>
                                       <span class="n">terminator</span><span class="p">,</span> <span class="n">bond_dict</span><span class="p">[</span><span class="n">bond_type</span><span class="p">])</span></div>
 
-    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._join_island"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic._join_island">[docs]</a>    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds bonds between unit cells of `island`.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For internal use by :meth:`island`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cells : nested :class:`list` of :class:`Cell`</span>
+
+<span class="sd">        island : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The island molecule holding unit cells placed side by</span>
+<span class="sd">            side like in a supercell but with no bonds running between</span>
+<span class="sd">            them.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">            The first member of the tuple an rdkit molecule of the</span>
+<span class="sd">            island with all bonds between the unit cells added. The</span>
+<span class="sd">            second member of the tuple is a :class:`set` of</span>
+<span class="sd">            :class:`int`, where each :class:`int` is id of a bonder</span>
+<span class="sd">            atom which had a bond added by this function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">island</span><span class="p">)</span>
         <span class="n">bonded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="c1"># `self.topology.connections` holds objects of the</span>
+        <span class="c1"># ``Connection`` class. Each ``Connection`` object has the</span>
+        <span class="c1"># ids of two bonder atoms in the unit cell which are connected</span>
+        <span class="c1"># by a bond running across the periodic boundary. The</span>
+        <span class="c1"># `direction1` and `direction2` attributes descibe the</span>
+        <span class="c1"># axes along which the periodic bond goes. For example,</span>
+        <span class="c1"># if `direction1` is [1, 0, 0] it means that the bonder atom</span>
+        <span class="c1"># in `connection.atom1` has a perdiodic bond connecting it to</span>
+        <span class="c1"># `connection.atom2` going in the positive direction along the</span>
+        <span class="c1"># x-axis.</span>
+
+        <span class="c1"># When iterating through all the unit cells composing the</span>
+        <span class="c1"># island, you can use the `direction` vector to get index of</span>
+        <span class="c1"># the unit cell which holds atoms connected the present cell.</span>
+        <span class="c1"># Then just form bonds between the correct atoms by mapping</span>
+        <span class="c1"># the atom ids in the unit cells to the ids of the equivalent</span>
+        <span class="c1"># atoms in the original unit cell  and checking the</span>
+        <span class="c1"># `connection` to see which atom ids are connected.</span>
         <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">cells</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
-                <span class="c1"># ccel as in &quot;connected cell&quot;.</span>
+                <span class="c1"># Get the indices of the cell which holds the atom</span>
+                <span class="c1"># bonded `connection.atom1` in the present `cell`.</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="n">connection</span><span class="o">.</span><span class="n">direction1</span>
                 <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># ccel as in &quot;connected cell&quot;.</span>
                     <span class="n">ccell</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span>
                 <span class="k">except</span><span class="p">:</span>
                     <span class="k">continue</span>
 
+                <span class="c1"># `b1id` is the id of bonder atom in the original unit</span>
+                <span class="c1"># cell. It is equivalent to the bonder atom in `cell`</span>
+                <span class="c1"># hvaing a bond added.</span>
                 <span class="n">b1id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span>
+                <span class="c1"># `bonder1` is the id of a bonder atom, found in `cell`</span>
+                <span class="c1"># and equivalent to `b1id`, having a bond added.</span>
                 <span class="n">bonder1</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="n">b1id</span><span class="p">]</span>
+                <span class="c1"># `b2id` is the id of the bonder atom in the original</span>
+                <span class="c1"># unit cell connected by a perdioc bond to `b1id`</span>
                 <span class="n">b2id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span>
+                <span class="c1"># `bonder2` is the id of a bonder atom, found in</span>
+                <span class="c1"># `ccell` and equivalent to `b2id`, having a bond</span>
+                <span class="c1"># added.</span>
                 <span class="n">bonder2</span> <span class="o">=</span> <span class="n">ccell</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="n">b2id</span><span class="p">]</span>
                 <span class="n">bond_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span>
                               <span class="bp">self</span><span class="p">,</span>
@@ -3107,21 +3261,68 @@
                 <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder1</span><span class="p">)</span>
                 <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder2</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="n">bonded</span>
+        <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="n">bonded</span></div>
 
-    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span>
+<div class="viewcode-block" id="Periodic._terminate_island"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic._terminate_island">[docs]</a>    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span>
                           <span class="n">bonder_map</span><span class="p">,</span> <span class="n">terminator</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds atoms to all bonder atoms at the edges of `island`.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For internal use by :meth:`island`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        island : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The island molecule which needs to have terminating atoms</span>
+<span class="sd">            added.</span>
+
+<span class="sd">        bonded : :class:`set` of :class:`int`</span>
+<span class="sd">            Contains all the ids of all bonder atoms in `island` which</span>
+<span class="sd">            have already had a bonded added by :methd:`_join_island`.</span>
+
+<span class="sd">        bonder_map : :class:`dict`</span>
+<span class="sd">            This is a mapping of the ids of bonder atoms in the island</span>
+<span class="sd">            back to the id of the equivalent atom in the original unit</span>
+<span class="sd">            cell.</span>
+
+<span class="sd">        terminator : :class:`int`</span>
+<span class="sd">            The atomic number of the terminating atoms added to the</span>
+<span class="sd">            supercell.</span>
+
+<span class="sd">        bond_type : :class:`str`</span>
+<span class="sd">            A string holding the bond type of bonds to the terminating</span>
+<span class="sd">            atoms. Valid options include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;``</span>
+<span class="sd">            and ``&#39;ar&#39;``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The rdkit molecule of the final, assembled island.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">iconf</span> <span class="o">=</span> <span class="n">island</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
         <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">island</span><span class="p">)</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">island</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+            <span class="c1"># If the atom is not connected to a terminal atom, move on</span>
+            <span class="c1"># to the next one.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_subterminal</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="n">tid</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">terminator</span><span class="p">))</span>
             <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
+            <span class="c1"># Get the id of bonder atom in the original unit cell</span>
+            <span class="c1"># which is equivalent to `atom`. Don&#39;t use the id directly</span>
+            <span class="c1"># but get its index within `bonder_ids`.</span>
             <span class="n">bi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bonder_map</span><span class="p">[</span><span class="n">atom_id</span><span class="p">])</span>
+            <span class="c1"># Using the equivalent bonder atom get the position</span>
+            <span class="c1"># of the terminating atom relative to the bonder atom. Add</span>
+            <span class="c1"># the relative position of the terminating atom and the</span>
+            <span class="c1"># position of `atom` to get the final position of the</span>
+            <span class="c1"># terminating atom.</span>
             <span class="n">tcoords</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">iconf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">))</span> <span class="o">+</span>
                        <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span><span class="p">[</span><span class="n">bi</span><span class="p">])</span>
             <span class="n">rdkit_coords</span> <span class="o">=</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">tcoords</span><span class="p">)</span>
@@ -3129,41 +3330,145 @@
 
         <span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="c1"># Update the positions of all the terminating atoms in the</span>
+        <span class="c1"># conformer.</span>
         <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coords</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coords</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">mol</span>
+        <span class="k">return</span> <span class="n">mol</span></div>
 
-    <span class="k">def</span> <span class="nf">_place_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._place_island"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic._place_island">[docs]</a>    <span class="k">def</span> <span class="nf">_place_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Places unit cells side by side to form an island.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For internal use by :meth:`island`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dimensions : :class:`list` of :class:`int`</span>
+<span class="sd">            The number of unit cells in the x, y and z directions to be</span>
+<span class="sd">            placed side by side.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">            The first member of the tuple is a :class:`list` holding</span>
+<span class="sd">            :class:`Cell` objects, one for each unit cell placed. The</span>
+<span class="sd">            :class:`Cell` object is placed within nested lists so that</span>
+<span class="sd">            a cell with the coordinates x, y, z can be accessed from</span>
+<span class="sd">            the list using ``[x][y][z]``. For example,</span>
+
+<span class="sd">                &gt;&gt;&gt; cells, island, bonder_map = \</span>
+<span class="sd">periodic._place_island([4, 4, 4])</span>
+<span class="sd">                &gt;&gt;&gt; cells[2][1][3]</span>
+<span class="sd">                &lt;Cell at 0x7fa0155d54e0&gt;</span>
+
+<span class="sd">            where the returned :class:`Cell` object represents the</span>
+<span class="sd">            3rd unit cell along the x axis, the second along the y axis</span>
+<span class="sd">            and the fourth along the z axis.</span>
+
+<span class="sd">            The second member is an rdkit molecule of the island being</span>
+<span class="sd">            built. The third member is a :class:`dict` mapping the</span>
+<span class="sd">            ids of bonder atoms in the island back to the id of the</span>
+<span class="sd">            equivalent atom in the original unit cell.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">cell_dimensions</span>
         <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">dimensions</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">island</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
         <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">ChainMap</span><span class="p">()</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># For each dimension place a unit cell.</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
                     <span class="n">island</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span>
                                 <span class="n">island</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">b</span> <span class="o">+</span> <span class="n">z</span><span class="o">*</span><span class="n">c</span><span class="p">))</span>
+                    <span class="c1"># `bonders` maps a bonder id in the original unit</span>
+                    <span class="c1"># cell to the one currently being added to the</span>
+                    <span class="c1"># island.</span>
                     <span class="n">bonders</span> <span class="o">=</span> <span class="p">{</span><span class="n">bi</span><span class="p">:</span> <span class="n">i</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span> <span class="o">+</span> <span class="n">bi</span> <span class="k">for</span>
                                <span class="n">bi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">}</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cell</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">bonders</span><span class="p">)</span>
+                    <span class="c1"># &#39;bonder_map&#39; maps all bonder ids in the island</span>
+                    <span class="c1"># to the bonder ids in the original unit cell.</span>
                     <span class="n">inverse_bonders</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bonders</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                                                <span class="n">bonders</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
                     <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="o">.</span><span class="n">new_child</span><span class="p">(</span><span class="n">inverse_bonders</span><span class="p">)</span>
-                    <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cell</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">bonders</span><span class="p">)</span>
                     <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span>
+        <span class="k">return</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span></div>
 
 <div class="viewcode-block" id="Periodic.write"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a molecular structure file of the molecule.</span>
+
+<span class="sd">        Extends :meth:`Molecule.write` to support ``.gin`` extensions</span>
+<span class="sd">        which will cause a GULP input file to be written.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            The `path` to which the molecule should be written.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gin&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_gulp_input</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_gulp_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="o">...</span>
+<div class="viewcode-block" id="Periodic._write_gulp_input"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic._write_gulp_input">[docs]</a>    <span class="k">def</span> <span class="nf">_write_gulp_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a GULP input file to `path`.</span>
 
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For internal use by :meth:`write`.</span>
 
-<div class="viewcode-block" id="Periodic.write_island"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic.write_island">[docs]</a>    <span class="k">def</span> <span class="nf">write_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            The `path` to which the molecule should be written.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="o">...</span></div>
+
+<div class="viewcode-block" id="Periodic.write_island"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic.write_island">[docs]</a>    <span class="k">def</span> <span class="nf">write_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span>
+                     <span class="n">terminator</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond_type</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a terminated supercell and writes it to `path`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dimensions : :class:`list` of :class:`int`</span>
+<span class="sd">            A 3 member :class:`list`, holding the number of unit cells</span>
+<span class="sd">            in the x, y and z directions used to make the supercell.</span>
+
+<span class="sd">        path : str</span>
+<span class="sd">            The `path` to which the molecule should be written.</span>
+
+<span class="sd">        terminator : :class:`int`, optional</span>
+<span class="sd">            The atomic number of the terminating atoms added to the</span>
+<span class="sd">            supercell.</span>
+
+<span class="sd">        bond_type : :class:`str`, optional</span>
+<span class="sd">            A string holding the bond type of bonds to the terminating</span>
+<span class="sd">            atoms. Valid options include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;``</span>
+<span class="sd">            and ``&#39;ar&#39;``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="o">...</span></div></div>
 </pre></div>
 

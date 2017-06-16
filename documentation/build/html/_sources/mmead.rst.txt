@@ -6,10 +6,8 @@ Subpackages
 
 .. toctree::
 
-    mmead.addons
     mmead.ga
     mmead.molecular
-    mmead.tests
 
 Submodules
 ----------

@@ -416,6 +416,214 @@ return fitness_value</p>
 <p>If this function is used in the GA, a progress plot will be made for
 each of the <cite>progress_params</cite> and they will have their y-axes labelled
 ‘Molecule Energy / J mol-1’ and ‘Molecule Radius / m-9’, respectively.</p>
+<dl class="class">
+<dt id="mmead.ga.fitness._FitnessFunc">
+<em class="property">class </em><code class="descclassname">mmead.ga.fitness.</code><code class="descname">_FitnessFunc</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_FitnessFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._FitnessFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A decorator for fitness functions.</p>
+<p>This decorator is applied to all fitness functions automatically in
+_calc_fitness(). It should not be applied explicitly when defining
+the functions.</p>
+<p>The decorator prevents fitness functions from raising if
+they fail (necessary for multiprocessing), prevents them from
+being run twice on the same molecule and stores the value returned
+by them in the <cite>unscaled_fitness</cite> dictionary.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._c60_rotations">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_c60_rotations</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>c60</em>, <em>n5fold</em>, <em>n2fold</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_c60_rotations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._c60_rotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates C60 about its axes of symmetry while placed in <cite>macro_mol</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The cage which should have C60 placed inside it.</li>
+<li><strong>c60</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.StructUnit" title="mmead.molecular.molecules.StructUnit"><em>StructUnit</em></a>) – A StructUnit instance of C60.</li>
+<li><strong>n5fold</strong> (<em>int</em>) – The number of rotations along the 5-fold axis of symmetry.</li>
+<li><strong>n2fold</strong> (<em>int</em>) – The number of rotations along the 2 fold axis of symmetry per
+rotation along the 5-fold axis.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>rdkit.Chem.rdchem.Mol</em> – An rdkit instance holding the cage / C60 complex.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._cage_target">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_cage_target</code><span class="sig-paren">(</span><em>func_name</em>, <em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotation_func</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._cage_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>A general fitness function for calculating fitness of complexes.</p>
+<p>This function should be inherited by other fitness functions which
+define their own rotation function. For example <code class="docutils literal"><span class="pre">cage_c60()</span></code> and
+<code class="docutils literal"><span class="pre">cage_target()</span></code>.</p>
+<p>The function returns a fitness vector consisting of the
+binding energy, asymmetry and strain.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_name</strong> (<em>str</em>) – The name of the external fitness function calling this one.
+Used for the key in the <cite>progress_params</cite> dict.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its fitness calculated.</li>
+<li><strong>target_mol_file</strong> (<em>str</em>) – The full path of the .mol file hodling the target molecule
+placed inside the cage.</li>
+<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the energy function used to
+calculate energies.</li>
+<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the optimization function to
+be run on the generated complexes.</li>
+<li><strong>rotation_func</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the rotation function to be
+used.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging. Not used by this function.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.progress_params</strong> (<em>dict</em>) – Places the calculated parameters in the list. The order
+corresponds to the arguments in the <code class="docutils literal"><span class="pre">_param_labels()</span></code>
+decorator applied to this function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holds the fitness vector described in this
+docstring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">numpy.array</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._calc_fitness">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_calc_fitness</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_calc_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._calc_fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the fitness values of all members of a population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_data</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A <code class="docutils literal"><span class="pre">FunctionData</span></code> instance representing the chosen fitness
+function and any additional parameters it may require.</li>
+<li><strong>population</strong> (<a class="reference internal" href="#mmead.ga.population.Population" title="mmead.ga.population.Population"><em>Population</em></a>) – The population whose members must have their fitness
+calculated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._calc_fitness_serial">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_calc_fitness_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_calc_fitness_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._calc_fitness_serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the fitness values of all members of a population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_data</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A <code class="docutils literal"><span class="pre">FunctionData</span></code> instance representing the chosen fitness
+function and any additional parameters it may require.</li>
+<li><strong>population</strong> (<a class="reference internal" href="#mmead.ga.population.Population" title="mmead.ga.population.Population"><em>Population</em></a>) – The population whose members must have their fitness
+calculated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._generate_complexes">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_generate_complexes</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target</em>, <em>number=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_generate_complexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._generate_complexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields rdkit instances of cage / target complexes.</p>
+<p>If multiple complexes are returned, they will be different via a
+random rotation accross the x, y and z axes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><em>Cage</em></a>) – The cage used to form the complex.</li>
+<li><strong>target</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.StructUnit" title="mmead.molecular.molecules.StructUnit"><em>StructUnit</em></a>) – The target used to form the complex.</li>
+<li><strong>number</strong> (<em>int</em><em> (</em><em>default = 1</em><em>)</em>) – The number of complexes to be returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>rdkit.Chem.rdchem.Mol</em> – An rdkit instance holding the cage / target complex.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._make_cage_target_folder">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_make_cage_target_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_make_cage_target_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._make_cage_target_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a folder to store molecules made by _cage_target().</p>
+<p>The function creates a folder called <cite>cage_target</cite>.
+Inside will be any complexes formed by the function _cage_target().
+The folder will be placed in the current working directory, or
+if the GA is running, 1 above the current working dirctory. This
+prevents the generated molecules from being cleaned up by the GA
+when it’s finished.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The path of the <code class="docutils literal"><span class="pre">cage_target</span></code> folder.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mmead.ga.fitness._param_labels">
+<code class="descclassname">mmead.ga.fitness.</code><code class="descname">_param_labels</code><span class="sig-paren">(</span><em>*labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_param_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._param_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the <cite>param_labels</cite> attribute to a fitness function.</p>
+<p>The point of this decorator is described in the module level
+docstring.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>labels</strong> (<em>tuple</em>) – List of strings about the fitness labels used for plotting
+EPPs. The order of the strings should represent the order of
+the fitness <code class="docutils literal"><span class="pre">vars</span></code> in the fitness funciton. In practice it
+should correspond to the order of the <code class="docutils literal"><span class="pre">coeffs</span></code> or
+<code class="docutils literal"><span class="pre">exponents</span></code> parameters given to the fitness function.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Decorated function.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mmead.molecular.html#mmead.molecular.energy.EMethod.func" title="mmead.molecular.energy.EMethod.func">func</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="mmead.ga.fitness.cage">
 <code class="descclassname">mmead.ga.fitness.</code><code class="descname">cage</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>pseudoformation_params={‘func’: FunctionData(‘rdkit’</em>, <em>forcefield=’mmff’)}</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness.cage" title="Permalink to this definition">¶</a></dt>
@@ -1312,7 +1520,7 @@ functions or methods that are to be used with that keyword.</dd>
 </dl>
 <dl class="attribute">
 <dt id="mmead.ga.input.InputHelp.modules">
-<code class="descname">modules</code><em class="property"> = {‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mmead.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">modules</code><em class="property"> = {‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mmead.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2942,6 +3150,51 @@ the function may require.</p>
 <dd><p><em>FunctionData</em> – Holds the <code class="docutils literal"><span class="pre">FunctionData</span></code> object representing the selection
 function used for selection individuals for mutation, along
 with any parameters the function may require.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.ga.selection.Selection._stochastic_sampling_guaranteed">
+<code class="descname">_stochastic_sampling_guaranteed</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/selection.html#Selection._stochastic_sampling_guaranteed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.selection.Selection._stochastic_sampling_guaranteed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yielded the members guaranteed by stochastic sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<em>list of MacroMolecules</em>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<em>set of MacroMolecule instances</em>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<em>bool</em>) – Indicates whether a member can be yielded more than once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>MacroMolecule</em> – The next member whose normalized fitness integer component
+is greater than 0.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.ga.selection.Selection._stochastic_sampling_roulette">
+<code class="descname">_stochastic_sampling_roulette</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/selection.html#Selection._stochastic_sampling_roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.selection.Selection._stochastic_sampling_roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the roulette component of stochastic sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<em>list of MacroMolecules</em>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<em>set of MacroMolecule instances</em>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<em>bool</em>) – Indicates whether a member can be yielded more than once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>MacroMolecule</em> – The seleceted population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
