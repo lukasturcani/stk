@@ -1,0 +1,1592 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mmead.ga.population &mdash; MMEA 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MMEA 0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MMEA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMEA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mmead.ga.population</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmead.ga.population</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines the Population class.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+
+<span class="kn">from</span> <span class="nn">.fitness</span> <span class="k">import</span> <span class="n">_calc_fitness</span><span class="p">,</span> <span class="n">_calc_fitness_serial</span>
+<span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
+<span class="kn">from</span> <span class="nn">.ga_tools</span> <span class="k">import</span> <span class="n">GATools</span>
+<span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">dedupe</span>
+<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Cage</span><span class="p">,</span>
+                         <span class="n">StructUnit</span><span class="p">,</span> <span class="n">StructUnit2</span><span class="p">,</span> <span class="n">StructUnit3</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..molecular.topologies.cage.base</span> <span class="k">import</span> <span class="n">_VertexOnlyCageTopology</span>
+<span class="kn">from</span> <span class="nn">..molecular.optimization.optimization</span> <span class="k">import</span> <span class="p">(</span>
+                                   <span class="n">_optimize_all_serial</span><span class="p">,</span> <span class="n">_optimize_all</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Population"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population">[docs]</a><span class="k">class</span> <span class="nc">Population</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains :class:`.Molecule` objects.</span>
+
+<span class="sd">    In addtion to holding :class:`.Molecule`</span>
+<span class="sd">    objects, the :class:`Population`</span>
+<span class="sd">    class can be used to create large numbers of these instances</span>
+<span class="sd">    through the :meth:`init\_` class methods. Contained |Molecule| objects</span>
+<span class="sd">    can have their structures optimized in parallel through the</span>
+<span class="sd">    :meth:`optimize_population` method. :class:`Population` instances</span>
+<span class="sd">    can be nested.</span>
+
+<span class="sd">    The EA is invoked by calling a number of methods of this class,</span>
+<span class="sd">    such as :meth:`gen_offspring`, :meth:`gen_mutants` and</span>
+<span class="sd">    :meth:`select`, on a given instance. However this class only</span>
+<span class="sd">    implements container related functionality. The EA operations are</span>
+<span class="sd">    performed by :class:`mmead.` It</span>
+<span class="sd">    delegates GA operations to its :attr:`ga_tools` attribute. Any</span>
+<span class="sd">    functionality related to the EA should be delegated to this</span>
+<span class="sd">    attribute. The :meth:`gen_offspring` and :meth:`gen_mutants`</span>
+<span class="sd">    methods can serve as a guide to how this should be done.</span>
+
+<span class="sd">    The only operations directly addressed by this class and definined</span>
+<span class="sd">    within it are those relevant to its role as a container. It</span>
+<span class="sd">    supports all expected and necessary container operations such as</span>
+<span class="sd">    iteration, indexing, membership checks (via the ``is in`` operator)</span>
+<span class="sd">    as would be expected. Details of the various implementations and a</span>
+<span class="sd">    full list of supported operations can be found by examining the</span>
+<span class="sd">    included methods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *args : |Molecule|, :class:`Population`, |GATools|</span>
+<span class="sd">        A population is initialized with as many |Molecule|</span>
+<span class="sd">        or :class:`Population` arguments as required. These are placed</span>
+<span class="sd">        into the :attr:`members` or :attr:`populations` attributes,</span>
+<span class="sd">        respectively. A |GATools| instance may be included</span>
+<span class="sd">        and will be placed into the :attr:`ga_tools` attribute.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If initialized with something other than |Molecule|,</span>
+<span class="sd">        :class:`Population` or |GATools| instances.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    populations : :class:`list` of :class:`Population` instances</span>
+<span class="sd">        A list of other instances of the :class:`Population` class.</span>
+<span class="sd">        This allows the implementation of subpopulations or</span>
+<span class="sd">        evolutionary islands. This attribute is also used for grouping</span>
+<span class="sd">        molecules within a given population for organizational</span>
+<span class="sd">        purposes.</span>
+
+<span class="sd">    members : :class:`list` of \</span>
+<span class="sd">              :class:`~mmead.molecular.molecules.Molecule` instances</span>
+<span class="sd">        Held here are the members of the population which are not held</span>
+<span class="sd">        within any subpopulations. This means that not all members of a</span>
+<span class="sd">        population are stored in this attribute. To access all members</span>
+<span class="sd">        of a population the generator :meth:`all_members` should be</span>
+<span class="sd">        used.</span>
+
+<span class="sd">    ga_tools : :class:`~mmead.ga.ga_tools.GATools`, optional</span>
+<span class="sd">        An instance of the ``GATools`` class. Calls to preform GA</span>
+<span class="sd">        operations on the ``Population`` instance are delegated</span>
+<span class="sd">        to this attribute.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializer for ``Population`` class.</span>
+
+<span class="sd">        This initializer creates a new population from the</span>
+<span class="sd">        ``Population`` and ``Molecule`` instances given as</span>
+<span class="sd">        arguments. It also accepts a ``GATools`` instance if the</span>
+<span class="sd">        population is to have GA operations performed on it.</span>
+
+<span class="sd">        The arguments can be provided in any order regardless of type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Generate `populations`, `members` and `ga_tools` attributes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">()</span>
+
+        <span class="c1"># Determine type of supplied arguments and place in the</span>
+        <span class="c1"># appropriate attribute.  ``Population`` types added to</span>
+        <span class="c1"># `populations` attribute, ``Molecule`` into `members` and</span>
+        <span class="c1"># if ``GATools`` is supplied it is placed into `ga_tools`.</span>
+        <span class="c1"># Raise a ``TypeError``  if an argument was not ``GATools``,</span>
+        <span class="c1"># ``Molecule`` or ``Population`` type.</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Population</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Molecule</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">GATools</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">arg</span>
+                <span class="k">continue</span>
+
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s2">&quot;Population can only be&quot;</span>
+                     <span class="s2">&quot; initialized with ``Population``,&quot;</span>
+                     <span class="s2">&quot; ``Molecule`` and ``GATools`` types.&quot;</span><span class="p">),</span> <span class="n">arg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Population.init_cage_isomers"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.init_cage_isomers">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">init_cage_isomers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lk_file</span><span class="p">,</span> <span class="n">bb_file</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span>
+                          <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span>
+                          <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a population holding all structural isomers of a cage.</span>
+
+<span class="sd">        Structural isomers here means that the building blocks are</span>
+<span class="sd">        rotated in position so that every possible bond combination</span>
+<span class="sd">        with linkers is formed.</span>
+
+<span class="sd">        This only works for cage topologies which have both building</span>
+<span class="sd">        blocks and linkers. It will not with topologies where all</span>
+<span class="sd">        building blocks have the same number of functional groups.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lk_file : str</span>
+<span class="sd">            The full path of the file holding the linker of the cage.</span>
+
+<span class="sd">        bb_file : str</span>
+<span class="sd">            The full path to the file holding the building block of the</span>
+<span class="sd">            cage.</span>
+
+<span class="sd">        topology : type</span>
+<span class="sd">            A _CageTopology child class. Exluding child classes of</span>
+<span class="sd">            _NoLinkerCageTopology.</span>
+
+<span class="sd">        ga_tools : GATools (default = GATools.init_empty())</span>
+<span class="sd">            The GATools instance to be used by created population.</span>
+
+<span class="sd">        lk_fg : str (default = None)</span>
+<span class="sd">            The name of the linker&#39;s functional group. If ``None`` then</span>
+<span class="sd">            `lk_file` is checked for a name.</span>
+
+<span class="sd">        bb_fg : str (default = None)</span>
+<span class="sd">            The name of the building block&#39;s functional group. If</span>
+<span class="sd">            ``None`` then `bb_file` is checked for a name.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population filled with isomers of a cage.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_A</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">positions_A</span><span class="p">)</span>
+        <span class="n">A_alignments</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations_with_replacement</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">n_A</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_A</span><span class="p">):</span>
+                <span class="n">A_alignments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="n">n_B</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">positions_B</span><span class="p">)</span>
+        <span class="n">B_alignments</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">orientations</span> <span class="o">=</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="k">if</span>
+                        <span class="nb">issubclass</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">_VertexOnlyCageTopology</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations_with_replacement</span><span class="p">(</span><span class="n">orientations</span><span class="p">,</span> <span class="n">n_B</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_B</span><span class="p">):</span>
+                <span class="n">B_alignments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_file</span><span class="p">,</span> <span class="n">bb_fg</span><span class="p">)</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">A_align</span> <span class="ow">in</span> <span class="n">A_alignments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">B_align</span> <span class="ow">in</span> <span class="n">B_alignments</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">topology</span><span class="p">(</span><span class="n">A_align</span><span class="p">,</span> <span class="n">B_align</span><span class="p">))</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pop</span></div>
+
+<div class="viewcode-block" id="Population.init_diverse_cages"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.init_diverse_cages">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">init_diverse_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
+                           <span class="n">topologies</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">,</span>
+                           <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a population of cages built from provided databases.</span>
+
+<span class="sd">        All cages are held in the population&#39;s `members` attribute.</span>
+
+<span class="sd">        From the supplied databases a random linker and building block</span>
+<span class="sd">        molecule is selected to form a cage. The next linker and</span>
+<span class="sd">        building block selected are those which have the most different</span>
+<span class="sd">        Morgan fingerprints to the first pair. The next pair random</span>
+<span class="sd">        again and so on. This is done until `size` cages have been</span>
+<span class="sd">        formed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bb_db : str</span>
+<span class="sd">            The full path of the database of building-block* molecules.</span>
+
+<span class="sd">        lk_db : str</span>
+<span class="sd">            The full path of the database of linker molecules.</span>
+
+<span class="sd">        topolgies : iterable of Topology objects</span>
+<span class="sd">            An iterable holding topologies which should be randomly</span>
+<span class="sd">            selected for cage initialization.</span>
+
+<span class="sd">        size : int</span>
+<span class="sd">            The size of the population to be initialized.</span>
+
+<span class="sd">        ga_tools : GATools</span>
+<span class="sd">            The GATools instance to be used by created population.</span>
+
+<span class="sd">        bb_fg : str (default = None)</span>
+<span class="sd">            The name of the functional group present in molecules in</span>
+<span class="sd">            `bb_db`. It is the name of the functional group used to</span>
+<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
+<span class="sd">            the name is present in `bb_db`.</span>
+
+<span class="sd">        lk_fg : str (default = None)</span>
+<span class="sd">            The name of the functional group present in molecules in</span>
+<span class="sd">            `lk_db`. It is the name of the functional group used to</span>
+<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
+<span class="sd">            the name is present in `lk_db`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population filled with random cages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">bb_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bb_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+        <span class="c1"># Remove any files which are not valid structure files.</span>
+        <span class="n">bb_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bb_files</span> <span class="k">if</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
+        <span class="n">lk_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lk_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+        <span class="n">lk_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lk_files</span> <span class="k">if</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
+
+        <span class="n">pairs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">bbindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bb_files</span><span class="p">)))</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">while</span> <span class="n">bbindices</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">topology</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">topologies</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># First pick the index of a building block file.</span>
+                <span class="n">bbi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bbindices</span><span class="p">)</span>
+                <span class="c1"># Next get the indices of all linker files which are</span>
+                <span class="c1"># not already used together with `bbi`.</span>
+                <span class="n">lkindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lk_files</span><span class="p">)))</span>
+                <span class="k">for</span> <span class="n">pairedi</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]:</span>
+                    <span class="n">lkindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pairedi</span><span class="p">)</span>
+                <span class="c1"># If `bbi` has been paired with all linkers already,</span>
+                <span class="c1"># remove it from the list of possible indices and try</span>
+                <span class="c1"># again.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">lkindices</span><span class="p">:</span>
+                    <span class="n">bbindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bbi</span><span class="p">)</span>
+                    <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">continue</span>
+                <span class="c1"># Pick a linker index and note the pairing.</span>
+                <span class="n">lki</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lkindices</span><span class="p">)</span>
+                <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lki</span><span class="p">)</span>
+
+                <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_files</span><span class="p">[</span><span class="n">bbi</span><span class="p">],</span> <span class="n">bb_fg</span><span class="p">)</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_files</span><span class="p">[</span><span class="n">lki</span><span class="p">],</span> <span class="n">lk_fg</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bb_file</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">bb_db</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_file</span><span class="p">,</span> <span class="n">bb_fg</span><span class="p">)</span>
+
+                <span class="n">lk_file</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">lk_db</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+
+            <span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">topology</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cage</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cage</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span>
+        <span class="k">return</span> <span class="n">pop</span></div>
+
+<div class="viewcode-block" id="Population.init_random_cages"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.init_random_cages">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">init_random_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
+                          <span class="n">topologies</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">,</span>
+                          <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a population of cages built from provided databases.</span>
+
+<span class="sd">        All cages are held in the population&#39;s `members` attribute.</span>
+
+<span class="sd">        From the supplied databases a random linker and building-block*</span>
+<span class="sd">        molecule is selected to form a cage. This is done until `size`</span>
+<span class="sd">        cages have been formed. After this, all of them are returned</span>
+<span class="sd">        together in a ``Population`` instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bb_db : str</span>
+<span class="sd">            The full path of the database of building-block* molecules.</span>
+
+<span class="sd">        lk_db : str</span>
+<span class="sd">            The full path of the database of linker molecules.</span>
+
+<span class="sd">        topolgies : iterable of Topology objects</span>
+<span class="sd">            An iterable holding topologies which should be randomly</span>
+<span class="sd">            selected for cage initialization.</span>
+
+<span class="sd">        size : int</span>
+<span class="sd">            The size of the population to be initialized.</span>
+
+<span class="sd">        ga_tools : GATools</span>
+<span class="sd">            The GATools instance to be used by created population.</span>
+
+<span class="sd">        bb_fg : str (default = None)</span>
+<span class="sd">            The name of the functional group present in molecules in</span>
+<span class="sd">            `bb_db`. It is the name of the functional group used to</span>
+<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
+<span class="sd">            the name is present in `bb_db`.</span>
+
+<span class="sd">        lk_fg : str (default = None)</span>
+<span class="sd">            The name of the functional group present in molecules in</span>
+<span class="sd">            `lk_db`. It is the name of the functional group used to</span>
+<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
+<span class="sd">            the name is present in `lk_db`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population filled with random cages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">bb_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bb_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+        <span class="c1"># Remove any files which are not valid structure files.</span>
+        <span class="n">bb_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bb_files</span> <span class="k">if</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
+        <span class="n">lk_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lk_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+        <span class="n">lk_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lk_files</span> <span class="k">if</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
+
+        <span class="n">pairs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">bbindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bb_files</span><span class="p">)))</span>
+        <span class="k">while</span> <span class="n">bbindices</span><span class="p">:</span>
+            <span class="c1"># First pick the index of a building block file.</span>
+            <span class="n">bbi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bbindices</span><span class="p">)</span>
+            <span class="c1"># Next get the indices of all linker files which are not</span>
+            <span class="c1"># already used together with `bbi`.</span>
+            <span class="n">lkindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lk_files</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">pairedi</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]:</span>
+                <span class="n">lkindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pairedi</span><span class="p">)</span>
+            <span class="c1"># If `bbi` has been paired with all linkers already, remove</span>
+            <span class="c1"># it from the list of possible indices and try again.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lkindices</span><span class="p">:</span>
+                <span class="n">bbindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bbi</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1"># Pick a linker index and note the pairing.</span>
+            <span class="n">lki</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lkindices</span><span class="p">)</span>
+            <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lki</span><span class="p">)</span>
+
+            <span class="n">topology</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">topologies</span><span class="p">)</span>
+            <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_files</span><span class="p">[</span><span class="n">bbi</span><span class="p">],</span> <span class="n">bb_fg</span><span class="p">)</span>
+            <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_files</span><span class="p">[</span><span class="n">lki</span><span class="p">],</span> <span class="n">lk_fg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+
+            <span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">topology</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cage</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cage</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span>
+        <span class="k">return</span> <span class="n">pop</span></div>
+
+<div class="viewcode-block" id="Population.add_members"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.add_members">[docs]</a>    <span class="k">def</span> <span class="nf">add_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds ``Molecule`` instances into `members`.</span>
+
+<span class="sd">        The |Molecule| instances held within the supplied</span>
+<span class="sd">        ``Population`` instance, `population`, are added into the</span>
+<span class="sd">        `members` attribute of `self`. The supplied `population` itself</span>
+<span class="sd">        is not added. This means that any information the `population`</span>
+<span class="sd">        instance had about subpopulations is lost. This is because all</span>
+<span class="sd">        of its ``Molecule`` instances are added into the `members`</span>
+<span class="sd">        attribute, regardless of which subpopulation they were</span>
+<span class="sd">        originally in.</span>
+
+<span class="sd">        The `duplicates` parameter indicates whether multiple instances</span>
+<span class="sd">        of the same molecule are allowed to be added into the</span>
+<span class="sd">        population. Note that the sameness of a molecule is judged</span>
+<span class="sd">        by the `same` method of the ``Molecule`` class, which is</span>
+<span class="sd">        invoked by the ``in`` operator within this method. See the</span>
+<span class="sd">        `__contains__` method of the ``Population`` class for details</span>
+<span class="sd">        on how the ``in`` operator uses the `same` method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : iterable of :class:`~mmead.molecular.molecules.Molecule`</span>
+<span class="sd">            ``Molecule`` instances to be added to the `members`</span>
+<span class="sd">            attribute and/or ``Population`` instances who&#39;s members, as</span>
+<span class="sd">            generated by `all_members`, will be added to the `members`</span>
+<span class="sd">            attribute.</span>
+
+<span class="sd">        duplicates : bool (default = False)</span>
+<span class="sd">            When ``False`` only molecules which are not already</span>
+<span class="sd">            held by the population will be added. ``True`` allows more</span>
+<span class="sd">            than one instance of the same molecule to be added.</span>
+<span class="sd">            Whether two molecules are the same is defined by the</span>
+<span class="sd">            `same()` method of the ``Molecule`` class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">duplicates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">population</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">population</span> <span class="k">if</span>
+                                <span class="n">mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.add_subpopulation"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.add_subpopulation">[docs]</a>    <span class="k">def</span> <span class="nf">add_subpopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Appends a population into the `populations` attribute.</span>
+
+<span class="sd">        The `population` instance itself is not added, only a copy.</span>
+<span class="sd">        However the items it holds are not copied.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population to be added as a subpopulation.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        populations : list of Populations</span>
+<span class="sd">            The `populations` attribute of `self` has ``Population``</span>
+<span class="sd">            instaces added to it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">*</span><span class="n">population</span><span class="o">.</span><span class="n">members</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">population</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+            <span class="n">pop</span><span class="o">.</span><span class="n">add_subpopulation</span><span class="p">(</span><span class="n">sp</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.all_members"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.all_members">[docs]</a>    <span class="k">def</span> <span class="nf">all_members</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields all members in the population and its subpopulations.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        Molecule</span>
+<span class="sd">            The next ``Molecule`` instance held within the</span>
+<span class="sd">            population or its subpopulations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Go through `members` attribute and yield ``Molecule``</span>
+        <span class="c1"># instances held within one by one.</span>
+        <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">ind</span>
+
+        <span class="c1"># Go thorugh `populations` attribute and for each</span>
+        <span class="c1"># ``Population`` instance within, yield ``Molecule``</span>
+        <span class="c1"># instances from its `all_members` generator.</span>
+        <span class="k">for</span> <span class="n">pop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">pop</span><span class="o">.</span><span class="n">all_members</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Population.assign_names_from"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.assign_names_from">[docs]</a>    <span class="k">def</span> <span class="nf">assign_names_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Give each member of the population a name starting from `n`.</span>
+
+<span class="sd">        `n` is a number which is incremented. Each population member</span>
+<span class="sd">        will have a unique name as a result.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">            A number. Members of this population are given a unique</span>
+<span class="sd">            number as a name, starting from this number.</span>
+
+<span class="sd">        overwrite : bool (default = False)</span>
+<span class="sd">            If ``True`` existing names are replaced.</span>
+
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The `name` attribute of the population&#39;s members is</span>
+<span class="sd">            modified.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The final value of `n`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">mem</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mem</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
+                <span class="n">mem</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">n</span></div>
+
+<div class="viewcode-block" id="Population.calculate_member_fitness"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.calculate_member_fitness">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_member_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies the fitness function to all members.</span>
+
+<span class="sd">        The calculation will be performed serially or in parallel</span>
+<span class="sd">        depending on the flag `ga_tools.parallel`. The serial version</span>
+<span class="sd">        may be faster in cases where all molecules have already had</span>
+<span class="sd">        their fitness calcluated. This is because all calculations will</span>
+<span class="sd">        be skipped. In this case creating a parallel process pool</span>
+<span class="sd">        creates unncessary overhead.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        MarcroMolecule</span>
+<span class="sd">            The MacroMolecule instances held by the population have</span>
+<span class="sd">            fitness values calculated and placed in the</span>
+<span class="sd">            `unscaled_fitness` attribute.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
+            <span class="n">_calc_fitness</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_calc_fitness_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.dump"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the population to a file.</span>
+
+<span class="sd">        The population is written in the JSON format in the following</span>
+<span class="sd">        way. The population is represented as a list,</span>
+
+<span class="sd">            [mem1.json(), mem2.json(), [mem3.json(), [mem4.json()]]]</span>
+
+<span class="sd">        where each member of the population held directly in the</span>
+<span class="sd">        `members` attribute is placed an an element in the list. Any</span>
+<span class="sd">        subpopulations are held as  sublists.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            The full path of the file to which the population should</span>
+<span class="sd">            be written.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.exit"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.exit">[docs]</a>    <span class="k">def</span> <span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks the if the exit criterion has been satisfied.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            ``True`` if the exit criterion is satisfied, else</span>
+<span class="sd">            ``False``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.fromlist"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.fromlist">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromlist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pop_list</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a population from a list representation of one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop_list : list of str and lists</span>
+<span class="sd">            A list which represents a population. Like the ones created</span>
+<span class="sd">            by `tolist()`.</span>
+
+<span class="sd">        load_names : bool (default = True)</span>
+<span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
+<span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            The population represented by `pop_list`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pop_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Molecule</span><span class="o">.</span><span class="n">fromdict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="n">load_names</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="n">load_names</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s1">&#39;Population list must consist only&#39;</span>
+                                 <span class="s1">&#39; of strings and lists.&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pop</span></div>
+
+<div class="viewcode-block" id="Population.gen_mutants"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.gen_mutants">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mutants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="o">=</span><span class="s1">&#39;mutation_counter.png&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a population of mutant ``MacroMolecule`` instances.</span>
+
+<span class="sd">        This is a GA operation and as a result this method merely</span>
+<span class="sd">        delegates the request to the ``Mutation`` instance held in the</span>
+<span class="sd">        `ga_tools` attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        counter_name : str (default=&#39;mutation_counter.png&#39;)</span>
+<span class="sd">            The name of the .png file showing which members were</span>
+<span class="sd">            selected for mutation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population holding mutants created by mutating contained</span>
+<span class="sd">            ``MacroMolecule`` instances.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">mutation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.gen_next_gen"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.gen_next_gen">[docs]</a>    <span class="k">def</span> <span class="nf">gen_next_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a population hodling the next generation of structures.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop_size : int</span>
+<span class="sd">            The size of the next generation.</span>
+
+<span class="sd">        counter_path : str (default= &#39;&#39;)</span>
+<span class="sd">            The name of the .png file showing which members were</span>
+<span class="sd">            selected for the next generation. If &#39;&#39; then no file</span>
+<span class="sd">            is made.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population holding the next generation of individuals.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">new_gen</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;generational&#39;</span><span class="p">):</span>
+            <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">member</span><span class="p">])</span>
+            <span class="n">new_gen</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_gen</span><span class="p">)</span> <span class="o">==</span> <span class="n">pop_size</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">counter_path</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">member</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">counter</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">member</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+            <span class="n">plot_counter</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">counter_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_gen</span></div>
+
+<div class="viewcode-block" id="Population.gen_offspring"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.gen_offspring">[docs]</a>    <span class="k">def</span> <span class="nf">gen_offspring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="o">=</span><span class="s1">&#39;crossover_counter.png&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a population of offspring ``MacroMolecule`` instances.</span>
+
+<span class="sd">        This is a GA operation and as a result this method merely</span>
+<span class="sd">        delegates the request to the ``Crossover`` instance held in the</span>
+<span class="sd">        `ga_tools` attribute. The ``Crossover`` instance takes care of</span>
+<span class="sd">        selecting parents and combining them to form offspring. The</span>
+<span class="sd">        ``Crossover`` instance delegates the selection to the</span>
+<span class="sd">        ``Selection`` instance as would be expected. The request to</span>
+<span class="sd">        perform crossovers is done by calling the ``Crossover``</span>
+<span class="sd">        instance with the population as the argument. Calling of the</span>
+<span class="sd">        ``Crossover``instance returns a ``Population`` instance holding</span>
+<span class="sd">        the generated offspring. All details regarding the crossover</span>
+<span class="sd">        procedure are handled by the ``Crossover`` instance.</span>
+
+<span class="sd">        For more details about how crossover is implemented see the</span>
+<span class="sd">        ``Crossover`` class documentation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        counter_name : str (default=&#39;crossover_counter.png&#39;)</span>
+<span class="sd">            The name of the .png file showing which members were</span>
+<span class="sd">            selected for crossover.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population holding offspring created by crossing</span>
+<span class="sd">            contained the ``MacroMolecule`` instances.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.has_structure"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.has_structure">[docs]</a>    <span class="k">def</span> <span class="nf">has_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns ``True`` if molecule with `mol` structure is held.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mol : Molecule</span>
+<span class="sd">            A molecule whose structure is being evaluated for presence</span>
+<span class="sd">            in the population.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            ``True`` if a molecule with the same structure as `mol`</span>
+<span class="sd">            is held by the population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">same</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.load"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a Population from one dumped to a file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            The full path of the file holding the dumped population.</span>
+
+<span class="sd">        load_names : bool (default = True)</span>
+<span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
+<span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            The population stored in the dump file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pop_list</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">pop_list</span><span class="p">,</span> <span class="n">load_names</span><span class="p">)</span>
+        <span class="n">pop</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">pop</span></div>
+
+<div class="viewcode-block" id="Population.max"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the max given a key.</span>
+
+<span class="sd">        This method applies key(member) on every member of the</span>
+<span class="sd">        population and returns the max of returned values.</span>
+
+<span class="sd">        For example, if the max value of the attribute `cavity_size`</span>
+<span class="sd">        was desired:</span>
+
+<span class="sd">            population.max(</span>
+<span class="sd">                 lambda macro_mol : macro_mol.topology.cavity_size())</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : function</span>
+<span class="sd">            A function which should take a Molecule instance as</span>
+<span class="sd">            its argument and return a value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The max of the values returned by the function `key` when</span>
+<span class="sd">            its applied to all members of the population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">key</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.mean"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the mean given a key.</span>
+
+<span class="sd">        This method applies key(member) on every member of the</span>
+<span class="sd">        population and returns the mean of returned values.</span>
+
+<span class="sd">        For example, if the mean value of the attribute `cavity_size`</span>
+<span class="sd">        was desired:</span>
+
+<span class="sd">            population.mean(</span>
+<span class="sd">                 lambda macro_mol : macro_mol.topology.cavity_size())</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : function</span>
+<span class="sd">            A function which should take a Molecule instance as</span>
+<span class="sd">            its argument and return a value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The mean of the values returned by the function `key` when</span>
+<span class="sd">            its applied to all members of the population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">key</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.min"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.min">[docs]</a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the min given a key.</span>
+
+<span class="sd">        This method applies key(member) on every member of the</span>
+<span class="sd">        population and returns the min of returned values.</span>
+
+<span class="sd">        For example, if the min value of the attribute `cavity_size`</span>
+<span class="sd">        was desired:</span>
+
+<span class="sd">            population.min(</span>
+<span class="sd">                 lambda macro_mol : macro_mol.topology.cavity_size())</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : function</span>
+<span class="sd">            A function which should take a Molecule instance as</span>
+<span class="sd">            its argument and return a value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The min of the values returned by the function `key` when</span>
+<span class="sd">            its applied to all members of the population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">key</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.normalize_fitness_values"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.normalize_fitness_values">[docs]</a>    <span class="k">def</span> <span class="nf">normalize_fitness_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies the normalization function.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">normalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.optimize_population"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.optimize_population">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Optimizes all the members of the population.</span>
+
+<span class="sd">        The population is optimized serially or in parallel depending</span>
+<span class="sd">        on the flag `ga_tools.parallel`. The serial version may be</span>
+<span class="sd">        faster in cases where all molecules have already been</span>
+<span class="sd">        optimized. This is because all optimizations will be skipped.</span>
+<span class="sd">        In this case creating a parallel process pool creates</span>
+<span class="sd">        unncessary overhead.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        Molecule</span>
+<span class="sd">            The Molecule instances held by the population have their</span>
+<span class="sd">            structures optimized.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
+            <span class="n">_optimize_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_optimize_all_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.remove_duplicates"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.remove_duplicates">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">between_subpops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">top_seen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes duplicates from a population and preserves structure.</span>
+
+<span class="sd">        The question of which ``Molecule`` instance is preserved</span>
+<span class="sd">        from a choice of two is difficult to answer. The iteration</span>
+<span class="sd">        through a population is depth-first, so a rule such as ``the</span>
+<span class="sd">        molecule in the topmost population is preserved`` is not</span>
+<span class="sd">        the case here. Rather, the first ``Molecule`` instance</span>
+<span class="sd">        iterated through is preserved.</span>
+
+<span class="sd">        However, this question is only relevant if duplicates in</span>
+<span class="sd">        different subpopulations are being removed. In this case it is</span>
+<span class="sd">        assumed that it is more important to have a single instance</span>
+<span class="sd">        than to worry about which subpopulation it is in.</span>
+
+<span class="sd">        If the duplicates are being removed from within subpopulations,</span>
+<span class="sd">        each subpopulation will end up with a single instance of all</span>
+<span class="sd">        molecules held before. There is no ``choice``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        between_subpops : bool (default = False)</span>
+<span class="sd">            When ``False`` duplicates are only removed from within a</span>
+<span class="sd">            given subpopulation. If ``True`` all duplicates are</span>
+<span class="sd">            removed, regardless of which subpopulation they are in.</span>
+
+<span class="sd">        key : callable (default = lambda x : id)</span>
+<span class="sd">            Duplicates are removed by on the value returned by this</span>
+<span class="sd">            function.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        members</span>
+<span class="sd">            Duplicate instances are removed from the `members`</span>
+<span class="sd">            attribute of the population or subpopulations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Whether duplicates are being removed from within a single</span>
+        <span class="c1"># subpopulation or from different subpopulations, the duplicate</span>
+        <span class="c1"># must be removed from the `members` attribute of some</span>
+        <span class="c1"># ``Population`` instance. This means ``dedupe`` can be run</span>
+        <span class="c1"># on the `members` attribute of every population or</span>
+        <span class="c1"># subpopulation. The only difference is that when duplicates</span>
+        <span class="c1"># must be removed between different subpopulations a global</span>
+        <span class="c1"># ``seen`` set must be defined for the entire top level</span>
+        <span class="c1"># ``Population`` instance. This can be passed each time dedupe</span>
+        <span class="c1"># is being called on a subpopulation&#39;s `members` attribute.</span>
+        <span class="k">if</span> <span class="n">between_subpops</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">top_seen</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">top_seen</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+                <span class="n">seen</span> <span class="o">=</span> <span class="n">top_seen</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dedupe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">seen</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">subpop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+                <span class="n">subpop</span><span class="o">.</span><span class="n">remove_duplicates</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">seen</span><span class="p">)</span>
+
+        <span class="c1"># If duplicates are only removed from within the same</span>
+        <span class="c1"># subpopulation, only the `members` attribute of each</span>
+        <span class="c1"># subpopulation needs to be cleared of duplicates. To do this,</span>
+        <span class="c1"># each `members` attribute is deduped recursively.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">between_subpops</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dedupe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">subpop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+                <span class="n">subpop</span><span class="o">.</span><span class="n">remove_duplicates</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.remove_members"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.remove_members">[docs]</a>    <span class="k">def</span> <span class="nf">remove_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all members where key(member) is ``True``.</span>
+
+<span class="sd">        The structure of the population is preserved.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : callable</span>
+<span class="sd">            A callable which takes 1 argument. Each member of the</span>
+<span class="sd">            population is passed as the argument to `key` in turn. If</span>
+<span class="sd">            the result is ``True`` then the member is removed from the</span>
+<span class="sd">            population.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        self : Population</span>
+<span class="sd">            All members of the population which have their `failed`</span>
+<span class="sd">            attribute set to ``True`` are removed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">(</span><span class="n">ind</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">subpop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+            <span class="n">subpop</span><span class="o">.</span><span class="n">remove_members</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.select"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;generational&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a generator field yielding selected members of `self`.</span>
+
+<span class="sd">        Selection is a GA procedure and as a result this method merely</span>
+<span class="sd">        delegates the selection request to the ``Selection`` instance</span>
+<span class="sd">        held within the `ga_tools` attribute. The ``Selection``</span>
+<span class="sd">        instance then returns a generator which yields</span>
+<span class="sd">        ``MacroMolecule`` instances held within the population. Which</span>
+<span class="sd">        macromolecules are yielded depends on the selection algorithm</span>
+<span class="sd">        which was chosen during initialization and when calling this</span>
+<span class="sd">        method. The selection instance (`self.ga_tools.selection`)</span>
+<span class="sd">        returns the generator when it is called. See ``Selection``</span>
+<span class="sd">        class documentation for more information.</span>
+
+<span class="sd">        Because selection is required in a number of different ways,</span>
+<span class="sd">        such as selecting the parents, ``MacroMolecule`` instances for</span>
+<span class="sd">        mutation and ``MacroMolecule`` instances for the next</span>
+<span class="sd">        generation, the type of selection must be specificed with the</span>
+<span class="sd">        `type_` parameter. The valid values for `type_` will correspond</span>
+<span class="sd">        to one of the attribute names of the ``Selection`` instance.</span>
+
+<span class="sd">        For example, if `type_` is set to &#39;crossover&#39; a selection</span>
+<span class="sd">        algorithm which yields a parents will be invoked. If the</span>
+<span class="sd">        `type_` is set to &#39;generational&#39; an algorithm which yields the</span>
+<span class="sd">        next generation will be invoked.</span>
+
+<span class="sd">        The information regarding which generational, parent pool, etc.</span>
+<span class="sd">        algorithm is used is held by the ``Selection`` instance. This</span>
+<span class="sd">        method merely requests that the ``Selection`` instance performs</span>
+<span class="sd">        the selection algorithm of the relevant type. The ``Selection``</span>
+<span class="sd">        instance takes care of all the details to do with selection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        type_ : str (default = &#39;generational&#39;)</span>
+<span class="sd">            A string specifying the type of selection to be performed.</span>
+<span class="sd">            Valid values will correspond to names of attributes of the</span>
+<span class="sd">            ``Selection`` class. Check ``Selection`` class</span>
+<span class="sd">            documentation for details.</span>
+
+<span class="sd">            Valid values include:</span>
+<span class="sd">                &#39;generational&#39; - selects the next generation</span>
+<span class="sd">                &#39;crossover&#39; - selects parents</span>
+<span class="sd">                &#39;mutation&#39; - selects ``MacroMolecule`` instances for</span>
+<span class="sd">                             mutation</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        generator</span>
+<span class="sd">           A generator which yields ``MacroMolecule`` instances or</span>
+<span class="sd">           tuples of them. Which instances are yielded depends on the</span>
+<span class="sd">           selection algorithm used by the generator. This will depend</span>
+<span class="sd">           on the `type_` provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Population.tolist"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.tolist">[docs]</a>    <span class="k">def</span> <span class="nf">tolist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the population to a list representation.</span>
+
+<span class="sd">        The population and any subpopulations are represented as lists</span>
+<span class="sd">        (and sublists), while members are represented by their JSON</span>
+<span class="sd">        dictionaries (as strings).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A JSON string representing the population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">json</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+            <span class="n">pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">pop</span></div>
+
+<div class="viewcode-block" id="Population.write"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">use_name</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes the ``.mol`` files of members to a directory.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dir_path : str</span>
+<span class="sd">            The full path of the directory into which the ``.mol`` file</span>
+<span class="sd">            is written.</span>
+
+<span class="sd">        use_name : bool (default = False)</span>
+<span class="sd">            When ``True`` the `name` attribute of the population&#39;s</span>
+<span class="sd">            members is used to make the name of the .mol file. If</span>
+<span class="sd">            ``False`` the files are just named after the member&#39;s</span>
+<span class="sd">            index in the population.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># If the directory does not exist, create it.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">member</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">use_name</span><span class="p">:</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                                        <span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+            <span class="n">member</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows the use of ``for`` loops, ``*`` and ``iter`` function.</span>
+
+<span class="sd">        When ``Population`` instances are iterated through they yield</span>
+<span class="sd">        ``Molecule`` instances generated by the `all_members`</span>
+<span class="sd">        method. It also means that a ``Population`` instance can be</span>
+<span class="sd">        unpacked with the ``*`` operator. This will produce the</span>
+<span class="sd">        ``Molecule`` instances yielded by the `all_members`</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Generator</span>
+<span class="sd">            The `all_members` generator. See `all_members` method</span>
+<span class="sd">            documentation for more information.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows the use of ``[]`` operator.</span>
+
+<span class="sd">        Molecules held by the ``Population`` instance can be</span>
+<span class="sd">        accesed by their index. Slices are also supported. These return</span>
+<span class="sd">        a new ``Population`` instance holding the ``Molecule``</span>
+<span class="sd">        instances with the requested indices. Using slices will return</span>
+<span class="sd">        a flat ``Population`` instance meaing no subpopulation</span>
+<span class="sd">        information is preserved. All of the ``Molecule``</span>
+<span class="sd">        instances are placed into the `members` attribute of the</span>
+<span class="sd">        returned ``Population`` instance.</span>
+
+<span class="sd">        The index corresponds to the ``Molecule`` yielded by the</span>
+<span class="sd">        `all_members` method.</span>
+
+<span class="sd">        This can be exploited if one desired to remove all</span>
+<span class="sd">        subpopulations and transfer all the ``Molecules``</span>
+<span class="sd">        instances into the members attribute. For example,</span>
+
+<span class="sd">        &gt;&gt;&gt; pop2 = pop[:]</span>
+
+<span class="sd">        ``pop2`` is a ``Population`` instance with all the same</span>
+<span class="sd">        ``Molecule`` instances as ``pop``, however all</span>
+<span class="sd">        ``Molecule`` instances are held within its `members`</span>
+<span class="sd">        attribute and its `populations` attribute is empty. This may or</span>
+<span class="sd">        may not be the case for the ``pop`` instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : int, slice</span>
+<span class="sd">            An int or slice can be used depending on if a single</span>
+<span class="sd">            ``Molecule`` instance needs to be returned or a</span>
+<span class="sd">            collection of ``Molecule`` instances.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Molecule</span>
+<span class="sd">            If the supplied `key` is an ``int``. Returns the</span>
+<span class="sd">            ``Molecule`` instance with the corresponding index</span>
+<span class="sd">            from the `all_members` generator.</span>
+
+<span class="sd">        Population</span>
+<span class="sd">            If the supplied `key` is a ``slice``. The returned</span>
+<span class="sd">            ``Population`` instance holds ``Molecule`` instances</span>
+<span class="sd">            in its `members` attribute. The ``Molecule`` instances</span>
+<span class="sd">            correspond to indices defined by the slice. The slice is</span>
+<span class="sd">            implemented on the `all_members` generator.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If the supplied `key` is not an ``int`` or ``slice`` type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Determine if provided key was an ``int`` or a ``slice``.</span>
+        <span class="c1"># If ``int``, return the corresponding ``Molecule``</span>
+        <span class="c1"># instance from the `all_members` generator.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">())[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># If ``slice`` return a ``Population`` of the corresponding</span>
+        <span class="c1"># ``Molecule`` instances. The returned ``Population`` will</span>
+        <span class="c1"># have the same `ga_tools` attribute as original ``Population``</span>
+        <span class="c1"># instance.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="n">mols</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">(),</span>
+                             <span class="n">key</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+            <span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">*</span><span class="n">mols</span><span class="p">)</span>
+            <span class="n">pop</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span>
+            <span class="k">return</span> <span class="n">pop</span>
+
+        <span class="c1"># If `key` is not ``int`` or ``slice`` raise ``TypeError``.</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Index must be an integer or slice, not&quot;</span>
+                        <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the number of members yielded by `all_members`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The number of members held by the population, including</span>
+<span class="sd">            those held within its subpopulations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows use of the ``-`` operator.</span>
+
+<span class="sd">        Subtracting one from another,</span>
+
+<span class="sd">            pop3 = pop1 - pop2,</span>
+
+<span class="sd">        returns a new population, pop3. The returned population</span>
+<span class="sd">        contains all the ``Molecule`` instances in pop1 except</span>
+<span class="sd">        those also in pop2. This refers to all of the ``Molecule``</span>
+<span class="sd">        instances, including those held within any subpopulations. The</span>
+<span class="sd">        returned population is flat. This means all information about</span>
+<span class="sd">        subpopulations in pop1 is lost as all the ``Molecule``</span>
+<span class="sd">        instances are held in the `members` attribute of pop3.</span>
+
+<span class="sd">        The resulting population, pop3, will inherit the `ga_tools`</span>
+<span class="sd">        attribute from pop1.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Population</span>
+<span class="sd">            A collection of ``Molecule`` instances to be removed</span>
+<span class="sd">            from `self`, if held by it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A flat population of ``Molecule`` instances which are</span>
+<span class="sd">            not also held in `other`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">new_pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">new_pop</span><span class="o">.</span><span class="n">add_members</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_pop</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows use fo the ``+`` operator.</span>
+
+<span class="sd">        Creates a new ``Population`` instance which holds two</span>
+<span class="sd">        subpopulations and no direct members. The two subpopulations</span>
+<span class="sd">        are the two ``Population`` instances on which the ``+``</span>
+<span class="sd">        operator was applied.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Population</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows use of the ``in`` operator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        item : Molecule</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output_string</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; Population &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                         <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                         <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Members</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;   ---------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">:</span>
+            <span class="n">output_string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output_string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">None</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+        <span class="n">output_string</span> <span class="o">+=</span> <span class="p">((</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Sub-populations</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                           <span class="s2">&quot;   -----------------</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">pop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+            <span class="n">output_string</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">pop</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output_string</span> <span class="o">+=</span> <span class="s2">&quot;None</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+        <span class="n">output_string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+        <span class="k">for</span> <span class="n">pop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+            <span class="n">output_string</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_string</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

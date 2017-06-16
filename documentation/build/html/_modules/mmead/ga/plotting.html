@@ -1,0 +1,462 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mmead.ga.plotting &mdash; MMEA 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MMEA 0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MMEA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMEA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mmead.ga.plotting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmead.ga.plotting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module for defining plotting functions.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">fitness</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">switch_backend</span><span class="p">(</span><span class="s1">&#39;agg&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="fitness_epp"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.plotting.fitness_epp">[docs]</a><span class="k">def</span> <span class="nf">fitness_epp</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">plot_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">dump_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Generation&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the min, max and avg fitness values of each subpopulation.</span>
+
+<span class="sd">    Also saves the plot data. The min, mean and max values for each</span>
+<span class="sd">    generation are placed in an array:</span>
+
+<span class="sd">        &gt;&gt;&gt; dmp_array = np.array(mins, means, maxs)</span>
+
+<span class="sd">    which is then dumped to the file `dump_name`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pop : Population</span>
+<span class="sd">        A population containing any number of subpopulations and no</span>
+<span class="sd">        direct members.</span>
+
+<span class="sd">    plot_name : str (default = False)</span>
+<span class="sd">        The full path of where the plot should be saved. If ``False``</span>
+<span class="sd">        then no plot is made. Useful if you only want the dump file.</span>
+
+<span class="sd">    dump_name : str (default = None)</span>
+<span class="sd">        If ``None`` then `plot_name` is used only with the extension</span>
+<span class="sd">        ``.dmp``.</span>
+
+<span class="sd">    xlabel : str (default = &#39;Generation&#39;)</span>
+<span class="sd">        The label on the x-axis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">maxs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">means</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mins</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">subpop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subpop</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span><span class="p">))</span>
+            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subpop</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span><span class="p">))</span>
+            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span><span class="p">))</span>
+
+    <span class="c1"># Save the plot data.</span>
+    <span class="k">if</span> <span class="n">plot_name</span> <span class="ow">and</span> <span class="n">dump_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">basename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">plot_name</span><span class="p">)</span>
+        <span class="n">dump_name</span> <span class="o">=</span> <span class="n">basename</span> <span class="o">+</span> <span class="s1">&#39;.dmp&#39;</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dump_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">plot_name</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Fitness&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">maxs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">mins</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">)</span>
+        <span class="n">lgd</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                         <span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">borderaxespad</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plot_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                    <span class="n">bbox_extra_artists</span><span class="o">=</span><span class="p">(</span><span class="n">lgd</span><span class="p">,),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parameter_epp"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.plotting.parameter_epp">[docs]</a><span class="k">def</span> <span class="nf">parameter_epp</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">plot_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">dump_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Generation&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the progress_params values across subpopulations.</span>
+
+<span class="sd">    For each progress_param a plot will be produced. Each will show</span>
+<span class="sd">    subpopulations on the x-axis and the min, max and avg values</span>
+<span class="sd">    of that progress param on the y axis.</span>
+
+<span class="sd">    Also saves the plot data. The min, mean and max values for each</span>
+<span class="sd">    generation are placed in an array:</span>
+
+<span class="sd">        &gt;&gt;&gt; dmp_array = np.array(mins, means, maxs)</span>
+
+<span class="sd">    which is then dumped to the file `dump_name`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pop : Population</span>
+<span class="sd">        A population holding any number of subpopulations and no</span>
+<span class="sd">        direct members.</span>
+
+<span class="sd">    plot_name : str (default = False)</span>
+<span class="sd">        The full path of where the plot should be saved. If ``False``</span>
+<span class="sd">        then no plot is made. Useful if you only want the dump file.</span>
+
+<span class="sd">    dump_name : str (default = None)</span>
+<span class="sd">        If ``None`` then `plot_name` is used only with the extension</span>
+<span class="sd">        ``.dmp``.</span>
+
+<span class="sd">    xlabel : str (default = &#39;Generation&#39;)</span>
+<span class="sd">        The label on the x-axis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">func_name</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">fitness_func</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">fitness</span><span class="p">)[</span><span class="n">func_name</span><span class="p">]</span>
+
+    <span class="c1"># Exit if a function which does not have param_labels was used.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fitness_func</span><span class="p">,</span> <span class="s1">&#39;param_labels&#39;</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">min_params</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">max_params</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mean_params</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">nparams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fitness_func</span><span class="o">.</span><span class="n">param_labels</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">min_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nparams</span><span class="p">)])</span>
+            <span class="n">mean_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nparams</span><span class="p">)])</span>
+            <span class="n">max_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nparams</span><span class="p">)])</span>
+            <span class="k">continue</span>
+
+        <span class="n">p_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">])</span>
+
+        <span class="c1"># Each element of this list holds an array of all the valid</span>
+        <span class="c1"># values of a particular progress_param.</span>
+        <span class="n">p_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">p_mat</span><span class="p">[:,</span> <span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nparams</span><span class="p">)]</span>
+        <span class="n">p_arrays</span> <span class="o">=</span> <span class="p">[[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">a</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">p_arrays</span><span class="p">]</span>
+
+        <span class="n">min_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p_arrays</span><span class="p">])</span>
+
+        <span class="n">mean_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+                            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p_arrays</span><span class="p">])</span>
+
+        <span class="n">max_params</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">p_arrays</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">min_params</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+
+        <span class="n">y_mean</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">mean_params</span><span class="p">]</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">max_params</span><span class="p">]</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="p">[</span><span class="n">array</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">min_params</span><span class="p">]</span>
+
+        <span class="c1"># This loop checks if any y values are ``None`` in which case</span>
+        <span class="c1"># they are removed and the corresponding x value as well.</span>
+        <span class="n">nones</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yval</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_min</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">yval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">nones</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">xvals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">xvals</span> <span class="o">=</span> <span class="p">[</span><span class="n">xv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">xv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xvals</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nones</span><span class="p">]</span>
+        <span class="n">y_mean</span> <span class="o">=</span> <span class="p">[</span><span class="n">yv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_mean</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nones</span><span class="p">]</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="p">[</span><span class="n">yv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_max</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nones</span><span class="p">]</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="p">[</span><span class="n">yv</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_min</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nones</span><span class="p">]</span>
+
+        <span class="c1"># Save the plot data.</span>
+        <span class="k">if</span> <span class="n">plot_name</span> <span class="ow">and</span> <span class="n">dump_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">basename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">plot_name</span><span class="p">)</span>
+            <span class="n">dump_name</span> <span class="o">=</span> <span class="n">basename</span><span class="o">+</span><span class="s1">&#39;.dmp&#39;</span>
+        <span class="n">dname</span> <span class="o">=</span> <span class="n">dump_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.dmp&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.dmp&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">dname</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plot_name</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Unscaled &#39;</span> <span class="o">+</span> <span class="n">fitness_func</span><span class="o">.</span><span class="n">param_labels</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">y_max</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
+            <span class="n">lgd</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                             <span class="n">borderaxespad</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+
+            <span class="n">new_plot_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">plot_name</span><span class="p">))</span>
+
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">new_plot_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                        <span class="n">bbox_extra_artists</span><span class="o">=</span><span class="p">(</span><span class="n">lgd</span><span class="p">,),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_counter"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.plotting.plot_counter">[docs]</a><span class="k">def</span> <span class="nf">plot_counter</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">plot_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves a .png file holding a plot of `counter`.</span>
+
+<span class="sd">    The counter should hold the number of times a certain population</span>
+<span class="sd">    member was selected.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    counter : Counter</span>
+<span class="sd">        A counter of which members of a population were picked.</span>
+
+<span class="sd">    plot_name : str</span>
+<span class="sd">        The full path of the .png where the plot is to be saved.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">x_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">items</span><span class="p">())</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">y_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">y_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_vals</span><span class="p">],</span> <span class="n">labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">plot_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -248,8 +248,8 @@ class Molecule:
 
     It is assumed that child classes will have some basic attributes.
 
-    Minimum required attributes of child classes
-    --------------------------------------------
+    Attributes
+    ----------
     mol : rdkit.Chem.rdchem.Mol
         A rdkit molecule instance representing the molecule.
 
@@ -2880,6 +2880,11 @@ class Polymer(MacroMolecule):
 
 
 class Cell:
+    """
+    Holds the bonder ids of a unit cell in an periodic island.
+
+    """
+
 
     def __init__(self, id_, bonders):
         self.id = np.array(id_)
@@ -2890,9 +2895,30 @@ class Periodic(MacroMolecule):
     """
     Used to represent periodic structures.
 
+    Attributes
+    ----------
+    terminator_coords : :class:`dict`
+        The key is an :class:`int` representing the index of a bonder
+        atom within :attr:`.bonder_ids`. The value is a
+        :class:`numpy.ndarray` which holds the x, y and z coordinates
+        of a deleter atom attached to the bonder. The coordinates
+        are relative to the bonder atom.
+
+        The index must be used rather than the bonder's id itself
+        because this dictionary is filled before atoms are deleted
+        during assembly. After deletion, ids of the remaining atoms
+        change and as a result if this dictionary saved the ids it
+        would be inaccurate by the time :meth:`.Topology.build`
+        completed.
+
     """
 
     def _is_subterminal(self, atom_id, bonder_map, bonded):
+        """
+        
+
+        """
+
         if atom_id not in bonder_map:
             return False
         bid = bonder_map[atom_id]
