@@ -2890,8 +2890,8 @@ class Cell:
         of the cell within the supercell.
 
     bonders : :class:`dict`
-        Maps the bonder atom in the original unit cell to the
-        equivalent bonder atom in the cell.
+        Maps the bonder atoms in the original unit cell to the
+        equivalent bonder atoms in the cell.
 
     Attributes
     ----------
@@ -2900,8 +2900,8 @@ class Cell:
         of the cell within the supercell.
 
     bonders : :class:`dict`
-        Maps the bonder atom in the original unit cell to the
-        equivalent bonder atom in the cell.
+        Maps the bonder atoms in the original unit cell to the
+        equivalent bonder atoms in the cell.
 
     """
 
@@ -2980,9 +2980,9 @@ class Periodic(MacroMolecule):
         # which were registered as having bonds crossing periodic
         # boundaries.
         periodic = {self.bonder_ids[x.atom1] for x in
-                    self.topology.connections}
+                    self.topology.periodic_bonds}
         periodic.update(self.bonder_ids[x.atom2] for x in
-                        self.topology.connections)
+                        self.topology.periodic_bonds)
         # If that atom does have a periodic bond and has not had a
         # bond added while building the island - it is subterminal and
         # needs to have a terminal atom attached.
@@ -3054,16 +3054,16 @@ class Periodic(MacroMolecule):
 
         emol = rdkit.EditableMol(island)
         bonded = set()
-        # `self.topology.connections` holds objects of the
-        # ``Connection`` class. Each ``Connection`` object has the
+        # `self.topology.periodic_bonds` holds objects of the
+        # ``PeriodicBond`` class. Each ``PeriodicBond`` object has the
         # ids of two bonder atoms in the unit cell which are connected
         # by a bond running across the periodic boundary. The
         # `direction1` and `direction2` attributes descibe the
         # axes along which the periodic bond goes. For example,
         # if `direction1` is [1, 0, 0] it means that the bonder atom
-        # in `connection.atom1` has a perdiodic bond connecting it to
-        # `connection.atom2` going in the positive direction along the
-        # x-axis.
+        # in `periodic_bond.atom1` has a perdiodic bond connecting it
+        # to `periodic_bond.atom2` going in the positive direction
+        # along the x-axis.
 
         # When iterating through all the unit cells composing the
         # island, you can use the `direction` vector to get index of
@@ -3071,12 +3071,13 @@ class Periodic(MacroMolecule):
         # Then just form bonds between the correct atoms by mapping
         # the atom ids in the unit cells to the ids of the equivalent
         # atoms in the original unit cell  and checking the
-        # `connection` to see which atom ids are connected.
+        # `periodic_bond` to see which atom ids are connected.
         for cell in flatten(cells):
-            for connection in self.topology.connections:
+            for periodic_bond in self.topology.periodic_bonds:
                 # Get the indices of the cell which holds the atom
-                # bonded `connection.atom1` in the present `cell`.
-                x, y, z = cell.id + connection.direction1
+                # bonded to the equivalent atom of
+                # `periodic_bond.atom1` in the present `cell`.
+                x, y, z = cell.id + periodic_bond.direction1
                 try:
                     # ccel as in "connected cell".
                     ccell = cells[x][y][z]
@@ -3086,21 +3087,21 @@ class Periodic(MacroMolecule):
                 # `b1id` is the id of bonder atom in the original unit
                 # cell. It is equivalent to the bonder atom in `cell`
                 # hvaing a bond added.
-                b1id = self.bonder_ids[connection.atom1]
+                b1id = self.bonder_ids[periodic_bond.atom1]
                 # `bonder1` is the id of a bonder atom, found in `cell`
                 # and equivalent to `b1id`, having a bond added.
                 bonder1 = cell.bonders[b1id]
                 # `b2id` is the id of the bonder atom in the original
-                # unit cell connected by a perdioc bond to `b1id`
-                b2id = self.bonder_ids[connection.atom2]
+                # unit cell connected by a periodic bond to `b1id`
+                b2id = self.bonder_ids[periodic_bond.atom2]
                 # `bonder2` is the id of a bonder atom, found in
                 # `ccell` and equivalent to `b2id`, having a bond
                 # added.
                 bonder2 = ccell.bonders[b2id]
                 bond_type = self.topology.determine_bond_type(
                               self,
-                              self.bonder_ids[connection.atom1],
-                              self.bonder_ids[connection.atom2])
+                              self.bonder_ids[periodic_bond.atom1],
+                              self.bonder_ids[periodic_bond.atom2])
                 emol.AddBond(bonder1, bonder2, bond_type)
                 bonded.add(bonder1)
                 bonded.add(bonder2)
