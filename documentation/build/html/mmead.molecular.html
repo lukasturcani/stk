@@ -1034,8 +1034,8 @@ number of expected windows.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>id</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding the x, y and z index
 of the cell within the supercell.</li>
-<li><strong>bonders</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the bonder atom in the original unit cell to the
-equivalent bonder atom in the cell.</li>
+<li><strong>bonders</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the bonder atoms in the original unit cell to the
+equivalent bonder atoms in the cell.</li>
 </ul>
 </td>
 </tr>
@@ -1051,8 +1051,8 @@ of the cell within the supercell.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.Cell.bonders">
 <code class="descname">bonders</code><a class="headerlink" href="#mmead.molecular.molecules.Cell.bonders" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the bonder atom in the original unit cell to the
-equivalent bonder atom in the cell.</p>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the bonder atoms in the original unit cell to the
+equivalent bonder atoms in the cell.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2146,7 +2146,7 @@ produce GULP input files when a path ending with the extension
 <dt id="mmead.molecular.molecules.Periodic.terminator_coords">
 <code class="descname">terminator_coords</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the index of a bonder
-atom within <a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
+atom within <a class="reference internal" href="#mmead.molecular.molecules.StructUnit.bonder_ids" title="mmead.molecular.molecules.StructUnit.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
 <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x, y and z coordinates
 of a deleter atom attached to the bonder. The coordinates
 are relative to the bonder atom.</p>
@@ -2298,16 +2298,17 @@ and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
 <code class="descname">_write_gulp_input</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._write_gulp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a GULP input file to <cite>path</cite>.</p>
 <p class="rubric">Notes</p>
-<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.write" title="mmead.molecular.molecules.Periodic.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>.</p>
+<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.write" title="mmead.molecular.molecules.Periodic.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>. Use that method directly,
+not this one.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The <cite>path</cite> to which the molecule should be written.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -2333,9 +2334,8 @@ bonds to terminating atoms.</p>
 in the x, y and z directions used to make the supercell.</li>
 <li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The atomic number of the terminating atoms added to the
 supercell.</li>
-<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – A string holding the bond type of bonds to the terminating
-atoms. Valid options include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code>
-and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The bond type of bonds to terminating atoms. Valid options
+include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code> and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -2377,16 +2377,22 @@ which will cause a GULP input file to be written.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, holding the number of unit cells
 in the x, y and z directions used to make the supercell.</li>
-<li><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</li>
+<li><strong>path</strong> (<em>str</em>) – The <cite>path</cite> of the file to which the molecule should be
+written.</li>
 <li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The atomic number of the terminating atoms added to the
 supercell.</li>
-<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – A string holding the bond type of bonds to the terminating
-atoms. Valid options include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code>
-and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The bond type of bonds to terminating atoms. Valid options
+include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code> and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -2756,7 +2762,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x3387b70&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x3387b00&gt;, sanitize=False, removeHs=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x3387b70&gt;, sanitize=False, removeHs=False), ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x338b2e0&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x3583bc0&gt;, removeHs=False, sanitize=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x3580450&gt;, removeHs=False, sanitize=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x35803e0&gt;, removeHs=False, sanitize=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x3580450&gt;, removeHs=False, sanitize=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
