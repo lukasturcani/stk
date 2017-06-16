@@ -458,6 +458,227 @@ also updated.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
+<dl class="class">
+<dt id="mmead.molecular.topologies.cage.base._CageTopology">
+<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.base.</code><code class="descname">_CageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_CageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._CageTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.base.Topology" title="mmead.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.base.Topology</span></code></a></p>
+<p>A topology class which cage topologies should inherit.</p>
+<dl class="attribute">
+<dt>
+<code class="descname">In addition to all the attributes defined within ``Topology`` this</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">class has the following attributes</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.cage.base._CageTopology.A_alignments">
+<code class="descname">A_alignments</code><a class="headerlink" href="#mmead.molecular.topologies.cage.base._CageTopology.A_alignments" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of ints (default = None)</em> – The length of this list must be equal to the number of
+building blocks in the cage. When cages are built one of the
+bonder atoms of each building block is aligned with an edge
+during placement. The int indicates which bonder atom is
+aligned. The int corresponds to an index in <cite>bonder_ids</cite>.</p>
+<p>If <code class="docutils literal"><span class="pre">None</span></code> the first atom in <cite>bonder_ids</cite> is always aligned.</p>
+<p>For example,</p>
+<blockquote>
+<div>A_alignments = [0,2,1,2]</div></blockquote>
+<p>In this case there must be 4 building blocks in the cage. The
+the first building block has its first (index 0) bonder atom
+aligned. The 2nd building block has the 3rd (index 2) atom
+aligned. The 3rd building block has the 2nd (index 1) atom
+aligned. The 4th building block has the 3rd (index 2) atom
+aligned.</p>
+</dd></dl>
+
+<dl class="docutils">
+<dt>B_alignments <span class="classifier-delimiter">:</span> <span class="classifier">list of ints (default = None)</span></dt>
+<dd><p class="first">The length of this list should be euqal to the number of
+linkers in the cage. The linkers of a cage can have either 2
+functional groups or 3 or more, depending on the topology.</p>
+<p>When the linkers have 2 functional groups the list should hold
+either 1 or -1. The value indicates that the linker is aligned
+parallel or antiparallel with the edge its placed on. For
+example in a tetrahedral topology,</p>
+<blockquote>
+<div>B_alignments = [-1, 1, 1, -1, 1, -1]</div></blockquote>
+<p>It indicates that the first linker is aligned anti parallel and
+the second is aligned in parallel, and so on.</p>
+<p class="last">If the linkers have 3 or more functional groups, the values
+in B_alignments have the same role as <cite>A_alignments</cite>. The only
+difference is that by default the second atom is aligned,
+rather than the first.</p>
+</dd>
+<dt>edge_alignments <span class="classifier-delimiter">:</span> <span class="classifier">list of ints, optional</span></dt>
+<dd><p class="first">The length of the list is equal to the number of building
+blocks in the cage. Each element is an int which holds the id
+of an edge. For example,</p>
+<blockquote>
+<div>edge_alignments = [1, 2, 3, 4]</div></blockquote>
+<p class="last">then the first building block is aligned with the edge with
+<cite>id</cite> of 1, the second building block is aligned with the edge
+with <cite>id</cite> 2 and so on. For this to work the edge defined by
+the class must have their <cite>id</cite> attributes defined.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mmead.molecular.topologies.cage.base._CageTopology.join_mols">
+<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_CageTopology.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._CageTopology.join_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins up the separate building blocks which form the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being assembled.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – Joins up the separate building blocks in this
+macromolecule.</li>
+<li><strong>macro_mol.bonds_made</strong> (<em>int</em>) – Places the number of bonds made during assembly into this
+attribute.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions">
+<code class="descname">pair_bonders_with_positions</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_CageTopology.pair_bonders_with_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matches atoms with the closest building block position.</p>
+<p>After a building block is placed on a position, each atom
+which forms a bond must be paired with the location of the
+building block to which it bonds. This function matches atoms
+and positions so that each is only present in one pairing and
+so that the total distance of the pairings is minimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being buit.</li>
+<li><strong>vertex</strong> (<a class="reference internal" href="#mmead.molecular.topologies.cage.base.Vertex" title="mmead.molecular.topologies.cage.base.Vertex"><em>Vertex</em></a>) – The position at which all the atoms being paired are
+located.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>vertex.atom_position_pairs</strong> (<em>list of tuples of</em><em> (</em><em>int</em><em>, </em><a class="reference internal" href="#mmead.molecular.topologies.cage.base.Vertex" title="mmead.molecular.topologies.cage.base.Vertex"><em>Vertex</em></a><em>)</em>) – Adds a tuples to this list represnting the id of the atom
+and position which were paired.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.topologies.cage.base._CageTopology.place_mols">
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_CageTopology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._CageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places all building block molecules on correct coordinates.</p>
+<p>The building block molecules are placed in their appropriate
+positions based on the topology. It does not join them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being built.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> – An rdkit instance of the macromolecule with disconnected
+building blocks is placed in this attribute.</li>
+<li><strong>macro_mol.bb_counter</strong> (<em>Counter</em>) – The counter is updated with the number of building blocks
+of each type used to form the macromolecule.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mmead.molecular.topologies.cage.base._NoLinkerCageTopology">
+<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.base.</code><code class="descname">_NoLinkerCageTopology</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>placement=’random’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_NoLinkerCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
+<p>Cage topologies where all building units have equal number of fgs.</p>
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.cage.base._NoLinkerCageTopology.alignments">
+<code class="descname">alignments</code><a class="headerlink" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology.alignments" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of ints</em> – Same meaning as <cite>A_alignments</cite> in _CageTopology.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.cage.base._NoLinkerCageTopology.placement">
+<code class="descname">placement</code><a class="headerlink" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology.placement" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> –</p>
+<p>The name of the placement type to be used. Valid options are</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>‘random’ - For each vertex, a building block is picked</dt>
+<dd>randomly from <cite>macro_mol.building_blocks</cite> and placed on
+the vertex.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mmead.molecular.topologies.cage.base._NoLinkerCageTopology.connect">
+<em class="property">classmethod </em><code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_NoLinkerCageTopology.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates each Vertex with a list of its neighbors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols">
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_NoLinkerCageTopology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols_random">
+<code class="descname">place_mols_random</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_NoLinkerCageTopology.place_mols_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols_random" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mmead.molecular.topologies.cage.base._VertexOnlyCageTopology">
+<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.base.</code><code class="descname">_VertexOnlyCageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/base.html#_VertexOnlyCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.base._VertexOnlyCageTopology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
+<p>Cage topolgies where all building block/linker mols have 3+ fgs.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-mmead.molecular.topologies.cage.three_plus_four">
 <span id="mmead-molecular-topologies-cage-three-plus-four-module"></span><h2>mmead.molecular.topologies.cage.three_plus_four module<a class="headerlink" href="#module-mmead.molecular.topologies.cage.three_plus_four" title="Permalink to this headline">¶</a></h2>
@@ -465,7 +686,7 @@ also updated.</p>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.three_plus_four.SixPlusEight">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.three_plus_four.</code><code class="descname">SixPlusEight</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/three_plus_four.html#SixPlusEight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.three_plus_four.SixPlusEight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._VertexOnlyCageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._VertexOnlyCageTopology" title="mmead.molecular.topologies.cage.base._VertexOnlyCageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._VertexOnlyCageTopology</span></code></a></p>
 <p>A cage topology of 3 and 4 functional group building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.three_plus_four.SixPlusEight.a">
@@ -526,7 +747,7 @@ also updated.</p>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.three_plus_three.FourPlusFour">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.three_plus_three.</code><code class="descname">FourPlusFour</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>placement=’random’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/three_plus_three.html#FourPlusFour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.three_plus_three.FourPlusFour" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._NoLinkerCageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology" title="mmead.molecular.topologies.cage.base._NoLinkerCageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._NoLinkerCageTopology</span></code></a></p>
 <p>A square cage topology from tri-functionalised building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.three_plus_three.FourPlusFour.a">
@@ -593,7 +814,7 @@ also updated.</p>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.three_plus_three.OnePlusOne">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.three_plus_three.</code><code class="descname">OnePlusOne</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>placement=’random’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/three_plus_three.html#OnePlusOne"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.three_plus_three.OnePlusOne" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._NoLinkerCageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology" title="mmead.molecular.topologies.cage.base._NoLinkerCageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._NoLinkerCageTopology</span></code></a></p>
 <p>A sandwich cage topology from tri-functionalised building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.three_plus_three.OnePlusOne.a">
@@ -635,7 +856,7 @@ also updated.</p>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.three_plus_three.TwoPlusTwo">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.three_plus_three.</code><code class="descname">TwoPlusTwo</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>placement=’random’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/three_plus_three.html#TwoPlusTwo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.three_plus_three.TwoPlusTwo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._NoLinkerCageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._NoLinkerCageTopology" title="mmead.molecular.topologies.cage.base._NoLinkerCageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._NoLinkerCageTopology</span></code></a></p>
 <p>Tetrahedral cage topology from tri-functionalised building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.three_plus_three.TwoPlusTwo.a">
@@ -710,7 +931,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.FourPlusEight">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_four.</code><code class="descname">FourPlusEight</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_four.html#FourPlusEight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_four.FourPlusEight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A cage topology from 2 and 4 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.FourPlusEight.a">
@@ -802,7 +1023,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.SixPlusTwelve">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_four.</code><code class="descname">SixPlusTwelve</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_four.html#SixPlusTwelve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_four.SixPlusTwelve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A cage topology from 2 and 4 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.SixPlusTwelve.a">
@@ -859,7 +1080,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.TenPlusTwenty">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_four.</code><code class="descname">TenPlusTwenty</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_four.html#TenPlusTwenty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_four.TenPlusTwenty" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A cage topology from 2 and 4 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.TenPlusTwenty.a">
@@ -936,7 +1157,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.ThreePlusSix">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_four.</code><code class="descname">ThreePlusSix</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_four.html#ThreePlusSix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_four.ThreePlusSix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A cage topology from 2 and 4 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.ThreePlusSix.a">
@@ -1013,7 +1234,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.TwoPlusFour">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_four.</code><code class="descname">TwoPlusFour</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_four.html#TwoPlusFour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_four.TwoPlusFour" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>Sandwich cage topology from 2 and 4 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_four.TwoPlusFour.a">
@@ -1074,7 +1295,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.Dodecahedron">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_three.</code><code class="descname">Dodecahedron</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_three.html#Dodecahedron"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_three.Dodecahedron" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A dodecahedron cage from 2 and 3 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.Dodecahedron.A">
@@ -1211,7 +1432,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.EightPlusTwelve">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_three.</code><code class="descname">EightPlusTwelve</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_three.html#EightPlusTwelve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_three.EightPlusTwelve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A square topology from 2 and 3 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.EightPlusTwelve.a">
@@ -1278,7 +1499,7 @@ from the origin.</td>
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.FourPlusSix">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_three.</code><code class="descname">FourPlusSix</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_three.html#FourPlusSix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_three.FourPlusSix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>Defines the tetrahedral, 4+6, topology.</p>
 <p>This is a topology of cages where 4 building-blocks* are placed on
 vertices and 6 linkers are placed on the edges between them. This
@@ -1335,7 +1556,7 @@ the <cite>heavy_mol</cite> attribute of a <code class="docutils literal"><span c
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.FourPlusSix2">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_three.</code><code class="descname">FourPlusSix2</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_three.html#FourPlusSix2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_three.FourPlusSix2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>Defines the 4+6 topolgy which is not a tetrahedron.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.FourPlusSix2.a">
@@ -1402,7 +1623,7 @@ the <cite>heavy_mol</cite> attribute of a <code class="docutils literal"><span c
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.SixPlusNine">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_three.</code><code class="descname">SixPlusNine</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_three.html#SixPlusNine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_three.SixPlusNine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A cage topology from 2 and 3 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.SixPlusNine.a">
@@ -1459,7 +1680,7 @@ the <cite>heavy_mol</cite> attribute of a <code class="docutils literal"><span c
 <dl class="class">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.TwoPlusThree">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.cage.two_plus_three.</code><code class="descname">TwoPlusThree</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/cage/two_plus_three.html#TwoPlusThree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.cage.two_plus_three.TwoPlusThree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.cage.base._CageTopology" title="mmead.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>A cage topology from 2 and 3 functionalized building blocks.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.cage.two_plus_three.TwoPlusThree.a">
