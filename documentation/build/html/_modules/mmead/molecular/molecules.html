@@ -3045,8 +3045,8 @@
 <span class="sd">        of the cell within the supercell.</span>
 
 <span class="sd">    bonders : :class:`dict`</span>
-<span class="sd">        Maps the bonder atom in the original unit cell to the</span>
-<span class="sd">        equivalent bonder atom in the cell.</span>
+<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
+<span class="sd">        equivalent bonder atoms in the cell.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -3055,8 +3055,8 @@
 <span class="sd">        of the cell within the supercell.</span>
 
 <span class="sd">    bonders : :class:`dict`</span>
-<span class="sd">        Maps the bonder atom in the original unit cell to the</span>
-<span class="sd">        equivalent bonder atom in the cell.</span>
+<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
+<span class="sd">        equivalent bonder atoms in the cell.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -3135,9 +3135,9 @@
         <span class="c1"># which were registered as having bonds crossing periodic</span>
         <span class="c1"># boundaries.</span>
         <span class="n">periodic</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">connections</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">}</span>
         <span class="n">periodic</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">connections</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">)</span>
         <span class="c1"># If that atom does have a periodic bond and has not had a</span>
         <span class="c1"># bond added while building the island - it is subterminal and</span>
         <span class="c1"># needs to have a terminal atom attached.</span>
@@ -3164,9 +3164,8 @@
 <span class="sd">            supercell.</span>
 
 <span class="sd">        bond_type : :class:`str`, optional</span>
-<span class="sd">            A string holding the bond type of bonds to the terminating</span>
-<span class="sd">            atoms. Valid options include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;``</span>
-<span class="sd">            and ``&#39;ar&#39;``.</span>
+<span class="sd">            The bond type of bonds to terminating atoms. Valid options</span>
+<span class="sd">            include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;`` and ``&#39;ar&#39;``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -3210,16 +3209,16 @@
 
         <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">island</span><span class="p">)</span>
         <span class="n">bonded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="c1"># `self.topology.connections` holds objects of the</span>
-        <span class="c1"># ``Connection`` class. Each ``Connection`` object has the</span>
+        <span class="c1"># `self.topology.periodic_bonds` holds objects of the</span>
+        <span class="c1"># ``PeriodicBond`` class. Each ``PeriodicBond`` object has the</span>
         <span class="c1"># ids of two bonder atoms in the unit cell which are connected</span>
         <span class="c1"># by a bond running across the periodic boundary. The</span>
         <span class="c1"># `direction1` and `direction2` attributes descibe the</span>
         <span class="c1"># axes along which the periodic bond goes. For example,</span>
         <span class="c1"># if `direction1` is [1, 0, 0] it means that the bonder atom</span>
-        <span class="c1"># in `connection.atom1` has a perdiodic bond connecting it to</span>
-        <span class="c1"># `connection.atom2` going in the positive direction along the</span>
-        <span class="c1"># x-axis.</span>
+        <span class="c1"># in `periodic_bond.atom1` has a perdiodic bond connecting it</span>
+        <span class="c1"># to `periodic_bond.atom2` going in the positive direction</span>
+        <span class="c1"># along the x-axis.</span>
 
         <span class="c1"># When iterating through all the unit cells composing the</span>
         <span class="c1"># island, you can use the `direction` vector to get index of</span>
@@ -3227,12 +3226,13 @@
         <span class="c1"># Then just form bonds between the correct atoms by mapping</span>
         <span class="c1"># the atom ids in the unit cells to the ids of the equivalent</span>
         <span class="c1"># atoms in the original unit cell  and checking the</span>
-        <span class="c1"># `connection` to see which atom ids are connected.</span>
+        <span class="c1"># `periodic_bond` to see which atom ids are connected.</span>
         <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">flatten</span><span class="p">(</span><span class="n">cells</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">periodic_bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">:</span>
                 <span class="c1"># Get the indices of the cell which holds the atom</span>
-                <span class="c1"># bonded `connection.atom1` in the present `cell`.</span>
-                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="n">connection</span><span class="o">.</span><span class="n">direction1</span>
+                <span class="c1"># bonded to the equivalent atom of</span>
+                <span class="c1"># `periodic_bond.atom1` in the present `cell`.</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">id</span> <span class="o">+</span> <span class="n">periodic_bond</span><span class="o">.</span><span class="n">direction1</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># ccel as in &quot;connected cell&quot;.</span>
                     <span class="n">ccell</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span>
@@ -3242,21 +3242,21 @@
                 <span class="c1"># `b1id` is the id of bonder atom in the original unit</span>
                 <span class="c1"># cell. It is equivalent to the bonder atom in `cell`</span>
                 <span class="c1"># hvaing a bond added.</span>
-                <span class="n">b1id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span>
+                <span class="n">b1id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span>
                 <span class="c1"># `bonder1` is the id of a bonder atom, found in `cell`</span>
                 <span class="c1"># and equivalent to `b1id`, having a bond added.</span>
                 <span class="n">bonder1</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="n">b1id</span><span class="p">]</span>
                 <span class="c1"># `b2id` is the id of the bonder atom in the original</span>
-                <span class="c1"># unit cell connected by a perdioc bond to `b1id`</span>
-                <span class="n">b2id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span>
+                <span class="c1"># unit cell connected by a periodic bond to `b1id`</span>
+                <span class="n">b2id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span>
                 <span class="c1"># `bonder2` is the id of a bonder atom, found in</span>
                 <span class="c1"># `ccell` and equivalent to `b2id`, having a bond</span>
                 <span class="c1"># added.</span>
                 <span class="n">bonder2</span> <span class="o">=</span> <span class="n">ccell</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="n">b2id</span><span class="p">]</span>
                 <span class="n">bond_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span>
                               <span class="bp">self</span><span class="p">,</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">atom1</span><span class="p">],</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">atom2</span><span class="p">])</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">],</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">periodic_bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">])</span>
                 <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
                 <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder1</span><span class="p">)</span>
                 <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder2</span><span class="p">)</span>
@@ -3429,16 +3429,17 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        For internal use by :meth:`write`.</span>
+<span class="sd">        For internal use by :meth:`write`. Use that method directly,</span>
+<span class="sd">        not this one.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
+<span class="sd">        path : :class:`str`</span>
 <span class="sd">            The `path` to which the molecule should be written.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3456,16 +3457,20 @@
 <span class="sd">            in the x, y and z directions used to make the supercell.</span>
 
 <span class="sd">        path : str</span>
-<span class="sd">            The `path` to which the molecule should be written.</span>
+<span class="sd">            The `path` of the file to which the molecule should be</span>
+<span class="sd">            written.</span>
 
 <span class="sd">        terminator : :class:`int`, optional</span>
 <span class="sd">            The atomic number of the terminating atoms added to the</span>
 <span class="sd">            supercell.</span>
 
 <span class="sd">        bond_type : :class:`str`, optional</span>
-<span class="sd">            A string holding the bond type of bonds to the terminating</span>
-<span class="sd">            atoms. Valid options include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;``</span>
-<span class="sd">            and ``&#39;ar&#39;``.</span>
+<span class="sd">            The bond type of bonds to terminating atoms. Valid options</span>
+<span class="sd">            include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;`` and ``&#39;ar&#39;``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 

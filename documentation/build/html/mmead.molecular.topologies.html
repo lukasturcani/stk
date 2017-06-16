@@ -516,15 +516,9 @@ double bond.</li>
 <div class="section" id="module-mmead.molecular.topologies.periodic">
 <span id="mmead-molecular-topologies-periodic-module"></span><h2>mmead.molecular.topologies.periodic module<a class="headerlink" href="#module-mmead.molecular.topologies.periodic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="mmead.molecular.topologies.periodic.Connection">
-<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.periodic.</code><code class="descname">Connection</code><span class="sig-paren">(</span><em>atom1</em>, <em>direction1</em>, <em>atom2</em>, <em>direction2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#Connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.Connection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-</dd></dl>
-
-<dl class="class">
 <dt id="mmead.molecular.topologies.periodic.Hexagonal">
 <em class="property">class </em><code class="descclassname">mmead.molecular.topologies.periodic.</code><code class="descname">Hexagonal</code><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#Hexagonal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.Hexagonal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicPattern" title="mmead.molecular.topologies.periodic.PeriodicPattern"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.periodic.PeriodicPattern</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicLattice" title="mmead.molecular.topologies.periodic.PeriodicLattice"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.periodic.PeriodicLattice</span></code></a></p>
 <p>Represents a hexagonal lattice.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.topologies.periodic.Hexagonal.a">
@@ -547,21 +541,6 @@ double bond.</li>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mmead.molecular.topologies.periodic.Hexagonal.connections">
-<code class="descname">connections</code><em class="property"> = []</em><a class="headerlink" href="#mmead.molecular.topologies.periodic.Hexagonal.connections" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mmead.molecular.topologies.periodic.Hexagonal.join_mols">
-<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#Hexagonal.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.Hexagonal.join_mols" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mmead.molecular.topologies.periodic.Hexagonal.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#Hexagonal.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.Hexagonal.place_mols" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="mmead.molecular.topologies.periodic.Hexagonal.vertices">
 <code class="descname">vertices</code><em class="property"> = [array([ 0.5       ,  0.28866667,  0.        ]), array([ 1.        ,  0.57733333,  0.        ])]</em><a class="headerlink" href="#mmead.molecular.topologies.periodic.Hexagonal.vertices" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -569,25 +548,105 @@ double bond.</li>
 </dd></dl>
 
 <dl class="class">
-<dt id="mmead.molecular.topologies.periodic.PeriodicPattern">
-<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.periodic.</code><code class="descname">PeriodicPattern</code><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicPattern"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicPattern" title="Permalink to this definition">¶</a></dt>
+<dt id="mmead.molecular.topologies.periodic.PeriodicBond">
+<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.periodic.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>atom1</em>, <em>direction1</em>, <em>atom2</em>, <em>direction2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicBond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents a periodic bond.</p>
+<p>In the attributes <cite>atom1</cite> and <cite>atom2</cite> the indices of bonder atom
+ids within <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.bonder_ids</span></code></a> are used rather than
+the bonder ids themselves because periodic bonds get created by
+<a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicLattice.join_mols" title="mmead.molecular.topologies.periodic.PeriodicLattice.join_mols"><code class="xref py py-meth docutils literal"><span class="pre">PeriodicLattice.join_mols()</span></code></a> before atoms are deleted by
+<a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms" title="mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms"><code class="xref py py-meth docutils literal"><span class="pre">PeriodicLattice.del_atoms()</span></code></a>. This means that ids of saved
+bonder atoms change. However, their position within
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.bonder_ids</span></code></a> does not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atom1</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – This represents the bonder atom which has a periodic bond with
+<cite>atom2</cite>. It is the index of the atom id within
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>.</li>
+<li><strong>direction1</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member list describing the axes along which the bond is
+periodic, when going from <cite>atom1</cite> toward <cite>atom2</cite>. For example
+<code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is perdiodic along the x axis
+in the positive direction.</li>
+<li><strong>atom2</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – This represents the bonder atom which has a periodic bond with
+<cite>atom1</cite>. It is the index of the atom id within
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>.</li>
+<li><strong>direction2</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member list describing the axes along which the bond is
+periodic, when going from <cite>atom2</cite> toward <cite>atom1</cite>. It should be
+like <cite>direction1</cite> but with all values made negative.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.periodic.PeriodicBond.atom1">
+<code class="descname">atom1</code><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – This represents the bonder atom which has a periodic bond with
+<cite>atom2</cite>. It is the index of the atom id within
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.periodic.PeriodicBond.direction1">
+<code class="descname">direction1</code><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicBond.direction1" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
+periodic, when going from <cite>atom1</cite> toward <cite>atom2</cite>. For example
+<code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is perdiodic along the x axis
+in the positive direction.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.periodic.PeriodicBond.atom2">
+<code class="descname">atom2</code><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – This represents the bonder atom which has a periodic bond with
+<cite>atom1</cite>. It is the index of the atom id within
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.periodic.PeriodicBond.direction2">
+<code class="descname">direction2</code><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicBond.direction2" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
+periodic, when going from <cite>atom2</cite> toward <cite>atom1</cite>. It should be
+like <cite>direction1</cite> but with all values made negative.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mmead.molecular.topologies.periodic.PeriodicLattice">
+<em class="property">class </em><code class="descclassname">mmead.molecular.topologies.periodic.</code><code class="descname">PeriodicLattice</code><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicLattice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicLattice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mmead.molecular.topologies.base.Topology" title="mmead.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.topologies.base.Topology</span></code></a></p>
 <p>A base class for periodic topologies.</p>
 <p>This class behaves almost exactly like
-<a class="reference internal" href="#mmead.molecular.topologies.base.Topology" title="mmead.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a> with only the <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicPattern.del_atoms" title="mmead.molecular.topologies.periodic.PeriodicPattern.del_atoms"><code class="xref py py-meth docutils literal"><span class="pre">del_atoms()</span></code></a> method being
-extended to collect the coordinates of any deleted atoms. This is
-necessary for positioning terminating atoms of islands generated
-from the periodic structure by the <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Periodic.island" title="mmead.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">Periodic.island()</span></code></a> method.</p>
+<a class="reference internal" href="#mmead.molecular.topologies.base.Topology" title="mmead.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a> with only minor additions to suit the
+representation of periodic lattices. The <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms" title="mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms"><code class="xref py py-meth docutils literal"><span class="pre">del_atoms()</span></code></a> method
+is extended to collect the coordinates of any deleted atoms. This
+is necessary for positioning terminating atoms on islands generated
+from the periodic structure by <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Periodic.island" title="mmead.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">Periodic.island()</span></code></a>.</p>
+<dl class="attribute">
+<dt id="mmead.molecular.topologies.periodic.PeriodicLattice.periodic_bonds">
+<code class="descname">periodic_bonds</code><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicLattice.periodic_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> – When periodic topologies are being assembled, periodic bonds
+do not get added to the rdkit molecule in the
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.mol" title="mmead.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute. Instead,
+<a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicLattice.join_mols" title="mmead.molecular.topologies.periodic.PeriodicLattice.join_mols"><code class="xref py py-meth docutils literal"><span class="pre">join_mols()</span></code></a> adds <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances
+representing the bonds into this list.</p>
+</dd></dl>
+
 <dl class="method">
-<dt id="mmead.molecular.topologies.periodic.PeriodicPattern.del_atoms">
-<code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicPattern.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicPattern.del_atoms" title="Permalink to this definition">¶</a></dt>
+<dt id="mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms">
+<code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicLattice.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes the atoms which are lost during assembly.</p>
 <p class="rubric">Notes</p>
 <p>The parameter <cite>macro_mol</cite> has two attributes changed.
-<code class="xref py py-attr docutils literal"><span class="pre">mol</span></code> has deleter
-atoms removed, while
-<code class="xref py py-attr docutils literal"><span class="pre">terminator_coords</span></code>
-is updated with the coordinates of every removed atom.</p>
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.mol" title="mmead.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> has deleter atoms removed, while
+<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Periodic.terminator_coords" title="mmead.molecular.molecules.Periodic.terminator_coords"><code class="xref py py-attr docutils literal"><span class="pre">terminator_coords</span></code></a> is updated with the
+coordinates of every removed atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -602,12 +661,69 @@ is updated with the coordinates of every removed atom.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="mmead.molecular.topologies.periodic.PeriodicLattice.join_mols">
+<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicLattice.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicLattice.join_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins the building blocks in the unit cell.</p>
+<p class="rubric">Notes</p>
+<p>The rdkit instance in the <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.mol" title="mmead.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute
+has bonds added to it. The <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicLattice.periodic_bonds" title="mmead.molecular.topologies.periodic.PeriodicLattice.periodic_bonds"><code class="xref py py-attr docutils literal"><span class="pre">periodic_bonds</span></code></a> attribute is
+also filled with <a class="reference internal" href="#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The unit cell being constructed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.topologies.periodic.PeriodicLattice.place_mols">
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#PeriodicLattice.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.PeriodicLattice.place_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places and aligns building blocks in the unit cell.</p>
+<p class="rubric">Notes</p>
+<p>This method modifies <cite>macro_mol</cite>. An rdkit molecule of the
+unit cell with the building blocks not joined up is placed in
+the <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.mol" title="mmead.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The unit cell being constructed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
 <dt id="mmead.molecular.topologies.periodic.is_bonder">
 <code class="descclassname">mmead.molecular.topologies.periodic.</code><code class="descname">is_bonder</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>atom_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/topologies/periodic.html#is_bonder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.topologies.periodic.is_bonder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p><code class="docutils literal"><span class="pre">True</span></code> if atom has <code class="docutils literal"><span class="pre">'bonder'</span></code> property.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule to which the atom belongs.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal"><span class="pre">True</span></code> if atom has <code class="docutils literal"><span class="pre">'bonder'</span></code> property else <code class="docutils literal"><span class="pre">False</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-mmead.molecular.topologies">
