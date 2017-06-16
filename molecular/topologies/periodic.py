@@ -20,7 +20,44 @@ def is_bonder(macro_mol, atom_id):
 
 
 class PeriodicPattern(Topology):
+    """
+    A base class for periodic topologies.
+
+    This class behaves almost exactly like
+    :class:`.Topology` with only the :meth:`del_atoms` method being
+    extended to collect the coordinates of any deleted atoms. This is
+    necessary for positioning terminating atoms of islands generated
+    from the periodic structure by the :meth:`.Periodic.island` method.
+
+    """
+
     def del_atoms(self, macro_mol):
+        """
+        Deletes the atoms which are lost during assembly.
+
+        Notes
+        -----
+        The parameter `macro_mol` has two attributes changed.
+        :attr:`~mmea.molecular.molecules.Molecule.mol` has deleter
+        atoms removed, while
+        :attr:`.~mmea.molecular.molecules.Periodic.terminator_coords`
+        is updated with the coordinates of every removed atom.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.Periodic`
+            The periodic macromolecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # This loop checks if an atom is an bonder and if its is finds
+        # a neighboring deleter atom. The deleter atom has its
+        # coordinates relative to the bonder found and saved in
+        # `terminator_coords`.
         macro_mol.terminator_coords = {}
         for atom in macro_mol.mol.GetAtoms():
             if not atom.HasProp('bonder'):
@@ -38,6 +75,11 @@ class PeriodicPattern(Topology):
 
 
 class Hexagonal(PeriodicPattern):
+    """
+    Represents a hexagonal lattice.
+
+    """
+
     cell_dimensions = a, b, c = [np.array([1, 0, 0]),
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 10.0000/1.7321])]
