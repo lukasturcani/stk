@@ -606,6 +606,13 @@ in the dictionary <cite>self.values</cite>.</p>
 
 </dd></dl>
 
+<dl class="exception">
+<dt id="mmead.molecular.energy._EnergyError">
+<em class="property">exception </em><code class="descclassname">mmead.molecular.energy.</code><code class="descname">_EnergyError</code><a class="reference internal" href="_modules/mmead/molecular/energy.html#_EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.energy._EnergyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>A class for errors in Energy methods.</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="mmead.molecular.energy.e_logger">
 <code class="descclassname">mmead.molecular.energy.</code><code class="descname">e_logger</code><span class="sig-paren">(</span><em>func</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/energy.html#e_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.energy.e_logger" title="Permalink to this definition">¶</a></dt>
@@ -1019,6 +1026,35 @@ number of expected windows.</li>
 <dt id="mmead.molecular.molecules.Cell">
 <em class="property">class </em><code class="descclassname">mmead.molecular.molecules.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>bonders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents an individual cell in a supercell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding the x, y and z index
+of the cell within the supercell.</li>
+<li><strong>bonders</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the bonder atom in the original unit cell to the
+equivalent bonder atom in the cell.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="mmead.molecular.molecules.Cell.id">
+<code class="descname">id</code><a class="headerlink" href="#mmead.molecular.molecules.Cell.id" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member array holding the x, y and z index
+of the cell within the supercell.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.molecules.Cell.bonders">
+<code class="descname">bonders</code><a class="headerlink" href="#mmead.molecular.molecules.Cell.bonders" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the bonder atom in the original unit cell to the
+equivalent bonder atom in the cell.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1206,6 +1242,27 @@ molecule of type building_blocks[1] to be added to the
 macromolecule during assembly.</p>
 <p>The value in the dictionary is a set of ints. These hold the
 atom ids belonging to a particular molecule - before assmebly.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mmead.molecular.molecules.MacroMolecule._json_init">
+<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#MacroMolecule._json_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.MacroMolecule._json_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Completes a JSON initialization.</p>
+<p>This function is not to be used. Use <code class="docutils literal"><span class="pre">Molecule.load()</span></code>
+for loading instances from a JSON string. That function will
+automatically call this one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json_dict</strong> (<em>dict</em>) – A dictionary holding the attribute data of the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1442,6 +1499,86 @@ identification.</p>
 <code class="descname">note</code><a class="headerlink" href="#mmead.molecular.molecules.Molecule.note" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>str (default = “”)</em> – A note or comment about the molecule. Purely optional but can
 be useful for labelling and debugging.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Molecule._cavity_size">
+<code class="descname">_cavity_size</code><span class="sig-paren">(</span><em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Molecule._cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Molecule._cavity_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates diameter of the molecule’s from <cite>origin</cite>.</p>
+<p>The cavity is measured by finding the atom nearest to
+<cite>origin</cite>, correcting for van der Waals diameter and multiplying
+by -2.</p>
+<p>This function should not be used. Use cavity_size() instead.
+cavity_size() finds the optimal value of <cite>origin</cite> to use.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>origin</strong> (<em>numpy.array</em>) – Holds the x, y and z coordinate of the position from which
+the cavity is measured.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The (negative) diameter of the molecules cavity.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Molecule._write_mdl_mol_file">
+<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Molecule._write_mdl_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a V3000 .mol file of the molecule</p>
+<p>This function should not be used directly, only via the
+<code class="docutils literal"><span class="pre">write()</span></code> method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) – The full path to which to the file should be written.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>file is created/ changed at path.</strong> (<a class="reference internal" href="mmead.molecular.topologies.cage.html#mmead.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mmead.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Molecule._write_pdb_file">
+<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Molecule._write_pdb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a .pdb file of the molecule</p>
+<p>This function should not be used directly, only via the
+<code class="docutils literal"><span class="pre">write()</span></code> method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) – The full path to which to the file should be written.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>file is created/ changed at path.</strong> (<a class="reference internal" href="mmead.molecular.topologies.cage.html#mmead.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mmead.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -1796,9 +1933,9 @@ of the macromolecules are the same.</td>
 <code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Molecule.set_orientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
 <p>Note: The difference between this method and
-<cite>_set_orientation2()</cite> is about which point the rotation
-occurs: centroid of entire molecule versus centroid of bonder
-atoms, respectively.</p>
+<a class="reference internal" href="#mmead.molecular.molecules.StructUnit._set_orientation2" title="mmead.molecular.molecules.StructUnit._set_orientation2"><code class="xref py py-meth docutils literal"><span class="pre">StructUnit._set_orientation2()</span></code></a> is about which point the
+rotation occurs: centroid of entire molecule versus centroid of
+bonder atoms, respectively.</p>
 <p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
 applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
 the molecule. The rotation occurs about the centroid of the
@@ -1916,7 +2053,7 @@ axis.</td>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A copy of the molecule where the coordinates have been
 shifted by <cite>shift</cite>.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">rdkit.Chem.rdchem.Mol</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -2000,20 +2137,180 @@ sanitization issues.</p>
 <em class="property">class </em><code class="descclassname">mmead.molecular.molecules.</code><code class="descname">Periodic</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mmead.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent periodic structures.</p>
+<p>This class is essentially the same as <a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>,
+with additional methods and attributes relevant to periodic
+materials being added. The <a class="reference internal" href="#mmead.molecular.molecules.Periodic.write" title="mmead.molecular.molecules.Periodic.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a> method is extended to
+produce GULP input files when a path ending with the extension
+<code class="docutils literal"><span class="pre">.gin</span></code> is provided.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.Periodic.terminator_coords">
 <code class="descname">terminator_coords</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the index of a bonder
-atom within <a class="reference internal" href="#mmead.molecular.molecules.StructUnit.bonder_ids" title="mmead.molecular.molecules.StructUnit.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
+atom within <a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule.bonder_ids" title="mmead.molecular.molecules.MacroMolecule.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
 <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x, y and z coordinates
 of a deleter atom attached to the bonder. The coordinates
 are relative to the bonder atom.</p>
-<p>The index must be used rather than the bonder id itself
+<p>The index must be used rather than the bonder’s id itself
 because this dictionary is filled before atoms are deleted
 during assembly. After deletion, ids of the remaining atoms
-change and as a result if this dictionary saved the ids it
+change and as a result, if this dictionary saved the ids, it
 would be inaccurate by the time <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.base.Topology.build" title="mmead.molecular.topologies.base.Topology.build"><code class="xref py py-meth docutils literal"><span class="pre">Topology.build()</span></code></a>
 completed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Periodic._is_subterminal">
+<code class="descname">_is_subterminal</code><span class="sig-paren">(</span><em>atom_id</em>, <em>bonder_map</em>, <em>bonded</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._is_subterminal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._is_subterminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal"><span class="pre">True</span></code> if atom is bonded to a terminal one.</p>
+<p class="rubric">Notes</p>
+<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.island" title="mmead.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom_id</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of the atom being checked.</li>
+<li><strong>bonder_map</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – A dictionary which maps the atom id in the island to the
+equivalent bonder atom in the unit cell.</li>
+<li><strong>bonded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code>) – A set of atom ids of all bonder atoms which have had a
+bond added by <a class="reference internal" href="#mmead.molecular.molecules.Periodic._join_island" title="mmead.molecular.molecules.Periodic._join_island"><code class="xref py py-meth docutils literal"><span class="pre">_join_island()</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if atom is bonded to a terminal atom, <code class="docutils literal"><span class="pre">False</span></code>
+otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Periodic._join_island">
+<code class="descname">_join_island</code><span class="sig-paren">(</span><em>cells</em>, <em>island</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._join_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._join_island" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds bonds between unit cells of <cite>island</cite>.</p>
+<p class="rubric">Notes</p>
+<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.island" title="mmead.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cells</strong> (nested <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="#mmead.molecular.molecules.Cell" title="mmead.molecular.molecules.Cell"><code class="xref py py-class docutils literal"><span class="pre">Cell</span></code></a>) – </li>
+<li><strong>island</strong> (<code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – The island molecule holding unit cells placed side by
+side like in a supercell but with no bonds running between
+them.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The first member of the tuple an rdkit molecule of the
+island with all bonds between the unit cells added. The
+second member of the tuple is a <code class="xref py py-class docutils literal"><span class="pre">set</span></code> of
+<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, where each <code class="xref py py-class docutils literal"><span class="pre">int</span></code> is id of a bonder
+atom which had a bond added by this function.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Periodic._place_island">
+<code class="descname">_place_island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._place_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._place_island" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places unit cells side by side to form an island.</p>
+<p class="rubric">Notes</p>
+<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.island" title="mmead.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of unit cells in the x, y and z directions to be
+placed side by side.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The first member of the tuple is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding
+<a class="reference internal" href="#mmead.molecular.molecules.Cell" title="mmead.molecular.molecules.Cell"><code class="xref py py-class docutils literal"><span class="pre">Cell</span></code></a> objects, one for each unit cell placed. The
+<a class="reference internal" href="#mmead.molecular.molecules.Cell" title="mmead.molecular.molecules.Cell"><code class="xref py py-class docutils literal"><span class="pre">Cell</span></code></a> object is placed within nested lists so that
+a cell with the coordinates x, y, z can be accessed from
+the list using <code class="docutils literal"><span class="pre">[x][y][z]</span></code>. For example,<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">periodic</span><span class="o">.</span><span class="n">_place_island</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+<span class="go">&lt;Cell at 0x7fa0155d54e0&gt;</span>
+</pre></div>
+</div>
+<p>where the returned <a class="reference internal" href="#mmead.molecular.molecules.Cell" title="mmead.molecular.molecules.Cell"><code class="xref py py-class docutils literal"><span class="pre">Cell</span></code></a> object represents the
+3rd unit cell along the x axis, the second along the y axis
+and the fourth along the z axis.</p>
+<p>The second member is an rdkit molecule of the island being
+built. The third member is a <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> mapping the
+ids of bonder atoms in the island back to the id of the
+equivalent atom in the original unit cell.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Periodic._terminate_island">
+<code class="descname">_terminate_island</code><span class="sig-paren">(</span><em>island</em>, <em>bonded</em>, <em>bonder_map</em>, <em>terminator</em>, <em>bond_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._terminate_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._terminate_island" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds atoms to all bonder atoms at the edges of <cite>island</cite>.</p>
+<p class="rubric">Notes</p>
+<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.island" title="mmead.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>island</strong> (<code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – The island molecule which needs to have terminating atoms
+added.</li>
+<li><strong>bonded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Contains all the ids of all bonder atoms in <cite>island</cite> which
+have already had a bonded added by <a href="#id1"><span class="problematic" id="id2">:methd:`_join_island`</span></a>.</li>
+<li><strong>bonder_map</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – This is a mapping of the ids of bonder atoms in the island
+back to the id of the equivalent atom in the original unit
+cell.</li>
+<li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The atomic number of the terminating atoms added to the
+supercell.</li>
+<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – A string holding the bond type of bonds to the terminating
+atoms. Valid options include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code>
+and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule of the final, assembled island.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.Periodic._write_gulp_input">
+<code class="descname">_write_gulp_input</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._write_gulp_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a GULP input file to <cite>path</cite>.</p>
+<p class="rubric">Notes</p>
+<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.write" title="mmead.molecular.molecules.Periodic.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -2024,17 +2321,77 @@ completed.</p>
 <dl class="method">
 <dt id="mmead.molecular.molecules.Periodic.island">
 <code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>terminator=1</em>, <em>bond_type=‘1’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Build a terminated supercell.</p>
+<p>Terminated means that the periodic bonds are replaced with
+bonds to terminating atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, holding the number of unit cells
+in the x, y and z directions used to make the supercell.</li>
+<li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The atomic number of the terminating atoms added to the
+supercell.</li>
+<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – A string holding the bond type of bonds to the terminating
+atoms. Valid options include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code>
+and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An rdkit molecule of the island.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="mmead.molecular.molecules.Periodic.write">
 <code class="descname">write</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Writes a molecular structure file of the molecule.</p>
+<p>Extends <a class="reference internal" href="#mmead.molecular.molecules.Molecule.write" title="mmead.molecular.molecules.Molecule.write"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.write()</span></code></a> to support <code class="docutils literal"><span class="pre">.gin</span></code> extensions
+which will cause a GULP input file to be written.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="mmead.molecular.molecules.Periodic.write_island">
-<code class="descname">write_island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write_island" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">write_island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>path</em>, <em>terminator=1</em>, <em>bond_type=‘1’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write_island" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a terminated supercell and writes it to <cite>path</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, holding the number of unit cells
+in the x, y and z directions used to make the supercell.</li>
+<li><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</li>
+<li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The atomic number of the terminating atoms added to the
+supercell.</li>
+<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – A string holding the bond type of bonds to the terminating
+atoms. Valid options include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code>
+and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -2140,6 +2497,104 @@ identification.</p>
 <code class="descname">note</code><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.note" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>str (default = “”)</em> – A note or comment about the molecule. Purely optional but can
 be useful for labelling and debugging.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mmead.molecular.molecules.StructUnit._json_init">
+<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit._json_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit._json_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Completes a JSON initialization.</p>
+<p>This function is not to be used. Use <code class="docutils literal"><span class="pre">Molecule.load()</span></code>
+for loading instances from a JSON string. That function will
+automatically call this one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json_dict</strong> (<em>dict</em>) – A dictionary holding the attribute data of the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.StructUnit._minimize_theta">
+<code class="descname">_minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit._minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit._minimize_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate mol to minimize angle between <cite>v1</cite> and <cite>v2</cite>.</p>
+<p>The rotation is done about the vector <cite>axis</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>v1</strong> (<em>numpy.array</em>) – The vector which is rotated.</li>
+<li><strong>v2</strong> (<em>numpy.array</em>) – The vector which is stationary.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
+<li><strong>centroid</strong> (<em>numpy.array</em>) – The position vector at the center of the rotation.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to the
+rotation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.StructUnit._set_orientation2">
+<code class="descname">_set_orientation2</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit._set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit._set_orientation2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: The difference between this method and
+<code class="docutils literal"><span class="pre">set_orientation()</span></code> is about which point the rotation
+occurs: centroid of bonder atoms versus centroid of entire
+molecule, respectively.</p>
+<p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
+applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
+the molecule. The rotation occurs about the centroid of the
+molecule.</p>
+<p>For example, if the <cite>start</cite> and <cite>end</cite> vectors
+are 45 degrees apart, a 45 degree rotation will be applied to
+the molecule. The rotation will be along the appropriate
+direction.</p>
+<p>The great thing about this method is that you as long as you
+can associate a gemotric feature of the molecule with a vector,
+then the molecule can be roatated so that this vector is
+aligned with <cite>end</cite>. The defined vector can be virtually
+anything. This means that any geomteric feature of the molecule
+can be easily aligned with any arbitrary axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>start</strong> (<em>numpy.array</em>) – A vector which is to be rotated so that it transforms to
+the <cite>end</cite> vector.</li>
+<li><strong>end</strong> (<em>numpy.array</em>) – This array holds the vector, onto which <cite>start</cite> is rotated.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
+rotation of the molecule about its centroid.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule in <cite>mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">rdkit.Chem.rdchem.Mol</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -2301,7 +2756,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x1df5b70&gt;, removeHs=False, sanitize=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x1df2400&gt;, removeHs=False, sanitize=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x1df2400&gt;, removeHs=False, sanitize=False), ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x1df2390&gt;, removeHs=False, sanitize=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x3387b70&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x3387b00&gt;, sanitize=False, removeHs=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x3387b70&gt;, sanitize=False, removeHs=False), ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x338b2e0&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
