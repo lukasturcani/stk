@@ -105,19 +105,7 @@ class PeriodicLattice(Topology):
     is necessary for positioning terminating atoms on islands generated
     from the periodic structure by :meth:`.Periodic.island`.
 
-    Attributes
-    ----------
-    periodic_bonds : :class:`list` of :class:`PeriodicBond`
-        When periodic topologies are being assembled, periodic bonds
-        do not get added to the rdkit molecule in the
-        :attr:`~.MacroMolecule.mol` attribute. Instead,
-        :meth:`join_mols` adds :class:`PeriodicBond` instances
-        representing the bonds into this list.
-
     """
-
-    def __init__(self):
-        self.periodic_bonds = []
 
     def del_atoms(self, macro_mol):
         """
@@ -167,8 +155,9 @@ class PeriodicLattice(Topology):
         Notes
         -----
         The rdkit instance in the :attr:`~.MacroMolecule.mol` attribute
-        has bonds added to it. The :attr:`periodic_bonds` attribute is
-        also filled with :class:`PeriodicBond` instances.
+        has bonds added to it. The
+        :attr:`~.MacroMolecule.periodic_bonds` attribute is also filled
+        with :class:`PeriodicBond` instances.
 
         Parameters
         ----------
@@ -207,7 +196,7 @@ class PeriodicLattice(Topology):
         # atom ids but not the ordering of this list.
         top_atom = macro_mol.bonder_ids.index(top_atom)
         bottom_atom = macro_mol.bonder_ids.index(bottom_atom)
-        self.periodic_bonds.append(
+        macro_mol.periodic_bonds.append(
                         PeriodicBond(top_atom, [0, 1, 0],
                                      bottom_atom, [0, -1, 0]))
         # Do the same for the x-axis periodic bonds.
@@ -220,7 +209,7 @@ class PeriodicLattice(Topology):
         # atom ids.
         right_atom = macro_mol.bonder_ids.index(right_atom)
         left_atom = macro_mol.bonder_ids.index(left_atom)
-        self.periodic_bonds.append(
+        macro_mol.periodic_bonds.append(
                                 PeriodicBond(right_atom, [1, 0, 0],
                                              left_atom, [-1, 0, 0]))
 
