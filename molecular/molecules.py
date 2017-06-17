@@ -133,10 +133,10 @@ import warnings
 import logging
 import json
 import os
-
 import numpy as np
 import networkx as nx
 import itertools as it
+import math
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
 
@@ -2916,9 +2916,7 @@ class Periodic(MacroMolecule):
 
     This class is essentially the same as :class:`MacroMolecule`,
     with additional methods and attributes relevant to periodic
-    materials being added. The :meth:`write` method is extended to
-    produce GULP input files when a path ending with the extension
-    ``.gin`` is provided.
+    materials being added.
 
     Attributes
     ----------
@@ -2936,7 +2934,18 @@ class Periodic(MacroMolecule):
         would be inaccurate by the time :meth:`.Topology.build`
         completed.
 
+    periodic_bonds : :class:`list` of :class:`.PeriodicBond`
+        When periodic topologies are being assembled, periodic bonds
+        do not get added to the rdkit molecule in the
+        :attr:`~.MacroMolecule.mol` attribute. Instead,
+        :meth:`join_mols` adds :class:`.PeriodicBond` instances
+        representing the bonds into this list.
+
     """
+
+    def __init__(self, building_blocks, topology, name="", note=""):
+        self.periodic_bonds = []
+        super().__init__(building_blocks, topology, name="", note="")
 
     def _is_subterminal(self, atom_id, bonder_map, bonded):
         """
@@ -2980,9 +2989,9 @@ class Periodic(MacroMolecule):
         # which were registered as having bonds crossing periodic
         # boundaries.
         periodic = {self.bonder_ids[x.atom1] for x in
-                    self.topology.periodic_bonds}
+                    self.periodic_bonds}
         periodic.update(self.bonder_ids[x.atom2] for x in
-                        self.topology.periodic_bonds)
+                        self.periodic_bonds)
         # If that atom does have a periodic bond and has not had a
         # bond added while building the island - it is subterminal and
         # needs to have a terminal atom attached.
@@ -3054,7 +3063,7 @@ class Periodic(MacroMolecule):
 
         emol = rdkit.EditableMol(island)
         bonded = set()
-        # `self.topology.periodic_bonds` holds objects of the
+        # `self.periodic_bonds` holds objects of the
         # ``PeriodicBond`` class. Each ``PeriodicBond`` object has the
         # ids of two bonder atoms in the unit cell which are connected
         # by a bond running across the periodic boundary. The
@@ -3073,7 +3082,7 @@ class Periodic(MacroMolecule):
         # atoms in the original unit cell  and checking the
         # `periodic_bond` to see which atom ids are connected.
         for cell in flatten(cells):
-            for periodic_bond in self.topology.periodic_bonds:
+            for periodic_bond in self.periodic_bonds:
                 # Get the indices of the cell which holds the atom
                 # bonded to the equivalent atom of
                 # `periodic_bond.atom1` in the present `cell`.
@@ -3246,31 +3255,10 @@ periodic._place_island([4, 4, 4])
                     i += 1
         return cells, island, bonder_map
 
-    def write(self, path):
+    def write_gulp_input(self, path, keywords,
+                         cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
         """
-        Writes a molecular structure file of the molecule.
-
-        Extends :meth:`Molecule.write` to support ``.gin`` extensions
-        which will cause a GULP input file to be written.
-
-        Parameters
-        ----------
-        path : str
-            The `path` to which the molecule should be written.
-
-        Returns
-        -------
-        None : NoneType
-
-        """
-
-        if path.endswith('.gin'):
-            return self._write_gulp_input(path)
-        return super().write(path)
-
-    def _write_gulp_input(self, path):
-        """
-        Writes a GULP input file to `path`.
+        Writes a GULP input file of the unit cell to `path`.
 
         Notes
         -----
@@ -3282,36 +3270,18 @@ periodic._place_island([4, 4, 4])
         path : :class:`str`
             The `path` to which the molecule should be written.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+        keywords : :class:`list` of :class:`str`
+            The keywords to be placed on the first line of the input
+            file.
 
-        """
+        cell_fix : :class:`list` of :class:`int`, optional
+            A 6 member list holding the fix parameters for the unit
+            cell.
 
-        ...
-
-    def write_island(self, dimensions, path,
-                     terminator=1, bond_type='1'):
-        """
-        Creates a terminated supercell and writes it to `path`.
-
-        Parameters
-        ----------
-        dimensions : :class:`list` of :class:`int`
-            A 3 member :class:`list`, holding the number of unit cells
-            in the x, y and z directions used to make the supercell.
-
-        path : str
-            The `path` of the file to which the molecule should be
-            written.
-
-        terminator : :class:`int`, optional
-            The atomic number of the terminating atoms added to the
-            supercell.
-
-        bond_type : :class:`str`, optional
-            The bond type of bonds to terminating atoms. Valid options
-            include ``'1'``, ``'2'``, ``'3'`` and ``'ar'``.
+        atom_fix : :class:`numpy.array` of :class:`int`, optional
+            An n by 3 array where n is the number of atoms in the
+            unit cell. Each row has the fix parameters for a given
+            atom.
 
         Returns
         -------
@@ -3319,4 +3289,46 @@ periodic._place_island([4, 4, 4])
 
         """
 
-        ...
+        if atom_fix is None:
+            atom_fix = np.ones([self.mol.GetNumAtoms(), 3])
+
+        with open(path, 'w') as f:
+            f.write(' '.join(keywords) + '\n\n')
+            f.write('name {}\n\n'.format(self.name))
+            # Write the cell paramters.
+            f.write('cell\n')
+            # The sizes of cell vectors a, b and c are written first.
+            for vector in self.topology.cell_dimensions:
+                f.write(str(np.linalg.norm(vector)) + ' ')
+            # Then angles alpha, beta and gamma.
+            a, b, c = self.topology.cell_dimensions
+            f.write(str(math.degrees(vector_theta(b, c))) + ' ')
+            f.write(str(math.degrees(vector_theta(a, c))) + ' ')
+            f.write(str(math.degrees(vector_theta(a, b))))
+            # Finally the fix parameters for the cell.
+            for fix in cell_fix:
+                f.write(' ' + str(fix))
+            f.write('\n')
+            # Add atom coordinates.
+            f.write('cart\n')
+            for (id_, coords), fix in zip(self.all_atom_coords(),
+                                          atom_fix):
+                x, y, z = [round(x, 4) for x in coords]
+                fx, fy, fz = [int(x) for x in fix]
+                f.write('{} core {} {} {} {} {} {}\n'.format(
+                         self.atom_symbol(id_), x, y, z, fx, fy, fz))
+            f.write('\n')
+            # Add bonds.
+            for bond in self.mol.GetBonds():
+                a1 = bond.GetBeginAtomIdx() + 1
+                a2 = bond.GetEndAtomIdx() + 1
+                f.write('connect {} {} 0 0 0\n'.format(a1, a2))
+
+            # Add periodic bonds.
+            for bond in self.periodic_bonds:
+                a1 = self.bonder_ids[bond.atom1] + 1
+                a2 = self.bonder_ids[bond.atom2] + 1
+                dx, dy, dz = bond.direction1
+                f.write('connect {} {} {:+} {:+} {:+}\n'.format(a1, a2,
+                                                                dx, dy,
+                                                                dz))
