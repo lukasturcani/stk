@@ -236,6 +236,8 @@ def plot_counter(counter, plot_name):
         labels.append(ind.name + ' - ' + str(ind.fitness))
 
     plt.bar(x_vals, y_vals, color='blue')
+    plt.xlabel('Individuals, denoted by fitness value')
+    plt.ylabel('Number of times selected')
     plt.xticks([x for x in x_vals], labels, rotation='vertical')
     plt.tight_layout()
     fig.savefig(plot_name, dpi=fig.dpi)
