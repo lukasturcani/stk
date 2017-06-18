@@ -426,7 +426,8 @@ class Molecule:
         cavity_origin = minimize(self._cavity_size,
                                  x0=ref,
                                  bounds=bounds).x
-        return -self._cavity_size(cavity_origin)
+        cavity =  -self._cavity_size(cavity_origin)
+        return 0 if cavity < 0 else cavity
 
     def center_of_mass(self):
         """
