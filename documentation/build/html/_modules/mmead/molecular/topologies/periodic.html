@@ -182,7 +182,7 @@
 <span class="sd">    direction1 : :class:`list` of :class:`int`</span>
 <span class="sd">        A 3 member list describing the axes along which the bond is</span>
 <span class="sd">        periodic, when going from `atom1` toward `atom2`. For example</span>
-<span class="sd">        ``[1, 0, 0]`` means that the bond is perdiodic along the x axis</span>
+<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
 <span class="sd">        in the positive direction.</span>
 
 <span class="sd">    atom2 : :class:`int`</span>
@@ -206,7 +206,7 @@
 <span class="sd">    direction1 : :class:`numpy.ndarray` of :class:`int`</span>
 <span class="sd">        A 3 member list describing the axes along which the bond is</span>
 <span class="sd">        periodic, when going from `atom1` toward `atom2`. For example</span>
-<span class="sd">        ``[1, 0, 0]`` means that the bond is perdiodic along the x axis</span>
+<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
 <span class="sd">        in the positive direction.</span>
 
 <span class="sd">    atom2 : :class:`int`</span>
@@ -239,7 +239,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool</span>
+<span class="sd">    :class:`bool`</span>
 <span class="sd">        ``True`` if atom has ``&#39;bonder&#39;`` property else ``False``.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -260,19 +260,7 @@
 <span class="sd">    is necessary for positioning terminating atoms on islands generated</span>
 <span class="sd">    from the periodic structure by :meth:`.Periodic.island`.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    periodic_bonds : :class:`list` of :class:`PeriodicBond`</span>
-<span class="sd">        When periodic topologies are being assembled, periodic bonds</span>
-<span class="sd">        do not get added to the rdkit molecule in the</span>
-<span class="sd">        :attr:`~.MacroMolecule.mol` attribute. Instead,</span>
-<span class="sd">        :meth:`join_mols` adds :class:`PeriodicBond` instances</span>
-<span class="sd">        representing the bonds into this list.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="PeriodicLattice.del_atoms"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -322,8 +310,9 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The rdkit instance in the :attr:`~.MacroMolecule.mol` attribute</span>
-<span class="sd">        has bonds added to it. The :attr:`periodic_bonds` attribute is</span>
-<span class="sd">        also filled with :class:`PeriodicBond` instances.</span>
+<span class="sd">        has bonds added to it. The</span>
+<span class="sd">        :attr:`~.MacroMolecule.periodic_bonds` attribute is also filled</span>
+<span class="sd">        with :class:`PeriodicBond` instances.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -352,7 +341,7 @@
         <span class="c1"># In the top fragment find the bonder atom with the</span>
         <span class="c1"># largest y value and connect it to the bonder atom in the</span>
         <span class="c1"># bottom fragment with the lowest y value. Note that the</span>
-        <span class="c1"># connection must be registered as perdiodic, hence the</span>
+        <span class="c1"># connection must be registered as periodic, hence the</span>
         <span class="c1"># directions are 1/-1.</span>
         <span class="n">top_atom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">bottom_atom</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span>
@@ -362,7 +351,7 @@
         <span class="c1"># atom ids but not the ordering of this list.</span>
         <span class="n">top_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">top_atom</span><span class="p">)</span>
         <span class="n">bottom_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bottom_atom</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">perdiodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">top_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                      <span class="n">bottom_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
         <span class="c1"># Do the same for the x-axis periodic bonds.</span>
@@ -375,7 +364,7 @@
         <span class="c1"># atom ids.</span>
         <span class="n">right_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">right_atom</span><span class="p">)</span>
         <span class="n">left_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">left_atom</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">perdiodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                                 <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">right_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                              <span class="n">left_atom</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
 

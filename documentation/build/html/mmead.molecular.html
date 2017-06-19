@@ -2139,9 +2139,7 @@ sanitization issues.</p>
 <p>Used to represent periodic structures.</p>
 <p>This class is essentially the same as <a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>,
 with additional methods and attributes relevant to periodic
-materials being added. The <a class="reference internal" href="#mmead.molecular.molecules.Periodic.write" title="mmead.molecular.molecules.Periodic.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a> method is extended to
-produce GULP input files when a path ending with the extension
-<code class="docutils literal"><span class="pre">.gin</span></code> is provided.</p>
+materials being added.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.Periodic.terminator_coords">
 <code class="descname">terminator_coords</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
@@ -2156,6 +2154,16 @@ during assembly. After deletion, ids of the remaining atoms
 change and as a result, if this dictionary saved the ids, it
 would be inaccurate by the time <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.base.Topology.build" title="mmead.molecular.topologies.base.Topology.build"><code class="xref py py-meth docutils literal"><span class="pre">Topology.build()</span></code></a>
 completed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.molecular.molecules.Periodic.periodic_bonds">
+<code class="descname">periodic_bonds</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.periodic_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> – When periodic topologies are being assembled, periodic bonds
+do not get added to the rdkit molecule in the
+<a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule.mol" title="mmead.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute. Instead,
+<code class="xref py py-meth docutils literal"><span class="pre">join_mols()</span></code> adds <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances
+representing the bonds into this list.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2293,27 +2301,6 @@ and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="mmead.molecular.molecules.Periodic._write_gulp_input">
-<code class="descname">_write_gulp_input</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic._write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic._write_gulp_input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes a GULP input file to <cite>path</cite>.</p>
-<p class="rubric">Notes</p>
-<p>For internal use by <a class="reference internal" href="#mmead.molecular.molecules.Periodic.write" title="mmead.molecular.molecules.Periodic.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>. Use that method directly,
-not this one.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The <cite>path</cite> to which the molecule should be written.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.Periodic.cache">
 <code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mmead.molecular.molecules.Periodic.cache" title="Permalink to this definition">¶</a></dt>
@@ -2350,42 +2337,25 @@ include <code class="docutils literal"><span class="pre">'1'</span></code>, <cod
 </dd></dl>
 
 <dl class="method">
-<dt id="mmead.molecular.molecules.Periodic.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes a molecular structure file of the molecule.</p>
-<p>Extends <a class="reference internal" href="#mmead.molecular.molecules.Molecule.write" title="mmead.molecular.molecules.Molecule.write"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.write()</span></code></a> to support <code class="docutils literal"><span class="pre">.gin</span></code> extensions
-which will cause a GULP input file to be written.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="mmead.molecular.molecules.Periodic.write_island">
-<code class="descname">write_island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>path</em>, <em>terminator=1</em>, <em>bond_type=‘1’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write_island" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a terminated supercell and writes it to <cite>path</cite>.</p>
+<dt id="mmead.molecular.molecules.Periodic.write_gulp_input">
+<code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a GULP input file of the unit cell to <cite>path</cite>.</p>
+<p class="rubric">Notes</p>
+<p>For internal use by <code class="xref py py-meth docutils literal"><span class="pre">write()</span></code>. Use that method directly,
+not this one.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, holding the number of unit cells
-in the x, y and z directions used to make the supercell.</li>
-<li><strong>path</strong> (<em>str</em>) – The <cite>path</cite> of the file to which the molecule should be
-written.</li>
-<li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The atomic number of the terminating atoms added to the
-supercell.</li>
-<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The bond type of bonds to terminating atoms. Valid options
-include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code> and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+<li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The <cite>path</cite> to which the molecule should be written.</li>
+<li><strong>keywords</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The keywords to be placed on the first line of the input
+file.</li>
+<li><strong>cell_fix</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – A 6 member list holding the fix parameters for the unit
+cell.</li>
+<li><strong>atom_fix</strong> (<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – An n by 3 array where n is the number of atoms in the
+unit cell. Each row has the fix parameters for a given
+atom.</li>
 </ul>
 </td>
 </tr>
@@ -2762,7 +2732,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x3583bc0&gt;, removeHs=False, sanitize=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x3580450&gt;, removeHs=False, sanitize=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x35803e0&gt;, removeHs=False, sanitize=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x3580450&gt;, removeHs=False, sanitize=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x2435c90&gt;, sanitize=False, removeHs=False), ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x2439400&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x2435c20&gt;, sanitize=False, removeHs=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x2435c90&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
