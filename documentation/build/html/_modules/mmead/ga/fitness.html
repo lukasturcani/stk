@@ -686,7 +686,8 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cavity</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="cage_target"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.fitness.cage_target">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="cage_target"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.fitness.cage_target">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">cage_target</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
                 <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -695,54 +696,55 @@
 <span class="sd">    The target is randomly rotated inside the cage&#39;s cavity and the</span>
 <span class="sd">    most stable conformation found is used.</span>
 
-<span class="sd">    The function calculates a fitness vector. The fitness vector</span>
-<span class="sd">    consists of the following properties in the listed order,</span>
+<span class="sd">    The function returns a fitness vector consisting of:</span>
 
-<span class="sd">            1) binding energy</span>
-<span class="sd">            2) asymmetry</span>
-<span class="sd">            3) strain</span>
+<span class="sd">        1. binding energy</span>
+<span class="sd">        2. cavity of cage in complex</span>
+<span class="sd">        3. asymmetry of cage in complex</span>
+<span class="sd">        4. strain of cage in complex</span>
+<span class="sd">        5. cavity of cage by itself</span>
+<span class="sd">        6. asymmetry of cage by itself</span>
+<span class="sd">        7. strain of cage by itself</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
+<span class="sd">    fitness parameters into :attr:`~.MacroMolecule.progress_params`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : Cage</span>
-<span class="sd">        The cage which is to have its fitness calculated,</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
+<span class="sd">        The cage which is to have its fitness calculated.</span>
 
-<span class="sd">    target_mol_file : str</span>
-<span class="sd">        The full path of the .mol file hodling the target molecule</span>
+<span class="sd">    target_mol_file : :class:`str`</span>
+<span class="sd">        The full path of the ``.mol`` file hodling the target molecule</span>
 <span class="sd">        placed inside the cage.</span>
 
-<span class="sd">    efunc : FunctionData</span>
-<span class="sd">        A FunctionData object representing the energy function used to</span>
-<span class="sd">        calculate energies.</span>
+<span class="sd">    efunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the energy</span>
+<span class="sd">        function used to calculate energies.</span>
 
-<span class="sd">    ofunc : FunctionData</span>
-<span class="sd">        A FunctionData object representing the optimization function to</span>
-<span class="sd">        be run on the generated complexes.</span>
+<span class="sd">    ofunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the optimization</span>
+<span class="sd">        function to be run on the generated complexes.</span>
 
-<span class="sd">    rotations : int (default = 0)</span>
+<span class="sd">    rotations : :class:`int`, optional</span>
 <span class="sd">        The number of times the target should be randomly rotated</span>
 <span class="sd">        within the cage cavity in order to find the most stable</span>
 <span class="sd">        conformation.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
+<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.progress_params : dict</span>
-<span class="sd">        Places the calculated parameters in the list. The order</span>
-<span class="sd">        corresponds to the arguments in the ``_param_labels()``</span>
-<span class="sd">        decorator applied to this function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
 <span class="sd">        The numpy array holds the fitness vector described in this</span>
 <span class="sd">        docstring.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
+<span class="sd">    :class:`ValueError`</span>
 <span class="sd">        If the calculation of a fitness parameter fails.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -754,67 +756,69 @@
                         <span class="n">logger</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cage_c60"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.fitness.cage_c60">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="cage_c60"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.fitness.cage_c60">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">cage_c60</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
              <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">n5fold</span><span class="p">,</span> <span class="n">n2fold</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness vector of a cage / C60 complex.</span>
 
-<span class="sd">    The difference between this function and `cage_target()` is that</span>
-<span class="sd">    the rotations are specifically aimed at sampling C60 entirely and</span>
-<span class="sd">    systematically. Rather than the random sampling of the other</span>
+<span class="sd">    The difference between this function and :func:`cage_target` is</span>
+<span class="sd">    that the rotations are specifically aimed at sampling C60 entirely</span>
+<span class="sd">    and systematically. Rather than the random sampling of the other</span>
 <span class="sd">    function.</span>
 
-<span class="sd">    The fitness vector consists of the following properties in the</span>
-<span class="sd">    listed order,</span>
+<span class="sd">    The function returns a fitness vector consisting of:</span>
 
-<span class="sd">        1) binding energy</span>
-<span class="sd">        2) asymmetry</span>
-<span class="sd">        3) strain</span>
+<span class="sd">        1. binding energy</span>
+<span class="sd">        2. cavity of cage in complex</span>
+<span class="sd">        3. asymmetry of cage in complex</span>
+<span class="sd">        4. strain of cage in complex</span>
+<span class="sd">        5. cavity of cage by itself</span>
+<span class="sd">        6. asymmetry of cage by itself</span>
+<span class="sd">        7. strain of cage by itself</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
+<span class="sd">    fitness parameters into :attr:`~.MacroMolecule.progress_params`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : Cage</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
 <span class="sd">        The cage which is to have its fitness calculated.</span>
 
-<span class="sd">    target_mol_file : str</span>
-<span class="sd">        The full path of the .mol file hodling the target molecule</span>
+<span class="sd">    target_mol_file : :class:`str`</span>
+<span class="sd">        The full path of the ``.mol`` file hodling the target molecule</span>
 <span class="sd">        placed inside the cage.</span>
 
-<span class="sd">    efunc : FunctionData</span>
-<span class="sd">        A FunctionData object representing the energy function used to</span>
-<span class="sd">        calculate energies.</span>
+<span class="sd">    efunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the energy</span>
+<span class="sd">        function used to calculate energies.</span>
 
-<span class="sd">    ofunc : FunctionData</span>
-<span class="sd">        A FunctionData object representing the optimization function to</span>
-<span class="sd">        be run on the generated complexes.</span>
+<span class="sd">    ofunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the optimization</span>
+<span class="sd">        function to be run on the generated complexes.</span>
 
-<span class="sd">    n5fold : int</span>
+<span class="sd">    n5fold : :class:`int`</span>
 <span class="sd">        The number of rotations along the 5-fold axis of symmetry.</span>
 
-<span class="sd">    n2fold : int</span>
+<span class="sd">    n2fold : :class:`int`</span>
 <span class="sd">        The number of rotations along the 2 fold axis of symmetry per</span>
 <span class="sd">        rotation along the 5-fold axis.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
+<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.progress_params : dict</span>
-<span class="sd">        Places the calculated parameters in the list. The order</span>
-<span class="sd">        corresponds to the arguments in the ``_param_labels()``</span>
-<span class="sd">        decorator applied to this function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
 <span class="sd">        The numpy array holds the fitness vector described in this</span>
 <span class="sd">        docstring.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
+<span class="sd">    :class:`ValueError`</span>
 <span class="sd">        If the calculation of a fitness parameter fails.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -832,56 +836,61 @@
 <span class="sd">    A general fitness function for calculating fitness of complexes.</span>
 
 <span class="sd">    This function should be inherited by other fitness functions which</span>
-<span class="sd">    define their own rotation function. For example ``cage_c60()`` and</span>
-<span class="sd">    ``cage_target()``.</span>
+<span class="sd">    define their own rotation function. For example :func:`cage_c60`</span>
+<span class="sd">    and :func:`cage_target`.</span>
 
-<span class="sd">    The function returns a fitness vector consisting of the</span>
-<span class="sd">    binding energy, asymmetry and strain.</span>
+<span class="sd">    The function returns a fitness vector consisting of:</span>
+
+<span class="sd">        1. binding energy</span>
+<span class="sd">        2. cavity of cage in complex</span>
+<span class="sd">        3. asymmetry of cage in complex</span>
+<span class="sd">        4. strain of cage in complex</span>
+<span class="sd">        5. cavity of cage by itself</span>
+<span class="sd">        6. asymmetry of cage by itself</span>
+<span class="sd">        7. strain of cage by itself</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
+<span class="sd">    fitness parameters into :attr:`~.MacroMolecule.progress_params`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    func_name : str</span>
+<span class="sd">    func_name : :class:`str`</span>
 <span class="sd">        The name of the external fitness function calling this one.</span>
-<span class="sd">        Used for the key in the `progress_params` dict.</span>
+<span class="sd">        Used for the key in :attr:`~.MacroMolecule.progress_params`.</span>
 
-<span class="sd">    macro_mol : Cage</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
 <span class="sd">        The cage which is to have its fitness calculated.</span>
 
-<span class="sd">    target_mol_file : str</span>
-<span class="sd">        The full path of the .mol file hodling the target molecule</span>
+<span class="sd">    target_mol_file : :class:`str`</span>
+<span class="sd">        The full path of the ``.mol`` file hodling the target molecule</span>
 <span class="sd">        placed inside the cage.</span>
 
-<span class="sd">    efunc : FunctionData</span>
-<span class="sd">        A FunctionData object representing the energy function used to</span>
-<span class="sd">        calculate energies.</span>
+<span class="sd">    efunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the energy</span>
+<span class="sd">        function used to calculate energies.</span>
 
-<span class="sd">    ofunc : FunctionData</span>
-<span class="sd">        A FunctionData object representing the optimization function to</span>
-<span class="sd">        be run on the generated complexes.</span>
+<span class="sd">    ofunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the optimization</span>
+<span class="sd">        function to be run on the generated complexes.</span>
 
-<span class="sd">    rotation_func : FunctionData</span>
-<span class="sd">        A FunctionData object representing the rotation function to be</span>
-<span class="sd">        used.</span>
+<span class="sd">    rotation_func : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the rotation</span>
+<span class="sd">        function to be used.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger</span>
+<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.progress_params : dict</span>
-<span class="sd">        Places the calculated parameters in the list. The order</span>
-<span class="sd">        corresponds to the arguments in the ``_param_labels()``</span>
-<span class="sd">        decorator applied to this function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
 <span class="sd">        The numpy array holds the fitness vector described in this</span>
 <span class="sd">        docstring.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
+<span class="sd">    :class:`ValueError`</span>
 <span class="sd">        If the calculation of a fitness parameter fails.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -979,13 +988,23 @@
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">cmplx_cage_mol</span>
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">topology</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span>
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">min_eng_cmplx</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_no_target&#39;</span>
+    <span class="c1"># Calculate fitness parameters of cage in complex.</span>
+    <span class="n">cmplx_cavity</span> <span class="o">=</span> <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
+    <span class="n">cmplx_asymmetry</span> <span class="o">=</span> <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">window_difference</span><span class="p">()</span>
+    <span class="n">cmplx_strain</span> <span class="o">=</span> <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
 
     <span class="c1"># Write the cage without the target to a file.</span>
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.mol&#39;</span><span class="p">))</span>
 
+    <span class="c1"># Calculate fitness parameters of cage by itself.</span>
+    <span class="n">cavity</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
     <span class="n">asymmetry</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">window_difference</span><span class="p">()</span>
     <span class="n">strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
     <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">binding_energy</span><span class="p">,</span>
+                                            <span class="n">cmplx_cavity</span><span class="p">,</span>
+                                            <span class="n">cmplx_asymmetry</span><span class="p">,</span>
+                                            <span class="n">cmplx_strain</span><span class="p">,</span>
+                                            <span class="n">cavity</span><span class="p">,</span>
                                             <span class="n">asymmetry</span><span class="p">,</span>
                                             <span class="n">strain</span><span class="p">]</span>
 
@@ -993,7 +1012,9 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;At least one&#39;</span>
                          <span class="s1">&#39; fitness parameter not calculated.&#39;</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">binding_energy</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">binding_energy</span><span class="p">,</span>
+                     <span class="n">cmplx_cavity</span><span class="p">,</span> <span class="n">cmplx_asymmetry</span><span class="p">,</span> <span class="n">cmplx_strain</span><span class="p">,</span>
+                     <span class="n">cavity</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="_make_cage_target_folder"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.fitness._make_cage_target_folder">[docs]</a><span class="k">def</span> <span class="nf">_make_cage_target_folder</span><span class="p">():</span>
