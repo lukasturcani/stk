@@ -459,32 +459,40 @@ rotation along the 5-fold axis.</li>
 <code class="descclassname">mmead.ga.fitness.</code><code class="descname">_cage_target</code><span class="sig-paren">(</span><em>func_name</em>, <em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotation_func</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#_cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness._cage_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>A general fitness function for calculating fitness of complexes.</p>
 <p>This function should be inherited by other fitness functions which
-define their own rotation function. For example <code class="docutils literal"><span class="pre">cage_c60()</span></code> and
-<code class="docutils literal"><span class="pre">cage_target()</span></code>.</p>
-<p>The function returns a fitness vector consisting of the
-binding energy, asymmetry and strain.</p>
+define their own rotation function. For example <a class="reference internal" href="#mmead.ga.fitness.cage_c60" title="mmead.ga.fitness.cage_c60"><code class="xref py py-func docutils literal"><span class="pre">cage_c60()</span></code></a>
+and <a class="reference internal" href="#mmead.ga.fitness.cage_target" title="mmead.ga.fitness.cage_target"><code class="xref py py-func docutils literal"><span class="pre">cage_target()</span></code></a>.</p>
+<p>The function returns a fitness vector consisting of:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>binding energy</li>
+<li>cavity of cage in complex</li>
+<li>asymmetry of cage in complex</li>
+<li>strain of cage in complex</li>
+<li>cavity of cage by itself</li>
+<li>asymmetry of cage by itself</li>
+<li>strain of cage by itself</li>
+</ol>
+</div></blockquote>
+<p class="rubric">Notes</p>
+<p>This function modifies <cite>macro_mol</cite>. It places the calculated
+fitness parameters into <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.progress_params" title="mmead.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_name</strong> (<em>str</em>) – The name of the external fitness function calling this one.
-Used for the key in the <cite>progress_params</cite> dict.</li>
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its fitness calculated.</li>
-<li><strong>target_mol_file</strong> (<em>str</em>) – The full path of the .mol file hodling the target molecule
+<li><strong>func_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of the external fitness function calling this one.
+Used for the key in <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.progress_params" title="mmead.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
+<li><strong>target_mol_file</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal"><span class="pre">.mol</span></code> file hodling the target molecule
 placed inside the cage.</li>
-<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the energy function used to
-calculate energies.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the optimization function to
-be run on the generated complexes.</li>
-<li><strong>rotation_func</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the rotation function to be
-used.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging. Not used by this function.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.progress_params</strong> (<em>dict</em>) – Places the calculated parameters in the list. The order
-corresponds to the arguments in the <code class="docutils literal"><span class="pre">_param_labels()</span></code>
-decorator applied to this function.</li>
+<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the energy
+function used to calculate energies.</li>
+<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be run on the generated complexes.</li>
+<li><strong>rotation_func</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the rotation
+function to be used.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>) – Used for logging. Not used by this function.</li>
 </ul>
 </td>
 </tr>
@@ -492,10 +500,10 @@ decorator applied to this function.</li>
 docstring.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">numpy.array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
 </td>
 </tr>
 </tbody>
@@ -689,40 +697,41 @@ docstring.</p>
 <dt id="mmead.ga.fitness.cage_c60">
 <code class="descclassname">mmead.ga.fitness.</code><code class="descname">cage_c60</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>n5fold</em>, <em>n2fold</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/fitness.html#cage_c60"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.fitness.cage_c60" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fitness vector of a cage / C60 complex.</p>
-<p>The difference between this function and <cite>cage_target()</cite> is that
-the rotations are specifically aimed at sampling C60 entirely and
-systematically. Rather than the random sampling of the other
+<p>The difference between this function and <a class="reference internal" href="#mmead.ga.fitness.cage_target" title="mmead.ga.fitness.cage_target"><code class="xref py py-func docutils literal"><span class="pre">cage_target()</span></code></a> is
+that the rotations are specifically aimed at sampling C60 entirely
+and systematically. Rather than the random sampling of the other
 function.</p>
-<p>The fitness vector consists of the following properties in the
-listed order,</p>
+<p>The function returns a fitness vector consisting of:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li>binding energy</li>
-<li>asymmetry</li>
-<li>strain</li>
+<li>cavity of cage in complex</li>
+<li>asymmetry of cage in complex</li>
+<li>strain of cage in complex</li>
+<li>cavity of cage by itself</li>
+<li>asymmetry of cage by itself</li>
+<li>strain of cage by itself</li>
 </ol>
 </div></blockquote>
+<p class="rubric">Notes</p>
+<p>This function modifies <cite>macro_mol</cite>. It places the calculated
+fitness parameters into <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.progress_params" title="mmead.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its fitness calculated.</li>
-<li><strong>target_mol_file</strong> (<em>str</em>) – The full path of the .mol file hodling the target molecule
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
+<li><strong>target_mol_file</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal"><span class="pre">.mol</span></code> file hodling the target molecule
 placed inside the cage.</li>
-<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the energy function used to
-calculate energies.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the optimization function to
-be run on the generated complexes.</li>
-<li><strong>n5fold</strong> (<em>int</em>) – The number of rotations along the 5-fold axis of symmetry.</li>
-<li><strong>n2fold</strong> (<em>int</em>) – The number of rotations along the 2 fold axis of symmetry per
+<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the energy
+function used to calculate energies.</li>
+<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be run on the generated complexes.</li>
+<li><strong>n5fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</li>
+<li><strong>n2fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 2 fold axis of symmetry per
 rotation along the 5-fold axis.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging. Not used by this function.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.progress_params</strong> (<em>dict</em>) – Places the calculated parameters in the list. The order
-corresponds to the arguments in the <code class="docutils literal"><span class="pre">_param_labels()</span></code>
-decorator applied to this function.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>, optional) – Used for logging. Not used by this function.</li>
 </ul>
 </td>
 </tr>
@@ -730,10 +739,10 @@ decorator applied to this function.</li>
 docstring.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">numpy.array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
 </td>
 </tr>
 </tbody>
@@ -746,36 +755,37 @@ docstring.</p>
 <dd><p>Returns the fitness vector of a cage / target complex.</p>
 <p>The target is randomly rotated inside the cage’s cavity and the
 most stable conformation found is used.</p>
-<p>The function calculates a fitness vector. The fitness vector
-consists of the following properties in the listed order,</p>
+<p>The function returns a fitness vector consisting of:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li>binding energy</li>
-<li>asymmetry</li>
-<li>strain</li>
+<li>cavity of cage in complex</li>
+<li>asymmetry of cage in complex</li>
+<li>strain of cage in complex</li>
+<li>cavity of cage by itself</li>
+<li>asymmetry of cage by itself</li>
+<li>strain of cage by itself</li>
 </ol>
 </div></blockquote>
+<p class="rubric">Notes</p>
+<p>This function modifies <cite>macro_mol</cite>. It places the calculated
+fitness parameters into <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule.progress_params" title="mmead.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its fitness calculated,</li>
-<li><strong>target_mol_file</strong> (<em>str</em>) – The full path of the .mol file hodling the target molecule
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.Cage" title="mmead.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
+<li><strong>target_mol_file</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal"><span class="pre">.mol</span></code> file hodling the target molecule
 placed inside the cage.</li>
-<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the energy function used to
-calculate energies.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the optimization function to
-be run on the generated complexes.</li>
-<li><strong>rotations</strong> (<em>int</em><em> (</em><em>default = 0</em><em>)</em>) – The number of times the target should be randomly rotated
+<li><strong>efunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the energy
+function used to calculate energies.</li>
+<li><strong>ofunc</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mmead.html#mmead.convenience_tools.FunctionData" title="mmead.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be run on the generated complexes.</li>
+<li><strong>rotations</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of times the target should be randomly rotated
 within the cage cavity in order to find the most stable
 conformation.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging. Not used by this function.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.progress_params</strong> (<em>dict</em>) – Places the calculated parameters in the list. The order
-corresponds to the arguments in the <code class="docutils literal"><span class="pre">_param_labels()</span></code>
-decorator applied to this function.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mmead.html#mmead.convenience_tools.FakeLogger" title="mmead.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>, optional) – Used for logging. Not used by this function.</li>
 </ul>
 </td>
 </tr>
@@ -783,10 +793,10 @@ decorator applied to this function.</li>
 docstring.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">numpy.array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
 </td>
 </tr>
 </tbody>
@@ -1520,7 +1530,7 @@ functions or methods that are to be used with that keyword.</dd>
 </dl>
 <dl class="attribute">
 <dt id="mmead.ga.input.InputHelp.modules">
-<code class="descname">modules</code><em class="property"> = {‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mmead.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">modules</code><em class="property"> = {‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mmead.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
