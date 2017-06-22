@@ -3261,11 +3261,6 @@ periodic._place_island([4, 4, 4])
         """
         Writes a GULP input file of the unit cell to `path`.
 
-        Notes
-        -----
-        For internal use by :meth:`write`. Use that method directly,
-        not this one.
-
         Parameters
         ----------
         path : :class:`str`
