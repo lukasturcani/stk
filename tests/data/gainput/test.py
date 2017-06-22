@@ -50,13 +50,13 @@ generational_select_func =  {'NAME' : 'stochastic_sampling',
 # Selection function for selecting parents.
 ##################################################################################
 
-parent_select_func = {'NAME' : 'crossover_roulette'}
+crossover_select_func = {'NAME' : 'crossover_roulette'}
 
 ##################################################################################
 # Selection function for selecting molecules for mutation.
 ##################################################################################
 
-mutant_select_func = {'NAME' : 'stochastic_sampling',
+mutation_select_func = {'NAME' : 'stochastic_sampling',
                       'duplicates' : True}
 
 ##################################################################################
