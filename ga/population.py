@@ -211,6 +211,7 @@ class Population:
 
         """
 
+        databases = [glob(os.path.join(db, '*')) for db in databases]
         p = Population(ga_tools)
         for *bb_files, topology in it.product(*databases, topologies):
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
