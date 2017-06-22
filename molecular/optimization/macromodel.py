@@ -377,7 +377,7 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
                 The number of conformers sampled and optimized from the
                 MD.
 
-            'time_step' : float (default = 1.5)
+            'time_step' : float (default = 1.0)
                 The time step in fs for the MD.
 
             'eq_time' : float (default = 10)
@@ -410,7 +410,7 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
                'force_field': 16,
                'temp': 300,
                'confs': 50,
-               'time_step': 1.5,
+               'time_step': 1.0,
                'eq_time': 10,
                'sim_time': 200,
                'max_iter': 2500,

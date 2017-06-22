@@ -23,56 +23,67 @@ from ..molecular.optimization.optimization import (
 
 class Population:
     """
-    A container of ``Molecule`` and ``Population`` instances.
+    Contains :class:`.Molecule` objects.
 
-    This is the central class of MMEA. The GA is invoked by calling the
-    ``gen_offspring``, ``gen_mutants`` and ``select`` methods of this
-    class on a given instance. However, this class is a container of
-    ``Molecule`` and other ``Population`` instances first and
-    foremost. It delegates GA operations to its `ga_tools` attribute.
-    Any functionality related to the GA should be delegated to this
-    attribute. The ``gen_offspring`` and ``gen_mutants`` methods can
-    serve as a guide to how this should be done. A comphrehensive
-    account of how the interaction between these two classes is
-    provided in the developer's guide.
+    In addtion to holding :class:`.Molecule`
+    objects, the :class:`Population`
+    class can be used to create large numbers of these instances
+    through the :meth:`init\_` class methods. Contained |Molecule| objects
+    can have their structures optimized in parallel through the
+    :meth:`optimize_population` method. :class:`Population` instances
+    can be nested.
 
-    For consistency and maintainability, collections of
-    ``Molecule`` or ``Population`` instances should always be
-    placed in a ``Population`` instance. As a result, any function
-    which should return multiple ``Molecule`` or ``Population``
-    instances can be expected to return a single ``Population``
-    instance holding the desired instances. Some functions may have to
-    return the population organized in a specific way, depending on
-    use.
+    The EA is invoked by calling a number of methods of this class,
+    such as :meth:`gen_offspring`, :meth:`gen_mutants` and
+    :meth:`select`, on a given instance. However this class only
+    implements container related functionality. The EA operations are
+    performed by :class:`mmead.` It
+    delegates GA operations to its :attr:`ga_tools` attribute. Any
+    functionality related to the EA should be delegated to this
+    attribute. The :meth:`gen_offspring` and :meth:`gen_mutants`
+    methods can serve as a guide to how this should be done.
 
     The only operations directly addressed by this class and definined
     within it are those relevant to its role as a container. It
     supports all expected and necessary container operations such as
     iteration, indexing, membership checks (via the ``is in`` operator)
-    as would be expected. Additional operations such as comparison via
-    the ``==``, ``>``, etc. operators is also supported. Details of the
-    various implementations and a full list of supported operations can
-    be found by examining the included methods. Note that all
-    comparison operations are accounted for with the ``total_ordering``
-    decorator, even if they are not explicity defined.
+    as would be expected. Details of the various implementations and a
+    full list of supported operations can be found by examining the
+    included methods.
+
+    Parameters
+    ----------
+    *args : |Molecule|, :class:`Population`, |GATools|
+        A population is initialized with as many |Molecule|
+        or :class:`Population` arguments as required. These are placed
+        into the :attr:`members` or :attr:`populations` attributes,
+        respectively. A |GATools| instance may be included
+        and will be placed into the :attr:`ga_tools` attribute.
+
+    Raises
+    ------
+    TypeError
+        If initialized with something other than |Molecule|,
+        :class:`Population` or |GATools| instances.
 
     Attributes
     ----------
-    populations : list of ``Population`` instances
-        A list of other instances of the ``Population`` class. This
-        allows the implementation of subpopulations or evolutionary
-        islands. This attribute is also used for grouping
+    populations : :class:`list` of :class:`Population` instances
+        A list of other instances of the :class:`Population` class.
+        This allows the implementation of subpopulations or
+        evolutionary islands. This attribute is also used for grouping
         molecules within a given population for organizational
         purposes.
 
-    members : list of ``Molecule`` instances
-        A list of ``Molecule`` instances. These are the members of
-        the population which are not held within any subpopulations.
-        This means that not all members of a population are stored
-        here. To access all members of a population the generator
-        method ``all_members()`` should be used.
+    members : :class:`list` of \
+              :class:`~mmead.molecular.molecules.Molecule` instances
+        Held here are the members of the population which are not held
+        within any subpopulations. This means that not all members of a
+        population are stored in this attribute. To access all members
+        of a population the generator :meth:`all_members` should be
+        used.
 
-    ga_tools : GATools, optional
+    ga_tools : :class:`~mmead.ga.ga_tools.GATools`, optional
         An instance of the ``GATools`` class. Calls to preform GA
         operations on the ``Population`` instance are delegated
         to this attribute.
@@ -89,21 +100,6 @@ class Population:
         population is to have GA operations performed on it.
 
         The arguments can be provided in any order regardless of type.
-
-        Parameters
-        ----------
-        *args : Molecule, Population, GATools
-            A population is initialized with as many ``Molecule``
-            or ``Population`` arguments as required. These are placed
-            into the `members` or `populations` attributes,
-            respectively. A ``GATools`` instance may be included
-            and will be placed into the `ga_tools` attribute.
-
-        Raises
-        ------
-        TypeError
-            If the instance is initialized with something other than
-            ``Molecule``, ``Population`` or ``GATools`` object.
 
         """
 
@@ -135,6 +131,96 @@ class Population:
                     ("Population can only be"
                      " initialized with ``Population``,"
                      " ``Molecule`` and ``GATools`` types."), arg)
+
+    @classmethod
+    def init_all(cls, databases, topologies,
+                 bb_classes, macromol_class,
+                 ga_tools=GATools.init_empty(), duplicates=False):
+        """
+        Creates all possible molecules from a given set of databases.
+
+        All possible combinations of building blocks from `databases`
+        and topologies from `topologies` are built. The initialization
+        of a macromolecule in the population has the form
+
+        .. code-block:: python
+
+            mol = macromol_class([bb1, bb2, ...], topology)
+
+        where ``bb1`` is initialized from a  molecule in
+        ``databases[0]``, ``bb2`` from a molecule in ``databases[1]``
+        and so on.
+
+        Parameters
+        ----------
+        databases : :class:`list` of :class:`str`
+            List of paths to directories, which hold molecular
+            structure files of the building blocks.
+
+        topologies : :class:`list` of :class:`.Topology`
+            The topologies of macromolecules being made.
+
+        bb_classes : :class:`list` of :class:`type`
+            This list must be equal in length to `databases`. For each
+            database provided in `databases`, a class used to
+            initialize building blocks from that database is provided
+            here. For example, if
+
+            .. code-block:: python
+
+                databases = ['/path/to/amines2f',
+                             '/path/to/aldehydes3f']
+
+            then a valid `bb_classes` list would be
+
+            .. code-block:: python
+
+                bb_classes = [StructUnit2, StructUnit3]
+
+            This means all molecules in the ``amines2f`` database are
+            initialized as :class:`.StructUnit2` objects, while all
+            molecules in ``aldehydes3f`` are initialized as
+            :class:`.StructUnit3` objects.
+
+        macromol_class : :class:`type`
+            The class of the :class:`.MacroMolecule` objects being
+            built.
+
+        duplicates : :class:`bool`, optional
+            If ``True`` duplicate structures are not removed from
+            the population.
+
+        Returns
+        -------
+        :class:`Population`
+            A population holding all possible macromolecules from
+            assembled from `databases`.
+
+        Example
+        -------
+        If the name of the functional group needs to be provided to the
+        building blocks, a lambda function can be used.
+
+        .. code-block:: python
+
+            dbs = ['/path/to/db1', 'path/to/db2']
+            tops = [Linear("AB", [0, 0], 6)]
+            bb_classes = [lambda x: StructUnit2(x, 'aldehyde'),
+                          lambda x: StructUnit3(x, 'amine')]
+            pop = Population.init_all(dbs, tops, bb_classes, Polymer)
+
+        """
+
+        databases = [glob(os.path.join(db, '*')) for db in databases]
+        p = Population(ga_tools)
+        for *bb_files, topology in it.product(*databases, topologies):
+            bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
+            p.members.append(macromol_class(bbs, topology))
+
+        if not duplicates:
+            p.remove_duplicates()
+
+        return p
 
     @classmethod
     def init_cage_isomers(cls, lk_file, bb_file, topology,
@@ -429,7 +515,7 @@ class Population:
         """
         Adds ``Molecule`` instances into `members`.
 
-        The ``Molecule`` instances held within the supplied
+        The |Molecule| instances held within the supplied
         ``Population`` instance, `population`, are added into the
         `members` attribute of `self`. The supplied `population` itself
         is not added. This means that any information the `population`
@@ -448,7 +534,7 @@ class Population:
 
         Parameters
         ----------
-        population : Population (or iterable of ``Molecule``s)
+        population : iterable of :class:`~mmead.molecular.molecules.Molecule`
             ``Molecule`` instances to be added to the `members`
             attribute and/or ``Population`` instances who's members, as
             generated by `all_members`, will be added to the `members`
@@ -460,11 +546,6 @@ class Population:
             than one instance of the same molecule to be added.
             Whether two molecules are the same is defined by the
             `same()` method of the ``Molecule`` class.
-
-        Modifies
-        --------
-        members
-            Adds instances into the `members` attribute of `self`.
 
         Returns
         -------

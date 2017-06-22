@@ -531,7 +531,8 @@ def cage(macro_mol, pseudoformation_params={
     return np.array([cavity, window, asymmetry, e_per_bond, strain])
 
 
-@_param_labels('Binding Energy', 'Asymmetry', 'Strain')
+@_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
+               'Complex Strain', 'Cavity', 'Asymmetry', 'Strain')
 def cage_target(macro_mol, target_mol_file,
                 efunc, ofunc, rotations=0, logger=logger):
     """
@@ -540,54 +541,55 @@ def cage_target(macro_mol, target_mol_file,
     The target is randomly rotated inside the cage's cavity and the
     most stable conformation found is used.
 
-    The function calculates a fitness vector. The fitness vector
-    consists of the following properties in the listed order,
+    The function returns a fitness vector consisting of:
 
-            1) binding energy
-            2) asymmetry
-            3) strain
+        1. binding energy
+        2. cavity of cage in complex
+        3. asymmetry of cage in complex
+        4. strain of cage in complex
+        5. cavity of cage by itself
+        6. asymmetry of cage by itself
+        7. strain of cage by itself
+
+    Notes
+    -----
+    This function modifies `macro_mol`. It places the calculated
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
-    macro_mol : Cage
-        The cage which is to have its fitness calculated,
+    macro_mol : :class:`.Cage`
+        The cage which is to have its fitness calculated.
 
-    target_mol_file : str
-        The full path of the .mol file hodling the target molecule
+    target_mol_file : :class:`str`
+        The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    efunc : FunctionData
-        A FunctionData object representing the energy function used to
-        calculate energies.
+    efunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the energy
+        function used to calculate energies.
 
-    ofunc : FunctionData
-        A FunctionData object representing the optimization function to
-        be run on the generated complexes.
+    ofunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the optimization
+        function to be run on the generated complexes.
 
-    rotations : int (default = 0)
+    rotations : :class:`int`, optional
         The number of times the target should be randomly rotated
         within the cage cavity in order to find the most stable
         conformation.
 
-    logger : FakeLogger or logging.Logger, optional
+    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
         Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.progress_params : dict
-        Places the calculated parameters in the list. The order
-        corresponds to the arguments in the ``_param_labels()``
-        decorator applied to this function.
 
     Returns
     -------
-    numpy.array
+    :class:`numpy.ndarray`
         The numpy array holds the fitness vector described in this
         docstring.
 
     Raises
     ------
-    ValueError
+    :class:`ValueError`
         If the calculation of a fitness parameter fails.
 
     """
@@ -599,67 +601,69 @@ def cage_target(macro_mol, target_mol_file,
                         logger)
 
 
-@_param_labels('Binding Energy', 'Asymmetry', 'Strain')
+@_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
+               'Complex Strain', 'Cavity', 'Asymmetry', 'Strain')
 def cage_c60(macro_mol, target_mol_file,
              efunc, ofunc, n5fold, n2fold, logger=logger):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
-    The difference between this function and `cage_target()` is that
-    the rotations are specifically aimed at sampling C60 entirely and
-    systematically. Rather than the random sampling of the other
+    The difference between this function and :func:`cage_target` is
+    that the rotations are specifically aimed at sampling C60 entirely
+    and systematically. Rather than the random sampling of the other
     function.
 
-    The fitness vector consists of the following properties in the
-    listed order,
+    The function returns a fitness vector consisting of:
 
-        1) binding energy
-        2) asymmetry
-        3) strain
+        1. binding energy
+        2. cavity of cage in complex
+        3. asymmetry of cage in complex
+        4. strain of cage in complex
+        5. cavity of cage by itself
+        6. asymmetry of cage by itself
+        7. strain of cage by itself
+
+    Notes
+    -----
+    This function modifies `macro_mol`. It places the calculated
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
-    macro_mol : Cage
+    macro_mol : :class:`.Cage`
         The cage which is to have its fitness calculated.
 
-    target_mol_file : str
-        The full path of the .mol file hodling the target molecule
+    target_mol_file : :class:`str`
+        The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    efunc : FunctionData
-        A FunctionData object representing the energy function used to
-        calculate energies.
+    efunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the energy
+        function used to calculate energies.
 
-    ofunc : FunctionData
-        A FunctionData object representing the optimization function to
-        be run on the generated complexes.
+    ofunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the optimization
+        function to be run on the generated complexes.
 
-    n5fold : int
+    n5fold : :class:`int`
         The number of rotations along the 5-fold axis of symmetry.
 
-    n2fold : int
+    n2fold : :class:`int`
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
 
-    logger : FakeLogger or logging.Logger, optional
+    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
         Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.progress_params : dict
-        Places the calculated parameters in the list. The order
-        corresponds to the arguments in the ``_param_labels()``
-        decorator applied to this function.
 
     Returns
     -------
-    numpy.array
+    :class:`numpy.ndarray`
         The numpy array holds the fitness vector described in this
         docstring.
 
     Raises
     ------
-    ValueError
+    :class:`ValueError`
         If the calculation of a fitness parameter fails.
 
     """
@@ -677,56 +681,61 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     A general fitness function for calculating fitness of complexes.
 
     This function should be inherited by other fitness functions which
-    define their own rotation function. For example ``cage_c60()`` and
-    ``cage_target()``.
+    define their own rotation function. For example :func:`cage_c60`
+    and :func:`cage_target`.
 
-    The function returns a fitness vector consisting of the
-    binding energy, asymmetry and strain.
+    The function returns a fitness vector consisting of:
+
+        1. binding energy
+        2. cavity of cage in complex
+        3. asymmetry of cage in complex
+        4. strain of cage in complex
+        5. cavity of cage by itself
+        6. asymmetry of cage by itself
+        7. strain of cage by itself
+
+    Notes
+    -----
+    This function modifies `macro_mol`. It places the calculated
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
-    func_name : str
+    func_name : :class:`str`
         The name of the external fitness function calling this one.
-        Used for the key in the `progress_params` dict.
+        Used for the key in :attr:`~.MacroMolecule.progress_params`.
 
-    macro_mol : Cage
+    macro_mol : :class:`.Cage`
         The cage which is to have its fitness calculated.
 
-    target_mol_file : str
-        The full path of the .mol file hodling the target molecule
+    target_mol_file : :class:`str`
+        The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    efunc : FunctionData
-        A FunctionData object representing the energy function used to
-        calculate energies.
+    efunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the energy
+        function used to calculate energies.
 
-    ofunc : FunctionData
-        A FunctionData object representing the optimization function to
-        be run on the generated complexes.
+    ofunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the optimization
+        function to be run on the generated complexes.
 
-    rotation_func : FunctionData
-        A FunctionData object representing the rotation function to be
-        used.
+    rotation_func : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the rotation
+        function to be used.
 
-    logger : FakeLogger or logging.Logger
+    logger : :class:`.FakeLogger` or :class:`logging.Logger`
         Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.progress_params : dict
-        Places the calculated parameters in the list. The order
-        corresponds to the arguments in the ``_param_labels()``
-        decorator applied to this function.
 
     Returns
     -------
-    numpy.array
+    :class:`numpy.ndarray`
         The numpy array holds the fitness vector described in this
         docstring.
 
     Raises
     ------
-    ValueError
+    :class:`ValueError`
         If the calculation of a fitness parameter fails.
 
     """
@@ -821,24 +830,41 @@ def _cage_target(func_name, macro_mol, target_mol_file,
                           counter == cage_counter)
 
     cmplx_cage = Cage.__new__(Cage)
+    cmplx_cage.building_blocks = list(macro_mol.building_blocks)
+    cmplx_cage.bonder_ids = list(macro_mol.bonder_ids)
+    cmplx_cage.fragments = macro_mol.fragments
+    cmplx_cage.fg_ids = set(macro_mol.fg_ids)
     cmplx_cage.mol = cmplx_cage_mol
     cmplx_cage.topology = macro_mol.topology
     cmplx_cage.name = min_eng_cmplx.name + '_no_target'
+    # Calculate fitness parameters of cage in complex.
+    cmplx_cavity = cmplx_cage.cavity_size()
+    cmplx_asymmetry = cmplx_cage.window_difference()
+    cmplx_strain = cmplx_cage.bb_distortion()
 
     # Write the cage without the target to a file.
     cmplx_cage.write(join(folder_path, cmplx_cage.name+'.mol'))
 
+    # Calculate fitness parameters of cage by itself.
+    cavity = macro_mol.cavity_size()
     asymmetry = macro_mol.window_difference()
     strain = macro_mol.bb_distortion()
     macro_mol.progress_params[func_name] = [binding_energy,
+                                            cmplx_cavity,
+                                            cmplx_asymmetry,
+                                            cmplx_strain,
+                                            cavity,
                                             asymmetry,
                                             strain]
 
     if None in macro_mol.progress_params[func_name]:
         raise ValueError(('At least one'
-                         ' fitness parameter not calculated.'))
+                         ' fitness parameter not calculated.'),
+                         macro_mol.progress_params[func_name])
 
-    return np.array([binding_energy, asymmetry, strain])
+    return np.array([binding_energy,
+                     cmplx_cavity, cmplx_asymmetry, cmplx_strain,
+                     cavity, asymmetry, strain])
 
 
 def _make_cage_target_folder():
