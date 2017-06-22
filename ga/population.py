@@ -9,6 +9,7 @@ import numpy as np
 from collections import Counter, defaultdict
 import json
 from glob import glob
+import multiprocessing as mp
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
@@ -212,14 +213,28 @@ class Population:
         """
 
         databases = [glob(os.path.join(db, '*')) for db in databases]
-        p = Population(ga_tools)
+        args = []
         for *bb_files, topology in it.product(*databases, topologies):
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
-            p.members.append(macromol_class(bbs, topology))
+            args.append((bbs, topology))
 
+        with mp.Pool() as pool:
+            mols = pool.starmap(macromol_class, args)
+
+        # Update the cache.
+        for i, mol in enumerate(mols):
+            # If the molecule did not exist already add it to the
+            # cache.
+            if mol.key not in macromol_class.cache:
+                macromol_class.cache[mol.key] = mol
+            # If the molecule did exist already, use the cached
+            # version.
+            else:
+                mols[i] = macromol_class.cache[mol.key]
+
+        p = Population(*mols, ga_tools)
         if not duplicates:
             p.remove_duplicates()
-
         return p
 
     @classmethod
