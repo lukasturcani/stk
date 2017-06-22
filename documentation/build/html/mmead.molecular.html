@@ -2144,7 +2144,7 @@ materials being added.</p>
 <dt id="mmead.molecular.molecules.Periodic.terminator_coords">
 <code class="descname">terminator_coords</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the index of a bonder
-atom within <a class="reference internal" href="#mmead.molecular.molecules.StructUnit.bonder_ids" title="mmead.molecular.molecules.StructUnit.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
+atom within <a class="reference internal" href="mmead.molecular.topologies.cage.html#mmead.molecular.topologies.cage.base.Vertex.bonder_ids" title="mmead.molecular.topologies.cage.base.Vertex.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
 <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x, y and z coordinates
 of a deleter atom attached to the bonder. The coordinates
 are relative to the bonder atom.</p>
@@ -2340,9 +2340,6 @@ include <code class="docutils literal"><span class="pre">'1'</span></code>, <cod
 <dt id="mmead.molecular.molecules.Periodic.write_gulp_input">
 <code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a GULP input file of the unit cell to <cite>path</cite>.</p>
-<p class="rubric">Notes</p>
-<p>For internal use by <code class="xref py py-meth docutils literal"><span class="pre">write()</span></code>. Use that method directly,
-not this one.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2732,7 +2729,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x2435c90&gt;, sanitize=False, removeHs=False), ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x2439400&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x2435c20&gt;, sanitize=False, removeHs=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x2435c90&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x32b0a30&gt;, sanitize=False, removeHs=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x32b0aa0&gt;, sanitize=False, removeHs=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x32b0aa0&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x32b4210&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">

@@ -985,6 +985,10 @@
                           <span class="n">counter</span> <span class="o">==</span> <span class="n">cage_counter</span><span class="p">)</span>
 
     <span class="n">cmplx_cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">Cage</span><span class="p">)</span>
+    <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">building_blocks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">)</span>
+    <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span>
+    <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">fragments</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">fragments</span>
+    <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">fg_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">fg_ids</span><span class="p">)</span>
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">cmplx_cage_mol</span>
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">topology</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span>
     <span class="n">cmplx_cage</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">min_eng_cmplx</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_no_target&#39;</span>
@@ -1010,7 +1014,8 @@
 
     <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;At least one&#39;</span>
-                         <span class="s1">&#39; fitness parameter not calculated.&#39;</span><span class="p">))</span>
+                         <span class="s1">&#39; fitness parameter not calculated.&#39;</span><span class="p">),</span>
+                         <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">binding_energy</span><span class="p">,</span>
                      <span class="n">cmplx_cavity</span><span class="p">,</span> <span class="n">cmplx_asymmetry</span><span class="p">,</span> <span class="n">cmplx_strain</span><span class="p">,</span>

@@ -133,6 +133,95 @@ class Population:
                      " ``Molecule`` and ``GATools`` types."), arg)
 
     @classmethod
+    def init_all(cls, databases, topologies,
+                 bb_classes, macromol_class,
+                 ga_tools=GATools.init_empty(), duplicates=False):
+        """
+        Creates all possible molecules from a given set of databases.
+
+        All possible combinations of building blocks from `databases`
+        and topologies from `topologies` are built. The initialization
+        of a macromolecule in the population has the form
+
+        .. code-block:: python
+
+            mol = macromol_class([bb1, bb2, ...], topology)
+
+        where ``bb1`` is initialized from a  molecule in
+        ``databases[0]``, ``bb2`` from a molecule in ``databases[1]``
+        and so on.
+
+        Parameters
+        ----------
+        databases : :class:`list` of :class:`str`
+            List of paths to directories, which hold molecular
+            structure files of the building blocks.
+
+        topologies : :class:`list` of :class:`.Topology`
+            The topologies of macromolecules being made.
+
+        bb_classes : :class:`list` of :class:`type`
+            This list must be equal in length to `databases`. For each
+            database provided in `databases`, a class used to
+            initialize building blocks from that database is provided
+            here. For example, if
+
+            .. code-block:: python
+
+                databases = ['/path/to/amines2f',
+                             '/path/to/aldehydes3f']
+
+            then a valid `bb_classes` list would be
+
+            .. code-block:: python
+
+                bb_classes = [StructUnit2, StructUnit3]
+
+            This means all molecules in the ``amines2f`` database are
+            initialized as :class:`.StructUnit2` objects, while all
+            molecules in ``aldehydes3f`` are initialized as
+            :class:`.StructUnit3` objects.
+
+        macromol_class : :class:`type`
+            The class of the :class:`.MacroMolecule` objects being
+            built.
+
+        duplicates : :class:`bool`, optional
+            If ``True`` duplicate structures are not removed from
+            the population.
+
+        Returns
+        -------
+        :class:`Population`
+            A population holding all possible macromolecules from
+            assembled from `databases`.
+
+        Example
+        -------
+        If the name of the functional group needs to be provided to the
+        building blocks, a lambda function can be used.
+
+        .. code-block:: python
+
+            dbs = ['/path/to/db1', 'path/to/db2']
+            tops = [Linear("AB", [0, 0], 6)]
+            bb_classes = [lambda x: StructUnit2(x, 'aldehyde'),
+                          lambda x: StructUnit3(x, 'amine')]
+            pop = Population.init_all(dbs, tops, bb_classes, Polymer)
+
+        """
+
+        p = Population(ga_tools)
+        for *bb_files, topology in it.product(*databases, topologies):
+            bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
+            p.members.append(macromol_class(bbs, topology))
+
+        if not duplicates:
+            p.remove_duplicates()
+
+        return p
+
+    @classmethod
     def init_cage_isomers(cls, lk_file, bb_file, topology,
                           ga_tools=GATools.init_empty(),
                           lk_fg=None, bb_fg=None):
