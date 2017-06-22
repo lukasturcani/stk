@@ -133,8 +133,8 @@ class Population:
                      " ``Molecule`` and ``GATools`` types."), arg)
 
     @classmethod
-    def init_all(cls, databases, topologies,
-                 bb_classes, macromol_class,
+    def init_all(cls, databases, bb_classes,
+                 topologies, macromol_class,
                  ga_tools=GATools.init_empty(), duplicates=False):
         """
         Creates all possible molecules from a given set of databases.
@@ -156,9 +156,6 @@ class Population:
         databases : :class:`list` of :class:`str`
             List of paths to directories, which hold molecular
             structure files of the building blocks.
-
-        topologies : :class:`list` of :class:`.Topology`
-            The topologies of macromolecules being made.
 
         bb_classes : :class:`list` of :class:`type`
             This list must be equal in length to `databases`. For each
@@ -182,6 +179,9 @@ class Population:
             molecules in ``aldehydes3f`` are initialized as
             :class:`.StructUnit3` objects.
 
+        topologies : :class:`list` of :class:`.Topology`
+            The topologies of macromolecules being made.
+
         macromol_class : :class:`type`
             The class of the :class:`.MacroMolecule` objects being
             built.
@@ -204,10 +204,10 @@ class Population:
         .. code-block:: python
 
             dbs = ['/path/to/db1', 'path/to/db2']
-            tops = [Linear("AB", [0, 0], 6)]
             bb_classes = [lambda x: StructUnit2(x, 'aldehyde'),
                           lambda x: StructUnit3(x, 'amine')]
-            pop = Population.init_all(dbs, tops, bb_classes, Polymer)
+            tops = [Linear("AB", [0, 0], 6)]
+            pop = Population.init_all(dbs, bb_classes, tops, Polymer)
 
         """
 
