@@ -1,0 +1,337 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mmead.tests.test_cage_topologies &mdash; MMEA 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MMEA 0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MMEA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMEA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mmead.tests.test_cage_topologies</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmead.tests.test_cage_topologies</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">..molecular.topologies.cage</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">StructUnit3</span><span class="p">,</span> <span class="n">StructUnit2</span><span class="p">,</span> <span class="n">Cage</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
+
+<span class="n">test_dir</span> <span class="o">=</span> <span class="s1">&#39;cage_topology_tests&#39;</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">test_dir</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">test_dir</span><span class="p">)</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;cage_topologies&#39;</span><span class="p">)</span>
+
+<span class="c1"># 3 + 4 topology tests.</span>
+<div class="viewcode-block" id="test_SixPlusEight"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_SixPlusEight">[docs]</a><span class="k">def</span> <span class="nf">test_SixPlusEight</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine4.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">SixPlusEight</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;SixPlusEight.pdb&#39;</span><span class="p">))</span></div>
+
+
+<span class="c1"># 2 + 4 topolgy tests.</span>
+<div class="viewcode-block" id="test_TwoPlusFour"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_TwoPlusFour">[docs]</a><span class="k">def</span> <span class="nf">test_TwoPlusFour</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine4.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">TwoPlusFour</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;TwoPlusFour.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_ThreePlusSix"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_ThreePlusSix">[docs]</a><span class="k">def</span> <span class="nf">test_ThreePlusSix</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine4.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">ThreePlusSix</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;ThreePlusSix.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_FourPlusEight"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_FourPlusEight">[docs]</a><span class="k">def</span> <span class="nf">test_FourPlusEight</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine4.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusEight</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;FourPlusEight.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_SixPlusTwelve"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_SixPlusTwelve">[docs]</a><span class="k">def</span> <span class="nf">test_SixPlusTwelve</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine4.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">SixPlusTwelve</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;SixPlusTwelve.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_TenPlusTwenty"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_TenPlusTwenty">[docs]</a><span class="k">def</span> <span class="nf">test_TenPlusTwenty</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine4.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">TenPlusTwenty</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;TenPlusTwenty.pdb&#39;</span><span class="p">))</span></div>
+
+
+<span class="c1"># 3 + 3 cage topologies.</span>
+<div class="viewcode-block" id="test_OnePlusOne"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_OnePlusOne">[docs]</a><span class="k">def</span> <span class="nf">test_OnePlusOne</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">OnePlusOne</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;OnePlusOne.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_TwoPlusTwo"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_TwoPlusTwo">[docs]</a><span class="k">def</span> <span class="nf">test_TwoPlusTwo</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">TwoPlusTwo</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;TwoPlusTwo.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_FourPlusFour"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_FourPlusFour">[docs]</a><span class="k">def</span> <span class="nf">test_FourPlusFour</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusFour</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;FourPlusFour.pdb&#39;</span><span class="p">))</span></div>
+
+
+<span class="c1"># 2 + 3 cage topologies.</span>
+<div class="viewcode-block" id="test_TwoPlusThree"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_TwoPlusThree">[docs]</a><span class="k">def</span> <span class="nf">test_TwoPlusThree</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">TwoPlusThree</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;TwoPlusThree.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_FourPlusSix"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_FourPlusSix">[docs]</a><span class="k">def</span> <span class="nf">test_FourPlusSix</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;FourPlusSix.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_FourPlusSix2"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_FourPlusSix2">[docs]</a><span class="k">def</span> <span class="nf">test_FourPlusSix2</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix2</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;FourPlusSix2.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_SixPlusNine"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_SixPlusNine">[docs]</a><span class="k">def</span> <span class="nf">test_SixPlusNine</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">SixPlusNine</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;SixPlusNine.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_EightPlusTwelve"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_EightPlusTwelve">[docs]</a><span class="k">def</span> <span class="nf">test_EightPlusTwelve</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">EightPlusTwelve</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;EightPlusTwelve.pdb&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_Dodecahedron"><a class="viewcode-back" href="../../../mmead.tests.html#mmead.tests.test_cage_topologies.test_Dodecahedron">[docs]</a><span class="k">def</span> <span class="nf">test_Dodecahedron</span><span class="p">():</span>
+    <span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;amine2.mol&#39;</span><span class="p">))</span>
+    <span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="s1">&#39;aldehyde3.mol&#39;</span><span class="p">))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Dodecahedron</span><span class="p">())</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">test_dir</span><span class="p">,</span> <span class="s1">&#39;Dodecahedron.pdb&#39;</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

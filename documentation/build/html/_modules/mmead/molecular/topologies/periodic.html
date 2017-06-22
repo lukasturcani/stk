@@ -1,0 +1,512 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mmead.molecular.topologies.periodic &mdash; MMEA 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="MMEA 0 documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MMEA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MMEA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mmead.molecular.topologies.periodic</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmead.molecular.topologies.periodic</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="k">import</span> <span class="n">euclidean</span>
+
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Topology</span>
+
+
+<div class="viewcode-block" id="PeriodicBond"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicBond">[docs]</a><span class="k">class</span> <span class="nc">PeriodicBond</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a periodic bond.</span>
+
+<span class="sd">    In the attributes `atom1` and `atom2` the indices of bonder atom</span>
+<span class="sd">    ids within :attr:`.MacroMolecule.bonder_ids` are used rather than</span>
+<span class="sd">    the bonder ids themselves because periodic bonds get created by</span>
+<span class="sd">    :meth:`PeriodicLattice.join_mols` before atoms are deleted by</span>
+<span class="sd">    :meth:`PeriodicLattice.del_atoms`. This means that ids of saved</span>
+<span class="sd">    bonder atoms change. However, their position within</span>
+<span class="sd">    :attr:`.MacroMolecule.bonder_ids` does not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom1 : :class:`int`</span>
+<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
+<span class="sd">        `atom2`. It is the index of the atom id within</span>
+<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
+
+<span class="sd">    direction1 : :class:`list` of :class:`int`</span>
+<span class="sd">        A 3 member list describing the axes along which the bond is</span>
+<span class="sd">        periodic, when going from `atom1` toward `atom2`. For example</span>
+<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
+<span class="sd">        in the positive direction.</span>
+
+<span class="sd">    atom2 : :class:`int`</span>
+<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
+<span class="sd">        `atom1`. It is the index of the atom id within</span>
+<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
+
+<span class="sd">    direction2 : :class:`list` of :class:`int`</span>
+<span class="sd">        A 3 member list describing the axes along which the bond is</span>
+<span class="sd">        periodic, when going from `atom2` toward `atom1`. It should be</span>
+<span class="sd">        like `direction1` but with all values made negative.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom1 : :class:`int`</span>
+<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
+<span class="sd">        `atom2`. It is the index of the atom id within</span>
+<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
+
+<span class="sd">    direction1 : :class:`numpy.ndarray` of :class:`int`</span>
+<span class="sd">        A 3 member list describing the axes along which the bond is</span>
+<span class="sd">        periodic, when going from `atom1` toward `atom2`. For example</span>
+<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
+<span class="sd">        in the positive direction.</span>
+
+<span class="sd">    atom2 : :class:`int`</span>
+<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
+<span class="sd">        `atom1`. It is the index of the atom id within</span>
+<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
+
+<span class="sd">    direction2 : :class:`numpy.ndarray` of :class:`int`</span>
+<span class="sd">        A 3 member list describing the axes along which the bond is</span>
+<span class="sd">        periodic, when going from `atom2` toward `atom1`. It should be</span>
+<span class="sd">        like `direction1` but with all values made negative.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">direction1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">direction2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">direction1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">direction2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_bonder"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.is_bonder">[docs]</a><span class="k">def</span> <span class="nf">is_bonder</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ``True`` if atom has ``&#39;bonder&#39;`` property.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">        The macromolecule to which the atom belongs.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`bool`</span>
+<span class="sd">        ``True`` if atom has ``&#39;bonder&#39;`` property else ``False``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="kc">True</span> <span class="k">if</span>
+            <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PeriodicLattice"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicLattice">[docs]</a><span class="k">class</span> <span class="nc">PeriodicLattice</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A base class for periodic topologies.</span>
+
+<span class="sd">    This class behaves almost exactly like</span>
+<span class="sd">    :class:`.Topology` with only minor additions to suit the</span>
+<span class="sd">    representation of periodic lattices. The :meth:`del_atoms` method</span>
+<span class="sd">    is extended to collect the coordinates of any deleted atoms. This</span>
+<span class="sd">    is necessary for positioning terminating atoms on islands generated</span>
+<span class="sd">    from the periodic structure by :meth:`.Periodic.island`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PeriodicLattice.del_atoms"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicLattice.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes the atoms which are lost during assembly.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The parameter `macro_mol` has two attributes changed.</span>
+<span class="sd">        :attr:`~.MacroMolecule.mol` has deleter atoms removed, while</span>
+<span class="sd">        :attr:`~.Periodic.terminator_coords` is updated with the</span>
+<span class="sd">        coordinates of every removed atom.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : :class:`.Periodic`</span>
+<span class="sd">            The periodic macromolecule being assembled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : :class:`NoneType`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># This loop checks if an atom is an bonder and if its is finds</span>
+        <span class="c1"># a neighboring deleter atom. The deleter atom has its</span>
+        <span class="c1"># coordinates relative to the bonder found and saved in</span>
+        <span class="c1"># `terminator_coords`.</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">terminator_coords</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetNeighbors</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">bi</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+                <span class="n">nid</span> <span class="o">=</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+                <span class="n">tcoords</span> <span class="o">=</span> <span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">nid</span><span class="p">)</span> <span class="o">-</span>
+                           <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()))</span>
+                <span class="n">macro_mol</span><span class="o">.</span><span class="n">terminator_coords</span><span class="p">[</span><span class="n">bi</span><span class="p">]</span> <span class="o">=</span> <span class="n">tcoords</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PeriodicLattice.join_mols"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicLattice.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joins the building blocks in the unit cell.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The rdkit instance in the :attr:`~.MacroMolecule.mol` attribute</span>
+<span class="sd">        has bonds added to it. The</span>
+<span class="sd">        :attr:`~.MacroMolecule.periodic_bonds` attribute is also filled</span>
+<span class="sd">        with :class:`PeriodicBond` instances.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">            The unit cell being constructed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : :class:`NoneType`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get the fragments.</span>
+        <span class="n">frag1</span><span class="p">,</span> <span class="n">frag2</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">GetMolFrags</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                                         <span class="n">sanitizeFrags</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Get rid of any non bonder atoms.</span>
+        <span class="n">frag1</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">frag1</span> <span class="k">if</span> <span class="n">is_bonder</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">x</span><span class="p">)]</span>
+        <span class="n">frag2</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">frag2</span> <span class="k">if</span> <span class="n">is_bonder</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">x</span><span class="p">)]</span>
+
+        <span class="c1"># The fragment with the larger bonder ids has higher x and y</span>
+        <span class="c1"># values - due to place_mols() implmentation. It is the &quot;top&quot;</span>
+        <span class="c1"># fragment.</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">frag1</span> <span class="k">if</span> <span class="n">frag1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">frag2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="n">frag2</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">frag2</span> <span class="k">if</span> <span class="n">top</span> <span class="ow">is</span> <span class="n">frag1</span> <span class="k">else</span> <span class="n">frag1</span>
+
+        <span class="c1"># In the top fragment find the bonder atom with the</span>
+        <span class="c1"># largest y value and connect it to the bonder atom in the</span>
+        <span class="c1"># bottom fragment with the lowest y value. Note that the</span>
+        <span class="c1"># connection must be registered as periodic, hence the</span>
+        <span class="c1"># directions are 1/-1.</span>
+        <span class="n">top_atom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">bottom_atom</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span>
+                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># The bonder atoms are registered by their index within</span>
+        <span class="c1"># `bonder_ids`. This is because del_atoms will change the</span>
+        <span class="c1"># atom ids but not the ordering of this list.</span>
+        <span class="n">top_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">top_atom</span><span class="p">)</span>
+        <span class="n">bottom_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bottom_atom</span><span class="p">)</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">top_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                     <span class="n">bottom_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="c1"># Do the same for the x-axis periodic bonds.</span>
+        <span class="n">right_atom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">top</span><span class="p">,</span>
+                         <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">left_atom</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span>
+                        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># The bonder atoms are registered by their index within</span>
+        <span class="c1"># `bonder_ids`. This is because del_atoms will change the</span>
+        <span class="c1"># atom ids.</span>
+        <span class="n">right_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">right_atom</span><span class="p">)</span>
+        <span class="n">left_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">left_atom</span><span class="p">)</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">right_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                             <span class="n">left_atom</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+
+        <span class="c1"># For the bond which gets created directly, find the bonder</span>
+        <span class="c1"># atom in the bottom fragment closest to the position of the</span>
+        <span class="c1"># top fragment. Create a bond between it and the bonder atom</span>
+        <span class="c1"># in the top fragment closest to the position of the bottom</span>
+        <span class="c1"># fragment.</span>
+        <span class="n">bottom_bonder</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>
+                            <span class="n">euclidean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                      <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="n">top_bonder</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>
+                         <span class="n">euclidean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                   <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">bond_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
+                                             <span class="n">top_bonder</span><span class="p">,</span>
+                                             <span class="n">bottom_bonder</span><span class="p">)</span>
+        <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">top_bonder</span><span class="p">,</span> <span class="n">bottom_bonder</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PeriodicLattice.place_mols"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicLattice.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Places and aligns building blocks in the unit cell.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies `macro_mol`. An rdkit molecule of the</span>
+<span class="sd">        unit cell with the building blocks not joined up is placed in</span>
+<span class="sd">        the :attr:`~.MacroMolecule.mol` attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">            The unit cell being constructed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : :class:`NoneType`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make the rdkit molecule.</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
+        <span class="c1"># Get the building blocks.</span>
+        <span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span>
+        <span class="n">cell_size</span> <span class="o">=</span> <span class="n">bb1</span><span class="o">.</span><span class="n">max_diameter</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">bb2</span><span class="o">.</span><span class="n">max_diameter</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_dimensions</span> <span class="o">=</span> <span class="p">[</span><span class="n">cell_size</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">cell_dimensions</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span><span class="n">cell_size</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
+        <span class="c1"># Place and set orientation of the first building block.</span>
+        <span class="n">bb1</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">bb1</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">bb1</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">bb1</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Add to the macromolecule.</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb1</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="c1"># Place and set orientation of the second building block.</span>
+        <span class="n">bb2</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">bb2</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">bb2</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">bb2</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1"># Add to the macromolecule.</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb2</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="c1"># Add the bonder_ids prematurely for this topology. Needed for</span>
+        <span class="c1"># making supercells - see join_mols().</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Hexagonal"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.Hexagonal">[docs]</a><span class="k">class</span> <span class="nc">Hexagonal</span><span class="p">(</span><span class="n">PeriodicLattice</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a hexagonal lattice.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cell_dimensions</span> <span class="o">=</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.866</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+                                 <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">10.0000</span><span class="o">/</span><span class="mf">1.7321</span><span class="p">])]</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="p">[(</span><span class="n">a</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="n">b</span><span class="o">/</span><span class="mi">3</span><span class="p">),</span>
+                <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="o">/</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="o">/</span><span class="mi">3</span><span class="p">)]</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

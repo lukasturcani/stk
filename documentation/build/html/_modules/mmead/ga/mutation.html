@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mmead.ga.mutation &mdash; MMEA 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MMEA 0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MMEA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMEA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mmead.ga.mutation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmead.ga.mutation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines mutation operations via the ``Mutation`` class.</span>
+
+<span class="sd">Extending MMEA: Adding mutation functions</span>
+<span class="sd">-----------------------------------------</span>
+<span class="sd">If a new mutation operation is to be added to MMEA it should be added</span>
+<span class="sd">as a method in the ``Mutation`` class defined in this module. The only</span>
+<span class="sd">requirement is that the first argument is ``macro_mol`` (excluding any</span>
+<span class="sd">``self`` or ``cls`` arguments).</span>
+
+<span class="sd">The naming requirement of ``macro_mol`` exists to help users identify</span>
+<span class="sd">which arguments are handled automatically by MMEA and which they need</span>
+<span class="sd">to define in the input file. The convention is that if the mutation</span>
+<span class="sd">function takes an argument called  ``macro_mol`` it does not have to be</span>
+<span class="sd">specified in the input file.</span>
+
+<span class="sd">If the mutation function does not fit neatly into a single function</span>
+<span class="sd">make sure that any helper functions are private, ie that their names</span>
+<span class="sd">start with a leading underscore.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">islice</span>
+
+<span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
+<span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
+<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">StructUnit3</span><span class="p">,</span> <span class="n">Cage</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MutationError"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.MutationError">[docs]</a><span class="k">class</span> <span class="nc">MutationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="o">...</span></div>
+
+
+<div class="viewcode-block" id="Mutation"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.Mutation">[docs]</a><span class="k">class</span> <span class="nc">Mutation</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Carries out mutations operations on a population.</span>
+
+<span class="sd">    Instances of the ``Population`` class delegate mutation operations</span>
+<span class="sd">    to instances of this class. They do this by calling:</span>
+
+<span class="sd">        &gt;&gt;&gt; mutant_pop = pop.gen_mutants()</span>
+
+<span class="sd">    which returns a new population consisting of molecules generated by</span>
+<span class="sd">    performing mutation operations on members of ``pop``. This class</span>
+<span class="sd">    invokes an instance of the ``Selection`` class to select molecules</span>
+<span class="sd">    for mutations. Both an instance of this class and the ``Selection``</span>
+<span class="sd">    class are held in the `ga_tools` attribute of a ``Population``</span>
+<span class="sd">    instance.</span>
+
+<span class="sd">    This class is initialized with a list of  ``FunctionData``</span>
+<span class="sd">    instances. Each ``FunctionData`` object holds the name of the</span>
+<span class="sd">    mutation function to be used by the population as well as any</span>
+<span class="sd">    additional parameters the function may require. Mutation functions</span>
+<span class="sd">    should be defined as methods within this class.</span>
+
+<span class="sd">    A mutation function from the list will be selected at random, with</span>
+<span class="sd">    likelihoods modified if the user supplies a `weights` list during</span>
+<span class="sd">    initialization.</span>
+
+<span class="sd">    Members of this class are also initialized with an integer which</span>
+<span class="sd">    holds the number of mutation operations to be performed each</span>
+<span class="sd">    generation.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    funcs : list of FunctionData instances</span>
+<span class="sd">        This lists holds all the mutation functions which are to be</span>
+<span class="sd">        applied by the GA. One will be chosen at random when a mutation</span>
+<span class="sd">        is desired. The likelihood that each is selected is given by</span>
+<span class="sd">        `weights`.</span>
+
+<span class="sd">    num_mutations : int</span>
+<span class="sd">        The number of mutations that needs to be performed each</span>
+<span class="sd">        generation.</span>
+
+<span class="sd">    weights : None or list of floats (default = None)</span>
+<span class="sd">        When ``None`` each mutation function has equal likelihood of</span>
+<span class="sd">        being picked. If `weights` is a list each float corresponds to</span>
+<span class="sd">        the probability of selecting the mutation function at the</span>
+<span class="sd">        corresponding index.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcs</span><span class="p">,</span> <span class="n">num_mutations</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">funcs</span> <span class="o">=</span> <span class="n">funcs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span> <span class="o">=</span> <span class="n">num_mutations</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Carries out mutation operations on the supplied population.</span>
+
+<span class="sd">        This function selects members of the population to be mutated</span>
+<span class="sd">        and mutates them. This goes on until either all possible</span>
+<span class="sd">        molecules have been mutated or the required number of</span>
+<span class="sd">        mutation operations have been performed.</span>
+
+<span class="sd">        The mutants generated are returned together in a ``Population``</span>
+<span class="sd">        instance. Any molecules that are created as a result of</span>
+<span class="sd">        mutation that match a molecule present in the original</span>
+<span class="sd">        population are removed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population who&#39;s members are to be mutated.</span>
+
+<span class="sd">        counter_path : str (default = &#39;&#39;)</span>
+<span class="sd">            The path to the .png file showing which members were</span>
+<span class="sd">            selected for mutation. If &#39;&#39; then no file is made.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Population</span>
+<span class="sd">            A population with all the mutants generated held in the</span>
+<span class="sd">            `members` attribute. This does not include mutants which</span>
+<span class="sd">            correspond to molecules already present in `population`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mutant_pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">population</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+
+        <span class="n">parent_pool</span> <span class="o">=</span> <span class="n">islice</span><span class="p">(</span><span class="n">population</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;mutation&#39;</span><span class="p">),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">parent</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parent_pool</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Mutation number </span><span class="si">{}</span><span class="s1">. Finish when </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                          <span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span><span class="p">))</span>
+            <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">parent</span><span class="p">])</span>
+            <span class="n">func_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">funcs</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mutant</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+                <span class="c1"># If the mutant was retrieved from the cache, log the</span>
+                <span class="c1"># name.</span>
+                <span class="k">if</span> <span class="n">mutant</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s1">&#39;Mutant &quot;</span><span class="si">{}</span><span class="s1">&quot; retrieved from &#39;</span>
+                                  <span class="s1">&#39;cache.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mutant</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+                <span class="n">mutant_pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mutant</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Mutation function &quot;</span><span class="si">{}</span><span class="s1">()&quot; &#39;</span>
+                            <span class="s1">&#39;failed on molecule &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                             <span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">mutant_pop</span> <span class="o">-=</span> <span class="n">population</span>
+
+        <span class="k">if</span> <span class="n">counter_path</span><span class="p">:</span>
+            <span class="c1"># Update counter with unselected members.</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">population</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">member</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">counter</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">member</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+            <span class="n">plot_counter</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">counter_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mutant_pop</span>
+
+<div class="viewcode-block" id="Mutation.cage_random_bb"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.Mutation.cage_random_bb">[docs]</a>    <span class="k">def</span> <span class="nf">cage_random_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Substitutes a building block with a random one from a database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Cage</span>
+<span class="sd">            The cage who&#39;s building block will be exchanged. Note that</span>
+<span class="sd">            the cage is not destroyed. It is used a template for a new</span>
+<span class="sd">            cage.</span>
+
+<span class="sd">        database : str</span>
+<span class="sd">            The full path of the database from which a new</span>
+<span class="sd">            building block is to be found.</span>
+
+<span class="sd">        fg : str (default = None)</span>
+<span class="sd">            The name of a functional group. All molecules in</span>
+<span class="sd">            `database` must have this functional group. This is the</span>
+<span class="sd">            functional group which is used to assemble the</span>
+<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
+<span class="sd">            path `database` holds the name of the functional group.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Cage</span>
+<span class="sd">            A cage instance generated by taking all attributes of</span>
+<span class="sd">            `macro_mol` except its building-block* which is replaced by</span>
+<span class="sd">            a random building-block* from `database`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">og_bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">bb_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
+                <span class="n">bb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">bb_file</span><span class="p">)</span>
+                <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_file</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
+                <span class="k">break</span>
+
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
+                <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement building block does&#39;</span>
+                   <span class="s1">&#39; not have the same number of functional groups as &#39;</span>
+                   <span class="s1">&#39;the original building block.</span><span class="se">\n\n</span><span class="s1">Original building &#39;</span>
+                  <span class="s1">&#39;block:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">Replacement building block:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39;</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_bb</span><span class="p">,</span> <span class="n">bb</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mutation.cage_random_lk"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.Mutation.cage_random_lk">[docs]</a>    <span class="k">def</span> <span class="nf">cage_random_lk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Substitutes a linker with a random one from a database.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Cage</span>
+<span class="sd">            The cage who&#39;s linker will be exchanged. Note that</span>
+<span class="sd">            the cage is not destroyed. It is used a template for a new</span>
+<span class="sd">            cage.</span>
+
+<span class="sd">        database : str</span>
+<span class="sd">            The full path of the database from which a new linker is to</span>
+<span class="sd">            be found.</span>
+
+<span class="sd">        fg : str (default = None)</span>
+<span class="sd">            The name of a functional group. All molecules in</span>
+<span class="sd">            `database` must have this functional group. This is the</span>
+<span class="sd">            functional group which is used to assemble the</span>
+<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
+<span class="sd">            path `database` holds the name of the functional group.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Cage</span>
+<span class="sd">            A cage instance generated by taking all attributes of</span>
+<span class="sd">            `macro_mol` except its linker which is replaced by a random</span>
+<span class="sd">            linker from `database`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">og_lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">lk_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">og_lk</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">lk_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
+                <span class="n">lk_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">lk_file</span><span class="p">)</span>
+                <span class="n">lk</span> <span class="o">=</span> <span class="n">lk_type</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
+                <span class="k">break</span>
+
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
+                 <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement linker does not&#39;</span>
+                  <span class="s1">&#39; have the same number of functional groups as the&#39;</span>
+                  <span class="s1">&#39; original linker.</span><span class="se">\n\n</span><span class="s1">Original linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39;Replacement linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_lk</span><span class="p">,</span> <span class="n">lk</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mutation.cage_similar_bb"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.Mutation.cage_similar_bb">[docs]</a>    <span class="k">def</span> <span class="nf">cage_similar_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Substitute the building block with similar one from `database`.</span>
+
+<span class="sd">        All of the molecules in `database` are checked for similarity</span>
+<span class="sd">        to the building block of `macro_mol`. The first time this</span>
+<span class="sd">        mutation function is run on a cage, the most similar molecule</span>
+<span class="sd">        in `database` is used to substitute the building block. The</span>
+<span class="sd">        next time this mutation function is run on the same cage, the</span>
+<span class="sd">        second most similar molecule from `database` is used and so on.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Cage</span>
+<span class="sd">            The cage which is to have its building-block* substituted.</span>
+
+<span class="sd">        database : str</span>
+<span class="sd">            The full path of the database from which molecules are used</span>
+<span class="sd">            to substitute the building-block* of `macro_mol`.</span>
+
+<span class="sd">        fg : str (default = None)</span>
+<span class="sd">            The name of a functional group. All molecules in</span>
+<span class="sd">            `database` must have this functional group. This is the</span>
+<span class="sd">            functional group which is used to assemble the</span>
+<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
+<span class="sd">            path `database` holds the name of the functional group.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol._similar_bb_mols : generator</span>
+<span class="sd">            Creates this attribute on the `macro_mol` instance. This</span>
+<span class="sd">            allows the function to keep track of which molecule from</span>
+<span class="sd">            `database` should be used in the substitution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Cage</span>
+<span class="sd">            A new cage with the same linker as `macro_mol` but a</span>
+<span class="sd">            different building-block*. The building-block* is selected</span>
+<span class="sd">            according to the description in this docstring.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_similar_bb_mols&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># The idea here is to create a list of molecules from</span>
+        <span class="c1"># `database` ordered by similarity to the building block of</span>
+        <span class="c1"># `macro_mol`. Each time this function is called on `macro_mol`</span>
+        <span class="c1"># the next molecule from this list is used to substitute the</span>
+        <span class="c1"># building block of the cage and create a new mutant.</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">og_bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
+                                    <span class="n">og_bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
+
+        <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">new_bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">sim_mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
+              <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement building block does&#39;</span>
+               <span class="s1">&#39; not have the same number of functional groups as &#39;</span>
+               <span class="s1">&#39;the original building block.</span><span class="se">\n\n</span><span class="s1">Original building &#39;</span>
+              <span class="s1">&#39;block:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">Replacement building block:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+              <span class="s1">&#39;</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_bb</span><span class="p">,</span> <span class="n">new_bb</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">new_bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mutation.cage_similar_lk"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.Mutation.cage_similar_lk">[docs]</a>    <span class="k">def</span> <span class="nf">cage_similar_lk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Substitute the linker with a similar one from `database`.</span>
+
+<span class="sd">        All of the molecules in `database` are checked for similarity</span>
+<span class="sd">        to the linker of `macro_mol`. The first time this mutation</span>
+<span class="sd">        function is run on a cage, the most similar molecule in</span>
+<span class="sd">        `database` is used to substitute the linker. The next time this</span>
+<span class="sd">        mutation function is run on the same cage, the second most</span>
+<span class="sd">        similar molecule from `database` is used and so on.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Cage</span>
+<span class="sd">            The cage which is to have its linker substituted.</span>
+
+<span class="sd">        database : str</span>
+<span class="sd">            The full path of the database from which molecules are used</span>
+<span class="sd">            to substitute the linker of `macro_mol`.</span>
+
+<span class="sd">        fg : str (default = None)</span>
+<span class="sd">            The name of a functional group. All molecules in</span>
+<span class="sd">            `database` must have this functional group. This is the</span>
+<span class="sd">            functional group which is used to assemble the</span>
+<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
+<span class="sd">            path `database` holds the name of the functional group.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol._similar_lk_mols : generator</span>
+<span class="sd">            Creates this attribute on the `macro_mol` instance. This</span>
+<span class="sd">            allows the function to keep track of which molecule from</span>
+<span class="sd">            `database` should be used in the substitution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Cage</span>
+<span class="sd">            A new cage with the same building-block* as `macro_mol` but</span>
+<span class="sd">            a different linker. The linker is selected according to the</span>
+<span class="sd">            description in this docstring.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_similar_lk_mols&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># The idea here is to create a list of molecules from</span>
+        <span class="c1"># `database` ordered by similarity to the linker of</span>
+        <span class="c1"># `macro_mol`. Each time this function is called on `macro_mol`</span>
+        <span class="c1"># the next molecule from this list is used to substitute the</span>
+        <span class="c1"># linker of the cage and create a new mutant.</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">og_lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">lk_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">og_lk</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+        <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
+                                    <span class="n">og_lk</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
+
+        <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">new_lk</span> <span class="o">=</span> <span class="n">lk_type</span><span class="p">(</span><span class="n">sim_mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
+             <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement linker does not&#39;</span>
+              <span class="s1">&#39; have the same number of functional groups as the&#39;</span>
+              <span class="s1">&#39; original linker.</span><span class="se">\n\n</span><span class="s1">Original linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+              <span class="s1">&#39;Replacement linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_lk</span><span class="p">,</span> <span class="n">new_lk</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">new_lk</span><span class="p">,</span> <span class="n">bb</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mutation.random_topology"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.mutation.Mutation.random_topology">[docs]</a>    <span class="k">def</span> <span class="nf">random_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Changes `macro_mol` topology to a random one from `topologies`.</span>
+
+<span class="sd">        A new instance of the same type as `macro_mol` is created. Ie</span>
+<span class="sd">        if `macro_mol` was a Polymer instance then a Polymer instance</span>
+<span class="sd">        will be returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">            The macromolecule which is to be mutated.</span>
+
+<span class="sd">        topologies : list of Topology instances</span>
+<span class="sd">            This lists holds the topology instances from which one is</span>
+<span class="sd">            selected at random to form a new molecule.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            A molecule generated by initializing a new instance</span>
+<span class="sd">            with all the same parameters as `macro_mol` except for the</span>
+<span class="sd">            topology.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tops</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">topologies</span> <span class="k">if</span>
+                                <span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)]</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">tops</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

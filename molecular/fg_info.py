@@ -15,14 +15,14 @@ should be necessary in order to incorporate new functional groups.
 Note that when adding SMARTS if you want to make a SMARTS that targets
 an atom in an environment, for example a bromine connected to a carbon
 
-    [$([Br][C]);$([Br])]
+    [$([Br][C])]
 
 The atom you are targeting needs to be written first. The above SMARTS
 works but
 
-    [$([C][Br]);$([Br])]
+    [$([C][Br])]
 
-doesn't. This is an rkdit issue or feature.
+does not.
 
 If this new functional group is to connect to another functional group
 with a double bond during assembly, the names of the functional groups
@@ -50,7 +50,7 @@ class FGInfo:
     fg_smarts : str
         A SMARTS string which matches the functional group.
 
-    target_smarts :
+    bonder_smarts :
         A SMARTS string which matches the atom on the functional group
         which forms bonds during reactions.
 
@@ -60,67 +60,67 @@ class FGInfo:
 
     """
 
-    __slots__ = ['name', 'fg_smarts', 'target_smarts', 'del_smarts']
+    __slots__ = ['name', 'fg_smarts', 'bonder_smarts', 'del_smarts']
 
-    def __init__(self, name, fg_smarts, target_smarts, del_smarts):
-         self.name = name
-         self.fg_smarts = fg_smarts
-         self.target_smarts = target_smarts
-         self.del_smarts = del_smarts
+    def __init__(self, name, fg_smarts, bonder_smarts, del_smarts):
+        self.name = name
+        self.fg_smarts = fg_smarts
+        self.bonder_smarts = bonder_smarts
+        self.del_smarts = del_smarts
 
 
 functional_groups = [
 
                 FGInfo("amine",
                        "[N]([H])[H]",
-                       "[$([N]([H])[H]);$([N])]",
-                       "[$([H][N][H]);$([H])].[$([H][N][H]);$([H])]"),
+                       "[$([N]([H])[H])]",
+                       "[$([H][N][H])].[$([H][N][H])]"),
 
                 FGInfo("aldehyde", "[C](=[O])[H]",
-                                   "[$([C](=[O])[H]);$([C])]",
-                                   "[$([O]=[C][H]);$([O])]"),
+                                   "[$([C](=[O])[H])]",
+                                   "[$([O]=[C][H])]"),
 
                 FGInfo("carboxylic_acid",
                        "[C](=[O])[O][H]",
-                       "[$([C](=[O])[O][H]);$([C])]",
-                       "[$([H][O][C](=[O]));$([H])][O]"),
+                       "[$([C](=[O])[O][H])]",
+                       "[$([H][O][C](=[O]))][O]"),
 
                 FGInfo("amide", "[C](=[O])[N]([H])[H]",
-                       "[$([C](=[O])[N]([H])[H]);$([C])]",
-                       "[$([N]([H])([H])[C](=[O]));$([N])]([H])[H]"),
+                       "[$([C](=[O])[N]([H])[H])]",
+                       "[$([N]([H])([H])[C](=[O]))]([H])[H]"),
 
                 FGInfo("thioacid",
                        "[C](=[O])[S][H]",
-                       "[$([C](=[O])[O][H]);$([C])]",
-                       "[$([H][O][C](=[O]));$([H])][S]"),
+                       "[$([C](=[O])[O][H])]",
+                       "[$([H][O][C](=[O]))][S]"),
 
                 FGInfo("alcohol", "[O][H]",
-                                  "[$([O][H]);$([O])]",
-                                  "[$([H][O]);$([H])]"),
+                                  "[$([O][H])]",
+                                  "[$([H][O])]"),
 
                 FGInfo("thiol", "[S][H]",
-                                "[$([S][H]);$([S])]",
-                                "[$([H][S]);$([H])]"),
+                                "[$([S][H])]",
+                                "[$([H][S])]"),
 
                 FGInfo("bromine", "*[Br]",
-                                  "[$(*[Br]);$(*)]",
-                                  "[$([Br]*);$([Br])]"),
+                                  "[$(*[Br])]",
+                                  "[$([Br]*)]"),
 
                 # This amine functional group only deletes one of the
                 # hydrogen atoms when a bond is formed.
                 FGInfo("amine2",
                        "[N]([H])[H]",
-                       "[$([N]([H])[H]);$([N])]",
-                       "[$([H][N][H]);$([H])]"),
+                       "[$([N]([H])[H])]",
+                       "[$([H][N][H])]"),
 
                 FGInfo("secondary_amine",
                        "[H][N]([#6])[#6]",
-                       "[$([N]([H])([#6])[#6]);$([N])]",
-                       "[$([H][N]([#6])[#6]);$([H])]")
+                       "[$([N]([H])([#6])[#6])]",
+                       "[$([H][N]([#6])[#6])]")
 
 
                     ]
 
-double_bond_combs = [('amine','aldehyde'),
-                     ('amide','aldehyde'),
-                     ('amide','amine')]
+double_bond_combs = [('amine', 'aldehyde'),
+                     ('amide', 'aldehyde'),
+                     ('amide', 'amine')]

@@ -1,0 +1,896 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mmead.ga.selection &mdash; MMEA 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="MMEA 0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MMEA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMEA</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mmead.ga.selection</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmead.ga.selection</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines selection functions via the ``Selection`` class.</span>
+
+<span class="sd">Extending MMEA: Adding selection functions</span>
+<span class="sd">------------------------------------------</span>
+<span class="sd">If a new selection operation is to be added to MMEA it should be added</span>
+<span class="sd">as a method in the ``Selection`` class defined in this module. The only</span>
+<span class="sd">requirements are that the first argument is ``population`` (excluding</span>
+<span class="sd">any ``self`` or ``cls`` arguments) and that the method is decorated</span>
+<span class="sd">wit the ``mutation()``, ``crossover()`` and ``generational()``</span>
+<span class="sd">decorators to highlight which selection it is to be used for. The</span>
+<span class="sd">decorators can be applied in sequence for functions which are suitable</span>
+<span class="sd">for more than one kind of selection.</span>
+
+<span class="sd">The naming requirement of ``population`` exists to help users identify</span>
+<span class="sd">which arguments are handled automatically by MMEA and which they need</span>
+<span class="sd">to defined in the input file. The convention is that if the mutation</span>
+<span class="sd">function takes an argument called  ``macro_mol`` it does not have to be</span>
+<span class="sd">specified in the input file.</span>
+
+<span class="sd">All selection functios should be defined as generators, which yield an</span>
+<span class="sd">member of ``population``. In the case of crossover selection functions,</span>
+<span class="sd">they should yield a tuple of selected parents. Generational selection</span>
+<span class="sd">function should yield each molecule at most once.</span>
+
+<span class="sd">If the selection function does not fit neatly into a single function</span>
+<span class="sd">make sure that any helper functions are private, ie that their names</span>
+<span class="sd">start with a leading underscore.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="mutation"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.mutation">[docs]</a><span class="k">def</span> <span class="nf">mutation</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies a function as suitable for mutation selections.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        A ``Selection`` class method which can be used for selecting</span>
+<span class="sd">        molecules for mutation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        The function received as an argument. The attribute</span>
+<span class="sd">        ``mutation`` is added and set to ``True``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">func</span><span class="o">.</span><span class="n">mutation</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="crossover"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.crossover">[docs]</a><span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies a function as suitable for crossover selections.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        A ``Selection`` class method which can be used for selecting</span>
+<span class="sd">        molecules for crossover.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        The function received as an argument. The attribute</span>
+<span class="sd">        ``crossover`` is added and set to ``True``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">func</span><span class="o">.</span><span class="n">crossover</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="generational"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.generational">[docs]</a><span class="k">def</span> <span class="nf">generational</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies a function as suitable for generational selections.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        A ``Selection`` class method which can be used for selecting</span>
+<span class="sd">        molecules for the next generation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        The function received as an argument. The attribute</span>
+<span class="sd">        ``generational`` is added and set to ``True``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">func</span><span class="o">.</span><span class="n">generational</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">func</span></div>
+
+
+<div class="viewcode-block" id="Selection"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection">[docs]</a><span class="k">class</span> <span class="nc">Selection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for handling all types of selection in the GA.</span>
+
+<span class="sd">    Whenever a population needs to have some of its members selected</span>
+<span class="sd">    for the creation of a parent pool or the next generation it</span>
+<span class="sd">    delegates this task to an instance of this class. The population</span>
+<span class="sd">    has this instance stored in its `ga_tools.selection` attribute.</span>
+
+<span class="sd">    Each instance of this class supports being called. What a calling</span>
+<span class="sd">    an instance does depends on the arguments the instance was</span>
+<span class="sd">    initialized with and what arguments were supplied during the call.</span>
+<span class="sd">    In all cases the call implements returns a generator. This</span>
+<span class="sd">    generator yields members of a ``Population`` instance in accordance</span>
+<span class="sd">    to some selection algorithm.</span>
+
+<span class="sd">    Initialization of this class takes the names of methods defined in</span>
+<span class="sd">    this class (as strings) and saves them into the instance&#39;s</span>
+<span class="sd">    `generational`, `crossover` and `mutation` attributes. These</span>
+<span class="sd">    attributes should therefore always hold the names of methods that</span>
+<span class="sd">    are to be used for the given purpose - such as generational</span>
+<span class="sd">    selection. The selection algorithms should be written as methods</span>
+<span class="sd">    within this class.</span>
+
+<span class="sd">    When an instance of this class is called it requires a</span>
+<span class="sd">    ``Population`` instance and a string to be provided as arguments.</span>
+<span class="sd">    The ``Population`` instance is the population which is to have some</span>
+<span class="sd">    of its members selected. Consider the following code:</span>
+
+<span class="sd">        &gt;&gt;&gt; pop.select(&#39;generational&#39;)</span>
+
+<span class="sd">    Here ``pop`` is a ``Population`` instance with a `ga_tools`</span>
+<span class="sd">    attribute, which holds an initialized ``Selection`` instance.</span>
+
+<span class="sd">    The method `select` invoked in the code automatically provides</span>
+<span class="sd">    the instance ``pop`` to the ``Selection`` instance it contains. The</span>
+<span class="sd">    function then calls the ``Selection`` instance. This means that</span>
+<span class="sd">    each time `select` is called on a population, the ``Selection``</span>
+<span class="sd">    instance will always act on the population it is held by. Different</span>
+<span class="sd">    populations can use different selection algorithms by holding</span>
+<span class="sd">    different ``Selection`` instances. Alternatively, they can perform</span>
+<span class="sd">    the same selection algorithms by sharing a ``Selection`` instance.</span>
+
+<span class="sd">    The string provided to the `select` method is passed all the way</span>
+<span class="sd">    down to the ``Selection`` instance being called. This is the second</span>
+<span class="sd">    argument a ``Selection`` instance requires when it is being called.</span>
+<span class="sd">    This is the string `generational` in the code example above. The</span>
+<span class="sd">    string should be the name of one of the attributes of the</span>
+<span class="sd">    ``Selection`` class. This means that &#39;generational&#39;, &#39;crossover&#39;</span>
+<span class="sd">    and &#39;mutation&#39; are valid strings at the time of this being written.</span>
+<span class="sd">    If more types of selection are added to MMEA, an attribute named</span>
+<span class="sd">    after that type of selection should be added to the ``Selection``</span>
+<span class="sd">    class. If one wishes to invoke that type of selection on a</span>
+<span class="sd">    population, `select` must be called with the name of that attribute</span>
+<span class="sd">    as a parameter.</span>
+
+<span class="sd">    There was a slight simplifcation in the paragraph describing</span>
+<span class="sd">    initialization. When the ``Selection`` instance is initialzed it</span>
+<span class="sd">    is not just with the names of the selection methods to be used. It</span>
+<span class="sd">    provided with the names of the methods and any paramters that the</span>
+<span class="sd">    methods will need to use. These parameters are packed into the</span>
+<span class="sd">    ``FunctionData`` class. The ``FunctionData`` instance holding the</span>
+<span class="sd">    method name and the appropriate parameter values is passed to</span>
+<span class="sd">    the initializer of ``Selection``.</span>
+
+<span class="sd">    Selection algorithms are to be implemented as generators. Selection</span>
+<span class="sd">    algorithms which produce parents pools must yield a tuple of</span>
+<span class="sd">    ``MacroMolecule`` instances. Selection algorithms should be grouped</span>
+<span class="sd">    together by their expected use when written into the class body.</span>
+
+<span class="sd">    Note that duplicates are not considered during selection. If a</span>
+<span class="sd">    molecule is present in the population twice, its chance of</span>
+<span class="sd">    selection does not double.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    generational : FunctionData</span>
+<span class="sd">        This holds the ``FunctionData`` object representing the</span>
+<span class="sd">        selection function used for selecting the next generation of</span>
+<span class="sd">        individuals along with any parameters the function may require.</span>
+
+<span class="sd">    crossover : FunctionData</span>
+<span class="sd">        Holds the ``FunctionData`` object representing the selection</span>
+<span class="sd">        function used for selecting parents, along with any parameters</span>
+<span class="sd">        the function may require.</span>
+
+<span class="sd">    mutation : FunctionData</span>
+<span class="sd">        Holds the ``FunctionData`` object representing the selection</span>
+<span class="sd">        function used for selection individuals for mutation, along</span>
+<span class="sd">        with any parameters the function may require.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generational</span><span class="p">,</span> <span class="n">crossover</span><span class="p">,</span> <span class="n">mutation</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generational</span> <span class="o">=</span> <span class="n">generational</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crossover</span> <span class="o">=</span> <span class="n">crossover</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutation</span> <span class="o">=</span> <span class="n">mutation</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">type_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields members from population.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which members should be selected.</span>
+
+<span class="sd">        type_ : str</span>
+<span class="sd">            The name of a ``Selection`` attribute. The name corresponds</span>
+<span class="sd">            to the type of selection that is desired: &#39;generational&#39;,</span>
+<span class="sd">            &#39;crossover&#39; or &#39;mutation&#39;.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        -------</span>
+<span class="sd">        MacroMolecule or tuple of MacroMolecules</span>
+<span class="sd">            ``MacroMolecule`` instances are yielded unless `type_` is</span>
+<span class="sd">            &#39;crossover&#39;. In this case a tuple of ``MacroMolecule``</span>
+<span class="sd">            instances is yielded.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make a population without any duplicates.</span>
+        <span class="n">unique_pop</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="o">*</span><span class="n">population</span><span class="p">)</span>
+        <span class="n">unique_pop</span><span class="o">.</span><span class="n">remove_duplicates</span><span class="p">()</span>
+
+        <span class="c1"># Get the attribute with the name provided as a string in</span>
+        <span class="c1"># `type_`. This returns a ``FunctionData`` object holding the</span>
+        <span class="c1"># name of the method which needs to be implemented and any</span>
+        <span class="c1"># required parameters and their values.</span>
+        <span class="n">func_data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">)</span>
+        <span class="c1"># Using the name of the method, get the method object with</span>
+        <span class="c1"># ``getattr``.</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1"># Call the method on the population and provide any additional</span>
+        <span class="c1"># parameters which may be necessary.</span>
+        <span class="k">yield from</span> <span class="n">func</span><span class="p">(</span><span class="n">unique_pop</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Selection.fittest"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.fittest">[docs]</a>    <span class="nd">@mutation</span>
+    <span class="nd">@generational</span>
+    <span class="k">def</span> <span class="nf">fittest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields members of the population, fittest first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population who&#39;s members need to be selected.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            The next fittest ``MacroMolecule`` instance held by the</span>
+<span class="sd">            population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">ind</span></div>
+
+<div class="viewcode-block" id="Selection.roulette"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.roulette">[docs]</a>    <span class="nd">@mutation</span>
+    <span class="nd">@generational</span>
+    <span class="k">def</span> <span class="nf">roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">elites</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields individuals using roulette selection.</span>
+
+<span class="sd">        In roulette selection the probability an individual is selected</span>
+<span class="sd">        is given by its fitness. If the total fitness is the sum of all</span>
+<span class="sd">        fitness values, the chance an individuals is selected is given</span>
+<span class="sd">        by</span>
+
+<span class="sd">        p = individual fitness / total fitness,</span>
+
+<span class="sd">        where p is the probability of selection [1].</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which individuals are to be selected.</span>
+
+<span class="sd">        elites : int, optional</span>
+<span class="sd">            The number of the fittest members which are guaranteed to</span>
+<span class="sd">            be yielded first.</span>
+
+<span class="sd">        truncation : int, optional</span>
+<span class="sd">            The number of least fit members which will never be</span>
+<span class="sd">            yielded.</span>
+
+<span class="sd">        duplicates : bool, optional</span>
+<span class="sd">            If ``True`` the same member can be yielded more than</span>
+<span class="sd">            once.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            The next selected population member.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        [1] http://tinyurl.com/csc3djm</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">yielded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">truncation</span> <span class="o">=</span> <span class="n">truncation</span> <span class="k">if</span> <span class="n">truncation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="n">truncation</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">truncation</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">elites</span><span class="p">):</span>
+            <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pop</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">yield</span> <span class="n">pop</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">valid_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span> <span class="k">if</span> <span class="n">ind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yielded</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_pop</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">valid_pop</span><span class="p">)</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">valid_pop</span><span class="p">]</span>
+
+            <span class="n">selected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_pop</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+            <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">yield</span> <span class="n">selected</span></div>
+
+<div class="viewcode-block" id="Selection.deterministic_sampling"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.deterministic_sampling">[docs]</a>    <span class="nd">@mutation</span>
+    <span class="k">def</span> <span class="nf">deterministic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields individuals using deterministic sampling.</span>
+
+<span class="sd">        This algorithm can only be used for selection of mutants. It</span>
+<span class="sd">        will return duplicates. The results of ``fittest()`` are</span>
+<span class="sd">        equivalent to algorithm without duplicates.</span>
+
+<span class="sd">        In determnistic sampling the mean fitness value of the</span>
+<span class="sd">        population is calculated, &lt;f&gt;. For each individual a</span>
+<span class="sd">        normalized fitness value is then calculated via</span>
+
+<span class="sd">            fn = f / &lt;f&gt;</span>
+
+<span class="sd">        where fn is the normalized fitness value and f is the original</span>
+<span class="sd">        fitness value. An individual will be selected n times, where</span>
+<span class="sd">        n is the integer value of fn. After all individuals where</span>
+<span class="sd">        n &gt; 0 are yielded, all inidividuals are yielded again. Largest</span>
+<span class="sd">        decimal part of fn first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which individuals are to be selected.</span>
+
+<span class="sd">        truncation : int, optional</span>
+<span class="sd">            The number of least fit members which will never be</span>
+<span class="sd">            yielded.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            The next selected population member.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">truncation</span> <span class="o">=</span> <span class="n">truncation</span> <span class="k">if</span> <span class="n">truncation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="n">truncation</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">truncation</span><span class="p">]</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">mem</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">])</span>
+        <span class="n">decimals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+            <span class="n">q</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+            <span class="n">decimals</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">r</span><span class="p">,</span> <span class="n">mem</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">q</span><span class="p">)):</span>
+                <span class="k">yield</span> <span class="n">mem</span>
+
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">mem</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">decimals</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">mem</span></div>
+
+<div class="viewcode-block" id="Selection.stochastic_sampling"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.stochastic_sampling">[docs]</a>    <span class="nd">@mutation</span>
+    <span class="nd">@generational</span>
+    <span class="k">def</span> <span class="nf">stochastic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span>
+                            <span class="n">elites</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_rank</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields individuals via stochastic sampling.</span>
+
+<span class="sd">        Each fitness value is used to calculate the normalized fitness</span>
+<span class="sd">        of an individual</span>
+
+<span class="sd">            fn = f / &lt;f&gt;</span>
+
+<span class="sd">        where fn is the normalized fitness value, f is the original</span>
+<span class="sd">        fitness value and &lt;f&gt; is the mean fitness of the population. If</span>
+<span class="sd">        f is greater than 1 then the individual is guaranteed to be</span>
+<span class="sd">        selected. If duplicates are allowed, individuals are guaranteed</span>
+<span class="sd">        to be selected n times, where n is the integer part of fn.</span>
+
+<span class="sd">        Once all the guarnteed individuals have been yielded, the</span>
+<span class="sd">        remaining individuals are yielded via the roulette method. The</span>
+<span class="sd">        weights in the roulette method are based on the decimal part of</span>
+<span class="sd">        fn.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which individuals are to be selected.</span>
+
+<span class="sd">        elites : int, optional</span>
+<span class="sd">            The number of the fittest members which are guaranteed to</span>
+<span class="sd">            be yielded first.</span>
+
+<span class="sd">        truncation : int, optional</span>
+<span class="sd">            The number of least fit members which will never be</span>
+<span class="sd">            yielded.</span>
+
+<span class="sd">        duplicates : bool, optional</span>
+<span class="sd">            If ``True`` the same member can be yielded more than</span>
+<span class="sd">            once.</span>
+
+<span class="sd">        use_rank : bool, optional</span>
+<span class="sd">            When ``True`` the fitness value of an individual is</span>
+<span class="sd">            calculated as, f = 1/rank.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            The next selected population member.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">yielded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">truncation</span> <span class="o">=</span> <span class="n">truncation</span> <span class="k">if</span> <span class="n">truncation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="n">truncation</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">truncation</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">elites</span><span class="p">):</span>
+            <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pop</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+            <span class="k">yield</span> <span class="n">pop</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">mem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">mem</span><span class="o">.</span><span class="n">_ssfitness</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">r</span> <span class="k">if</span> <span class="n">use_rank</span> <span class="k">else</span> <span class="n">mem</span><span class="o">.</span><span class="n">fitness</span>
+
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_sampling_guaranteed</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span>
+                                                        <span class="n">yielded</span><span class="p">,</span>
+                                                        <span class="n">duplicates</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stochastic_sampling_roulette</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span>
+                                                      <span class="n">yielded</span><span class="p">,</span>
+                                                      <span class="n">duplicates</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Selection._stochastic_sampling_guaranteed"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection._stochastic_sampling_guaranteed">[docs]</a>    <span class="k">def</span> <span class="nf">_stochastic_sampling_guaranteed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span>
+                                        <span class="n">yielded</span><span class="p">,</span> <span class="n">duplicates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yielded the members guaranteed by stochastic sampling.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : list of MacroMolecules</span>
+<span class="sd">            The molecules which are being selected.</span>
+
+<span class="sd">        yielded : set of MacroMolecule instances</span>
+<span class="sd">            Holds all previously yielded molecules.</span>
+
+<span class="sd">        duplicates : bool</span>
+<span class="sd">            Indicates whether a member can be yielded more than once.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            The next member whose normalized fitness integer component</span>
+<span class="sd">            is greater than 0.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">mem</span><span class="o">.</span><span class="n">_ssfitness</span> <span class="k">for</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">divmod</span><span class="p">(</span><span class="n">mem</span><span class="o">.</span><span class="n">_ssfitness</span><span class="p">,</span> <span class="n">mean</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># Account for the fact that a molecule may have been</span>
+            <span class="c1"># yielded due to elitism.</span>
+            <span class="n">q</span> <span class="o">-=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">yielded</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">yielded</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="n">q</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+                <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mem</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="n">mem</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span><span class="p">:</span>
+                    <span class="k">break</span></div>
+
+<div class="viewcode-block" id="Selection._stochastic_sampling_roulette"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection._stochastic_sampling_roulette">[docs]</a>    <span class="k">def</span> <span class="nf">_stochastic_sampling_roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span>
+                                      <span class="n">yielded</span><span class="p">,</span> <span class="n">duplicates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does the roulette component of stochastic sampling.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : list of MacroMolecules</span>
+<span class="sd">            The molecules which are being selected.</span>
+
+<span class="sd">        yielded : set of MacroMolecule instances</span>
+<span class="sd">            Holds all previously yielded molecules.</span>
+
+<span class="sd">        duplicates : bool</span>
+<span class="sd">            Indicates whether a member can be yielded more than once.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        MacroMolecule</span>
+<span class="sd">            The seleceted population member.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">yielded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="k">if</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="n">yielded</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">valid_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span> <span class="k">if</span> <span class="n">ind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yielded</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_pop</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">mem</span><span class="o">.</span><span class="n">_ssfitness</span> <span class="k">for</span> <span class="n">mem</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">])</span>
+            <span class="n">rtotal</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">divmod</span><span class="p">(</span><span class="n">ind</span><span class="o">.</span><span class="n">_ssfitness</span><span class="p">,</span> <span class="n">mean</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span>
+                         <span class="n">ind</span> <span class="ow">in</span> <span class="n">valid_pop</span><span class="p">)</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="nb">divmod</span><span class="p">(</span><span class="n">ind</span><span class="o">.</span><span class="n">_ssfitness</span><span class="p">,</span> <span class="n">mean</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">rtotal</span> <span class="k">for</span>
+                       <span class="n">ind</span> <span class="ow">in</span> <span class="n">valid_pop</span><span class="p">]</span>
+
+            <span class="n">selected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_pop</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+            <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">yield</span> <span class="n">selected</span></div>
+
+<div class="viewcode-block" id="Selection.all_combinations"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.all_combinations">[docs]</a>    <span class="nd">@crossover</span>
+    <span class="k">def</span> <span class="nf">all_combinations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields every possible pairing of individuals from a population.</span>
+
+<span class="sd">        This yields members regardless of which subpopulation they are</span>
+<span class="sd">        in. Each pair is only returned once. This means if (1,2) is</span>
+<span class="sd">        returned (2,1) will not be.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which parents should be selected.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        tuple of 2 MacroMolecule instances</span>
+<span class="sd">            The ``MacroMolecule`` instances which together form a</span>
+<span class="sd">            parent pair.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get all combinations of size 2.</span>
+        <span class="k">for</span> <span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span></div>
+
+<div class="viewcode-block" id="Selection.all_combinations_n_fittest"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.all_combinations_n_fittest">[docs]</a>    <span class="nd">@crossover</span>
+    <span class="k">def</span> <span class="nf">all_combinations_n_fittest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields all pairings of the `n` fittest individuals.</span>
+
+<span class="sd">        The pairings are yielded with in order of fitness, with most</span>
+<span class="sd">        fit pair yielded first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which parents should be selected.</span>
+
+<span class="sd">        n : int</span>
+<span class="sd">            The number of individuals used for making offspring.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        tuple of 2 MacroMolecule instances</span>
+<span class="sd">            The ``MacroMolecule`` instances which together form a parent</span>
+<span class="sd">            pair.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_fittest</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fittest</span><span class="p">(</span><span class="n">population</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">n_fittest</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span></div>
+
+<div class="viewcode-block" id="Selection.crossover_roulette"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.crossover_roulette">[docs]</a>    <span class="nd">@crossover</span>
+    <span class="k">def</span> <span class="nf">crossover_roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields parents using roulette selection.</span>
+
+<span class="sd">        In roulette selection the probability an individual is selected</span>
+<span class="sd">        is given by its fitness. If the total fitness is the sum of all</span>
+<span class="sd">        fitness values, the chance an individuals is selected is given</span>
+<span class="sd">        by</span>
+
+<span class="sd">        p = individual fitness / total fitness,</span>
+
+<span class="sd">        where p is the probability of selection [1].</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which parents are selected.</span>
+
+<span class="sd">        truncation : int, optional</span>
+<span class="sd">            The number of least fit members which will never be</span>
+<span class="sd">            yielded.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        numpy.ndarray of MacroMolecule instances</span>
+<span class="sd">            The selected parent pair.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        [1] http://tinyurl.com/csc3djm</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">truncation</span> <span class="o">=</span> <span class="n">truncation</span> <span class="k">if</span> <span class="n">truncation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="n">truncation</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">truncation</span><span class="p">]</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">)</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">]</span>
+            <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Selection.crossover_deterministic_sampling"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.selection.Selection.crossover_deterministic_sampling">[docs]</a>    <span class="nd">@crossover</span>
+    <span class="k">def</span> <span class="nf">crossover_deterministic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span>
+                                         <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Yields parents according to determnistic sampling.</span>
+
+<span class="sd">        In determnistic sampling the mean fitness value of the</span>
+<span class="sd">        population is calculated, &lt;f&gt;. For each individual a</span>
+<span class="sd">        normalized fitness value is then calculated via</span>
+
+<span class="sd">            fn = f / &lt;f&gt;</span>
+
+<span class="sd">        where fn is the normalized fitness value and f is the original</span>
+<span class="sd">        fitness value.</span>
+
+<span class="sd">        Deterministic sampling then creates a temporary, parent</span>
+<span class="sd">        population of the same size as the original population. An</span>
+<span class="sd">        individual is guaranteed to be placed into the parent</span>
+<span class="sd">        population n times, where n is the integer part of fn. Any</span>
+<span class="sd">        remaining slots are to individuals with the largest decimal</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        Parents are then randomly selected from the parent population.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : Population</span>
+<span class="sd">            The population from which parents are selected.</span>
+
+<span class="sd">        truncation : int, optional</span>
+<span class="sd">            The number of least fit members which will never be</span>
+<span class="sd">            yielded.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        numpy.ndarray of MacroMolecule instances</span>
+<span class="sd">            The selected parent pair.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">truncation</span> <span class="o">=</span> <span class="n">truncation</span> <span class="k">if</span> <span class="n">truncation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="n">truncation</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">truncation</span><span class="p">]</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">])</span>
+
+        <span class="n">parent_pop</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="o">/</span> <span class="n">mean</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">parent_pop</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="n">fn</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+                <span class="n">parent_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">parent_pop</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
