@@ -58,7 +58,7 @@ class Vertex:
     """
 
     def __init__(self, x, y, z, id_=None):
-        self.coord = np.array([x,y,z])
+        self.coord = np.array([x, y, z])
         self.connected = []
         self.bonder_ids = []
         self.atom_position_pairs = []
