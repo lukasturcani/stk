@@ -264,13 +264,13 @@ class PeriodicLattice(Topology):
         # Place and set orientation of the first building block.
         bb1.set_bonder_centroid(self.vertices[0])
         bb1.set_orientation2([0, 0, 1])
-        bb1.minimize_theta(bb1.bonder_ids[0], [0, -1, 0], [0, 0, 1])
+        bb1.minimize_theta2(bb1.bonder_ids[0], [0, -1, 0], [0, 0, 1])
         # Add to the macromolecule.
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb1.mol)
         # Place and set orientation of the second building block.
         bb2.set_bonder_centroid(self.vertices[1])
         bb2.set_orientation2([0, 0, 1])
-        bb2.minimize_theta(bb2.bonder_ids[0], [0, 1, 0], [0, 0, 1])
+        bb2.minimize_theta2(bb2.bonder_ids[0], [0, 1, 0], [0, 0, 1])
         # Add to the macromolecule.
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb2.mol)
         # Add the bonder_ids prematurely for this topology. Needed for
