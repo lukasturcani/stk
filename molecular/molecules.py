@@ -1593,7 +1593,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return functional_group, rdkit.MolToInchi(rdkit_mol)
 
-    def _minimize_theta(self, v1, v2, axis, centroid):
+    def minimize_theta(self, v1, v2, axis, centroid):
         """
         Rotate mol to minimize angle between `v1` and `v2`.
 
@@ -2040,7 +2040,7 @@ class StructUnit2(StructUnit):
         *_, start = next(self.bonder_direction_vectors())
         return self._set_orientation2(start, end)
 
-    def minimize_theta(self, vector, axis):
+    def minimize_theta2(self, vector, axis):
         """
         Rotates molecule about `axis` to minimze theta with `vector`.
 
@@ -2069,8 +2069,8 @@ class StructUnit2(StructUnit):
 
         """
 
-        self._minimize_theta(self.centroid_centroid_dir_vector(),
-                             vector, axis, self.bonder_centroid())
+        self.minimize_theta(self.centroid_centroid_dir_vector(),
+                            vector, axis, self.bonder_centroid())
 
 
 class StructUnit3(StructUnit):
@@ -2144,7 +2144,7 @@ class StructUnit3(StructUnit):
 
         return normal_v
 
-    def minimize_theta(self, atom, vector, axis):
+    def minimize_theta2(self, atom, vector, axis):
         """
         Rotates molecule to minimize angle between `atom` and `vector`.
 
@@ -2174,7 +2174,7 @@ class StructUnit3(StructUnit):
         """
 
         v1 = self.atom_coords(atom) - self.bonder_centroid()
-        self._minimize_theta(v1, vector, axis, self.bonder_centroid())
+        self.minimize_theta(v1, vector, axis, self.bonder_centroid())
 
     def set_orientation2(self, end):
         """

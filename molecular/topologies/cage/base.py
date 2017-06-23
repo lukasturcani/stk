@@ -163,9 +163,9 @@ class Vertex:
         atom = building_block.bonder_ids[aligner]
         # Minimize the angle between these things by rotating about the
         # normal of the edge plane.
-        building_block.minimize_theta(atom,
-                                      vector,
-                                      self.edge_plane_normal())
+        building_block.minimize_theta2(atom,
+                                       vector,
+                                       self.edge_plane_normal())
 
         return building_block.mol
 
@@ -359,7 +359,7 @@ class Edge(Vertex):
 
         # Ensure the centroid of the linker is placed on the outside of
         # the cage.
-        linker.minimize_theta(self.coord, self.direction)
+        linker.minimize_theta2(self.coord, self.direction)
 
         return linker.mol
 
