@@ -72,12 +72,16 @@ def fitness_epp(pop, plot_name=False,
 
     if plot_name:
         fig = plt.figure()
+        axes = plt.gca()
         plt.xlabel(xlabel)
         plt.ylabel('Fitness')
         plt.scatter(xvals, maxs, color='red', marker='x', label='max')
         plt.scatter(xvals, means,
                     color='green', marker='x', label='mean')
         plt.scatter(xvals, mins, color='blue', marker='x', label='min')
+        frame = (min(mins) + max(maxs))/100
+        axes.set_ylim([min(mins)-frame, max(maxs)+frame])
+
         lgd = plt.legend(bbox_to_anchor=(1.05, 1),
                          loc=2, borderaxespad=0.)
         fig.savefig(plot_name, dpi=1000,
