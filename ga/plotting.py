@@ -75,12 +75,12 @@ def fitness_epp(pop, plot_name=False,
         axes = plt.gca()
         plt.xlabel(xlabel)
         plt.ylabel('Fitness')
-        plt.scatter(xvals, maxs, color='red', marker='x', label='max')
+        plt.scatter(xvals, maxs, color='red', marker='o', label='max')
         plt.scatter(xvals, means,
-                    color='green', marker='x', label='mean')
-        plt.scatter(xvals, mins, color='blue', marker='x', label='min')
-        frame = (min(mins) + max(maxs))/100
-        axes.set_ylim([min(mins)-frame, max(maxs)+frame])
+                    color='green', marker='o', label='mean')
+        plt.scatter(xvals, mins, color='blue', marker='o', label='min')
+        frame = (min(mins) + max(maxs))/50
+        axes.set_ylim([min(mins) - frame, max(maxs) + frame])
 
         lgd = plt.legend(bbox_to_anchor=(1.05, 1),
                          loc=2, borderaxespad=0.)
@@ -191,14 +191,17 @@ def parameter_epp(pop, plot_name=False,
 
         if plot_name:
             fig = plt.figure()
+            axes = plt.gca()
             plt.xlabel(xlabel)
             plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
             plt.scatter(xvals, y_mean,
-                        color='green', marker='x', label='mean')
+                        color='green', marker='o', label='mean')
             plt.scatter(xvals, y_min,
-                        color='blue', marker='x', label='min')
+                        color='blue', marker='o', label='min')
             plt.scatter(xvals, y_max,
-                        color='red', marker='x', label='max')
+                        color='red', marker='o', label='max')
+            frame = (min(y_min) + max(y_max))/50
+            axes.set_ylim([min(y_min) - frame, max(y_max) + frame])
             lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
                              borderaxespad=0.)
 
