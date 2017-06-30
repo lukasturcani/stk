@@ -80,6 +80,7 @@ class PeriodicLattice(Topology):
                 macro_mol.terminator_coords[bi] = tcoords
 
         super().del_atoms(macro_mol)
+        macro_mol._ids_updated = False
 
     def join_mols(self, macro_mol):
         """
@@ -205,7 +206,11 @@ class PeriodicLattice(Topology):
         # Add to the macromolecule.
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb2.mol)
         # Add the bonder_ids prematurely for this topology. Needed for
-        # making supercells - see join_mols().
+        # making supercells - see join_mols(). Using the ``super``
+        # version here because Periodic.save_ids() tries to update the
+        # atom ids in periodic bonds, which is needed later in the
+        # assembly process. Here only saving of the atom ids
+        # is needed, which is done by the ``super`` version.
         super(macro_mol.__class__, macro_mol).save_ids()
 
 

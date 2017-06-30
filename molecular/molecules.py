@@ -2887,6 +2887,9 @@ class Periodic(MacroMolecule):
     with additional methods and attributes relevant to periodic
     materials being added.
 
+    The method :meth:`~.MacroMolecule.save_ids` is extended to take
+    into account ids of atoms in perdiodic bonds.
+
     Attributes
     ----------
     terminator_coords : :class:`dict`
@@ -2903,10 +2906,15 @@ class Periodic(MacroMolecule):
         :class:`.PeriodicBond` instances representing the bonds into
         this list.
 
+    _ids_updated : :class:`bool`
+        Indicates whether periodic bond ids have been updated already
+        by :meth:`save_ids`.
+
     """
 
     def __init__(self, building_blocks, topology, name="", note=""):
         self.periodic_bonds = []
+        self._ids_updated = False
         super().__init__(building_blocks, topology, name="", note="")
 
     def _is_subterminal(self, atom_id, bonder_map, bonded):
@@ -3210,6 +3218,10 @@ periodic._place_island([4, 4, 4])
     def save_ids(self):
         super().save_ids()
 
+        # If the ids of periodic bonds have already been updated, stop.
+        if self._ids_updated:
+            return
+
         # Update periodic bonds to hold atom ids directly instead of
         # indices of the atom ids within `bonder_ids`.
         for pb in self.periodic_bonds:
@@ -3223,6 +3235,8 @@ periodic._place_island([4, 4, 4])
             bonder_id = self.bonder_ids[index]
             terminator_coords[bonder_id] = coord
         self.terminator_coords = terminator_coords
+
+        self._ids_updated = True
 
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
