@@ -3,74 +3,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 
 from .base import Topology
-
-
-class PeriodicBond:
-    """
-    Represents a periodic bond.
-
-    In the attributes `atom1` and `atom2` the indices of bonder atom
-    ids within :attr:`.MacroMolecule.bonder_ids` are used rather than
-    the bonder ids themselves because periodic bonds get created by
-    :meth:`PeriodicLattice.join_mols` before atoms are deleted by
-    :meth:`PeriodicLattice.del_atoms`. This means that ids of saved
-    bonder atoms change. However, their position within
-    :attr:`.MacroMolecule.bonder_ids` does not.
-
-    Parameters
-    ----------
-    atom1 : :class:`int`
-        This represents the bonder atom which has a periodic bond with
-        `atom2`. It is the index of the atom id within
-        :attr:`~.MacroMolecule.bonder_ids`.
-
-    direction1 : :class:`list` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from `atom1` toward `atom2`. For example
-        ``[1, 0, 0]`` means that the bond is periodic along the x axis
-        in the positive direction.
-
-    atom2 : :class:`int`
-        This represents the bonder atom which has a periodic bond with
-        `atom1`. It is the index of the atom id within
-        :attr:`~.MacroMolecule.bonder_ids`.
-
-    direction2 : :class:`list` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from `atom2` toward `atom1`. It should be
-        like `direction1` but with all values made negative.
-
-
-    Attributes
-    ----------
-    atom1 : :class:`int`
-        This represents the bonder atom which has a periodic bond with
-        `atom2`. It is the index of the atom id within
-        :attr:`~.MacroMolecule.bonder_ids`.
-
-    direction1 : :class:`numpy.ndarray` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from `atom1` toward `atom2`. For example
-        ``[1, 0, 0]`` means that the bond is periodic along the x axis
-        in the positive direction.
-
-    atom2 : :class:`int`
-        This represents the bonder atom which has a periodic bond with
-        `atom1`. It is the index of the atom id within
-        :attr:`~.MacroMolecule.bonder_ids`.
-
-    direction2 : :class:`numpy.ndarray` of :class:`int`
-        A 3 member list describing the axes along which the bond is
-        periodic, when going from `atom2` toward `atom1`. It should be
-        like `direction1` but with all values made negative.
-
-    """
-
-    def __init__(self, atom1, direction1, atom2, direction2):
-        self.atom1 = atom1
-        self.direction1 = np.array(direction1)
-        self.atom2 = atom2
-        self.direction2 = np.array(direction2)
+from ...convenience_tools import PeriodicBond
 
 
 def is_bonder(macro_mol, atom_id):
@@ -197,8 +130,7 @@ class PeriodicLattice(Topology):
         top_atom = macro_mol.bonder_ids.index(top_atom)
         bottom_atom = macro_mol.bonder_ids.index(bottom_atom)
         macro_mol.periodic_bonds.append(
-                        PeriodicBond(top_atom, [0, 1, 0],
-                                     bottom_atom, [0, -1, 0]))
+                    PeriodicBond(top_atom, bottom_atom, [0, 1, 0]))
         # Do the same for the x-axis periodic bonds.
         right_atom = max(top,
                          key=lambda x: macro_mol.atom_coords(x)[0])
@@ -210,8 +142,7 @@ class PeriodicLattice(Topology):
         right_atom = macro_mol.bonder_ids.index(right_atom)
         left_atom = macro_mol.bonder_ids.index(left_atom)
         macro_mol.periodic_bonds.append(
-                                PeriodicBond(right_atom, [1, 0, 0],
-                                             left_atom, [-1, 0, 0]))
+                        PeriodicBond(right_atom, left_atom, [1, 0, 0]))
 
         # For the bond which gets created directly, find the bonder
         # atom in the bottom fragment closest to the position of the
@@ -275,7 +206,7 @@ class PeriodicLattice(Topology):
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb2.mol)
         # Add the bonder_ids prematurely for this topology. Needed for
         # making supercells - see join_mols().
-        macro_mol.save_ids()
+        super(macro_mol.__class__, macro_mol).save_ids()
 
 
 class Hexagonal(PeriodicLattice):

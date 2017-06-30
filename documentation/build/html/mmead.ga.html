@@ -1530,7 +1530,7 @@ functions or methods that are to be used with that keyword.</dd>
 </dl>
 <dl class="attribute">
 <dt id="mmead.ga.input.InputHelp.modules">
-<code class="descname">modules</code><em class="property"> = {‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mmead.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">modules</code><em class="property"> = {‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mmead.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2586,7 +2586,7 @@ is held by the population.</td>
 
 <dl class="classmethod">
 <dt id="mmead.ga.population.Population.init_all">
-<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>databases</em>, <em>topologies</em>, <em>bb_classes</em>, <em>macromol_class</em>, <em>ga_tools=&lt;mmead.ga.ga_tools.GATools object&gt;</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>databases</em>, <em>bb_classes</em>, <em>topologies</em>, <em>macromol_class</em>, <em>ga_tools=&lt;mmead.ga.ga_tools.GATools object&gt;</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/ga/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.ga.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates all possible molecules from a given set of databases.</p>
 <p>All possible combinations of building blocks from <cite>databases</cite>
 and topologies from <cite>topologies</cite> are built. The initialization
@@ -2604,7 +2604,6 @@ and so on.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>databases</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – List of paths to directories, which hold molecular
 structure files of the building blocks.</li>
-<li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.base.Topology" title="mmead.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>bb_classes</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">type</span></code>) – <p>This list must be equal in length to <cite>databases</cite>. For each
 database provided in <cite>databases</cite>, a class used to
 initialize building blocks from that database is provided
@@ -2622,6 +2621,7 @@ initialized as <a class="reference internal" href="mmead.molecular.html#mmead.mo
 molecules in <code class="docutils literal"><span class="pre">aldehydes3f</span></code> are initialized as
 <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.StructUnit3" title="mmead.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a> objects.</p>
 </li>
+<li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.base.Topology" title="mmead.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="mmead.molecular.html#mmead.molecular.molecules.MacroMolecule" title="mmead.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> objects being
 built.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code> duplicate structures are not removed from
@@ -2642,10 +2642,10 @@ assembled from <cite>databases</cite>.</p>
 <p>If the name of the functional group needs to be provided to the
 building blocks, a lambda function can be used.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">dbs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/path/to/db1&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/db2&#39;</span><span class="p">]</span>
-<span class="n">tops</span> <span class="o">=</span> <span class="p">[</span><span class="n">Linear</span><span class="p">(</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">)]</span>
 <span class="n">bb_classes</span> <span class="o">=</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">),</span>
               <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)]</span>
-<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_all</span><span class="p">(</span><span class="n">dbs</span><span class="p">,</span> <span class="n">tops</span><span class="p">,</span> <span class="n">bb_classes</span><span class="p">,</span> <span class="n">Polymer</span><span class="p">)</span>
+<span class="n">tops</span> <span class="o">=</span> <span class="p">[</span><span class="n">Linear</span><span class="p">(</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">)]</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_all</span><span class="p">(</span><span class="n">dbs</span><span class="p">,</span> <span class="n">bb_classes</span><span class="p">,</span> <span class="n">tops</span><span class="p">,</span> <span class="n">Polymer</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
