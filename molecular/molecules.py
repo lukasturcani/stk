@@ -212,8 +212,8 @@ class CachedStructUnit(type):
 
         # Ensure a valid file type was provided.
         if ext not in self.init_funcs:
-            raise TypeError(
-            'Unable to initialize from "{}" files.'.format(ext))
+            raise TypeError(('Unable to initialize'
+                             ' from "{}" files.').format(ext))
 
         mol = self.init_funcs[ext](sig['file'])
 
@@ -223,7 +223,7 @@ class CachedStructUnit(type):
             fg = sig['functional_group']
         else:
             fg = next((x.name for x in functional_groups if
-                                        x.name in sig['file']), None)
+                       x.name in sig['file']), None)
 
         key = self.gen_key(mol, fg)
         if key in self.cache:
@@ -426,7 +426,7 @@ class Molecule:
         cavity_origin = minimize(self._cavity_size,
                                  x0=ref,
                                  bounds=bounds).x
-        cavity =  -self._cavity_size(cavity_origin)
+        cavity = -self._cavity_size(cavity_origin)
         return 0 if cavity < 0 else cavity
 
     def center_of_mass(self):
@@ -444,12 +444,12 @@ class Molecule:
 
         """
 
-        center = np.array([0.,0.,0.])
+        center = np.array([0., 0., 0.])
         total_mass = 0.
         for atom_id, coord in self.all_atom_coords():
             mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
-            center +=  mass*coord
+            center += mass*coord
         return np.divide(center, total_mass)
 
     def centroid(self):
@@ -693,7 +693,7 @@ class Molecule:
             pos_vect = np.array([*self.atom_coords(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
-        return np.matrix(pos_array.reshape(-1,3).T)
+        return np.matrix(pos_array.reshape(-1, 3).T)
 
     def same(self, other):
         """
@@ -833,7 +833,7 @@ class Molecule:
         # centroid to the origin. This is so that the rotation occurs
         # about this point.
         og_center = self.centroid()
-        self.set_position([0,0,0])
+        self.set_position([0, 0, 0])
 
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
@@ -1800,7 +1800,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # atom centroid to the origin. This is so that the rotation
         # occurs about this point.
         og_center = self.bonder_centroid()
-        self.set_bonder_centroid(np.array([0,0,0]))
+        self.set_bonder_centroid(np.array([0, 0, 0]))
 
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
@@ -2782,7 +2782,7 @@ class Cage(MacroMolecule):
         """
 
         if (self.windows is None or
-            len(self.windows) < self.topology.n_windows):
+           len(self.windows) < self.topology.n_windows):
             return None
 
         # Cluster the windows into groups so that only size
@@ -2819,10 +2819,9 @@ class Cage(MacroMolecule):
         diff_sums = []
         for cluster in clusters:
             diff_sum = sum(abs(w1 - w2) for w1, w2 in
-                                    it.combinations(cluster, 2))
+                           it.combinations(cluster, 2))
 
-            diff_num = sum(1 for _ in
-                it.combinations(cluster, 2))
+            diff_num = sum(1 for _ in it.combinations(cluster, 2))
 
             diff_sums.append(diff_sum / diff_num)
 
