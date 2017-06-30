@@ -328,6 +328,51 @@ class MAEExtractor:
                 mae_file.write(maegz_file.read())
 
 
+class PeriodicBond:
+    """
+    Represents a periodic bond.
+
+    Parameters
+    ----------
+    atom1 : :class:`int`
+        The id of first atom in the bond.
+
+    atom2 : :class:`int`
+        The id of the second atom in the bond.
+
+    direction : :class:`list` of :class:`int`
+        A 3 member list describing the axes along which the bond is
+        periodic, when going from `atom1` to `atom2`. For example,
+        ``[1, 0, 0]`` means that the bond is periodic along the x axis
+        in the positive direction.
+
+
+    Attributes
+    ----------
+    atom1 : :class:`int`
+        The id of first atom in the bond.
+
+    atom2 : :class:`int`
+        The id of the second atom in the bond.
+
+    direction : :class:`numpy.ndarray` of :class:`int`
+        A 3 member list describing the axes along which the bond is
+        periodic, when going from `atom1` to `atom2`. For example,
+        ``[1, 0, 0]`` means that the bond is periodic along the x axis
+        in the positive direction.
+
+    """
+
+    def __init__(self, atom1, atom2, direction):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.direction = np.array(direction)
+
+    def __str__(self):
+        return ("PeriodicBond({0.atom1}, "
+                "{0.atom2}, {0.direction})").format(self)
+
+
 class StopLogging:
     ...
 

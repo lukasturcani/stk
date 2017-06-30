@@ -158,74 +158,7 @@
 <span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="k">import</span> <span class="n">euclidean</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Topology</span>
-
-
-<div class="viewcode-block" id="PeriodicBond"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicBond">[docs]</a><span class="k">class</span> <span class="nc">PeriodicBond</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents a periodic bond.</span>
-
-<span class="sd">    In the attributes `atom1` and `atom2` the indices of bonder atom</span>
-<span class="sd">    ids within :attr:`.MacroMolecule.bonder_ids` are used rather than</span>
-<span class="sd">    the bonder ids themselves because periodic bonds get created by</span>
-<span class="sd">    :meth:`PeriodicLattice.join_mols` before atoms are deleted by</span>
-<span class="sd">    :meth:`PeriodicLattice.del_atoms`. This means that ids of saved</span>
-<span class="sd">    bonder atoms change. However, their position within</span>
-<span class="sd">    :attr:`.MacroMolecule.bonder_ids` does not.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    atom1 : :class:`int`</span>
-<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
-<span class="sd">        `atom2`. It is the index of the atom id within</span>
-<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
-
-<span class="sd">    direction1 : :class:`list` of :class:`int`</span>
-<span class="sd">        A 3 member list describing the axes along which the bond is</span>
-<span class="sd">        periodic, when going from `atom1` toward `atom2`. For example</span>
-<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
-<span class="sd">        in the positive direction.</span>
-
-<span class="sd">    atom2 : :class:`int`</span>
-<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
-<span class="sd">        `atom1`. It is the index of the atom id within</span>
-<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
-
-<span class="sd">    direction2 : :class:`list` of :class:`int`</span>
-<span class="sd">        A 3 member list describing the axes along which the bond is</span>
-<span class="sd">        periodic, when going from `atom2` toward `atom1`. It should be</span>
-<span class="sd">        like `direction1` but with all values made negative.</span>
-
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    atom1 : :class:`int`</span>
-<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
-<span class="sd">        `atom2`. It is the index of the atom id within</span>
-<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
-
-<span class="sd">    direction1 : :class:`numpy.ndarray` of :class:`int`</span>
-<span class="sd">        A 3 member list describing the axes along which the bond is</span>
-<span class="sd">        periodic, when going from `atom1` toward `atom2`. For example</span>
-<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
-<span class="sd">        in the positive direction.</span>
-
-<span class="sd">    atom2 : :class:`int`</span>
-<span class="sd">        This represents the bonder atom which has a periodic bond with</span>
-<span class="sd">        `atom1`. It is the index of the atom id within</span>
-<span class="sd">        :attr:`~.MacroMolecule.bonder_ids`.</span>
-
-<span class="sd">    direction2 : :class:`numpy.ndarray` of :class:`int`</span>
-<span class="sd">        A 3 member list describing the axes along which the bond is</span>
-<span class="sd">        periodic, when going from `atom2` toward `atom1`. It should be</span>
-<span class="sd">        like `direction1` but with all values made negative.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">direction1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">direction2</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">direction1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">direction1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">direction2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">direction2</span><span class="p">)</span></div>
+<span class="kn">from</span> <span class="nn">...convenience_tools</span> <span class="k">import</span> <span class="n">PeriodicBond</span>
 
 
 <div class="viewcode-block" id="is_bonder"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.is_bonder">[docs]</a><span class="k">def</span> <span class="nf">is_bonder</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">):</span>
@@ -352,8 +285,7 @@
         <span class="n">top_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">top_atom</span><span class="p">)</span>
         <span class="n">bottom_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bottom_atom</span><span class="p">)</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">top_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                     <span class="n">bottom_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+                    <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">top_atom</span><span class="p">,</span> <span class="n">bottom_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
         <span class="c1"># Do the same for the x-axis periodic bonds.</span>
         <span class="n">right_atom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">top</span><span class="p">,</span>
                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
@@ -365,8 +297,7 @@
         <span class="n">right_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">right_atom</span><span class="p">)</span>
         <span class="n">left_atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">left_atom</span><span class="p">)</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">right_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                             <span class="n">left_atom</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+                        <span class="n">PeriodicBond</span><span class="p">(</span><span class="n">right_atom</span><span class="p">,</span> <span class="n">left_atom</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
 
         <span class="c1"># For the bond which gets created directly, find the bonder</span>
         <span class="c1"># atom in the bottom fragment closest to the position of the</span>
@@ -419,18 +350,18 @@
         <span class="c1"># Place and set orientation of the first building block.</span>
         <span class="n">bb1</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">bb1</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">bb1</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">bb1</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">bb1</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="n">bb1</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="c1"># Add to the macromolecule.</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb1</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
         <span class="c1"># Place and set orientation of the second building block.</span>
         <span class="n">bb2</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">bb2</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-        <span class="n">bb2</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">bb2</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">bb2</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="n">bb2</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="c1"># Add to the macromolecule.</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb2</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
         <span class="c1"># Add the bonder_ids prematurely for this topology. Needed for</span>
         <span class="c1"># making supercells - see join_mols().</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span></div></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">)</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="Hexagonal"><a class="viewcode-back" href="../../../../mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.Hexagonal">[docs]</a><span class="k">class</span> <span class="nc">Hexagonal</span><span class="p">(</span><span class="n">PeriodicLattice</span><span class="p">):</span>

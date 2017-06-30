@@ -2143,27 +2143,21 @@ materials being added.</p>
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.Periodic.terminator_coords">
 <code class="descname">terminator_coords</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the index of a bonder
-atom within <a class="reference internal" href="mmead.molecular.topologies.cage.html#mmead.molecular.topologies.cage.base.Vertex.bonder_ids" title="mmead.molecular.topologies.cage.base.Vertex.bonder_ids"><code class="xref py py-attr docutils literal"><span class="pre">bonder_ids</span></code></a>. The value is a
-<code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x, y and z coordinates
-of a deleter atom attached to the bonder. The coordinates
-are relative to the bonder atom.</p>
-<p>The index must be used rather than the bonder’s id itself
-because this dictionary is filled before atoms are deleted
-during assembly. After deletion, ids of the remaining atoms
-change and as a result, if this dictionary saved the ids, it
-would be inaccurate by the time <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.base.Topology.build" title="mmead.molecular.topologies.base.Topology.build"><code class="xref py py-meth docutils literal"><span class="pre">Topology.build()</span></code></a>
-completed.</p>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the id of a bonder
+atom. The value is a <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x,
+y and z coordinates of a deleter atom attached to the bonder.
+The coordinates are relative to the bonder atom.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.Periodic.periodic_bonds">
 <code class="descname">periodic_bonds</code><a class="headerlink" href="#mmead.molecular.molecules.Periodic.periodic_bonds" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> – When periodic topologies are being assembled, periodic bonds
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mmead.html#mmead.convenience_tools.PeriodicBond" title="mmead.convenience_tools.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> – When periodic topologies are assembled, periodic bonds
 do not get added to the rdkit molecule in the
 <a class="reference internal" href="#mmead.molecular.molecules.MacroMolecule.mol" title="mmead.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute. Instead,
-<code class="xref py py-meth docutils literal"><span class="pre">join_mols()</span></code> adds <a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicBond" title="mmead.molecular.topologies.periodic.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances
-representing the bonds into this list.</p>
+<a class="reference internal" href="mmead.molecular.topologies.html#mmead.molecular.topologies.periodic.PeriodicLattice.join_mols" title="mmead.molecular.topologies.periodic.PeriodicLattice.join_mols"><code class="xref py py-meth docutils literal"><span class="pre">join_mols()</span></code></a> adds
+<a class="reference internal" href="mmead.html#mmead.convenience_tools.PeriodicBond" title="mmead.convenience_tools.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances representing the bonds into
+this list.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2337,6 +2331,11 @@ include <code class="docutils literal"><span class="pre">'1'</span></code>, <cod
 </dd></dl>
 
 <dl class="method">
+<dt id="mmead.molecular.molecules.Periodic.save_ids">
+<code class="descname">save_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.save_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.save_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="mmead.molecular.molecules.Periodic.write_gulp_input">
 <code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#Periodic.write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a GULP input file of the unit cell to <cite>path</cite>.</p>
@@ -2488,37 +2487,6 @@ automatically call this one.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="mmead.molecular.molecules.StructUnit._minimize_theta">
-<code class="descname">_minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit._minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit._minimize_theta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rotate mol to minimize angle between <cite>v1</cite> and <cite>v2</cite>.</p>
-<p>The rotation is done about the vector <cite>axis</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>v1</strong> (<em>numpy.array</em>) – The vector which is rotated.</li>
-<li><strong>v2</strong> (<em>numpy.array</em>) – The vector which is stationary.</li>
-<li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
-<li><strong>centroid</strong> (<em>numpy.array</em>) – The position vector at the center of the rotation.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to the
-rotation.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
 </tr>
 </tbody>
 </table>
@@ -2729,7 +2697,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mmead.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x32b0a30&gt;, sanitize=False, removeHs=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x32b0aa0&gt;, sanitize=False, removeHs=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x32b0aa0&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x32b4210&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x3126410&gt;, sanitize=False, removeHs=False), ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x3122c30&gt;, sanitize=False, removeHs=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x3122ca0&gt;, sanitize=False, removeHs=False), ‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x3122ca0&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -2805,6 +2773,37 @@ core.</td>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dict which represents the molecule.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mmead.molecular.molecules.StructUnit.minimize_theta">
+<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit.minimize_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate mol to minimize angle between <cite>v1</cite> and <cite>v2</cite>.</p>
+<p>The rotation is done about the vector <cite>axis</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>v1</strong> (<em>numpy.array</em>) – The vector which is rotated.</li>
+<li><strong>v2</strong> (<em>numpy.array</em>) – The vector which is stationary.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
+<li><strong>centroid</strong> (<em>numpy.array</em>) – The position vector at the center of the rotation.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to the
+rotation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -2986,8 +2985,8 @@ during reactions have the property ‘del’ set to ‘1’.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="mmead.molecular.molecules.StructUnit2.minimize_theta">
-<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit2.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit2.minimize_theta" title="Permalink to this definition">¶</a></dt>
+<dt id="mmead.molecular.molecules.StructUnit2.minimize_theta2">
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit2.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit2.minimize_theta2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates molecule about <cite>axis</cite> to minimze theta with <cite>vector</cite>.</p>
 <p>The molecule is rotated about <cite>axis</cite> passing through the bonder
 centroid. It is rotated so that the vector between the bonder
@@ -3111,8 +3110,8 @@ the bonder atoms.</td>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="mmead.molecular.molecules.StructUnit3.minimize_theta">
-<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>atom</em>, <em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit3.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit3.minimize_theta" title="Permalink to this definition">¶</a></dt>
+<dt id="mmead.molecular.molecules.StructUnit3.minimize_theta2">
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>atom</em>, <em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/molecular/molecules.html#StructUnit3.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.molecular.molecules.StructUnit3.minimize_theta2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates molecule to minimize angle between <cite>atom</cite> and <cite>vector</cite>.</p>
 <p>The rotation is done about <cite>axis</cite> and is centered on the
 bonder centroid.</p>

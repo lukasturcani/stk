@@ -431,6 +431,50 @@ energy conformer.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
+<dl class="class">
+<dt id="mmead.convenience_tools.PeriodicBond">
+<em class="property">class </em><code class="descclassname">mmead.convenience_tools.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/convenience_tools.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.convenience_tools.PeriodicBond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents a periodic bond.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atom1</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of first atom in the bond.</li>
+<li><strong>atom2</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of the second atom in the bond.</li>
+<li><strong>direction</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member list describing the axes along which the bond is
+periodic, when going from <cite>atom1</cite> to <cite>atom2</cite>. For example,
+<code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along the x axis
+in the positive direction.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="mmead.convenience_tools.PeriodicBond.atom1">
+<code class="descname">atom1</code><a class="headerlink" href="#mmead.convenience_tools.PeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The id of first atom in the bond.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.convenience_tools.PeriodicBond.atom2">
+<code class="descname">atom2</code><a class="headerlink" href="#mmead.convenience_tools.PeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The id of the second atom in the bond.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.convenience_tools.PeriodicBond.direction">
+<code class="descname">direction</code><a class="headerlink" href="#mmead.convenience_tools.PeriodicBond.direction" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
+periodic, when going from <cite>atom1</cite> to <cite>atom2</cite>. For example,
+<code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along the x axis
+in the positive direction.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="exception">
 <dt id="mmead.convenience_tools.PopulationSizeError">
 <em class="property">exception </em><code class="descclassname">mmead.convenience_tools.</code><code class="descname">PopulationSizeError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/convenience_tools.html#PopulationSizeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.convenience_tools.PopulationSizeError" title="Permalink to this definition">¶</a></dt>

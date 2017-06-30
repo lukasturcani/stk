@@ -318,9 +318,9 @@
         <span class="n">atom</span> <span class="o">=</span> <span class="n">building_block</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">aligner</span><span class="p">]</span>
         <span class="c1"># Minimize the angle between these things by rotating about the</span>
         <span class="c1"># normal of the edge plane.</span>
-        <span class="n">building_block</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span>
-                                      <span class="n">vector</span><span class="p">,</span>
-                                      <span class="bp">self</span><span class="o">.</span><span class="n">edge_plane_normal</span><span class="p">())</span>
+        <span class="n">building_block</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span>
+                                       <span class="n">vector</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">edge_plane_normal</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">building_block</span><span class="o">.</span><span class="n">mol</span></div>
 
@@ -514,7 +514,7 @@
 
         <span class="c1"># Ensure the centroid of the linker is placed on the outside of</span>
         <span class="c1"># the cage.</span>
-        <span class="n">linker</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+        <span class="n">linker</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div></div>
 
