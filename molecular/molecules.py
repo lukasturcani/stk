@@ -158,7 +158,7 @@ from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
-                                 atom_vdw_radii, bond_dict)
+                                 atom_vdw_radii, bond_dict, Cell)
 
 
 logger = logging.getLogger(__name__)
@@ -2880,37 +2880,6 @@ class Polymer(MacroMolecule):
     pass
 
 
-class Cell:
-    """
-    Represents an individual cell in a supercell.
-
-    Parameters
-    ----------
-    id : :class:`list` of :class:`int`
-        A 3 member :class:`list` holding the x, y and z index
-        of the cell within the supercell.
-
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
-
-    Attributes
-    ----------
-    id : :class:`numpy.ndarray` of :class:`int`
-        A 3 member array holding the x, y and z index
-        of the cell within the supercell.
-
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
-
-    """
-
-    def __init__(self, id_, bonders):
-        self.id = np.array(id_)
-        self.bonders = bonders
-
-
 class Periodic(MacroMolecule):
     """
     Used to represent periodic structures.
@@ -3259,12 +3228,13 @@ periodic._place_island([4, 4, 4])
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
         """
-        Writes a GULP input file of the unit cell to `path`.
+        Writes a GULP input file of the unit cell.
 
         Parameters
         ----------
         path : :class:`str`
-            The `path` to which the molecule should be written.
+            The `path` of the file to which the molecule should be
+            written.
 
         keywords : :class:`list` of :class:`str`
             The keywords to be placed on the first line of the input
@@ -3322,9 +3292,9 @@ periodic._place_island([4, 4, 4])
 
             # Add periodic bonds.
             for bond in self.periodic_bonds:
-                a1 = self.bonder_ids[bond.atom1] + 1
-                a2 = self.bonder_ids[bond.atom2] + 1
-                dx, dy, dz = bond.direction1
+                a1 = bond.atom1 + 1
+                a2 = bond.atom2 + 1
+                dx, dy, dz = bond.direction
                 f.write('connect {} {} {:+} {:+} {:+}\n'.format(a1, a2,
                                                                 dx, dy,
                                                                 dz))
