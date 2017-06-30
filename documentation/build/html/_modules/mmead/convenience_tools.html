@@ -252,6 +252,37 @@
               <span class="mi">117</span><span class="p">:</span> <span class="s1">&#39;Uus&#39;</span><span class="p">,</span> <span class="mi">118</span><span class="p">:</span> <span class="s1">&#39;Uuo&#39;</span><span class="p">}</span>
 
 
+<div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../mmead.html#mmead.convenience_tools.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents an individual cell in a supercell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    id : :class:`list` of :class:`int`</span>
+<span class="sd">        A 3 member :class:`list` holding the x, y and z index</span>
+<span class="sd">        of the cell within the supercell.</span>
+
+<span class="sd">    bonders : :class:`dict`</span>
+<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
+<span class="sd">        equivalent bonder atoms in the cell.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    id : :class:`numpy.ndarray` of :class:`int`</span>
+<span class="sd">        A 3 member array holding the x, y and z index</span>
+<span class="sd">        of the cell within the supercell.</span>
+
+<span class="sd">    bonders : :class:`dict`</span>
+<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
+<span class="sd">        equivalent bonder atoms in the cell.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">bonders</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span> <span class="o">=</span> <span class="n">bonders</span></div>
+
+
 <div class="viewcode-block" id="ChargedMolError"><a class="viewcode-back" href="../../mmead.html#mmead.convenience_tools.ChargedMolError">[docs]</a><span class="k">class</span> <span class="nc">ChargedMolError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol_file</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol_file</span> <span class="o">=</span> <span class="n">mol_file</span>
@@ -730,10 +761,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coords1</span><span class="p">,</span> <span class="n">coords2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-    <span class="n">u</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">v</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">v</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">v</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">v</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span></div>
 
@@ -784,7 +815,6 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
@@ -819,20 +849,19 @@
             <span class="n">bond_block</span> <span class="o">=</span> <span class="n">block</span>
         <span class="n">prev_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
 
-
-
     <span class="n">labels</span><span class="p">,</span> <span class="n">data_block</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">atom_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:::&#39;</span><span class="p">)</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span>
-               <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">l</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+              <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">l</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
 
     <span class="n">data_block</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">data_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span>
-                   <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+                  <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data_block</span><span class="p">:</span>
         <span class="n">line</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">if</span> <span class="n">word</span> <span class="o">!=</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s1">&#39;Number of labels does&#39;</span>
-                      <span class="s1">&#39; not match number of columns in .mae file.&#39;</span><span class="p">))</span>
+                                <span class="s1">&#39; not match number of columns&#39;</span>
+                                <span class="s1">&#39; in .mae file.&#39;</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
             <span class="k">if</span> <span class="s1">&#39;x_coord&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
@@ -845,20 +874,21 @@
                 <span class="n">atom_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="n">atom_sym</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atom_num</span><span class="p">]</span>
-        <span class="n">atom_coord</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">atom_coord</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
         <span class="n">atom_id</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">atom_sym</span><span class="p">))</span>
         <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coord</span><span class="p">)</span>
 
     <span class="n">labels</span><span class="p">,</span> <span class="n">data_block</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">bond_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:::&#39;</span><span class="p">)</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span>
-                <span class="n">labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">l</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+              <span class="n">labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">l</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
     <span class="n">data_block</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span>
-                <span class="n">data_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+                  <span class="n">data_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">isspace</span><span class="p">()</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data_block</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s1">&#39;Number of labels does&#39;</span>
-                      <span class="s1">&#39; not match number of columns in .mae file.&#39;</span><span class="p">))</span>
+                                <span class="s1">&#39; not match number of &#39;</span>
+                                <span class="s1">&#39;columns in .mae file.&#39;</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
             <span class="k">if</span> <span class="s1">&#39;from&#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
@@ -932,8 +962,9 @@
                 <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">ChargedMolError</span><span class="p">(</span><span class="n">mol_file</span><span class="p">,</span>
-                    <span class="p">(</span><span class="s1">&#39;Atom row has more&#39;</span>
-                    <span class="s1">&#39; than 8 coloumns. Likely due to a charged atom.&#39;</span><span class="p">))</span>
+                                          <span class="p">(</span><span class="s1">&#39;Atom row has more&#39;</span>
+                                           <span class="s1">&#39; than 8 coloumns. Likely &#39;</span>
+                                           <span class="s1">&#39;due to a charged atom.&#39;</span><span class="p">))</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">atom_sym</span><span class="p">,</span> <span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">words</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">]</span>
                 <span class="n">atom_coord</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">)</span>
@@ -1023,7 +1054,7 @@
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">vector2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
         <span class="c1"># Get a vector orthogonal to `vector1` by finding the smallest</span>
         <span class="c1"># component of `vector1` and making that a vector.</span>
-        <span class="n">ortho</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ortho</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">ortho</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">vector1</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">vector1</span><span class="p">)))]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">ortho</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
@@ -1040,7 +1071,7 @@
 
     <span class="n">mult_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">I</span> <span class="o">+</span> <span class="n">vx</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vx</span><span class="p">,</span><span class="n">vx</span><span class="p">),</span> <span class="n">mult_factor</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">I</span> <span class="o">+</span> <span class="n">vx</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vx</span><span class="p">,</span> <span class="n">vx</span><span class="p">),</span> <span class="n">mult_factor</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="rotation_matrix_arbitrary_axis"><a class="viewcode-back" href="../../mmead.html#mmead.convenience_tools.rotation_matrix_arbitrary_axis">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
@@ -1064,11 +1095,10 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-
     <span class="n">axis</span> <span class="o">=</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
 
     <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">axis</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">axis</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="n">e11</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="n">e12</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">b</span><span class="o">*</span><span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="n">d</span><span class="p">)</span>
@@ -1079,7 +1109,7 @@
     <span class="n">e23</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">d</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">)</span>
 
     <span class="n">e31</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">b</span><span class="o">*</span><span class="n">d</span> <span class="o">-</span> <span class="n">a</span><span class="o">*</span><span class="n">c</span><span class="p">)</span>
-    <span class="n">e32</span> <span class="o">=</span>  <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">d</span> <span class="o">+</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">e32</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">d</span> <span class="o">+</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">)</span>
     <span class="n">e33</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">e11</span><span class="p">,</span> <span class="n">e12</span><span class="p">,</span> <span class="n">e13</span><span class="p">],</span>
@@ -1097,7 +1127,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">tname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span><span class="s1">&#39;output.tgz&#39;</span><span class="p">)</span>
+    <span class="n">tname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;output.tgz&#39;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tname</span><span class="p">,</span> <span class="s1">&#39;w:gz&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
         <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
 
@@ -1122,8 +1152,8 @@
     <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="k">yield</span>
     <span class="n">time_taken</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
-    <span class="n">m</span><span class="p">,</span><span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">time_taken</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-    <span class="n">h</span><span class="p">,</span><span class="n">m</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">time_taken</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Time taken was </span><span class="si">{}</span><span class="s1"> : </span><span class="si">{}</span><span class="s1"> : </span><span class="si">{}</span><span class="s1">.</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                                     <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">s</span><span class="p">))</span></div>
 
@@ -1149,7 +1179,7 @@
 
     <span class="n">numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">vector2</span><span class="p">)</span>
     <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vector1</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vector2</span><span class="p">))</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vector2</span><span class="p">))</span>
     <span class="c1"># This if statement prevents returns of NaN due to floating point</span>
     <span class="c1"># incurracy.</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>

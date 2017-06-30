@@ -313,7 +313,7 @@
                                  <span class="n">normalize_vector</span><span class="p">,</span> <span class="n">rotation_matrix</span><span class="p">,</span>
                                  <span class="n">vector_theta</span><span class="p">,</span> <span class="n">mol_from_mae_file</span><span class="p">,</span>
                                  <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
-                                 <span class="n">atom_vdw_radii</span><span class="p">,</span> <span class="n">bond_dict</span><span class="p">)</span>
+                                 <span class="n">atom_vdw_radii</span><span class="p">,</span> <span class="n">bond_dict</span><span class="p">,</span> <span class="n">Cell</span><span class="p">)</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -367,8 +367,8 @@
 
         <span class="c1"># Ensure a valid file type was provided.</span>
         <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s1">&#39;Unable to initialize from &quot;</span><span class="si">{}</span><span class="s1">&quot; files.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s1">&#39;Unable to initialize&#39;</span>
+                             <span class="s1">&#39; from &quot;</span><span class="si">{}</span><span class="s1">&quot; files.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ext</span><span class="p">))</span>
 
         <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">sig</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
 
@@ -378,7 +378,7 @@
             <span class="n">fg</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;functional_group&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fg</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">functional_groups</span> <span class="k">if</span>
-                                        <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]),</span> <span class="kc">None</span><span class="p">)</span>
+                       <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]),</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_key</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
@@ -581,7 +581,7 @@
         <span class="n">cavity_origin</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">,</span>
                                  <span class="n">x0</span><span class="o">=</span><span class="n">ref</span><span class="p">,</span>
                                  <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span><span class="o">.</span><span class="n">x</span>
-        <span class="n">cavity</span> <span class="o">=</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">cavity_origin</span><span class="p">)</span>
+        <span class="n">cavity</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">cavity_origin</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">cavity</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">cavity</span></div>
 
 <div class="viewcode-block" id="Molecule.center_of_mass"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule.center_of_mass">[docs]</a>    <span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -599,12 +599,12 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">])</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
         <span class="n">total_mass</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_atom_coords</span><span class="p">():</span>
             <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetMass</span><span class="p">()</span>
             <span class="n">total_mass</span> <span class="o">+=</span> <span class="n">mass</span>
-            <span class="n">center</span> <span class="o">+=</span>  <span class="n">mass</span><span class="o">*</span><span class="n">coord</span>
+            <span class="n">center</span> <span class="o">+=</span> <span class="n">mass</span><span class="o">*</span><span class="n">coord</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">total_mass</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.centroid"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -848,7 +848,7 @@
             <span class="n">pos_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)])</span>
             <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos_array</span><span class="p">,</span> <span class="n">pos_vect</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">pos_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">pos_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.same"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Molecule.same">[docs]</a>    <span class="k">def</span> <span class="nf">same</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -988,7 +988,7 @@
         <span class="c1"># centroid to the origin. This is so that the rotation occurs</span>
         <span class="c1"># about this point.</span>
         <span class="n">og_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
         <span class="c1"># Get the rotation matrix.</span>
         <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
@@ -1955,7 +1955,7 @@
         <span class="c1"># atom centroid to the origin. This is so that the rotation</span>
         <span class="c1"># occurs about this point.</span>
         <span class="n">og_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
 
         <span class="c1"># Get the rotation matrix.</span>
         <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
@@ -2937,7 +2937,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span>
-            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">):</span>
+           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Cluster the windows into groups so that only size</span>
@@ -2974,10 +2974,9 @@
         <span class="n">diff_sums</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">:</span>
             <span class="n">diff_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">w1</span> <span class="o">-</span> <span class="n">w2</span><span class="p">)</span> <span class="k">for</span> <span class="n">w1</span><span class="p">,</span> <span class="n">w2</span> <span class="ow">in</span>
-                                    <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                           <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
-            <span class="n">diff_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span>
-                <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">diff_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
             <span class="n">diff_sums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diff_sum</span> <span class="o">/</span> <span class="n">diff_num</span><span class="p">)</span>
 
@@ -3035,37 +3034,6 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents an individual cell in a supercell.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : :class:`list` of :class:`int`</span>
-<span class="sd">        A 3 member :class:`list` holding the x, y and z index</span>
-<span class="sd">        of the cell within the supercell.</span>
-
-<span class="sd">    bonders : :class:`dict`</span>
-<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
-<span class="sd">        equivalent bonder atoms in the cell.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    id : :class:`numpy.ndarray` of :class:`int`</span>
-<span class="sd">        A 3 member array holding the x, y and z index</span>
-<span class="sd">        of the cell within the supercell.</span>
-
-<span class="sd">    bonders : :class:`dict`</span>
-<span class="sd">        Maps the bonder atoms in the original unit cell to the</span>
-<span class="sd">        equivalent bonder atoms in the cell.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">,</span> <span class="n">bonders</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span> <span class="o">=</span> <span class="n">bonders</span></div>
-
-
 <div class="viewcode-block" id="Periodic"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic">[docs]</a><span class="k">class</span> <span class="nc">Periodic</span><span class="p">(</span><span class="n">MacroMolecule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Used to represent periodic structures.</span>
@@ -3073,6 +3041,9 @@
 <span class="sd">    This class is essentially the same as :class:`MacroMolecule`,</span>
 <span class="sd">    with additional methods and attributes relevant to periodic</span>
 <span class="sd">    materials being added.</span>
+
+<span class="sd">    The method :meth:`~.MacroMolecule.save_ids` is extended to take</span>
+<span class="sd">    into account ids of atoms in perdiodic bonds.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -3090,10 +3061,15 @@
 <span class="sd">        :class:`.PeriodicBond` instances representing the bonds into</span>
 <span class="sd">        this list.</span>
 
+<span class="sd">    _ids_updated : :class:`bool`</span>
+<span class="sd">        Indicates whether periodic bond ids have been updated already</span>
+<span class="sd">        by :meth:`save_ids`.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Periodic._is_subterminal"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic._is_subterminal">[docs]</a>    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
@@ -3397,6 +3373,10 @@
 <div class="viewcode-block" id="Periodic.save_ids"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic.save_ids">[docs]</a>    <span class="k">def</span> <span class="nf">save_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span>
 
+        <span class="c1"># If the ids of periodic bonds have already been updated, stop.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span><span class="p">:</span>
+            <span class="k">return</span>
+
         <span class="c1"># Update periodic bonds to hold atom ids directly instead of</span>
         <span class="c1"># indices of the atom ids within `bonder_ids`.</span>
         <span class="k">for</span> <span class="n">pb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">:</span>
@@ -3409,17 +3389,20 @@
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">bonder_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="n">terminator_coords</span><span class="p">[</span><span class="n">bonder_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">coord</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span> <span class="o">=</span> <span class="n">terminator_coords</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span> <span class="o">=</span> <span class="n">terminator_coords</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="Periodic.write_gulp_input"><a class="viewcode-back" href="../../../mmead.molecular.html#mmead.molecular.molecules.Periodic.write_gulp_input">[docs]</a>    <span class="k">def</span> <span class="nf">write_gulp_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span>
                          <span class="n">cell_fix</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">atom_fix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes a GULP input file of the unit cell to `path`.</span>
+<span class="sd">        Writes a GULP input file of the unit cell.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path : :class:`str`</span>
-<span class="sd">            The `path` to which the molecule should be written.</span>
+<span class="sd">            The `path` of the file to which the molecule should be</span>
+<span class="sd">            written.</span>
 
 <span class="sd">        keywords : :class:`list` of :class:`str`</span>
 <span class="sd">            The keywords to be placed on the first line of the input</span>
@@ -3477,9 +3460,9 @@
 
             <span class="c1"># Add periodic bonds.</span>
             <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span><span class="p">:</span>
-                <span class="n">a1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-                <span class="n">a2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-                <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">direction1</span>
+                <span class="n">a1</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom1</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">a2</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">direction</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;connect </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> </span><span class="si">{:+}</span><span class="s1"> </span><span class="si">{:+}</span><span class="s1"> </span><span class="si">{:+}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span>
                                                                 <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span>
                                                                 <span class="n">dz</span><span class="p">))</span></div></div>

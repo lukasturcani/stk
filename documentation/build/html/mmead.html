@@ -271,6 +271,41 @@
 <p>This module defines general-purpose objects, functions and classes.</p>
 <p>Functions, classes, etc. defined here should not depend on any other
 part of MMEA. They must be completely self-sufficient.</p>
+<dl class="class">
+<dt id="mmead.convenience_tools.Cell">
+<em class="property">class </em><code class="descclassname">mmead.convenience_tools.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>bonders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/convenience_tools.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.convenience_tools.Cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents an individual cell in a supercell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding the x, y and z index
+of the cell within the supercell.</li>
+<li><strong>bonders</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the bonder atoms in the original unit cell to the
+equivalent bonder atoms in the cell.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="mmead.convenience_tools.Cell.id">
+<code class="descname">id</code><a class="headerlink" href="#mmead.convenience_tools.Cell.id" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member array holding the x, y and z index
+of the cell within the supercell.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mmead.convenience_tools.Cell.bonders">
+<code class="descname">bonders</code><a class="headerlink" href="#mmead.convenience_tools.Cell.bonders" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the bonder atoms in the original unit cell to the
+equivalent bonder atoms in the cell.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="exception">
 <dt id="mmead.convenience_tools.ChargedMolError">
 <em class="property">exception </em><code class="descclassname">mmead.convenience_tools.</code><code class="descname">ChargedMolError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmead/convenience_tools.html#ChargedMolError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mmead.convenience_tools.ChargedMolError" title="Permalink to this definition">¶</a></dt>
