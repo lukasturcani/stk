@@ -97,6 +97,37 @@ periodic_table = {
               117: 'Uus', 118: 'Uuo'}
 
 
+class Cell:
+    """
+    Represents an individual cell in a supercell.
+
+    Parameters
+    ----------
+    id : :class:`list` of :class:`int`
+        A 3 member :class:`list` holding the x, y and z index
+        of the cell within the supercell.
+
+    bonders : :class:`dict`
+        Maps the bonder atoms in the original unit cell to the
+        equivalent bonder atoms in the cell.
+
+    Attributes
+    ----------
+    id : :class:`numpy.ndarray` of :class:`int`
+        A 3 member array holding the x, y and z index
+        of the cell within the supercell.
+
+    bonders : :class:`dict`
+        Maps the bonder atoms in the original unit cell to the
+        equivalent bonder atoms in the cell.
+
+    """
+
+    def __init__(self, id_, bonders):
+        self.id = np.array(id_)
+        self.bonders = bonders
+
+
 class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
