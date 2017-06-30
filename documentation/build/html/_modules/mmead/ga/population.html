@@ -164,6 +164,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 
 <span class="kn">from</span> <span class="nn">.fitness</span> <span class="k">import</span> <span class="n">_calc_fitness</span><span class="p">,</span> <span class="n">_calc_fitness_serial</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
@@ -288,8 +289,8 @@
                      <span class="s2">&quot; ``Molecule`` and ``GATools`` types.&quot;</span><span class="p">),</span> <span class="n">arg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.init_all"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.init_all">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_all</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">databases</span><span class="p">,</span> <span class="n">topologies</span><span class="p">,</span>
-                 <span class="n">bb_classes</span><span class="p">,</span> <span class="n">macromol_class</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">init_all</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">databases</span><span class="p">,</span> <span class="n">bb_classes</span><span class="p">,</span>
+                 <span class="n">topologies</span><span class="p">,</span> <span class="n">macromol_class</span><span class="p">,</span>
                  <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span> <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates all possible molecules from a given set of databases.</span>
@@ -311,9 +312,6 @@
 <span class="sd">        databases : :class:`list` of :class:`str`</span>
 <span class="sd">            List of paths to directories, which hold molecular</span>
 <span class="sd">            structure files of the building blocks.</span>
-
-<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
-<span class="sd">            The topologies of macromolecules being made.</span>
 
 <span class="sd">        bb_classes : :class:`list` of :class:`type`</span>
 <span class="sd">            This list must be equal in length to `databases`. For each</span>
@@ -337,6 +335,9 @@
 <span class="sd">            molecules in ``aldehydes3f`` are initialized as</span>
 <span class="sd">            :class:`.StructUnit3` objects.</span>
 
+<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
+<span class="sd">            The topologies of macromolecules being made.</span>
+
 <span class="sd">        macromol_class : :class:`type`</span>
 <span class="sd">            The class of the :class:`.MacroMolecule` objects being</span>
 <span class="sd">            built.</span>
@@ -359,22 +360,36 @@
 <span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            dbs = [&#39;/path/to/db1&#39;, &#39;path/to/db2&#39;]</span>
-<span class="sd">            tops = [Linear(&quot;AB&quot;, [0, 0], 6)]</span>
 <span class="sd">            bb_classes = [lambda x: StructUnit2(x, &#39;aldehyde&#39;),</span>
 <span class="sd">                          lambda x: StructUnit3(x, &#39;amine&#39;)]</span>
-<span class="sd">            pop = Population.init_all(dbs, tops, bb_classes, Polymer)</span>
+<span class="sd">            tops = [Linear(&quot;AB&quot;, [0, 0], 6)]</span>
+<span class="sd">            pop = Population.init_all(dbs, bb_classes, tops, Polymer)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">databases</span><span class="p">]</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="o">*</span><span class="n">bb_files</span><span class="p">,</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">databases</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
             <span class="n">bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">su</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">su</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bb_classes</span><span class="p">,</span> <span class="n">bb_files</span><span class="p">)]</span>
-            <span class="n">p</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macromol_class</span><span class="p">(</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span><span class="p">))</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span><span class="p">))</span>
 
+        <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+            <span class="n">mols</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">macromol_class</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+        <span class="c1"># Update the cache.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+            <span class="c1"># If the molecule did not exist already add it to the</span>
+            <span class="c1"># cache.</span>
+            <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">macromol_class</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+                <span class="n">macromol_class</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mol</span>
+            <span class="c1"># If the molecule did exist already, use the cached</span>
+            <span class="c1"># version.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">macromol_class</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">*</span><span class="n">mols</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span><span class="p">:</span>
             <span class="n">p</span><span class="o">.</span><span class="n">remove_duplicates</span><span class="p">()</span>
-
         <span class="k">return</span> <span class="n">p</span></div>
 
 <div class="viewcode-block" id="Population.init_cage_isomers"><a class="viewcode-back" href="../../../mmead.ga.html#mmead.ga.population.Population.init_cage_isomers">[docs]</a>    <span class="nd">@classmethod</span>

@@ -2922,25 +2922,18 @@ class Periodic(MacroMolecule):
     Attributes
     ----------
     terminator_coords : :class:`dict`
-        The key is an :class:`int` representing the index of a bonder
-        atom within :attr:`.bonder_ids`. The value is a
-        :class:`numpy.ndarray` which holds the x, y and z coordinates
-        of a deleter atom attached to the bonder. The coordinates
-        are relative to the bonder atom.
-
-        The index must be used rather than the bonder's id itself
-        because this dictionary is filled before atoms are deleted
-        during assembly. After deletion, ids of the remaining atoms
-        change and as a result, if this dictionary saved the ids, it
-        would be inaccurate by the time :meth:`.Topology.build`
-        completed.
+        The key is an :class:`int` representing the id of a bonder
+        atom. The value is a :class:`numpy.ndarray` which holds the x,
+        y and z coordinates of a deleter atom attached to the bonder.
+        The coordinates are relative to the bonder atom.
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
-        When periodic topologies are being assembled, periodic bonds
+        When periodic topologies are assembled, periodic bonds
         do not get added to the rdkit molecule in the
         :attr:`~.MacroMolecule.mol` attribute. Instead,
-        :meth:`join_mols` adds :class:`.PeriodicBond` instances
-        representing the bonds into this list.
+        :meth:`~.PeriodicLattice.join_mols` adds
+        :class:`.PeriodicBond` instances representing the bonds into
+        this list.
 
     """
 
@@ -2989,10 +2982,8 @@ class Periodic(MacroMolecule):
         # Make a set of all bonder atoms in the original unit cell
         # which were registered as having bonds crossing periodic
         # boundaries.
-        periodic = {self.bonder_ids[x.atom1] for x in
-                    self.periodic_bonds}
-        periodic.update(self.bonder_ids[x.atom2] for x in
-                        self.periodic_bonds)
+        periodic = {x.atom1 for x in self.periodic_bonds}
+        periodic.update(x.atom2 for x in self.periodic_bonds)
         # If that atom does have a periodic bond and has not had a
         # bond added while building the island - it is subterminal and
         # needs to have a terminal atom attached.
@@ -3068,12 +3059,11 @@ class Periodic(MacroMolecule):
         # ``PeriodicBond`` class. Each ``PeriodicBond`` object has the
         # ids of two bonder atoms in the unit cell which are connected
         # by a bond running across the periodic boundary. The
-        # `direction1` and `direction2` attributes descibe the
-        # axes along which the periodic bond goes. For example,
-        # if `direction1` is [1, 0, 0] it means that the bonder atom
-        # in `periodic_bond.atom1` has a perdiodic bond connecting it
-        # to `periodic_bond.atom2` going in the positive direction
-        # along the x-axis.
+        # `direction` attribute descibes the axes along which the
+        # bond is periodic. For example, if `direction1` is [1, 0, 0]
+        # it means that the bonder atom in `periodic_bond.atom1` has a
+        # perdiodic bond connecting it to `periodic_bond.atom2` going
+        # in the positive direction along the x-axis.
 
         # When iterating through all the unit cells composing the
         # island, you can use the `direction` vector to get index of
@@ -3087,31 +3077,25 @@ class Periodic(MacroMolecule):
                 # Get the indices of the cell which holds the atom
                 # bonded to the equivalent atom of
                 # `periodic_bond.atom1` in the present `cell`.
-                x, y, z = cell.id + periodic_bond.direction1
+                x, y, z = cell.id + periodic_bond.direction
                 try:
                     # ccel as in "connected cell".
                     ccell = cells[x][y][z]
                 except:
                     continue
 
-                # `b1id` is the id of bonder atom in the original unit
-                # cell. It is equivalent to the bonder atom in `cell`
-                # hvaing a bond added.
-                b1id = self.bonder_ids[periodic_bond.atom1]
                 # `bonder1` is the id of a bonder atom, found in `cell`
-                # and equivalent to `b1id`, having a bond added.
-                bonder1 = cell.bonders[b1id]
-                # `b2id` is the id of the bonder atom in the original
-                # unit cell connected by a periodic bond to `b1id`
-                b2id = self.bonder_ids[periodic_bond.atom2]
+                # and equivalent to `periodic_bond.atom1`, having a
+                # bond added.
+                bonder1 = cell.bonders[periodic_bond.atom1]
                 # `bonder2` is the id of a bonder atom, found in
-                # `ccell` and equivalent to `b2id`, having a bond
-                # added.
-                bonder2 = ccell.bonders[b2id]
+                # `ccell` and equivalent to `periodic_bond.atom2`,
+                # having a bond added.
+                bonder2 = ccell.bonders[periodic_bond.atom2]
                 bond_type = self.topology.determine_bond_type(
                               self,
-                              self.bonder_ids[periodic_bond.atom1],
-                              self.bonder_ids[periodic_bond.atom2])
+                              periodic_bond.atom1,
+                              periodic_bond.atom2)
                 emol.AddBond(bonder1, bonder2, bond_type)
                 bonded.add(bonder1)
                 bonded.add(bonder2)
@@ -3170,9 +3154,8 @@ class Periodic(MacroMolecule):
             tid = emol.AddAtom(rdkit.Atom(terminator))
             emol.AddBond(tid, atom_id, bond_type)
             # Get the id of bonder atom in the original unit cell
-            # which is equivalent to `atom`. Don't use the id directly
-            # but get its index within `bonder_ids`.
-            bi = self.bonder_ids.index(bonder_map[atom_id])
+            # which is equivalent to `atom`.
+            bi = bonder_map[atom_id]
             # Using the equivalent bonder atom get the position
             # of the terminating atom relative to the bonder atom. Add
             # the relative position of the terminating atom and the
@@ -3255,6 +3238,23 @@ periodic._place_island([4, 4, 4])
                     bonder_map = bonder_map.new_child(inverse_bonders)
                     i += 1
         return cells, island, bonder_map
+
+    def save_ids(self):
+        super().save_ids()
+
+        # Update periodic bonds to hold atom ids directly instead of
+        # indices of the atom ids within `bonder_ids`.
+        for pb in self.periodic_bonds:
+            pb.atom1 = self.bonder_ids[pb.atom1]
+            pb.atom2 = self.bonder_ids[pb.atom2]
+
+        # Update terminator_coords to hold atom ids directly instead
+        # of indices of the atom ids within `bonder_ids`.
+        terminator_coords = {}
+        for index, coord in self.terminator_coords.items():
+            bonder_id = self.bonder_ids[index]
+            terminator_coords[bonder_id] = coord
+        self.terminator_coords = terminator_coords
 
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):

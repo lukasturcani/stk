@@ -483,6 +483,51 @@
                 <span class="n">mae_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">maegz_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div></div>
 
 
+<div class="viewcode-block" id="PeriodicBond"><a class="viewcode-back" href="../../mmead.html#mmead.convenience_tools.PeriodicBond">[docs]</a><span class="k">class</span> <span class="nc">PeriodicBond</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a periodic bond.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom1 : :class:`int`</span>
+<span class="sd">        The id of first atom in the bond.</span>
+
+<span class="sd">    atom2 : :class:`int`</span>
+<span class="sd">        The id of the second atom in the bond.</span>
+
+<span class="sd">    direction : :class:`list` of :class:`int`</span>
+<span class="sd">        A 3 member list describing the axes along which the bond is</span>
+<span class="sd">        periodic, when going from `atom1` to `atom2`. For example,</span>
+<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
+<span class="sd">        in the positive direction.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom1 : :class:`int`</span>
+<span class="sd">        The id of first atom in the bond.</span>
+
+<span class="sd">    atom2 : :class:`int`</span>
+<span class="sd">        The id of the second atom in the bond.</span>
+
+<span class="sd">    direction : :class:`numpy.ndarray` of :class:`int`</span>
+<span class="sd">        A 3 member list describing the axes along which the bond is</span>
+<span class="sd">        periodic, when going from `atom1` to `atom2`. For example,</span>
+<span class="sd">        ``[1, 0, 0]`` means that the bond is periodic along the x axis</span>
+<span class="sd">        in the positive direction.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="n">atom1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="n">atom2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;PeriodicBond(</span><span class="si">{0.atom1}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;</span><span class="si">{0.atom2}</span><span class="s2">, </span><span class="si">{0.direction}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="StopLogging"><a class="viewcode-back" href="../../mmead.html#mmead.convenience_tools.StopLogging">[docs]</a><span class="k">class</span> <span class="nc">StopLogging</span><span class="p">:</span>
     <span class="o">...</span></div>
 
