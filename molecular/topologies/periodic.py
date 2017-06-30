@@ -217,7 +217,7 @@ class Hexagonal(PeriodicLattice):
 
     cell_dimensions = a, b, c = [np.array([1, 0, 0]),
                                  np.array([0.5, 0.866, 0]),
-                                 np.array([0, 0, 10.0000/1.7321])]
+                                 np.array([0, 0, 5/1.7321])]
 
-    vertices = [(a/3 + b/3),
-                (2*a/3 + 2*b/3)]
+    vertices = [(a/3 + b/3 + c/2),
+                (2*a/3 + 2*b/3 + c/2)]
