@@ -1,0 +1,19 @@
+mtk\.addons\.pyWINDOW\.pywindow package
+=======================================
+
+.. automodule:: mtk.addons.pyWINDOW.pywindow
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+
+   mtk.addons.pyWINDOW.pywindow.io_tools
+   mtk.addons.pyWINDOW.pywindow.molecular
+   mtk.addons.pyWINDOW.pywindow.tables
+   mtk.addons.pyWINDOW.pywindow.trajectory
+   mtk.addons.pyWINDOW.pywindow.utilities
+
