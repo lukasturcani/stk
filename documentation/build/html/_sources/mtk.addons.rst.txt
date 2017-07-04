@@ -1,0 +1,15 @@
+mtk\.addons package
+===================
+
+.. automodule:: mtk.addons
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    mtk.addons.pyWINDOW
+
