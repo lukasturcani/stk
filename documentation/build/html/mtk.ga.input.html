@@ -1,0 +1,619 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.ga.input module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.ga.input module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.ga.input module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.ga.input.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.ga.input">
+<span id="mtk-ga-input-module"></span><h1>mtk.ga.input module<a class="headerlink" href="#module-mtk.ga.input" title="Permalink to this headline">¶</a></h1>
+<p>Defines classes which deal with input.</p>
+<dl class="class">
+<dt id="mtk.ga.input.GAInput">
+<em class="property">class </em><code class="descclassname">mtk.ga.input.</code><code class="descname">GAInput</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class for concisely holding information from MMEA’s input file.</p>
+<p>An MMEA input file is a Python script. The script must define a set
+of variables. Each variable defines a parameter or a function used
+by MMEA. If the variable defines a function used by MMEA it must
+also define any parameters necessary to use the function. It does
+not have to define any default initialized parameters, though it
+may if desired.</p>
+<p>Each variable name must corresond to an attribute of this class.</p>
+<p>Variables which define a function or method are supplied as
+dictionaries, for example:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>fitness_func = {‘NAME’ <span class="classifier-delimiter">:</span> <span class="classifier">‘func_name’,</span></dt>
+<dd>‘param1_name’ : param1_val,
+‘param2_name’ : param2_val}</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Key points from the line example are:</dt>
+<dd><dl class="first last docutils">
+<dt>&gt; The variable name specifies the GA operation and is equal to</dt>
+<dd>the name of an attribute of this class.</dd>
+<dt>&gt; The key ‘NAME’ holds the name of the function which carries</dt>
+<dd>out the GA operation.</dd>
+<dt>&gt; Any parameters which the function needs are provided as key</dt>
+<dd>value pairs where the keys are strings holding the parameter
+name.</dd>
+</dl>
+</dd>
+</dl>
+<p>Valid function names for a given variable can be found by using
+the -h option.</p>
+<blockquote>
+<div>python -m mmea -h fitness_func</div></blockquote>
+<p>See also the User’s guide.</p>
+<p>Some variables will need to define other parameters used by MMEA,
+such as constants,</p>
+<blockquote>
+<div>num_generations = 5</div></blockquote>
+<p>or lists of constants</p>
+<blockquote>
+<div>databases = [‘first/path’, ‘second/path’]</div></blockquote>
+<p>See the <code class="docutils literal"><span class="pre">Attributes</span></code> section to see what data each variable must
+hold.</p>
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.pop_size">
+<code class="descname">pop_size</code><a class="headerlink" href="#mtk.ga.input.GAInput.pop_size" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The size of the population.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.num_generations">
+<code class="descname">num_generations</code><a class="headerlink" href="#mtk.ga.input.GAInput.num_generations" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of generations formed by MMEA.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.num_mutations">
+<code class="descname">num_mutations</code><a class="headerlink" href="#mtk.ga.input.GAInput.num_mutations" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of successful mutations per generation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.num_crossovers">
+<code class="descname">num_crossovers</code><a class="headerlink" href="#mtk.ga.input.GAInput.num_crossovers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of successful crossovers per generation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.init_func">
+<code class="descname">init_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.init_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key ‘NAME’ must hold the name of a <code class="docutils literal"><span class="pre">Population</span></code> method
+initializer method.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.generational_select_func">
+<code class="descname">generational_select_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.generational_select_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key ‘NAME’ must hold the name of the <code class="docutils literal"><span class="pre">Selection</span></code> class
+method used to select members of the next generation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.crossover_select_func">
+<code class="descname">crossover_select_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.crossover_select_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key ‘NAME’ must hold the name of the <code class="docutils literal"><span class="pre">Selection</span></code> class
+method used to select parents from the current generation’s
+population for crossover.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.mutation_select_func">
+<code class="descname">mutation_select_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.mutation_select_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key ‘NAME’ must hold the name of the <code class="docutils literal"><span class="pre">Selection</span></code> class
+method used to select <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances for mutation
+from the current generation’s population.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.crossover_funcs">
+<code class="descname">crossover_funcs</code><a class="headerlink" href="#mtk.ga.input.GAInput.crossover_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of dicts</em> – This list holds a dict for each crossover function which is to
+be used by the GA. The key ‘NAME’ in each dict must hold the
+name of a method of the <code class="docutils literal"><span class="pre">Crossover</span></code> class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.mutation_funcs">
+<code class="descname">mutation_funcs</code><a class="headerlink" href="#mtk.ga.input.GAInput.mutation_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of dicts</em> – This list holds a dict for each mutation function which is to
+be used by the GA. The key ‘NAME’ in each dict must hold the
+name of a method of the <code class="docutils literal"><span class="pre">Mutation</span></code> class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.opt_func">
+<code class="descname">opt_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.opt_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key ‘NAME’ of the dict must hold the name of a fucntion
+defined in the <code class="docutils literal"><span class="pre">optimization.py</span></code> module. It is used for
+optimizing the structure of generated molecules.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.fitness_func">
+<code class="descname">fitness_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.fitness_func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key ‘NAME’ must hold the name of a function defined in
+<code class="docutils literal"><span class="pre">fitness.py</span></code>. The function is used to calculate the fitness
+of generated molecules.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.mutation_weights">
+<code class="descname">mutation_weights</code><a class="headerlink" href="#mtk.ga.input.GAInput.mutation_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of ints</em> – The probability that each function in <cite>mutation_funcs</cite> will be
+selected each time a mutation operation is carried out. The
+order of the probabilities corresponds to the order of the
+mutation functions in <cite>mutation_funcs</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.normalization_funcs">
+<code class="descname">normalization_funcs</code><a class="headerlink" href="#mtk.ga.input.GAInput.normalization_funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of dicts</em> – A list of functions which rescale or normalize the population’s
+fitness values. The order reflects the order in which they are
+applied each generation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.databases">
+<code class="descname">databases</code><a class="headerlink" href="#mtk.ga.input.GAInput.databases" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of strings</em> – A list which holds the paths to any number JSON files. These
+files must hold the JSON representations of Population
+instances. All the molecules in the populations are loaded
+into memory for the duration of the GA run. This means not all
+molecules have to be remade and optimized or have their
+fitness value recalculated.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.parallel">
+<code class="descname">parallel</code><a class="headerlink" href="#mtk.ga.input.GAInput.parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = True)</em> – If <code class="docutils literal"><span class="pre">True</span></code> MMEA does optimization and fitness calculation of
+each molecule in parallel.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.progress_dump">
+<code class="descname">progress_dump</code><a class="headerlink" href="#mtk.ga.input.GAInput.progress_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = True)</em> – If <code class="docutils literal"><span class="pre">True</span></code> a .json Population dump is made at the end of the
+GA run called <a href="#id1"><span class="problematic" id="id2">``</span></a>progress`.json`. The population holds each
+generation as a subpopulation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.database_dump">
+<code class="descname">database_dump</code><a class="headerlink" href="#mtk.ga.input.GAInput.database_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = True)</em> – If <code class="docutils literal"><span class="pre">True</span></code> a .json Population dump is made at the end of the
+GA run called <code class="docutils literal"><span class="pre">database.json</span></code>. The population holds every
+molecule made by the GA as a member.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.plot_epp">
+<code class="descname">plot_epp</code><a class="headerlink" href="#mtk.ga.input.GAInput.plot_epp" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>False or str (default = ‘epp.png’)</em> – If a string, then it should hold the name of the EPP plots.
+If <code class="docutils literal"><span class="pre">False</span></code> then no EPP plots are made.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.logging_level">
+<code class="descname">logging_level</code><a class="headerlink" href="#mtk.ga.input.GAInput.logging_level" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int (default = logging.DEBUG)</em> – The logging level for logging messages to the screen.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.counters">
+<code class="descname">counters</code><a class="headerlink" href="#mtk.ga.input.GAInput.counters" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = True)</em> – If <code class="docutils literal"><span class="pre">True</span></code> plots the which molecules get chosen by selection
+functions get made.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.pop_dumps">
+<code class="descname">pop_dumps</code><a class="headerlink" href="#mtk.ga.input.GAInput.pop_dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = True)</em> – If <code class="docutils literal"><span class="pre">True</span></code> each generation makes a .json dump file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.tar_output">
+<code class="descname">tar_output</code><a class="headerlink" href="#mtk.ga.input.GAInput.tar_output" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = True)</em> – If <code class="docutils literal"><span class="pre">True</span></code> a copy of the output folder is compressed, tarred
+and placed in the output folder.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.crosser">
+<code class="descname">crosser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.crosser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.crosser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Crossover instance loaded with data from input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A Crossover instance which has all of the crossover
+related data held in the GAInput instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.ga.crossover.html#mtk.ga.crossover.Crossover" title="mtk.ga.crossover.Crossover">Crossover</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.exiter">
+<code class="descname">exiter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.exiter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.exiter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Exit instance loaded with data from the input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An Exit instance loaded with the exit function defined in
+the input file. If none was defined an exit function which
+always returns <code class="docutils literal"><span class="pre">False</span></code> is used.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit" title="mtk.ga.ga_exit.Exit">Exit</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.fitnessor">
+<code class="descname">fitnessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.fitnessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.fitnessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a FunctionData of fitness func in input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A FunctionData object which represents the fitness
+function.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData">FunctionData</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.ga_tools">
+<code class="descname">ga_tools</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.ga_tools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.ga_tools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a GATools instance loaded with data from the input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A GATools instance which has all of the input data held in
+the GAInput instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools">GATools</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.initer">
+<code class="descname">initer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.initer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.initer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a FunctionData object of init function in input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A FunctionData object which represents the initialization
+function.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData">FunctionData</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.mutator">
+<code class="descname">mutator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.mutator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.mutator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Mutation instance loaded with data from input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A Mutation instance which has all of the mutation related
+data held in the GAInput instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.ga.mutation.html#mtk.ga.mutation.Mutation" title="mtk.ga.mutation.Mutation">Mutation</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.normalizer">
+<code class="descname">normalizer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.normalizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.normalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Normalization instance holding data from input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A Normalization instance which has all of the normalization
+related data held in the GAInput instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.ga.normalization.html#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization">Normalization</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.opter">
+<code class="descname">opter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.opter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.opter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a FunctionData of optimization func in input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A FunctionData object which represents the optimization
+function.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData">FunctionData</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.selector">
+<code class="descname">selector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.selector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Selection instance loaded with data from input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A Selection instance which has all of the selection
+related data held in the GAInput instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.ga.selection.html#mtk.ga.selection.Selection" title="mtk.ga.selection.Selection">Selection</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.ga.input.InputHelp">
+<em class="property">class </em><code class="descclassname">mtk.ga.input.</code><code class="descname">InputHelp</code><span class="sig-paren">(</span><em>keyword</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#InputHelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.InputHelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class which creates output when <code class="docutils literal"><span class="pre">-h</span></code> option is used as input.</p>
+<p>The <code class="docutils literal"><span class="pre">-h</span></code> option is used in the following way:</p>
+<blockquote>
+<div>python -m MMEA -h keyword</div></blockquote>
+<p>Here <code class="docutils literal"><span class="pre">keyword</span></code> corresponds to one of the attributes of the
+<code class="docutils literal"><span class="pre">GAInput</span></code> class. The output when this command is used will be
+a list of all functions which can be used with that keyword and
+the corresponding documentation.</p>
+<dl class="docutils">
+<dt>modules <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>Maps the name of the keyword to the object which holds the
+functions or methods that are to be used with that keyword.</dd>
+</dl>
+<dl class="attribute">
+<dt id="mtk.ga.input.InputHelp.modules">
+<code class="descname">modules</code><em class="property"> = {‘energy’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘normalization_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘exit_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘topologies’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘fitness_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘mutation_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘init_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘opt_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘generational_select_func’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, ‘crossover_funcs’: &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mtk.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

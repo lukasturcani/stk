@@ -1,0 +1,7 @@
+mtk\.addons\.pyWINDOW\.pywindow\.trajectory module
+==================================================
+
+.. automodule:: mtk.addons.pyWINDOW.pywindow.trajectory
+    :members:
+    :undoc-members:
+    :show-inheritance:
