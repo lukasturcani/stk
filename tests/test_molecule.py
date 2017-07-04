@@ -8,6 +8,7 @@ from scipy.spatial.distance import euclidean
 from ..molecular import Molecule
 from ..convenience_tools import periodic_table
 
+
 # Make a loader for a test Molecule object.
 def make_mol():
     mol = Molecule.__new__(Molecule)
@@ -16,6 +17,7 @@ def make_mol():
                                    removeHs=False,
                                    sanitize=False)
     return mol
+
 
 # Load the test molecule into a Molecule instance.
 # This instance can be used in unit tests which do not change the state
@@ -69,8 +71,8 @@ def test_atom_distance():
         atom1_id = atom1.GetIdx()
         atom2_id = atom2.GetIdx()
         assert (mol.atom_distance(atom1_id, atom2_id) ==
-               euclidean(conf.GetAtomPosition(atom1_id),
-                         conf.GetAtomPosition(atom2_id)))
+                euclidean(conf.GetAtomPosition(atom1_id),
+                          conf.GetAtomPosition(atom2_id)))
 
 
 def test_atom_symbol():
@@ -150,7 +152,7 @@ def test_max_diameter():
     # Make a position matrix which sets all atoms to the origin except
     # 2 and 13. These should be placed a distance of 100 apart.
     pos_mat = [[0 for x in range(3)] for
-                                    y in range(mol.mol.GetNumAtoms())]
+               y in range(mol.mol.GetNumAtoms())]
     pos_mat[1] = [0, -50, 0]
     pos_mat[12] = [0, 50, 0]
     mol.set_position_from_matrix(np.matrix(pos_mat).T)
@@ -180,7 +182,7 @@ def test_position_matrix():
         conf_coord = np.array(conf.GetAtomPosition(atom_id))
         mat_coord = pos_mat1.T[atom_id]
 
-        assert np.allclose(conf_coord, mat_coord, atol = 1e-8)
+        assert np.allclose(conf_coord, mat_coord, atol=1e-8)
 
 
 def test_same():
@@ -193,7 +195,7 @@ def test_same():
     assert mol is not mol2
     assert mol.same(mol2)
 
-    mol3 =  Molecule.__new__(Molecule)
+    mol3 = Molecule.__new__(Molecule)
     molfile = join('data', 'molecule', 'molecule2.mol')
     mol3.mol = rdkit.MolFromMolFile(molfile,
                                     removeHs=False,
@@ -227,15 +229,15 @@ def test_set_position_from_matrix():
 
     # The new position matrix just sets all atomic positions to origin.
     new_pos_mat = np.matrix([[0 for x in range(3)] for y in
-                              range(mol.mol.GetNumAtoms())])
+                            range(mol.mol.GetNumAtoms())])
     mol.set_position_from_matrix(new_pos_mat.T)
     for _, atom_coord in mol.all_atom_coords():
-        assert np.allclose(atom_coord, [0,0,0], atol=1e-8)
+        assert np.allclose(atom_coord, [0, 0, 0], atol=1e-8)
 
 
 def test_shift():
 
-    s= np.array([10,-20,5])
+    s = np.array([10, -20, 5])
     mol2 = mol.shift(s)
     conf = mol2.GetConformer()
     for atom in mol2.GetAtoms():

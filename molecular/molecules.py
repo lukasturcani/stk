@@ -367,9 +367,7 @@ class Molecule:
 
         """
 
-        atom = self.mol.GetAtomWithIdx(atom_id)
-        atomic_num = atom.GetAtomicNum()
-        return periodic_table[atomic_num]
+        return self.mol.GetAtomWithIdx(atom_id).GetSymbol()
 
     def _cavity_size(self, origin):
         """
