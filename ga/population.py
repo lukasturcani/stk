@@ -5,10 +5,11 @@ Defines the Population class.
 
 import itertools as it
 import os
+from os.path import join
 import numpy as np
 from collections import Counter, defaultdict
 import json
-from glob import glob
+from glob import iglob, glob
 import multiprocessing as mp
 
 from .fitness import _calc_fitness, _calc_fitness_serial
@@ -212,7 +213,7 @@ class Population:
 
         """
 
-        databases = [glob(os.path.join(db, '*')) for db in databases]
+        databases = [glob(join(db, '*')) for db in databases]
         args = []
         for *bb_files, topology in it.product(*databases, topologies):
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
@@ -369,11 +370,11 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        bb_files = glob(os.path.join(bb_db, '*'))
+        bb_files = glob(join(bb_db, '*'))
         # Remove any files which are not valid structure files.
         bb_files = [x for x in bb_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
-        lk_files = glob(os.path.join(lk_db, '*'))
+        lk_files = glob(join(lk_db, '*'))
         lk_files = [x for x in lk_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
 
@@ -429,6 +430,38 @@ class Population:
         return pop
 
     @classmethod
+    def init_from_files(cls, folder, moltype, glob_pattern='*'):
+        """
+        Creates a population from files in `folder`.
+
+        Parameters
+        ----------
+        folder : :class:`str`
+            The path to a folder holding molecular structure files
+            used to initialize :class:`~.Molecule` objects held by
+            the population.
+
+        moltype : :class:`type`
+            An initializer for the molecular structure files. For
+            example, :class:`~.StructUnit` or :class:`.StructUnit2`.
+            If `folder` contains ``.json`` dump files of
+            :class:`MacroMolecule` then :meth:`.Molecule.load` could
+            also be used.
+
+        glob_pattern : :class:`str`, optional
+            A glob used for selecting specific files within `folder`.
+
+        Returns
+        -------
+        :class:`Population`
+            A population made from files in `folder`.
+
+        """
+
+        return cls(*(moltype(x) for x in
+                     iglob(join(folder, glob_pattern))))
+
+    @classmethod
     def init_random_cages(cls, bb_db, lk_db,
                           topologies, size, ga_tools,
                           bb_fg=None, lk_fg=None):
@@ -480,11 +513,11 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        bb_files = glob(os.path.join(bb_db, '*'))
+        bb_files = glob(join(bb_db, '*'))
         # Remove any files which are not valid structure files.
         bb_files = [x for x in bb_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
-        lk_files = glob(os.path.join(lk_db, '*'))
+        lk_files = glob(join(lk_db, '*'))
         lk_files = [x for x in lk_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
 
@@ -1252,10 +1285,10 @@ class Population:
 
         for i, member in enumerate(self):
             if use_name:
-                fname = os.path.join(dir_path, '{}.mol'.format(
+                fname = join(dir_path, '{}.mol'.format(
                                                         member.name))
             else:
-                fname = os.path.join(dir_path, '{}.mol'.format(i))
+                fname = join(dir_path, '{}.mol'.format(i))
 
             member.write(fname)
 
