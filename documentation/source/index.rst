@@ -1,10 +1,10 @@
-.. MMEA documentation master file, created by
-   sphinx-quickstart on Fri Jun 16 00:16:26 2017.
+.. mtk documentation master file, created by
+   sphinx-quickstart on Tue Jul  4 15:18:37 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MMEA's documentation!
-================================
+Welcome to mtk's documentation!
+===============================
 
 .. toctree::
    :maxdepth: 2
