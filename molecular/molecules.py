@@ -1670,6 +1670,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         self.set_position_from_matrix(posmat)
         self.set_position(iposition)
 
+    @classmethod
+    def rdkit_init(cls, mol, functional_group=None, name="", note=""):
+        """
+        Uses an ``rdkit`` molecule for initialization.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Chem.rdchem.Mol`
+            An ``rdkit`` molecule used for initialization.
+
+        Returns
+        -------
+        :class:`StructUnit`
+            A :class:`StructUnit` of `mol`.
+
+        """
+
+        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
+            f.write(rdkit.MolToMolBlock(mol, forceV3000=True))
+            f.seek(0)
+            return cls(f.name, functional_group, name, note)
+
     def rotate2(self, theta, axis):
         """
         Rotates the molecule by `theta` about `axis`.

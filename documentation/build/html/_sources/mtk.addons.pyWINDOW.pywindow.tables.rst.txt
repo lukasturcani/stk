@@ -1,7 +1,0 @@
-mtk\.addons\.pyWINDOW\.pywindow\.tables module
-==============================================
-
-.. automodule:: mtk.addons.pyWINDOW.pywindow.tables
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,5 +1,5 @@
 .. mtk documentation master file, created by
-   sphinx-quickstart on Tue Jul  4 15:18:37 2017.
+   sphinx-quickstart on Thu Jul 13 12:16:00 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 

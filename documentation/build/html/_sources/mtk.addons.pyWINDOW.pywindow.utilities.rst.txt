@@ -1,7 +1,0 @@
-mtk\.addons\.pyWINDOW\.pywindow\.utilities module
-=================================================
-
-.. automodule:: mtk.addons.pyWINDOW.pywindow.utilities
-    :members:
-    :undoc-members:
-    :show-inheritance:

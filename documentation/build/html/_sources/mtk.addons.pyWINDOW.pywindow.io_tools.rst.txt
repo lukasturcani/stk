@@ -1,7 +1,0 @@
-mtk\.addons\.pyWINDOW\.pywindow\.io\_tools module
-=================================================
-
-.. automodule:: mtk.addons.pyWINDOW.pywindow.io_tools
-    :members:
-    :undoc-members:
-    :show-inheritance:
