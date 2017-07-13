@@ -13,7 +13,6 @@ Subpackages
 
     mtk.ga
     mtk.molecular
-    mtk.tests
 
 Submodules
 ----------
