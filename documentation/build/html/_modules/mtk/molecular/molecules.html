@@ -518,9 +518,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
-        <span class="n">atomic_num</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atomic_num</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1822,6 +1820,28 @@
         <span class="n">posmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">posmat</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StructUnit.rdkit_init"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rdkit_init">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">rdkit_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses an ``rdkit`` molecule for initialization.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mol : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            An ``rdkit`` molecule used for initialization.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`StructUnit`</span>
+<span class="sd">            A :class:`StructUnit` of `mol`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s1">&#39;r+t&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.mol&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">MolToMolBlock</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">forceV3000</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">functional_group</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit.rotate2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rotate2">[docs]</a>    <span class="k">def</span> <span class="nf">rotate2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
