@@ -199,6 +199,9 @@ def _mop_line(settings):
     # Add fileout info
     mopac_run_str = mopac_run_str + " " + settings['fileout']
 
+    # Add the let keyword avoiding the crash of MOPAC
+    mopac_run_str = mopac_run_str + " LET "
+
     return mopac_run_str
 
 
