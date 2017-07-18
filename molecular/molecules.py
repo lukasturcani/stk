@@ -2373,7 +2373,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         macromolecule during assembly.
 
         The value in the dictionary is a set of ints. These hold the
-        atom ids belonging to a particular molecule - before assmebly.
+        atom ids belonging to a particular molecule before assembly.
 
     """
 
