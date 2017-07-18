@@ -436,7 +436,7 @@ class _CageTopology(Topology):
             B_alignments = np.ones(len(self.positions_B))
         if edge_alignments is None:
             edge_alignments = [None for x in
-                                        range(len(self.positions_A))]
+                               range(len(self.positions_A))]
 
         super().__init__()
         self.A_alignments = A_alignments
@@ -686,7 +686,7 @@ class _VertexOnlyCageTopology(_CageTopology):
     """
 
     def __init__(self, A_alignments=None, B_alignments=None,
-                        edge_alignments=None):
+                 edge_alignments=None):
 
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
@@ -694,11 +694,12 @@ class _VertexOnlyCageTopology(_CageTopology):
             B_alignments = np.zeros(len(self.positions_B))
         if edge_alignments is None:
             edge_alignments = [None for x in
-                                        range(len(self.positions_A))]
+                               range(len(self.positions_A))]
 
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
         self.edge_alignments = edge_alignments
+
 
 class _NoLinkerCageTopology(_CageTopology):
     """
@@ -741,7 +742,8 @@ class _NoLinkerCageTopology(_CageTopology):
             n_bb = len(bb.functional_group_atoms())
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
-                             position.place_mol(bb, int(orientation)))
+                                              position.place_mol(
+                                                bb, int(orientation)))
             macro_mol.bb_counter.update([bb])
 
             bonder_ids = deque(maxlen=n_bb)

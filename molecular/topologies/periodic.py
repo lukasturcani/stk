@@ -3,7 +3,7 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 
 from .base import Topology
-from ...convenience_tools import PeriodicBond
+from ...convenience_tools import PeriodicBond, add_fragment_props
 
 
 def is_bonder(macro_mol, atom_id):
@@ -198,12 +198,18 @@ class PeriodicLattice(Topology):
         bb1.set_orientation2([0, 0, 1])
         bb1.minimize_theta2(bb1.bonder_ids[0], [0, -1, 0], [0, 0, 1])
         # Add to the macromolecule.
+        add_fragment_props(bb1.mol,
+                           macro_mol.building_blocks.index(bb1),
+                           0)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb1.mol)
         # Place and set orientation of the second building block.
         bb2.set_bonder_centroid(self.vertices[1])
         bb2.set_orientation2([0, 0, 1])
         bb2.minimize_theta2(bb2.bonder_ids[0], [0, 1, 0], [0, 0, 1])
         # Add to the macromolecule.
+        add_fragment_props(bb2.mol,
+                           macro_mol.building_blocks.index(bb2),
+                           0)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb2.mol)
         # Add the bonder_ids prematurely for this topology. Needed for
         # making supercells - see join_mols(). Using the ``super``
