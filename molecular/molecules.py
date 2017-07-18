@@ -3300,10 +3300,14 @@ periodic._place_island([4, 4, 4])
             for vector in self.topology.cell_dimensions:
                 f.write(str(np.linalg.norm(vector)) + ' ')
             # Then angles alpha, beta and gamma.
-            a, b, c = self.topology.cell_dimensions
-            f.write(str(math.degrees(vector_theta(a, c))) + ' ')
-            f.write(str(math.degrees(vector_theta(b, c))) + ' ')
-            f.write(str(math.degrees(vector_theta(a, b))))
+            a, b, c = (round(x, 6) for x in
+                       self.topology.cell_dimensions)
+            angle1 = round(math.degrees(vector_theta(a, c)), 6)
+            angle2 = round(math.degrees(vector_theta(b, c)), 6)
+            angle3 = round(math.degrees(vector_theta(a, b)), 6)
+            f.write(str(angle1) + ' ')
+            f.write(str(angle2) + ' ')
+            f.write(str(angle3))
             # Finally the fix parameters for the cell.
             for fix in cell_fix:
                 f.write(' ' + str(fix))
