@@ -3298,10 +3298,9 @@ periodic._place_island([4, 4, 4])
             f.write('cell\n')
             # The sizes of cell vectors a, b and c are written first.
             for vector in self.topology.cell_dimensions:
-                f.write(str(np.linalg.norm(vector)) + ' ')
+                f.write(str(np.round(np.linalg.norm(vector), 6)) + ' ')
             # Then angles alpha, beta and gamma.
-            a, b, c = (round(x, 6) for x in
-                       self.topology.cell_dimensions)
+            a, b, c = self.topology.cell_dimensions
             angle1 = round(math.degrees(vector_theta(a, c)), 6)
             angle2 = round(math.degrees(vector_theta(b, c)), 6)
             angle3 = round(math.degrees(vector_theta(a, b)), 6)
