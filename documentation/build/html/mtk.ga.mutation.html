@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.ga.mutation module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.ga.mutation module</a><ul>
+<li><a class="reference internal" href="#extending-mmea-adding-mutation-functions">Extending MMEA: Adding mutation functions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.ga.mutation module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.ga.mutation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.ga.mutation">
+<span id="mtk-ga-mutation-module"></span><h1>mtk.ga.mutation module<a class="headerlink" href="#module-mtk.ga.mutation" title="Permalink to this headline">¶</a></h1>
+<p>Defines mutation operations via the <code class="docutils literal"><span class="pre">Mutation</span></code> class.</p>
+<div class="section" id="extending-mmea-adding-mutation-functions">
+<h2>Extending MMEA: Adding mutation functions<a class="headerlink" href="#extending-mmea-adding-mutation-functions" title="Permalink to this headline">¶</a></h2>
+<p>If a new mutation operation is to be added to MMEA it should be added
+as a method in the <code class="docutils literal"><span class="pre">Mutation</span></code> class defined in this module. The only
+requirement is that the first argument is <code class="docutils literal"><span class="pre">macro_mol</span></code> (excluding any
+<code class="docutils literal"><span class="pre">self</span></code> or <code class="docutils literal"><span class="pre">cls</span></code> arguments).</p>
+<p>The naming requirement of <code class="docutils literal"><span class="pre">macro_mol</span></code> exists to help users identify
+which arguments are handled automatically by MMEA and which they need
+to define in the input file. The convention is that if the mutation
+function takes an argument called  <code class="docutils literal"><span class="pre">macro_mol</span></code> it does not have to be
+specified in the input file.</p>
+<p>If the mutation function does not fit neatly into a single function
+make sure that any helper functions are private, ie that their names
+start with a leading underscore.</p>
+<dl class="class">
+<dt id="mtk.ga.mutation.Mutation">
+<em class="property">class </em><code class="descclassname">mtk.ga.mutation.</code><code class="descname">Mutation</code><span class="sig-paren">(</span><em>funcs</em>, <em>num_mutations</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Carries out mutations operations on a population.</p>
+<p>Instances of the <code class="docutils literal"><span class="pre">Population</span></code> class delegate mutation operations
+to instances of this class. They do this by calling:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mutant_pop</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">gen_mutants</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>which returns a new population consisting of molecules generated by
+performing mutation operations on members of <code class="docutils literal"><span class="pre">pop</span></code>. This class
+invokes an instance of the <code class="docutils literal"><span class="pre">Selection</span></code> class to select molecules
+for mutations. Both an instance of this class and the <code class="docutils literal"><span class="pre">Selection</span></code>
+class are held in the <cite>ga_tools</cite> attribute of a <code class="docutils literal"><span class="pre">Population</span></code>
+instance.</p>
+<p>This class is initialized with a list of  <code class="docutils literal"><span class="pre">FunctionData</span></code>
+instances. Each <code class="docutils literal"><span class="pre">FunctionData</span></code> object holds the name of the
+mutation function to be used by the population as well as any
+additional parameters the function may require. Mutation functions
+should be defined as methods within this class.</p>
+<p>A mutation function from the list will be selected at random, with
+likelihoods modified if the user supplies a <cite>weights</cite> list during
+initialization.</p>
+<p>Members of this class are also initialized with an integer which
+holds the number of mutation operations to be performed each
+generation.</p>
+<dl class="attribute">
+<dt id="mtk.ga.mutation.Mutation.funcs">
+<code class="descname">funcs</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of FunctionData instances</em> – This lists holds all the mutation functions which are to be
+applied by the GA. One will be chosen at random when a mutation
+is desired. The likelihood that each is selected is given by
+<cite>weights</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.mutation.Mutation.num_mutations">
+<code class="descname">num_mutations</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.num_mutations" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of mutations that needs to be performed each
+generation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.mutation.Mutation.weights">
+<code class="descname">weights</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>None or list of floats (default = None)</em> – When <code class="docutils literal"><span class="pre">None</span></code> each mutation function has equal likelihood of
+being picked. If <cite>weights</cite> is a list each float corresponds to
+the probability of selecting the mutation function at the
+corresponding index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.cage_random_bb">
+<code class="descname">cage_random_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>database</em>, <em>fg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.cage_random_bb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.cage_random_bb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitutes a building block with a random one from a database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage who’s building block will be exchanged. Note that
+the cage is not destroyed. It is used a template for a new
+cage.</li>
+<li><strong>database</strong> (<em>str</em>) – The full path of the database from which a new
+building block is to be found.</li>
+<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
+<cite>database</cite> must have this functional group. This is the
+functional group which is used to assemble the
+macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
+path <cite>database</cite> holds the name of the functional group.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A cage instance generated by taking all attributes of
+<cite>macro_mol</cite> except its building-block* which is replaced by
+a random building-block* from <cite>database</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.cage_random_lk">
+<code class="descname">cage_random_lk</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>database</em>, <em>fg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.cage_random_lk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.cage_random_lk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitutes a linker with a random one from a database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage who’s linker will be exchanged. Note that
+the cage is not destroyed. It is used a template for a new
+cage.</li>
+<li><strong>database</strong> (<em>str</em>) – The full path of the database from which a new linker is to
+be found.</li>
+<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
+<cite>database</cite> must have this functional group. This is the
+functional group which is used to assemble the
+macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
+path <cite>database</cite> holds the name of the functional group.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A cage instance generated by taking all attributes of
+<cite>macro_mol</cite> except its linker which is replaced by a random
+linker from <cite>database</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.cage_similar_bb">
+<code class="descname">cage_similar_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>database</em>, <em>fg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.cage_similar_bb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.cage_similar_bb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitute the building block with similar one from <cite>database</cite>.</p>
+<p>All of the molecules in <cite>database</cite> are checked for similarity
+to the building block of <cite>macro_mol</cite>. The first time this
+mutation function is run on a cage, the most similar molecule
+in <cite>database</cite> is used to substitute the building block. The
+next time this mutation function is run on the same cage, the
+second most similar molecule from <cite>database</cite> is used and so on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its building-block* substituted.</li>
+<li><strong>database</strong> (<em>str</em>) – The full path of the database from which molecules are used
+to substitute the building-block* of <cite>macro_mol</cite>.</li>
+<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
+<cite>database</cite> must have this functional group. This is the
+functional group which is used to assemble the
+macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
+path <cite>database</cite> holds the name of the functional group.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol._similar_bb_mols</strong> (<em>generator</em>) – Creates this attribute on the <cite>macro_mol</cite> instance. This
+allows the function to keep track of which molecule from
+<cite>database</cite> should be used in the substitution.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new cage with the same linker as <cite>macro_mol</cite> but a
+different building-block*. The building-block* is selected
+according to the description in this docstring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.cage_similar_lk">
+<code class="descname">cage_similar_lk</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>database</em>, <em>fg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.cage_similar_lk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.cage_similar_lk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitute the linker with a similar one from <cite>database</cite>.</p>
+<p>All of the molecules in <cite>database</cite> are checked for similarity
+to the linker of <cite>macro_mol</cite>. The first time this mutation
+function is run on a cage, the most similar molecule in
+<cite>database</cite> is used to substitute the linker. The next time this
+mutation function is run on the same cage, the second most
+similar molecule from <cite>database</cite> is used and so on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its linker substituted.</li>
+<li><strong>database</strong> (<em>str</em>) – The full path of the database from which molecules are used
+to substitute the linker of <cite>macro_mol</cite>.</li>
+<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
+<cite>database</cite> must have this functional group. This is the
+functional group which is used to assemble the
+macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
+path <cite>database</cite> holds the name of the functional group.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol._similar_lk_mols</strong> (<em>generator</em>) – Creates this attribute on the <cite>macro_mol</cite> instance. This
+allows the function to keep track of which molecule from
+<cite>database</cite> should be used in the substitution.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new cage with the same building-block* as <cite>macro_mol</cite> but
+a different linker. The linker is selected according to the
+description in this docstring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.random_topology">
+<code class="descname">random_topology</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.random_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.random_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes <cite>macro_mol</cite> topology to a random one from <cite>topologies</cite>.</p>
+<p>A new instance of the same type as <cite>macro_mol</cite> is created. Ie
+if <cite>macro_mol</cite> was a Polymer instance then a Polymer instance
+will be returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule which is to be mutated.</li>
+<li><strong>topologies</strong> (<em>list of Topology instances</em>) – This lists holds the topology instances from which one is
+selected at random to form a new molecule.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A molecule generated by initializing a new instance
+with all the same parameters as <cite>macro_mol</cite> except for the
+topology.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule">MacroMolecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="mtk.ga.mutation.MutationError">
+<em class="property">exception </em><code class="descclassname">mtk.ga.mutation.</code><code class="descname">MutationError</code><a class="reference internal" href="_modules/mtk/ga/mutation.html#MutationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.MutationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
