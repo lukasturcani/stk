@@ -158,7 +158,7 @@ from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
-                                 atom_vdw_radii, bond_dict)
+                                 atom_vdw_radii, bond_dict, Cell)
 
 
 logger = logging.getLogger(__name__)
@@ -212,8 +212,8 @@ class CachedStructUnit(type):
 
         # Ensure a valid file type was provided.
         if ext not in self.init_funcs:
-            raise TypeError(
-            'Unable to initialize from "{}" files.'.format(ext))
+            raise TypeError(('Unable to initialize'
+                             ' from "{}" files.').format(ext))
 
         mol = self.init_funcs[ext](sig['file'])
 
@@ -223,7 +223,7 @@ class CachedStructUnit(type):
             fg = sig['functional_group']
         else:
             fg = next((x.name for x in functional_groups if
-                                        x.name in sig['file']), None)
+                       x.name in sig['file']), None)
 
         key = self.gen_key(mol, fg)
         if key in self.cache:
@@ -367,9 +367,7 @@ class Molecule:
 
         """
 
-        atom = self.mol.GetAtomWithIdx(atom_id)
-        atomic_num = atom.GetAtomicNum()
-        return periodic_table[atomic_num]
+        return self.mol.GetAtomWithIdx(atom_id).GetSymbol()
 
     def _cavity_size(self, origin):
         """
@@ -426,7 +424,7 @@ class Molecule:
         cavity_origin = minimize(self._cavity_size,
                                  x0=ref,
                                  bounds=bounds).x
-        cavity =  -self._cavity_size(cavity_origin)
+        cavity = -self._cavity_size(cavity_origin)
         return 0 if cavity < 0 else cavity
 
     def center_of_mass(self):
@@ -444,12 +442,12 @@ class Molecule:
 
         """
 
-        center = np.array([0.,0.,0.])
+        center = np.array([0., 0., 0.])
         total_mass = 0.
         for atom_id, coord in self.all_atom_coords():
             mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
-            center +=  mass*coord
+            center += mass*coord
         return np.divide(center, total_mass)
 
     def centroid(self):
@@ -693,7 +691,7 @@ class Molecule:
             pos_vect = np.array([*self.atom_coords(atom_id)])
             pos_array = np.append(pos_array, pos_vect)
 
-        return np.matrix(pos_array.reshape(-1,3).T)
+        return np.matrix(pos_array.reshape(-1, 3).T)
 
     def same(self, other):
         """
@@ -833,7 +831,7 @@ class Molecule:
         # centroid to the origin. This is so that the rotation occurs
         # about this point.
         og_center = self.centroid()
-        self.set_position([0,0,0])
+        self.set_position([0, 0, 0])
 
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
@@ -1593,7 +1591,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return functional_group, rdkit.MolToInchi(rdkit_mol)
 
-    def _minimize_theta(self, v1, v2, axis, centroid):
+    def minimize_theta(self, v1, v2, axis, centroid):
         """
         Rotate mol to minimize angle between `v1` and `v2`.
 
@@ -1671,6 +1669,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         posmat = np.dot(rotmat, self.position_matrix())
         self.set_position_from_matrix(posmat)
         self.set_position(iposition)
+
+    @classmethod
+    def rdkit_init(cls, mol, functional_group=None, name="", note=""):
+        """
+        Uses an ``rdkit`` molecule for initialization.
+
+        Parameters
+        ----------
+        mol : :class:`rdkit.Chem.rdchem.Mol`
+            An ``rdkit`` molecule used for initialization.
+
+        Returns
+        -------
+        :class:`StructUnit`
+            A :class:`StructUnit` of `mol`.
+
+        """
+
+        with tempfile.NamedTemporaryFile('r+t', suffix='.mol') as f:
+            f.write(rdkit.MolToMolBlock(mol, forceV3000=True))
+            f.seek(0)
+            return cls(f.name, functional_group, name, note)
 
     def rotate2(self, theta, axis):
         """
@@ -1800,7 +1820,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # atom centroid to the origin. This is so that the rotation
         # occurs about this point.
         og_center = self.bonder_centroid()
-        self.set_bonder_centroid(np.array([0,0,0]))
+        self.set_bonder_centroid(np.array([0, 0, 0]))
 
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
@@ -2040,7 +2060,7 @@ class StructUnit2(StructUnit):
         *_, start = next(self.bonder_direction_vectors())
         return self._set_orientation2(start, end)
 
-    def minimize_theta(self, vector, axis):
+    def minimize_theta2(self, vector, axis):
         """
         Rotates molecule about `axis` to minimze theta with `vector`.
 
@@ -2069,8 +2089,8 @@ class StructUnit2(StructUnit):
 
         """
 
-        self._minimize_theta(self.centroid_centroid_dir_vector(),
-                             vector, axis, self.bonder_centroid())
+        self.minimize_theta(self.centroid_centroid_dir_vector(),
+                            vector, axis, self.bonder_centroid())
 
 
 class StructUnit3(StructUnit):
@@ -2144,7 +2164,7 @@ class StructUnit3(StructUnit):
 
         return normal_v
 
-    def minimize_theta(self, atom, vector, axis):
+    def minimize_theta2(self, atom, vector, axis):
         """
         Rotates molecule to minimize angle between `atom` and `vector`.
 
@@ -2174,7 +2194,7 @@ class StructUnit3(StructUnit):
         """
 
         v1 = self.atom_coords(atom) - self.bonder_centroid()
-        self._minimize_theta(v1, vector, axis, self.bonder_centroid())
+        self.minimize_theta(v1, vector, axis, self.bonder_centroid())
 
     def set_orientation2(self, end):
         """
@@ -2353,7 +2373,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         macromolecule during assembly.
 
         The value in the dictionary is a set of ints. These hold the
-        atom ids belonging to a particular molecule - before assmebly.
+        atom ids belonging to a particular molecule before assembly.
 
     """
 
@@ -2782,7 +2802,7 @@ class Cage(MacroMolecule):
         """
 
         if (self.windows is None or
-            len(self.windows) < self.topology.n_windows):
+           len(self.windows) < self.topology.n_windows):
             return None
 
         # Cluster the windows into groups so that only size
@@ -2819,10 +2839,9 @@ class Cage(MacroMolecule):
         diff_sums = []
         for cluster in clusters:
             diff_sum = sum(abs(w1 - w2) for w1, w2 in
-                                    it.combinations(cluster, 2))
+                           it.combinations(cluster, 2))
 
-            diff_num = sum(1 for _ in
-                it.combinations(cluster, 2))
+            diff_num = sum(1 for _ in it.combinations(cluster, 2))
 
             diff_sums.append(diff_sum / diff_num)
 
@@ -2880,37 +2899,6 @@ class Polymer(MacroMolecule):
     pass
 
 
-class Cell:
-    """
-    Represents an individual cell in a supercell.
-
-    Parameters
-    ----------
-    id : :class:`list` of :class:`int`
-        A 3 member :class:`list` holding the x, y and z index
-        of the cell within the supercell.
-
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
-
-    Attributes
-    ----------
-    id : :class:`numpy.ndarray` of :class:`int`
-        A 3 member array holding the x, y and z index
-        of the cell within the supercell.
-
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
-
-    """
-
-    def __init__(self, id_, bonders):
-        self.id = np.array(id_)
-        self.bonders = bonders
-
-
 class Periodic(MacroMolecule):
     """
     Used to represent periodic structures.
@@ -2919,33 +2907,34 @@ class Periodic(MacroMolecule):
     with additional methods and attributes relevant to periodic
     materials being added.
 
+    The method :meth:`~.MacroMolecule.save_ids` is extended to take
+    into account ids of atoms in perdiodic bonds.
+
     Attributes
     ----------
     terminator_coords : :class:`dict`
-        The key is an :class:`int` representing the index of a bonder
-        atom within :attr:`.bonder_ids`. The value is a
-        :class:`numpy.ndarray` which holds the x, y and z coordinates
-        of a deleter atom attached to the bonder. The coordinates
-        are relative to the bonder atom.
-
-        The index must be used rather than the bonder's id itself
-        because this dictionary is filled before atoms are deleted
-        during assembly. After deletion, ids of the remaining atoms
-        change and as a result, if this dictionary saved the ids, it
-        would be inaccurate by the time :meth:`.Topology.build`
-        completed.
+        The key is an :class:`int` representing the id of a bonder
+        atom. The value is a :class:`numpy.ndarray` which holds the x,
+        y and z coordinates of a deleter atom attached to the bonder.
+        The coordinates are relative to the bonder atom.
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
-        When periodic topologies are being assembled, periodic bonds
+        When periodic topologies are assembled, periodic bonds
         do not get added to the rdkit molecule in the
         :attr:`~.MacroMolecule.mol` attribute. Instead,
-        :meth:`join_mols` adds :class:`.PeriodicBond` instances
-        representing the bonds into this list.
+        :meth:`~.PeriodicLattice.join_mols` adds
+        :class:`.PeriodicBond` instances representing the bonds into
+        this list.
+
+    _ids_updated : :class:`bool`
+        Indicates whether periodic bond ids have been updated already
+        by :meth:`save_ids`.
 
     """
 
     def __init__(self, building_blocks, topology, name="", note=""):
         self.periodic_bonds = []
+        self._ids_updated = False
         super().__init__(building_blocks, topology, name="", note="")
 
     def _is_subterminal(self, atom_id, bonder_map, bonded):
@@ -2989,10 +2978,8 @@ class Periodic(MacroMolecule):
         # Make a set of all bonder atoms in the original unit cell
         # which were registered as having bonds crossing periodic
         # boundaries.
-        periodic = {self.bonder_ids[x.atom1] for x in
-                    self.periodic_bonds}
-        periodic.update(self.bonder_ids[x.atom2] for x in
-                        self.periodic_bonds)
+        periodic = {x.atom1 for x in self.periodic_bonds}
+        periodic.update(x.atom2 for x in self.periodic_bonds)
         # If that atom does have a periodic bond and has not had a
         # bond added while building the island - it is subterminal and
         # needs to have a terminal atom attached.
@@ -3068,12 +3055,11 @@ class Periodic(MacroMolecule):
         # ``PeriodicBond`` class. Each ``PeriodicBond`` object has the
         # ids of two bonder atoms in the unit cell which are connected
         # by a bond running across the periodic boundary. The
-        # `direction1` and `direction2` attributes descibe the
-        # axes along which the periodic bond goes. For example,
-        # if `direction1` is [1, 0, 0] it means that the bonder atom
-        # in `periodic_bond.atom1` has a perdiodic bond connecting it
-        # to `periodic_bond.atom2` going in the positive direction
-        # along the x-axis.
+        # `direction` attribute descibes the axes along which the
+        # bond is periodic. For example, if `direction1` is [1, 0, 0]
+        # it means that the bonder atom in `periodic_bond.atom1` has a
+        # perdiodic bond connecting it to `periodic_bond.atom2` going
+        # in the positive direction along the x-axis.
 
         # When iterating through all the unit cells composing the
         # island, you can use the `direction` vector to get index of
@@ -3087,31 +3073,25 @@ class Periodic(MacroMolecule):
                 # Get the indices of the cell which holds the atom
                 # bonded to the equivalent atom of
                 # `periodic_bond.atom1` in the present `cell`.
-                x, y, z = cell.id + periodic_bond.direction1
+                x, y, z = cell.id + periodic_bond.direction
                 try:
                     # ccel as in "connected cell".
                     ccell = cells[x][y][z]
                 except:
                     continue
 
-                # `b1id` is the id of bonder atom in the original unit
-                # cell. It is equivalent to the bonder atom in `cell`
-                # hvaing a bond added.
-                b1id = self.bonder_ids[periodic_bond.atom1]
                 # `bonder1` is the id of a bonder atom, found in `cell`
-                # and equivalent to `b1id`, having a bond added.
-                bonder1 = cell.bonders[b1id]
-                # `b2id` is the id of the bonder atom in the original
-                # unit cell connected by a periodic bond to `b1id`
-                b2id = self.bonder_ids[periodic_bond.atom2]
+                # and equivalent to `periodic_bond.atom1`, having a
+                # bond added.
+                bonder1 = cell.bonders[periodic_bond.atom1]
                 # `bonder2` is the id of a bonder atom, found in
-                # `ccell` and equivalent to `b2id`, having a bond
-                # added.
-                bonder2 = ccell.bonders[b2id]
+                # `ccell` and equivalent to `periodic_bond.atom2`,
+                # having a bond added.
+                bonder2 = ccell.bonders[periodic_bond.atom2]
                 bond_type = self.topology.determine_bond_type(
                               self,
-                              self.bonder_ids[periodic_bond.atom1],
-                              self.bonder_ids[periodic_bond.atom2])
+                              periodic_bond.atom1,
+                              periodic_bond.atom2)
                 emol.AddBond(bonder1, bonder2, bond_type)
                 bonded.add(bonder1)
                 bonded.add(bonder2)
@@ -3170,9 +3150,8 @@ class Periodic(MacroMolecule):
             tid = emol.AddAtom(rdkit.Atom(terminator))
             emol.AddBond(tid, atom_id, bond_type)
             # Get the id of bonder atom in the original unit cell
-            # which is equivalent to `atom`. Don't use the id directly
-            # but get its index within `bonder_ids`.
-            bi = self.bonder_ids.index(bonder_map[atom_id])
+            # which is equivalent to `atom`.
+            bi = bonder_map[atom_id]
             # Using the equivalent bonder atom get the position
             # of the terminating atom relative to the bonder atom. Add
             # the relative position of the terminating atom and the
@@ -3256,15 +3235,39 @@ periodic._place_island([4, 4, 4])
                     i += 1
         return cells, island, bonder_map
 
+    def save_ids(self):
+        super().save_ids()
+
+        # If the ids of periodic bonds have already been updated, stop.
+        if self._ids_updated:
+            return
+
+        # Update periodic bonds to hold atom ids directly instead of
+        # indices of the atom ids within `bonder_ids`.
+        for pb in self.periodic_bonds:
+            pb.atom1 = self.bonder_ids[pb.atom1]
+            pb.atom2 = self.bonder_ids[pb.atom2]
+
+        # Update terminator_coords to hold atom ids directly instead
+        # of indices of the atom ids within `bonder_ids`.
+        terminator_coords = {}
+        for index, coord in self.terminator_coords.items():
+            bonder_id = self.bonder_ids[index]
+            terminator_coords[bonder_id] = coord
+        self.terminator_coords = terminator_coords
+
+        self._ids_updated = True
+
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):
         """
-        Writes a GULP input file of the unit cell to `path`.
+        Writes a GULP input file of the unit cell.
 
         Parameters
         ----------
         path : :class:`str`
-            The `path` to which the molecule should be written.
+            The `path` of the file to which the molecule should be
+            written.
 
         keywords : :class:`list` of :class:`str`
             The keywords to be placed on the first line of the input
@@ -3295,12 +3298,15 @@ periodic._place_island([4, 4, 4])
             f.write('cell\n')
             # The sizes of cell vectors a, b and c are written first.
             for vector in self.topology.cell_dimensions:
-                f.write(str(np.linalg.norm(vector)) + ' ')
+                f.write(str(np.round(np.linalg.norm(vector), 6)) + ' ')
             # Then angles alpha, beta and gamma.
             a, b, c = self.topology.cell_dimensions
-            f.write(str(math.degrees(vector_theta(a, c))) + ' ')
-            f.write(str(math.degrees(vector_theta(b, c))) + ' ')
-            f.write(str(math.degrees(vector_theta(a, b))))
+            angle1 = round(math.degrees(vector_theta(a, c)), 6)
+            angle2 = round(math.degrees(vector_theta(b, c)), 6)
+            angle3 = round(math.degrees(vector_theta(a, b)), 6)
+            f.write(str(angle1) + ' ')
+            f.write(str(angle2) + ' ')
+            f.write(str(angle3))
             # Finally the fix parameters for the cell.
             for fix in cell_fix:
                 f.write(' ' + str(fix))
@@ -3322,9 +3328,9 @@ periodic._place_island([4, 4, 4])
 
             # Add periodic bonds.
             for bond in self.periodic_bonds:
-                a1 = self.bonder_ids[bond.atom1] + 1
-                a2 = self.bonder_ids[bond.atom2] + 1
-                dx, dy, dz = bond.direction1
+                a1 = bond.atom1 + 1
+                a2 = bond.atom2 + 1
+                dx, dy, dz = bond.direction
                 f.write('connect {} {} {:+} {:+} {:+}\n'.format(a1, a2,
                                                                 dx, dy,
                                                                 dz))

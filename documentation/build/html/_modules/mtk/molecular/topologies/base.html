@@ -1,0 +1,699 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.molecular.topologies.base &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="mtk  documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mtk.molecular.topologies.base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mtk.molecular.topologies.base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines the base ``Topology`` type.</span>
+
+<span class="sd">Extending MMEA: Adding new topologies</span>
+<span class="sd">-------------------------------------</span>
+<span class="sd">&gt; Cages</span>
+<span class="sd">To add a new cage topology a new class should be created, named</span>
+<span class="sd">after the topology. This class should inhertic the ``CageTopology``</span>
+<span class="sd">class. This will give access to various methods which are necessary</span>
+<span class="sd">for dealing with any cage molecule. See the documenation of</span>
+<span class="sd">``CageTopology`` for more details.</span>
+
+<span class="sd">The new class will only need to have five class attributes added:</span>
+<span class="sd">    1) a list called `vertices`</span>
+<span class="sd">    2) a list called `edges`</span>
+<span class="sd">    3) `n_windows` which holds the number of windows the cage</span>
+<span class="sd">       topology has</span>
+<span class="sd">    4) `n_window_types` which holds the number of different window</span>
+<span class="sd">       types. For example, if `n_window_types` is 2 then the</span>
+<span class="sd">       topology will have two kinds of windows, each with a</span>
+<span class="sd">       different expected size even in a perfectly symmetrical case.</span>
+<span class="sd">       Windows of the same type are expected to be of the same size.</span>
+
+<span class="sd">The `vertices` list holds instances of the class ``Vertex``. Each</span>
+<span class="sd">instance represents a vertex of a cage and needs to be initialized</span>
+<span class="sd">with the coordinates of that vertex. Vertices of a cage are where</span>
+<span class="sd">building-blocks* of cages are placed.</span>
+
+<span class="sd">The `edges` list holds instances of the class ``Edge``. Each</span>
+<span class="sd">instance represents an edge of a cage and needs to be initialized</span>
+<span class="sd">with two instnaces of the ``Vertex`` class. The ``Vertex`` instances</span>
+<span class="sd">should be held in the `vertices` list mentioned above. These are</span>
+<span class="sd">the two vertices which the edge connects. Linkers of cages are</span>
+<span class="sd">placed on edges. The edge instances automatically derive their</span>
+<span class="sd">positions from the vertices supplied during initialization.</span>
+
+<span class="sd">The vertices need to be positioned such that the center of the</span>
+<span class="sd">topology is at the origin.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span>
+
+<span class="kn">from</span> <span class="nn">..fg_info</span> <span class="k">import</span> <span class="n">double_bond_combs</span>
+<span class="kn">from</span> <span class="nn">...convenience_tools</span> <span class="k">import</span> <span class="n">dedupe</span><span class="p">,</span> <span class="n">flatten</span><span class="p">,</span> <span class="n">add_fragment_props</span>
+
+
+<div class="viewcode-block" id="TopologyMeta"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.TopologyMeta">[docs]</a><span class="k">class</span> <span class="nc">TopologyMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes a repr of an instance, based on __init__ arguments used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="c1"># Get the arguments, keyword arguments and defulat initialized</span>
+        <span class="c1"># arguments used to make an instance of Topology.</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                                    <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">sig</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+        <span class="n">sig</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;self&#39;</span><span class="p">)</span>
+        <span class="c1"># Create the Topology instance.</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Use the arguments the object was initialized with to make</span>
+        <span class="c1"># a repr of the object and place it in the `repr` attribute.</span>
+        <span class="c1"># The __repr__() function in Topology will then just return</span>
+        <span class="c1"># this attribute.</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{!s}</span><span class="s2">=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span>
+                      <span class="nb">sorted</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_repr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">TopologyMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds macromolecules.</span>
+
+<span class="sd">    More accurately, child classes of ``Topology`` class take care of</span>
+<span class="sd">    building macromolecules.</span>
+
+<span class="sd">    This class directly defines any operations and attributes that are</span>
+<span class="sd">    needed by any topology during assembly. However, this class is not</span>
+<span class="sd">    used directly by MMEA. It is intended to be inherited from. All</span>
+<span class="sd">    macromolecules within MMEA have a `topology` attribute which hold</span>
+<span class="sd">    an instance of a Topology child class. Child classes of Topology</span>
+<span class="sd">    define operations specific to that one topology. For example, each</span>
+<span class="sd">    child class must define a `join_mols()` method which creates bonds</span>
+<span class="sd">    between the building blocks of a macromolecule. The way in which</span>
+<span class="sd">    this is done will depend on what kind of macromolecules are being</span>
+<span class="sd">    built. In addition, each child class must define methods which</span>
+<span class="sd">    place the building blocks in approriate positions.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.build"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assembles rdkit instances of macromolecules.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">            The MacroMolecule instance which needs to be built.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">            An rdkit instance of the assembled macromolecule is placed</span>
+<span class="sd">            in this attribute.</span>
+
+<span class="sd">        macro_mol.bb_counter : Counter</span>
+<span class="sd">            The counter is updated with the amounts of building blocks</span>
+<span class="sd">            used to make the macromolecule.</span>
+
+<span class="sd">        macro_mol.bonds_made : int</span>
+<span class="sd">            This count is updated with the number of bonds made during</span>
+<span class="sd">            assembly.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># When running ``build()`` in parallel, the atom tags are</span>
+        <span class="c1"># cleared by the multiprocessing module. Make sure to reapply</span>
+        <span class="c1"># the tags before running ``build()``.</span>
+        <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">:</span>
+            <span class="n">bb</span><span class="o">.</span><span class="n">tag_atoms</span><span class="p">()</span>
+
+        <span class="c1"># Building should return building blocks to original positions</span>
+        <span class="c1"># when done.</span>
+        <span class="n">ipositions</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                      <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">place_mols</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">join_mols</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+
+        <span class="c1"># Make sure that the property cache of each atom is up to date.</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
+
+        <span class="c1"># Make sure that the tags showing which building block each</span>
+        <span class="c1"># atom belongs to are saved in `fragment_assignments` and not</span>
+        <span class="c1"># lost due to parallelism.</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_fragments</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">pos_mat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">ipositions</span><span class="p">):</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">pos_mat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Topology.del_atoms"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes the atoms which are lost during assembly.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">            Atoms are removed from this molecule.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="c1"># Delete atoms with largest id last, so that when deleting</span>
+        <span class="c1"># later atoms their ids do not change.</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">):</span>
+                <span class="n">mol</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Topology.determine_bond_type"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.determine_bond_type">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">determine_bond_type</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the bond order to be formed between the atoms.</span>
+
+<span class="sd">        Some atoms will need to have a double bond created between</span>
+<span class="sd">        them. This is defined in the `double_bond_combs` list. If the</span>
+<span class="sd">        atom ids provided as paramters belong to functional grups found</span>
+<span class="sd">        in this list, the rdkit double bond type will be returned.</span>
+<span class="sd">        If not the rdkit single bond type will be returned. These types</span>
+<span class="sd">        are needed when adding bonds using ``EditableMol`` instances.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">            The macromolecule being assembled.</span>
+
+<span class="sd">        atom1_id : int</span>
+<span class="sd">            The id number of the first atom.</span>
+
+<span class="sd">        atom2_id : int</span>
+<span class="sd">            The id number of the second atom.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        rdkit.Chem.rdchem.BondType.SINGLE</span>
+<span class="sd">            If the atoms don&#39;t belong to functional groups which form</span>
+<span class="sd">            a double bond.</span>
+
+<span class="sd">        rdkit.Chem.rdchem.BondType.DOUBLE</span>
+<span class="sd">            If the atoms belong to functional groups which form a</span>
+<span class="sd">            double bond.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get the functional groups of the of the atoms whose atom ids</span>
+        <span class="c1"># were supplied as arguments. If the groups form a tuple in</span>
+        <span class="c1"># `double_bond_combs` return a rdkit double bond type. If they</span>
+        <span class="c1"># do not, return a rdkit single bond type.</span>
+
+        <span class="n">atom1</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
+        <span class="n">atom1_grp</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span>
+        <span class="n">atom2</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
+        <span class="n">atom2_grp</span> <span class="o">=</span> <span class="n">atom2</span><span class="o">.</span><span class="n">GetProp</span><span class="p">(</span><span class="s1">&#39;fg&#39;</span><span class="p">)</span>
+
+        <span class="n">double_bond_present</span> <span class="o">=</span> <span class="p">((</span><span class="n">atom1_grp</span><span class="p">,</span> <span class="n">atom2_grp</span><span class="p">)</span> <span class="o">==</span> <span class="n">tup</span> <span class="ow">or</span>
+                               <span class="p">(</span><span class="n">atom2_grp</span><span class="p">,</span> <span class="n">atom1_grp</span><span class="p">)</span> <span class="o">==</span> <span class="n">tup</span> <span class="k">for</span>
+                               <span class="n">tup</span> <span class="ow">in</span> <span class="n">double_bond_combs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">double_bond_present</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">DOUBLE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># The `_repr` attribute is made in the TopologyMeta __call__()</span>
+        <span class="c1"># method, when the Topology object is instantiated.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repr</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="nb">repr</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Linear"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear">[docs]</a><span class="k">class</span> <span class="nc">Linear</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class represting linear polymers.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    repeating_unit : str</span>
+<span class="sd">        A string showing the repeating unit of the Polymer. For</span>
+<span class="sd">        example, &quot;AB&quot; or &quot;ABB&quot;. The building block with index 0 in</span>
+<span class="sd">        `building-blocks` is labelled as &quot;A&quot; while index 1 as &quot;B&quot; and</span>
+<span class="sd">        so on.</span>
+
+<span class="sd">    orientation : tuple of ints</span>
+<span class="sd">        For each character in the repeating unit, a value of -1, 0 or</span>
+<span class="sd">        1 must be given as a list. It indicates the direction at</span>
+<span class="sd">        which each monomer of the repeating unit is placed. 0 means</span>
+<span class="sd">        that the direction is random.</span>
+
+<span class="sd">    n : int</span>
+<span class="sd">        The number of repeating units which are used to make the</span>
+<span class="sd">        polymer.</span>
+
+<span class="sd">    ends : str (default = &#39;h&#39;)</span>
+<span class="sd">        The string represents how the end groups of the polymer are</span>
+<span class="sd">        treated. If &#39;h&#39; the functional groups at the end of the polymer</span>
+<span class="sd">        are converted into hydrogem atoms. If &#39;fg&#39; they are kept as the</span>
+<span class="sd">        original functional group.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repeating_unit</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ends</span><span class="o">=</span><span class="s1">&#39;h&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repeating_unit</span> <span class="o">=</span> <span class="n">repeating_unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">orientation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">=</span> <span class="n">ends</span>
+
+<div class="viewcode-block" id="Linear.del_atoms"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hygrogen_ends</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">==</span> <span class="s1">&#39;fg&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fg_ends</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Linear.fg_ends"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.fg_ends">[docs]</a>    <span class="k">def</span> <span class="nf">fg_ends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes almost all atoms tagged for deletion.</span>
+
+<span class="sd">        In polymers, you don&#39;t want to delete the atoms on the</span>
+<span class="sd">        functional groups</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Polymer</span>
+<span class="sd">            The polymer being assembled.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">            Redundant atoms are removed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">fgs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="c1"># Get all atoms tagged for deletion, held in tuples</span>
+        <span class="c1"># corresponding to individual functional groups.</span>
+        <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">:</span>
+            <span class="n">delmol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">func_grp</span><span class="o">.</span><span class="n">del_smarts</span><span class="p">)</span>
+            <span class="n">fgs</span> <span class="o">=</span> <span class="n">fgs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">delmol</span><span class="p">))</span>
+
+        <span class="c1"># Get the functional groups which hold the atoms with the</span>
+        <span class="c1"># smallest and largest values for the x coordinate need to have</span>
+        <span class="c1"># deletion tags removed.</span>
+        <span class="n">maxid</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">fgs</span><span class="p">),</span>
+                    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">maxfg</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fg</span> <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fgs</span> <span class="k">if</span> <span class="n">maxid</span> <span class="ow">in</span> <span class="n">fg</span><span class="p">)</span>
+
+        <span class="n">minid</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">fgs</span><span class="p">),</span>
+                    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">minfg</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fg</span> <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fgs</span> <span class="k">if</span> <span class="n">minid</span> <span class="ow">in</span> <span class="n">fg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">minfg</span><span class="p">),</span> <span class="n">flatten</span><span class="p">(</span><span class="n">maxfg</span><span class="p">)):</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">ClearProp</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Linear.hygrogen_ends"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.hygrogen_ends">[docs]</a>    <span class="k">def</span> <span class="nf">hygrogen_ends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes all atoms tagged for deletion and adds Hs.</span>
+
+<span class="sd">        In polymers, you want to replace the functional groups at the</span>
+<span class="sd">        ends with hydrogen atoms.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Polymer</span>
+<span class="sd">            The polymer being assembled.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">            Redundant atoms are removed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Remove all extra atoms.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">del_atoms</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+        <span class="c1"># Add hydrogens.</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">addCoords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Linear.place_mols"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Places monomers side by side and joins them.</span>
+
+<span class="sd">        The monomers are placed along the x-axis, so that the vector</span>
+<span class="sd">        running between the functional groups is placed on the axis.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Polymer</span>
+<span class="sd">            The polymer being assembled.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">            The monomers are placed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make a map from monomer label to object.</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Assign every monomer a label (&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, etc.).</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">monomer</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dedupe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repeating_unit</span><span class="p">),</span>
+                                  <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">):</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">monomer</span>
+
+        <span class="c1"># Make a que for holding bonder atom ids.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Make string representing the entire polymer, not just the</span>
+        <span class="c1"># repeating unit.</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeating_unit</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+        <span class="c1"># Make a string holding the orientation of each monomer in the</span>
+        <span class="c1"># entire polymer, not just the repeating unit.</span>
+        <span class="n">dirs</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span>
+        <span class="n">dirs</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+        <span class="c1"># Turn the string into a list of numbers.</span>
+        <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dirs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+
+        <span class="c1"># Go through the repeating unit. Place each monomer 50 A apart.</span>
+        <span class="c1"># Also create a bond.</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">mdir</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">dirs</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
+                <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span> <span class="o">+</span> <span class="n">id_</span> <span class="k">for</span>
+                <span class="n">id_</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">])</span>
+
+            <span class="n">mdir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">mdir</span> <span class="k">else</span> <span class="n">mdir</span>
+            <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="n">mdir</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">monomer_mol</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="n">i</span><span class="o">*</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+            <span class="n">bb_index</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+            <span class="n">add_fragment_props</span><span class="p">(</span><span class="n">monomer_mol</span><span class="p">,</span> <span class="n">bb_index</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                                              <span class="n">monomer_mol</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Linear.join"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Joins 2 monomers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Polymer</span>
+<span class="sd">            The polymer being assembled.</span>
+
+<span class="sd">        Modifies</span>
+<span class="sd">        --------</span>
+<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">            The polymer with the monomers connected.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bonder1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">bonder2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">distances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">),</span>
+                         <span class="n">bonder1</span><span class="p">,</span>
+                         <span class="n">bonder2</span><span class="p">))</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+        <span class="n">emol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">bonder1</span><span class="p">,</span> <span class="n">bonder2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span>
+                                                            <span class="n">macro_mol</span><span class="p">,</span>
+                                                            <span class="n">bonder1</span><span class="p">,</span>
+                                                            <span class="n">bonder2</span><span class="p">))</span>
+
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Linear.join_mols"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does nothing, place_mols() joins up the molecules too.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : Polymer</span>
+<span class="sd">            The polymer being assembled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : NoneType</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -5,10 +5,12 @@ Defines the Population class.
 
 import itertools as it
 import os
+from os.path import join
 import numpy as np
 from collections import Counter, defaultdict
 import json
-from glob import glob
+from glob import iglob, glob
+import multiprocessing as mp
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
@@ -133,8 +135,8 @@ class Population:
                      " ``Molecule`` and ``GATools`` types."), arg)
 
     @classmethod
-    def init_all(cls, databases, topologies,
-                 bb_classes, macromol_class,
+    def init_all(cls, databases, bb_classes,
+                 topologies, macromol_class,
                  ga_tools=GATools.init_empty(), duplicates=False):
         """
         Creates all possible molecules from a given set of databases.
@@ -156,9 +158,6 @@ class Population:
         databases : :class:`list` of :class:`str`
             List of paths to directories, which hold molecular
             structure files of the building blocks.
-
-        topologies : :class:`list` of :class:`.Topology`
-            The topologies of macromolecules being made.
 
         bb_classes : :class:`list` of :class:`type`
             This list must be equal in length to `databases`. For each
@@ -182,6 +181,9 @@ class Population:
             molecules in ``aldehydes3f`` are initialized as
             :class:`.StructUnit3` objects.
 
+        topologies : :class:`list` of :class:`.Topology`
+            The topologies of macromolecules being made.
+
         macromol_class : :class:`type`
             The class of the :class:`.MacroMolecule` objects being
             built.
@@ -204,22 +206,36 @@ class Population:
         .. code-block:: python
 
             dbs = ['/path/to/db1', 'path/to/db2']
-            tops = [Linear("AB", [0, 0], 6)]
             bb_classes = [lambda x: StructUnit2(x, 'aldehyde'),
                           lambda x: StructUnit3(x, 'amine')]
-            pop = Population.init_all(dbs, tops, bb_classes, Polymer)
+            tops = [Linear("AB", [0, 0], 6)]
+            pop = Population.init_all(dbs, bb_classes, tops, Polymer)
 
         """
 
-        databases = [glob(os.path.join(db, '*')) for db in databases]
-        p = Population(ga_tools)
+        databases = [glob(join(db, '*')) for db in databases]
+        args = []
         for *bb_files, topology in it.product(*databases, topologies):
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
-            p.members.append(macromol_class(bbs, topology))
+            args.append((bbs, topology))
 
+        with mp.Pool() as pool:
+            mols = pool.starmap(macromol_class, args)
+
+        # Update the cache.
+        for i, mol in enumerate(mols):
+            # If the molecule did not exist already add it to the
+            # cache.
+            if mol.key not in macromol_class.cache:
+                macromol_class.cache[mol.key] = mol
+            # If the molecule did exist already, use the cached
+            # version.
+            else:
+                mols[i] = macromol_class.cache[mol.key]
+
+        p = Population(*mols, ga_tools)
         if not duplicates:
             p.remove_duplicates()
-
         return p
 
     @classmethod
@@ -354,11 +370,11 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        bb_files = glob(os.path.join(bb_db, '*'))
+        bb_files = glob(join(bb_db, '*'))
         # Remove any files which are not valid structure files.
         bb_files = [x for x in bb_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
-        lk_files = glob(os.path.join(lk_db, '*'))
+        lk_files = glob(join(lk_db, '*'))
         lk_files = [x for x in lk_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
 
@@ -414,6 +430,38 @@ class Population:
         return pop
 
     @classmethod
+    def init_from_files(cls, folder, moltype, glob_pattern='*'):
+        """
+        Creates a population from files in `folder`.
+
+        Parameters
+        ----------
+        folder : :class:`str`
+            The path to a folder holding molecular structure files
+            used to initialize :class:`~.Molecule` objects held by
+            the population.
+
+        moltype : :class:`type`
+            An initializer for the molecular structure files. For
+            example, :class:`~.StructUnit` or :class:`.StructUnit2`.
+            If `folder` contains ``.json`` dump files of
+            :class:`MacroMolecule` then :meth:`.Molecule.load` could
+            also be used.
+
+        glob_pattern : :class:`str`, optional
+            A glob used for selecting specific files within `folder`.
+
+        Returns
+        -------
+        :class:`Population`
+            A population made from files in `folder`.
+
+        """
+
+        return cls(*(moltype(x) for x in
+                     iglob(join(folder, glob_pattern))))
+
+    @classmethod
     def init_random_cages(cls, bb_db, lk_db,
                           topologies, size, ga_tools,
                           bb_fg=None, lk_fg=None):
@@ -465,11 +513,11 @@ class Population:
         """
 
         pop = cls(ga_tools)
-        bb_files = glob(os.path.join(bb_db, '*'))
+        bb_files = glob(join(bb_db, '*'))
         # Remove any files which are not valid structure files.
         bb_files = [x for x in bb_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
-        lk_files = glob(os.path.join(lk_db, '*'))
+        lk_files = glob(join(lk_db, '*'))
         lk_files = [x for x in lk_files if
                     os.path.splitext(x)[1] in StructUnit.init_funcs]
 
@@ -1237,10 +1285,10 @@ class Population:
 
         for i, member in enumerate(self):
             if use_name:
-                fname = os.path.join(dir_path, '{}.mol'.format(
+                fname = join(dir_path, '{}.mol'.format(
                                                         member.name))
             else:
-                fname = os.path.join(dir_path, '{}.mol'.format(i))
+                fname = join(dir_path, '{}.mol'.format(i))
 
             member.write(fname)
 

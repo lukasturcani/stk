@@ -97,6 +97,37 @@ periodic_table = {
               117: 'Uus', 118: 'Uuo'}
 
 
+class Cell:
+    """
+    Represents an individual cell in a supercell.
+
+    Parameters
+    ----------
+    id : :class:`list` of :class:`int`
+        A 3 member :class:`list` holding the x, y and z index
+        of the cell within the supercell.
+
+    bonders : :class:`dict`
+        Maps the bonder atoms in the original unit cell to the
+        equivalent bonder atoms in the cell.
+
+    Attributes
+    ----------
+    id : :class:`numpy.ndarray` of :class:`int`
+        A 3 member array holding the x, y and z index
+        of the cell within the supercell.
+
+    bonders : :class:`dict`
+        Maps the bonder atoms in the original unit cell to the
+        equivalent bonder atoms in the cell.
+
+    """
+
+    def __init__(self, id_, bonders):
+        self.id = np.array(id_)
+        self.bonders = bonders
+
+
 class ChargedMolError(Exception):
     def __init__(self, mol_file, msg):
         self.mol_file = mol_file
@@ -328,6 +359,51 @@ class MAEExtractor:
                 mae_file.write(maegz_file.read())
 
 
+class PeriodicBond:
+    """
+    Represents a periodic bond.
+
+    Parameters
+    ----------
+    atom1 : :class:`int`
+        The id of first atom in the bond.
+
+    atom2 : :class:`int`
+        The id of the second atom in the bond.
+
+    direction : :class:`list` of :class:`int`
+        A 3 member list describing the axes along which the bond is
+        periodic, when going from `atom1` to `atom2`. For example,
+        ``[1, 0, 0]`` means that the bond is periodic along the x axis
+        in the positive direction.
+
+
+    Attributes
+    ----------
+    atom1 : :class:`int`
+        The id of first atom in the bond.
+
+    atom2 : :class:`int`
+        The id of the second atom in the bond.
+
+    direction : :class:`numpy.ndarray` of :class:`int`
+        A 3 member list describing the axes along which the bond is
+        periodic, when going from `atom1` to `atom2`. For example,
+        ``[1, 0, 0]`` means that the bond is periodic along the x axis
+        in the positive direction.
+
+    """
+
+    def __init__(self, atom1, atom2, direction):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.direction = np.array(direction)
+
+    def __str__(self):
+        return ("PeriodicBond({0.atom1}, "
+                "{0.atom2}, {0.direction})").format(self)
+
+
 class StopLogging:
     ...
 
@@ -530,10 +606,10 @@ def kabsch(coords1, coords2):
     """
 
     h = np.dot(coords1, coords2.T)
-    u,s,v = np.linalg.svd(h)
+    u, s, v = np.linalg.svd(h)
 
     if int(np.linalg.det(v)) < 0:
-        v[:,2] = -v[:,2]
+        v[:, 2] = -v[:, 2]
 
     return np.dot(v, u)
 
@@ -584,7 +660,6 @@ def matrix_centroid(matrix):
 
     """
 
-
     return np.array(np.sum(matrix, axis=0) / len(matrix))[0]
 
 
@@ -619,20 +694,19 @@ def mol_from_mae_file(mae_path):
             bond_block = block
         prev_block.append(block)
 
-
-
     labels, data_block, *_ = atom_block.split(':::')
     labels = [l for l in labels.split('\n') if
-               not l.isspace() and l != '']
+              not l.isspace() and l != '']
 
     data_block = [a.split() for a in data_block.split('\n') if
-                   not a.isspace() and a != '']
+                  not a.isspace() and a != '']
 
     for line in data_block:
         line = [word for word in line if word != '"']
         if len(labels) != len(line):
             raise RuntimeError(('Number of labels does'
-                      ' not match number of columns in .mae file.'))
+                                ' not match number of columns'
+                                ' in .mae file.'))
 
         for label, data in zip(labels, line):
             if 'x_coord' in label:
@@ -645,20 +719,21 @@ def mol_from_mae_file(mae_path):
                 atom_num = int(data)
 
         atom_sym = periodic_table[atom_num]
-        atom_coord = Point3D(x,y,z)
+        atom_coord = Point3D(x, y, z)
         atom_id = mol.AddAtom(rdkit.Atom(atom_sym))
         conf.SetAtomPosition(atom_id, atom_coord)
 
     labels, data_block, *_ = bond_block.split(':::')
     labels = [l for l in
-                labels.split('\n') if not l.isspace() and l != '']
+              labels.split('\n') if not l.isspace() and l != '']
     data_block = [a.split() for a in
-                data_block.split('\n') if not a.isspace() and a != '']
+                  data_block.split('\n') if not a.isspace() and a != '']
 
     for line in data_block:
         if len(labels) != len(line):
             raise RuntimeError(('Number of labels does'
-                      ' not match number of columns in .mae file.'))
+                                ' not match number of '
+                                'columns in .mae file.'))
 
         for label, data in zip(labels, line):
             if 'from' in label:
@@ -732,8 +807,9 @@ def mol_from_mol_file(mol_file):
                 words = line.split()
                 if len(words) > 8:
                     raise ChargedMolError(mol_file,
-                    ('Atom row has more'
-                    ' than 8 coloumns. Likely due to a charged atom.'))
+                                          ('Atom row has more'
+                                           ' than 8 coloumns. Likely '
+                                           'due to a charged atom.'))
                 _, _, _, atom_sym, *coords, _ = words
                 coords = [float(x) for x in coords]
                 atom_coord = Point3D(*coords)
@@ -823,7 +899,7 @@ def rotation_matrix(vector1, vector2):
     if np.array_equal(vector1, np.multiply(vector2, -1)):
         # Get a vector orthogonal to `vector1` by finding the smallest
         # component of `vector1` and making that a vector.
-        ortho = [0,0,0]
+        ortho = [0, 0, 0]
         ortho[list(vector1).index(min(abs(vector1)))] = 1
         axis = np.cross(vector1, ortho)
         return rotation_matrix_arbitrary_axis(np.pi, axis)
@@ -840,7 +916,7 @@ def rotation_matrix(vector1, vector2):
 
     mult_factor = (1-c)/np.square(s)
 
-    return I + vx + np.multiply(np.dot(vx,vx), mult_factor)
+    return I + vx + np.multiply(np.dot(vx, vx), mult_factor)
 
 
 def rotation_matrix_arbitrary_axis(angle, axis):
@@ -864,11 +940,10 @@ def rotation_matrix_arbitrary_axis(angle, axis):
 
     """
 
-
     axis = normalize_vector(axis)
 
     a = np.cos(angle/2)
-    b,c,d = axis * np.sin(angle/2)
+    b, c, d = axis * np.sin(angle/2)
 
     e11 = np.square(a) + np.square(b) - np.square(c) - np.square(d)
     e12 = 2*(b*c - a*d)
@@ -879,7 +954,7 @@ def rotation_matrix_arbitrary_axis(angle, axis):
     e23 = 2*(c*d - a*b)
 
     e31 = 2*(b*d - a*c)
-    e32 =  2*(c*d + a*b)
+    e32 = 2*(c*d + a*b)
     e33 = np.square(a) + np.square(d) - np.square(b) - np.square(c)
 
     return np.array([[e11, e12, e13],
@@ -897,7 +972,7 @@ def tar_output():
 
     """
 
-    tname = os.path.join('output','output.tgz')
+    tname = os.path.join('output', 'output.tgz')
     with tarfile.open(tname, 'w:gz') as tar:
         tar.add('output')
 
@@ -922,8 +997,8 @@ def time_it():
     start = time.time()
     yield
     time_taken = time.time() - start
-    m,s = divmod(time_taken, 60)
-    h,m = divmod(m, 60)
+    m, s = divmod(time_taken, 60)
+    h, m = divmod(m, 60)
     print('\nTime taken was {} : {} : {}.\n\n'.format(
                                                     int(h), int(m), s))
 
@@ -949,7 +1024,7 @@ def vector_theta(vector1, vector2):
 
     numerator = np.dot(vector1, vector2)
     denominator = (np.linalg.norm(vector1) *
-                    np.linalg.norm(vector2))
+                   np.linalg.norm(vector2))
     # This if statement prevents returns of NaN due to floating point
     # incurracy.
     if np.isclose(numerator, denominator, atol=1e-8):
