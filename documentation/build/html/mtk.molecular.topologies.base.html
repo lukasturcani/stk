@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.molecular.topologies.base module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.molecular.topologies.base module</a><ul>
+<li><a class="reference internal" href="#extending-mmea-adding-new-topologies">Extending MMEA: Adding new topologies</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.molecular.topologies.base module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.molecular.topologies.base.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.molecular.topologies.base">
+<span id="mtk-molecular-topologies-base-module"></span><h1>mtk.molecular.topologies.base module<a class="headerlink" href="#module-mtk.molecular.topologies.base" title="Permalink to this headline">¶</a></h1>
+<p>Defines the base <code class="docutils literal"><span class="pre">Topology</span></code> type.</p>
+<div class="section" id="extending-mmea-adding-new-topologies">
+<h2>Extending MMEA: Adding new topologies<a class="headerlink" href="#extending-mmea-adding-new-topologies" title="Permalink to this headline">¶</a></h2>
+<p>&gt; Cages
+To add a new cage topology a new class should be created, named
+after the topology. This class should inhertic the <code class="docutils literal"><span class="pre">CageTopology</span></code>
+class. This will give access to various methods which are necessary
+for dealing with any cage molecule. See the documenation of
+<code class="docutils literal"><span class="pre">CageTopology</span></code> for more details.</p>
+<dl class="docutils">
+<dt>The new class will only need to have five class attributes added:</dt>
+<dd><ol class="first last arabic simple">
+<li>a list called <cite>vertices</cite></li>
+<li>a list called <cite>edges</cite></li>
+<li><cite>n_windows</cite> which holds the number of windows the cage
+topology has</li>
+<li><cite>n_window_types</cite> which holds the number of different window
+types. For example, if <cite>n_window_types</cite> is 2 then the
+topology will have two kinds of windows, each with a
+different expected size even in a perfectly symmetrical case.
+Windows of the same type are expected to be of the same size.</li>
+</ol>
+</dd>
+</dl>
+<p>The <cite>vertices</cite> list holds instances of the class <code class="docutils literal"><span class="pre">Vertex</span></code>. Each
+instance represents a vertex of a cage and needs to be initialized
+with the coordinates of that vertex. Vertices of a cage are where
+building-blocks* of cages are placed.</p>
+<p>The <cite>edges</cite> list holds instances of the class <code class="docutils literal"><span class="pre">Edge</span></code>. Each
+instance represents an edge of a cage and needs to be initialized
+with two instnaces of the <code class="docutils literal"><span class="pre">Vertex</span></code> class. The <code class="docutils literal"><span class="pre">Vertex</span></code> instances
+should be held in the <cite>vertices</cite> list mentioned above. These are
+the two vertices which the edge connects. Linkers of cages are
+placed on edges. The edge instances automatically derive their
+positions from the vertices supplied during initialization.</p>
+<p>The vertices need to be positioned such that the center of the
+topology is at the origin.</p>
+<dl class="class">
+<dt id="mtk.molecular.topologies.base.Linear">
+<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.base.</code><code class="descname">Linear</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends=’h’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.base.Topology</span></code></a></p>
+<p>A class represting linear polymers.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Linear.repeating_unit">
+<code class="descname">repeating_unit</code><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.repeating_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – A string showing the repeating unit of the Polymer. For
+example, “AB” or “ABB”. The building block with index 0 in
+<cite>building-blocks</cite> is labelled as “A” while index 1 as “B” and
+so on.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Linear.orientation">
+<code class="descname">orientation</code><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>tuple of ints</em> – For each character in the repeating unit, a value of -1, 0 or
+1 must be given as a list. It indicates the direction at
+which each monomer of the repeating unit is placed. 0 means
+that the direction is random.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Linear.n">
+<code class="descname">n</code><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.n" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of repeating units which are used to make the
+polymer.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Linear.ends">
+<code class="descname">ends</code><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.ends" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = ‘h’)</em> – The string represents how the end groups of the polymer are
+treated. If ‘h’ the functional groups at the end of the polymer
+are converted into hydrogem atoms. If ‘fg’ they are kept as the
+original functional group.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.del_atoms">
+<code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.del_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.fg_ends">
+<code class="descname">fg_ends</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.fg_ends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.fg_ends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes almost all atoms tagged for deletion.</p>
+<p>In polymers, you don’t want to delete the atoms on the
+functional groups</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><em>Polymer</em></a>) – The polymer being assembled.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – Redundant atoms are removed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.hygrogen_ends">
+<code class="descname">hygrogen_ends</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.hygrogen_ends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.hygrogen_ends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all atoms tagged for deletion and adds Hs.</p>
+<p>In polymers, you want to replace the functional groups at the
+ends with hydrogen atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><em>Polymer</em></a>) – The polymer being assembled.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – Redundant atoms are removed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.join">
+<code class="descname">join</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins 2 monomers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><em>Polymer</em></a>) – The polymer being assembled.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The polymer with the monomers connected.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.join_mols">
+<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.join_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does nothing, place_mols() joins up the molecules too.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><em>Polymer</em></a>) – The polymer being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.place_mols">
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.place_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places monomers side by side and joins them.</p>
+<p>The monomers are placed along the x-axis, so that the vector
+running between the functional groups is placed on the axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><em>Polymer</em></a>) – The polymer being assembled.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The monomers are placed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.topologies.base.Topology">
+<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.base.</code><code class="descname">Topology</code><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Builds macromolecules.</p>
+<p>More accurately, child classes of <code class="docutils literal"><span class="pre">Topology</span></code> class take care of
+building macromolecules.</p>
+<p>This class directly defines any operations and attributes that are
+needed by any topology during assembly. However, this class is not
+used directly by MMEA. It is intended to be inherited from. All
+macromolecules within MMEA have a <cite>topology</cite> attribute which hold
+an instance of a Topology child class. Child classes of Topology
+define operations specific to that one topology. For example, each
+child class must define a <cite>join_mols()</cite> method which creates bonds
+between the building blocks of a macromolecule. The way in which
+this is done will depend on what kind of macromolecules are being
+built. In addition, each child class must define methods which
+place the building blocks in approriate positions.</p>
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Topology.build">
+<code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assembles rdkit instances of macromolecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The MacroMolecule instance which needs to be built.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – An rdkit instance of the assembled macromolecule is placed
+in this attribute.</li>
+<li><strong>macro_mol.bb_counter</strong> (<em>Counter</em>) – The counter is updated with the amounts of building blocks
+used to make the macromolecule.</li>
+<li><strong>macro_mol.bonds_made</strong> (<em>int</em>) – This count is updated with the number of bonds made during
+assembly.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Topology.del_atoms">
+<code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.del_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the atoms which are lost during assembly.</p>
+<dl class="docutils">
+<dt>macro_mol.mol <span class="classifier-delimiter">:</span> <span class="classifier">rdkit.Chem.rdchem.Mol</span></dt>
+<dd>Atoms are removed from this molecule.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="mtk.molecular.topologies.base.Topology.determine_bond_type">
+<em class="property">static </em><code class="descname">determine_bond_type</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>atom1_id</em>, <em>atom2_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.determine_bond_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.determine_bond_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the bond order to be formed between the atoms.</p>
+<p>Some atoms will need to have a double bond created between
+them. This is defined in the <cite>double_bond_combs</cite> list. If the
+atom ids provided as paramters belong to functional grups found
+in this list, the rdkit double bond type will be returned.
+If not the rdkit single bond type will be returned. These types
+are needed when adding bonds using <code class="docutils literal"><span class="pre">EditableMol</span></code> instances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being assembled.</li>
+<li><strong>atom1_id</strong> (<em>int</em>) – The id number of the first atom.</li>
+<li><strong>atom2_id</strong> (<em>int</em>) – The id number of the second atom.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>rdkit.Chem.rdchem.BondType.SINGLE</em> – If the atoms don’t belong to functional groups which form
+a double bond.</li>
+<li><em>rdkit.Chem.rdchem.BondType.DOUBLE</em> – If the atoms belong to functional groups which form a
+double bond.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.topologies.base.TopologyMeta">
+<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.base.</code><code class="descname">TopologyMeta</code><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#TopologyMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
+<p>Makes a repr of an instance, based on __init__ arguments used.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.export_tools &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="mtk  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>mtk.export_tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mtk.export_tools</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines functions only useful when using MMEA as a library.</span>
+
+<span class="sd">The functions here are not for use when running the GA.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">rdkit.Chem</span> <span class="k">as</span> <span class="nn">chem</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Pool</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+
+<span class="kn">from</span> <span class="nn">.ga</span> <span class="k">import</span> <span class="n">Population</span>
+<span class="kn">from</span> <span class="nn">.molecular</span> <span class="k">import</span> <span class="p">(</span><span class="n">StructUnit</span><span class="p">,</span> <span class="n">functional_groups</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.molecular.optimization</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="fg_prune"><a class="viewcode-back" href="../../mtk.export_tools.html#mtk.export_tools.fg_prune">[docs]</a><span class="k">def</span> <span class="nf">fg_prune</span><span class="p">(</span><span class="n">ifolder</span><span class="p">,</span> <span class="n">fg</span><span class="p">,</span> <span class="n">fg_num</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deletes molecules without a given functional group from a folder.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ifolder : str</span>
+<span class="sd">        The full path of the folder holding .mol files. Any</span>
+<span class="sd">        molecules without functional group `fg` `fg_num` amount of times</span>
+<span class="sd">        are deleted.</span>
+
+<span class="sd">    fg : str</span>
+<span class="sd">        The name of the functional group which the copied molecules must</span>
+<span class="sd">        possess. The name must correspond to one of the name of a</span>
+<span class="sd">        functional group defined within</span>
+<span class="sd">        ``FGInfo.functional_groups_list``.</span>
+
+<span class="sd">    fg_num : int</span>
+<span class="sd">        The number of functional groups of type `fg` which the molecule</span>
+<span class="sd">        must have in order to not be deleted.</span>
+
+<span class="sd">    ext : str</span>
+<span class="sd">        The extension of the molecular structure files in `ifolder`.</span>
+<span class="sd">        All other files are skipped.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Go through all the files in `ifolder` if they do not have the</span>
+    <span class="c1"># file extension `ext` go to the next file.</span>
+    <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">ifolder</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ifolder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="c1"># Make a StructUnit object and substitute the functional group</span>
+        <span class="c1"># of type `fg`.</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">untag_atoms</span><span class="p">()</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">func_grp</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">functional_groups</span> <span class="k">if</span>
+                             <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">fg</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">mol</span><span class="o">.</span><span class="n">tag_atoms</span><span class="p">()</span>
+
+        <span class="c1"># Check that the correct number is present.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span> <span class="o">!=</span> <span class="n">fg_num</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Deleting </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fg_distance_prune"><a class="viewcode-back" href="../../mtk.export_tools.html#mtk.export_tools.fg_distance_prune">[docs]</a><span class="k">def</span> <span class="nf">fg_distance_prune</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">fg</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deletes molecules with functional groups seperated by 1 atom.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    folder : str</span>
+<span class="sd">        The full path of the folder which holdes the molecules. The</span>
+<span class="sd">        files are removed from this folder.</span>
+
+<span class="sd">    fg : str</span>
+<span class="sd">        The name of the functional group.</span>
+
+<span class="sd">    ext : str</span>
+<span class="sd">        The file extension of the structure files in `folder`. All</span>
+<span class="sd">        other files are skipped.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Go through all the files in `ifolder` if they do not have the</span>
+    <span class="c1"># file extension `ext` go to the next file.</span>
+    <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Make a StructUnit object and substitute the functional group</span>
+        <span class="c1"># of type `fg`.</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
+
+        <span class="c1"># Make a mathematical graph of the molecule. Useful for finding</span>
+        <span class="c1"># the separation between nodes (atoms).</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">graph</span><span class="p">()</span>
+        <span class="c1"># Each bonder atom can act as either a start or end node on a</span>
+        <span class="c1"># graph. Find the seperations between such nodes. If the</span>
+        <span class="c1"># separation is 3 this means there is only one nodes between</span>
+        <span class="c1"># the start and end nodes. As a result the functional groups</span>
+        <span class="c1"># are separated by 1 atom and should be deleted.</span>
+        <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Removing </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="optimize_folder"><a class="viewcode-back" href="../../mtk.export_tools.html#mtk.export_tools.optimize_folder">[docs]</a><span class="k">def</span> <span class="nf">optimize_folder</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                    <span class="n">confs</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">eq_time</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">sim_time</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Optimizes all molecules found in `folder`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    folder : str</span>
+<span class="sd">        The full path of the folder which holds .mol file for</span>
+<span class="sd">        optimization.</span>
+
+<span class="sd">    macromodel_path : str</span>
+<span class="sd">        The full path to the Schrodinger home directory.</span>
+
+<span class="sd">    timeout : float (default=False)</span>
+<span class="sd">        The seconds before the optimization is cancalled. If ``False``</span>
+<span class="sd">        it will run until completion.</span>
+
+<span class="sd">    temp : float (default=300)</span>
+<span class="sd">        The temperature (K) of the MD conformer search.</span>
+
+<span class="sd">    confs : float (default=500)</span>
+<span class="sd">        The number of conformers sampled during the MD conformer search.</span>
+
+<span class="sd">    eq_time : float (default=50)</span>
+<span class="sd">        The equilibration time before the MD conformer search.</span>
+
+<span class="sd">    sim_time : float (default=500)</span>
+<span class="sd">        The simulation time of the MD conformer search.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># First make a list holding all macromolecule objects to be</span>
+    <span class="c1"># optimized. Because the objects need to be initialized from a .mol</span>
+    <span class="c1"># file a StructUnit instance not a MacroMolecule instance is used.</span>
+    <span class="c1"># minimal = True, because it is all that is needed to run</span>
+    <span class="c1"># optimziations, plus you want to avoid doing functional group</span>
+    <span class="c1"># substitutions.</span>
+
+    <span class="c1"># Get the names of all the .mol files.</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span>
+             <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.mol&quot;</span><span class="p">)]</span>
+    <span class="c1"># Make the StructUnit instances from the .mol files.</span>
+    <span class="n">macro_mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">StructUnit</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span>  <span class="n">names</span><span class="p">]</span>
+
+    <span class="c1"># Run the opt.</span>
+    <span class="n">md_opt</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">macromodel_md_opt</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="o">=</span><span class="n">macromodel_path</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">confs</span><span class="o">=</span><span class="n">confs</span><span class="p">,</span>
+        <span class="n">eq_time</span><span class="o">=</span><span class="n">eq_time</span><span class="p">,</span> <span class="n">sim_time</span><span class="o">=</span><span class="n">sim_time</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">md_opt</span><span class="p">,</span> <span class="n">macro_mols</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="redump_pop"><a class="viewcode-back" href="../../mtk.export_tools.html#mtk.export_tools.redump_pop">[docs]</a><span class="k">def</span> <span class="nf">redump_pop</span><span class="p">(</span><span class="o">*</span><span class="n">folders</span><span class="p">,</span> <span class="n">ofolder</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collects all the MacroMolecule .dmp files and creates a dump file.</span>
+
+<span class="sd">    The function creates a population of all the .dmp files in `folders`</span>
+<span class="sd">    and creates a dump file of that population. The dump file gets</span>
+<span class="sd">    placed in `ofolder`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *folders : str</span>
+<span class="sd">        The full paths of the folders holding the MacroMolecule .dmp</span>
+<span class="sd">        files.</span>
+
+<span class="sd">    ofolder : str</span>
+<span class="sd">        The folder in which the dump file should be placed.</span>
+
+<span class="sd">    cls : MacroMolecule child class</span>
+<span class="sd">        The class to which the .dmp files belong.</span>
+
+<span class="sd">    Modifies</span>
+<span class="sd">    --------</span>
+<span class="sd">    ofolder/pop_dump</span>
+<span class="sd">        Creates a file holding the population dump at this location.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Collect the paths of all the .dmp files.</span>
+    <span class="n">cage_paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">folders</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;*.dmp&#39;</span><span class="p">)</span>
+        <span class="n">cage_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+    <span class="c1"># Make a population holding all the MacroMolecule objects and dump</span>
+    <span class="c1"># it.</span>
+    <span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cage_paths</span><span class="p">))</span>
+    <span class="n">pop</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ofolder</span><span class="p">,</span> <span class="s1">&#39;pop_dump&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="substruct_prune"><a class="viewcode-back" href="../../mtk.export_tools.html#mtk.export_tools.substruct_prune">[docs]</a><span class="k">def</span> <span class="nf">substruct_prune</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">substruct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deletes molecules which contain the substructure `substruct`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    folder : str</span>
+<span class="sd">        The full path of the folder from which the files are checked for</span>
+<span class="sd">        the substructure and deleted.</span>
+
+<span class="sd">    ext : str</span>
+<span class="sd">        The extension of the structure files in `folder`. All other</span>
+<span class="sd">        files are skipped.</span>
+
+<span class="sd">    substruct : str</span>
+<span class="sd">        The SMARTS string of the substructure, which if present in a</span>
+<span class="sd">        molecule causes it to be deleted from `folder`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create a rdkit molecule of the substructure.</span>
+    <span class="n">substruct_mol</span> <span class="o">=</span> <span class="n">chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">substruct</span><span class="p">)</span>
+    <span class="c1"># Go through all the files in `ifolder` if they do not have the</span>
+    <span class="c1"># file extension `ext` go to the next file.</span>
+    <span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Make a molecule from the file.</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">minimal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Check for substruct and delete as appropriate.</span>
+        <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">HasSubstructMatch</span><span class="p">(</span><span class="n">substruct_mol</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Removing </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
