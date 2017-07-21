@@ -18,17 +18,6 @@ helper functions are private, ie their names start with a leading
 underscore.
 
 """
-import logging
-from rdkit import RDLogger
-
-RDLogger.logger().setLevel(RDLogger.CRITICAL)
-
-
-# Get the loggers.
-rootlogger = logging.getLogger()
-logger = logging.getLogger(__name__)
-
-
 
 class Exit:
     def __init__(self, func_data):
@@ -120,11 +109,6 @@ class Exit:
         if len(progress.populations) > num:
             gens = {frozenset(sorted(progress.populations[-x],reverse=True)[:top_members]) for x in range(1, num)}
             unique_gens = len(gens)
-            log_gens = []
-            for pop in gens:
-                for m in pop:
-                    log_gens.append(m.name)
-            logger.info('LEN UNIQUE GENS {}: {}'.format(unique_gens, log_gens))
             if unique_gens == 1:
                 return True
             else:
