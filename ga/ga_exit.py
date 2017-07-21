@@ -18,15 +18,25 @@ helper functions are private, ie their names start with a leading
 underscore.
 
 """
+import logging
+from rdkit import RDLogger
+
+RDLogger.logger().setLevel(RDLogger.CRITICAL)
+
+
+# Get the loggers.
+rootlogger = logging.getLogger()
+logger = logging.getLogger(__name__)
+
 
 
 class Exit:
     def __init__(self, func_data):
         self.func_data = func_data
 
-    def __call__(self, pop):
+    def __call__(self, pop, progress):
         func = getattr(self, self.func_data.name)
-        return func(pop, **self.func_data.params)
+        return func(pop, progress, **self.func_data.params)
 
     def mol_present(self, population, mol):
         """
@@ -52,7 +62,7 @@ class Exit:
             return True
         return False
 
-    def mol_name_present(self, population, mol_name):
+    def mol_name_present(self, population, progress, mol_name):
         """
         Returns ``True`` if molecule with `name` in `population`.
 
@@ -60,6 +70,9 @@ class Exit:
         ----------
         population : Population
             The GA population.
+
+        progress : :class:`Population`
+            population where each subpopulation is a previous generation.
 
         mol_name : str
             The name of a molecule.
@@ -74,13 +87,61 @@ class Exit:
 
         return any(x.name == mol_name for x in population)
 
-    def no_exit(self, population):
+    def fitness_plateau(self, population, progress, num, top_members = 1):
+        """
+        Returns ``True`` if fitness function of the top x candidates shows no
+        improvement for n generations.
+
+        Parameters
+        ----------
+        population : Population
+            The GA population.
+
+        progress : :class:`Population`
+            Population where each subpopulation is a previous generation.
+
+        num : int
+            Number of generations for which no the x top cages did not change.
+            This number is defined by the user.
+
+        top_members : int
+            Number of members that are going to be considered for the plateau
+            analysis. This number needs to be smaller than the total population.
+            The user can define this number, which defaults to 1.
+
+        Returns
+        -------
+        bool
+            ``True`` if the fitness function shows no improvement for n
+            generations.
+
+        """
+        # Check that the GA has run for more than num generations
+        if len(progress.populations) > num:
+            gens = {frozenset(sorted(progress.populations[-x],reverse=True)[:top_members]) for x in range(1, num)}
+            unique_gens = len(gens)
+            log_gens = []
+            for pop in gens:
+                for m in pop:
+                    log_gens.append(m.name)
+            logger.info('LEN UNIQUE GENS {}: {}'.format(unique_gens, log_gens))
+            if unique_gens == 1:
+                return True
+            else:
+                return False
+
+        return False
+
+    def no_exit(self, population, progress):
         """
         Returns ``False``.
 
         Useful when you never want the GA to exit prematurely. This is
         used by default when no exit function is defined in the input
         file.
+
+        progress : :class:`Population`
+            population where each subpopulation is a previous generation.
 
         Returns
         -------

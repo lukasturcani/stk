@@ -754,9 +754,14 @@ class Population:
         with open(path, 'w') as f:
             json.dump(self.tolist(), f, indent=4)
 
-    def exit(self):
+    def exit(self, progress):
         """
         Checks the if the exit criterion has been satisfied.
+
+        Parameters
+        ----------
+        progress : :class:`Population`
+            population where each subpopulation is a previous generation.
 
         Returns
         -------
@@ -766,7 +771,7 @@ class Population:
 
         """
 
-        return self.ga_tools.exit(self)
+        return self.ga_tools.exit(self, progress)
 
     @classmethod
     def fromlist(cls, pop_list, load_names=True):
