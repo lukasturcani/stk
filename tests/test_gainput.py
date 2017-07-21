@@ -46,7 +46,7 @@ def test_init():
     assert i.num_crossovers == 2
     assert i.pop_size == 5
     assert i.comparison_pops == ['pop1', 'pop2']
-    assert i.exit_func == {'NAME': 'no_exit'}
+    assert i.exit_func == {'NAME': 'fitness_plateau', 'num': 5}
     assert i.databases == ['1', '2']
 
 
@@ -59,7 +59,7 @@ def test_crosser():
 
 def test_exiter():
     exiter = i.exiter()
-    assert exiter.func_data == FunctionData('no_exit')
+    assert exiter.func_data == FunctionData('fitness_plateau')
 
 
 def test_fitnessor():
