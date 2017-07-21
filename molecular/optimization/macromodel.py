@@ -393,6 +393,7 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
             'gradient' : float (default = 0.05)
                 The gradient at which optimization is stopped.
 
+
     Modifies
     --------
     macro_mol.mol
@@ -414,7 +415,7 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
                'eq_time': 10,
                'sim_time': 200,
                'max_iter': 2500,
-               'gradient': 0.05
+               'gradient': 0.05,
               }
 
     vals.update(settings)
