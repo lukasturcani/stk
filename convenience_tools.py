@@ -266,39 +266,54 @@ class MAEExtractor:
         The full path of the .mae file holding the extracted lowest
         energy conformer.
 
+    extract_conformers : int
+        Number of final conformers that are going to be extracted. The
+        number is defined by the user. Default value is 1.
+
     """
 
-    def __init__(self, file):
+    def __init__(self, file, n=1):
 
         name, ext = os.path.splitext(file)
         self.maegz_path = name + '-out.maegz'
         self.maegz_to_mae()
-        self.extract_conformer()
+        self.extract_conformers(n)
 
-    def extract_conformer(self):
+
+    def extract_conformers(self, n):
         """
-        Creates a .mae file holding the lowest energy conformer.
+        Creates a series of .mae files holding the lowest energy conformers.
 
         """
 
-        # Get the id of the lowest energy conformer.
-        num = self.lowest_energy_conformer()
 
-        # Get the structure block corresponding to the lowest energy
-        # conformer.
-        content = self.content.split("f_m_ct")
-        new_mae = "f_m_ct".join([content[0], content[num]])
+        for i in range(n):
+            # Get the id of the lowest energy conformer.
+            num = self.lowest_energy_conformers(n)[i]
+            # Get the structure block corresponding to the lowest energy
+            # conformer.
+            content = self.content.split("f_m_ct")
+            new_mae = "f_m_ct".join([content[0], content[num]])
 
-        # Write the structure block in its own .mae file, named after
-        # conformer extracted.
-        new_name = self.mae_path.replace(
-                                    '.mae',
-                                    '_EXTRACTED_{}.mae'.format(num))
-        with open(new_name, 'w') as mae_file:
-            mae_file.write(new_mae)
+            # Write the structure block in its own .mae file, named after
+            # conformer extracted.
+            if n == 1:
+                # Write the structure block in its own .mae file, named after
+                # conformer extracted.
+                new_name = self.mae_path.replace(
+                                            '.mae',
+                                            'EXTRACTED_{}.mae'.format(num))
+            else:
+                new_name = self.mae_path.replace(
+                               '.mae', 'EXTRACTED_{}_conf{}.mae'.format(num, i))
 
-        # Save the path of the newly created file.
-        self.path = new_name
+            with open(new_name, 'w') as mae_file:
+                mae_file.write(new_mae)
+
+            if i == 0:
+                # Save the path of the newly created file.
+                self.path = new_name
+
 
     def extract_energy(self, block):
         """
@@ -312,9 +327,11 @@ class MAEExtractor:
             if 'r_mmod_Potential_Energy' in name:
                 return float(value)
 
-    def lowest_energy_conformer(self):
+    def lowest_energy_conformers(self, n):
         """
         Returns the id of the lowest energy conformer in the .mae file.
+
+        Parameters
 
         """
 
@@ -342,10 +359,12 @@ class MAEExtractor:
 
             prev_block.append(block)
 
-        e, conf = min(self.energies)
-        self.min_energy = e
-        # Return the id of the lowst energy conformer.
-        return conf
+        # Selecting the lowest energy n conformers
+        confs = sorted(self.energies)[:n]
+        # Define the energy of the lowest energy conformer
+        self.min_energy = confs[0][0]
+        # Return a list with id of the lowest energy conformers.
+        return [x[1] for x in confs]
 
     def maegz_to_mae(self):
         """

@@ -75,10 +75,12 @@ def fitness_epp(pop, plot_name=False,
         axes = plt.gca()
         plt.xlabel(xlabel)
         plt.ylabel('Fitness')
-        plt.scatter(xvals, maxs, color='red', marker='o', label='max')
-        plt.scatter(xvals, means,
-                    color='green', marker='o', label='mean')
-        plt.scatter(xvals, mins, color='blue', marker='o', label='min')
+        plt.scatter(xvals, maxs, color='red', marker='o', label='max',
+                    alpha=0.5)
+        plt.scatter(xvals, means, color='green', marker='o', label='mean',
+                    alpha=0.5)
+        plt.scatter(xvals, mins, color='blue', marker='o', label='min',
+                    alpha=0.5)
         frame = (min(mins) + max(maxs))/50
         axes.set_ylim([min(mins) - frame, max(maxs) + frame])
 

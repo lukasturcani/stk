@@ -1,4 +1,4 @@
-"""
+l"""
 Defines functions which cut short the GA if a criterion is reached.
 
 These functions are useful when debugging and testing the convergence
@@ -78,8 +78,8 @@ class Exit:
 
     def fitness_plateau(self, population, progress, num, top_members = 1):
         """
-        Returns ``True`` if fitness function of the top x candidates shows no
-        improvement for n generations.
+        Returns ``True`` if fitness function of the top x candidates do not
+        change for n generations.
 
         Parameters
         ----------
@@ -90,13 +90,13 @@ class Exit:
             Population where each subpopulation is a previous generation.
 
         num : int
-            Number of generations for which no the x top cages did not change.
-            This number is defined by the user.
+            Number of generations for which no the x top members did not
+            change. This number is defined by the user.
 
         top_members : int
             Number of members that are going to be considered for the plateau
-            analysis. This number needs to be smaller than the total population.
-            The user can define this number, which defaults to 1.
+            analysis. This number needs to be smaller than the total
+            population. The user can define this number, which defaults to 1.
 
         Returns
         -------
