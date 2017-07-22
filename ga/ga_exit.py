@@ -1,4 +1,4 @@
-l"""
+"""
 Defines functions which cut short the GA if a criterion is reached.
 
 These functions are useful when debugging and testing the convergence
@@ -18,6 +18,7 @@ helper functions are private, ie their names start with a leading
 underscore.
 
 """
+
 
 class Exit:
     def __init__(self, func_data):
