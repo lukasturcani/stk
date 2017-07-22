@@ -305,7 +305,7 @@ class MAEExtractor:
                                             'EXTRACTED_{}.mae'.format(num))
             else:
                 new_name = self.mae_path.replace(
-                               '.mae', 'EXTRACTED_{}_conf{}.mae'.format(num, i))
+                              '.mae', 'EXTRACTED_{}_conf_{}.mae'.format(num, i))
 
             with open(new_name, 'w') as mae_file:
                 mae_file.write(new_mae)
