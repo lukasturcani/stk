@@ -106,6 +106,10 @@ functional_groups = [
                                   "[$(*[Br])]",
                                   "[$([Br]*)]"),
 
+                FGInfo("iodine", "*[I]",
+                                 "[$(*[I])]",
+                                 "[$([I]*)]"),
+
                 # This amine functional group only deletes one of the
                 # hydrogen atoms when a bond is formed.
                 FGInfo("amine2",
