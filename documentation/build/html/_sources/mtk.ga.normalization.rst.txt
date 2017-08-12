@@ -1,5 +1,5 @@
-mtk\.ga\.normalization module
-=============================
+mtk.ga.normalization module
+===========================
 
 .. automodule:: mtk.ga.normalization
     :members:

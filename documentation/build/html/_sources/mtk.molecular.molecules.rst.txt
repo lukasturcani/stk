@@ -1,5 +1,5 @@
-mtk\.molecular\.molecules module
-================================
+mtk.molecular.molecules module
+==============================
 
 .. automodule:: mtk.molecular.molecules
     :members:

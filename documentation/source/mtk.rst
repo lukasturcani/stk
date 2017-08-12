@@ -1,11 +1,6 @@
 mtk package
 ===========
 
-.. automodule:: mtk
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -22,3 +17,10 @@ Submodules
    mtk.convenience_tools
    mtk.export_tools
 
+Module contents
+---------------
+
+.. automodule:: mtk
+    :members:
+    :undoc-members:
+    :show-inheritance:

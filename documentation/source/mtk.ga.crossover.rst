@@ -1,5 +1,5 @@
-mtk\.ga\.crossover module
-=========================
+mtk.ga.crossover module
+=======================
 
 .. automodule:: mtk.ga.crossover
     :members:
