@@ -95,8 +95,8 @@ class Population:
         used.
 
     ga_tools : :class:`.GATools`
-        An instance of the ``GATools`` class. Calls to preform GA
-        operations on the ``Population`` instance are delegated
+        An instance of the :class:`.GATools` class. Calls to preform EA
+        operations on the :class:`.Population` instance are delegated
         to this attribute.
 
     """
