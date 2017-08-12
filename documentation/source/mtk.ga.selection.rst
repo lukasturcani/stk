@@ -1,5 +1,5 @@
-mtk\.ga\.selection module
-=========================
+mtk.ga.selection module
+=======================
 
 .. automodule:: mtk.ga.selection
     :members:

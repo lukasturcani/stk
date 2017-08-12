@@ -1,5 +1,5 @@
-mtk\.ga\.ga\_exit module
-========================
+mtk.ga.ga_exit module
+=====================
 
 .. automodule:: mtk.ga.ga_exit
     :members:

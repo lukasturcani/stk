@@ -1,5 +1,5 @@
-mtk\.ga\.ga\_tools module
-=========================
+mtk.ga.ga_tools module
+======================
 
 .. automodule:: mtk.ga.ga_tools
     :members:

@@ -154,7 +154,7 @@
 <span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="k">import</span> <span class="n">euclidean</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Topology</span>
-<span class="kn">from</span> <span class="nn">...convenience_tools</span> <span class="k">import</span> <span class="n">PeriodicBond</span>
+<span class="kn">from</span> <span class="nn">...convenience_tools</span> <span class="k">import</span> <span class="n">PeriodicBond</span><span class="p">,</span> <span class="n">add_fragment_props</span>
 
 
 <div class="viewcode-block" id="is_bonder"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.periodic.html#mtk.molecular.topologies.periodic.is_bonder">[docs]</a><span class="k">def</span> <span class="nf">is_bonder</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">):</span>
@@ -349,12 +349,18 @@
         <span class="n">bb1</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="n">bb1</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="n">bb1</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="c1"># Add to the macromolecule.</span>
+        <span class="n">add_fragment_props</span><span class="p">(</span><span class="n">bb1</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                           <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bb1</span><span class="p">),</span>
+                           <span class="mi">0</span><span class="p">)</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb1</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
         <span class="c1"># Place and set orientation of the second building block.</span>
         <span class="n">bb2</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">bb2</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="n">bb2</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="n">bb2</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="c1"># Add to the macromolecule.</span>
+        <span class="n">add_fragment_props</span><span class="p">(</span><span class="n">bb2</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                           <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bb2</span><span class="p">),</span>
+                           <span class="mi">0</span><span class="p">)</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb2</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
         <span class="c1"># Add the bonder_ids prematurely for this topology. Needed for</span>
         <span class="c1"># making supercells - see join_mols(). Using the ``super``</span>

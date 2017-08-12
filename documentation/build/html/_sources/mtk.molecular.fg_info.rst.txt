@@ -1,5 +1,5 @@
-mtk\.molecular\.fg\_info module
-===============================
+mtk.molecular.fg_info module
+============================
 
 .. automodule:: mtk.molecular.fg_info
     :members:

@@ -1,10 +1,5 @@
-mtk\.ga package
-===============
-
-.. automodule:: mtk.ga
-    :members:
-    :undoc-members:
-    :show-inheritance:
+mtk.ga package
+==============
 
 Submodules
 ----------
@@ -22,3 +17,10 @@ Submodules
    mtk.ga.population
    mtk.ga.selection
 
+Module contents
+---------------
+
+.. automodule:: mtk.ga
+    :members:
+    :undoc-members:
+    :show-inheritance:
