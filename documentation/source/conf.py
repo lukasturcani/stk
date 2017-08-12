@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # mtk documentation build configuration file, created by
-# sphinx-quickstart on Thu Jul 13 12:30:29 2017.
+# sphinx-quickstart on Sat Aug 12 21:23:16 2017.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -32,6 +32,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
+    'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon']

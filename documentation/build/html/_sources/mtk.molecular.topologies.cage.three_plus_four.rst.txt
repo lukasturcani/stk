@@ -1,5 +1,5 @@
-mtk\.molecular\.topologies\.cage\.three\_plus\_four module
-==========================================================
+mtk.molecular.topologies.cage.three_plus_four module
+====================================================
 
 .. automodule:: mtk.molecular.topologies.cage.three_plus_four
     :members:
