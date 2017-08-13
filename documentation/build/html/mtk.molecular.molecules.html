@@ -86,7 +86,13 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">mtk.molecular.molecules module</a></li>
+<li><a class="reference internal" href="#">mtk.molecular.molecules module</a><ul>
+<li><a class="reference internal" href="#a-more-detailed-description-of-macromolecular-assembly">A more detailed description of macromolecular assembly.</a><ul>
+<li><a class="reference internal" href="#extending-mmea-adding-new-macromolecules">Extending MMEA: Adding new macromolecules.</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
             
@@ -150,8 +156,2044 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="mtk-molecular-molecules-module">
-<h1>mtk.molecular.molecules module<a class="headerlink" href="#mtk-molecular-molecules-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mtk.molecular.molecules">
+<span id="mtk-molecular-molecules-module"></span><h1>mtk.molecular.molecules module<a class="headerlink" href="#module-mtk.molecular.molecules" title="Permalink to this headline">¶</a></h1>
+<p>Defines classes which describe molecules.</p>
+<p>There are a couple of major classes defined here. The most important
+ones are <code class="docutils literal"><span class="pre">StructUnit</span></code> and <code class="docutils literal"><span class="pre">MacroMolecule</span></code>. Here is an overview of
+their role/interaction. This is followed by a step-by-step guide to
+macromolecular assembly.</p>
+<p>The StructUnit class represents the monomers that make up
+macromolecules. These are commonly refered to as <code class="docutils literal"><span class="pre">building</span> <span class="pre">blocks</span></code> in
+the documentation. The class holds information concerning only a single
+building block molecule. Such as the number of atoms and bonds it may
+have. It also has information about the functoinal groups present on
+the building block molecule (FGInfo class defined in
+/mmea/classes/fg_info.py). The class also allows manipulation of the
+lone building block molecule, such as rotations and translations.</p>
+<p>The StructUnit class should be inherited as necessary. For example
+StructUnit2 adds manipulations relavant to molecules with 2 functional
+groups. The StructUnit3 class adds manipulations relavant to 3 or more
+functional groups. If you have a monomer which needs specific
+information or manipulations, give it its own class.</p>
+<p>The MacroMolecule class represents an assembled macromolecule. It
+requires at least 2 basic pieces of information: which monomers are
+used to assemble the macromolecule and what is the topology/structure
+of the macromolecule.</p>
+<p>The MacroMolecule holds in its <cite>building_blocks</cite> attribute a list of
+StructUnit (or derived classes) instances. These represent the
+monomers which form the macromolecule. Only one StructUnit instance per
+monomer type is held. So if 4 of one type of monomer and 2 of another
+type of monomer form a macromolecule, only 2 StructUnit instances are
+in <cite>building_blocks</cite>.</p>
+<p>In its <cite>topology</cite> attribute a MacroMolecule holds a <code class="docutils literal"><span class="pre">Topology`</span> <span class="pre">child</span>
+<span class="pre">class</span> <span class="pre">instance.</span> <span class="pre">This</span> <span class="pre">instance</span> <span class="pre">is</span> <span class="pre">responsible</span> <span class="pre">for</span> <span class="pre">assembling</span> <span class="pre">the</span>
+<span class="pre">macromolecule</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">building</span> <span class="pre">blocks.</span> <span class="pre">The</span> <span class="pre">building</span> <span class="pre">should</span> <span class="pre">happen</span> <span class="pre">in</span>
+<span class="pre">the</span> <span class="pre">``__init__()</span></code> method of the MacroMolecule via the Topology
+instance’s <code class="docutils literal"><span class="pre">build()</span></code> method. The <code class="docutils literal"><span class="pre">build()</span></code> method should place the
+assembled macromoleclue in the <cite>mol</cite> attribute of the MacroMolecule
+instance.</p>
+<p>The StructUnit class labels atoms in the functional groups of the
+building blocks as either <code class="docutils literal"><span class="pre">bonder</span></code> or <code class="docutils literal"><span class="pre">del</span></code> (see its
+documentation). This tells the Topology intance which atoms form bonds
+and which are removed during assembly.</p>
+<p>No need to worry about the metaclasses.</p>
+<div class="section" id="a-more-detailed-description-of-macromolecular-assembly">
+<h2>A more detailed description of macromolecular assembly.<a class="headerlink" href="#a-more-detailed-description-of-macromolecular-assembly" title="Permalink to this headline">¶</a></h2>
+<p>This is a step-by-step guide of how macromolecular assembly is carried
+out and what the classes do.</p>
+<p>First you create StructUnit instances of the building blocks which make
+up the macromolecule:</p>
+<blockquote>
+<div>bb = StructUnit(‘/path/to/struct/file.mol2’)</div></blockquote>
+<p>The StructUnit instances are initialized using paths of molecular
+structure files. (Initializing a StructUnit automatically completes
+steps 1 to 4.)</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Place an rdkit instance of the molecule into the <cite>mol</cite> attribute
+of the StructUnit.</li>
+<li>Scan the path of the structure file for the name of a functional
+group. (Alternatively the name of a functional group can be
+supplied to the initializer).</li>
+</ol>
+</div></blockquote>
+<p>What functional groups are recognized by MMEA?
+The module <code class="docutils literal"><span class="pre">/mmea/molecular_tools/fg_info.py</span></code> defines a class called
+FGInfo. Instances of this class are held in the list
+<cite>functional_groups</cite> (also in that module). If you put an FGInfo
+instance in that list, the functional group will be recognized.</p>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li>Place the FGInfo instance of the functional group in the
+<cite>func_grp</cite> attribute of the StructUnit.</li>
+<li>Using the FGInfo instance, tag atoms in the building block as
+either ‘bonder’ or ‘del’. ‘bonder’ signifies that the atoms form
+a bond during macromolecular assembly, while ‘del’ means they
+are deleted.</li>
+<li>Give the StructUnit instances and the class representing the
+topology to the macromolecule’s initializer.</li>
+<li>Make an instance of the topology class in the MacroMolecule</li>
+</ol>
+<blockquote>
+<div>initializer.</div></blockquote>
+<ol class="arabic simple" start="7">
+<li>Run the <code class="docutils literal"><span class="pre">build()</span></code> of the instance generated in 6) during
+MacroMolecule initialization.</li>
+<li>The <code class="docutils literal"><span class="pre">build()</span></code> will vary depending on the Topology class.
+However the basic structure is the same (steps 9 - 11).</li>
+<li>Combine the StructUnit rdkit molecules into a single rdkit
+molecule. Make sure that the building blocks are arranged in the
+shape of the macromolecule. All the manipulations available via
+the StructUnit class are useful here to make sure all the
+building blocks are orientated correctly when forming the
+macromolecule.</li>
+<li>Create bonds between all the disjoined building block
+molecules. This is where the tagging done by StructUnit is
+needed.</li>
+<li>Delete all the atoms tagged for deletion.</li>
+</ol>
+</div></blockquote>
+<p>After all this you should have a rdkit instance of the macromolecule
+which should be placed in the <cite>mol</cite> attribute of the MacroMolecule
+intance.</p>
+<div class="section" id="extending-mmea-adding-new-macromolecules">
+<h3>Extending MMEA: Adding new macromolecules.<a class="headerlink" href="#extending-mmea-adding-new-macromolecules" title="Permalink to this headline">¶</a></h3>
+<p>To add new macromolecules create a new class which inherits
+<code class="docutils literal"><span class="pre">MacroMolecule</span></code>. The initializer of <code class="docutils literal"><span class="pre">MacroMolecule</span></code> can be used or
+a custom one may be used. However, all the same attributes must be
+defined.</p>
+<p>If you’re adding a new class of macromolecules, it quite likely you
+want to add a new <code class="docutils literal"><span class="pre">Topology</span></code> class. See the docstring of the
+/mmea/molecular_tools/topologies/base.py module for guidance on adding
+these. The topology class does the assembly of the macromolecule from
+the building blocks. The assembled macromolecule instance is then held
+by the macromolecular class.</p>
+<dl class="class">
+<dt id="mtk.molecular.molecules.Cached">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Cached</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
+<p>A metaclass for creating classes which create cached instances.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.CachedStructUnit">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">CachedStructUnit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#CachedStructUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.CachedStructUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
+<p>A metaclass for making StructUnit create cached instances.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.Cage">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
+<p>Used to represent molecular cages.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Cage.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.Cage.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Cage.window_difference">
+<code class="descname">window_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage.window_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage.window_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total difference in all window sizes.</p>
+<p>Every combination of windows is considered and all the
+size differences are summed and returned. Only
+differences between windows of the same type are
+considered.</p>
+<p>Consider a triangular-based prism cage topology. Such a
+cage will have triangular windows and square windows. You
+only want to compare the triangulars with other
+triangular windows and squares only with other squares.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><em>float</em> – The total difference of window size when considering
+every combination of windows of the same type.</li>
+<li><strong>None</strong> (<em>NoneType</em>) – If not all windows were found.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">WindowError</span></code> – When the number of found windows is less than the
+number of expected windows. Likely due to a collapsed
+cage.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Cage.windows">
+<code class="descname">windows</code><a class="headerlink" href="#mtk.molecular.molecules.Cage.windows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns window sizes found by pyWindow.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>None</strong> (<em>NoneType</em>) – If the function for finding windows and their sizes
+found fewer than the required number of windows or
+if it failed for some other reason.</li>
+<li><em>list of floats</em> – Each float in the list represents the size of a
+window in the cage. If the window finding function
+found more than the expected number of windows, only
+the largest n windows are returned. Where n is the
+number of expected windows.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.MacroMolecule">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.Molecule</span></code></a></p>
+<p>A class for assembled macromolecules.</p>
+<p>The goal of this class is to represent an individual used by the
+GA. As such, it holds attributes that are to be expected for this
+purpose. Mainly, it has a fitness value stored in its <cite>fitness</cite>
+attribute and a genetic code - as defined by its <cite>building_blocks</cite>
+and  <cite>topology</cite> attributes. If a change is made to either of these
+attributes, they should describe a different macromolecule. On the
+other hand, the same attributes should always describe the same
+macromolecule.</p>
+<p>Because of this, as well as the computational cost associated with
+macromolecule initialization, instances of this class are cached.
+This means that providing the same arguments to the initializer
+will not build a different instance with the same attribute values.
+It will yield the original instance, retrieved from memory.</p>
+<p>To prevent bloating this class, any information that can be
+categorized is. For example, storing information that concerns
+building blocks <code class="docutils literal"><span class="pre">in</span> <span class="pre">a</span> <span class="pre">vacuum</span></code> is stored in <code class="docutils literal"><span class="pre">StructUnit</span></code>
+instances. Equally, manipulations of such data is also performed by
+those instances. Similarly, anything to do with topolgy should be
+held by a <code class="docutils literal"><span class="pre">Topology</span></code> instance in the topology attribute. There is
+a notable exception to this however. This happens when retrieving
+topological information directly from rdkit molecule instances
+of the macromolecule. Examples include the information about atomic
+coordinates, which can be access with the <code class="docutils literal"><span class="pre">atom_coords()</span></code> method.</p>
+<p>It should also be noted that only a single copy of each
+<code class="docutils literal"><span class="pre">StructUnit</span></code> instance representing a specific building block
+needs to be held. How many of such building blocks are need to
+assemble the molecule is the handled by the <code class="docutils literal"><span class="pre">Topology</span></code> class.</p>
+<p>This class is not intended to be used directly but should be
+inherited by subclasses representing specific macromolecules. The
+<code class="docutils literal"><span class="pre">Cage</span></code> and <code class="docutils literal"><span class="pre">Polymer</span></code> classes are examples of this. Any
+information or methods that apply generally to all macromolecules
+should be defined within this class while specific non-general data
+should be included in derived classes.</p>
+<p>This class also supports comparison operations, these act on the
+fitness value assiciated with a macromolecule. Comparison
+operations not explicitly defined are included via the
+<code class="docutils literal"><span class="pre">total_ordering</span></code> decorator. For other operations and methods
+supported by this class examine the rest of the class definition.</p>
+<p>Finally, a word of caution. The equality operator <code class="docutils literal"><span class="pre">==</span></code> compares
+fitness values. This means two macromolecules, made from different
+building blocks, can compare equal if they happen to have the same
+fitness. The operator is not to be used to check if one
+macromolecule is the same structurally as another. To do this check
+use the <code class="docutils literal"><span class="pre">same()</span></code> method. This method may be overwritten in
+derived classes, as necessary. In addition the <code class="docutils literal"><span class="pre">is</span></code> operator is
+implemented as is default in Python. It compares whether two
+objects are in the same location in memory. Because the
+<code class="docutils literal"><span class="pre">MacroMolecule</span></code> class is cached the <code class="docutils literal"><span class="pre">is</span></code> operator could in
+principle be used instead of the <cite>same</cite> method (including in
+derived classes). However, this is not intended use and is not
+guaranteed to work in future implementations. If caching stops
+being implemented such code would break.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.building_blocks">
+<code class="descname">building_blocks</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.building_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of <code class="docutils literal"><span class="pre">StructUnit</span></code> instances – This attribute holds <code class="docutils literal"><span class="pre">StructUnit</span></code> instances which represent
+the monomers forming the macromolecule. Only one <code class="docutils literal"><span class="pre">StructUnit</span></code>
+instance is needed per building block, even if multiples of a
+building block join up to form the macromolecule</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.bb_counter">
+<code class="descname">bb_counter</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.bb_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Counter</em> – A counter keeping track of how much of each building block is
+used to form the macromolecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.topology">
+<code class="descname">topology</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.topology" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Topology</em> – An object of a class derived from <code class="docutils literal"><span class="pre">Topology</span></code>. It
+assembles the marcormolecule from the building_blocks.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.mol">
+<code class="descname">mol</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.mol" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>rdkit.Chem.rdchem.Mol</em> – An rdkit instance representing the macromolecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.inchi">
+<code class="descname">inchi</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.inchi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The InChI of the molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.optimized">
+<code class="descname">optimized</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.optimized" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = False)</em> – This is a flag to indicate if a molecule has been previously
+optimized. Optimization functions set this flag to <code class="docutils literal"><span class="pre">True</span></code>
+after an optimization.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.energy">
+<code class="descname">energy</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Energy</em> – This attribute handles information about the energy of the
+instance. See the documentation of <code class="docutils literal"><span class="pre">Energy</span></code> to see what is
+available.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.fitness">
+<code class="descname">fitness</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float (default = None)</em> – The fitness value of the macromolecule, as determined by the
+chosen fitness functions together with any normalization
+functions. Fitness functions do not place values into this
+attribute directly.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.unscaled_fitness">
+<code class="descname">unscaled_fitness</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.unscaled_fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The dictionary hold the name of a fitness function as the
+key and the value it calculated for unscaled_fitness as the
+value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.progress_params">
+<code class="descname">progress_params</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.progress_params" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict (default = {})</em> – Holds the fitness parameters which the GA should track to make
+progress plots. The key is the name of a fitness function.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.bonds_made">
+<code class="descname">bonds_made</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.bonds_made" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The number of bonds created during assembly.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.bonder_ids">
+<code class="descname">bonder_ids</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.bonder_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of ints</em> – The ids of atoms which have bonds added during assembly. This
+list is sorted from lowest to highest id.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.fg_ids">
+<code class="descname">fg_ids</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.fg_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>set of ints</em> – The ids of atoms which were parth of the functional group of
+the building blocks.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.key">
+<code class="descname">key</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.key" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>MacroMolKey</em> – The key used for caching the molecule. Necessary for
+<cite>update_cache</cite> to work. This attribute is assigned by the
+<cite>__call__()</cite> method of the <code class="docutils literal"><span class="pre">Cached</span></code> metaclass.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.name">
+<code class="descname">name</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = “”)</em> – A name which can be optionally given to the molcule for easy
+identification.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.note">
+<code class="descname">note</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.note" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = “”)</em> – A note or comment about the molecule. Purely optional but can
+be useful for labelling and debugging.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.fragments">
+<code class="descname">fragments</code><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.fragments" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – The key in this dictionary is a tuple of form (int, int). The
+first int is the index of a building block within
+<cite>building_blocks</cite>. The second int indentifies a molecule of
+that building block. For example, (1, 3) identifies the 4th
+molecule of type building_blocks[1] to be added to the
+macromolecule during assembly.</p>
+<p>The value in the dictionary is a set of ints. These hold the
+atom ids belonging to a particular molecule before assembly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.bb_distortion">
+<code class="descname">bb_distortion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.bb_distortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.bb_distortion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rmsd difference of building blocks before and after assembly.</p>
+<p>The function looks at each building block in the macromolecule
+and calculates the rmsd between the “free” verson and the one
+present in the macromolecule. The mean of these rmsds is
+returned.</p>
+<p>Atoms which form the functional group of the building blocks
+and hydrogens are excluded from the calculation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The mean rmsd of the macromole’s building blocks to their
+“free” counterparts.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.building_block_cores">
+<code class="descname">building_block_cores</code><span class="sig-paren">(</span><em>bb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.building_block_cores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.building_block_cores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields the “cores” of a building block molecule.</p>
+<p>The structure of the cores are representative of how they are
+found in the macromolecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bb</strong> (<em>int</em>) – The index of a building block molecule within
+<cite>building_blocks</cite>. The cores of this molecule are yielded.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>rdkit.Chem.rdchem.Mol</em> – The core of a building block molecule, as found in the
+macromolecule.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.MacroMolecule.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="mtk.molecular.molecules.MacroMolecule.gen_key">
+<em class="property">static </em><code class="descname">gen_key</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.gen_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.gen_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the key for caching the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>building_blocks</strong> (<em>iterable of StructUnit instances</em>) – The building blocks used to make the macromolecule.</li>
+<li><strong>topology</strong> (<a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><em>Topology</em></a>) – The topology used to make the macromolecule.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The key used for caching the macromolecule.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.json">
+<code class="descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a JSON representation of the object.</p>
+<p>The representation has the following form:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>{</dt>
+<dd><p class="first">‘class’ : ‘Polymer’,
+‘mol_block’ : ‘A string holding the V3000 mol</p>
+<blockquote>
+<div>block of the molecule.’</div></blockquote>
+<p>‘building_blocks’ : {bb1.json(), bb2.json()}
+‘topology’ : ‘Copolymer(repeating_unit=’AB’)’
+‘unscaled_fitness’ : {‘fitness_func1’ : fitness1,</p>
+<blockquote>
+<div>‘fitness_func2’ : fitness2},</div></blockquote>
+<p class="last">‘note’ : ‘A nice molecule.’,
+‘name’ : ‘Poly-Benzene’</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dict which represents the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.save_ids">
+<code class="descname">save_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.save_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.save_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates <cite>bonder_ids</cite> and <cite>fg_ids</cite> attributes.</p>
+<dl class="docutils">
+<dt>bonder_ids <span class="classifier-delimiter">:</span> <span class="classifier">list of ints</span></dt>
+<dd>All molecules tagged ‘bonder’ have their ids added to this
+list.</dd>
+<dt>fg_ids <span class="classifier-delimiter">:</span> <span class="classifier">set of ints</span></dt>
+<dd>All molecules tagged ‘fg’ have their ids add to
+this set.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.molecular.molecules.MacroMolecule.testing_init">
+<em class="property">classmethod </em><code class="descname">testing_init</code><span class="sig-paren">(</span><em>bb1</em>, <em>bb2</em>, <em>topology</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.testing_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.testing_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.update_cache">
+<code class="descname">update_cache</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.update_cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.update_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set cached molecule with same ‘key’ to have equal attributes.</p>
+<p>When an instance of <code class="docutils literal"><span class="pre">MacroMolecule</span></code> is first created it
+is cached. Using multiprocessing to perform optimizations or
+calculate fitness returns modified copies of the cached
+molecules. In order to ensure that the cached molecules have
+their attributes updated to the values of the copies, this
+method must be run on the copies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.update_fragments">
+<code class="descname">update_fragments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.update_fragments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.update_fragments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves rdkit atom properties in <cite>fragments</cite>.</p>
+<p>The properties saved are ‘bb_index’ and ‘mol_index’. These
+should be added to the atoms by the <code class="docutils literal"><span class="pre">place_mols()</span></code> function
+during <code class="docutils literal"><span class="pre">build()</span></code>.</p>
+<dl class="docutils">
+<dt>fragments <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>The dictionary is updated with the data from the ‘bb_index’
+and ‘mol_index’ properties.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.Molecule">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The most basic class representing molecules.</p>
+<p>This class defines defines the operations which any class
+describing molecules should inherit or may find useful. Examples of
+such classes are <code class="docutils literal"><span class="pre">StructUnit</span></code> and <code class="docutils literal"><span class="pre">MacroMolecule</span></code>. This calls
+is unlikely to be useful as in and of itself. It lacks an
+<cite>__init__()</cite> method because it does not need one. Child classes
+should define it.</p>
+<p>It is assumed that child classes will have some basic attributes.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Molecule.mol">
+<code class="descname">mol</code><a class="headerlink" href="#mtk.molecular.molecules.Molecule.mol" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>rdkit.Chem.rdchem.Mol</em> – A rdkit molecule instance representing the molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Molecule.inchi">
+<code class="descname">inchi</code><a class="headerlink" href="#mtk.molecular.molecules.Molecule.inchi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The InChI of the molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Molecule.energy">
+<code class="descname">energy</code><a class="headerlink" href="#mtk.molecular.molecules.Molecule.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Energy</em> – An instance of the <code class="docutils literal"><span class="pre">Energy</span></code> class. It handles all things
+energy.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Molecule.optimized">
+<code class="descname">optimized</code><a class="headerlink" href="#mtk.molecular.molecules.Molecule.optimized" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – Indicates whether a Molecule has been passed through an
+optimization function or not.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Molecule.name">
+<code class="descname">name</code><a class="headerlink" href="#mtk.molecular.molecules.Molecule.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = “”)</em> – A name which can be optionally given to the molecule for easy
+identification.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Molecule.note">
+<code class="descname">note</code><a class="headerlink" href="#mtk.molecular.molecules.Molecule.note" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = “”)</em> – A note or comment about the molecule. Purely optional but can
+be useful for labelling and debugging.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.all_atom_coords">
+<code class="descname">all_atom_coords</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.all_atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.all_atom_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields the coordinates of atoms in <cite>mol</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><p class="first"><em>tuple of (int, numpy.array)</em> – The <code class="docutils literal"><span class="pre">int</span></code> represents the atom id of the atom whose
+coordinates are being yielded.</p>
+<p class="last">The array represents the position.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.atom_coords">
+<code class="descname">atom_coords</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return coordinates of an atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom_id</strong> (<em>int</em>) – The id of the atom whose coordinates are desired.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An array holding the x, y and z coordinates of the atom.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.atom_distance">
+<code class="descname">atom_distance</code><span class="sig-paren">(</span><em>atom1_id</em>, <em>atom2_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the distance between 2 atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom1_id</strong> (<em>int</em>) – The id of the first atom.</li>
+<li><strong>atom2_id</strong> (<em>int</em>) – The id of the second atom.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The distance between the first and second atoms.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">scipy.double</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.atom_symbol">
+<code class="descname">atom_symbol</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the symbol of the atom with id <cite>atom_id</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom_id</strong> (<em>int</em>) – The id number of the atom.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The atomic symbol of the atom.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.cavity_size">
+<code class="descname">cavity_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.cavity_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the diameter of the molecule’s cavity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The diameter of the molecule’s cavity in Angstroms.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.center_of_mass">
+<code class="descname">center_of_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the centre of mass of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">An array holding the coordinates of the center of mass.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Center_of_mass">https://en.wikipedia.org/wiki/Center_of_mass</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.centroid">
+<code class="descname">centroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the centroid of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A numpy array holding the position of the centroid.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.dump">
+<code class="descname">dump</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a JSON dict of the molecule to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The full path of the file to which the JSON dict of the
+molecule can be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.molecular.molecules.Molecule.fromdict">
+<em class="property">classmethod </em><code class="descname">fromdict</code><span class="sig-paren">(</span><em>json_dict</em>, <em>optimized=True</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.fromdict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.fromdict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Molecule from a JSON dict.</p>
+<p>The Molecule returned has the class specified in the JSON
+dictionary, not <code class="docutils literal"><span class="pre">Molecule</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>json_dict</strong> (<em>dict</em>) – A dict holding the JSON representation of a molecule.</li>
+<li><strong>optimized</strong> (<em>bool</em>) – The value passed to the loaded molecules <cite>optimized</cite>
+attribute.</li>
+<li><strong>load_names</strong> (<em>bool</em><em> (</em><em>default = True</em><em>)</em>) – If <code class="docutils literal"><span class="pre">True</span></code> then the <cite>name</cite> attribute stored in the JSON
+objects is loaded. If <code class="docutils literal"><span class="pre">False</span></code> then it’s not.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The molecule represented by <cite>json_dict</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule">Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.graph">
+<code class="descname">graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a mathematical graph representing the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A graph where the nodes are the ids of the atoms in the
+rdkit molecule and the edges are the bonds.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">networkx.Graph</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">inchi</code></dt>
+<dd><p>Returns the InChi of the molecule.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.molecular.molecules.Molecule.load">
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>optimized=True</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Molecule from a JSON file.</p>
+<p>The Molecule returned has the class specified in the JSON
+dictionary, not <code class="docutils literal"><span class="pre">Molecule</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) – The full path holding a JSON representation to a molecule.</li>
+<li><strong>optimized</strong> (<em>bool</em><em> (</em><em>default = True</em><em>)</em>) – The value passed to the loaded molecules <cite>optimized</cite>
+attribute.</li>
+<li><strong>load_names</strong> (<em>bool</em><em> (</em><em>default = True</em><em>)</em>) – If <code class="docutils literal"><span class="pre">True</span></code> then the <cite>name</cite> attribute stored in the JSON
+objects is loaded. If <code class="docutils literal"><span class="pre">False</span></code> then it’s not.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The molecule held in <cite>path</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule">Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.max_diameter">
+<code class="descname">max_diameter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.max_diameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.max_diameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the largest distance between 2 atoms in the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The float represents the largest inter-atomic distance on
+the molecule. The ints are the ids of the atoms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple of form (float, int, int)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.mdl_mol_block">
+<code class="descname">mdl_mol_block</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.mdl_mol_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.mdl_mol_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a V3000 mol block of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The V3000 mol block representing the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.position_matrix">
+<code class="descname">position_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the position of all atoms in the as a matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The matrix is 3 x n. Each column holds the x, y and z
+coordinates of an atom. The index of the column corresponds
+to the id of the atom in the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.rotate">
+<code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
+<p>The rotation occurs about the molecular centroid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>theta</strong> (<em>float</em>) – The size of the rotation in radians.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The axis about which the rotation happens.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The positions of all the atoms are changed due to the
+rotation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.same">
+<code class="descname">same</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.same"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.same" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if <cite>other</cite> has the same molecular structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instance you are checking has
+the same structure.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns <code class="docutils literal"><span class="pre">True</span></code> if the building blocks and topology
+of the macromolecules are the same.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.save_bonders">
+<code class="descname">save_bonders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.save_bonders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.save_bonders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds atoms tagged with ‘bonder’ to <cite>bonder_ids</cite>.</p>
+<dl class="docutils">
+<dt>bonder_ids <span class="classifier-delimiter">:</span> <span class="classifier">list of ints</span></dt>
+<dd>Updates this set with the ids of atoms tagged ‘bonder’.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.set_orientation">
+<code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_orientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
+<p>Note: The difference between this method and
+<code class="xref py py-meth docutils literal"><span class="pre">StructUnit._set_orientation2()</span></code> is about which point the
+rotation occurs: centroid of entire molecule versus centroid of
+bonder atoms, respectively.</p>
+<p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
+applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
+the molecule. The rotation occurs about the centroid of the
+molecule.</p>
+<p>For example, if the <cite>start</cite> and <cite>end</cite> vectors
+are 45 degrees apart, a 45 degree rotation will be applied to
+the molecule. The rotation will be along the appropriate
+direction.</p>
+<p>The great thing about this method is that you as long as you
+can associate a gemotric feature of the molecule with a vector,
+then the molecule can be roatated so that this vector is
+aligned with <cite>end</cite>. The defined vector can be virtually
+anything. This means that any geomteric feature of the molecule
+can be easily aligned with any arbitrary axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>start</strong> (<em>numpy.array</em>) – A vector which is to be rotated so that it transforms to
+the <cite>end</cite> vector.</li>
+<li><strong>end</strong> (<em>numpy.array</em>) – This array holds the vector, onto which <cite>start</cite> is rotated.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
+rotation of the molecule about its centroid.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule in <cite>mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">rdkit.Chem.rdchem.Mol</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.set_position">
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the centroid of the molecule to <cite>position</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>position</strong> (<em>numpy.array</em>) – This array holds the position on which the centroid of the
+molecule should be placed.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed so that its
+centroid falls on <cite>position</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule with the centroid placed at <cite>position</cite>.
+This is the same instance as that in <cite>mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">rdkit.Chem.rdchem.Mol</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.set_position_from_matrix">
+<code class="descname">set_position_from_matrix</code><span class="sig-paren">(</span><em>pos_mat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_position_from_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_position_from_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set atomic positions of the molecule to those in <cite>pos_mat</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pos_mat</strong> (<em>numpy.array</em>) – <p>The matrix holds the coordinates on which the atoms of the
+molecule should be placed.</p>
+<p>The dimensions are 3 x n. Each column of <cite>pos_mat</cite>
+represents the coordinates of a single atom. The 1st column
+sets the coordinate of the atom with id of 0. The next
+column sets the coordinate of the atom with id 1, and so
+on.</p>
+</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The coordinates of atoms in this molecule are set to the
+coordinates in <cite>pos_mat</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.shift">
+<code class="descname">shift</code><span class="sig-paren">(</span><em>shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.shift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shifts the coordinates of all atoms.</p>
+<p>This does not modify the molecule. A modified copy is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>shift</strong> (<em>numpy.array</em>) – A numpy array holding the value of the shift along each
+axis.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A copy of the molecule where the coordinates have been
+shifted by <cite>shift</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.update_from_mae">
+<code class="descname">update_from_mae</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_from_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_from_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates molecular structure to match an .mae file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mae_path</strong> (<em>str</em>) – The full path of the .mae file from which the structure
+should be updated.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The rdkit molecule held in this attribute is changed so
+that it matches the moleclue held in the .mae file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.update_stereochemistry">
+<code class="descname">update_stereochemistry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_stereochemistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_stereochemistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates stereochemistry tags on <cite>mol</cite> attribute.</p>
+<dl class="docutils">
+<dt>mol <span class="classifier-delimiter">:</span> <span class="classifier">rdkit.Chem.rdchem.Mol</span></dt>
+<dd>The ‘_CIPCode’ property on each atom of the rkdit molecule
+is updated to reflect the R or S configuration of the atom
+in the current geometry.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a molecular structure file of the molecule.</p>
+<p>This bypasses the need to use rdkit’s writing functions, which
+have issues with macromolecules due to poor ring finding and
+sanitization issues.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.Periodic">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Periodic</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
+<p>Used to represent periodic structures.</p>
+<p>This class is essentially the same as <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>,
+with additional methods and attributes relevant to periodic
+materials being added.</p>
+<p>The method <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule.save_ids" title="mtk.molecular.molecules.MacroMolecule.save_ids"><code class="xref py py-meth docutils literal"><span class="pre">save_ids()</span></code></a> is extended to take
+into account ids of atoms in perdiodic bonds.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Periodic.terminator_coords">
+<code class="descname">terminator_coords</code><a class="headerlink" href="#mtk.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the id of a bonder
+atom. The value is a <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x,
+y and z coordinates of a deleter atom attached to the bonder.
+The coordinates are relative to the bonder atom.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Periodic.periodic_bonds">
+<code class="descname">periodic_bonds</code><a class="headerlink" href="#mtk.molecular.molecules.Periodic.periodic_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.PeriodicBond" title="mtk.convenience_tools.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> – When periodic topologies are assembled, periodic bonds
+do not get added to the rdkit molecule in the
+<a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule.mol" title="mtk.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute. Instead,
+<a class="reference internal" href="mtk.molecular.topologies.periodic.html#mtk.molecular.topologies.periodic.PeriodicLattice.join_mols" title="mtk.molecular.topologies.periodic.PeriodicLattice.join_mols"><code class="xref py py-meth docutils literal"><span class="pre">join_mols()</span></code></a> adds
+<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.PeriodicBond" title="mtk.convenience_tools.PeriodicBond"><code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code></a> instances representing the bonds into
+this list.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Periodic._ids_updated">
+<code class="descname">_ids_updated</code><a class="headerlink" href="#mtk.molecular.molecules.Periodic._ids_updated" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – Indicates whether periodic bond ids have been updated already
+by <a class="reference internal" href="#mtk.molecular.molecules.Periodic.save_ids" title="mtk.molecular.molecules.Periodic.save_ids"><code class="xref py py-meth docutils literal"><span class="pre">save_ids()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Periodic.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.Periodic.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Periodic.island">
+<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>terminator=1</em>, <em>bond_type='1'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a terminated supercell.</p>
+<p>Terminated means that the periodic bonds are replaced with
+bonds to terminating atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, holding the number of unit cells
+in the x, y and z directions used to make the supercell.</li>
+<li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The atomic number of the terminating atoms added to the
+supercell.</li>
+<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The bond type of bonds to terminating atoms. Valid options
+include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code> and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An rdkit molecule of the island.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Periodic.save_ids">
+<code class="descname">save_ids</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.save_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.save_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Periodic.write_gulp_input">
+<code class="descname">write_gulp_input</code><span class="sig-paren">(</span><em>path, keywords, cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.write_gulp_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.write_gulp_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a GULP input file of the unit cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The <cite>path</cite> of the file to which the molecule should be
+written.</li>
+<li><strong>keywords</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The keywords to be placed on the first line of the input
+file.</li>
+<li><strong>cell_fix</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – A 6 member list holding the fix parameters for the unit
+cell.</li>
+<li><strong>atom_fix</strong> (<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – An n by 3 array where n is the number of atoms in the
+unit cell. Each row has the fix parameters for a given
+atom.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.Polymer">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Polymer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
+<p>Used to represent polymers.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.Polymer.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.Polymer.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.StructUnit">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.Molecule</span></code></a></p>
+<p>Represents the building blocks of macromolecules examined by MMEA.</p>
+<p><code class="docutils literal"><span class="pre">Building</span> <span class="pre">blocks</span></code> in this case refers to the smallest molecular
+units of the assembled molecules examined by MMEA.</p>
+<p>The goal of this class is to conveniently store information about,
+and perform operations on, single instances of macromolecular
+building blocks.</p>
+<p>An important part of this class is labelling atoms in functional
+groups.</p>
+<p>This class should only deal with issues that concern a single
+building block in and of itself.</p>
+<dl class="docutils">
+<dt>init_funcs <span class="classifier-delimiter">:</span> <span class="classifier">dict of {str</span> <span class="classifier-delimiter">:</span> <span class="classifier">function}</span></dt>
+<dd>This dictionary holds the various functions which can be used
+to initialize rdkit molecules and pairs them with the
+appropriate file extension.</dd>
+</dl>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.file">
+<code class="descname">file</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.file" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The full path of the molecular structure file holding the
+molecule. The supported file formats are the keys in the
+<cite>init_funcs</cite> dictionary. As long as a file of one of these
+types is provided, MMEA will automatically use the correct
+initialization function.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.mol">
+<code class="descname">mol</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.mol" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>rdkit.Chem.rdchem.Mol</em> – The rdkit instance of the molecule held in <cite>file</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.inchi">
+<code class="descname">inchi</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.inchi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The InChI of the molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.func_grp">
+<code class="descname">func_grp</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.func_grp" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FGInfo</em> – The <code class="docutils literal"><span class="pre">FGInfo</span></code> instance holding information about the
+functional group which will react when the building block
+assembles to form macromolecules.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.bonder_ids">
+<code class="descname">bonder_ids</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of ints</em> – A list holding the atom ids of the atoms which form bonds
+during macromolecular assembly.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.energy">
+<code class="descname">energy</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Energy</em> – This attribute handles information about the energy of the
+instance. See the documentation of <code class="docutils literal"><span class="pre">Energy</span></code> to see what is
+available.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.optimized">
+<code class="descname">optimized</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.optimized" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool (default = False)</em> – A flag to monitor whether an optimization has been performed on
+the molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.key">
+<code class="descname">key</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.key" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>MacroMolKey</em> – The key used for caching the molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.name">
+<code class="descname">name</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = “”)</em> – A name which can be optionally given to the molcule for easy
+identification.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.note">
+<code class="descname">note</code><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.note" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str (default = “”)</em> – A note or comment about the molecule. Purely optional but can
+be useful for labelling and debugging.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.all_bonder_distances">
+<code class="descname">all_bonder_distances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.all_bonder_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.all_bonder_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield distances between all pairs of bonder atoms.</p>
+<p>All distances are only yielded once. This means that if the
+distance between atoms with ids <code class="docutils literal"><span class="pre">1</span></code> and <code class="docutils literal"><span class="pre">2``is</span> <span class="pre">yielded</span> <span class="pre">as</span>
+<span class="pre">``(12.4,</span> <span class="pre">1,</span> <span class="pre">2)</span></code>, no tuple of the form <code class="docutils literal"><span class="pre">(12.4,</span> <span class="pre">2,</span> <span class="pre">1)</span></code> will be
+yielded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of form (int, int, scipy.double)</em> – The ints represnt the atoms ids and the double is their
+distance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.bonder_centroid">
+<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the centroid of the bonder atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A numpy array holding the midpoint of the bonder atoms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.bonder_direction_vectors">
+<code class="descname">bonder_direction_vectors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_direction_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_direction_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields the direction vectors between all pairs of bonder atoms.</p>
+<p>The yielded vector is normalized. If a pair (1,2) is yielded,
+the pair (2,1) will not be.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of (int, int, numpy.array)</em> – The ints in the tuple represent the ids of the start and
+end atoms, respectively. The array is the direciont vector
+running between the atomic positions.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.bonder_position_matrix">
+<code class="descname">bonder_position_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_position_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a matrix holding the positions of bonder atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The matrix is 3 x n. Each column holds the x, y and z
+coordinates of a bonder atom. The index of the column
+corresponds to the index of the atom id in <cite>bonder_ids</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector">
+<code class="descname">centroid_centroid_dir_vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.centroid_centroid_dir_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the direction vector between the 2 molecular centroids.</p>
+<p>The first molecule centroid is the centroid of the entire
+molecule. The second molecular centroid is the centroid of the
+bonder atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The normalized direction vector running from the centroid
+of the bonder atoms to the molecular centroid.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.core">
+<code class="descname">core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the molecule with no H or functional group atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The “core” of the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">rdkit.Chem.rdchem.Mol</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.functional_group_atoms">
+<code class="descname">functional_group_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.functional_group_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.functional_group_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a container of atom ids of atoms in functional groups.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The form of the returned tuple is:
+((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with
+ids 1 to 9 are in a functional group and that the atoms 1,
+2 and 3 all form one functional group together. So do 4, 5
+and 5 and so on.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple of tuples of ints</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="mtk.molecular.molecules.StructUnit.gen_key">
+<em class="property">static </em><code class="descname">gen_key</code><span class="sig-paren">(</span><em>rdkit_mol</em>, <em>functional_group</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.gen_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.gen_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the key for caching the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rdkit_mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – An rdkit instance of the molecule.</li>
+<li><strong>functional_group</strong> (<em>str</em>) – The name of the functional group being used to make
+macromolecules.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The key used for caching the molecule.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit.init_funcs">
+<code class="descname">init_funcs</code><em class="property"> = {'.mol': functools.partial(&lt;Boost.Python.function object at 0x30a0b20&gt;, removeHs=False, sanitize=False), '.mae': &lt;function mol_from_mae_file&gt;, '.mol2': functools.partial(&lt;Boost.Python.function object at 0x30a0ab0&gt;, removeHs=False, sanitize=False), '.sdf': functools.partial(&lt;Boost.Python.function object at 0x30a0b20&gt;, removeHs=False, sanitize=False), '.pdb': functools.partial(&lt;Boost.Python.function object at 0x30a4290&gt;, removeHs=False, sanitize=False)}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.molecular.molecules.StructUnit.init_random">
+<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>db</em>, <em>fg=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.init_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Picks a random file from <cite>db</cite> to initialize from.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db</strong> (<em>str</em>) – A path to a database of molecular files.</li>
+<li><strong>fg</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of a functional group which the molecules in <cite>db</cite>
+have. By default it is assumed the name is present in the
+path of the files.</li>
+<li><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name to be given to the created molecule.</li>
+<li><strong>note</strong> (<em>str</em><em>, </em><em>optional</em>) – A note to be given to the created molecule.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>StructUnit</em> – A random molecule from <cite>db</cite>.</li>
+<li><strong>None</strong> (<em>NoneType</em>) – If no files in <cite>db</cite> could be initialized from.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.is_core_atom">
+<code class="descname">is_core_atom</code><span class="sig-paren">(</span><em>atomid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.is_core_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.is_core_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal"><span class="pre">True</span></code> if atom is not H or part of the fg.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atomid</strong> (<em>int</em>) – The id of the atom being queried.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Indicates whether the atom with <cite>atomid</cite> is part of the
+core.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.json">
+<code class="descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a JSON representation of the object.</p>
+<p>The representation has the following form:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>{</dt>
+<dd><p class="first">‘class’ : ‘StructUnit’,
+‘mol_block’ : ‘A string holding the V3000 mol</p>
+<blockquote>
+<div>block of the molecule.’,</div></blockquote>
+<p class="last">‘note’ : ‘This molecule is nice.’,
+‘name’ : ‘benzene’</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dict which represents the molecule.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.minimize_theta">
+<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.minimize_theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate mol to minimize angle between <cite>v1</cite> and <cite>v2</cite>.</p>
+<p>The rotation is done about the vector <cite>axis</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>v1</strong> (<em>numpy.array</em>) – The vector which is rotated.</li>
+<li><strong>v2</strong> (<em>numpy.array</em>) – The vector which is stationary.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
+<li><strong>centroid</strong> (<em>numpy.array</em>) – The position vector at the center of the rotation.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to the
+rotation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.molecular.molecules.StructUnit.rdkit_init">
+<em class="property">classmethod </em><code class="descname">rdkit_init</code><span class="sig-paren">(</span><em>mol</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.rdkit_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.rdkit_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses an <code class="docutils literal"><span class="pre">rdkit</span></code> molecule for initialization.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – An <code class="docutils literal"><span class="pre">rdkit</span></code> molecule used for initialization.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A <a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> of <cite>mol</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.rotate2">
+<code class="descname">rotate2</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.rotate2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.rotate2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
+<p>The rotation occurs about the centroid of the bonder atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>theta</strong> (<em>float</em>) – The size of the rotation in radians.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The axis about which rotation happens.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The atoms in this molecule are rotated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.set_bonder_centroid">
+<code class="descname">set_bonder_centroid</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.set_bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.set_bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the molecule so that the bonder centroid is on <cite>position</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>position</strong> (<em>numpy.array</em>) – A numpy array holding the desired the position. It holds
+the x, y and z coordinates, respectively.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The position of the molecule in this rdkit instance is
+changed, as described in this docstring.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule after it has been shifted. The same
+instance as held in <cite>mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">rdkit.Chem.rdchem.Mol</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.similar_molecules">
+<code class="descname">similar_molecules</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.similar_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.similar_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns molecules from <cite>database</cite> ordered by similarity.</p>
+<p>The most similar molecule is at index 0.</p>
+<p>This method uses the Morgan fingerprints of radius 4 to
+evaluate how similar the molecules in <cite>database</cite> are.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>database</strong> (<em>str</em>) – The full path of the database from which the molecules are
+checked for similarity.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The float is the similarity of a given molecule in the
+database to <cite>mol</cite> while the str is the full path of the
+structure file of that molecule.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of tuples of form (float, str)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.molecular.molecules.StructUnit.smarts_init">
+<em class="property">classmethod </em><code class="descname">smarts_init</code><span class="sig-paren">(</span><em>smarts</em>, <em>functional_group=None</em>, <em>note=''</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.smarts_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.smarts_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize from a SMARTS string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>smiles</strong> (<em>str</em>) – A SMARTS string of the molecule.</li>
+<li><strong>functional_group</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of the functional group which is to have atoms
+tagged. If no functional group is provided to this
+parameter, no tagging is done.</li>
+<li><strong>note</strong> (<em>str</em><em> (</em><em>default = &quot;&quot;</em><em>)</em>) – A note or comment about the molecule.</li>
+<li><strong>name</strong> (<em>str</em><em> (</em><em>default = &quot;&quot;</em><em>)</em>) – A name which can be optionally given to the molcule for
+easy identification.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The StructUnit instance of the molecule represented by
+<cite>smarts</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit">StructUnit</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.tag_atoms">
+<code class="descname">tag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.tag_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.tag_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds bonding and deletion tags to atoms.</p>
+<p>All atoms which form the functional group of the molecule have
+the property ‘fg’ added. Its value is set to the name of the
+functional group.</p>
+<p>The atoms which form bonds during assembly have the property
+called ‘bonder’ added and set to ‘1’. Atoms which are deleted
+during reactions have the property ‘del’ set to ‘1’.</p>
+<dl class="docutils">
+<dt>mol <span class="classifier-delimiter">:</span> <span class="classifier">rdkit.Chem.rdchem.Mol</span></dt>
+<dd>The atoms in this rdkit molecule have the properties ‘fg’,
+‘bonder’ and ‘del’ added, in accordance with the docstring.</dd>
+<dt>bonder_ids <span class="classifier-delimiter">:</span> <span class="classifier">set of ints</span></dt>
+<dd>Adds the ids of bonder atoms to this list.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit.untag_atoms">
+<code class="descname">untag_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.untag_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.untag_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the tags added by <code class="docutils literal"><span class="pre">tag_atoms()</span></code>.</p>
+<dl class="docutils">
+<dt>mol <span class="classifier-delimiter">:</span> <span class="classifier">rdkit.Chem.rdchem.Mol</span></dt>
+<dd>The atoms in this rdkit molecule have the properties
+‘fg’, ‘bonder’ and ‘del’ removed.</dd>
+<dt>bonder_ids <span class="classifier-delimiter">:</span> <span class="classifier">list of ints</span></dt>
+<dd>This list is set to [].</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.StructUnit2">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit2</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.StructUnit</span></code></a></p>
+<p>Represents building blocks with 2 functional groups.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit2.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit2.minimize_theta2">
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.minimize_theta2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates molecule about <cite>axis</cite> to minimze theta with <cite>vector</cite>.</p>
+<p>The molecule is rotated about <cite>axis</cite> passing through the bonder
+centroid. It is rotated so that the vector between the bonder
+and molecular centroids lies on the same plane as <cite>vector</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>vector</strong> (<em>numpy.array</em>) – The vector to which the distance should be minimized.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The direction vector along which the rotation happens.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
+rotation of the molecule about the centroid of the bonder
+atoms.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit2.set_orientation2">
+<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.set_orientation2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the molecule so that bonder atoms lie on <cite>end</cite>.</p>
+<p>The molecule is rotated about the centroid of the bonder atoms.
+It is rotated so that the direction vector running between the
+2 bonder atoms is aligned with the vector <cite>end</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>end</strong> (<em>numpy.array</em>) – The vector with which the molecule’s bonder atoms should be
+aligned.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
+rotation of the molecule about the centroid of the bonder
+atoms.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule in <cite>mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">rdkit.Chem.rdchem.Mol</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.molecules.StructUnit3">
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit3</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.StructUnit</span></code></a></p>
+<p>Represents building blocks with 3 functional groups.</p>
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit3.bonder_plane">
+<code class="descname">bonder_plane</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.bonder_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.bonder_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the coefficients of the plane formed by bonder atoms.</p>
+<p>A plane is defined by the scalar plane equation,</p>
+<blockquote>
+<div>ax + by + cz = d.</div></blockquote>
+<p>This method returns the a, b, c and d coefficients of this
+equation for the plane formed by the bonder atoms. The
+coefficents a, b and c decribe the normal vector to the plane.
+The coefficent d is found by substituting these coefficients
+along with the x, y and z variables in the scalar equation and
+solving for d. The variables x, y and z are substituted by the
+coordinate of some point on the plane. For example, the
+position of one of the bonder atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This array has the form [a, b, c, d] and represents the
+scalar equation of the plane formed by the bonder atoms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://tinyurl.com/okpqv6">https://tinyurl.com/okpqv6</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit3.bonder_plane_normal">
+<code class="descname">bonder_plane_normal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.bonder_plane_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.bonder_plane_normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the normal vector to the plane formed by bonder atoms.</p>
+<p>The normal of the plane is defined such that it goes in the
+direction toward the centroid of the molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A unit vector which describes the normal to the plane of
+the bonder atoms.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.molecules.StructUnit3.cache">
+<code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.cache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit3.minimize_theta2">
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>atom</em>, <em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.minimize_theta2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates molecule to minimize angle between <cite>atom</cite> and <cite>vector</cite>.</p>
+<p>The rotation is done about <cite>axis</cite> and is centered on the
+bonder centroid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom</strong> (<em>int</em>) – The id of atom which is to have angle minimized.</li>
+<li><strong>vector</strong> (<em>numpy.array</em>) – A vector with which the angle is minimized.</li>
+<li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The rdkit molecule is changed to reflect the rotation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.StructUnit3.set_orientation2">
+<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.set_orientation2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotates the molecule so the plane normal is aligned with <cite>end</cite>.</p>
+<p>Here <code class="docutils literal"><span class="pre">plane</span> <span class="pre">normal</span></code> referes to the normal of the plane formed
+by the bonder atoms in the substituted molecule. The molecule
+is rotated about the centroid of the bonder atoms. The rotation
+results in the normal of their plane being aligned with <cite>end</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>end</strong> (<em>numpy.array</em>) – The vector with which the normal of plane of bonder atoms
+shoould be aligned.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
+rotation of the molecule about the centroid of the bonder
+atoms.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The rdkit molecule in <cite>mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">rdkit.Chem.rdchem.Mol</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 

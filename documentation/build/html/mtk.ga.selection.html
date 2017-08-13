@@ -86,7 +86,10 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">mtk.ga.selection module</a></li>
+<li><a class="reference internal" href="#">mtk.ga.selection module</a><ul>
+<li><a class="reference internal" href="#extending-mmea-adding-selection-functions">Extending MMEA: Adding selection functions</a></li>
+</ul>
+</li>
 </ul>
 </div>
             
@@ -150,8 +153,421 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="mtk-ga-selection-module">
-<h1>mtk.ga.selection module<a class="headerlink" href="#mtk-ga-selection-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mtk.ga.selection">
+<span id="mtk-ga-selection-module"></span><h1>mtk.ga.selection module<a class="headerlink" href="#module-mtk.ga.selection" title="Permalink to this headline">¶</a></h1>
+<p>Defines selection functions via the <code class="docutils literal"><span class="pre">Selection</span></code> class.</p>
+<div class="section" id="extending-mmea-adding-selection-functions">
+<h2>Extending MMEA: Adding selection functions<a class="headerlink" href="#extending-mmea-adding-selection-functions" title="Permalink to this headline">¶</a></h2>
+<p>If a new selection operation is to be added to MMEA it should be added
+as a method in the <code class="docutils literal"><span class="pre">Selection</span></code> class defined in this module. The only
+requirements are that the first argument is <code class="docutils literal"><span class="pre">population</span></code> (excluding
+any <code class="docutils literal"><span class="pre">self</span></code> or <code class="docutils literal"><span class="pre">cls</span></code> arguments) and that the method is decorated
+wit the <code class="docutils literal"><span class="pre">mutation()</span></code>, <code class="docutils literal"><span class="pre">crossover()</span></code> and <code class="docutils literal"><span class="pre">generational()</span></code>
+decorators to highlight which selection it is to be used for. The
+decorators can be applied in sequence for functions which are suitable
+for more than one kind of selection.</p>
+<p>The naming requirement of <code class="docutils literal"><span class="pre">population</span></code> exists to help users identify
+which arguments are handled automatically by MMEA and which they need
+to defined in the input file. The convention is that if the mutation
+function takes an argument called  <code class="docutils literal"><span class="pre">macro_mol</span></code> it does not have to be
+specified in the input file.</p>
+<p>All selection functios should be defined as generators, which yield an
+member of <code class="docutils literal"><span class="pre">population</span></code>. In the case of crossover selection functions,
+they should yield a tuple of selected parents. Generational selection
+function should yield each molecule at most once.</p>
+<p>If the selection function does not fit neatly into a single function
+make sure that any helper functions are private, ie that their names
+start with a leading underscore.</p>
+<dl class="class">
+<dt id="mtk.ga.selection.Selection">
+<em class="property">class </em><code class="descclassname">mtk.ga.selection.</code><code class="descname">Selection</code><span class="sig-paren">(</span><em>generational</em>, <em>crossover</em>, <em>mutation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class for handling all types of selection in the GA.</p>
+<p>Whenever a population needs to have some of its members selected
+for the creation of a parent pool or the next generation it
+delegates this task to an instance of this class. The population
+has this instance stored in its <cite>ga_tools.selection</cite> attribute.</p>
+<p>Each instance of this class supports being called. What a calling
+an instance does depends on the arguments the instance was
+initialized with and what arguments were supplied during the call.
+In all cases the call implements returns a generator. This
+generator yields members of a <code class="docutils literal"><span class="pre">Population</span></code> instance in accordance
+to some selection algorithm.</p>
+<p>Initialization of this class takes the names of methods defined in
+this class (as strings) and saves them into the instance’s
+<cite>generational</cite>, <cite>crossover</cite> and <cite>mutation</cite> attributes. These
+attributes should therefore always hold the names of methods that
+are to be used for the given purpose - such as generational
+selection. The selection algorithms should be written as methods
+within this class.</p>
+<p>When an instance of this class is called it requires a
+<code class="docutils literal"><span class="pre">Population</span></code> instance and a string to be provided as arguments.
+The <code class="docutils literal"><span class="pre">Population</span></code> instance is the population which is to have some
+of its members selected. Consider the following code:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pop</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;generational&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal"><span class="pre">pop</span></code> is a <code class="docutils literal"><span class="pre">Population</span></code> instance with a <cite>ga_tools</cite>
+attribute, which holds an initialized <code class="docutils literal"><span class="pre">Selection</span></code> instance.</p>
+<p>The method <cite>select</cite> invoked in the code automatically provides
+the instance <code class="docutils literal"><span class="pre">pop</span></code> to the <code class="docutils literal"><span class="pre">Selection</span></code> instance it contains. The
+function then calls the <code class="docutils literal"><span class="pre">Selection</span></code> instance. This means that
+each time <cite>select</cite> is called on a population, the <code class="docutils literal"><span class="pre">Selection</span></code>
+instance will always act on the population it is held by. Different
+populations can use different selection algorithms by holding
+different <code class="docutils literal"><span class="pre">Selection</span></code> instances. Alternatively, they can perform
+the same selection algorithms by sharing a <code class="docutils literal"><span class="pre">Selection</span></code> instance.</p>
+<p>The string provided to the <cite>select</cite> method is passed all the way
+down to the <code class="docutils literal"><span class="pre">Selection</span></code> instance being called. This is the second
+argument a <code class="docutils literal"><span class="pre">Selection</span></code> instance requires when it is being called.
+This is the string <cite>generational</cite> in the code example above. The
+string should be the name of one of the attributes of the
+<code class="docutils literal"><span class="pre">Selection</span></code> class. This means that ‘generational’, ‘crossover’
+and ‘mutation’ are valid strings at the time of this being written.
+If more types of selection are added to MMEA, an attribute named
+after that type of selection should be added to the <code class="docutils literal"><span class="pre">Selection</span></code>
+class. If one wishes to invoke that type of selection on a
+population, <cite>select</cite> must be called with the name of that attribute
+as a parameter.</p>
+<p>There was a slight simplifcation in the paragraph describing
+initialization. When the <code class="docutils literal"><span class="pre">Selection</span></code> instance is initialzed it
+is not just with the names of the selection methods to be used. It
+provided with the names of the methods and any paramters that the
+methods will need to use. These parameters are packed into the
+<code class="docutils literal"><span class="pre">FunctionData</span></code> class. The <code class="docutils literal"><span class="pre">FunctionData</span></code> instance holding the
+method name and the appropriate parameter values is passed to
+the initializer of <code class="docutils literal"><span class="pre">Selection</span></code>.</p>
+<p>Selection algorithms are to be implemented as generators. Selection
+algorithms which produce parents pools must yield a tuple of
+<code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances. Selection algorithms should be grouped
+together by their expected use when written into the class body.</p>
+<p>Note that duplicates are not considered during selection. If a
+molecule is present in the population twice, its chance of
+selection does not double.</p>
+<dl class="attribute">
+<dt id="mtk.ga.selection.Selection.generational">
+<code class="descname">generational</code><a class="headerlink" href="#mtk.ga.selection.Selection.generational" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FunctionData</em> – This holds the <code class="docutils literal"><span class="pre">FunctionData</span></code> object representing the
+selection function used for selecting the next generation of
+individuals along with any parameters the function may require.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.selection.Selection.crossover">
+<code class="descname">crossover</code><a class="headerlink" href="#mtk.ga.selection.Selection.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FunctionData</em> – Holds the <code class="docutils literal"><span class="pre">FunctionData</span></code> object representing the selection
+function used for selecting parents, along with any parameters
+the function may require.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.selection.Selection.mutation">
+<code class="descname">mutation</code><a class="headerlink" href="#mtk.ga.selection.Selection.mutation" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FunctionData</em> – Holds the <code class="docutils literal"><span class="pre">FunctionData</span></code> object representing the selection
+function used for selection individuals for mutation, along
+with any parameters the function may require.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.all_combinations">
+<code class="descname">all_combinations</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.all_combinations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.all_combinations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields every possible pairing of individuals from a population.</p>
+<p>This yields members regardless of which subpopulation they are
+in. Each pair is only returned once. This means if (1,2) is
+returned (2,1) will not be.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which parents should be selected.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of 2 MacroMolecule instances</em> – The <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances which together form a
+parent pair.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.all_combinations_n_fittest">
+<code class="descname">all_combinations_n_fittest</code><span class="sig-paren">(</span><em>population</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.all_combinations_n_fittest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.all_combinations_n_fittest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields all pairings of the <cite>n</cite> fittest individuals.</p>
+<p>The pairings are yielded with in order of fitness, with most
+fit pair yielded first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which parents should be selected.</li>
+<li><strong>n</strong> (<em>int</em>) – The number of individuals used for making offspring.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>tuple of 2 MacroMolecule instances</em> – The <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances which together form a parent
+pair.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.crossover_deterministic_sampling">
+<code class="descname">crossover_deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.crossover_deterministic_sampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.crossover_deterministic_sampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields parents according to determnistic sampling.</p>
+<p>In determnistic sampling the mean fitness value of the
+population is calculated, &lt;f&gt;. For each individual a
+normalized fitness value is then calculated via</p>
+<blockquote>
+<div>fn = f / &lt;f&gt;</div></blockquote>
+<p>where fn is the normalized fitness value and f is the original
+fitness value.</p>
+<p>Deterministic sampling then creates a temporary, parent
+population of the same size as the original population. An
+individual is guaranteed to be placed into the parent
+population n times, where n is the integer part of fn. Any
+remaining slots are to individuals with the largest decimal
+values.</p>
+<p>Parents are then randomly selected from the parent population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which parents are selected.</li>
+<li><strong>truncation</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of least fit members which will never be
+yielded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>numpy.ndarray of MacroMolecule instances</em> – The selected parent pair.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.crossover_roulette">
+<code class="descname">crossover_roulette</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.crossover_roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.crossover_roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields parents using roulette selection.</p>
+<p>In roulette selection the probability an individual is selected
+is given by its fitness. If the total fitness is the sum of all
+fitness values, the chance an individuals is selected is given
+by</p>
+<p>p = individual fitness / total fitness,</p>
+<p>where p is the probability of selection [1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which parents are selected.</li>
+<li><strong>truncation</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of least fit members which will never be
+yielded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>numpy.ndarray of MacroMolecule instances</em> – The selected parent pair.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="http://tinyurl.com/csc3djm">http://tinyurl.com/csc3djm</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.deterministic_sampling">
+<code class="descname">deterministic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>truncation=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.deterministic_sampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.deterministic_sampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields individuals using deterministic sampling.</p>
+<p>This algorithm can only be used for selection of mutants. It
+will return duplicates. The results of <code class="docutils literal"><span class="pre">fittest()</span></code> are
+equivalent to algorithm without duplicates.</p>
+<p>In determnistic sampling the mean fitness value of the
+population is calculated, &lt;f&gt;. For each individual a
+normalized fitness value is then calculated via</p>
+<blockquote>
+<div>fn = f / &lt;f&gt;</div></blockquote>
+<p>where fn is the normalized fitness value and f is the original
+fitness value. An individual will be selected n times, where
+n is the integer value of fn. After all individuals where
+n &gt; 0 are yielded, all inidividuals are yielded again. Largest
+decimal part of fn first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which individuals are to be selected.</li>
+<li><strong>truncation</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of least fit members which will never be
+yielded.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>MacroMolecule</em> – The next selected population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.fittest">
+<code class="descname">fittest</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.fittest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.fittest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields members of the population, fittest first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population who’s members need to be selected.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>MacroMolecule</em> – The next fittest <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instance held by the
+population.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.roulette">
+<code class="descname">roulette</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields individuals using roulette selection.</p>
+<p>In roulette selection the probability an individual is selected
+is given by its fitness. If the total fitness is the sum of all
+fitness values, the chance an individuals is selected is given
+by</p>
+<p>p = individual fitness / total fitness,</p>
+<p>where p is the probability of selection [1].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which individuals are to be selected.</li>
+<li><strong>elites</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of the fittest members which are guaranteed to
+be yielded first.</li>
+<li><strong>truncation</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of least fit members which will never be
+yielded.</li>
+<li><strong>duplicates</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal"><span class="pre">True</span></code> the same member can be yielded more than
+once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>MacroMolecule</em> – The next selected population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>[1] <a class="reference external" href="http://tinyurl.com/csc3djm">http://tinyurl.com/csc3djm</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.selection.Selection.stochastic_sampling">
+<code class="descname">stochastic_sampling</code><span class="sig-paren">(</span><em>population</em>, <em>elites=0</em>, <em>truncation=None</em>, <em>duplicates=False</em>, <em>use_rank=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#Selection.stochastic_sampling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.Selection.stochastic_sampling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields individuals via stochastic sampling.</p>
+<p>Each fitness value is used to calculate the normalized fitness
+of an individual</p>
+<blockquote>
+<div>fn = f / &lt;f&gt;</div></blockquote>
+<p>where fn is the normalized fitness value, f is the original
+fitness value and &lt;f&gt; is the mean fitness of the population. If
+f is greater than 1 then the individual is guaranteed to be
+selected. If duplicates are allowed, individuals are guaranteed
+to be selected n times, where n is the integer part of fn.</p>
+<p>Once all the guarnteed individuals have been yielded, the
+remaining individuals are yielded via the roulette method. The
+weights in the roulette method are based on the decimal part of
+fn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population from which individuals are to be selected.</li>
+<li><strong>elites</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of the fittest members which are guaranteed to
+be yielded first.</li>
+<li><strong>truncation</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of least fit members which will never be
+yielded.</li>
+<li><strong>duplicates</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal"><span class="pre">True</span></code> the same member can be yielded more than
+once.</li>
+<li><strong>use_rank</strong> (<em>bool</em><em>, </em><em>optional</em>) – When <code class="docutils literal"><span class="pre">True</span></code> the fitness value of an individual is
+calculated as, f = 1/rank.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>MacroMolecule</em> – The next selected population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.ga.selection.crossover">
+<code class="descclassname">mtk.ga.selection.</code><code class="descname">crossover</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#crossover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies a function as suitable for crossover selections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func</strong> (<em>function</em>) – A <code class="docutils literal"><span class="pre">Selection</span></code> class method which can be used for selecting
+molecules for crossover.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>func</strong> – The function received as an argument. The attribute
+<code class="docutils literal"><span class="pre">crossover</span></code> is added and set to <code class="docutils literal"><span class="pre">True</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.ga.selection.generational">
+<code class="descclassname">mtk.ga.selection.</code><code class="descname">generational</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#generational"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.generational" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies a function as suitable for generational selections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func</strong> (<em>function</em>) – A <code class="docutils literal"><span class="pre">Selection</span></code> class method which can be used for selecting
+molecules for the next generation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>func</strong> – The function received as an argument. The attribute
+<code class="docutils literal"><span class="pre">generational</span></code> is added and set to <code class="docutils literal"><span class="pre">True</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.ga.selection.mutation">
+<code class="descclassname">mtk.ga.selection.</code><code class="descname">mutation</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/selection.html#mutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.selection.mutation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies a function as suitable for mutation selections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func</strong> (<em>function</em>) – A <code class="docutils literal"><span class="pre">Selection</span></code> class method which can be used for selecting
+molecules for mutation.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>func</strong> – The function received as an argument. The attribute
+<code class="docutils literal"><span class="pre">mutation</span></code> is added and set to <code class="docutils literal"><span class="pre">True</span></code>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 
 
