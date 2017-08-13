@@ -195,8 +195,8 @@ class Population:
             A population holding all possible macromolecules from
             assembled from `databases`.
 
-        Example
-        -------
+        Examples
+        --------
         If the name of the functional group needs to be provided to the
         building blocks, a lambda function can be used.
 
@@ -234,84 +234,6 @@ class Population:
         if not duplicates:
             p.remove_duplicates()
         return p
-
-    @classmethod
-    def init_cage_isomers(cls, lk_file, bb_file, topology,
-                          ga_tools=GATools.init_empty(),
-                          lk_fg=None, bb_fg=None):
-        """
-        Creates a population holding all structural isomers of a cage.
-
-        Structural isomers here means that the building blocks are
-        rotated in position so that every possible bond combination
-        with linkers is formed.
-
-        This only works for cage topologies which have both building
-        blocks and linkers. It will not with topologies where all
-        building blocks have the same number of functional groups.
-
-        Parameters
-        ----------
-        lk_file : str
-            The full path of the file holding the linker of the cage.
-
-        bb_file : str
-            The full path to the file holding the building block of the
-            cage.
-
-        topology : type
-            A _CageTopology child class. Exluding child classes of
-            _NoLinkerCageTopology.
-
-        ga_tools : GATools (default = GATools.init_empty())
-            The GATools instance to be used by created population.
-
-        lk_fg : str (default = None)
-            The name of the linker's functional group. If ``None`` then
-            `lk_file` is checked for a name.
-
-        bb_fg : str (default = None)
-            The name of the building block's functional group. If
-            ``None`` then `bb_file` is checked for a name.
-
-        Returns
-        -------
-        Population
-            A population filled with isomers of a cage.
-
-        """
-
-        n_A = len(topology.positions_A)
-        A_alignments = set()
-
-        for x in it.combinations_with_replacement([0, 1, 2], n_A):
-            for y in it.permutations(x, n_A):
-                A_alignments.add(y)
-
-        n_B = len(topology.positions_B)
-        B_alignments = set()
-        orientations = ([0, 1, 2] if
-                        issubclass(topology, _VertexOnlyCageTopology)
-                        else [1, -1])
-        for x in it.combinations_with_replacement(orientations, n_B):
-            for y in it.permutations(x, n_B):
-                B_alignments.add(y)
-
-        lk = StructUnit(lk_file, lk_fg)
-        if len(lk.functional_group_atoms()) > 2:
-            lk = StructUnit3(lk_file, lk_fg)
-        else:
-            lk = StructUnit2(lk_file, lk_fg)
-
-        bb = StructUnit3(bb_file, bb_fg)
-
-        pop = cls(ga_tools)
-        for A_align in A_alignments:
-            for B_align in B_alignments:
-                c = Cage([bb, lk], topology(A_align, B_align))
-                pop.members.append(c)
-
-        return pop
 
     @classmethod
     def init_diverse_cages(cls, bb_db, lk_db,
@@ -440,9 +362,9 @@ class Population:
 
         moltype : :class:`type`
             An initializer for the molecular structure files. For
-            example, :class:`~.StructUnit` or :class:`.StructUnit2`.
+            example, :class:`.StructUnit` or :class:`.StructUnit2`.
             If `folder` contains ``.json`` dump files of
-            :class:`MacroMolecule` then :meth:`.Molecule.load` could
+            :class:`.MacroMolecule` then :meth:`.Molecule.load` could
             also be used.
 
         glob_pattern : :class:`str`, optional
@@ -558,24 +480,18 @@ class Population:
 
     def add_members(self, population, duplicates=False):
         """
-        Adds ``Molecule`` instances into `members`.
+        Adds :class:`.Molecule` instances into :attr:`members`.
 
-        The |Molecule| instances held within the supplied
-        ``Population`` instance, `population`, are added into the
-        `members` attribute of `self`. The supplied `population` itself
-        is not added. This means that any information the `population`
-        instance had about subpopulations is lost. This is because all
-        of its ``Molecule`` instances are added into the `members`
-        attribute, regardless of which subpopulation they were
-        originally in.
+        The :class:`.Molecule`  instances held within `population`, are
+        added into the :attr:`members`. Any nesting is removed. This is
+        because all :class:`.Molecule`  instances are added into the
+        `members` attribute directly, regardless of how nested they are
+        within `population`.
 
         The `duplicates` parameter indicates whether multiple instances
         of the same molecule are allowed to be added into the
         population. Note that the sameness of a molecule is judged
-        by the `same` method of the ``Molecule`` class, which is
-        invoked by the ``in`` operator within this method. See the
-        `__contains__` method of the ``Population`` class for details
-        on how the ``in`` operator uses the `same` method.
+        by the :meth:`.Molecule.same`.
 
         Parameters
         ----------
