@@ -346,8 +346,8 @@
 <span class="sd">            A population holding all possible macromolecules from</span>
 <span class="sd">            assembled from `databases`.</span>
 
-<span class="sd">        Example</span>
-<span class="sd">        -------</span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
 <span class="sd">        If the name of the functional group needs to be provided to the</span>
 <span class="sd">        building blocks, a lambda function can be used.</span>
 
@@ -385,84 +385,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span><span class="p">:</span>
             <span class="n">p</span><span class="o">.</span><span class="n">remove_duplicates</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">p</span></div>
-
-<div class="viewcode-block" id="Population.init_cage_isomers"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_cage_isomers">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_cage_isomers</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lk_file</span><span class="p">,</span> <span class="n">bb_file</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span>
-                          <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span>
-                          <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a population holding all structural isomers of a cage.</span>
-
-<span class="sd">        Structural isomers here means that the building blocks are</span>
-<span class="sd">        rotated in position so that every possible bond combination</span>
-<span class="sd">        with linkers is formed.</span>
-
-<span class="sd">        This only works for cage topologies which have both building</span>
-<span class="sd">        blocks and linkers. It will not with topologies where all</span>
-<span class="sd">        building blocks have the same number of functional groups.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        lk_file : str</span>
-<span class="sd">            The full path of the file holding the linker of the cage.</span>
-
-<span class="sd">        bb_file : str</span>
-<span class="sd">            The full path to the file holding the building block of the</span>
-<span class="sd">            cage.</span>
-
-<span class="sd">        topology : type</span>
-<span class="sd">            A _CageTopology child class. Exluding child classes of</span>
-<span class="sd">            _NoLinkerCageTopology.</span>
-
-<span class="sd">        ga_tools : GATools (default = GATools.init_empty())</span>
-<span class="sd">            The GATools instance to be used by created population.</span>
-
-<span class="sd">        lk_fg : str (default = None)</span>
-<span class="sd">            The name of the linker&#39;s functional group. If ``None`` then</span>
-<span class="sd">            `lk_file` is checked for a name.</span>
-
-<span class="sd">        bb_fg : str (default = None)</span>
-<span class="sd">            The name of the building block&#39;s functional group. If</span>
-<span class="sd">            ``None`` then `bb_file` is checked for a name.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        Population</span>
-<span class="sd">            A population filled with isomers of a cage.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">n_A</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">positions_A</span><span class="p">)</span>
-        <span class="n">A_alignments</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations_with_replacement</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">n_A</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_A</span><span class="p">):</span>
-                <span class="n">A_alignments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-        <span class="n">n_B</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">positions_B</span><span class="p">)</span>
-        <span class="n">B_alignments</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">orientations</span> <span class="o">=</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="k">if</span>
-                        <span class="nb">issubclass</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">_VertexOnlyCageTopology</span><span class="p">)</span>
-                        <span class="k">else</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations_with_replacement</span><span class="p">(</span><span class="n">orientations</span><span class="p">,</span> <span class="n">n_B</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n_B</span><span class="p">):</span>
-                <span class="n">B_alignments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-        <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
-
-        <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_file</span><span class="p">,</span> <span class="n">bb_fg</span><span class="p">)</span>
-
-        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">A_align</span> <span class="ow">in</span> <span class="n">A_alignments</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">B_align</span> <span class="ow">in</span> <span class="n">B_alignments</span><span class="p">:</span>
-                <span class="n">c</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">topology</span><span class="p">(</span><span class="n">A_align</span><span class="p">,</span> <span class="n">B_align</span><span class="p">))</span>
-                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">pop</span></div>
 
 <div class="viewcode-block" id="Population.init_diverse_cages"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_diverse_cages">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">init_diverse_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
@@ -591,9 +513,9 @@
 
 <span class="sd">        moltype : :class:`type`</span>
 <span class="sd">            An initializer for the molecular structure files. For</span>
-<span class="sd">            example, :class:`~.StructUnit` or :class:`.StructUnit2`.</span>
+<span class="sd">            example, :class:`.StructUnit` or :class:`.StructUnit2`.</span>
 <span class="sd">            If `folder` contains ``.json`` dump files of</span>
-<span class="sd">            :class:`MacroMolecule` then :meth:`.Molecule.load` could</span>
+<span class="sd">            :class:`.MacroMolecule` then :meth:`.Molecule.load` could</span>
 <span class="sd">            also be used.</span>
 
 <span class="sd">        glob_pattern : :class:`str`, optional</span>
@@ -709,43 +631,32 @@
 
 <div class="viewcode-block" id="Population.add_members"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.add_members">[docs]</a>    <span class="k">def</span> <span class="nf">add_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds ``Molecule`` instances into `members`.</span>
+<span class="sd">        Adds :class:`.Molecule` instances into :attr:`members`.</span>
 
-<span class="sd">        The |Molecule| instances held within the supplied</span>
-<span class="sd">        ``Population`` instance, `population`, are added into the</span>
-<span class="sd">        `members` attribute of `self`. The supplied `population` itself</span>
-<span class="sd">        is not added. This means that any information the `population`</span>
-<span class="sd">        instance had about subpopulations is lost. This is because all</span>
-<span class="sd">        of its ``Molecule`` instances are added into the `members`</span>
-<span class="sd">        attribute, regardless of which subpopulation they were</span>
-<span class="sd">        originally in.</span>
-
-<span class="sd">        The `duplicates` parameter indicates whether multiple instances</span>
-<span class="sd">        of the same molecule are allowed to be added into the</span>
-<span class="sd">        population. Note that the sameness of a molecule is judged</span>
-<span class="sd">        by the `same` method of the ``Molecule`` class, which is</span>
-<span class="sd">        invoked by the ``in`` operator within this method. See the</span>
-<span class="sd">        `__contains__` method of the ``Population`` class for details</span>
-<span class="sd">        on how the ``in`` operator uses the `same` method.</span>
+<span class="sd">        The :class:`.Molecule`  instances held within `population`, are</span>
+<span class="sd">        added into :attr:`members`. Any nesting is removed. This is</span>
+<span class="sd">        because all :class:`.Molecule`  instances are added into</span>
+<span class="sd">        :attr:`members` directly, regardless of how nested they are</span>
+<span class="sd">        within `population`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : iterable of :class:`~mmead.molecular.molecules.Molecule`</span>
-<span class="sd">            ``Molecule`` instances to be added to the `members`</span>
-<span class="sd">            attribute and/or ``Population`` instances who&#39;s members, as</span>
-<span class="sd">            generated by `all_members`, will be added to the `members`</span>
-<span class="sd">            attribute.</span>
+<span class="sd">        population : :class:`iterable` of :class:`.Molecule`</span>
+<span class="sd">            :class:`.Molecule` instances held by this container are</span>
+<span class="sd">            added into :attr:`members`.</span>
 
-<span class="sd">        duplicates : bool (default = False)</span>
+<span class="sd">        duplicates : :class:`bool`, optional</span>
+<span class="sd">            Indicates whether multiple instances of the same molecule</span>
+<span class="sd">            are allowed to be added. Note, the sameness of a molecule</span>
+<span class="sd">            is judged by :meth:`.Molecule.same`.</span>
+
 <span class="sd">            When ``False`` only molecules which are not already</span>
 <span class="sd">            held by the population will be added. ``True`` allows more</span>
 <span class="sd">            than one instance of the same molecule to be added.</span>
-<span class="sd">            Whether two molecules are the same is defined by the</span>
-<span class="sd">            `same()` method of the ``Molecule`` class.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -757,25 +668,19 @@
 
 <div class="viewcode-block" id="Population.add_subpopulation"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.add_subpopulation">[docs]</a>    <span class="k">def</span> <span class="nf">add_subpopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Appends a population into the `populations` attribute.</span>
+<span class="sd">        Appends a copy of `population` to :attr:`populations`.</span>
 
-<span class="sd">        The `population` instance itself is not added, only a copy.</span>
-<span class="sd">        However the items it holds are not copied.</span>
+<span class="sd">        Only a copy of the `population` container is made. The</span>
+<span class="sd">        molecules it holds are not copies.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : Population</span>
+<span class="sd">        population : :class:`Population`</span>
 <span class="sd">            The population to be added as a subpopulation.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        populations : list of Populations</span>
-<span class="sd">            The `populations` attribute of `self` has ``Population``</span>
-<span class="sd">            instaces added to it.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -787,12 +692,12 @@
 
 <div class="viewcode-block" id="Population.all_members"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.all_members">[docs]</a>    <span class="k">def</span> <span class="nf">all_members</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Yields all members in the population and its subpopulations.</span>
+<span class="sd">        Yields all molecules in the population and its subpopulations.</span>
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
-<span class="sd">        Molecule</span>
-<span class="sd">            The next ``Molecule`` instance held within the</span>
+<span class="sd">        :class:`.Molecule`</span>
+<span class="sd">            The next :class:`.Molecule` instance held within the</span>
 <span class="sd">            population or its subpopulations.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -812,29 +717,25 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Give each member of the population a name starting from `n`.</span>
 
-<span class="sd">        `n` is a number which is incremented. Each population member</span>
-<span class="sd">        will have a unique name as a result.</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method modifies the :attr:`.Molecule.name` attribute of</span>
+<span class="sd">        :class:`.Molecule` instances held by the population.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        n : int</span>
+<span class="sd">        n : :class:`int`</span>
 <span class="sd">            A number. Members of this population are given a unique</span>
-<span class="sd">            number as a name, starting from this number.</span>
+<span class="sd">            number as a name, starting from this number and incremented</span>
+<span class="sd">            by one between members.</span>
 
-<span class="sd">        overwrite : bool (default = False)</span>
+<span class="sd">        overwrite : :class:`bool`, optional</span>
 <span class="sd">            If ``True`` existing names are replaced.</span>
-
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        name : str</span>
-<span class="sd">            The `name` attribute of the population&#39;s members is</span>
-<span class="sd">            modified.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        int</span>
-<span class="sd">            The final value of `n`.</span>
+<span class="sd">        :class:`int`</span>
+<span class="sd">            The value of the last name assigned, plus 1.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -849,23 +750,26 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies the fitness function to all members.</span>
 
-<span class="sd">        The calculation will be performed serially or in parallel</span>
-<span class="sd">        depending on the flag `ga_tools.parallel`. The serial version</span>
-<span class="sd">        may be faster in cases where all molecules have already had</span>
-<span class="sd">        their fitness calcluated. This is because all calculations will</span>
-<span class="sd">        be skipped. In this case creating a parallel process pool</span>
-<span class="sd">        creates unncessary overhead.</span>
+<span class="sd">        The fitness function is defined in the attribute</span>
+<span class="sd">        :attr:`.GATools.fitness` of the :class:`.GATools` instance</span>
+<span class="sd">        held in the :attr:`ga_tools` attribute of the population.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        MarcroMolecule</span>
-<span class="sd">            The MacroMolecule instances held by the population have</span>
-<span class="sd">            fitness values calculated and placed in the</span>
-<span class="sd">            `unscaled_fitness` attribute.</span>
+<span class="sd">        The calculation will be performed serially or in parallel</span>
+<span class="sd">        depending on the flag :attr:`.GATools.parallel`. The serial</span>
+<span class="sd">        version may be faster in cases where all molecules have already</span>
+<span class="sd">        had their fitness values calcluated. This is because all</span>
+<span class="sd">        calculations will be skipped. In this case creating a parallel</span>
+<span class="sd">        process pool creates unncessary overhead.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method will result in the modification of the</span>
+<span class="sd">        :attr:`.MacroMolecule.unscaled_fitness` attribute of molecules</span>
+<span class="sd">        held by the population.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -876,26 +780,28 @@
 
 <div class="viewcode-block" id="Population.dump"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write the population to a file.</span>
+<span class="sd">        Dumps the population to a file.</span>
 
-<span class="sd">        The population is written in the JSON format in the following</span>
+<span class="sd">        The population is dumped in the JSON format in the following</span>
 <span class="sd">        way. The population is represented as a list,</span>
+
+<span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            [mem1.json(), mem2.json(), [mem3.json(), [mem4.json()]]]</span>
 
 <span class="sd">        where each member of the population held directly in the</span>
 <span class="sd">        `members` attribute is placed an an element in the list. Any</span>
-<span class="sd">        subpopulations are held as  sublists.</span>
+<span class="sd">        subpopulations are held as sublists.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
+<span class="sd">        path : :class:`str`</span>
 <span class="sd">            The full path of the file to which the population should</span>
-<span class="sd">            be written.</span>
+<span class="sd">            be dumped.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -904,11 +810,11 @@
 
 <div class="viewcode-block" id="Population.exit"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.exit">[docs]</a>    <span class="k">def</span> <span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Checks the if the exit criterion has been satisfied.</span>
+<span class="sd">        Checks the if the EA exit criterion has been satisfied.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool</span>
+<span class="sd">        :class:`bool`</span>
 <span class="sd">            ``True`` if the exit criterion is satisfied, else</span>
 <span class="sd">            ``False``.</span>
 
@@ -923,17 +829,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        pop_list : list of str and lists</span>
+<span class="sd">        pop_list : :class:`list` of :class:`str` and :class:`list`</span>
 <span class="sd">            A list which represents a population. Like the ones created</span>
-<span class="sd">            by `tolist()`.</span>
+<span class="sd">            by :meth:`tolist()`.</span>
 
-<span class="sd">        load_names : bool (default = True)</span>
-<span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
-<span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
+<span class="sd">        load_names : :class:`bool`, optional</span>
+<span class="sd">            If ``True`` then the :meth:`.Molecule.name` attribute</span>
+<span class="sd">            stored in the JSON objects is loaded. If ``False`` then</span>
+<span class="sd">            it&#39;s not.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
+<span class="sd">        :class:`Population`</span>
 <span class="sd">            The population represented by `pop_list`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -954,23 +861,29 @@
 
 <div class="viewcode-block" id="Population.gen_mutants"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.gen_mutants">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mutants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="o">=</span><span class="s1">&#39;mutation_counter.png&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a population of mutant ``MacroMolecule`` instances.</span>
+<span class="sd">        Returns a :class:`Population` of mutants.</span>
 
-<span class="sd">        This is a GA operation and as a result this method merely</span>
-<span class="sd">        delegates the request to the ``Mutation`` instance held in the</span>
-<span class="sd">        `ga_tools` attribute.</span>
+<span class="sd">        The selection function which decides which molecules are</span>
+<span class="sd">        selected for mutation is defined in the</span>
+<span class="sd">        :attr:`.Selection.mutation` attribute of the</span>
+<span class="sd">        :class:`.Selection` instance held by the population via its</span>
+<span class="sd">        :attr:`ga_tools` attribute.</span>
+
+<span class="sd">        The mutation function(s) to be used are defined in the</span>
+<span class="sd">        :class:`.Mutation` instance held by the population via its</span>
+<span class="sd">        :attr:`ga_tools` attribute.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        counter_name : str (default=&#39;mutation_counter.png&#39;)</span>
-<span class="sd">            The name of the .png file showing which members were</span>
-<span class="sd">            selected for mutation.</span>
+<span class="sd">        counter_name : :class:`str`, optional</span>
+<span class="sd">            The name of the ``.png`` file which holds a graph showing</span>
+<span class="sd">            which members were selected for mutation.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
-<span class="sd">            A population holding mutants created by mutating contained</span>
-<span class="sd">            ``MacroMolecule`` instances.</span>
+<span class="sd">        :class:`Population`</span>
+<span class="sd">            A population holding mutants created by mutating the</span>
+<span class="sd">            :class:`.MacroMolecule` instances held by the population.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -978,22 +891,27 @@
 
 <div class="viewcode-block" id="Population.gen_next_gen"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.gen_next_gen">[docs]</a>    <span class="k">def</span> <span class="nf">gen_next_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a population hodling the next generation of structures.</span>
+<span class="sd">        Returns a population holding the next generation of structures.</span>
+
+<span class="sd">        The selection function to be used for selecting the next</span>
+<span class="sd">        generation of molecules is defined in the :class:`.Selection`</span>
+<span class="sd">        instance held by the population via its :attr:`ga_tools`</span>
+<span class="sd">        attribute.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        pop_size : int</span>
+<span class="sd">        pop_size : :class:`int`</span>
 <span class="sd">            The size of the next generation.</span>
 
-<span class="sd">        counter_path : str (default= &#39;&#39;)</span>
-<span class="sd">            The name of the .png file showing which members were</span>
-<span class="sd">            selected for the next generation. If &#39;&#39; then no file</span>
-<span class="sd">            is made.</span>
+<span class="sd">        counter_path : :class:`str`, optional</span>
+<span class="sd">            The name of the ``.png`` file holding a graph showing which</span>
+<span class="sd">            members were selected for the next generation. If ``&#39;&#39;``</span>
+<span class="sd">            then no file is made.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
-<span class="sd">            A population holding the next generation of individuals.</span>
+<span class="sd">        :class:`Population`</span>
+<span class="sd">            A population holding the next generation of molecules.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1015,34 +933,30 @@
 
 <div class="viewcode-block" id="Population.gen_offspring"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.gen_offspring">[docs]</a>    <span class="k">def</span> <span class="nf">gen_offspring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="o">=</span><span class="s1">&#39;crossover_counter.png&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a population of offspring ``MacroMolecule`` instances.</span>
+<span class="sd">        Returns a :class:`Population` of offspring molecules.</span>
 
-<span class="sd">        This is a GA operation and as a result this method merely</span>
-<span class="sd">        delegates the request to the ``Crossover`` instance held in the</span>
-<span class="sd">        `ga_tools` attribute. The ``Crossover`` instance takes care of</span>
-<span class="sd">        selecting parents and combining them to form offspring. The</span>
-<span class="sd">        ``Crossover`` instance delegates the selection to the</span>
-<span class="sd">        ``Selection`` instance as would be expected. The request to</span>
-<span class="sd">        perform crossovers is done by calling the ``Crossover``</span>
-<span class="sd">        instance with the population as the argument. Calling of the</span>
-<span class="sd">        ``Crossover``instance returns a ``Population`` instance holding</span>
-<span class="sd">        the generated offspring. All details regarding the crossover</span>
-<span class="sd">        procedure are handled by the ``Crossover`` instance.</span>
+<span class="sd">        The selection function which decides which molecules are</span>
+<span class="sd">        selected for crossover is defined in the</span>
+<span class="sd">        :attr:`.Selection.crossover` attribute of the</span>
+<span class="sd">        :class:`.Selection` instance held by the population via its</span>
+<span class="sd">        :attr:`ga_tools` attribute.</span>
 
-<span class="sd">        For more details about how crossover is implemented see the</span>
-<span class="sd">        ``Crossover`` class documentation.</span>
+<span class="sd">        The crossover function(s) to be used are defined in the</span>
+<span class="sd">        :class:`.Crossover` instance held by the population via its</span>
+<span class="sd">        :attr:`ga_tools` attribute.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        counter_name : str (default=&#39;crossover_counter.png&#39;)</span>
-<span class="sd">            The name of the .png file showing which members were</span>
+<span class="sd">        counter_name : :class:`str`, optional</span>
+<span class="sd">            The name of the ``.png`` file showing which members were</span>
 <span class="sd">            selected for crossover.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
-<span class="sd">            A population holding offspring created by crossing</span>
-<span class="sd">            contained the ``MacroMolecule`` instances.</span>
+<span class="sd">        :class:`Population`</span>
+<span class="sd">            A population of offspring, created by crossing</span>
+<span class="sd">            :class:`.MacroMolecule` instances contained in the</span>
+<span class="sd">            population.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1054,13 +968,13 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mol : Molecule</span>
+<span class="sd">        mol : :class:`.Molecule`</span>
 <span class="sd">            A molecule whose structure is being evaluated for presence</span>
 <span class="sd">            in the population.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool</span>
+<span class="sd">        :class:`bool`</span>
 <span class="sd">            ``True`` if a molecule with the same structure as `mol`</span>
 <span class="sd">            is held by the population.</span>
 
@@ -1071,20 +985,20 @@
 <div class="viewcode-block" id="Population.load"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.load">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes a Population from one dumped to a file.</span>
+<span class="sd">        Initializes a :class:`Population` from one dumped to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
+<span class="sd">        path : :class:`str`</span>
 <span class="sd">            The full path of the file holding the dumped population.</span>
 
-<span class="sd">        load_names : bool (default = True)</span>
+<span class="sd">        load_names : :class:`bool`, optional</span>
 <span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
 <span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
+<span class="sd">        :class:`Population`</span>
 <span class="sd">            The population stored in the dump file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1098,7 +1012,7 @@
 
 <div class="viewcode-block" id="Population.max"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.max">[docs]</a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the max given a key.</span>
+<span class="sd">        Calculates the max in the population given a key.</span>
 
 <span class="sd">        This method applies key(member) on every member of the</span>
 <span class="sd">        population and returns the max of returned values.</span>
