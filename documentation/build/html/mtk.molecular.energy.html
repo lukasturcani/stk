@@ -86,7 +86,12 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">mtk.molecular.energy module</a></li>
+<li><a class="reference internal" href="#">mtk.molecular.energy module</a><ul>
+<li><a class="reference internal" href="#extending-mmea-supporting-more-energy-calculations">Extending MMEA: Supporting more energy calculations.</a></li>
+<li><a class="reference internal" href="#sidenote1">Sidenote1</a></li>
+<li><a class="reference internal" href="#sidenote2">Sidenote2</a></li>
+</ul>
+</li>
 </ul>
 </div>
             
@@ -150,8 +155,521 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="mtk-molecular-energy-module">
-<h1>mtk.molecular.energy module<a class="headerlink" href="#mtk-molecular-energy-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mtk.molecular.energy">
+<span id="mtk-molecular-energy-module"></span><h1>mtk.molecular.energy module<a class="headerlink" href="#module-mtk.molecular.energy" title="Permalink to this headline">¶</a></h1>
+<p>Defines energy calculations via the <code class="docutils literal"><span class="pre">Energy</span></code> class.</p>
+<div class="section" id="extending-mmea-supporting-more-energy-calculations">
+<h2>Extending MMEA: Supporting more energy calculations.<a class="headerlink" href="#extending-mmea-supporting-more-energy-calculations" title="Permalink to this headline">¶</a></h2>
+<p>It may well be the case that more ways to calculate the energy of
+molcules will need to be added. For example, if support for using some
+external software to perform the calculations needs to be added.</p>
+<p>In order to add a new function which calculates the energy, just add it
+as a method to the <code class="docutils literal"><span class="pre">Energy</span></code> class. There really aren’t any
+requirements beyond this, just make sure the energy value is what the
+method returns.</p>
+<p>If the energy method does not fit neatly into a single method, feel
+free to split it up. Make sure sure that any helper methods are
+private, ie that their names start with a leading underscore. Only the
+main method which the user will use should be public.</p>
+<p>To calculate the energy of some <code class="docutils literal"><span class="pre">Molecule</span></code> object the only thing that
+is needed is calling one of the <code class="docutils literal"><span class="pre">Energy</span></code> methods:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+<span class="go">OUT: 16.501</span>
+</pre></div>
+</div>
+<p>Here the <cite>Energy.rdkit()</cite> method was used as an example and <cite>molecule</cite>
+is just some  <code class="docutils literal"><span class="pre">Molecule</span></code> instance. (Each <code class="docutils literal"><span class="pre">Molecule</span></code> object has an
+<code class="docutils literal"><span class="pre">Energy</span></code> instance in its <cite>energy</cite> attribute.)</p>
+<p>Each <code class="docutils literal"><span class="pre">Energy</span></code> instance also has a <cite>values</cite> attribute which stores the
+result of previous calculations. Using the molecule from the previous
+.. rubric:: example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span>
+<span class="go">OUT: {FunctionData(&#39;rdkit&#39;, forcefield=uff) : 16.501}</span>
+</pre></div>
+</div>
+<p>IE this indicates that the <cite>rdkit</cite> method was called with the
+<cite>forcefield</cite> argument set to ‘uff’ and the result was 16.501.</p>
+<p>Calling any method of the <code class="docutils literal"><span class="pre">Energy</span></code> class updates the dictionary
+automatically. When adding a new method to the class, no mechanism for
+updating the dictionary needs to be provided. Writing the method within
+the class is enough for it to update the <cite>values</cite> dictionary when
+called.</p>
+<p>Sometimes a function will require a parameter which does not affect the
+outcome of the energy calculation. For example, to calculate the energy
+using the <code class="docutils literal"><span class="pre">macromodel</span></code> program, the <code class="docutils literal"><span class="pre">Energy.macromodel()</span></code> function
+can be used:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>molecule.energy.macromodel(forcefield=16,</dt>
+<dd>macromodel_path=’path/to/macromodel/dir’)</dd>
+</dl>
+</div></blockquote>
+<p>This function requires the number of a forcefield (16) and the
+directory where <code class="docutils literal"><span class="pre">macromodel</span></code> is installed on the users computer
+(‘path/to/macromodel/dir’). However, the directory does not affect the
+value of the calculated energy. When running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+<p>We want the output to be:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>OUT: {FunctionData(‘rdkit’, forcefield=uff) <span class="classifier-delimiter">:</span> <span class="classifier">16.501,</span></dt>
+<dd>FunctionData(‘macromolecule’, forcefield=16): 200}</dd>
+</dl>
+</div></blockquote>
+<p>(Assuming we are still dealing with the same <cite>molecule</cite> instance from
+the <cite>rdkit</cite> example, both calculated energies should be kept in the
+dictionary.)</p>
+<p>However if we just define the <code class="docutils literal"><span class="pre">Energy.macromodel()</span></code> function within
+the energy class, and then run:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>molecule.energy.macromodel(forcefield=16,</dt>
+<dd>macromodel_path=’path/to/macromodel/dir’)</dd>
+</dl>
+</div></blockquote>
+<p>The output of</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+<p>will be</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>OUT: {FunctionData(‘rdkit’, forcefield=uff) <span class="classifier-delimiter">:</span> <span class="classifier">16.501,</span></dt>
+<dd><dl class="first last docutils">
+<dt>FunctionData(‘macromolecule’, forcefield=16,</dt>
+<dd>macromodel_path=’path/to/macromodel/dir’): 200}</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p>In order to make sure that the macromodel_path is excluded from the
+key, decorate the function <code class="docutils literal"><span class="pre">Energy.macromodel()</span></code> with the
+<code class="docutils literal"><span class="pre">exclude()</span></code> decorator. For example:</p>
+<blockquote>
+<div><p>&#64;exclude(‘macromodel_path’)
+def macromodel(self, forcefield, macromodel_path):</p>
+<blockquote>
+<div>…</div></blockquote>
+</div></blockquote>
+<p>Now the parameter <cite>macromodel_path</cite> will not form part of the key in
+the <cite>values</cite> dictionary. If there were 2 parameters you wanted to
+exlude:</p>
+<blockquote>
+<div><p>&#64;exclude(‘exclude1’, ‘exclude2’)
+def energy_func(include1, include2, exclude1, exclude2):</p>
+<blockquote>
+<div>…</div></blockquote>
+</div></blockquote>
+<p>and so on.</p>
+<p>Exclusion of some parameters is doubly beneficial because it means less
+typing needs to be done to make the key:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">key</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<span class="go">OUT: 200</span>
+</pre></div>
+</div>
+<p>rather than:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">key</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<span class="go">                         macromodel_path=&#39;path/to/macromodel/dir&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<span class="go">OUT: 200</span>
+</pre></div>
+</div>
+<p>Sometimes even this isn’t enough to get the key to look exactly the way
+we want. For exmple:</p>
+<blockquote>
+<div><p>&#64;exclude(‘force_e_calc’)
+def formation(self, func, products,</p>
+<blockquote>
+<div>building_blocks=None, force_e_calc=False):</div></blockquote>
+</div></blockquote>
+<p>The <cite>func</cite> parameter of this function is a FunctionData instance, which
+holds data for one of the other <code class="docutils literal"><span class="pre">Energy</span></code> functions. This includes
+all data the function requires to run, even software directories if
+needed. As a result, the key when running this function may look like
+this:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>FunctionData(‘pseudoformation’, building_blocks=None,</dt>
+<dd><blockquote class="first">
+<div>func=FunctionData(‘macromodel’, forcefield=16,</div></blockquote>
+<p class="last">macromodel_path=’C:Program FilesSchrodinger2016-3’))</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Notice that the path of the macromodel installation was kept nested in
+the key of the <code class="docutils literal"><span class="pre">Energy.formation()</span></code> function. This is undesirable. To
+make this work properly, a completely custom mechanism for making the
+key of the <code class="docutils literal"><span class="pre">Energy.formation()</span></code> is necessary. To do this, define a
+function in this module. For example:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>def formation_key(fargs, fkwargs):</dt>
+<dd>…</dd>
+</dl>
+</div></blockquote>
+<p>And set the <cite>key</cite> attribute of the energy function to the newly defined
+function:</p>
+<blockquote>
+<div>Energy.formation.key = formation_key</div></blockquote>
+<p>The <cite>fargs</cite> and <cite>fkwargs</cite> arguments are the arguments and keyword
+arguments with which <code class="docutils literal"><span class="pre">Energy.formation()</span></code> was called (including
+<cite>self</cite>). The <code class="docutils literal"><span class="pre">formation_key()</span></code> function should return a FunctionData
+instance which will act as the key. In our case the function was
+defined so that the key is:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>FunctionData(‘formation’, products=[], building_blocks=None,</dt>
+<dd>func=FunctionData(‘macromodel’, forcefield=16))</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="sidenote1">
+<h2>Sidenote1<a class="headerlink" href="#sidenote1" title="Permalink to this headline">¶</a></h2>
+<p>Make sure to use the <cite>values</cite> dictionary instead of running the same
+calculation repeatedly.</p>
+</div>
+<div class="section" id="sidenote2">
+<h2>Sidenote2<a class="headerlink" href="#sidenote2" title="Permalink to this headline">¶</a></h2>
+<p>The automatic updating of the dictionary is  achieved by the <code class="docutils literal"><span class="pre">EMeta</span></code>
+metaclass, <code class="docutils literal"><span class="pre">EMethod</span></code> descriptor and <code class="docutils literal"><span class="pre">e_logger</span></code> decorator. You do
+not need to worry about these, but information about how they work is
+provided in the docstring of <code class="docutils literal"><span class="pre">EMeta</span></code>.</p>
+<dl class="class">
+<dt id="mtk.molecular.energy.EMeta">
+<em class="property">class </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EMeta</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
+<p>A metaclass for <code class="docutils literal"><span class="pre">Energy</span></code>.</p>
+<p>In conjuction with the EMethod descriptor and the e_logger
+decorator this function allows methods to automatically update the
+<cite>values</cite> attribute of their Energy instance without explicitly
+being told to do so.</p>
+<p>Basically this metaclass turns all methods of the Energy class into
+descriptors of the EMethod class. These descriptors return a
+decorated version of the original method defined in the class. The
+method is decorated with the <code class="docutils literal"><span class="pre">e_logger()</span></code> decorator. Calling this
+decorated method makes it automatically update the <cite>values</cite>
+dictionary of the object which used the method.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.energy.EMethod">
+<em class="property">class </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EMethod</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A descriptor for methods of the <code class="docutils literal"><span class="pre">Energy</span></code> class.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.func">
+<code class="descname">func</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.func" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>function</em> – The method which the descriptor acts as a getter for.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.energy.Energy">
+<em class="property">class </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">Energy</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Handles all things related to a molecules energy.</p>
+<p>An instance of this class will be placed in the <cite>energy</cite> attribute
+of each <code class="docutils literal"><span class="pre">Molecule</span></code> instance.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.molecule">
+<code class="descname">molecule</code><a class="headerlink" href="#mtk.molecular.energy.Energy.molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Molecule</em> – The energetic information held by an instance of <code class="docutils literal"><span class="pre">Energy</span></code>
+concerns the molecule held in this attribute.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.values">
+<code class="descname">values</code><a class="headerlink" href="#mtk.molecular.energy.Energy.values" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict of FunctionData instances</em> – The keys in the dict code for the function and parameters which
+were used to calculate the energy. The values are the energies.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.formation">
+<code class="descname">formation</code><span class="sig-paren">(</span><em>func</em>, <em>products</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.formation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.formation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the formation energy.</p>
+<p>The formation energy is calculated under the assumption that
+the molecule in <cite>self.molecule</cite> is composed of the molecules in
+<cite>building_blocks</cite> and that during formation molecules in
+<cite>products</cite> are formed in addition to <cite>self.molecule</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><em>FunctionData</em></a>) – <p>A FunctionData object which describes the method of the
+<code class="docutils literal"><span class="pre">Energy</span></code> class used to calculate the energies of the
+various molecules. For example:</p>
+<blockquote>
+<div>FunctionData(‘rdkit’, forcefield=’uff’)</div></blockquote>
+</li>
+<li><strong>products</strong> (<em>tuple of form</em><em> (</em><em>float</em><em>, </em><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><em>Molecule</em></a><em>)</em>) – This tuple holds the molecules produced in addition to
+<cite>self.molecule</cite>, when  a single <cite>self.molecule</cite> is made.
+The <code class="docutils literal"><span class="pre">int</span></code> represents the number made per <cite>self.molecule</cite>.</li>
+<li><strong>building_blocks</strong> (<em>tuple</em><em> (</em><em>default = None</em><em>)</em>) – This argument should be a tuple of the form
+(float, Molecule). It holds the number of a given Molecule
+required to build a single molecule held in
+<cite>self.molecule</cite>. This argument can be omitted when the
+formation energy of a MacroMolecule instance is being
+found, as they keep this data stored elsewhere already.</li>
+<li><strong>force_e_calc</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – If the this is <code class="docutils literal"><span class="pre">True</span></code> then all building blocks, products
+and <cite>self.molecule</cite> will have their energies recalculated.
+Even if the energy values have already been found if the
+chosen forcefield/method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only
+calculated if the value has not already been foud.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The formation energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.macromodel">
+<code class="descname">macromodel</code><span class="sig-paren">(</span><em>forcefield</em>, <em>macromodel_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.macromodel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the energy of <cite>self.molecule</cite> using macromodel.</p>
+<p>Note that this requires macromodel to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>forcefield</strong> (<em>int</em>) – The id number of the forcefield to be used by macromodel.</li>
+<li><strong>macromodel_path</strong> (<em>str</em>) – The full path of the <code class="docutils literal"><span class="pre">Schrodinger</span></code> suite within the
+user’s machine. For example, in a default Microsoft
+installation the folder will probably be something like
+<code class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\Schrodinger2016-2</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><em>_EnergyError : Exception</em> – This exception is raised if no energy value if found in the
+MacroModel calculation’s .log file. Likely due to a
+forcefield error.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.pseudoformation">
+<code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.pseudoformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the formation energy, sans other products.</p>
+<p>This is the formation energy if the energy of the other
+products of the reaction is not taken into account.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><em>FunctionData</em></a>) – <p>A FunctionData object which describes the method of the
+<code class="docutils literal"><span class="pre">Energy</span></code> class used to calculate the energies of the
+various molecules. For example:</p>
+<blockquote>
+<div>FunctionData(‘rdkit’, forcefield=’uff’)</div></blockquote>
+</li>
+<li><strong>building_blocks</strong> (<em>tuple</em><em> (</em><em>default = None</em><em>)</em>) – This argument should be a tuple of the form
+(float, Molecule). It holds the number of a given Molecule
+required to build a single molecule held in
+<cite>self.molecule</cite>. This argument can be omitted when the
+formation energy of a MacroMolecule instance is being
+found, as they keep this data stored elsewhere already.</li>
+<li><strong>force_e_calc</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – If the this is <code class="docutils literal"><span class="pre">True</span></code> then all building blocks, products
+and <cite>self.molecule</cite> will have their energies recalculated.
+Even if the energy values have already been found if the
+chosen forcefield/method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only
+calculated if the value has not already been foud.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The pseudoformation energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.rdkit">
+<code class="descname">rdkit</code><span class="sig-paren">(</span><em>forcefield</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.rdkit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.rdkit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses rdkit to calculate the energy of <cite>self.molecule</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>forcefield</strong> (<em>str</em>) – The name of the forcefield to be used.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>self.values</strong> (<em>dict</em>) – Adds an entry to this dictionary. The key is a tuple of the
+form (‘rdkit’, <cite>forcefield</cite>). The value is the caculated
+energy.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy. Note that this value is also stored
+in the dictionary <cite>self.values</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.e_logger">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">e_logger</code><span class="sig-paren">(</span><em>func</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#e_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.e_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns <cite>func</cite> into a version which updates the <cite>values</cite> dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<em>function</em>) – </li>
+<li><strong>obj</strong> (<a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><em>Energy</em></a>) – The Energy object on which the method <cite>func</cite> was called.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The function <cite>func</cite> bound to <cite>obj</cite> and modified so that when
+called the results update the <cite>values</cite> dictionary of <cite>obj</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">MethodType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.exclude">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">exclude</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator to add the <cite>exclude</cite> attribute to methods.</p>
+<dl class="docutils">
+<dt>args <span class="classifier-delimiter">:</span> <span class="classifier">tuple of strings</span></dt>
+<dd>Holds the names parameters which are not to be used as part of
+the key identifying the energy calculation run.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The function which has had the <cite>exclude</cite> attribute added. This
+is a list  holding the names of parameters of the function
+which are not used for identifying energy calculations.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.formation_key">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">formation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#formation_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.formation_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the key of the <cite>formation()</cite> method in the <cite>values</cite> dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fargs</strong> (<em>tuple</em>) – The arguments with which Energy.formation() was called.</li>
+<li><strong>fkwargs</strong> (<em>dict</em>) – The keyword arguments with which Energy.formation() was called.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The FunctionData object representing the key when <cite>formation()</cite>
+is called with the arguments <cite>fargs</cite> and keyword arguments
+<cite>fkwargs</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData">FunctionData</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.func_key">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">func_key</code><span class="sig-paren">(</span><em>func</em>, <em>fargs=None</em>, <em>fkwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#func_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.func_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the key used in the <cite>values</cite> dictionary for <cite>func</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<em>function</em>) – The function whose results are to be stored in the <cite>values</cite>
+dictionary.</li>
+<li><strong>fargs</strong> (<em>tuple</em><em> (</em><em>default = None</em><em>)</em>) – The arguments passed to <cite>func</cite>.</li>
+<li><strong>fkwargs</strong> (<em>dict</em><em> (</em><em>default = None</em><em>)</em>) – The keyword arguments passed to <cite>func</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The FunctionData object representing the key when <cite>func</cite> is
+called with the arguments <cite>fargs</cite> and keyword arguments
+<cite>fkwargs</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData">FunctionData</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.pseudoformation_key">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">pseudoformation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#pseudoformation_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.pseudoformation_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates key of the <cite>pseudoformation()</cite> method in <cite>values</cite> dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fargs</strong> (<em>tuple</em>) – The arguments with which Energy.pseudoformation() was called.</li>
+<li><strong>fkwargs</strong> (<em>dict</em>) – The keyword arguments with which Energy.pseudoformation() was
+called.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The FunctionData object representing the key when
+<cite>pseudoformation()</cite> is called with the arguments <cite>fargs</cite> and
+keyword arguments <cite>fkwargs</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData">FunctionData</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 
 

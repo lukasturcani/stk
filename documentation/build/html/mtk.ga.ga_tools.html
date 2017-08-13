@@ -150,8 +150,134 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="mtk-ga-ga-tools-module">
-<h1>mtk.ga.ga_tools module<a class="headerlink" href="#mtk-ga-ga-tools-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mtk.ga.ga_tools">
+<span id="mtk-ga-ga-tools-module"></span><h1>mtk.ga.ga_tools module<a class="headerlink" href="#module-mtk.ga.ga_tools" title="Permalink to this headline">¶</a></h1>
+<p>Defines the GATools class.</p>
+<dl class="class">
+<dt id="mtk.ga.ga_tools.GATools">
+<em class="property">class </em><code class="descclassname">mtk.ga.ga_tools.</code><code class="descname">GATools</code><span class="sig-paren">(</span><em>selection</em>, <em>crossover</em>, <em>mutation</em>, <em>normalization</em>, <em>optimization</em>, <em>fitness</em>, <em>exit_</em>, <em>parallel</em>, <em>ga_input</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_tools.html#GATools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_tools.GATools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Stores objects which carry out GA operations on populations.</p>
+<p>Instances of this class are held by <code class="docutils literal"><span class="pre">Population</span></code> instances in
+their <cite>ga_tools</cite> attribute. All the instances which carry out GA
+operations on the population are held conveniently together in an
+instance of this class. The optimization function used by the GA
+is also stored here as is the fitness function.</p>
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.selection">
+<code class="descname">selection</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.selection" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Selection</em> – The <code class="docutils literal"><span class="pre">Selection</span></code> instance which performes selections of a
+population’s members.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.crossover">
+<code class="descname">crossover</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.crossover" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Crossover</em> – The <code class="docutils literal"><span class="pre">Crossover</span></code> instance which crosses a population’s members.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.mutation">
+<code class="descname">mutation</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.mutation" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Mutation</em> – The <code class="docutils literal"><span class="pre">Mutation</span></code> instance which mutates a population’s members</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.normalization">
+<code class="descname">normalization</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.normalization" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Normalization</em> – A <code class="docutils literal"><span class="pre">Normalization</span></code> instance which rescales or normalizes the
+fitness values of the population.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.optimization">
+<code class="descname">optimization</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.optimization" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FuncionData</em> – Holds the name of the function in <code class="docutils literal"><span class="pre">optimization.py</span></code> to be
+used for <code class="docutils literal"><span class="pre">MacroMolecule</span></code> optimizations and any additional
+parameters the function may require.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.fitness">
+<code class="descname">fitness</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.fitness" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FunctionData</em> – Holds the name of the function in <code class="docutils literal"><span class="pre">fitness.py</span></code> to be used for
+calculating the fitness of <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances. It also
+holds any additional paramters the function may require.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.exit">
+<code class="descname">exit</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.exit" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Exit</em> – An exit object which checks if the population achieved the
+exit criterion to stop the GA before all generations have been
+made.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.parallel">
+<code class="descname">parallel</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – If <code class="docutils literal"><span class="pre">True</span></code> optimizations and fitness calculations are done on
+each molecule in parallel.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.ga_tools.GATools.input">
+<code class="descname">input</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.input" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>GAInput</em> – The GAInput object holding data gathered from the input file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">crossover</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">exit</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">fitness</code></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="mtk.ga.ga_tools.GATools.init_empty">
+<em class="property">classmethod </em><code class="descname">init_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_tools.html#GATools.init_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_tools.GATools.init_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">input</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">mutation</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">normalization</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">optimization</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">parallel</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">selection</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 
