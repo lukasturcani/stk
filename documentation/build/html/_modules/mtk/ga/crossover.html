@@ -221,12 +221,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcs</span><span class="p">,</span> <span class="n">num_crossovers</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Crossover.__init__"><a class="viewcode-back" href="../../../mtk.ga.crossover.html#mtk.ga.crossover.Crossover.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcs</span><span class="p">,</span> <span class="n">num_crossovers</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">funcs</span> <span class="o">=</span> <span class="n">funcs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_crossovers</span> <span class="o">=</span> <span class="n">num_crossovers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_crossovers</span> <span class="o">=</span> <span class="n">num_crossovers</span></div>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Crossover.__call__"><a class="viewcode-back" href="../../../mtk.ga.crossover.html#mtk.ga.crossover.Crossover.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Carries out crossover operations on the supplied population.</span>
 
@@ -307,7 +307,7 @@
                     <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">member</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
             <span class="n">plot_counter</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">counter_path</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">offspring_pop</span>
+        <span class="k">return</span> <span class="n">offspring_pop</span></div>
 
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The following crossover operations apply to ``Cage`` instances</span>

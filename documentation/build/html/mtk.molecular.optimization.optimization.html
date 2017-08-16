@@ -186,6 +186,99 @@ folder as this file. Then import the optimization function into this
 file. See <code class="docutils literal"><span class="pre">macromodel.py</span></code> as an example. Make sure that only the
 optimization functions are imported back into this file, not any of the
 helper functions or classes.</p>
+<dl class="class">
+<dt id="mtk.molecular.optimization.optimization._OptimizationFunc">
+<em class="property">class </em><code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_OptimizationFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A decorator for optimziation functions.</p>
+<p>This decorator is applied to all optimization functions
+automatically in _optimize_all(). It should not be applied
+explicitly when defining the functions.</p>
+<p>This decorator prevents optimization functions from raising if
+they fail (necessary for multiprocessing) and prevents them from
+being run twice on the same molecule.</p>
+<dl class="method">
+<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_OptimizationFunc.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__call__': &lt;function _OptimizationFunc.__call__&gt;, '__init__': &lt;function _OptimizationFunc.__init__&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;, '__module__': 'mtk.molecular.optimization.optimization', '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in _optimize_all(). It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_OptimizationFunc.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.optimization.optimization'</em><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.optimization.optimization._optimize_all">
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">_optimize_all</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_optimize_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._optimize_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run opt function on all population members in parallel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><em>FunctionData</em></a>) – The <code class="docutils literal"><span class="pre">FunctionData</span></code> object which represents the chosen
+optimization function. This function should be defined within
+this module. The <code class="docutils literal"><span class="pre">FunctionData</span></code> object also holds any
+additional parameters the optimization function may need.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The <code class="docutils literal"><span class="pre">Population</span></code> instance who’s members must be optimized.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.optimization.optimization._optimize_all_serial">
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">_optimize_all_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_optimize_all_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._optimize_all_serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run opt function on all population members sequentially.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><em>FunctionData</em></a>) – The <code class="docutils literal"><span class="pre">FunctionData</span></code> object which represents the chosen
+optimization function. This function should be defined within
+this module. The <code class="docutils literal"><span class="pre">FunctionData</span></code> object also holds any
+additional parameters the optimization function may need.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The <code class="docutils literal"><span class="pre">Population</span></code> instance who’s members must be optimized.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="mtk.molecular.optimization.optimization.do_not_optimize">
 <code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>

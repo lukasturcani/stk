@@ -352,6 +352,17 @@ decorated version of the original method defined in the class. The
 method is decorated with the <code class="docutils literal"><span class="pre">e_logger()</span></code> decorator. Calling this
 decorated method makes it automatically update the <cite>values</cite>
 dictionary of the object which used the method.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMeta.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.EMeta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="mtk.molecular.energy.EMeta.__new__">
+<em class="property">static </em><code class="descname">__new__</code><span class="sig-paren">(</span><em>cls_name</em>, <em>bases</em>, <em>cls_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMeta.__new__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMeta.__new__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns all the public methods in <cite>cls</cite> to EMethod descriptors.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -363,6 +374,62 @@ dictionary of the object which used the method.</p>
 <dt id="mtk.molecular.energy.EMethod.func">
 <code class="descname">func</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.func" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>function</em> – The method which the descriptor acts as a getter for.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__init__': &lt;function EMethod.__init__&gt;, '__weakref__': &lt;attribute '__weakref__' of 'EMethod' objects&gt;, '__get__': &lt;function EMethod.__get__&gt;, '__module__': 'mtk.molecular.energy', '__doc__': '\n    A descriptor for methods of the ``Energy`` class.\n\n    Attributes\n    ----------\n    func : function\n        The method which the descriptor acts as a getter for.\n\n    ', '__dict__': &lt;attribute '__dict__' of 'EMethod' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.EMethod.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.EMethod.__get__">
+<code class="descname">__get__</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMethod.__get__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMethod.__get__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a modified <cite>self.func</cite>.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.obj">
+<code class="descname">obj</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>object</em> – The object to which the method in <cite>self.func</cite> should be
+bound.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.cls">
+<code class="descname">cls</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.cls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>object</em> – The class of <cite>obj</cite>.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><em>BoundMethod</em> – A decorated version of the method held in <cite>self.func</cite>. The
+difference is that when calling the method  now, it will
+automatically update the <cite>values</cite> attribute of <cite>obj</cite>.</li>
+<li><strong>self.func</strong> (<em>function</em>) – If the method in <cite>self.func</cite> is called as a class attribute
+rather than an instance attribute, return it instead of the
+descriptor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.EMethod.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMethod.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMethod.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.EMethod.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 </dd></dl>
@@ -386,6 +453,27 @@ concerns the molecule held in this attribute.</p>
 <code class="descname">values</code><a class="headerlink" href="#mtk.molecular.energy.Energy.values" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict of FunctionData instances</em> – The keys in the dict code for the function and parameters which
 were used to calculate the energy. The values are the energies.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'formation': &lt;mtk.molecular.energy.EMethod object&gt;, 'pseudoformation': &lt;mtk.molecular.energy.EMethod object&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Energy' objects&gt;, '__doc__': '\n    Handles all things related to a molecules energy.\n\n    An instance of this class will be placed in the `energy` attribute\n    of each ``Molecule`` instance.\n\n    Attributes\n    ----------\n    molecule : Molecule\n        The energetic information held by an instance of ``Energy``\n        concerns the molecule held in this attribute.\n\n    values : dict of FunctionData instances\n        The keys in the dict code for the function and parameters which\n        were used to calculate the energy. The values are the energies.\n\n    ', 'macromodel': &lt;mtk.molecular.energy.EMethod object&gt;, '__module__': 'mtk.molecular.energy', '__init__': &lt;function Energy.__init__&gt;, 'rdkit': &lt;mtk.molecular.energy.EMethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'Energy' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.Energy.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.Energy.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy.Energy.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">
@@ -536,6 +624,24 @@ in the dictionary <cite>self.values</cite>.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="mtk.molecular.energy._EnergyError">
+<em class="property">exception </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">_EnergyError</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#_EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._EnergyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>A class for errors in Energy methods.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy._EnergyError.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy._EnergyError.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy._EnergyError.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy._EnergyError.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 </dd></dl>

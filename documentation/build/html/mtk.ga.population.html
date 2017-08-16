@@ -232,6 +232,166 @@ to this attribute.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.ga.population.Population.__add__">
+<code class="descname">__add__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__add__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__add__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins two populations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population to be joined with.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A new <a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance which holds two
+subpopulations and no direct members. The two
+subpopulations are the two <a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instances on
+which the <code class="docutils literal"><span class="pre">+</span></code> operator was applied.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__contains__">
+<code class="descname">__contains__</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.population.Population.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'min': &lt;function Population.min&gt;, 'has_structure': &lt;function Population.has_structure&gt;, 'select': &lt;function Population.select&gt;, 'remove_members': &lt;function Population.remove_members&gt;, '__len__': &lt;function Population.__len__&gt;, 'init_all': &lt;classmethod object&gt;, 'init_diverse_cages': &lt;classmethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'Population' objects&gt;, 'init_from_files': &lt;classmethod object&gt;, 'add_subpopulation': &lt;function Population.add_subpopulation&gt;, '__init__': &lt;function Population.__init__&gt;, '__getitem__': &lt;function Population.__getitem__&gt;, 'exit': &lt;function Population.exit&gt;, 'gen_next_gen': &lt;function Population.gen_next_gen&gt;, '__doc__': '\n    A container for  :class:`.Molecule` objects.\n\n    :class:`Population` instances can be nested.\n\n    In addtion to holding :class:`.Molecule` objects, the\n    :class:`Population` class can be used to create large numbers of\n    these instances through the :meth:`init\\_` class methods.\n\n    :class:`.Molecule` instances held by a :class:`Population` can have\n    their structures optimized in parallel through the\n    :meth:`optimize_population` method.\n\n    The EA is invoked by calling a number of methods of this class,\n    such as :meth:`gen_offspring`, :meth:`gen_mutants` and\n    :meth:`select`. However, this class only implements container\n    related functionality. It delegates EA operations to the\n    :class:`.Crossover`, :class:`.Mutation` and :class:`.Selection`\n    classes.\n\n    These classes are organised as follows. Each :class:`Population`\n    instance has a :attr:`ga_tools` attribute. This holds a\n    :class:`.GATools` instance. The :class:`.GATools` instance is just\n    a container. It holds a :class:`.Crossover`, :class:`.Mutation`\n    and :class:`.Selection` instance. These instances deal with the\n    :class:`Population` instance they are held by and perform the\n    various crossover, mutation and selection operations on it.\n    Any functionality related to the EA should be delegated to these\n    instances. The :meth:`gen_offspring` and :meth:`gen_mutants`\n    methods can serve as a guide to how this should be done.\n\n    The only operations directly implemented by this class are those\n    relevant to its role as a container. It supports all expected and\n    necessary container operations such as iteration, indexing,\n    membership checks (via the ``is in`` operator) as would be\n    expected. Details of the various implementations and a full list of\n    supported operations can be found by examining the included\n    methods.\n\n    Parameters\n    ----------\n    *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`\n        A population is initialized with the :class:`.Molecule` and\n        :class:`Population` instances it should hold. These are placed\n        into the :attr:`members` or :attr:`populations` attributes,\n        respectively. A :class:`.GATools` instance may be included\n        and will be placed into the :attr:`ga_tools` attribute.\n\n    Raises\n    ------\n    TypeError\n        If initialized with something other than :class:`.Molecule`,\n        :class:`Population` or :class:`.GATools` instances.\n\n    Attributes\n    ----------\n    populations : :class:`list` of :class:`Population` instances\n        A list of other instances of the :class:`Population` class.\n        This allows the implementation of subpopulations or\n        evolutionary islands. This attribute is also used for grouping\n        molecules within a given population for organizational\n        purposes.\n\n    members : :class:`list` of :class:`.Molecule` instances\n        Held here are the members of the population which are not held\n        within any subpopulations. This means that not all members of a\n        population are stored in this attribute. To access all members\n        of a population the generator :meth:`all_members` should be\n        used.\n\n    ga_tools : :class:`.GATools`\n        An instance of the :class:`.GATools` class. Calls to preform EA\n        operations on the :class:`.Population` instance are delegated\n        to this attribute.\n\n    ', 'fromlist': &lt;classmethod object&gt;, 'calculate_member_fitness': &lt;function Population.calculate_member_fitness&gt;, 'write': &lt;function Population.write&gt;, 'normalize_fitness_values': &lt;function Population.normalize_fitness_values&gt;, 'max': &lt;function Population.max&gt;, 'dump': &lt;function Population.dump&gt;, '__module__': 'mtk.ga.population', 'all_members': &lt;function Population.all_members&gt;, 'tolist': &lt;function Population.tolist&gt;, 'gen_mutants': &lt;function Population.gen_mutants&gt;, 'load': &lt;classmethod object&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Population' objects&gt;, 'assign_names_from': &lt;function Population.assign_names_from&gt;, 'remove_duplicates': &lt;function Population.remove_duplicates&gt;, 'gen_offspring': &lt;function Population.gen_offspring&gt;, 'init_random_cages': &lt;classmethod object&gt;, '__str__': &lt;function Population.__str__&gt;, '__iter__': &lt;function Population.__iter__&gt;, '__contains__': &lt;function Population.__contains__&gt;, 'add_members': &lt;function Population.add_members&gt;, 'optimize_population': &lt;function Population.optimize_population&gt;, '__sub__': &lt;function Population.__sub__&gt;, 'mean': &lt;function Population.mean&gt;, '__add__': &lt;function Population.__add__&gt;, '__repr__': &lt;function Population.__repr__&gt;})</em><a class="headerlink" href="#mtk.ga.population.Population.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__getitem__">
+<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows indexing to select members of the population.</p>
+<p>Molecules held by the <a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance can be
+accessed by their index. Slices are also supported. These return
+a new <a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance holding the members with the
+requested indices. Using slices will return a flat
+<a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance, meaing no nesting is preserved.</p>
+<p>The index corresponds to the order of members in
+<a class="reference internal" href="#mtk.ga.population.Population.all_members" title="mtk.ga.population.Population.all_members"><code class="xref py py-meth docutils literal"><span class="pre">all_members()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal"><span class="pre">slice</span></code>) – An <code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">slice</span></code> can be used depending on
+if a single members needs to be returned or a cllection of
+them.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> – If the supplied <cite>key</cite> is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code>. Returns the
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instance with the corresponding index
+from <a class="reference internal" href="#mtk.ga.population.Population.all_members" title="mtk.ga.population.Population.all_members"><code class="xref py py-meth docutils literal"><span class="pre">all_members()</span></code></a>.</li>
+<li><a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> – If the supplied <cite>key</cite> is a <code class="xref py py-class docutils literal"><span class="pre">slice</span></code>. The returned
+<a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance holds members at the given
+indices in <a class="reference internal" href="#mtk.ga.population.Population.all_members" title="mtk.ga.population.Population.all_members"><code class="xref py py-meth docutils literal"><span class="pre">all_members()</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">TypeError</span></code> – If the supplied <cite>key</cite> is not an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> or
+<code class="xref py py-class docutils literal"><span class="pre">slice</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__iter__">
+<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows populations to be iterated through,</p>
+<p>When <a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instances are iterated through, they
+yield <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instances from the <a class="reference internal" href="#mtk.ga.population.Population.all_members" title="mtk.ga.population.Population.all_members"><code class="xref py py-meth docutils literal"><span class="pre">all_members()</span></code></a>
+generator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The <a class="reference internal" href="#mtk.ga.population.Population.all_members" title="mtk.ga.population.Population.all_members"><code class="xref py py-meth docutils literal"><span class="pre">all_members()</span></code></a> generator.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">generator</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__len__">
+<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total number of members in the population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of members held by the population, including
+those held within its subpopulations.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.population.Population.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.ga.population'</em><a class="headerlink" href="#mtk.ga.population.Population.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.population.Population.__sub__">
+<code class="descname">__sub__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.__sub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.__sub__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes members of <cite>other</cite> from the population.</p>
+<p>Subtracting one population from another,</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop3</span> <span class="o">=</span> <span class="n">pop1</span> <span class="o">-</span> <span class="n">pop2</span>
+</pre></div>
+</div>
+<p>returns a new population, <code class="docutils literal"><span class="pre">pop3</span></code>. The returned population
+contains all molecules in <code class="docutils literal"><span class="pre">pop1</span></code> excep those also found in
+<code class="docutils literal"><span class="pre">pop2</span></code>. This refers to all molcules, including those held
+within any subpopulations. The returned population is flat.
+This means any nesting in <code class="docutils literal"><span class="pre">pop1</span></code> is not preserved.</p>
+<p>The resulting population, <code class="docutils literal"><span class="pre">pop3</span></code>, will hold the same
+<a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a> instance as <code class="docutils literal"><span class="pre">pop1</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A collection of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instances to be removed
+from the population, if held by it.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A flat population of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instances which
+are in the population but not in <cite>other</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.population.Population.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.ga.population.Population.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="mtk.ga.population.Population.add_members">
 <code class="descname">add_members</code><span class="sig-paren">(</span><em>population</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.add_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.add_members" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instances into <a class="reference internal" href="#mtk.ga.population.Population.members" title="mtk.ga.population.Population.members"><code class="xref py py-attr docutils literal"><span class="pre">members</span></code></a>.</p>
@@ -747,28 +907,25 @@ objects is loaded. If <code class="docutils literal"><span class="pre">False</sp
 <dl class="method">
 <dt id="mtk.ga.population.Population.max">
 <code class="descname">max</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.max" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the max in the population given a key.</p>
-<p>This method applies key(member) on every member of the
-population and returns the max of returned values.</p>
-<p>For example, if the max value of the attribute <cite>cavity_size</cite>
-was desired:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>population.max(</dt>
-<dd>lambda macro_mol : macro_mol.topology.cavity_size())</dd>
-</dl>
-</div></blockquote>
+<dd><p>Calculates the maximum in the population given a key.</p>
+<p>This method applies <code class="docutils literal"><span class="pre">key(member)</span></code> on every member of the
+population and returns the maximum of returned values.</p>
+<p>For example, if the maximum molecular cavity in the
+population is desired:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">population</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="k">lambda</span> <span class="n">macro_mol</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">())</span>
+</pre></div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>function</em>) – A function which should take a Molecule instance as
-its argument and return a value.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instance
+as its argument and returns a numerical value.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The max of the values returned by the function <cite>key</cite> when
-its applied to all members of the population.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The maximum of the values returned by the function <cite>key</cite>
+when it is applied to all members of the population.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -777,28 +934,25 @@ its applied to all members of the population.</td>
 <dl class="method">
 <dt id="mtk.ga.population.Population.mean">
 <code class="descname">mean</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.mean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the mean given a key.</p>
-<p>This method applies key(member) on every member of the
+<dd><p>Calculates the mean in the population given a key.</p>
+<p>This method applies <code class="docutils literal"><span class="pre">key(member)</span></code> on every member of the
 population and returns the mean of returned values.</p>
-<p>For example, if the mean value of the attribute <cite>cavity_size</cite>
-was desired:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>population.mean(</dt>
-<dd>lambda macro_mol : macro_mol.topology.cavity_size())</dd>
-</dl>
-</div></blockquote>
+<p>For example, if the mean of molecular cavities in the
+population is desired:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">population</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="k">lambda</span> <span class="n">macro_mol</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">())</span>
+</pre></div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>function</em>) – A function which should take a Molecule instance as
-its argument and return a value.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instance
+as its argument and returns a numerical value.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The mean of the values returned by the function <cite>key</cite> when
-its applied to all members of the population.</td>
+it is applied to all members of the population.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -807,28 +961,25 @@ its applied to all members of the population.</td>
 <dl class="method">
 <dt id="mtk.ga.population.Population.min">
 <code class="descname">min</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.min" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the min given a key.</p>
-<p>This method applies key(member) on every member of the
-population and returns the min of returned values.</p>
-<p>For example, if the min value of the attribute <cite>cavity_size</cite>
-was desired:</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>population.min(</dt>
-<dd>lambda macro_mol : macro_mol.topology.cavity_size())</dd>
-</dl>
-</div></blockquote>
+<dd><p>Calculates the minimum in the population given a key.</p>
+<p>This method applies <code class="docutils literal"><span class="pre">key(member)</span></code> on every member of the
+population and returns the minimum of returned values.</p>
+<p>For example, if the minimum molecular cavity in the
+population is desired:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">population</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="k">lambda</span> <span class="n">macro_mol</span><span class="p">:</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">())</span>
+</pre></div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>function</em>) – A function which should take a Molecule instance as
-its argument and return a value.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which should take a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instance
+as its argument and returns a numerical value.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The min of the values returned by the function <cite>key</cite> when
-its applied to all members of the population.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The minimum of the values returned by the function <cite>key</cite>
+when it is applied to all members of the population.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -837,14 +988,23 @@ its applied to all members of the population.</td>
 <dl class="method">
 <dt id="mtk.ga.population.Population.normalize_fitness_values">
 <code class="descname">normalize_fitness_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.normalize_fitness_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.normalize_fitness_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies the normalization function.</p>
+<dd><p>Applies the normalization functions on the population.</p>
+<p>Normalization functions scale or modify the fitness values of
+molecules in the population.</p>
+<p>The normalization functions which are applied on the
+population, along with their order, are defined in the
+<a class="reference internal" href="mtk.ga.normalization.html#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> instance held by the population via the
+<a class="reference internal" href="#mtk.ga.population.Population.ga_tools" title="mtk.ga.population.Population.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">ga_tools</span></code></a> attribute.</p>
+<p class="rubric">Notes</p>
+<p>This method modifies the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>
+attribute of molecules held by the population.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -853,25 +1013,25 @@ its applied to all members of the population.</td>
 <dl class="method">
 <dt id="mtk.ga.population.Population.optimize_population">
 <code class="descname">optimize_population</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.optimize_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.optimize_population" title="Permalink to this definition">¶</a></dt>
-<dd><p>Optimizes all the members of the population.</p>
-<p>The population is optimized serially or in parallel depending
-on the flag <cite>ga_tools.parallel</cite>. The serial version may be
+<dd><p>Optimizes the structures of molecules in the population.</p>
+<p>The molecules are optimized serially or in parallel depending
+on the flag <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.parallel" title="mtk.ga.ga_tools.GATools.parallel"><code class="xref py py-attr docutils literal"><span class="pre">GATools.parallel</span></code></a> of the <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a>
+instance held by the population. The serial version may be
 faster in cases where all molecules have already been
 optimized. This is because all optimizations will be skipped.
 In this case creating a parallel process pool creates
 unncessary overhead.</p>
-<dl class="docutils">
-<dt>Molecule</dt>
-<dd>The Molecule instances held by the population have their
-structures optimized.</dd>
-</dl>
+<p class="rubric">Notes</p>
+<p>This function modifies the structures of molecules held by the
+population. This means their <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.mol" title="mtk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">Molecule.mol</span></code></a> attributes
+are modified.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -880,41 +1040,36 @@ structures optimized.</dd>
 <dl class="method">
 <dt id="mtk.ga.population.Population.remove_duplicates">
 <code class="descname">remove_duplicates</code><span class="sig-paren">(</span><em>between_subpops=True</em>, <em>key=&lt;function Population.&lt;lambda&gt;&gt;</em>, <em>top_seen=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.remove_duplicates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.remove_duplicates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes duplicates from a population and preserves structure.</p>
-<p>The question of which <code class="docutils literal"><span class="pre">Molecule</span></code> instance is preserved
-from a choice of two is difficult to answer. The iteration
-through a population is depth-first, so a rule such as <code class="docutils literal"><span class="pre">the</span>
-<span class="pre">molecule</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">topmost</span> <span class="pre">population</span> <span class="pre">is</span> <span class="pre">preserved</span></code> is not
-the case here. Rather, the first <code class="docutils literal"><span class="pre">Molecule</span></code> instance
-iterated through is preserved.</p>
+<dd><p>Removes duplicates from the population and preserves structure.</p>
+<p>The question of which molcule is preserved when duplicates are
+removed is difficult to answer. The iteration through a
+population is depth-first, so a rule such as “the molecule in
+the topmost population is preserved” is not the case here.
+Rather, the first molecule found is preserved.</p>
 <p>However, this question is only relevant if duplicates in
 different subpopulations are being removed. In this case it is
 assumed that it is more important to have a single instance
 than to worry about which subpopulation it is in.</p>
 <p>If the duplicates are being removed from within subpopulations,
 each subpopulation will end up with a single instance of all
-molecules held before. There is no <code class="docutils literal"><span class="pre">choice</span></code>.</p>
+molecules held before. There is no “choice”.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>between_subpops</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – When <code class="docutils literal"><span class="pre">False</span></code> duplicates are only removed from within a
+<li><strong>between_subpops</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal"><span class="pre">False</span></code> duplicates are only removed from within a
 given subpopulation. If <code class="docutils literal"><span class="pre">True</span></code> all duplicates are
 removed, regardless of which subpopulation they are in.</li>
-<li><strong>key</strong> (<em>callable</em><em> (</em><em>default = lambda x : id</em><em>)</em>) – Duplicates are removed by on the value returned by this
-function.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>members</strong> – Duplicate instances are removed from the <cite>members</cite>
-attribute of the population or subpopulations.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">callable</span></code>, optional) – Two molecules are considered the same if the values
+returned by <code class="docutils literal"><span class="pre">key(molecule)</span></code> are the same.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -924,29 +1079,20 @@ attribute of the population or subpopulations.</li>
 <dl class="method">
 <dt id="mtk.ga.population.Population.remove_members">
 <code class="descname">remove_members</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.remove_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.remove_members" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes all members where key(member) is <code class="docutils literal"><span class="pre">True</span></code>.</p>
+<dd><p>Removes all members where <code class="docutils literal"><span class="pre">key(member)</span></code> is <code class="docutils literal"><span class="pre">True</span></code>.</p>
 <p>The structure of the population is preserved.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<em>callable</em>) – A callable which takes 1 argument. Each member of the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">callable</span></code>) – A callable which takes 1 argument. Each member of the
 population is passed as the argument to <cite>key</cite> in turn. If
 the result is <code class="docutils literal"><span class="pre">True</span></code> then the member is removed from the
-population.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>self</strong> (<a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – All members of the population which have their <cite>failed</cite>
-attribute set to <code class="docutils literal"><span class="pre">True</span></code> are removed.</li>
-</ul>
-</td>
+population.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -954,57 +1100,29 @@ attribute set to <code class="docutils literal"><span class="pre">True</span></c
 
 <dl class="method">
 <dt id="mtk.ga.population.Population.select">
-<code class="descname">select</code><span class="sig-paren">(</span><em>type_='generational'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.select" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a generator field yielding selected members of <cite>self</cite>.</p>
-<p>Selection is a GA procedure and as a result this method merely
-delegates the selection request to the <code class="docutils literal"><span class="pre">Selection</span></code> instance
-held within the <cite>ga_tools</cite> attribute. The <code class="docutils literal"><span class="pre">Selection</span></code>
-instance then returns a generator which yields
-<code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances held within the population. Which
-macromolecules are yielded depends on the selection algorithm
-which was chosen during initialization and when calling this
-method. The selection instance (<cite>self.ga_tools.selection</cite>)
-returns the generator when it is called. See <code class="docutils literal"><span class="pre">Selection</span></code>
-class documentation for more information.</p>
-<p>Because selection is required in a number of different ways,
-such as selecting the parents, <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances for
-mutation and <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances for the next
-generation, the type of selection must be specificed with the
-<cite>type_</cite> parameter. The valid values for <cite>type_</cite> will correspond
-to one of the attribute names of the <code class="docutils literal"><span class="pre">Selection</span></code> instance.</p>
-<p>For example, if <cite>type_</cite> is set to ‘crossover’ a selection
-algorithm which yields a parents will be invoked. If the
-<cite>type_</cite> is set to ‘generational’ an algorithm which yields the
-next generation will be invoked.</p>
-<p>The information regarding which generational, parent pool, etc.
-algorithm is used is held by the <code class="docutils literal"><span class="pre">Selection</span></code> instance. This
-method merely requests that the <code class="docutils literal"><span class="pre">Selection</span></code> instance performs
-the selection algorithm of the relevant type. The <code class="docutils literal"><span class="pre">Selection</span></code>
-instance takes care of all the details to do with selection.</p>
+<code class="descname">select</code><span class="sig-paren">(</span><em>type='generational'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a generator for yielding members of the population.</p>
+<p>Members are yielded based on the selection function defined in
+the <a class="reference internal" href="mtk.ga.selection.html#mtk.ga.selection.Selection" title="mtk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance held by the population via the
+<a class="reference internal" href="#mtk.ga.population.Population.ga_tools" title="mtk.ga.population.Population.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">ga_tools</span></code></a> attribute. The instance defines 3 selection
+functions, 1 for each <cite>type</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> (<em>str</em><em> (</em><em>default = 'generational'</em><em>)</em>) – <p>A string specifying the type of selection to be performed.
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – <p>A string specifying the type of selection to be performed.
 Valid values will correspond to names of attributes of the
-<code class="docutils literal"><span class="pre">Selection</span></code> class. Check <code class="docutils literal"><span class="pre">Selection</span></code> class
-documentation for details.</p>
-<dl class="docutils">
-<dt>Valid values include:</dt>
-<dd>’generational’ - selects the next generation
-‘crossover’ - selects parents
-‘mutation’ - selects <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances for<blockquote class="last">
-<div>mutation</div></blockquote>
-</dd>
-</dl>
+<code class="xref py py-class docutils literal"><span class="pre">Selection</span></code> class.</p>
+<p>Valid values are:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">'generational'</span></code> - selects the next generation
+<code class="docutils literal"><span class="pre">'crossover'</span></code> - selects molecules for crossover
+<code class="docutils literal"><span class="pre">'mutation'</span></code> - selects molecules for mutation</div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A generator which yields <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instances or
-tuples of them. Which instances are yielded depends on the
-selection algorithm used by the generator. This will depend
-on the <cite>type_</cite> provided.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A generator which yields molecules or tuples of them.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">generator</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">generator</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -1023,7 +1141,7 @@ dictionaries (as strings).</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A JSON string representing the population.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -1038,11 +1156,11 @@ dictionaries (as strings).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dir_path</strong> (<em>str</em>) – The full path of the directory into which the <code class="docutils literal"><span class="pre">.mol</span></code> file
+<li><strong>dir_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the directory into which the <code class="docutils literal"><span class="pre">.mol</span></code> file
 is written.</li>
-<li><strong>use_name</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – When <code class="docutils literal"><span class="pre">True</span></code> the <cite>name</cite> attribute of the population’s
-members is used to make the name of the .mol file. If
-<code class="docutils literal"><span class="pre">False</span></code> the files are just named after the member’s
+<li><strong>use_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal"><span class="pre">True</span></code> the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.name" title="mtk.molecular.molecules.Molecule.name"><code class="xref py py-attr docutils literal"><span class="pre">Molecule.name</span></code></a> attribute of the
+members is used to make the name of the <code class="docutils literal"><span class="pre">.mol</span></code> file. If
+<code class="docutils literal"><span class="pre">False</span></code>, the files are just named after the member’s
 index in the population.</li>
 </ul>
 </td>
@@ -1050,7 +1168,7 @@ index in the population.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
