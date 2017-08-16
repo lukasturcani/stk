@@ -441,10 +441,10 @@ def partial_raiser(macro_mol, logger=logger):
 
 # Provides labels for the progress plotter.
 @_param_labels('Cavity Difference ', 'Window Difference ',
-               'Asymmetry ', 'Energy per Bond ', 'Strain')
-def cage(macro_mol, pseudoformation_params={
-                     'func': FunctionData('rdkit', forcefield='mmff')},
-         logger=logger):
+               'Asymmetry ', 'Energy per Bond ', 'Precursors Strain',
+               'Dihedral Strain')
+def cage(macro_mol, dihedral_SMARTS, target_value, pseudoformation_params={
+        'func': FunctionData('rdkit', forcefield='mmff')}, logger=logger):
     """
     Returns the fitness vector of a cage.
 
@@ -457,13 +457,22 @@ def cage(macro_mol, pseudoformation_params={
            windows in `macro_mol`.
         4) `eng_per_bond` - The formation energy of `macro_mol` per
            bond made.
-        5) `strain` - The mean rmsd between the free building blocks
+        5) `prec_strain` - The mean rmsd between the free building blocks
            and those in the macromolecule.
+        6) `dihedral_strain` - The % relative difference between the average
+            dihedral angle within the molecule and a target value. The user
+            must provide the SMARTS for the dihedral and the target value.
 
     Parameters
     ----------
     macro_mol : Cage
         The cage whose fitness is to be calculated.
+
+    dihedral_SMARTS : :class: `str`
+        The SMARTS code for the dihedral of interest.
+
+    target_value : :class: `float`
+        Float representing the target value for the dihedral angle.
 
     pseudoformation_params : dict (default =
           { 'func' : FunctionData('rdkit', forcefield='uff') })
@@ -519,21 +528,27 @@ def cage(macro_mol, pseudoformation_params={
                                            **pseudoformation_params)
     e_per_bond /= macro_mol.bonds_made
 
-    strain = macro_mol.bb_distortion()
+    prec_strain = macro_mol.bb_distortion()
+
+    dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
+                                                target_value)
 
     macro_mol.progress_params['cage'] = [cavity, window, asymmetry,
-                                         e_per_bond, strain]
+                                         e_per_bond, prec_strain,
+                                         dihedral_strain]
 
     if None in macro_mol.progress_params['cage']:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
-    return np.array([cavity, window, asymmetry, e_per_bond, strain])
+    return np.array([cavity, window, asymmetry, e_per_bond, prec_strain,
+                     dihedral_strain])
 
 
 @_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
-               'Complex Strain', 'Cavity', 'Asymmetry', 'Strain')
-def cage_target(macro_mol, target_mol_file,
+               'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
+               'Dihedral Strain')
+def cage_target(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
                 efunc, ofunc, rotations=0, logger=logger):
     """
     Returns the fitness vector of a cage / target complex.
@@ -550,6 +565,7 @@ def cage_target(macro_mol, target_mol_file,
         5. cavity of cage by itself
         6. asymmetry of cage by itself
         7. strain of cage by itself
+        8. strain in the relevant dihedral angles of the cage itself
 
     Notes
     -----
@@ -564,6 +580,12 @@ def cage_target(macro_mol, target_mol_file,
     target_mol_file : :class:`str`
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
+
+    dihedral_SMARTS : str
+        The SMARTS code for the dihedral of interest.
+
+    target_value : float
+        Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the energy
@@ -595,15 +617,17 @@ def cage_target(macro_mol, target_mol_file,
     """
 
     return _cage_target('cage_target', macro_mol,
-                        target_mol_file, efunc, ofunc,
+                        target_mol_file, dihedral_SMARTS,
+                        target_value, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1),
                         logger)
 
 
 @_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
-               'Complex Strain', 'Cavity', 'Asymmetry', 'Strain')
-def cage_c60(macro_mol, target_mol_file,
+               'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
+               'Dihedral Strain')
+def cage_c60(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
              efunc, ofunc, n5fold, n2fold, logger=logger):
     """
     Calculates the fitness vector of a cage / C60 complex.
@@ -622,6 +646,7 @@ def cage_c60(macro_mol, target_mol_file,
         5. cavity of cage by itself
         6. asymmetry of cage by itself
         7. strain of cage by itself
+        8. strain in the relevant dihedral angles of the cage itself
 
     Notes
     -----
@@ -636,6 +661,12 @@ def cage_c60(macro_mol, target_mol_file,
     target_mol_file : :class:`str`
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
+
+    dihedral_SMARTS : str
+        The SMARTS code for the dihedral of interest.
+
+    target_value : float
+        Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the energy
@@ -675,8 +706,8 @@ def cage_c60(macro_mol, target_mol_file,
                         logger)
 
 
-def _cage_target(func_name, macro_mol, target_mol_file,
-                 efunc, ofunc, rotation_func, logger):
+def _cage_target(func_name, macro_mol, target_mol_file, dihedral_SMARTS,
+                 target_value, efunc, ofunc, rotation_func, logger):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -693,6 +724,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
         5. cavity of cage by itself
         6. asymmetry of cage by itself
         7. strain of cage by itself
+        8. strain in the relevant dihedral angles of the cage itself
 
     Notes
     -----
@@ -711,6 +743,12 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     target_mol_file : :class:`str`
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
+
+    dihedral_SMARTS : :class:`str`
+        The SMARTS code for the dihedral angle of interest.
+
+    target_value : :class:`float`
+        Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the energy
@@ -848,14 +886,17 @@ def _cage_target(func_name, macro_mol, target_mol_file,
     # Calculate fitness parameters of cage by itself.
     cavity = macro_mol.cavity_size()
     asymmetry = macro_mol.window_difference()
-    strain = macro_mol.bb_distortion()
+    prec_strain = macro_mol.bb_distortion()
+    dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
+                                                target_value)
     macro_mol.progress_params[func_name] = [binding_energy,
                                             cmplx_cavity,
                                             cmplx_asymmetry,
                                             cmplx_strain,
                                             cavity,
                                             asymmetry,
-                                            strain]
+                                            prec_strain,
+                                            dihedral_strain]
 
     if None in macro_mol.progress_params[func_name]:
         raise ValueError(('At least one'
@@ -864,7 +905,7 @@ def _cage_target(func_name, macro_mol, target_mol_file,
 
     return np.array([binding_energy,
                      cmplx_cavity, cmplx_asymmetry, cmplx_strain,
-                     cavity, asymmetry, strain])
+                     cavity, asymmetry, prec_strain, dihedral_strain])
 
 
 def _make_cage_target_folder():
