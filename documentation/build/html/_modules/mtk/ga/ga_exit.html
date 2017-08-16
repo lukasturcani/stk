@@ -172,12 +172,12 @@
 
 
 <div class="viewcode-block" id="Exit"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit">[docs]</a><span class="k">class</span> <span class="nc">Exit</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_data</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span> <span class="o">=</span> <span class="n">func_data</span>
+<div class="viewcode-block" id="Exit.__init__"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span> <span class="o">=</span> <span class="n">func_data</span></div>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
+<div class="viewcode-block" id="Exit.__call__"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
         <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Exit.mol_present"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.mol_present">[docs]</a>    <span class="k">def</span> <span class="nf">mol_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

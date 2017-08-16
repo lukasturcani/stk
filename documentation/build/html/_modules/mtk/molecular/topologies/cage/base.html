@@ -162,8 +162,8 @@
 
 
 <div class="viewcode-block" id="WindowError"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.WindowError">[docs]</a><span class="k">class</span> <span class="nc">WindowError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+<div class="viewcode-block" id="WindowError.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.WindowError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div></div>
 
 
 <div class="viewcode-block" id="Vertex"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex">[docs]</a><span class="k">class</span> <span class="nc">Vertex</span><span class="p">:</span>
@@ -208,13 +208,13 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Vertex.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_position_pairs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">id_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">id_</span></div>
 
 <div class="viewcode-block" id="Vertex.vertex_init"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.vertex_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">vertex_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="p">):</span>
@@ -458,12 +458,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Edge.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Edge.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">Vertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">centroid</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">),</span> <span class="n">id_</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">])</span>
         <span class="n">v1</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Edge.place_mol"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Edge.place_mol">[docs]</a>    <span class="k">def</span> <span class="nf">place_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linker</span><span class="p">,</span> <span class="n">alignment</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -515,7 +515,7 @@
         <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology">[docs]</a><span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A topology class which cage topologies should inherit.</span>
 
@@ -579,7 +579,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="_CageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">edge_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">A_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">A_alignments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">))</span>
@@ -592,9 +592,9 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A_alignments</span> <span class="o">=</span> <span class="n">A_alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">B_alignments</span> <span class="o">=</span> <span class="n">B_alignments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span></div>
 
-    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.join_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Joins up the separate building blocks which form the molecule.</span>
 
@@ -653,9 +653,9 @@
                 <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
                 <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
 
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">pair_bonders_with_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.pair_bonders_with_positions"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions">[docs]</a>    <span class="k">def</span> <span class="nf">pair_bonders_with_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matches atoms with the closest building block position.</span>
 
@@ -714,9 +714,9 @@
                 <span class="k">continue</span>
             <span class="n">vertex</span><span class="o">.</span><span class="n">atom_position_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bonder_id</span><span class="p">,</span> <span class="n">pos</span><span class="p">))</span>
             <span class="n">paired_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder_id</span><span class="p">)</span>
-            <span class="n">paired_pos</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+            <span class="n">paired_pos</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.place_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Places all building block molecules on correct coordinates.</span>
 
@@ -827,16 +827,16 @@
                     <span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
 
             <span class="c1"># Save the ids of atoms which form new bonds.</span>
-            <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
+            <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_VertexOnlyCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+<div class="viewcode-block" id="_VertexOnlyCageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_VertexOnlyCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cage topolgies where all building block/linker mols have 3+ fgs.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="_VertexOnlyCageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">edge_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">A_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -849,10 +849,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">A_alignments</span> <span class="o">=</span> <span class="n">A_alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">B_alignments</span> <span class="o">=</span> <span class="n">B_alignments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cage topologies where all building units have equal number of fgs.</span>
 
@@ -870,22 +870,22 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">alignments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">alignments</span> <span class="o">=</span> <span class="n">alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">=</span> <span class="n">placement</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology.place_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
 
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">place_mols_random</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">place_mols_random</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">place_mols_random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology.place_mols_random"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols_random">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols_random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">alignments</span><span class="p">):</span>
             <span class="n">bb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">))</span>
@@ -904,9 +904,9 @@
 
             <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair_bonders_with_positions</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-            <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">ipos</span><span class="p">)</span>
+            <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">ipos</span><span class="p">)</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology.connect"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.connect">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates each Vertex with a list of its neighbors.</span>
@@ -923,7 +923,7 @@
         <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
             <span class="n">v1</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
             <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span></div></div>
 </pre></div>
 
            </div>
