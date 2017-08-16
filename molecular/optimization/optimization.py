@@ -44,7 +44,9 @@ import numpy as np
 import logging
 from threading import Thread
 from traceback import format_exc
+
 from .macromodel import macromodel_opt, macromodel_cage_opt
+
 from ...convenience_tools import FakeLogger, mplogger, StopLogging
 
 
