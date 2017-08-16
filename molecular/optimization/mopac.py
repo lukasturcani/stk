@@ -100,7 +100,7 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
             'eps': 80.1,
             'charge': 0,
             'fileout': 'PDBOUT',
-            'timeout': 172800,
+            'timeout': 172800
             }
     vals.update(settings)
 
@@ -151,6 +151,8 @@ def _run_mopac(macro_mol, mopac_path, settings, timeout=7200):
 
 def _kill_mopac(macro_mol):
     """
+    Kills a MOPAC run.
+
     To kill a MOPAC run for a specific structure it is enough to generate
     a non empty file with the molecule's name with the `.end` extension.
     """
@@ -163,6 +165,8 @@ def _kill_mopac(macro_mol):
 
 def _mop_line(settings):
     """
+    Generates the formatted string for a MOPAC input file.
+
     Formats the settings dictionary with the correct keywords for MOPAC into
     a string to be added to the MOPAC input.
 
@@ -208,6 +212,7 @@ def _mop_line(settings):
 def _create_mop(macro_mol, settings):
     """
     Creates the ``.mop`` file holding the molecule to be optimized.
+    
     The name of the input file will contain info about its charge:
     charge = 0: name_neu
     charge = -1: name_an1
@@ -283,6 +288,7 @@ def _convert_mopout_to_mol(macro_mol):
 
     """
     name, ext = os.path.splitext(macro_mol._file)
+    print(name)
     pdb_file = name + ".pdb"
 
     print("\nUpdating molecule with MOPAC optimized one - {}.\n".format(macro_mol.name))
