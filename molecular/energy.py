@@ -728,7 +728,7 @@ class Energy(metaclass=EMeta):
                 PM7 is the latest version of the reparametrization of the NDDO
                 theory, where all the atomic and diatomic parameters were
                 re-optimized - update compared to PM6.
-                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
+                `http://openmopac.net/PM7_accuracy/PM7_accuracy.html`
 
             'method' : string (default = 'NOOPT')
                 This calculation consists in a single point energy calculation.
@@ -772,7 +772,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800,
+                'timeout': 172800
                 }
 
         vals.update(settings)
@@ -865,7 +865,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800,
+                'timeout': 172800
                 }
 
         vals.update(settings)
@@ -959,7 +959,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800,
+                'timeout': 172800
                 }
         vals.update(settings)
 
@@ -981,7 +981,10 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        en1 = _extract_MOPAC_en(file_root)
+        try:
+            en1 = _extract_MOPAC_en(file_root)
+        except FileNotFoundError:
+            en1 = 0.0
 
         # Update the settings for the anion optimization
         settings2 = {
@@ -1076,7 +1079,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800,
+                'timeout': 172800
                 }
         vals.update(settings)
 

@@ -139,6 +139,7 @@ import itertools as it
 import math
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
+from rdkit.Chem import rdMolTransforms
 
 from rdkit import DataStructs
 from glob import glob
@@ -463,6 +464,53 @@ class Molecule:
 
         centroid = sum(x for _, x in self.all_atom_coords())
         return np.divide(centroid, self.mol.GetNumAtoms())
+
+    # @classmethod
+    def dihedral_strain(self, dihedral_SMARTS, target):
+        """
+        Calculates the relative % difference between all the average dihedral
+        angle values within the molecule and the target value.
+
+        Parameters
+        ----------
+        dihedral_SMARTS : str
+            The SMARTS code for the dihedral of interest.
+
+        target : float
+            Float representing the target value for the dihedral angle.
+
+        Returns
+        -------
+        diff : float
+            Float representing the % relative difference between the average
+            dihedral value in the molecule and the target value.
+        """
+
+        # Sanitize the molecule
+        rdkit.SanitizeMol(self.mol)
+
+        match = rdkit.MolFromSmarts(dihedral_SMARTS)
+
+        atoms_dihedral = self.mol.GetSubstructMatches(match)
+
+        dihedral_info = []
+        if len(atoms_dihedral) > 0:
+            for atoms_group in atoms_dihedral:
+                # Calculate the dihedral angle
+                dihedral_value = rdMolTransforms.GetDihedralDeg(
+                                    self.mol.GetConformer(), atoms_group[0],
+                                    atoms_group[1], atoms_group[2],
+                                    atoms_group[3])
+                dihedral_info.append(dihedral_value)
+
+            # Calculate the average dihedral value
+            avg_dihedral = np.mean([abs(x) for x in dihedral_info])
+            # Calculate the relative diff with the target dihedral value
+            diff = (abs(target - avg_dihedral) / target) * 100
+        else:
+            diff = 0
+
+        return diff
 
     def dump(self, path):
         """
