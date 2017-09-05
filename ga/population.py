@@ -25,48 +25,58 @@ from ..molecular.optimization.optimization import (
 
 class Population:
     """
-    Contains :class:`.Molecule` objects.
+    A container for  :class:`.Molecule` objects.
 
-    In addtion to holding :class:`.Molecule`
-    objects, the :class:`Population`
-    class can be used to create large numbers of these instances
-    through the :meth:`init\_` class methods. Contained |Molecule| objects
-    can have their structures optimized in parallel through the
-    :meth:`optimize_population` method. :class:`Population` instances
-    can be nested.
+    :class:`Population` instances can be nested.
+
+    In addtion to holding :class:`.Molecule` objects, the
+    :class:`Population` class can be used to create large numbers of
+    these instances through the :meth:`init\_` class methods.
+
+    :class:`.Molecule` instances held by a :class:`Population` can have
+    their structures optimized in parallel through the
+    :meth:`optimize_population` method.
 
     The EA is invoked by calling a number of methods of this class,
     such as :meth:`gen_offspring`, :meth:`gen_mutants` and
-    :meth:`select`, on a given instance. However this class only
-    implements container related functionality. The EA operations are
-    performed by :class:`mmead.` It
-    delegates GA operations to its :attr:`ga_tools` attribute. Any
-    functionality related to the EA should be delegated to this
-    attribute. The :meth:`gen_offspring` and :meth:`gen_mutants`
+    :meth:`select`. However, this class only implements container
+    related functionality. It delegates EA operations to the
+    :class:`.Crossover`, :class:`.Mutation` and :class:`.Selection`
+    classes.
+
+    These classes are organised as follows. Each :class:`Population`
+    instance has a :attr:`ga_tools` attribute. This holds a
+    :class:`.GATools` instance. The :class:`.GATools` instance is just
+    a container. It holds a :class:`.Crossover`, :class:`.Mutation`
+    and :class:`.Selection` instance. These instances deal with the
+    :class:`Population` instance they are held by and perform the
+    various crossover, mutation and selection operations on it.
+    Any functionality related to the EA should be delegated to these
+    instances. The :meth:`gen_offspring` and :meth:`gen_mutants`
     methods can serve as a guide to how this should be done.
 
-    The only operations directly addressed by this class and definined
-    within it are those relevant to its role as a container. It
-    supports all expected and necessary container operations such as
-    iteration, indexing, membership checks (via the ``is in`` operator)
-    as would be expected. Details of the various implementations and a
-    full list of supported operations can be found by examining the
-    included methods.
+    The only operations directly implemented by this class are those
+    relevant to its role as a container. It supports all expected and
+    necessary container operations such as iteration, indexing,
+    membership checks (via the ``is in`` operator) as would be
+    expected. Details of the various implementations and a full list of
+    supported operations can be found by examining the included
+    methods.
 
     Parameters
     ----------
-    *args : |Molecule|, :class:`Population`, |GATools|
-        A population is initialized with as many |Molecule|
-        or :class:`Population` arguments as required. These are placed
+    *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`
+        A population is initialized with the :class:`.Molecule` and
+        :class:`Population` instances it should hold. These are placed
         into the :attr:`members` or :attr:`populations` attributes,
-        respectively. A |GATools| instance may be included
+        respectively. A :class:`.GATools` instance may be included
         and will be placed into the :attr:`ga_tools` attribute.
 
     Raises
     ------
     TypeError
-        If initialized with something other than |Molecule|,
-        :class:`Population` or |GATools| instances.
+        If initialized with something other than :class:`.Molecule`,
+        :class:`Population` or :class:`.GATools` instances.
 
     Attributes
     ----------
@@ -77,34 +87,21 @@ class Population:
         molecules within a given population for organizational
         purposes.
 
-    members : :class:`list` of \
-              :class:`~mmead.molecular.molecules.Molecule` instances
+    members : :class:`list` of :class:`.Molecule` instances
         Held here are the members of the population which are not held
         within any subpopulations. This means that not all members of a
         population are stored in this attribute. To access all members
         of a population the generator :meth:`all_members` should be
         used.
 
-    ga_tools : :class:`~mmead.ga.ga_tools.GATools`, optional
-        An instance of the ``GATools`` class. Calls to preform GA
-        operations on the ``Population`` instance are delegated
+    ga_tools : :class:`.GATools`
+        An instance of the :class:`.GATools` class. Calls to preform EA
+        operations on the :class:`.Population` instance are delegated
         to this attribute.
 
     """
 
     def __init__(self, *args):
-        """
-        Initializer for ``Population`` class.
-
-        This initializer creates a new population from the
-        ``Population`` and ``Molecule`` instances given as
-        arguments. It also accepts a ``GATools`` instance if the
-        population is to have GA operations performed on it.
-
-        The arguments can be provided in any order regardless of type.
-
-        """
-
         # Generate `populations`, `members` and `ga_tools` attributes.
         self.populations = []
         self.members = []

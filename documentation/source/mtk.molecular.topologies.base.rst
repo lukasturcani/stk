@@ -1,5 +1,5 @@
-mtk\.molecular\.topologies\.base module
-=======================================
+mtk.molecular.topologies.base module
+====================================
 
 .. automodule:: mtk.molecular.topologies.base
     :members:
