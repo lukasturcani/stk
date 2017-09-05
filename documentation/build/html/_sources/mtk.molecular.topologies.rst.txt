@@ -1,10 +1,5 @@
-mtk\.molecular\.topologies package
-==================================
-
-.. automodule:: mtk.molecular.topologies
-    :members:
-    :undoc-members:
-    :show-inheritance:
+mtk.molecular.topologies package
+================================
 
 Subpackages
 -----------
@@ -21,3 +16,10 @@ Submodules
    mtk.molecular.topologies.base
    mtk.molecular.topologies.periodic
 
+Module contents
+---------------
+
+.. automodule:: mtk.molecular.topologies
+    :members:
+    :undoc-members:
+    :show-inheritance:

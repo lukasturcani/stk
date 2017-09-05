@@ -1,10 +1,5 @@
-mtk\.molecular\.optimization package
-====================================
-
-.. automodule:: mtk.molecular.optimization
-    :members:
-    :undoc-members:
-    :show-inheritance:
+mtk.molecular.optimization package
+==================================
 
 Submodules
 ----------
@@ -14,3 +9,10 @@ Submodules
    mtk.molecular.optimization.macromodel
    mtk.molecular.optimization.optimization
 
+Module contents
+---------------
+
+.. automodule:: mtk.molecular.optimization
+    :members:
+    :undoc-members:
+    :show-inheritance:

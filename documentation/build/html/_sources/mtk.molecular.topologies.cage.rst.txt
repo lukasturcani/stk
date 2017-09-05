@@ -1,10 +1,5 @@
-mtk\.molecular\.topologies\.cage package
-========================================
-
-.. automodule:: mtk.molecular.topologies.cage
-    :members:
-    :undoc-members:
-    :show-inheritance:
+mtk.molecular.topologies.cage package
+=====================================
 
 Submodules
 ----------
@@ -17,3 +12,10 @@ Submodules
    mtk.molecular.topologies.cage.two_plus_four
    mtk.molecular.topologies.cage.two_plus_three
 
+Module contents
+---------------
+
+.. automodule:: mtk.molecular.topologies.cage
+    :members:
+    :undoc-members:
+    :show-inheritance:
