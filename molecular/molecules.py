@@ -473,15 +473,15 @@ class Molecule:
 
         Parameters
         ----------
-        dihedral_SMARTS : str
+        dihedral_SMARTS : :class:`str`
             The SMARTS code for the dihedral of interest.
 
-        target : float
+        target : :class:`float`
             Float representing the target value for the dihedral angle.
 
         Returns
         -------
-        diff : float
+        diff : :class:`float`
             Float representing the % relative difference between the average
             dihedral value in the molecule and the target value.
         """
@@ -508,6 +508,7 @@ class Molecule:
             # Calculate the relative diff with the target dihedral value
             diff = (abs(target - avg_dihedral) / target) * 100
         else:
+            # If the molecule does not contain the bond, give 1% strain.
             diff = 1
 
         return diff
@@ -1127,9 +1128,14 @@ class Molecule:
         None : NoneType
 
         """
+        try:
+            with open(path, 'w') as f:
+                f.write(self.mdl_mol_block())
 
-        with open(path, 'w') as f:
-            f.write(self.mdl_mol_block())
+        except Exception as ex:
+            # Print the name of the problematic molecule
+            errormsg = 'Issue with this molecule {}\n'.format(self.name)
+            logger.error(errormsg, exc_info=True)
 
     def _write_pdb_file(self, path):
         """
@@ -1574,17 +1580,22 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        return {
+        try:
+            return {
 
-            'class': self.__class__.__name__,
-            'func_grp': (self.func_grp if
-                         self.func_grp is None else
-                         self.func_grp.name),
-            'mol_block': self.mdl_mol_block(),
-            'note': self.note,
-            'name': self.name
+                'class': self.__class__.__name__,
+                'func_grp': (self.func_grp if
+                             self.func_grp is None else
+                             self.func_grp.name),
+                'mol_block': self.mdl_mol_block(),
+                'note': self.note,
+                'name': self.name
 
-        }
+            }
+
+        except Exception as ex:
+            errormsg = 'Issue with this molecule {}\n'.format(self.name)
+            logger.error(errormsg, exc_info=True)
 
     @classmethod
     def _json_init(cls, json_dict):
@@ -2557,27 +2568,30 @@ class MacroMolecule(Molecule, metaclass=Cached):
             A dict which represents the molecule.
 
         """
+        try:
+            return {
+                'bb_counter': [(key.json(), val) for key, val in
+                               self.bb_counter.items()],
+                'bonds_made': self.bonds_made,
+                'bonder_ids': self.bonder_ids,
+                'fg_ids': list(self.fg_ids),
+                'class': self.__class__.__name__,
+                'mol_block': self.mdl_mol_block(),
+                'building_blocks': [x.json() for x in
+                                    self.building_blocks],
+                'topology': repr(self.topology),
+                'unscaled_fitness': repr(self.unscaled_fitness),
+                'progress_params': self.progress_params,
+                'note': self.note,
+                'name': self.name,
+                'fragments': dict(zip(
+                              (str(x) for x in self.fragments.keys()),
+                              (list(x) for x in self.fragments.values())))
 
-        return {
-            'bb_counter': [(key.json(), val) for key, val in
-                           self.bb_counter.items()],
-            'bonds_made': self.bonds_made,
-            'bonder_ids': self.bonder_ids,
-            'fg_ids': list(self.fg_ids),
-            'class': self.__class__.__name__,
-            'mol_block': self.mdl_mol_block(),
-            'building_blocks': [x.json() for x in
-                                self.building_blocks],
-            'topology': repr(self.topology),
-            'unscaled_fitness': repr(self.unscaled_fitness),
-            'progress_params': self.progress_params,
-            'note': self.note,
-            'name': self.name,
-            'fragments': dict(zip(
-                          (str(x) for x in self.fragments.keys()),
-                          (list(x) for x in self.fragments.values())))
-
-        }
+            }
+        except Exception as ex:
+            errormsg = 'Issue with this molecule {}\n'.format(self.name)
+            logger.error(errormsg, exc_info=True)
 
     @classmethod
     def _json_init(cls, json_dict):
