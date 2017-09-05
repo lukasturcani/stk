@@ -463,15 +463,20 @@ def cage(macro_mol, dihedral_SMARTS, target_value, pseudoformation_params={
             dihedral angle within the molecule and a target value. The user
             must provide the SMARTS for the dihedral and the target value.
 
+    Notes
+    -----
+    This function modifies `macro_mol`. It places the calculated
+    fitness parameters into :attr:``~.MacroMolecule.progress_params``.
+
     Parameters
     ----------
-    macro_mol : Cage
+    macro_mol : :class:`.Cage`
         The cage whose fitness is to be calculated.
 
-    dihedral_SMARTS : :class: `str`
+    dihedral_SMARTS : :class:`str`
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class: `float`
+    target_value : :class:`float`
         Float representing the target value for the dihedral angle.
 
     pseudoformation_params : dict (default =
@@ -484,33 +489,27 @@ def cage(macro_mol, dihedral_SMARTS, target_value, pseudoformation_params={
         value.
 
         Default initialized arguments of Energy.pseudoformation() only
-        need to be specified in `energy_params` if the user wishes to
+        need to be specified in ``energy_params`` if the user wishes to
         change the default value.
 
-        To see what arguments the `Energy.pseudoformation()` method
+        To see what arguments the ``Energy.pseudoformation()`` method
         requires, try using the  `-h` option:
 
             python -m mmea -h energy
 
-    logger : FakeLogger or logging.Logger, optional
+    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
         Used for logging. Not used by this function.
 
-    Modifies
-    --------
-    macro_mol.progress_params : dict
-        Places the calculated parameters in the dict. The order
-        corresponds to the arguments in the ``_param_labels()``
-        decorator applied to this function.
 
     Returns
     -------
-    numpy.array
+    :class:`numpy.ndarray`
         The numpy array holds the fitness vector described in this
         docstring.
 
     Raises
     ------
-    ValueError
+    :class:`ValueError`
         If the calculation of a fitness parameter fails.
 
     """
@@ -570,7 +569,7 @@ def cage_target(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
     Notes
     -----
     This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
+    fitness parameters into :attr:``~.MacroMolecule.progress_params``.
 
     Parameters
     ----------
@@ -581,10 +580,10 @@ def cage_target(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : str
+    dihedral_SMARTS : :class:`str`
         The SMARTS code for the dihedral of interest.
 
-    target_value : float
+    target_value : :class:`float`
         Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
@@ -662,10 +661,10 @@ def cage_c60(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : str
+    dihedral_SMARTS : :class:`str`
         The SMARTS code for the dihedral of interest.
 
-    target_value : float
+    target_value : :class:`float`
         Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
