@@ -16,26 +16,29 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
 
     This function runs an optimization. It is possible to provide different
     options, which correspond to the input keywords from MOPAC:
-    http://openmopac.net/Manual/index.html
+    `Link text <http://openmopac.net/Manual/index.html>`
 
-    * need to create a tool for generating mopac inputs
+    Notes
+    -----
+    This function modifies `macro_mol`. It places the calculated
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    macro_mol : :class:`.StructUnit`
         The macromolecule who's structure must be optimized.
 
-    mopac_path : str
+    mopac_path : :class:`str`
         The full path of the ``MOPAC`` suite within the user's
         machine. For example, in a default MacOS installation the
         folder will probably be something like
         ``/opt/mopac/MOPAC2016.exe``.
 
-    settings: dict (default = {})
+    settings: :class:`dict`, (default = {})
         A dictionary which maps the names of the optimization parameters to
         their values. Valid values are:
 
-            'hamiltonian' : string(default = 'PM7')
+            'hamiltonian' : :class:`str`, (default = 'PM7')
                 A series of different methods can be selected:
                 PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
 
@@ -44,19 +47,19 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
                 re-optimized - update compared to PM6.
                 http://openmopac.net/PM7_accuracy/PM7_accuracy.html
 
-            'method' : string (default = 'OPT')
+            'method' : :class:`str`, (default = 'OPT')
                 The default calculation consists in a geometry optimization.
                 You can run single point calculations (SCF) or transition
                 search algorithms (TS). Refer to the MOPAC website for specific
                 keywords.
 
-            'gradient' : float (default = 0.01)
+            'gradient' : :class:`float`, (default = 0.01)
                 The gradient at which the geometry optimization reaches the
                 convergence criteria (kcal/mol/Angstrom). For small system high
                 precision work, 0.01 is recommended, as these results are
                 easily good enough for all high precision work.
 
-            'eps' : float (detault = 80.1)
+            'eps' : :class:`float`, (detault = 80.1)
                 Sets the dielectric constant for the solvent. Presence of this
                 keyword will cause the COSMO (Conductor-like Screening Model)
                 method to be used to approximate the effect of a solvent model
@@ -67,25 +70,19 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
                 80.1 can be used to model a water environment at room
                 temperature.
 
-            'charge' : list of floats (default = 0)
+            'charge' : :class:`list`, (default = 0)
                 When the system being studied is an ion, the charge, n, on the
                 ion must be supplied as an integer. For cations n can be 1, 2,
                 3, etc.; for anions -1, -2, -3, etc.
 
 
-            'fileout' : string (default = 'PDBOUT')
+            'fileout' : :class:`str`, (default = 'PDBOUT')
                 This generates the pdb file with the optimized structure.
 
-            'timeout' : float (default = 172800)
+            'timeout' : :class:`float`, (default = 172800)
                 The amount in seconds the optimization is allowed to run before
                 being terminated. The default value is 2 days =
                 172,800 seconds.
-
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute is replaced by an
-        rdkit molecule with an optimized structure.
 
     Returns
     -------
@@ -165,21 +162,21 @@ def _kill_mopac(macro_mol):
 
 def _mop_line(settings):
     """
-    Generates the formatted string for a MOPAC input file.
+    Generates the formatted string for a ``MOPAC`` input file.
 
-    Formats the settings dictionary with the correct keywords for MOPAC into
-    a string to be added to the MOPAC input.
+    Formats the settings dictionary with the correct keywords for ``MOPAC`` into
+    a string to be added to the ``MOPAC`` input.
 
     Parameters
     ----------
-    settings : dict
+    settings : :class:`dict`
         Dictionary defined in the mopac_opt function, where all the run details
         are defined.
 
     Returns
     -------
-    mopac_run_str : str
-        String containing all the MOPAC keywords correctly formatted for the
+    mopac_run_str : :class:`str`
+        String containing all the ``MOPAC`` keywords correctly formatted for the
         input file.
     """
 
@@ -212,7 +209,7 @@ def _mop_line(settings):
 def _create_mop(macro_mol, settings):
     """
     Creates the ``.mop`` file holding the molecule to be optimized.
-    
+
     The name of the input file will contain info about its charge:
     charge = 0: name_neu
     charge = -1: name_an1
@@ -225,8 +222,8 @@ def _create_mop(macro_mol, settings):
         structure file is converted to a ``.mop`` file. The original
         file is also kept.
 
-    mopac_run_str : str
-        This string specifies the MOPAC keywords to be used in the input for
+    mopac_run_str : :class:`str`
+        This string specifies the ``MOPAC`` keywords to be used in the input for
         the calculation.
 
     Modifies
@@ -237,7 +234,7 @@ def _create_mop(macro_mol, settings):
 
     Returns
     -------
-    str
+    file_path: :class:`str`
         The full path of the newly created ``.mop`` file.
     """
     name, ext = os.path.splitext(macro_mol._file)
@@ -268,19 +265,21 @@ def _create_mop(macro_mol, settings):
 def _convert_mopout_to_mol(macro_mol):
     """
     Updates the molecule information (coords) if the opt is successful.
-    Takes the ``.pdb`` file of the neutral file generated from the MOPAC run
+    Takes the ``.pdb`` file of the neutral file generated from the ``MOPAC`` run
     and initiates a new rdkit molecule with that coordinates.
-    The macro_mol instance is then updated with the new molecule.
+    The `macro_mol` instance is then updated with the new molecule.
+
+    Notes
+    -----
+    This function modifies `macro_mol`. It places the calculated
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    macro_mol : :class:`MacroMolecule`
         The macromolecule being optimized. The ``.pdb`` file holding
         its optimized structure is converted to a rdkit molecule.
 
-    Modifies
-    --------
-    This function updates the macro_mol instance.
 
     Returns
     -------
