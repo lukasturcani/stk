@@ -508,7 +508,7 @@ class Molecule:
             # Calculate the relative diff with the target dihedral value
             diff = (abs(target - avg_dihedral) / target) * 100
         else:
-            diff = 0
+            diff = 1
 
         return diff
 
