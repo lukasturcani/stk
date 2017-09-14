@@ -285,7 +285,7 @@ by the macromolecular class.</p>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.Cage">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent molecular cages.</p>
 <dl class="attribute">
@@ -352,7 +352,7 @@ number of expected windows.</li>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.MacroMolecule">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.Molecule</span></code></a></p>
 <p>A class for assembled macromolecules.</p>
 <p>The goal of this class is to represent an individual used by the
@@ -534,7 +534,7 @@ that building block. For example, (1, 3) identifies the 4th
 molecule of type building_blocks[1] to be added to the
 macromolecule during assembly.</p>
 <p>The value in the dictionary is a set of ints. These hold the
-atom ids belonging to a particular molecule - before assmebly.</p>
+atom ids belonging to a particular molecule before assembly.</p>
 </dd></dl>
 
 <dl class="method">
@@ -723,7 +723,7 @@ and ‘mol_index’ properties.</dd>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.Molecule">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>The most basic class representing molecules.</p>
 <p>This class defines defines the operations which any class
@@ -1326,7 +1326,7 @@ sanitization issues.</p>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.Periodic">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Periodic</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Periodic</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent periodic structures.</p>
 <p>This class is essentially the same as <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>,
@@ -1368,7 +1368,7 @@ by <a class="reference internal" href="#mtk.molecular.molecules.Periodic.save_id
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Periodic.island">
-<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>terminator=1</em>, <em>bond_type=‘1’</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
+<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>terminator=1</em>, <em>bond_type='1'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build a terminated supercell.</p>
 <p>Terminated means that the periodic bonds are replaced with
 bonds to terminating atoms.</p>
@@ -1436,7 +1436,7 @@ atom.</li>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.Polymer">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Polymer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Polymer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent polymers.</p>
 <dl class="attribute">
@@ -1448,7 +1448,7 @@ atom.</li>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.StructUnit">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.Molecule</span></code></a></p>
 <p>Represents the building blocks of macromolecules examined by MMEA.</p>
 <p><code class="docutils literal"><span class="pre">Building</span> <span class="pre">blocks</span></code> in this case refers to the smallest molecular
@@ -1697,12 +1697,12 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mtk.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {‘.sdf’: functools.partial(&lt;Boost.Python.function object at 0x213b950&gt;, sanitize=False, removeHs=False), ‘.mae’: &lt;function mol_from_mae_file&gt;, ‘.mol2’: functools.partial(&lt;Boost.Python.function object at 0x213b8e0&gt;, sanitize=False, removeHs=False), ‘.pdb’: functools.partial(&lt;Boost.Python.function object at 0x213f0c0&gt;, sanitize=False, removeHs=False), ‘.mol’: functools.partial(&lt;Boost.Python.function object at 0x213b950&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {'.mol2': functools.partial(&lt;Boost.Python.function object at 0x2f1fbe0&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object at 0x2f1fc50&gt;, sanitize=False, removeHs=False), '.mae': &lt;function mol_from_mae_file&gt;, '.pdb': functools.partial(&lt;Boost.Python.function object at 0x2f233c0&gt;, sanitize=False, removeHs=False), '.mol': functools.partial(&lt;Boost.Python.function object at 0x2f1fc50&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="mtk.molecular.molecules.StructUnit.init_random">
-<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>db</em>, <em>fg=None</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.init_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_random" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_random</code><span class="sig-paren">(</span><em>db</em>, <em>fg=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.init_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_random" title="Permalink to this definition">¶</a></dt>
 <dd><p>Picks a random file from <cite>db</cite> to initialize from.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1811,7 +1811,7 @@ rotation.</li>
 
 <dl class="classmethod">
 <dt id="mtk.molecular.molecules.StructUnit.rdkit_init">
-<em class="property">classmethod </em><code class="descname">rdkit_init</code><span class="sig-paren">(</span><em>mol</em>, <em>functional_group=None</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.rdkit_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.rdkit_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">rdkit_init</code><span class="sig-paren">(</span><em>mol</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.rdkit_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.rdkit_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses an <code class="docutils literal"><span class="pre">rdkit</span></code> molecule for initialization.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1910,7 +1910,7 @@ structure file of that molecule.</td>
 
 <dl class="classmethod">
 <dt id="mtk.molecular.molecules.StructUnit.smarts_init">
-<em class="property">classmethod </em><code class="descname">smarts_init</code><span class="sig-paren">(</span><em>smarts</em>, <em>functional_group=None</em>, <em>note=”</em>, <em>name=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.smarts_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.smarts_init" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">smarts_init</code><span class="sig-paren">(</span><em>smarts</em>, <em>functional_group=None</em>, <em>note=''</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.smarts_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.smarts_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize from a SMARTS string.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1994,7 +1994,7 @@ during reactions have the property ‘del’ set to ‘1’.</p>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.StructUnit2">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit2</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit2</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.StructUnit</span></code></a></p>
 <p>Represents building blocks with 2 functional groups.</p>
 <dl class="attribute">
@@ -2070,7 +2070,7 @@ atoms.</li>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.StructUnit3">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit3</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=”</em>, <em>note=”</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">StructUnit3</code><span class="sig-paren">(</span><em>file</em>, <em>functional_group=None</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.StructUnit</span></code></a></p>
 <p>Represents building blocks with 3 functional groups.</p>
 <dl class="method">

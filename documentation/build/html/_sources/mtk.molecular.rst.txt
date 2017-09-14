@@ -1,10 +1,5 @@
-mtk\.molecular package
-======================
-
-.. automodule:: mtk.molecular
-    :members:
-    :undoc-members:
-    :show-inheritance:
+mtk.molecular package
+=====================
 
 Subpackages
 -----------
@@ -23,3 +18,10 @@ Submodules
    mtk.molecular.fg_info
    mtk.molecular.molecules
 
+Module contents
+---------------
+
+.. automodule:: mtk.molecular
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,5 +1,5 @@
-mtk\.convenience\_tools module
-==============================
+mtk.convenience_tools module
+============================
 
 .. automodule:: mtk.convenience_tools
     :members:
