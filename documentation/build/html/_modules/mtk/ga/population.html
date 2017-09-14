@@ -176,48 +176,58 @@
 
 <div class="viewcode-block" id="Population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population">[docs]</a><span class="k">class</span> <span class="nc">Population</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Contains :class:`.Molecule` objects.</span>
+<span class="sd">    A container for  :class:`.Molecule` objects.</span>
 
-<span class="sd">    In addtion to holding :class:`.Molecule`</span>
-<span class="sd">    objects, the :class:`Population`</span>
-<span class="sd">    class can be used to create large numbers of these instances</span>
-<span class="sd">    through the :meth:`init\_` class methods. Contained |Molecule| objects</span>
-<span class="sd">    can have their structures optimized in parallel through the</span>
-<span class="sd">    :meth:`optimize_population` method. :class:`Population` instances</span>
-<span class="sd">    can be nested.</span>
+<span class="sd">    :class:`Population` instances can be nested.</span>
+
+<span class="sd">    In addtion to holding :class:`.Molecule` objects, the</span>
+<span class="sd">    :class:`Population` class can be used to create large numbers of</span>
+<span class="sd">    these instances through the :meth:`init\_` class methods.</span>
+
+<span class="sd">    :class:`.Molecule` instances held by a :class:`Population` can have</span>
+<span class="sd">    their structures optimized in parallel through the</span>
+<span class="sd">    :meth:`optimize_population` method.</span>
 
 <span class="sd">    The EA is invoked by calling a number of methods of this class,</span>
 <span class="sd">    such as :meth:`gen_offspring`, :meth:`gen_mutants` and</span>
-<span class="sd">    :meth:`select`, on a given instance. However this class only</span>
-<span class="sd">    implements container related functionality. The EA operations are</span>
-<span class="sd">    performed by :class:`mmead.` It</span>
-<span class="sd">    delegates GA operations to its :attr:`ga_tools` attribute. Any</span>
-<span class="sd">    functionality related to the EA should be delegated to this</span>
-<span class="sd">    attribute. The :meth:`gen_offspring` and :meth:`gen_mutants`</span>
+<span class="sd">    :meth:`select`. However, this class only implements container</span>
+<span class="sd">    related functionality. It delegates EA operations to the</span>
+<span class="sd">    :class:`.Crossover`, :class:`.Mutation` and :class:`.Selection`</span>
+<span class="sd">    classes.</span>
+
+<span class="sd">    These classes are organised as follows. Each :class:`Population`</span>
+<span class="sd">    instance has a :attr:`ga_tools` attribute. This holds a</span>
+<span class="sd">    :class:`.GATools` instance. The :class:`.GATools` instance is just</span>
+<span class="sd">    a container. It holds a :class:`.Crossover`, :class:`.Mutation`</span>
+<span class="sd">    and :class:`.Selection` instance. These instances deal with the</span>
+<span class="sd">    :class:`Population` instance they are held by and perform the</span>
+<span class="sd">    various crossover, mutation and selection operations on it.</span>
+<span class="sd">    Any functionality related to the EA should be delegated to these</span>
+<span class="sd">    instances. The :meth:`gen_offspring` and :meth:`gen_mutants`</span>
 <span class="sd">    methods can serve as a guide to how this should be done.</span>
 
-<span class="sd">    The only operations directly addressed by this class and definined</span>
-<span class="sd">    within it are those relevant to its role as a container. It</span>
-<span class="sd">    supports all expected and necessary container operations such as</span>
-<span class="sd">    iteration, indexing, membership checks (via the ``is in`` operator)</span>
-<span class="sd">    as would be expected. Details of the various implementations and a</span>
-<span class="sd">    full list of supported operations can be found by examining the</span>
-<span class="sd">    included methods.</span>
+<span class="sd">    The only operations directly implemented by this class are those</span>
+<span class="sd">    relevant to its role as a container. It supports all expected and</span>
+<span class="sd">    necessary container operations such as iteration, indexing,</span>
+<span class="sd">    membership checks (via the ``is in`` operator) as would be</span>
+<span class="sd">    expected. Details of the various implementations and a full list of</span>
+<span class="sd">    supported operations can be found by examining the included</span>
+<span class="sd">    methods.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    *args : |Molecule|, :class:`Population`, |GATools|</span>
-<span class="sd">        A population is initialized with as many |Molecule|</span>
-<span class="sd">        or :class:`Population` arguments as required. These are placed</span>
+<span class="sd">    *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`</span>
+<span class="sd">        A population is initialized with the :class:`.Molecule` and</span>
+<span class="sd">        :class:`Population` instances it should hold. These are placed</span>
 <span class="sd">        into the :attr:`members` or :attr:`populations` attributes,</span>
-<span class="sd">        respectively. A |GATools| instance may be included</span>
+<span class="sd">        respectively. A :class:`.GATools` instance may be included</span>
 <span class="sd">        and will be placed into the :attr:`ga_tools` attribute.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    TypeError</span>
-<span class="sd">        If initialized with something other than |Molecule|,</span>
-<span class="sd">        :class:`Population` or |GATools| instances.</span>
+<span class="sd">        If initialized with something other than :class:`.Molecule`,</span>
+<span class="sd">        :class:`Population` or :class:`.GATools` instances.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -228,34 +238,21 @@
 <span class="sd">        molecules within a given population for organizational</span>
 <span class="sd">        purposes.</span>
 
-<span class="sd">    members : :class:`list` of \</span>
-<span class="sd">              :class:`~mmead.molecular.molecules.Molecule` instances</span>
+<span class="sd">    members : :class:`list` of :class:`.Molecule` instances</span>
 <span class="sd">        Held here are the members of the population which are not held</span>
 <span class="sd">        within any subpopulations. This means that not all members of a</span>
 <span class="sd">        population are stored in this attribute. To access all members</span>
 <span class="sd">        of a population the generator :meth:`all_members` should be</span>
 <span class="sd">        used.</span>
 
-<span class="sd">    ga_tools : :class:`~mmead.ga.ga_tools.GATools`, optional</span>
-<span class="sd">        An instance of the ``GATools`` class. Calls to preform GA</span>
-<span class="sd">        operations on the ``Population`` instance are delegated</span>
+<span class="sd">    ga_tools : :class:`.GATools`</span>
+<span class="sd">        An instance of the :class:`.GATools` class. Calls to preform EA</span>
+<span class="sd">        operations on the :class:`.Population` instance are delegated</span>
 <span class="sd">        to this attribute.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializer for ``Population`` class.</span>
-
-<span class="sd">        This initializer creates a new population from the</span>
-<span class="sd">        ``Population`` and ``Molecule`` instances given as</span>
-<span class="sd">        arguments. It also accepts a ``GATools`` instance if the</span>
-<span class="sd">        population is to have GA operations performed on it.</span>
-
-<span class="sd">        The arguments can be provided in any order regardless of type.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># Generate `populations`, `members` and `ga_tools` attributes.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">populations</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="p">[]</span>
