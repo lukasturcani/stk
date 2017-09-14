@@ -2,6 +2,26 @@
 """
 Module containing all general purpose functions shared by other modules.
 
+LOG
+---
+27/07/17
+    Fixed the cartesian coordinates -> fractional coordinates -> cartesian
+    coordinates conversion related functions, creation of lattice array
+    from unit cell parameters (triclinic system: so applicable to any)
+    and conversion back to unit cell parameters. WORKS! inspiration from:
+    http://www.ruppweb.org/Xray/tutorial/Coordinate%20system%20transformation.htm
+
+26/07/17
+    Changed the way bonds are determined. Now, rather then fixed value
+    a formula and covalent radii are used as explained in the Elemental_Radii
+    spreadsheet (see tables module).
+
+TO DO LIST
+----------
+
+- In the find_windows() function, maybe change the way the EPS value for
+  the DBSCAN() is estimates. Need to look how the distances change with the
+  increase in size of the sampling sphere.
 """
 
 import numpy as np
@@ -12,7 +32,9 @@ from sklearn.cluster import DBSCAN
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.neighbors import KDTree
 
-from .tables import atomic_mass, atomic_vdw_radius, opls_atom_keys
+from .tables import (
+    atomic_mass, atomic_vdw_radius, opls_atom_keys, atomic_covalent_radius
+    )
 
 
 class _AtomKeyError(Exception):
@@ -47,6 +69,7 @@ def is_number(number):
     -------
     bool
         True if input is a float convertable (a number), False otherwise.
+
     """
     try:
         float(number)
@@ -68,6 +91,7 @@ def unique(input_list):
     -------
     list
         A list with only unique occurances of an item.
+
     """
     output = []
     for item in input_list:
@@ -98,6 +122,7 @@ def make_JSON_serializable(obj):
     -------
     dictionary
         A processed dictionary without numpy arrays.
+
     """
     for key in obj.keys():
         if isinstance(obj[key], np.ndarray):
@@ -136,6 +161,7 @@ def distance(a, b):
     -------
     numpy.float64
         A distance between two vectors (points).
+
     """
     return (np.sum((a - b)**2))**0.5
 
@@ -153,6 +179,7 @@ def molecular_weight(elements):
     -------
     numpy.float64
         A molecular weight of a molecule.
+
     """
     return (np.array([atomic_mass[i.upper()] for i in elements]).sum())
 
@@ -171,6 +198,7 @@ def center_of_coor(coordinates):
     numpy.ndarray
         An 1d array with coordinates of the centre of coordinates excluding
         elements' masses.
+
     """
     return (np.sum(coordinates, axis=0) / coordinates.shape[0])
 
@@ -192,6 +220,7 @@ def center_of_mass(elements, coordinates):
     numpy.ndarray
         An 1d array with coordinates of the centre of mass including elements'
         masses.
+
     """
     mass = molecular_weight(elements)
     mass_array = np.array([[atomic_mass[i.upper()]] * 3 for i in elements])
@@ -238,6 +267,7 @@ def compose_atom_list(*args):
     ------
     _FunctionError : Exception
         Raised when wrong number of parameters is passed to the function.
+
     """
     if len(args) == 2:
         atom_list = [[
@@ -291,6 +321,7 @@ def decompose_atom_list(atom_list):
     -------------------
     (numpy.ndarray, numpy.ndarray, numpy.ndarray)
         A touple of elements, atom keys and coordinates arrays.
+
     """
     transpose = list(zip(*atom_list))
     if len(transpose) == 4:
@@ -317,9 +348,7 @@ def decompose_atom_list(atom_list):
 
 
 def dlf_notation(atom_key):
-    """
-    Return element for atom key using DL_F notation.
-    """
+    """Return element for atom key using DL_F notation."""
     split = list(atom_key)
     element = ''
     number = False
@@ -329,13 +358,19 @@ def dlf_notation(atom_key):
         count += 1
         if is_number(split[count]) is True:
             number = True
+    # In case of for example Material Studio output, integers can also be
+    # in the beginning of the string. As the dlf_notation decipher function
+    # is very general in use, we have to make sure these integers are deleted.
+    # In standard DL_F notation the string will never start with integer so it
+    # will not affect the functionality towards it.
+    # EDIT2: also the '?' atoms, you can delete them manually or somewhere else
+    element = "".join(i for i in element if not is_number(i))
+    element = "".join(i for i in element if i != '?')
     return element
 
 
 def opls_notation(atom_key):
-    """
-    Return element for OPLS forcefield atom key.
-    """
+    """Return element for OPLS forcefield atom key."""
     # warning for Ne, He, Na types overlap
     conflicts = ['ne', 'he', 'na']
     if atom_key in conflicts:
@@ -373,6 +408,7 @@ def decipher_atom_key(atom_key, forcefield):
     str
         A string that is the periodic table element equvalent of forcefield
         atom key.
+
     """
     load_funcs = {
         'DLF': dlf_notation,
@@ -410,6 +446,7 @@ def shift_com(elements, coordinates, com_adjust=np.zeros(3)):
     -------
     numpy.ndarray
         Translated array of molecule's coordinates.
+
     """
     com = center_of_mass(elements, coordinates)
     com = np.array([com - com_adjust] * coordinates.shape[0])
@@ -446,9 +483,7 @@ def max_dim(elements, coordinates):
 
 
 def void_diameter(elements, coordinates, com=None):
-    """
-    Return void diameter of a molecule.
-    """
+    """Return void diameter of a molecule."""
     if com is None:
         com = center_of_mass(elements, coordinates)
     atom_vdw = np.array([[atomic_vdw_radius[x.upper()]] for x in elements])
@@ -460,22 +495,22 @@ def void_diameter(elements, coordinates, com=None):
 
 
 def correct_void_diameter(com, *params):
-    """
-    Return negative of a void diameter. (optimisation function)
-    """
+    """Return negative of a void diameter. (optimisation function)."""
     elements, coordinates = params
     return (-void_diameter(elements, coordinates, com)[0])
 
 
 def opt_void_diameter(elements, coordinates, bounds=None, **kwargs):
-    """
-    Return optimised void diameter and it's COM.
-    """
-    if bounds is None:
-        void_r = void_diameter(elements, coordinates)[0] / 2
-        bounds = ((-void_r, void_r), (-void_r, void_r), (-void_r, void_r))
-    com = center_of_mass(elements, coordinates)
+    """Return optimised void diameter and it's COM."""
     args = elements, coordinates
+    com = center_of_mass(elements, coordinates)
+    if bounds is None:
+        void_r = void_diameter(elements, coordinates, com=com)[0] / 2
+        bounds = (
+            (com[0]-void_r, com[0]+void_r),
+            (com[1]-void_r, com[1]+void_r),
+            (com[2]-void_r, com[2]+void_r)
+        )
     minimisation = minimize(
         correct_void_diameter, x0=com, args=args, bounds=bounds)
     voidd = void_diameter(elements, coordinates, com=minimisation.x)
@@ -483,109 +518,98 @@ def opt_void_diameter(elements, coordinates, bounds=None, **kwargs):
 
 
 def void_volume(void_radius):
-    """
-    Return the volume of a spherical void.
-    """
+    """Return the volume of a spherical void."""
     return (4 / 3 * np.pi * void_radius**3)
 
 
-def unit_cell_to_lattice_matrix(cryst):
-    """
-    Return parallelpiped unit cell lattice matrix from crystallographic param.
-    """
-    # Extract unit cell edges and angles.
+def unit_cell_to_lattice_array(cryst):
+    """Return parallelpiped unit cell lattice matrix."""
     a_, b_, c_, alpha, beta, gamma = cryst
     # Convert angles from degrees to radians.
-    alpha_rad = np.deg2rad(alpha)
-    beta_rad = np.deg2rad(beta)
-    gamma_rad = np.deg2rad(gamma)
-    # Calculate for each unit cell edge vectors a, b, c
-    # components in x, y and z directions and compose the matrix
+    r_alpha = np.deg2rad(alpha)
+    r_beta = np.deg2rad(beta)
+    r_gamma = np.deg2rad(gamma)
+    # Calculate unit cell volume that is neccessary.
+    volume = a_ * b_ * c_ * (
+        1 - np.cos(r_alpha)**2 - np.cos(r_beta)**2 - np.cos(r_gamma)**2 + 2 *
+        np.cos(r_alpha) * np.cos(r_beta) * np.cos(r_gamma))**0.5
+    # Create the orthogonalisation Matrix (M^-1) - lattice matrix
     a_x = a_
-    a_y = 0
-    a_z = 0
-    b_x = b_ * np.cos(gamma_rad)
-    b_y = b_ * np.sin(gamma_rad)
-    b_z = 0
-    c_x = c_ * np.cos(beta_rad)
-    c_y = c_ * (np.cos(alpha_rad) - np.cos(gamma_rad) * np.cos(beta_rad) /
-                np.sin(gamma_rad))
-    c_z = c_ * np.sin(gamma_rad) * (
-        1 - np.cos(alpha_rad)**2 - np.cos(beta_rad)**2 - np.cos(gamma_rad)**2 +
-        2 * np.cos(alpha_rad) * np.cos(beta_rad) * np.cos(gamma_rad))**0.5
-    return np.array([[a_x, a_y, a_z], [b_x, b_y, b_z], [c_x, c_y, c_z]])
+    a_y = b_ * np.cos(r_gamma)
+    a_z = c_ * np.cos(r_beta)
+    b_x = 0
+    b_y = b_ * np.sin(r_gamma)
+    b_z = c_ * (
+        np.cos(r_alpha) - np.cos(r_beta) * np.cos(r_gamma)) / np.sin(r_gamma)
+    c_x = 0
+    c_y = 0
+    c_z = volume / (a_ * b_ * np.sin(r_gamma))
+    lattice_array = np.array(
+        [[a_x, a_y, a_z], [b_x, b_y, b_z], [c_x, c_y, c_z]])
+    return lattice_array
 
 
-def lattice_matrix_to_unit_cell(lattice_matrix):
-    """
-    Return crystallographic param. from unit cell lattice matrix.
-    """
-    cell_lengths = np.sqrt(np.sum(lattice_matrix**2, axis=1))
-    cell_angles = np.array([
-        np.rad2deg(np.pi / 2 - np.dot(lattice_matrix[1], lattice_matrix[2]) /
-                   cell_lengths[1] / cell_lengths[2]),
-        np.rad2deg(np.pi / 2 - np.dot(lattice_matrix[2], lattice_matrix[0]) /
-                   cell_lengths[2] / cell_lengths[0]),
-        np.rad2deg(np.pi / 2 - np.dot(lattice_matrix[0], lattice_matrix[1]) /
-                   cell_lengths[0] / cell_lengths[1])
-    ])
+def lattice_array_to_unit_cell(lattice_array):
+    """Return crystallographic param. from unit cell lattice matrix."""
+    cell_lengths = np.sqrt(np.sum(lattice_array**2, axis=0))
+    gamma_r = np.arccos(lattice_array[0][1] / cell_lengths[1])
+    beta_r = np.arccos(lattice_array[0][2] / cell_lengths[2])
+    alpha_r = np.arccos(
+        lattice_array[1][2] * np.sin(gamma_r) / cell_lengths[2]
+        + np.cos(beta_r) * np.cos(gamma_r)
+        )
+    cell_angles = [
+        np.rad2deg(alpha_r), np.rad2deg(beta_r), np.rad2deg(gamma_r)
+        ]
     return np.append(cell_lengths, cell_angles)
 
 
-def cell_volume_from_matrix(matrix):
+def volume_from_lattice_array(lattice_array):
     """Return unit cell's volume from lattice matrix."""
-    return np.linalg.det(matrix)
+    return np.linalg.det(lattice_array)
 
 
-def cell_volume_from_cryst(cryst):
+def volume_from_cell_parameters(cryst):
     """Return unit cell's volume from crystallographic parameters."""
-    return cell_volume_from_matrix(cryst_to_lattice_matrix(cryst))
+    return volume_from_lattice_array(unit_cell_to_lattice_array(cryst))
 
 
-def fractional_from_cartesian(coordinate, matrix):
-    """ Return a fractional coordinate from a cartesian one. """
-    sigma_a = np.cross(matrix[1], matrix[2])
-    sigma_b = np.cross(matrix[2], matrix[0])
-    sigma_c = np.cross(matrix[0], matrix[1])
-    cell_volume = cell_volume_from_matrix(matrix)
-    sigma_a_prim = 1 / cell_volume * sigma_a
-    sigma_b_prim = 1 / cell_volume * sigma_b
-    sigma_c_prim = 1 / cell_volume * sigma_c
-    multiplication_matrix = np.matrix(
-        [sigma_a_prim, sigma_b_prim, sigma_c_prim])
-    fractional = multiplication_matrix * coordinate.reshape(-1, 1)
+def fractional_from_cartesian(coordinate, lattice_array):
+    """Return a fractional coordinate from a cartesian one."""
+    deorthogonalisation_M = np.matrix(np.linalg.inv(lattice_array))
+    fractional = deorthogonalisation_M * coordinate.reshape(-1, 1)
     return np.array(fractional.reshape(1, -1))
 
 
-def cartisian_from_fractional(coordinate, matrix):
-    """ Return cartesian coordinate from a fractional one. """
-    multiplication_matrix = np.matrix(matrix)
-    orthogonal = multiplication_matrix * coordinate.reshape(-1, 1)
+def cartisian_from_fractional(coordinate, lattice_array):
+    """Return cartesian coordinate from a fractional one."""
+    orthogonalisation_M = np.matrix(lattice_array)
+    orthogonal = orthogonalisation_M * coordinate.reshape(-1, 1)
     return np.array(orthogonal.reshape(1, -1))
 
 
-def cart2frac_all(coordinates, matrix):
-    """ Convert all cartesian coordinates to fractional. """
+def cart2frac_all(coordinates, lattice_array):
+    """Convert all cartesian coordinates to fractional."""
     frac_coordinates = deepcopy(coordinates)
     for coord in range(frac_coordinates.shape[0]):
         frac_coordinates[coord] = fractional_from_cartesian(
-            frac_coordinates[coord], matrix)
+            frac_coordinates[coord], lattice_array)
     return frac_coordinates
 
 
-def frac2cart_all(frac_coordinates, matrix):
-    """ Convert all fractional coordinates to cartesian. """
+def frac2cart_all(frac_coordinates, lattice_array):
+    """Convert all fractional coordinates to cartesian."""
     coordinates = deepcopy(frac_coordinates)
     for coord in range(coordinates.shape[0]):
         coordinates[coord] = cartisian_from_fractional(coordinates[coord],
-                                                       matrix)
+                                                       lattice_array)
     return coordinates
 
 
 def create_supercell(system, supercell=[[-1, 1], [-1, 1], [-1, 1]]):
-    """ Create a supercell. """
+    """Create a supercell."""
     if 'lattice' not in system.keys():
-        matrix = unit_cell_to_lattice_matrix(system['unit_cell'])
+        matrix = unit_cell_to_lattice_array(system['unit_cell'])
     else:
         matrix = system['lattice']
     coordinates = deepcopy(system['coordinates'])
@@ -611,7 +635,7 @@ def create_supercell(system, supercell=[[-1, 1], [-1, 1], [-1, 1]]):
     for i in range(len(updated_coordinates) - 1):
         new_elements = np.concatenate((new_elements, system['elements']))
         new_ids = np.concatenate((new_ids, system['atom_ids']))
-    cryst = lattice_matrix_to_unit_cell(matrix)
+    cryst = lattice_array_to_unit_cell(matrix)
     supercell_system = {
         'elements': new_elements,
         'atom_ids': new_ids,
@@ -622,14 +646,45 @@ def create_supercell(system, supercell=[[-1, 1], [-1, 1], [-1, 1]]):
     return supercell_system
 
 
+def is_inside_polyhedron(point, polyhedron):
+    if polyhedron.shape == (1, 6):
+        matrix = unit_cell_to_lattice_array(polyhedron)
+    if polyhedron.shape == (3, 3):
+        matrix = polyhedron
+    frac_coordinates = cart2frac_all(point, matrix.T)
+    if point[0] <= 1.000 and point[1] <= 1.000 and point[2] <= 1.000:
+        return True
+    else:
+        return False
+
+
 def normal_vector(origin, vectors):
-    """ Return normal vector for two vectors with same origin. """
+    """Return normal vector for two vectors with same origin."""
     return np.cross(vectors[0] - origin, vectors[1] - origin)
 
 
-def discrete_molecules(system, supercell=None):
-    """ Decompose molecular system into individual discreet molecules. """
-    origin = np.array([0, 0, 0])
+def discrete_molecules(system, supercell=None, tol=0.4):
+    """
+    Decompose molecular system into individual discreet molecules.
+
+    New formula for bonds: (26/07/17)
+        The two atoms, x and y, are considered bonded if the distance between
+        them, calculated with distance matrix, is within the ranges:
+              Rcov(x) + Rcov(y) - t < R(x,y) <  Rcov(x) + Rcov(y) + t
+        where Rcov is the covalent radius and the tolarenace (t) is set to
+        0.4 Angstrom.
+    """
+    # First we check which operation mode we use.
+    #    1) Non-periodic MolecularSystem.
+    #    2) Periodic MolecularSystem without rebuilding.
+    #    3) Periodic Molecular system with rebuilding (supercell provided).
+    if supercell is not None:
+        mode = 3
+    else:
+        if 'unit_cell' in system.keys() or 'lattice' in system.keys():
+            mode = 2
+        else:
+            mode = 1
     # We create a list containing all atoms, theirs periodic elements and
     # coordinates. As this process is quite complicated, we need a list
     # which we will gradually be reducing.
@@ -650,39 +705,66 @@ def discrete_molecules(system, supercell=None):
         atom_ids = system['atom_ids']
         args = (elements, atom_ids, coordinates)
         adj = 1
-    if supercell is not None:
-        lattice = system['lattice']
     atom_list = compose_atom_list(*args)
     atom_coor = decompose_atom_list(atom_list)[1 + adj]
-    # If a supercell is also provided that encloses the unit cell for the
-    # purpose of reconstructing the molecules through the periodic boundary.
-    if supercell is not None:
-        selements = supercell['elements']
-        sids = supercell['atom_ids']
-        scoordinates = supercell['coordinates']
-        satom_list = compose_atom_list(selements, sids, scoordinates)
-        satom_coor = decompose_atom_list(satom_list)[1 + adj]
-    # There is one more step. We need to sort out for all the
-    # reconstructed molecules, which are the ones that belong to the
-    # unit cell. As we did the reconstruction to every chunk in the unit cell
-    # we have now some molecules that belong to neighbouring cells.
-    # The screening is simple. If the COM of a molecule translated to
-    # fractional coordinates (so that it works for parallelpiped) is
-    # within the unit cell boundaries <0, 1> then it's it. There is
-    # an exception, for the trajectories, very often the unit cell
-    # is centered at origin. Therefore we need to use <-0.5, 0.5>
-    # boundary. We will simply decide which is the case by calculating
-    # the centre of mass of the whole system.
-    system_com = center_of_mass(elements, coordinates)
-    if np.allclose(system_com, origin, atol=1e-00):
-        boundary = [-0.5, 0.5]
+    # Scenario 1: We load a non-periodic MolecularSystem.
+    # We will not have 'unit_cell' nor 'lattice' keywords in the dictionary
+    # and also we do not do any re-building.
+    # Scenario 2: We load a periodic MolecularSystem. We want to only Extract
+    # complete molecules that do not have been affected by the periodic
+    # boundary.
+    # Scenario 3: We load a periodic Molecular System. We want it to be rebuild
+    # therefore, we also provide a supercell.
+    # Scenarios 2 and 3 require a lattice and also their origin is at origin.
+    # Scenario 1 should have the origin at the center of mass of the system.
+    if mode == 2 or mode == 3:
+        # Scenarios 2 or 3.
+        origin = np.array([0., 0., 0.])
+        if 'lattice' not in system.keys():
+            matrix = unit_cell_to_lattice_array(system['unit_cell'])
+        else:
+            matrix = system['lattice']
+        pseudo_origin_frac = np.array([0.25, 0.25, 0.25])
+        pseudo_origin = cartisian_from_fractional(pseudo_origin_frac, matrix)
+        # If a supercell is also provided that encloses the unit cell for the
+        # reconstruction of the molecules through the periodic boundary.
+        if supercell is not None:
+            selements = supercell['elements']
+            sids = supercell['atom_ids']
+            scoordinates = supercell['coordinates']
+            satom_list = compose_atom_list(selements, sids, scoordinates)
+            satom_coor = decompose_atom_list(satom_list)[1 + adj]
+        # There is one more step. We need to sort out for all the
+        # reconstructed molecules, which are the ones that belong to the
+        # unit cell. As we did the reconstruction to every chunk in the unit
+        # cell we have now some molecules that belong to neighbouring cells.
+        # The screening is simple. If the COM of a molecule translated to
+        # fractional coordinates (so that it works for parallelpiped) is
+        # within the unit cell boundaries <0, 1> then it's it. There is
+        # an exception, for the trajectories, very often the unit cell
+        # is centered at origin. Therefore we need to use <-0.5, 0.5>
+        # boundary. We will simply decide which is the case by calculating
+        # the centre of mass of the whole system.
+        system_com = center_of_mass(elements, coordinates)
+        if np.allclose(system_com, origin, atol=1e-00):
+            boundary = np.array([-0.5, 0.5])
+        else:
+            boundary = np.array([0., 1.])
     else:
-        boundary = [0, 1]
+        # Scenario 1.
+        pseudo_origin = center_of_mass(elements, coordinates)
     # Here the final discrete molecules will be stored.
     molecules = []
     # Exceptions. Usually end-point atoms that create single bonds or
     # just a separate atoms in the system.
     exceptions = ['H', 'CL', 'BR', 'F', 'HE', 'AR', 'NE', 'KR', 'XE', 'RN']
+    # The upper limit for distances analysed for bonds will be assigned for
+    # a given system (to save time). We take set('elements') and then find
+    # the largest R(cov) in the system and set the max_dist as a double
+    # of it plus the 150% tolerance (tol).
+    set_of_elements = set(system['elements'])
+    max_r_cov = max([atomic_covalent_radius[i.upper()] for i in set_of_elements])
+    max_dist = 2 * max_r_cov + tol
     # We continue untill all items in the list have been analysed and popped.
     while atom_list:
         inside_atoms_heavy = [
@@ -698,10 +780,23 @@ def discrete_molecules(system, supercell=None):
             inside_atoms_coord_heavy = decompose_atom_list(inside_atoms_heavy)[
                 1 + adj]
             dist_matrix = euclidean_distances(inside_atoms_coord_heavy,
-                                              origin.reshape(1, -1))
+                                              pseudo_origin.reshape(1, -1))
             atom_index_x, _ = np.unravel_index(dist_matrix.argmin(),
                                                dist_matrix.shape)
-            working_list = [inside_atoms_heavy[atom_index_x]]
+            # Added this so that lone atoms (even if heavy) close to the
+            # periodic boundary are not analysed, as they surely have matching
+            # symmetry equivalence that bind to a bigger atom cluster inside
+            # the unit_cell.
+            potential_starting_point = inside_atoms_heavy[atom_index_x]
+            pot_arr = np.array(potential_starting_point[1 + adj:])
+            dist_matrix = euclidean_distances(
+                atom_coor, pot_arr.reshape(1, -1)
+                )
+            idx = (dist_matrix > 0.1) * (dist_matrix < max_dist)
+            if len(idx) < 1:
+                pass
+            else:
+                working_list = [potential_starting_point]
         else:
             # Safety check.
             break
@@ -714,23 +809,39 @@ def discrete_molecules(system, supercell=None):
                 atom_coor = None
             for i in working_list:
                 if i[0].upper() not in exceptions:
+                    # It's of GREATEST importance that the i_arr variable
+                    # is assigned here before entering the atom_coor loop.!
+                    # Otherwise it will not be re-asigned when the satom_list
+                    # still iterates, but the atom_list is already empty...
+                    i_arr = np.array(i[1 + adj:])
                     if atom_coor is not None:
                         dist_matrix = euclidean_distances(
-                            atom_coor, np.array(i[1 + adj:]).reshape(1, -1))
-                        idx = (dist_matrix > 0.1) * (dist_matrix < 2.1)
+                            atom_coor, i_arr.reshape(1, -1)
+                            )
+                        idx = (dist_matrix > 0.1) * (dist_matrix < max_dist)
                         neighbours_indexes = np.where(idx)[0]
                         for j in neighbours_indexes:
-                            working_list_temp.append(atom_list[j])
+                            j_arr = np.array(atom_coor[j])
+                            r_i_j = distance(i_arr, j_arr)
+                            r_cov_i_j = atomic_covalent_radius[i[0].upper()] + atomic_covalent_radius[atom_list[j][0].upper()]
+                            if r_cov_i_j - tol < r_i_j < r_cov_i_j + tol:
+                                working_list_temp.append(atom_list[j])
                     if supercell is not None:
                         sdist_matrix = euclidean_distances(
-                            satom_coor, np.array(i[1 + adj:]).reshape(1, -1))
-                        sidx = (sdist_matrix > 0.1) * (sdist_matrix < 2.2)
+                            satom_coor, i_arr.reshape(1, -1))
+                        sidx = (sdist_matrix > 0.1) * (sdist_matrix < max_dist)
                         sneighbours_indexes = np.where(sidx)[0]
                         for j in sneighbours_indexes:
                             if satom_list[j] in atom_list:
                                 pass
                             else:
-                                working_list_temp.append(satom_list[j])
+                                j_arr = np.array(satom_coor[j])
+                                r_i_j = distance(i_arr, j_arr)
+                                r_cov_i_j = atomic_covalent_radius[
+                                    i[0].upper()
+                                    ] + atomic_covalent_radius[satom_list[j][0].upper()]
+                                if r_cov_i_j - tol < r_i_j < r_cov_i_j + tol:
+                                    working_list_temp.append(satom_list[j])
                     final_molecule.append(i)
                 else:
                     final_molecule.append(i)
@@ -765,7 +876,7 @@ def discrete_molecules(system, supercell=None):
         if supercell is not None:
             com = center_of_mass(final_molecule_dict['elements'],
                                  final_molecule_dict['coordinates'])
-            com_frac = fractional_from_cartesian(com, lattice)[0]
+            com_frac = fractional_from_cartesian(com, matrix)[0]
             # If we don't round the numerical errors will come up.
             com_frac_round = np.around(com_frac, decimals=8)
             bool_ = np.all(np.logical_and(com_frac_round >= boundary[0],
@@ -777,7 +888,7 @@ def discrete_molecules(system, supercell=None):
 
 
 def angle_between_vectors(x, y):
-    """ Calculate the angle between two vectors x and y """
+    """Calculate the angle between two vectors x and y."""
     first_step = abs(x[0] * y[0] + x[1] * y[1] + x[2] * y[2]) / (
         np.sqrt(x[0]**2 + x[1]**2 + x[2]**2) *
         np.sqrt(y[0]**2 + y[1]**2 + y[2]**2))
@@ -786,9 +897,7 @@ def angle_between_vectors(x, y):
 
 
 def vector_analysis(vector, coordinates, elements_vdw, increment=1.0):
-    """
-    Analyse a sampling vector's path for window analysis purpose.
-    """
+    """Analyse a sampling vector's path for window analysis purpose."""
     # Calculate number of chunks if vector length is divided by increment.
     chunks = int(np.linalg.norm(vector) // increment)
     # Create a single chunk.
@@ -809,18 +918,14 @@ def vector_analysis(vector, coordinates, elements_vdw, increment=1.0):
 
 
 def optimise_xy(xy, *args):
-    """
-    Return negative void diameter for x and y coordinates optimisation.
-    """
+    """Return negative void diameter for x and y coordinates optimisation."""
     z, elements, coordinates = args
     window_com = np.array([xy[0], xy[1], z])
     return -void_diameter(elements, coordinates, com=window_com)[0]
 
 
 def optimise_z(z, *args):
-    """
-    Return void diameter for coordinates optimisation in z direction.
-    """
+    """Return void diameter for coordinates optimisation in z direction."""
     x, y, elements, coordinates = args
     window_com = np.array([x, y, z])
     return void_diameter(elements, coordinates, com=window_com)[0]
@@ -848,6 +953,7 @@ def window_analysis(window,
     elements_vdw: numpy.array
 
     step: float
+
     """
     # Copy the coordinates as we will manipulate them.
     coordinates = deepcopy(coordinates)
@@ -855,6 +961,11 @@ def window_analysis(window,
     vector_ = window[window.argmax(axis=0)[1]][5:8]
     vector_analysed = vector_analysis(
         vector_, coordinates, elements_vdw, increment=increment2)
+    # A safety check, if the refined analysis give None we end the function.
+    if vector_analysed is not None:
+        pass
+    else:
+        return None
     vector = vector_analysed[5:8]
     # Unit vectors.
     vec_a = [1, 0, 0]
@@ -974,9 +1085,7 @@ def find_windows(elements,
                  increment=1.0,
                  output='all',
                  **kwargs):
-    """
-    Return windows diameters and center of masses for a molecule.
-    """
+    """Return windows diameters and center of masses for a molecule."""
     # Copy the coordinates as will perform many opertaions on them
     coordinates = deepcopy(coordinates)
     # Center of our cartesian system is always at origin
@@ -1016,7 +1125,7 @@ def find_windows(elements,
     # sampling by changing the adjust factor.
     number_of_points = int(np.log10(sphere_surface_area) * 250 * adjust)
     points_per_1A_surface = number_of_points / sphere_surface_area
-    # Here I use code by Alexandre Devert for spreding points on a sphere:
+    # Here I use code by Alexandre Devert for spreading points on a sphere:
     # http://blog.marmakoide.org/?p=1
     golden_angle = np.pi * (3 - np.sqrt(5))
     theta = golden_angle * np.arange(number_of_points)
@@ -1078,6 +1187,8 @@ def find_windows(elements,
         return None
     else:
         # Perfomr DBSCAN to cluster the sampling points vectors.
+        # the n_jobs will be developed later.
+        # db = DBSCAN(eps=eps, n_jobs=_ncpus).fit(dataset)
         db = DBSCAN(eps=eps).fit(dataset)
         core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
         core_samples_mask[db.core_sample_indices_] = True
@@ -1115,10 +1226,240 @@ def find_windows(elements,
             pool.terminate()
     # The function returns two numpy arrays, one with windows diameters
     # in Angstrom, second with corresponding windows center's coordinates
-    windows = np.array([result[0] for result in window_results])
+    windows = np.array([result[0] for result in window_results
+                        if result is not None])
     windows_coms = np.array(
-        [np.add(result[1], initial_com) for result in window_results])
+        [np.add(result[1], initial_com) for result in window_results
+         if result is not None])
+    # Safety measures, if one of the windows is None or negative a warning
+    # should be raised.
+    for result in window_results:
+        if result is None:
+            msg_ = " ".join(
+                ['Warning. One of the analysed windows has',
+                 'returned as None. See manual.']
+            )
+            # print(msg_)
+        elif result[0] < 0:
+            msg_ = " ".join(
+                ['Warning. One of the analysed windows has a vdW',
+                 'corrected diameter smaller than 0. See manual.']
+            )
+            # print(msg_)
     if output == 'all':
         return (windows, windows_coms)
     if output == 'windows':
         return windows
+
+
+def vector_analysis_reversed(vector, coordinates, elements_vdw, shpere_radius,
+                             increment=0.1):
+    """Analyse a sampling vector's path for avarge diamatere of a molecule."""
+    # Calculate number of chunks if vector length is divided by increment.
+    chunks = int(np.linalg.norm(vector) // increment)
+    # Create a single chunk.
+    chunk = vector / chunks
+    # Calculate set of points on vector's path every increment.
+    vector_pathway = [chunk * i for i in range(chunks + 1)]
+    reversed_vector_pathway = np.array(vector_pathway[::-1])
+    analysed_vector = np.array([
+        np.amin(
+            euclidean_distances(coordinates, i.reshape(1, -1)) - elements_vdw)
+        for i in reversed_vector_pathway
+    ])
+    if all(i > 0 for i in analysed_vector):
+        return None
+    else:
+        count = -1
+        for i in analysed_vector:
+            if i > 0:
+                pass
+            else:
+                break
+            count += 1
+        dist_origin = np.linalg.norm(reversed_vector_pathway[count])
+        dist_origin_corrected = dist_origin - analysed_vector[count]
+        return [dist_origin_corrected, reversed_vector_pathway[count]]
+
+
+def find_avarage_diameter(elements, coordinates, adjust=1, increment=0.1,
+                          **kwargs):
+    """Return avarage diameter for a molecule."""
+    # Copy the coordinates as will perform many opertaions on them
+    coordinates = deepcopy(coordinates)
+    # Center of our cartesian system is always at origin
+    origin = np.array([0, 0, 0])
+    # Initial center of mass to reverse translation at the end
+    initial_com = center_of_mass(elements, coordinates)
+    # We just shift the cage to the origin.
+    coordinates = shift_com(elements, coordinates)
+    # We create an array of vdw radii of elements.
+    elements_vdw = np.array([[atomic_vdw_radius[x.upper()]] for x in elements])
+    # We calculate maximum diameter of a molecule to determine the radius
+    # of a sampling sphere neccessary to enclose the whole molecule.
+    shpere_radius = max_dim(elements, coordinates)[2]
+    sphere_surface_area = 4 * np.pi * shpere_radius**2
+    # Here we determine the number of sampling points necessary for a fine
+    # sampling. Smaller molecules require more finner density of sampling
+    # points on the sampling sphere's surface, whereas largen require less.
+    # This formula was created so that larger molecule do not take much longer
+    # to analyse, as number_sampling_points*length_of_sampling_vectors
+    # results in quadratic increase of sampling time. The 250 factor was
+    # specificly determined to produce close to 1 sampling point /Angstrom^2
+    # for a sphere of radius ~ 24 Angstrom. We can adjust how fine is the
+    # sampling by changing the adjust factor.
+    number_of_points = int(np.log10(sphere_surface_area) * 250 * adjust)
+    points_per_1A_surface = number_of_points / sphere_surface_area
+    # Here I use code by Alexandre Devert for spreading points on a sphere:
+    # http://blog.marmakoide.org/?p=1
+    golden_angle = np.pi * (3 - np.sqrt(5))
+    theta = golden_angle * np.arange(number_of_points)
+    z = np.linspace(1 - 1.0 / number_of_points, 1.0 / number_of_points - 1.0,
+                    number_of_points)
+    radius = np.sqrt(1 - z * z)
+    points = np.zeros((number_of_points, 3))
+    points[:, 0] = radius * np.cos(theta) * shpere_radius
+    points[:, 1] = radius * np.sin(theta) * shpere_radius
+    points[:, 2] = z * shpere_radius
+    # Here we will compute the eps parameter for the sklearn.cluster.DBSCAN
+    # (3-dimensional spatial clustering algorithm) which is the mean distance
+    # to the closest point of all points.
+    values = []
+    tree = KDTree(points)
+    for i in points:
+        dist, ind = tree.query(i.reshape(1, -1), k=10)
+        values.append(dist[0][1])
+        values.append(dist[0][2])
+        values.append(dist[0][3])
+    mean_closest_distance = np.mean(values)
+    # The best eps is parametrized when adding the mean distance and it's root.
+    eps = mean_closest_distance + mean_closest_distance**0.5
+    # Here we either run the sampling points vectors analysis in serial
+    # or parallel. The vectors that go through molecular voids return
+    # as analysed list with the increment at vector's path with largest
+    # included sphere, coordinates for this narrow channel point. vectors
+    # that find molecule on theirs path are return as NoneType object.
+    results = [
+        vector_analysis_reversed(
+            point, coordinates, elements_vdw, shpere_radius,
+            increment=increment)
+        for point in points
+    ]
+    results_cleaned = [x[0]*2 for x in results if x is not None]
+    avarage_molecule_diameter = np.mean(results_cleaned)
+    points_density = []
+    for i in np.arange(1, int(shpere_radius)+1, increment):
+        surface = 4 * np.pi * i**2
+        density = number_of_points/surface
+        points_density.append([i, density])
+    normalised = []
+    for i in points_density:
+        normalised.append([i[0], points_density[0][1]/i[1]])
+    weighted_avarage = [[] for x in range(len(normalised))]
+    for i in results_cleaned:
+        for j in range(len(normalised)-1):
+            if normalised[j][0] < i <= normalised[j+1][0]:
+                weighted_avarage[j].append(i)
+    average_1 = 0
+    average_2 = 0
+    for i, j in zip(weighted_avarage, normalised):
+        if i:
+            average_1 += np.mean(i) * j[1]
+            average_2 += j[1]
+    average = average_1 / average_2
+    return average
+
+
+def vector_analysis_pore_shape(vector, coordinates, elements_vdw,
+                               increment=1.0):
+    """Analyse a sampling vector's path for pore shape determination."""
+    # Calculate number of chunks if vector length is divided by increment.
+    chunks = int(np.linalg.norm(vector) // increment)
+    # Create a single chunk.
+    chunk = vector / chunks
+    # Calculate set of points on vector's path every increment.
+    vector_pathway = np.array([chunk * i for i in range(chunks + 1)])
+    analysed_vector = np.array([
+        np.amin(
+            euclidean_distances(coordinates, i.reshape(1, -1)) - elements_vdw)
+        for i in vector_pathway
+    ])
+    if all(i > 0 for i in analysed_vector):
+        return None
+    else:
+        count = -1
+        for i in analysed_vector:
+            if i > 0:
+                pass
+            else:
+                break
+            count += 1
+        return vector_pathway[count]
+
+
+def calculate_pore_shape(elements, coordinates, adjust=1, increment=0.1,
+                         **kwargs):
+    """Return avarage diameter for a molecule."""
+    # Copy the coordinates as will perform many opertaions on them
+    coordinates = deepcopy(coordinates)
+    # Center of our cartesian system is always at origin
+    origin = np.array([0, 0, 0])
+    # Initial center of mass to reverse translation at the end
+    initial_com = center_of_mass(elements, coordinates)
+    # We just shift the cage to the origin.
+    coordinates = shift_com(elements, coordinates)
+    # We create an array of vdw radii of elements.
+    elements_vdw = np.array([[atomic_vdw_radius[x.upper()]] for x in elements])
+    # We calculate maximum diameter of a molecule to determine the radius
+    # of a sampling sphere neccessary to enclose the whole molecule.
+    shpere_radius = max_dim(elements, coordinates)[2]/2
+    sphere_surface_area = 4 * np.pi * shpere_radius**2
+    # Here we determine the number of sampling points necessary for a fine
+    # sampling. Smaller molecules require more finner density of sampling
+    # points on the sampling sphere's surface, whereas largen require less.
+    # This formula was created so that larger molecule do not take much longer
+    # to analyse, as number_sampling_points*length_of_sampling_vectors
+    # results in quadratic increase of sampling time. The 250 factor was
+    # specificly determined to produce close to 1 sampling point /Angstrom^2
+    # for a sphere of radius ~ 24 Angstrom. We can adjust how fine is the
+    # sampling by changing the adjust factor.
+    number_of_points = int(np.log10(sphere_surface_area) * 250 * adjust)
+    points_per_1A_surface = number_of_points / sphere_surface_area
+    # Here I use code by Alexandre Devert for spreading points on a sphere:
+    # http://blog.marmakoide.org/?p=1
+    golden_angle = np.pi * (3 - np.sqrt(5))
+    theta = golden_angle * np.arange(number_of_points)
+    z = np.linspace(1 - 1.0 / number_of_points, 1.0 / number_of_points - 1.0,
+                    number_of_points)
+    radius = np.sqrt(1 - z * z)
+    points = np.zeros((number_of_points, 3))
+    points[:, 0] = radius * np.cos(theta) * shpere_radius
+    points[:, 1] = radius * np.sin(theta) * shpere_radius
+    points[:, 2] = z * shpere_radius
+    # Here we will compute the eps parameter for the sklearn.cluster.DBSCAN
+    # (3-dimensional spatial clustering algorithm) which is the mean distance
+    # to the closest point of all points.
+    values = []
+    tree = KDTree(points)
+    for i in points:
+        dist, ind = tree.query(i.reshape(1, -1), k=10)
+        values.append(dist[0][1])
+        values.append(dist[0][2])
+        values.append(dist[0][3])
+    mean_closest_distance = np.mean(values)
+    # The best eps is parametrized when adding the mean distance and it's root.
+    eps = mean_closest_distance + mean_closest_distance**0.5
+    # Here we either run the sampling points vectors analysis in serial
+    # or parallel. The vectors that go through molecular voids return
+    # as analysed list with the increment at vector's path with largest
+    # included sphere, coordinates for this narrow channel point. vectors
+    # that find molecule on theirs path are return as NoneType object.
+    results = [
+        vector_analysis_pore_shape(
+            point, coordinates, elements_vdw, increment=increment)
+        for point in points
+    ]
+    results_cleaned = [x for x in results if x is not None]
+    ele = np.array(['He'] * len(results_cleaned))
+    coor = np.array(results_cleaned)
+    return ele, coor
