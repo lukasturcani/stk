@@ -2,14 +2,27 @@
 """
 This module containes general-purpose chemical data (aka tables).
 
-The dictionaries defined here with the atomic masses, van der Waals radii
-and OPLS force field atom keys are independent of the rest of pywindow.
+The dictionaries defined here:
+    -the atomic masses
+    -van der Waals radii
+    -covalent radii (used for bonds determination)
+    -OPLS force field atom keys
+are independent of the rest of pywindow.
+
+Sources:
+[1] www.ccdc.cam.ac.uk/Lists/ResourceFileList/Elemental_Radii.xlsx, (access
+    date: 13 Oct 2015)
+[2] C. W. Yong, 'DL_FIELD - A force field and model development tool for
+    DL_POLY', R. Blake, Ed., CSE Frontier, STFC Computational Science and
+    Engineering, Daresbury Laboratory, UK, p38-40 (2010)
+
+Edit 1:
+[1] https://www.ccdc.cam.ac.uk/support-and-resources/ccdcresources/
+    Elemental_Radii.xlsx (access date: 26 Jul 2017)
 """
 
 
 # Atomic mass dictionary (in upper case!)
-# www.ccdc.cam.ac.uk/Lists/ResourceFileList/Elemental_Radii.xlsx
-# Date: 13 Oct 2015
 atomic_mass = {
     'AL': 26.982,
     'SB': 121.76,
@@ -98,8 +111,6 @@ atomic_mass = {
 }
 
 # Atomic vdW radii dictionary (in upper case!)
-# www.ccdc.cam.ac.uk/Lists/ResourceFileList/Elemental_Radii.xlsx
-# Date: 13 Oct 2015
 atomic_vdw_radius = {
     'AL': 2,
     'SB': 2,
@@ -185,6 +196,94 @@ atomic_vdw_radius = {
     'Y': 2,
     'ZN': 1.29,
     'ZR': 2,
+}
+
+# Atomic covalent radii dictionary (in upper case!)
+atomic_covalent_radius = {
+    'AL': 1.21,
+    'SB': 1.39,
+    'AR': 1.51,
+    'AS': 1.21,
+    'BA': 2.15,
+    'BE': 0.96,
+    'BI': 1.48,
+    'B': 0.83,
+    'BR': 1.21,
+    'CD': 1.54,
+    'CS': 2.44,
+    'CA': 1.76,
+    'C': 0.68,
+    'CE': 2.04,
+    'CL': 0.99,
+    'CR': 1.39,
+    'CO': 1.26,
+    'CU': 1.32,
+    'DY': 1.92,
+    'ER': 1.89,
+    'EU': 1.98,
+    'F': 0.64,
+    'GD': 1.96,
+    'GA': 1.22,
+    'GE': 1.17,
+    'AU': 1.36,
+    'HF': 1.75,
+    'HE': 1.5,
+    'HO': 1.92,
+    'H': 0.23,
+    'IN': 1.42,
+    'I': 1.4,
+    'IR': 1.41,
+    'FE': 1.52,
+    'KR': 1.5,
+    'LA': 2.07,
+    'PB': 1.46,
+    'LI': 1.28,
+    'LU': 1.87,
+    'MG': 1.41,
+    'MN': 1.61,
+    'HG': 1.32,
+    'MO': 1.54,
+    'ND': 2.01,
+    'NE': 1.5,
+    'NI': 1.24,
+    'NB': 1.64,
+    'N': 0.68,
+    'OS': 1.44,
+    'O': 0.68,
+    'PD': 1.39,
+    'P': 1.05,
+    'PT': 1.36,
+    'K': 2.03,
+    'PR': 2.03,
+    'PA': 2,
+    'RE': 1.51,
+    'RH': 1.42,
+    'RB': 2.2,
+    'RU': 1.46,
+    'SM': 1.98,
+    'SC': 1.7,
+    'SE': 1.22,
+    'SI': 1.2,
+    'AG': 1.45,
+    'NA': 1.66,
+    'SR': 1.95,
+    'S': 1.02,
+    'TA': 1.7,
+    'TE': 1.47,
+    'TB': 1.94,
+    'TL': 1.45,
+    'TH': 2.06,
+    'TM': 1.9,
+    'SN': 1.39,
+    'TI': 1.6,
+    'W': 1.62,
+    'U': 1.96,
+    'V': 1.53,
+    'XE': 1.5,
+    'YB': 1.87,
+    'Y': 1.9,
+    'ZN': 1.22,
+    'ZR': 1.75,
 }
 
 # Atom symbols - atom keys pairs for deciphering OPLS force field
