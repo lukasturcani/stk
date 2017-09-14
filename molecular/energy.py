@@ -988,6 +988,7 @@ class Energy(metaclass=EMeta):
         try:
             en1 = _extract_MOPAC_en(file_root)
         except FileNotFoundError:
+            print(" There is an issue with the file")
             en1 = 0.0
 
         # Update the settings for the anion optimization
