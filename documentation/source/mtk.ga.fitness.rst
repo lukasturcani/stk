@@ -1,5 +1,5 @@
-mtk\.ga\.fitness module
-=======================
+mtk.ga.fitness module
+=====================
 
 .. automodule:: mtk.ga.fitness
     :members:

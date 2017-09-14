@@ -1,5 +1,5 @@
-mtk\.export\_tools module
-=========================
+mtk.export_tools module
+=======================
 
 .. automodule:: mtk.export_tools
     :members:
