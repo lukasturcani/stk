@@ -24,6 +24,9 @@ def fitness_epp(pop, plot_name=False,
 
     which is then dumped to the file `dump_name`.
 
+    The members with a standard fitness of 0.0001 are excluded from
+    this analysis.
+
     Parameters
     ----------
     pop : Population

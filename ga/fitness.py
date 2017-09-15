@@ -474,10 +474,11 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
     macro_mol : :class:`.Cage`
         The cage whose fitness is to be calculated.
 
-    dihedral_SMARTS : :class:`str`
+    dihedral_SMARTS : :class:`str` (default="")
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`
+
+    target_value : :class:`float` (default=180)
         Float representing the target value for the dihedral angle.
 
     pseudoformation_params : dict (default =
@@ -548,8 +549,9 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
 @_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
                'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
                'Dihedral Strain')
-def cage_target(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
-                efunc, ofunc, rotations=0, logger=logger):
+def cage_target(macro_mol, target_mol_file, efunc, ofunc,
+                dihedral_SMARTS="", target_value=180,
+                rotations=0, logger=logger):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -581,10 +583,11 @@ def cage_target(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : :class:`str`
+    dihedral_SMARTS : :class:`str` (default="")
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`
+
+    target_value : :class:`float` (default=180)
         Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
@@ -627,8 +630,8 @@ def cage_target(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
 @_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
                'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
                'Dihedral Strain')
-def cage_c60(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
-             efunc, ofunc, n5fold, n2fold, logger=logger):
+def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
+             dihedral_SMARTS="", target_value=180, logger=logger):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
@@ -662,10 +665,11 @@ def cage_c60(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : :class:`str`
+    dihedral_SMARTS : :class:`str` (default="")
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`
+
+    target_value : :class:`float` (default=180)
         Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
@@ -706,8 +710,8 @@ def cage_c60(macro_mol, target_mol_file, dihedral_SMARTS, target_value,
                         logger)
 
 
-def _cage_target(func_name, macro_mol, target_mol_file, dihedral_SMARTS,
-                 target_value, efunc, ofunc, rotation_func, logger):
+def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
+                 rotation_func, logger, dihedral_SMARTS="", target_value=180):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -744,10 +748,11 @@ def _cage_target(func_name, macro_mol, target_mol_file, dihedral_SMARTS,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : :class:`str`
-        The SMARTS code for the dihedral angle of interest.
+    dihedral_SMARTS : :class:`str` (default="")
+        The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`
+
+    target_value : :class:`float` (default=180)
         Float representing the target value for the dihedral angle.
 
     efunc : :class:`.FunctionData`
