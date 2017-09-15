@@ -443,8 +443,9 @@ def partial_raiser(macro_mol, logger=logger):
 @_param_labels('Cavity Difference ', 'Window Difference ',
                'Asymmetry ', 'Energy per Bond ', 'Precursors Strain',
                'Dihedral Strain')
-def cage(macro_mol, dihedral_SMARTS, target_value, pseudoformation_params={
-        'func': FunctionData('rdkit', forcefield='mmff')}, logger=logger):
+def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
+                                                    forcefield='mmff')},
+         dihedral_SMARTS="", target_value=180, logger=logger):
     """
     Returns the fitness vector of a cage.
 
