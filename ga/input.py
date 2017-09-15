@@ -1,8 +1,9 @@
-"""
+cd """
 Defines classes which deal with input.
 
 """
 
+import psutil
 from types import ModuleType
 from inspect import isclass
 import logging
@@ -75,6 +76,9 @@ class GAInput:
 
     Attributes
     ----------
+    num_cores : int
+        The number of CPUs to be used for the simulation.
+
     pop_size : int
         The size of the population.
 
@@ -202,6 +206,9 @@ class GAInput:
 
         # If the input file did not specify some values, default
         # initialize them.
+        if not hasattr(self, 'num_cores'):
+            self.num_cores = psutil.cpu_count(logical=False)
+
         if not hasattr(self, 'num_crossovers'):
             self.num_crossovers = 0
 

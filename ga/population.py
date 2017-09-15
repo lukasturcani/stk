@@ -15,6 +15,7 @@ import multiprocessing as mp
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
+from .ga import GAInput
 from ..convenience_tools import dedupe
 from ..molecular import (Molecule, Cage,
                          StructUnit, StructUnit2, StructUnit3)
@@ -216,7 +217,7 @@ class Population:
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
             args.append((bbs, topology))
 
-        with mp.Pool() as pool:
+        with mp.Pool(GAInput.num_cores) as pool:
             mols = pool.starmap(macromol_class, args)
 
         # Update the cache.
