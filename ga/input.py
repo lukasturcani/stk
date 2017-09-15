@@ -1,4 +1,4 @@
-cd """
+"""
 Defines classes which deal with input.
 
 """
@@ -9,10 +9,10 @@ from inspect import isclass
 import logging
 
 from . import fitness
-from .crossover import Crossover
 from .ga_tools import GATools
 from .selection import Selection
 from .mutation import Mutation
+from .crossover import Crossover
 from .population import Population
 from .normalization import Normalization
 from .ga_exit import Exit

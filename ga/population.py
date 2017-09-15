@@ -15,7 +15,6 @@ import multiprocessing as mp
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
-from .ga import GAInput
 from ..convenience_tools import dedupe
 from ..molecular import (Molecule, Cage,
                          StructUnit, StructUnit2, StructUnit3)
