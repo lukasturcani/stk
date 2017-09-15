@@ -147,7 +147,7 @@ import logging
 from threading import Thread
 from traceback import format_exc
 
-from .ga import GAInput
+from ga import GAInput
 
 from ..convenience_tools import (matrix_centroid,
                                  FunctionData,
