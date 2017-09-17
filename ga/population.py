@@ -195,8 +195,8 @@ class Population:
             A population holding all possible macromolecules from
             assembled from `databases`.
 
-        Example
-        -------
+        Examples
+        --------
         If the name of the functional group needs to be provided to the
         building blocks, a lambda function can be used.
 
@@ -234,84 +234,6 @@ class Population:
         if not duplicates:
             p.remove_duplicates()
         return p
-
-    @classmethod
-    def init_cage_isomers(cls, lk_file, bb_file, topology,
-                          ga_tools=GATools.init_empty(),
-                          lk_fg=None, bb_fg=None):
-        """
-        Creates a population holding all structural isomers of a cage.
-
-        Structural isomers here means that the building blocks are
-        rotated in position so that every possible bond combination
-        with linkers is formed.
-
-        This only works for cage topologies which have both building
-        blocks and linkers. It will not with topologies where all
-        building blocks have the same number of functional groups.
-
-        Parameters
-        ----------
-        lk_file : str
-            The full path of the file holding the linker of the cage.
-
-        bb_file : str
-            The full path to the file holding the building block of the
-            cage.
-
-        topology : type
-            A _CageTopology child class. Exluding child classes of
-            _NoLinkerCageTopology.
-
-        ga_tools : GATools (default = GATools.init_empty())
-            The GATools instance to be used by created population.
-
-        lk_fg : str (default = None)
-            The name of the linker's functional group. If ``None`` then
-            `lk_file` is checked for a name.
-
-        bb_fg : str (default = None)
-            The name of the building block's functional group. If
-            ``None`` then `bb_file` is checked for a name.
-
-        Returns
-        -------
-        Population
-            A population filled with isomers of a cage.
-
-        """
-
-        n_A = len(topology.positions_A)
-        A_alignments = set()
-
-        for x in it.combinations_with_replacement([0, 1, 2], n_A):
-            for y in it.permutations(x, n_A):
-                A_alignments.add(y)
-
-        n_B = len(topology.positions_B)
-        B_alignments = set()
-        orientations = ([0, 1, 2] if
-                        issubclass(topology, _VertexOnlyCageTopology)
-                        else [1, -1])
-        for x in it.combinations_with_replacement(orientations, n_B):
-            for y in it.permutations(x, n_B):
-                B_alignments.add(y)
-
-        lk = StructUnit(lk_file, lk_fg)
-        if len(lk.functional_group_atoms()) > 2:
-            lk = StructUnit3(lk_file, lk_fg)
-        else:
-            lk = StructUnit2(lk_file, lk_fg)
-
-        bb = StructUnit3(bb_file, bb_fg)
-
-        pop = cls(ga_tools)
-        for A_align in A_alignments:
-            for B_align in B_alignments:
-                c = Cage([bb, lk], topology(A_align, B_align))
-                pop.members.append(c)
-
-        return pop
 
     @classmethod
     def init_diverse_cages(cls, bb_db, lk_db,
@@ -440,9 +362,9 @@ class Population:
 
         moltype : :class:`type`
             An initializer for the molecular structure files. For
-            example, :class:`~.StructUnit` or :class:`.StructUnit2`.
+            example, :class:`.StructUnit` or :class:`.StructUnit2`.
             If `folder` contains ``.json`` dump files of
-            :class:`MacroMolecule` then :meth:`.Molecule.load` could
+            :class:`.MacroMolecule` then :meth:`.Molecule.load` could
             also be used.
 
         glob_pattern : :class:`str`, optional
@@ -558,43 +480,32 @@ class Population:
 
     def add_members(self, population, duplicates=False):
         """
-        Adds ``Molecule`` instances into `members`.
+        Adds :class:`.Molecule` instances into :attr:`members`.
 
-        The |Molecule| instances held within the supplied
-        ``Population`` instance, `population`, are added into the
-        `members` attribute of `self`. The supplied `population` itself
-        is not added. This means that any information the `population`
-        instance had about subpopulations is lost. This is because all
-        of its ``Molecule`` instances are added into the `members`
-        attribute, regardless of which subpopulation they were
-        originally in.
-
-        The `duplicates` parameter indicates whether multiple instances
-        of the same molecule are allowed to be added into the
-        population. Note that the sameness of a molecule is judged
-        by the `same` method of the ``Molecule`` class, which is
-        invoked by the ``in`` operator within this method. See the
-        `__contains__` method of the ``Population`` class for details
-        on how the ``in`` operator uses the `same` method.
+        The :class:`.Molecule`  instances held within `population`, are
+        added into :attr:`members`. Any nesting is removed. This is
+        because all :class:`.Molecule`  instances are added into
+        :attr:`members` directly, regardless of how nested they are
+        within `population`.
 
         Parameters
         ----------
-        population : iterable of :class:`~mmead.molecular.molecules.Molecule`
-            ``Molecule`` instances to be added to the `members`
-            attribute and/or ``Population`` instances who's members, as
-            generated by `all_members`, will be added to the `members`
-            attribute.
+        population : :class:`iterable` of :class:`.Molecule`
+            :class:`.Molecule` instances held by this container are
+            added into :attr:`members`.
 
-        duplicates : bool (default = False)
+        duplicates : :class:`bool`, optional
+            Indicates whether multiple instances of the same molecule
+            are allowed to be added. Note, the sameness of a molecule
+            is judged by :meth:`.Molecule.same`.
+
             When ``False`` only molecules which are not already
             held by the population will be added. ``True`` allows more
             than one instance of the same molecule to be added.
-            Whether two molecules are the same is defined by the
-            `same()` method of the ``Molecule`` class.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -606,25 +517,19 @@ class Population:
 
     def add_subpopulation(self, population):
         """
-        Appends a population into the `populations` attribute.
+        Appends a copy of `population` to :attr:`populations`.
 
-        The `population` instance itself is not added, only a copy.
-        However the items it holds are not copied.
+        Only a copy of the `population` container is made. The
+        molecules it holds are not copies.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`Population`
             The population to be added as a subpopulation.
-
-        Modifies
-        --------
-        populations : list of Populations
-            The `populations` attribute of `self` has ``Population``
-            instaces added to it.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -636,12 +541,12 @@ class Population:
 
     def all_members(self):
         """
-        Yields all members in the population and its subpopulations.
+        Yields all molecules in the population and its subpopulations.
 
         Yields
         ------
-        Molecule
-            The next ``Molecule`` instance held within the
+        :class:`.Molecule`
+            The next :class:`.Molecule` instance held within the
             population or its subpopulations.
 
         """
@@ -661,29 +566,25 @@ class Population:
         """
         Give each member of the population a name starting from `n`.
 
-        `n` is a number which is incremented. Each population member
-        will have a unique name as a result.
+        Notes
+        -----
+        This method modifies the :attr:`.Molecule.name` attribute of
+        :class:`.Molecule` instances held by the population.
 
         Parameters
         ----------
-        n : int
+        n : :class:`int`
             A number. Members of this population are given a unique
-            number as a name, starting from this number.
+            number as a name, starting from this number and incremented
+            by one between members.
 
-        overwrite : bool (default = False)
+        overwrite : :class:`bool`, optional
             If ``True`` existing names are replaced.
-
-
-        Modifies
-        --------
-        name : str
-            The `name` attribute of the population's members is
-            modified.
 
         Returns
         -------
-        int
-            The final value of `n`.
+        :class:`int`
+            The value of the last name assigned, plus 1.
 
         """
 
@@ -698,23 +599,26 @@ class Population:
         """
         Applies the fitness function to all members.
 
-        The calculation will be performed serially or in parallel
-        depending on the flag `ga_tools.parallel`. The serial version
-        may be faster in cases where all molecules have already had
-        their fitness calcluated. This is because all calculations will
-        be skipped. In this case creating a parallel process pool
-        creates unncessary overhead.
+        The fitness function is defined in the attribute
+        :attr:`.GATools.fitness` of the :class:`.GATools` instance
+        held in the :attr:`ga_tools` attribute of the population.
 
-        Modifies
-        --------
-        MarcroMolecule
-            The MacroMolecule instances held by the population have
-            fitness values calculated and placed in the
-            `unscaled_fitness` attribute.
+        The calculation will be performed serially or in parallel
+        depending on the flag :attr:`.GATools.parallel`. The serial
+        version may be faster in cases where all molecules have already
+        had their fitness values calcluated. This is because all
+        calculations will be skipped. In this case creating a parallel
+        process pool creates unncessary overhead.
+
+        Notes
+        -----
+        This method will result in the modification of the
+        :attr:`.MacroMolecule.unscaled_fitness` attribute of molecules
+        held by the population.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -725,26 +629,28 @@ class Population:
 
     def dump(self, path):
         """
-        Write the population to a file.
+        Dumps the population to a file.
 
-        The population is written in the JSON format in the following
+        The population is dumped in the JSON format in the following
         way. The population is represented as a list,
+
+        .. code-block:: python
 
             [mem1.json(), mem2.json(), [mem3.json(), [mem4.json()]]]
 
         where each member of the population held directly in the
         `members` attribute is placed an an element in the list. Any
-        subpopulations are held as  sublists.
+        subpopulations are held as sublists.
 
         Parameters
         ----------
-        path : str
+        path : :class:`str`
             The full path of the file to which the population should
-            be written.
+            be dumped.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -753,7 +659,7 @@ class Population:
 
     def exit(self, progress):
         """
-        Checks the if the exit criterion has been satisfied.
+        Checks the if the EA exit criterion has been satisfied.
 
         Parameters
         ----------
@@ -762,7 +668,7 @@ class Population:
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if the exit criterion is satisfied, else
             ``False``.
 
@@ -777,17 +683,18 @@ class Population:
 
         Parameters
         ----------
-        pop_list : list of str and lists
+        pop_list : :class:`list` of :class:`str` and :class:`list`
             A list which represents a population. Like the ones created
-            by `tolist()`.
+            by :meth:`tolist()`.
 
-        load_names : bool (default = True)
-            If ``True`` then the `name` attribute stored in the JSON
-            objects is loaded. If ``False`` then it's not.
+        load_names : :class:`bool`, optional
+            If ``True`` then the :meth:`.Molecule.name` attribute
+            stored in the JSON objects is loaded. If ``False`` then
+            it's not.
 
         Returns
         -------
-        Population
+        :class:`Population`
             The population represented by `pop_list`.
 
         """
@@ -808,23 +715,29 @@ class Population:
 
     def gen_mutants(self, counter_name='mutation_counter.png'):
         """
-        Returns a population of mutant ``MacroMolecule`` instances.
+        Returns a :class:`Population` of mutants.
 
-        This is a GA operation and as a result this method merely
-        delegates the request to the ``Mutation`` instance held in the
-        `ga_tools` attribute.
+        The selection function which decides which molecules are
+        selected for mutation is defined in the
+        :attr:`.Selection.mutation` attribute of the
+        :class:`.Selection` instance held by the population via its
+        :attr:`ga_tools` attribute.
+
+        The mutation function(s) to be used are defined in the
+        :class:`.Mutation` instance held by the population via its
+        :attr:`ga_tools` attribute.
 
         Parameters
         ----------
-        counter_name : str (default='mutation_counter.png')
-            The name of the .png file showing which members were
-            selected for mutation.
+        counter_name : :class:`str`, optional
+            The name of the ``.png`` file which holds a graph showing
+            which members were selected for mutation.
 
         Returns
         -------
-        Population
-            A population holding mutants created by mutating contained
-            ``MacroMolecule`` instances.
+        :class:`Population`
+            A population holding mutants created by mutating the
+            :class:`.MacroMolecule` instances held by the population.
 
         """
 
@@ -832,22 +745,27 @@ class Population:
 
     def gen_next_gen(self, pop_size, counter_path=''):
         """
-        Returns a population hodling the next generation of structures.
+        Returns a population holding the next generation of structures.
+
+        The selection function to be used for selecting the next
+        generation of molecules is defined in the :class:`.Selection`
+        instance held by the population via its :attr:`ga_tools`
+        attribute.
 
         Parameters
         ----------
-        pop_size : int
+        pop_size : :class:`int`
             The size of the next generation.
 
-        counter_path : str (default= '')
-            The name of the .png file showing which members were
-            selected for the next generation. If '' then no file
-            is made.
+        counter_path : :class:`str`, optional
+            The name of the ``.png`` file holding a graph showing which
+            members were selected for the next generation. If ``''``
+            then no file is made.
 
         Returns
         -------
-        Population
-            A population holding the next generation of individuals.
+        :class:`Population`
+            A population holding the next generation of molecules.
 
         """
 
@@ -869,34 +787,30 @@ class Population:
 
     def gen_offspring(self, counter_name='crossover_counter.png'):
         """
-        Returns a population of offspring ``MacroMolecule`` instances.
+        Returns a :class:`Population` of offspring molecules.
 
-        This is a GA operation and as a result this method merely
-        delegates the request to the ``Crossover`` instance held in the
-        `ga_tools` attribute. The ``Crossover`` instance takes care of
-        selecting parents and combining them to form offspring. The
-        ``Crossover`` instance delegates the selection to the
-        ``Selection`` instance as would be expected. The request to
-        perform crossovers is done by calling the ``Crossover``
-        instance with the population as the argument. Calling of the
-        ``Crossover``instance returns a ``Population`` instance holding
-        the generated offspring. All details regarding the crossover
-        procedure are handled by the ``Crossover`` instance.
+        The selection function which decides which molecules are
+        selected for crossover is defined in the
+        :attr:`.Selection.crossover` attribute of the
+        :class:`.Selection` instance held by the population via its
+        :attr:`ga_tools` attribute.
 
-        For more details about how crossover is implemented see the
-        ``Crossover`` class documentation.
+        The crossover function(s) to be used are defined in the
+        :class:`.Crossover` instance held by the population via its
+        :attr:`ga_tools` attribute.
 
         Parameters
         ----------
-        counter_name : str (default='crossover_counter.png')
-            The name of the .png file showing which members were
+        counter_name : :class:`str`, optional
+            The name of the ``.png`` file showing which members were
             selected for crossover.
 
         Returns
         -------
-        Population
-            A population holding offspring created by crossing
-            contained the ``MacroMolecule`` instances.
+        :class:`Population`
+            A population of offspring, created by crossing
+            :class:`.MacroMolecule` instances contained in the
+            population.
 
         """
 
@@ -908,13 +822,13 @@ class Population:
 
         Parameters
         ----------
-        mol : Molecule
+        mol : :class:`.Molecule`
             A molecule whose structure is being evaluated for presence
             in the population.
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if a molecule with the same structure as `mol`
             is held by the population.
 
@@ -925,20 +839,20 @@ class Population:
     @classmethod
     def load(cls, path, load_names=True):
         """
-        Initializes a Population from one dumped to a file.
+        Initializes a :class:`Population` from one dumped to a file.
 
         Parameters
         ----------
-        path : str
+        path : :class:`str`
             The full path of the file holding the dumped population.
 
-        load_names : bool (default = True)
+        load_names : :class:`bool`, optional
             If ``True`` then the `name` attribute stored in the JSON
             objects is loaded. If ``False`` then it's not.
 
         Returns
         -------
-        Population
+        :class:`Population`
             The population stored in the dump file.
 
         """
@@ -952,28 +866,29 @@ class Population:
 
     def max(self, key):
         """
-        Calculates the max given a key.
+        Calculates the maximum in the population given a key.
 
-        This method applies key(member) on every member of the
-        population and returns the max of returned values.
+        This method applies ``key(member)`` on every member of the
+        population and returns the maximum of returned values.
 
-        For example, if the max value of the attribute `cavity_size`
-        was desired:
+        For example, if the maximum molecular cavity in the
+        population is desired:
 
-            population.max(
-                 lambda macro_mol : macro_mol.topology.cavity_size())
+        .. code-block:: python
+
+            population.max(lambda macro_mol: macro_mol.cavity_size())
 
         Parameters
         ----------
-        key : function
-            A function which should take a Molecule instance as
-            its argument and return a value.
+        key : :class:`function`
+            A function which should take a :class:`.Molecule` instance
+            as its argument and returns a numerical value.
 
         Returns
         -------
-        float
-            The max of the values returned by the function `key` when
-            its applied to all members of the population.
+        :class:`float`
+            The maximum of the values returned by the function `key`
+            when it is applied to all members of the population.
 
         """
 
@@ -981,28 +896,29 @@ class Population:
 
     def mean(self, key):
         """
-        Calculates the mean given a key.
+        Calculates the mean in the population given a key.
 
-        This method applies key(member) on every member of the
+        This method applies ``key(member)`` on every member of the
         population and returns the mean of returned values.
 
-        For example, if the mean value of the attribute `cavity_size`
-        was desired:
+        For example, if the mean of molecular cavities in the
+        population is desired:
 
-            population.mean(
-                 lambda macro_mol : macro_mol.topology.cavity_size())
+        .. code-block:: python
+
+            population.mean(lambda macro_mol: macro_mol.cavity_size())
 
         Parameters
         ----------
-        key : function
-            A function which should take a Molecule instance as
-            its argument and return a value.
+        key : :class:`function`
+            A function which should take a :class:`.Molecule` instance
+            as its argument and returns a numerical value.
 
         Returns
         -------
-        float
+        :class:`float`
             The mean of the values returned by the function `key` when
-            its applied to all members of the population.
+            it is applied to all members of the population.
 
         """
 
@@ -1010,28 +926,29 @@ class Population:
 
     def min(self, key):
         """
-        Calculates the min given a key.
+        Calculates the minimum in the population given a key.
 
-        This method applies key(member) on every member of the
-        population and returns the min of returned values.
+        This method applies ``key(member)`` on every member of the
+        population and returns the minimum of returned values.
 
-        For example, if the min value of the attribute `cavity_size`
-        was desired:
+        For example, if the minimum molecular cavity in the
+        population is desired:
 
-            population.min(
-                 lambda macro_mol : macro_mol.topology.cavity_size())
+        .. code-block:: python
+
+            population.min(lambda macro_mol: macro_mol.cavity_size())
 
         Parameters
         ----------
-        key : function
-            A function which should take a Molecule instance as
-            its argument and return a value.
+        key : :class:`function`
+            A function which should take a :class:`.Molecule` instance
+            as its argument and returns a numerical value.
 
         Returns
         -------
-        float
-            The min of the values returned by the function `key` when
-            its applied to all members of the population.
+        :class:`float`
+            The minimum of the values returned by the function `key`
+            when it is applied to all members of the population.
 
         """
 
@@ -1039,11 +956,24 @@ class Population:
 
     def normalize_fitness_values(self):
         """
-        Applies the normalization function.
+        Applies the normalization functions on the population.
+
+        Normalization functions scale or modify the fitness values of
+        molecules in the population.
+
+        The normalization functions which are applied on the
+        population, along with their order, are defined in the
+        :class:`.Normalization` instance held by the population via the
+        :attr:`ga_tools` attribute.
+
+        Notes
+        -----
+        This method modifies the :attr:`.MacroMolecule.fitness`
+        attribute of molecules held by the population.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1051,24 +981,25 @@ class Population:
 
     def optimize_population(self):
         """
-        Optimizes all the members of the population.
+        Optimizes the structures of molecules in the population.
 
-        The population is optimized serially or in parallel depending
-        on the flag `ga_tools.parallel`. The serial version may be
+        The molecules are optimized serially or in parallel depending
+        on the flag :attr:`.GATools.parallel` of the :class:`.GATools`
+        instance held by the population. The serial version may be
         faster in cases where all molecules have already been
         optimized. This is because all optimizations will be skipped.
         In this case creating a parallel process pool creates
         unncessary overhead.
 
-        Modifies
-        --------
-        Molecule
-            The Molecule instances held by the population have their
-            structures optimized.
+        Notes
+        -----
+        This function modifies the structures of molecules held by the
+        population. This means their :attr:`.Molecule.mol` attributes
+        are modified.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1080,14 +1011,13 @@ class Population:
     def remove_duplicates(self, between_subpops=True,
                           key=lambda x: id(x), top_seen=None):
         """
-        Removes duplicates from a population and preserves structure.
+        Removes duplicates from the population and preserves structure.
 
-        The question of which ``Molecule`` instance is preserved
-        from a choice of two is difficult to answer. The iteration
-        through a population is depth-first, so a rule such as ``the
-        molecule in the topmost population is preserved`` is not
-        the case here. Rather, the first ``Molecule`` instance
-        iterated through is preserved.
+        The question of which molcule is preserved when duplicates are
+        removed is difficult to answer. The iteration through a
+        population is depth-first, so a rule such as "the molecule in
+        the topmost population is preserved" is not the case here.
+        Rather, the first molecule found is preserved.
 
         However, this question is only relevant if duplicates in
         different subpopulations are being removed. In this case it is
@@ -1096,28 +1026,22 @@ class Population:
 
         If the duplicates are being removed from within subpopulations,
         each subpopulation will end up with a single instance of all
-        molecules held before. There is no ``choice``.
+        molecules held before. There is no "choice".
 
         Parameters
         ----------
-        between_subpops : bool (default = False)
+        between_subpops : :class:`bool`, optional
             When ``False`` duplicates are only removed from within a
             given subpopulation. If ``True`` all duplicates are
             removed, regardless of which subpopulation they are in.
 
-        key : callable (default = lambda x : id)
-            Duplicates are removed by on the value returned by this
-            function.
-
-        Modifies
-        --------
-        members
-            Duplicate instances are removed from the `members`
-            attribute of the population or subpopulations.
+        key : :class:`callable`, optional
+            Two molecules are considered the same if the values
+            returned by ``key(molecule)`` are the same.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1152,27 +1076,21 @@ class Population:
 
     def remove_members(self, key):
         """
-        Removes all members where key(member) is ``True``.
+        Removes all members where ``key(member)`` is ``True``.
 
         The structure of the population is preserved.
 
         Parameters
         ----------
-        key : callable
+        key : :class:`callable`
             A callable which takes 1 argument. Each member of the
             population is passed as the argument to `key` in turn. If
             the result is ``True`` then the member is removed from the
             population.
 
-        Modifies
-        --------
-        self : Population
-            All members of the population which have their `failed`
-            attribute set to ``True`` are removed.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1180,64 +1098,36 @@ class Population:
         for subpop in self.populations:
             subpop.remove_members(key)
 
-    def select(self, type_='generational'):
+    def select(self, type='generational'):
         """
-        Returns a generator field yielding selected members of `self`.
+        Returns a generator for yielding members of the population.
 
-        Selection is a GA procedure and as a result this method merely
-        delegates the selection request to the ``Selection`` instance
-        held within the `ga_tools` attribute. The ``Selection``
-        instance then returns a generator which yields
-        ``MacroMolecule`` instances held within the population. Which
-        macromolecules are yielded depends on the selection algorithm
-        which was chosen during initialization and when calling this
-        method. The selection instance (`self.ga_tools.selection`)
-        returns the generator when it is called. See ``Selection``
-        class documentation for more information.
-
-        Because selection is required in a number of different ways,
-        such as selecting the parents, ``MacroMolecule`` instances for
-        mutation and ``MacroMolecule`` instances for the next
-        generation, the type of selection must be specificed with the
-        `type_` parameter. The valid values for `type_` will correspond
-        to one of the attribute names of the ``Selection`` instance.
-
-        For example, if `type_` is set to 'crossover' a selection
-        algorithm which yields a parents will be invoked. If the
-        `type_` is set to 'generational' an algorithm which yields the
-        next generation will be invoked.
-
-        The information regarding which generational, parent pool, etc.
-        algorithm is used is held by the ``Selection`` instance. This
-        method merely requests that the ``Selection`` instance performs
-        the selection algorithm of the relevant type. The ``Selection``
-        instance takes care of all the details to do with selection.
+        Members are yielded based on the selection function defined in
+        the :class:`.Selection` instance held by the population via the
+        :attr:`ga_tools` attribute. The instance defines 3 selection
+        functions, 1 for each `type`.
 
         Parameters
         ----------
-        type_ : str (default = 'generational')
+        type : :class:`str`, optional
             A string specifying the type of selection to be performed.
             Valid values will correspond to names of attributes of the
-            ``Selection`` class. Check ``Selection`` class
-            documentation for details.
+            :class:`Selection` class.
 
-            Valid values include:
-                'generational' - selects the next generation
-                'crossover' - selects parents
-                'mutation' - selects ``MacroMolecule`` instances for
-                             mutation
+            Valid values are:
+
+                ``'generational'`` - selects the next generation
+                ``'crossover'`` - selects molecules for crossover
+                ``'mutation'`` - selects molecules for mutation
 
         Returns
         -------
-        generator
-           A generator which yields ``MacroMolecule`` instances or
-           tuples of them. Which instances are yielded depends on the
-           selection algorithm used by the generator. This will depend
-           on the `type_` provided.
+        :class:`generator`
+           A generator which yields molecules or tuples of them.
 
         """
 
-        return self.ga_tools.selection(self, type_)
+        return self.ga_tools.selection(self, type)
 
     def tolist(self):
         """
@@ -1249,7 +1139,7 @@ class Population:
 
         Returns
         -------
-        str
+        :class:`str`
             A JSON string representing the population.
 
         """
@@ -1265,19 +1155,19 @@ class Population:
 
         Parameters
         ----------
-        dir_path : str
+        dir_path : :class:`str`
             The full path of the directory into which the ``.mol`` file
             is written.
 
-        use_name : bool (default = False)
-            When ``True`` the `name` attribute of the population's
-            members is used to make the name of the .mol file. If
-            ``False`` the files are just named after the member's
+        use_name : :class:`bool`, optional
+            When ``True`` the :attr:`.Molecule.name` attribute of the
+            members is used to make the name of the ``.mol`` file. If
+            ``False``, the files are just named after the member's
             index in the population.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1296,20 +1186,16 @@ class Population:
 
     def __iter__(self):
         """
-        Allows the use of ``for`` loops, ``*`` and ``iter`` function.
+        Allows populations to be iterated through,
 
-        When ``Population`` instances are iterated through they yield
-        ``Molecule`` instances generated by the `all_members`
-        method. It also means that a ``Population`` instance can be
-        unpacked with the ``*`` operator. This will produce the
-        ``Molecule`` instances yielded by the `all_members`
-        method.
+        When :class:`Population` instances are iterated through, they
+        yield :class:`.Molecule` instances from the :meth:`all_members`
+        generator.
 
         Returns
         -------
-        Generator
-            The `all_members` generator. See `all_members` method
-            documentation for more information.
+        :class:`generator`
+            The :meth:`all_members` generator.
 
         """
 
@@ -1317,57 +1203,41 @@ class Population:
 
     def __getitem__(self, key):
         """
-        Allows the use of ``[]`` operator.
+        Allows indexing to select members of the population.
 
-        Molecules held by the ``Population`` instance can be
-        accesed by their index. Slices are also supported. These return
-        a new ``Population`` instance holding the ``Molecule``
-        instances with the requested indices. Using slices will return
-        a flat ``Population`` instance meaing no subpopulation
-        information is preserved. All of the ``Molecule``
-        instances are placed into the `members` attribute of the
-        returned ``Population`` instance.
+        Molecules held by the :class:`Population` instance can be
+        accessed by their index. Slices are also supported. These return
+        a new :class:`Population` instance holding the members with the
+        requested indices. Using slices will return a flat
+        :class:`Population` instance, meaing no nesting is preserved.
 
-        The index corresponds to the ``Molecule`` yielded by the
-        `all_members` method.
-
-        This can be exploited if one desired to remove all
-        subpopulations and transfer all the ``Molecules``
-        instances into the members attribute. For example,
-
-        >>> pop2 = pop[:]
-
-        ``pop2`` is a ``Population`` instance with all the same
-        ``Molecule`` instances as ``pop``, however all
-        ``Molecule`` instances are held within its `members`
-        attribute and its `populations` attribute is empty. This may or
-        may not be the case for the ``pop`` instance.
+        The index corresponds to the order of members in
+        :meth:`all_members`.
 
         Parameters
         ----------
-        key : int, slice
-            An int or slice can be used depending on if a single
-            ``Molecule`` instance needs to be returned or a
-            collection of ``Molecule`` instances.
+        key : :class:`int`, :class:`slice`
+            An :class:`int` or :class:`slice` can be used depending on
+            if a single members needs to be returned or a cllection of
+            them.
 
         Returns
         -------
-        Molecule
-            If the supplied `key` is an ``int``. Returns the
-            ``Molecule`` instance with the corresponding index
-            from the `all_members` generator.
+        :class:`.Molecule`
+            If the supplied `key` is an :class:`int`. Returns the
+            :class:`.Molecule` instance with the corresponding index
+            from :meth:`all_members`.
 
-        Population
-            If the supplied `key` is a ``slice``. The returned
-            ``Population`` instance holds ``Molecule`` instances
-            in its `members` attribute. The ``Molecule`` instances
-            correspond to indices defined by the slice. The slice is
-            implemented on the `all_members` generator.
+        :class:`Population`
+            If the supplied `key` is a :class:`slice`. The returned
+            :class:`Population` instance holds members at the given
+            indices in :meth:`all_members`.
 
         Raises
         ------
-        TypeError
-            If the supplied `key` is not an ``int`` or ``slice`` type.
+        :class:`TypeError`
+            If the supplied `key` is not an :class:`int` or
+            :class:`slice`.
 
         """
 
@@ -1394,11 +1264,11 @@ class Population:
 
     def __len__(self):
         """
-        Returns the number of members yielded by `all_members`.
+        Returns the total number of members in the population.
 
         Returns
         -------
-        int
+        :class:`int`
             The number of members held by the population, including
             those held within its subpopulations.
 
@@ -1408,34 +1278,34 @@ class Population:
 
     def __sub__(self, other):
         """
-        Allows use of the ``-`` operator.
+        Removes members of `other` from the population.
 
-        Subtracting one from another,
+        Subtracting one population from another,
 
-            pop3 = pop1 - pop2,
+        .. code-block:: python
 
-        returns a new population, pop3. The returned population
-        contains all the ``Molecule`` instances in pop1 except
-        those also in pop2. This refers to all of the ``Molecule``
-        instances, including those held within any subpopulations. The
-        returned population is flat. This means all information about
-        subpopulations in pop1 is lost as all the ``Molecule``
-        instances are held in the `members` attribute of pop3.
+            pop3 = pop1 - pop2
 
-        The resulting population, pop3, will inherit the `ga_tools`
-        attribute from pop1.
+        returns a new population, ``pop3``. The returned population
+        contains all molecules in ``pop1`` excep those also found in
+        ``pop2``. This refers to all molcules, including those held
+        within any subpopulations. The returned population is flat.
+        This means any nesting in ``pop1`` is not preserved.
+
+        The resulting population, ``pop3``, will hold the same
+        :class:`.GATools` instance as ``pop1``.
 
         Parameters
         ----------
-        other : Population
-            A collection of ``Molecule`` instances to be removed
-            from `self`, if held by it.
+        other : :class:`Population`
+            A collection of :class:`.Molecule` instances to be removed
+            from the population, if held by it.
 
         Returns
         -------
-        Population
-            A flat population of ``Molecule`` instances which are
-            not also held in `other`.
+        :class:`Population`
+            A flat population of :class:`.Molecule` instances which
+            are in the population but not in `other`.
 
         """
 
@@ -1445,40 +1315,26 @@ class Population:
 
     def __add__(self, other):
         """
-        Allows use fo the ``+`` operator.
-
-        Creates a new ``Population`` instance which holds two
-        subpopulations and no direct members. The two subpopulations
-        are the two ``Population`` instances on which the ``+``
-        operator was applied.
+        Joins two populations.
 
         Parameters
         ----------
-        other : Population
+        other : :class:`Population`
+            A population to be joined with.
 
         Returns
         -------
-        Population
-
+        :class:`Population`
+            A new :class:`Population` instance which holds two
+            subpopulations and no direct members. The two
+            subpopulations are the two :class:`Population` instances on
+            which the ``+`` operator was applied.
 
         """
 
         return Population(self, other, self.ga_tools)
 
     def __contains__(self, item):
-        """
-        Allows use of the ``in`` operator.
-
-        Parameters
-        ----------
-        item : Molecule
-
-        Returns
-        -------
-        bool
-
-        """
-
         return any(item is mol for mol in self.all_members())
 
     def __str__(self):

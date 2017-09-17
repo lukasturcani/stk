@@ -232,6 +232,16 @@ original functional group.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends='h'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Linear.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="mtk.molecular.topologies.base.Linear.del_atoms">
 <code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.del_atoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -384,6 +394,42 @@ between the building blocks of a macromolecule. The way in which
 this is done will depend on what kind of macromolecules are being
 built. In addition, each child class must define methods which
 place the building blocks in approriate positions.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Topology.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'build': &lt;function Topology.build&gt;, '__str__': &lt;function Topology.__str__&gt;, '__dict__': &lt;attribute '__dict__' of 'Topology' objects&gt;, '__doc__': '\n    Builds macromolecules.\n\n    More accurately, child classes of ``Topology`` class take care of\n    building macromolecules.\n\n    This class directly defines any operations and attributes that are\n    needed by any topology during assembly. However, this class is not\n    used directly by MMEA. It is intended to be inherited from. All\n    macromolecules within MMEA have a `topology` attribute which hold\n    an instance of a Topology child class. Child classes of Topology\n    define operations specific to that one topology. For example, each\n    child class must define a `join_mols()` method which creates bonds\n    between the building blocks of a macromolecule. The way in which\n    this is done will depend on what kind of macromolecules are being\n    built. In addition, each child class must define methods which\n    place the building blocks in approriate positions.\n\n    ', 'del_atoms': &lt;function Topology.del_atoms&gt;, '__eq__': &lt;function Topology.__eq__&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Topology' objects&gt;, '__module__': 'mtk.molecular.topologies.base', 'determine_bond_type': &lt;staticmethod object&gt;, '__hash__': &lt;function Topology.__hash__&gt;, '__repr__': &lt;function Topology.__repr__&gt;})</em><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Topology.__eq__">
+<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Topology.__hash__">
+<code class="descname">__hash__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__hash__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__hash__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Topology.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Topology.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.Topology.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.Topology.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="mtk.molecular.topologies.base.Topology.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
@@ -476,6 +522,16 @@ double bond.</li>
 <em class="property">class </em><code class="descclassname">mtk.molecular.topologies.base.</code><code class="descname">TopologyMeta</code><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#TopologyMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
 <p>Makes a repr of an instance, based on __init__ arguments used.</p>
+<dl class="method">
+<dt id="mtk.molecular.topologies.base.TopologyMeta.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#TopologyMeta.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta.__call__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.topologies.base.TopologyMeta.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
