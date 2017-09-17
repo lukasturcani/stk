@@ -371,6 +371,46 @@ functions get made.</p>
 and placed in the output folder.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'normalizer': &lt;function GAInput.normalizer&gt;, 'exiter': &lt;function GAInput.exiter&gt;, 'ga_tools': &lt;function GAInput.ga_tools&gt;, '__str__': &lt;function GAInput.__str__&gt;, '__weakref__': &lt;attribute '__weakref__' of 'GAInput' objects&gt;, '__doc__': &quot;\n    A class for concisely holding information from MMEA's input file.\n\n    An MMEA input file is a Python script. The script must define a set\n    of variables. Each variable defines a parameter or a function used\n    by MMEA. If the variable defines a function used by MMEA it must\n    also define any parameters necessary to use the function. It does\n    not have to define any default initialized parameters, though it\n    may if desired.\n\n    Each variable name must corresond to an attribute of this class.\n\n    Variables which define a function or method are supplied as\n    dictionaries, for example:\n\n        fitness_func = {'NAME' : 'func_name',\n                        'param1_name' : param1_val,\n                        'param2_name' : param2_val}\n\n    Key points from the line example are:\n        &gt; The variable name specifies the GA operation and is equal to\n          the name of an attribute of this class.\n        &gt; The key 'NAME' holds the name of the function which carries\n          out the GA operation.\n        &gt; Any parameters which the function needs are provided as key\n          value pairs where the keys are strings holding the parameter\n          name.\n\n    Valid function names for a given variable can be found by using\n    the -h option.\n\n        python -m mmea -h fitness_func\n\n    See also the User's guide.\n\n    Some variables will need to define other parameters used by MMEA,\n    such as constants,\n\n        num_generations = 5\n\n    or lists of constants\n\n        databases = ['first/path', 'second/path']\n\n    See the ``Attributes`` section to see what data each variable must\n    hold.\n\n    Attributes\n    ----------\n    pop_size : int\n        The size of the population.\n\n    num_generations : int\n        The number of generations formed by MMEA.\n\n    num_mutations: int\n        The number of successful mutations per generation.\n\n    num_crossovers: int\n        The number of successful crossovers per generation.\n\n    init_func : dict\n        The key 'NAME' must hold the name of a ``Population`` method\n        initializer method.\n\n    generational_select_func : dict\n        The key 'NAME' must hold the name of the ``Selection`` class\n        method used to select members of the next generation.\n\n    crossover_select_func : dict\n        The key 'NAME' must hold the name of the ``Selection`` class\n        method used to select parents from the current generation's\n        population for crossover.\n\n    mutation_select_func : dict\n        The key 'NAME' must hold the name of the ``Selection`` class\n        method used to select ``MacroMolecule`` instances for mutation\n        from the current generation's population.\n\n    crossover_funcs : list of dicts\n        This list holds a dict for each crossover function which is to\n        be used by the GA. The key 'NAME' in each dict must hold the\n        name of a method of the ``Crossover`` class.\n\n    mutation_funcs : list of dicts\n        This list holds a dict for each mutation function which is to\n        be used by the GA. The key 'NAME' in each dict must hold the\n        name of a method of the ``Mutation`` class.\n\n    opt_func : dict\n        The key 'NAME' of the dict must hold the name of a fucntion\n        defined in the ``optimization.py`` module. It is used for\n        optimizing the structure of generated molecules.\n\n    fitness_func : dict\n        The key 'NAME' must hold the name of a function defined in\n        ``fitness.py``. The function is used to calculate the fitness\n        of generated molecules.\n\n    mutation_weights : list of ints\n        The probability that each function in `mutation_funcs` will be\n        selected each time a mutation operation is carried out. The\n        order of the probabilities corresponds to the order of the\n        mutation functions in `mutation_funcs`.\n\n    normalization_funcs : list of dicts\n        A list of functions which rescale or normalize the population's\n        fitness values. The order reflects the order in which they are\n        applied each generation.\n\n    databases : list of strings\n        A list which holds the paths to any number JSON files. These\n        files must hold the JSON representations of Population\n        instances. All the molecules in the populations are loaded\n        into memory for the duration of the GA run. This means not all\n        molecules have to be remade and optimized or have their\n        fitness value recalculated.\n\n    parallel : bool (default = True)\n        If ``True`` MMEA does optimization and fitness calculation of\n        each molecule in parallel.\n\n    progress_dump : bool (default = True)\n        If ``True`` a .json Population dump is made at the end of the\n        GA run called ``progress`.json`. The population holds each\n        generation as a subpopulation.\n\n    database_dump : bool (default = True)\n        If ``True`` a .json Population dump is made at the end of the\n        GA run called ``database.json``. The population holds every\n        molecule made by the GA as a member.\n\n    plot_epp : False or str (default = 'epp.png')\n        If a string, then it should hold the name of the EPP plots.\n        If ``False`` then no EPP plots are made.\n\n    logging_level : int (default = logging.DEBUG)\n        The logging level for logging messages to the screen.\n\n    counters : bool (default = True)\n        If ``True`` plots the which molecules get chosen by selection\n        functions get made.\n\n    pop_dumps : bool (default = True)\n        If ``True`` each generation makes a .json dump file.\n\n    tar_output : bool (default = True)\n        If ``True`` a copy of the output folder is compressed, tarred\n        and placed in the output folder.\n\n    &quot;, 'opter': &lt;function GAInput.opter&gt;, 'mutator': &lt;function GAInput.mutator&gt;, '__init__': &lt;function GAInput.__init__&gt;, 'crosser': &lt;function GAInput.crosser&gt;, 'selector': &lt;function GAInput.selector&gt;, 'initer': &lt;function GAInput.initer&gt;, '__module__': 'mtk.ga.input', '__dict__': &lt;attribute '__dict__' of 'GAInput' objects&gt;, 'fitnessor': &lt;function GAInput.fitnessor&gt;, '__repr__': &lt;function GAInput.__repr__&gt;})</em><a class="headerlink" href="#mtk.ga.input.GAInput.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>input_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes a <code class="docutils literal"><span class="pre">GAInput</span></code> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_file</strong> (<em>str</em>) – The full path of the MMEA input file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.ga.input'</em><a class="headerlink" href="#mtk.ga.input.GAInput.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.GAInput.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.GAInput.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.ga.input.GAInput.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="mtk.ga.input.GAInput.crosser">
 <code class="descname">crosser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#GAInput.crosser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.GAInput.crosser" title="Permalink to this definition">¶</a></dt>
@@ -545,8 +585,29 @@ the corresponding documentation.</p>
 functions or methods that are to be used with that keyword.</dd>
 </dl>
 <dl class="attribute">
+<dt id="mtk.ga.input.InputHelp.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__init__': &lt;function InputHelp.__init__&gt;, '__weakref__': &lt;attribute '__weakref__' of 'InputHelp' objects&gt;, 'modules': {'mutation_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'mutation_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'generational_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'crossover_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'normalization_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'topologies': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'opt_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'init_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'exit_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'energy': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'fitness_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'crossover_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}, '__module__': 'mtk.ga.input', '__doc__': '\n    A class which creates output when ``-h`` option is used as input.\n\n    The ``-h`` option is used in the following way:\n\n        python -m MMEA -h keyword\n\n    Here ``keyword`` corresponds to one of the attributes of the\n    ``GAInput`` class. The output when this command is used will be\n    a list of all functions which can be used with that keyword and\n    the corresponding documentation.\n\n    Class attributes\n    ----------------\n    modules : dict\n        Maps the name of the keyword to the object which holds the\n        functions or methods that are to be used with that keyword.\n\n    ', '__dict__': &lt;attribute '__dict__' of 'InputHelp' objects&gt;})</em><a class="headerlink" href="#mtk.ga.input.InputHelp.__dict__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.input.InputHelp.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>keyword</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/input.html#InputHelp.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.input.InputHelp.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.InputHelp.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.ga.input'</em><a class="headerlink" href="#mtk.ga.input.InputHelp.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.input.InputHelp.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.ga.input.InputHelp.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="mtk.ga.input.InputHelp.modules">
-<code class="descname">modules</code><em class="property"> = {'crossover_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'mutation_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'opt_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'fitness_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'init_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'energy': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'normalization_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'exit_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'mutation_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'generational_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'crossover_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'topologies': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mtk.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">modules</code><em class="property"> = {'mutation_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'mutation_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'generational_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'crossover_select_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'normalization_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'topologies': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'opt_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'init_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'exit_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'energy': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'fitness_func': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;, 'crossover_funcs': &lt;generator object InputHelp.&lt;genexpr&gt;&gt;}</em><a class="headerlink" href="#mtk.ga.input.InputHelp.modules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
