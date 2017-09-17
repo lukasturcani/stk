@@ -331,13 +331,13 @@
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FunctionData</span>
 
 
-<span class="k">class</span> <span class="nc">_EnergyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="_EnergyError"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._EnergyError">[docs]</a><span class="k">class</span> <span class="nc">_EnergyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for errors in Energy methods.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="o">...</span>
+    <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="EMethod"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMethod">[docs]</a><span class="k">class</span> <span class="nc">EMethod</span><span class="p">:</span>
@@ -351,10 +351,10 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+<div class="viewcode-block" id="EMethod.__init__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMethod.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span></div>
 
-    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+<div class="viewcode-block" id="EMethod.__get__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMethod.__get__">[docs]</a>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a modified `self.func`.</span>
 
@@ -391,7 +391,7 @@
         <span class="c1"># method is modified so that after the method returns a value,</span>
         <span class="c1"># it is stored in the `values` dictionary of the Energy</span>
         <span class="c1"># instance.</span>
-        <span class="k">return</span> <span class="n">e_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">e_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="EMeta"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMeta">[docs]</a><span class="k">class</span> <span class="nc">EMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
@@ -412,7 +412,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="EMeta.__new__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMeta.__new__">[docs]</a>    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Turns all the public methods in `cls` to EMethod descriptors.</span>
 
@@ -429,7 +429,7 @@
             <span class="c1"># Replace method with descriptor.</span>
             <span class="n">cls_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EMethod</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="e_logger"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.e_logger">[docs]</a><span class="k">def</span> <span class="nf">e_logger</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
@@ -576,9 +576,9 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">molecule</span><span class="p">):</span>
+<div class="viewcode-block" id="Energy.__init__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">molecule</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="n">molecule</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="Energy.formation"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.formation">[docs]</a>    <span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;force_e_calc&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">formation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">products</span><span class="p">,</span>
