@@ -146,6 +146,7 @@ from uuid import uuid4
 import logging
 from threading import Thread
 from traceback import format_exc
+import psutil
 
 from ..convenience_tools import (matrix_centroid,
                                  FunctionData,
@@ -196,7 +197,7 @@ def _calc_fitness(func_data, population):
 
     # Apply the function to every member of the population, in
     # parallel.
-    with mp.get_context('spawn').Pool() as pool:
+    with mp.get_context('spawn').Pool(psutil.cpu_count(False)) as pool:
         evaluated = pool.map(p_func, population)
 
     # Make sure the cache is updated with the evaluated versions.
