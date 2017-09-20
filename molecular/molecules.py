@@ -494,7 +494,7 @@ class Molecule:
         atoms_dihedral = self.mol.GetSubstructMatches(match)
 
         dihedral_info = []
-        if len(atoms_dihedral) > 0 and len(atoms_dihedral[0] != 0):
+        if len(atoms_dihedral) > 0 and len(atoms_dihedral[0]) != 0:
             for atoms_group in atoms_dihedral:
                 # Calculate the dihedral angle
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
