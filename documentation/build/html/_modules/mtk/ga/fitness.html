@@ -297,6 +297,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
 <span class="kn">from</span> <span class="nn">traceback</span> <span class="k">import</span> <span class="n">format_exc</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
 
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">matrix_centroid</span><span class="p">,</span>
                                  <span class="n">FunctionData</span><span class="p">,</span>
@@ -347,7 +348,7 @@
 
     <span class="c1"># Apply the function to every member of the population, in</span>
     <span class="c1"># parallel.</span>
-    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
         <span class="n">evaluated</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">p_func</span><span class="p">,</span> <span class="n">population</span><span class="p">)</span>
 
     <span class="c1"># Make sure the cache is updated with the evaluated versions.</span>
