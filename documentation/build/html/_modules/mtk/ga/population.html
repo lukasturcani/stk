@@ -169,7 +169,6 @@
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">dedupe</span>
 <span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Cage</span><span class="p">,</span>
                          <span class="n">StructUnit</span><span class="p">,</span> <span class="n">StructUnit2</span><span class="p">,</span> <span class="n">StructUnit3</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..molecular.topologies.cage.base</span> <span class="k">import</span> <span class="n">_VertexOnlyCageTopology</span>
 <span class="kn">from</span> <span class="nn">..molecular.optimization.optimization</span> <span class="k">import</span> <span class="p">(</span>
                                    <span class="n">_optimize_all_serial</span><span class="p">,</span> <span class="n">_optimize_all</span><span class="p">)</span>
 
@@ -214,21 +213,6 @@
 <span class="sd">    supported operations can be found by examining the included</span>
 <span class="sd">    methods.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`</span>
-<span class="sd">        A population is initialized with the :class:`.Molecule` and</span>
-<span class="sd">        :class:`Population` instances it should hold. These are placed</span>
-<span class="sd">        into the :attr:`members` or :attr:`populations` attributes,</span>
-<span class="sd">        respectively. A :class:`.GATools` instance may be included</span>
-<span class="sd">        and will be placed into the :attr:`ga_tools` attribute.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    TypeError</span>
-<span class="sd">        If initialized with something other than :class:`.Molecule`,</span>
-<span class="sd">        :class:`Population` or :class:`.GATools` instances.</span>
-
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    populations : :class:`list` of :class:`Population` instances</span>
@@ -253,6 +237,26 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Population.__init__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Intializes a population.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`</span>
+<span class="sd">            A population is initialized with the :class:`.Molecule` and</span>
+<span class="sd">            :class:`Population` instances it should hold. These are placed</span>
+<span class="sd">            into the :attr:`members` or :attr:`populations` attributes,</span>
+<span class="sd">            respectively. A :class:`.GATools` instance may be included</span>
+<span class="sd">            and will be placed into the :attr:`ga_tools` attribute.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If initialized with something other than :class:`.Molecule`,</span>
+<span class="sd">            :class:`Population` or :class:`.GATools` instances.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># Generate `populations`, `members` and `ga_tools` attributes.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">populations</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="p">[]</span>
@@ -337,7 +341,7 @@
 <span class="sd">            built.</span>
 
 <span class="sd">        duplicates : :class:`bool`, optional</span>
-<span class="sd">            If ``True`` duplicate structures are not removed from</span>
+<span class="sd">            If ``True``, duplicate structures are not removed from</span>
 <span class="sd">            the population.</span>
 
 <span class="sd">        Returns</span>
@@ -730,7 +734,7 @@
 <span class="sd">            by one between members.</span>
 
 <span class="sd">        overwrite : :class:`bool`, optional</span>
-<span class="sd">            If ``True`` existing names are replaced.</span>
+<span class="sd">            If ``True``, existing names are replaced.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -834,8 +838,8 @@
 <span class="sd">            by :meth:`tolist()`.</span>
 
 <span class="sd">        load_names : :class:`bool`, optional</span>
-<span class="sd">            If ``True`` then the :meth:`.Molecule.name` attribute</span>
-<span class="sd">            stored in the JSON objects is loaded. If ``False`` then</span>
+<span class="sd">            If ``True``, then the :meth:`.Molecule.name` attribute</span>
+<span class="sd">            stored in the JSON objects is loaded. If ``False``, then</span>
 <span class="sd">            it&#39;s not.</span>
 
 <span class="sd">        Returns</span>
@@ -993,8 +997,8 @@
 <span class="sd">            The full path of the file holding the dumped population.</span>
 
 <span class="sd">        load_names : :class:`bool`, optional</span>
-<span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
-<span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
+<span class="sd">            If ``True``, then the `name` attribute stored in the JSON</span>
+<span class="sd">            objects is loaded. If ``False``, then it&#39;s not.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1178,7 +1182,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        between_subpops : :class:`bool`, optional</span>
 <span class="sd">            When ``False`` duplicates are only removed from within a</span>
-<span class="sd">            given subpopulation. If ``True`` all duplicates are</span>
+<span class="sd">            given subpopulation. If ``True``, all duplicates are</span>
 <span class="sd">            removed, regardless of which subpopulation they are in.</span>
 
 <span class="sd">        key : :class:`callable`, optional</span>
@@ -1258,13 +1262,13 @@
 <span class="sd">        type : :class:`str`, optional</span>
 <span class="sd">            A string specifying the type of selection to be performed.</span>
 <span class="sd">            Valid values will correspond to names of attributes of the</span>
-<span class="sd">            :class:`Selection` class.</span>
+<span class="sd">            :class:`.Selection` class.</span>
 
 <span class="sd">            Valid values are:</span>
 
-<span class="sd">                ``&#39;generational&#39;`` - selects the next generation</span>
-<span class="sd">                ``&#39;crossover&#39;`` - selects molecules for crossover</span>
-<span class="sd">                ``&#39;mutation&#39;`` - selects molecules for mutation</span>
+<span class="sd">                * ``&#39;generational&#39;`` - selects the next generation</span>
+<span class="sd">                * ``&#39;crossover&#39;`` - selects molecules for crossover</span>
+<span class="sd">                * ``&#39;mutation&#39;`` - selects molecules for mutation</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
