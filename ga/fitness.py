@@ -621,11 +621,10 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
     """
 
     return _cage_target('cage_target', macro_mol,
-                        target_mol_file, dihedral_SMARTS,
-                        target_value, efunc, ofunc,
+                        target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1),
-                        logger)
+                        logger, dihedral_SMARTS, target_value)
 
 
 @_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
@@ -704,16 +703,15 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
 
     """
     return _cage_target('cage_c60', macro_mol,
-                        target_mol_file, dihedral_SMARTS,
-                        target_value, efunc, ofunc,
+                        target_mol_file, efunc, ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold),
-                        logger)
+                        logger, dihedral_SMARTS, target_value)
 
 
 def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
-                 rotation_func, logger, dihedral_SMARTS="", target_value=180):
+                 rotation_func, logger, dihedral_SMARTS, target_value):
     """
     A general fitness function for calculating fitness of complexes.
 
