@@ -704,7 +704,8 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
 
     """
     return _cage_target('cage_c60', macro_mol,
-                        target_mol_file, efunc, ofunc,
+                        target_mol_file, dihedral_SMARTS,
+                        target_value, efunc, ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold),
