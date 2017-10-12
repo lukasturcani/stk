@@ -8,7 +8,9 @@ import psutil
 import time
 import rdkit.Chem.AllChem as rdkit
 from uuid import uuid4
+import logging
 
+logger = logging.getLogger(__name__)
 
 def mopac_opt(macro_mol, mopac_path, settings={}):
     """
