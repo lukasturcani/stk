@@ -663,7 +663,7 @@ def normal_vector(origin, vectors):
     return np.cross(vectors[0] - origin, vectors[1] - origin)
 
 
-def discrete_molecules(system, supercell=None, tol=0.4):
+def discrete_molecules(system, rebuild=None, tol=0.4):
     """
     Decompose molecular system into individual discreet molecules.
 
@@ -678,7 +678,7 @@ def discrete_molecules(system, supercell=None, tol=0.4):
     #    1) Non-periodic MolecularSystem.
     #    2) Periodic MolecularSystem without rebuilding.
     #    3) Periodic Molecular system with rebuilding (supercell provided).
-    if supercell is not None:
+    if rebuild is not None:
         mode = 3
     else:
         if 'unit_cell' in system.keys() or 'lattice' in system.keys():
@@ -728,10 +728,10 @@ def discrete_molecules(system, supercell=None, tol=0.4):
         pseudo_origin = cartisian_from_fractional(pseudo_origin_frac, matrix)
         # If a supercell is also provided that encloses the unit cell for the
         # reconstruction of the molecules through the periodic boundary.
-        if supercell is not None:
-            selements = supercell['elements']
-            sids = supercell['atom_ids']
-            scoordinates = supercell['coordinates']
+        if rebuild is not None:
+            selements = rebuild['elements']
+            sids = rebuild['atom_ids']
+            scoordinates = rebuild['coordinates']
             satom_list = compose_atom_list(selements, sids, scoordinates)
             satom_coor = decompose_atom_list(satom_list)[1 + adj]
         # There is one more step. We need to sort out for all the
@@ -826,7 +826,7 @@ def discrete_molecules(system, supercell=None, tol=0.4):
                             r_cov_i_j = atomic_covalent_radius[i[0].upper()] + atomic_covalent_radius[atom_list[j][0].upper()]
                             if r_cov_i_j - tol < r_i_j < r_cov_i_j + tol:
                                 working_list_temp.append(atom_list[j])
-                    if supercell is not None:
+                    if rebuild is not None:
                         sdist_matrix = euclidean_distances(
                             satom_coor, i_arr.reshape(1, -1))
                         sidx = (sdist_matrix > 0.1) * (sdist_matrix < max_dist)
@@ -873,7 +873,7 @@ def discrete_molecules(system, supercell=None, tol=0.4):
         # In general we always want the molecule so the initial bool_ is True.
         bool_ = True
         # But, for periodic only if the molecule is in the initial unit cell.
-        if supercell is not None:
+        if rebuild is not None:
             com = center_of_mass(final_molecule_dict['elements'],
                                  final_molecule_dict['coordinates'])
             com_frac = fractional_from_cartesian(com, matrix)[0]
@@ -1345,7 +1345,7 @@ def find_avarage_diameter(elements, coordinates, adjust=1, increment=0.1,
             increment=increment)
         for point in points
     ]
-    results_cleaned = [x[0]*2 for x in results if x is not None]
+    results_cleaned = [x[0] for x in results if x is not None]
     avarage_molecule_diameter = np.mean(results_cleaned)
     points_density = []
     for i in np.arange(1, int(shpere_radius)+1, increment):
@@ -1367,7 +1367,7 @@ def find_avarage_diameter(elements, coordinates, adjust=1, increment=0.1,
             average_1 += np.mean(i) * j[1]
             average_2 += j[1]
     average = average_1 / average_2
-    return average
+    return average * 2
 
 
 def vector_analysis_pore_shape(vector, coordinates, elements_vdw,
