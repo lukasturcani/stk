@@ -793,10 +793,10 @@ class Energy(metaclass=EMeta):
         # Run MOPAC
         _run_mopac(file_root, mopac_path)
 
-        # Extract the energy
-        energy_val = _extract_MOPAC_en(file_root)
 
         try:
+            # Extract the energy
+            energy_val = _extract_MOPAC_en(file_root)
             return energy_val
         except UnboundLocalError:
             raise _EnergyError('MOPAC energy calculation failed.')
@@ -888,10 +888,9 @@ class Energy(metaclass=EMeta):
         # Run MOPAC
         _run_mopac(file_root, mopac_path)
 
-        # Extract the dipole
-        dipole_val = _extract_MOPAC_dipole(file_root)
-
         try:
+            # Extract the dipole
+            dipole_val = _extract_MOPAC_dipole(file_root)
             return dipole_val
         except UnboundLocalError:
             raise _EnergyError('MOPAC dipole calculation failed.')
@@ -985,11 +984,11 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        try:
-            en1 = _extract_MOPAC_en(file_root)
-        except FileNotFoundError:
-            print(" There is an issue with the file")
-            en1 = 0.0
+        # try:
+        en1 = _extract_MOPAC_en(file_root)
+        # except FileNotFoundError:
+        #     print(" There is an issue with the file")
+        #     en1 = 0.0
 
         # Update the settings for the anion optimization
         settings2 = {
@@ -1009,12 +1008,12 @@ class Energy(metaclass=EMeta):
         vals['method'] = 'NOOPT'
         del vals['gradient']
         del vals['fileout']
-        en2 = mol2.energy.mopac(mopac_path, vals)
-
-        # Calculate the EA (eV)
-        ea = en2 - en1
 
         try:
+            en2 = mol2.energy.mopac(mopac_path, vals)
+            # Calculate the EA (eV)
+            ea = en2 - en1
+
             return ea
         except UnboundLocalError:
             raise _EnergyError('MOPAC ea calculation failed.')
@@ -1108,11 +1107,11 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        try:
-            en1 = _extract_MOPAC_en(file_root)
-        except FileNotFoundError:
-            print(" There is an issue with the file")
-            en1 = 0.0
+        # try:
+        en1 = _extract_MOPAC_en(file_root)
+        # except FileNotFoundError:
+        #     print(" There is an issue with the file")
+        #     en1 = 0.0
 
         # Update the settings for the cation optimization
         settings2 = {
@@ -1132,12 +1131,12 @@ class Energy(metaclass=EMeta):
         vals['method'] = 'NOOPT'
         del vals['gradient']
         del vals['fileout']
-        en2 = mol2.energy.mopac(mopac_path, vals)
-
-        # Calculate the IP (eV)
-        ip = en2 - en1
 
         try:
+            en2 = mol2.energy.mopac(mopac_path, vals)
+            # Calculate the IP (eV)
+            ip = en2 - en1
+            # try:
             return ip
         except UnboundLocalError:
             raise _EnergyError('MOPAC ip calculation failed.')
