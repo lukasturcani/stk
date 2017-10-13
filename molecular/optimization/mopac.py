@@ -295,8 +295,8 @@ def _convert_mopout_to_mol(macro_mol, logger=logger):
     name, ext = os.path.splitext(macro_mol._file)
     pdb_file = name + ".pdb"
 
-    logger.log("\nUpdating molecule with MOPAC optimized '
-               'one - {}.\n".format(macro_mol.name))
+    logger.log("\nUpdating molecule with MOPAC optimized "
+               "one - {}.\n".format(macro_mol.name))
 
     new_mol = rdkit.MolFromPDBFile(pdb_file, sanitize=False,
                                    removeHs=False)
