@@ -18,7 +18,6 @@ from .ga_tools import GATools
 from ..convenience_tools import dedupe
 from ..molecular import (Molecule, Cage,
                          StructUnit, StructUnit2, StructUnit3)
-from ..molecular.topologies.cage.base import _VertexOnlyCageTopology
 from ..molecular.optimization.optimization import (
                                    _optimize_all_serial, _optimize_all)
 
@@ -63,21 +62,6 @@ class Population:
     supported operations can be found by examining the included
     methods.
 
-    Parameters
-    ----------
-    *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`
-        A population is initialized with the :class:`.Molecule` and
-        :class:`Population` instances it should hold. These are placed
-        into the :attr:`members` or :attr:`populations` attributes,
-        respectively. A :class:`.GATools` instance may be included
-        and will be placed into the :attr:`ga_tools` attribute.
-
-    Raises
-    ------
-    TypeError
-        If initialized with something other than :class:`.Molecule`,
-        :class:`Population` or :class:`.GATools` instances.
-
     Attributes
     ----------
     populations : :class:`list` of :class:`Population` instances
@@ -102,6 +86,26 @@ class Population:
     """
 
     def __init__(self, *args):
+        """
+        Intializes a population.
+
+        Parameters
+        ----------
+        *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`
+            A population is initialized with the :class:`.Molecule` and
+            :class:`Population` instances it should hold. These are placed
+            into the :attr:`members` or :attr:`populations` attributes,
+            respectively. A :class:`.GATools` instance may be included
+            and will be placed into the :attr:`ga_tools` attribute.
+
+        Raises
+        ------
+        TypeError
+            If initialized with something other than :class:`.Molecule`,
+            :class:`Population` or :class:`.GATools` instances.
+
+        """
+
         # Generate `populations`, `members` and `ga_tools` attributes.
         self.populations = []
         self.members = []
@@ -186,7 +190,7 @@ class Population:
             built.
 
         duplicates : :class:`bool`, optional
-            If ``True`` duplicate structures are not removed from
+            If ``True``, duplicate structures are not removed from
             the population.
 
         Returns
@@ -579,7 +583,7 @@ class Population:
             by one between members.
 
         overwrite : :class:`bool`, optional
-            If ``True`` existing names are replaced.
+            If ``True``, existing names are replaced.
 
         Returns
         -------
@@ -688,8 +692,8 @@ class Population:
             by :meth:`tolist()`.
 
         load_names : :class:`bool`, optional
-            If ``True`` then the :meth:`.Molecule.name` attribute
-            stored in the JSON objects is loaded. If ``False`` then
+            If ``True``, then the :meth:`.Molecule.name` attribute
+            stored in the JSON objects is loaded. If ``False``, then
             it's not.
 
         Returns
@@ -847,8 +851,8 @@ class Population:
             The full path of the file holding the dumped population.
 
         load_names : :class:`bool`, optional
-            If ``True`` then the `name` attribute stored in the JSON
-            objects is loaded. If ``False`` then it's not.
+            If ``True``, then the `name` attribute stored in the JSON
+            objects is loaded. If ``False``, then it's not.
 
         Returns
         -------
@@ -1032,7 +1036,7 @@ class Population:
         ----------
         between_subpops : :class:`bool`, optional
             When ``False`` duplicates are only removed from within a
-            given subpopulation. If ``True`` all duplicates are
+            given subpopulation. If ``True``, all duplicates are
             removed, regardless of which subpopulation they are in.
 
         key : :class:`callable`, optional
@@ -1112,13 +1116,13 @@ class Population:
         type : :class:`str`, optional
             A string specifying the type of selection to be performed.
             Valid values will correspond to names of attributes of the
-            :class:`Selection` class.
+            :class:`.Selection` class.
 
             Valid values are:
 
-                ``'generational'`` - selects the next generation
-                ``'crossover'`` - selects molecules for crossover
-                ``'mutation'`` - selects molecules for mutation
+                * ``'generational'`` - selects the next generation
+                * ``'crossover'`` - selects molecules for crossover
+                * ``'mutation'`` - selects molecules for mutation
 
         Returns
         -------
