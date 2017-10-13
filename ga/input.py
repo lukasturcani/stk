@@ -76,19 +76,19 @@ class GAInput:
 
     Attributes
     ----------
-    num_cores : int
+    num_cores : :class:`int`
         The number of CPUs to be used for the simulation.
 
-    pop_size : int
+    pop_size : :class:`int`
         The size of the population.
 
-    num_generations : int
+    num_generations : :class:`int`
         The number of generations formed by MMEA.
 
-    num_mutations: int
+    num_mutations: :class:`int`
         The number of successful mutations per generation.
 
-    num_crossovers: int
+    num_crossovers: :class:`int`
         The number of successful crossovers per generation.
 
     init_func : dict

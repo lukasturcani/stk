@@ -491,7 +491,7 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
         the argument is the key and the value of the argument is the
         value.
 
-        Default initialized arguments of Energy.pseudoformation() only
+        Default initialized arguments of ``Energy.pseudoformation()`` only
         need to be specified in ``energy_params`` if the user wishes to
         change the default value.
 
@@ -586,7 +586,6 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
 
     dihedral_SMARTS : :class:`str` (default="")
         The SMARTS code for the dihedral of interest.
-
 
     target_value : :class:`float` (default=180)
         Float representing the target value for the dihedral angle.

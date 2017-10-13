@@ -58,13 +58,13 @@ class Exit:
 
         Parameters
         ----------
-        population : Population
+        population : :class:`Population`
             The GA population.
 
         progress : :class:`Population`
-            population where each subpopulation is a previous generation.
+            Population where each subpopulation is a previous generation.
 
-        mol_name : str
+        mol_name : :class:`str`
             The name of a molecule.
 
         Returns
@@ -77,24 +77,24 @@ class Exit:
 
         return any(x.name == mol_name for x in population)
 
-    def fitness_plateau(self, population, progress, num, top_members = 1):
+    def fitness_plateau(self, population, progress, num, top_members=1):
         """
         Returns ``True`` if fitness function of the top x candidates do not
         change for n generations.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`Population`
             The GA population.
 
         progress : :class:`Population`
             Population where each subpopulation is a previous generation.
 
-        num : int
+        num : :class:`int`
             Number of generations for which no the x top members did not
             change. This number is defined by the user.
 
-        top_members : int
+        top_members : :class:`int`
             Number of members that are going to be considered for the plateau
             analysis. This number needs to be smaller than the total
             population. The user can define this number, which defaults to 1.
