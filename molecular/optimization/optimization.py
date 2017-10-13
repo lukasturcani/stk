@@ -311,3 +311,32 @@ def rdkit_optimization(macro_mol, embed=False, logger=logger):
     # Sanitize then optimize the rdkit molecule.
     rdkit.SanitizeMol(macro_mol.mol)
     rdkit.MMFFOptimizeMolecule(macro_mol.mol)
+
+def rdkit_ETKDG(macro_mol, logger=logger):
+    """
+    Does a conformer search with the rdkit.ETKDG method:
+    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
+
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure should be optimized.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
+    Modifies
+    --------
+    macro_mol.mol
+        The rdkit molecule held in this attribute has it's structure
+        changed as a result of the optimization. This means the
+        ``Conformer`` instance held by the rdkit molecule is changed.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    rdkit.EmbedMolecule(macro_mol.mol, rdkit.ETKDG())
