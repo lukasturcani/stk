@@ -180,6 +180,7 @@ from types import MethodType
 from functools import wraps
 from inspect import signature as sig
 
+
 from ..convenience_tools import FunctionData
 from .optimization.mopac import mopac_opt
 
@@ -535,7 +536,7 @@ class Energy(metaclass=EMeta):
 
         Returns
         -------
-        float :
+        float : :class:`float`
             The pseudoformation energy.
 
         """
@@ -710,59 +711,61 @@ class Energy(metaclass=EMeta):
     @exclude('mopac_path')
     def mopac(self, mopac_path, settings={}):
         """
-        Calculates the energy of `self.molecule` using ``MOPAC``.
+        Calculates the energy of `self.molecule` using MOPAC.
 
-        Note that this requires ``MOPAC`` to be installed and have a
+        Note that this requires MOPAC to be installed and have a
         valid license.
 
         Parameters
         ----------
-        settings: :class:`dict`, (default = {})
+        settings: :class:`dict`, optional
         A dictionary which maps the names of the optimization parameters to
         their values. Valid values are:
 
-            'hamiltonian' : :class:`str`, (default = 'PM7')
+            'hamiltonian' : :class:`string`
                 A series of different methods can be selected:
                 PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
 
                 PM7 is the latest version of the reparametrization of the NDDO
                 theory, where all the atomic and diatomic parameters were
                 re-optimized - update compared to PM6.
-                `Link text <http://openmopac.net/PM7_accuracy/PM7_accuracy.html>`
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
 
-            'method' : :class:`string`, (default = 'NOOPT')
+                Defaults to PM7.
+
+            'method' : :class:`string`
                 This calculation consists in a single point energy calculation.
-                If you are interested in running a MOPAC optimization,
 
-            'eps' : :class:`float`, (detault = 80.1)
+            'eps' : :class:`float`
                 Sets the dielectric constant for the solvent. Presence of this
-                keyword will cause the ``COSMO`` (Conductor-like Screening Model)
+                keyword will cause the COSMO (Conductor-like Screening Model)
                 method to be used to approximate the effect of a solvent model
                 surrounding the molecule. Solvents with low dielectric constant
                 are not likely to work well with this model.
                 0 means that the dielectric constant is not included in the
                 calculation.
-                80.1 can be used to model a water environment at room
-                temperature.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
 
-            'charge' : :class:`list` (default = 0)
+            'charge' : :class:`list` of :class:`floats`
                 When the system being studied is an ion, the charge, n, on the
                 ion must be supplied as an integer. For cations n can be 1, 2,
                 3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
 
 
-            'timeout' : :class:`float` (default = 172800)
+            'timeout' : :class:`float`
                 The amount in seconds the optimization is allowed to run before
                 being terminated. The default value is 2 days =
                 172,800 seconds.
 
         mopac_path : :class:`str`
-            The full path of the ``MOPAC`` suite within the
+            The full path of the MOPAC suite within the
             user's machine.
 
         Returns
         -------
-        energy_val: :class:`float`
+        :class:`float`
             The calculated energy.
 
         """
@@ -772,7 +775,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800
+                'timeout': 172800,
                 }
 
         vals.update(settings)
@@ -793,11 +796,11 @@ class Energy(metaclass=EMeta):
         # Run MOPAC
         _run_mopac(file_root, mopac_path)
 
-
         try:
             # Extract the energy
             energy_val = _extract_MOPAC_en(file_root)
             return energy_val
+
         except UnboundLocalError:
             raise _EnergyError('MOPAC energy calculation failed.')
 
@@ -810,54 +813,54 @@ class Energy(metaclass=EMeta):
         valid license.
         Parameters
         ----------
-        Parameters
-        ----------
-        settings: :class:`dict`, (default = {})
+        settings: :class:`dict`, optional
         A dictionary which maps the names of the optimization parameters to
         their values. Valid values are:
 
-            'hamiltonian' : :class:`str`, (default = 'PM7')
+            'hamiltonian' : :class:`string`
                 A series of different methods can be selected:
                 PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
 
                 PM7 is the latest version of the reparametrization of the NDDO
                 theory, where all the atomic and diatomic parameters were
                 re-optimized - update compared to PM6.
-                `Link text <http://openmopac.net/PM7_accuracy/PM7_accuracy.html>`
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
 
-            'method' : :class:`string`, (default = 'NOOPT')
+                Defaults to PM7.
+
+            'method' : :class:`string`
                 This calculation consists in a single point energy calculation.
-                If you are interested in running a MOPAC optimization,
 
-            'eps' : :class:`float`, (detault = 80.1)
+            'eps' : :class:`float`
                 Sets the dielectric constant for the solvent. Presence of this
-                keyword will cause the ``COSMO`` (Conductor-like Screening Model)
+                keyword will cause the COSMO (Conductor-like Screening Model)
                 method to be used to approximate the effect of a solvent model
                 surrounding the molecule. Solvents with low dielectric constant
                 are not likely to work well with this model.
                 0 means that the dielectric constant is not included in the
                 calculation.
-                80.1 can be used to model a water environment at room
-                temperature.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
 
-            'charge' : :class:`list` (default = 0)
+            'charge' : :class:`list` of :class:`floats`
                 When the system being studied is an ion, the charge, n, on the
                 ion must be supplied as an integer. For cations n can be 1, 2,
                 3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
 
 
-            'timeout' : :class:`float` (default = 172800)
+            'timeout' : :class:`float`
                 The amount in seconds the optimization is allowed to run before
                 being terminated. The default value is 2 days =
                 172,800 seconds.
 
         mopac_path : :class:`str`
-            The full path of the ``MOPAC`` suite within the
+            The full path of the MOPAC suite within the
             user's machine.
 
         Returns
         -------
-        Dipole: :class:`float`
+        :class:`float`
             The calculated dipole.
 
         """
@@ -867,7 +870,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800
+                'timeout': 172800,
                 }
 
         vals.update(settings)
@@ -907,52 +910,57 @@ class Energy(metaclass=EMeta):
 
         Parameters
         ----------
-        settings: :class:`dict`, (default = {})
+        settings: :class:`dict`, optional
         A dictionary which maps the names of the optimization parameters to
         their values. Valid values are:
 
-            'hamiltonian' : :class:`str`, (default = 'PM7')
+            'hamiltonian' : :class:`string`
                 A series of different methods can be selected:
                 PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
 
                 PM7 is the latest version of the reparametrization of the NDDO
                 theory, where all the atomic and diatomic parameters were
                 re-optimized - update compared to PM6.
-                `Link text <http://openmopac.net/PM7_accuracy/PM7_accuracy.html>`
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
 
-            'method' : :class:`string`, (default = 'NOOPT')
+                Defaults to PM7.
+
+            'method' : :class:`string`
                 This calculation consists in a single point energy calculation.
-                If you are interested in running a MOPAC optimization,
 
-            'eps' : :class:`float`, (detault = 80.1)
+            'eps' : :class:`float`
                 Sets the dielectric constant for the solvent. Presence of this
-                keyword will cause the ``COSMO`` (Conductor-like Screening Model)
+                keyword will cause the COSMO (Conductor-like Screening Model)
                 method to be used to approximate the effect of a solvent model
                 surrounding the molecule. Solvents with low dielectric constant
                 are not likely to work well with this model.
                 0 means that the dielectric constant is not included in the
                 calculation.
-                80.1 can be used to model a water environment at room
-                temperature.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
 
-            'charge' : :class:`list` (default = 0)
+            'charge' : :class:`list` of :class:`floats`
                 When the system being studied is an ion, the charge, n, on the
                 ion must be supplied as an integer. For cations n can be 1, 2,
                 3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
 
-
-            'timeout' : :class:`float` (default = 172800)
+            'timeout' : :class:`float`
                 The amount in seconds the optimization is allowed to run before
                 being terminated. The default value is 2 days =
                 172,800 seconds.
 
         mopac_path : :class:`str`
-            The full path of the ``MOPAC`` suite within the
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        mopac_path : str
+            The full path of the MOPAC suite within the
             user's machine.
 
         Returns
         -------
-        EA: :class:`float`
+        :class:`float`
             The calculated energy.
 
         """
@@ -962,7 +970,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800
+                'timeout': 172800,
                 }
         vals.update(settings)
 
@@ -984,11 +992,10 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        # try:
-        en1 = _extract_MOPAC_en(file_root)
-        # except FileNotFoundError:
-        #     print(" There is an issue with the file")
-        #     en1 = 0.0
+        try:
+            en1 = _extract_MOPAC_en(file_root)
+        except FileNotFoundError:
+            en1 = 0.0
 
         # Update the settings for the anion optimization
         settings2 = {
@@ -1008,12 +1015,11 @@ class Energy(metaclass=EMeta):
         vals['method'] = 'NOOPT'
         del vals['gradient']
         del vals['fileout']
+        en2 = mol2.energy.mopac(mopac_path, vals)
 
         try:
-            en2 = mol2.energy.mopac(mopac_path, vals)
             # Calculate the EA (eV)
             ea = en2 - en1
-
             return ea
         except UnboundLocalError:
             raise _EnergyError('MOPAC ea calculation failed.')
@@ -1030,52 +1036,57 @@ class Energy(metaclass=EMeta):
 
         Parameters
         ----------
-        settings: :class:`dict`, (default = {})
+        settings: :class:`dict`, optional
         A dictionary which maps the names of the optimization parameters to
         their values. Valid values are:
 
-            'hamiltonian' : :class:`str`, (default = 'PM7')
+            'hamiltonian' : :class:`string`
                 A series of different methods can be selected:
                 PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
 
                 PM7 is the latest version of the reparametrization of the NDDO
                 theory, where all the atomic and diatomic parameters were
                 re-optimized - update compared to PM6.
-                `Link text <http://openmopac.net/PM7_accuracy/PM7_accuracy.html>`
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
 
-            'method' : :class:`string`, (default = 'NOOPT')
+                Defaults to PM7.
+
+            'method' : :class:`string`
                 This calculation consists in a single point energy calculation.
-                If you are interested in running a MOPAC optimization,
 
-            'eps' : :class:`float`, (detault = 80.1)
+            'eps' : :class:`float`
                 Sets the dielectric constant for the solvent. Presence of this
-                keyword will cause the ``COSMO`` (Conductor-like Screening Model)
+                keyword will cause the COSMO (Conductor-like Screening Model)
                 method to be used to approximate the effect of a solvent model
                 surrounding the molecule. Solvents with low dielectric constant
                 are not likely to work well with this model.
                 0 means that the dielectric constant is not included in the
                 calculation.
-                80.1 can be used to model a water environment at room
-                temperature.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
 
-            'charge' : :class:`list` (default = 0)
+            'charge' : :class:`list` of :class:`floats`
                 When the system being studied is an ion, the charge, n, on the
                 ion must be supplied as an integer. For cations n can be 1, 2,
                 3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
 
-
-            'timeout' : :class:`float` (default = 172800)
+            'timeout' : :class:`float`
                 The amount in seconds the optimization is allowed to run before
                 being terminated. The default value is 2 days =
                 172,800 seconds.
 
         mopac_path : :class:`str`
-            The full path of the ``MOPAC`` suite within the
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        mopac_path : str
+            The full path of the MOPAC suite within the
             user's machine.
 
         Returns
         -------
-        IP: :class:`float`
+        :class:`float`
             The calculated energy.
 
         """
@@ -1085,7 +1096,7 @@ class Energy(metaclass=EMeta):
                 'method': 'NOOPT',
                 'eps': 80.1,
                 'charge': 0,
-                'timeout': 172800
+                'timeout': 172800,
                 }
         vals.update(settings)
 
@@ -1107,11 +1118,11 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        # try:
-        en1 = _extract_MOPAC_en(file_root)
-        # except FileNotFoundError:
-        #     print(" There is an issue with the file")
-        #     en1 = 0.0
+        try:
+            en1 = _extract_MOPAC_en(file_root)
+        except FileNotFoundError:
+            print(" There is an issue with the file")
+            en1 = 0.0
 
         # Update the settings for the cation optimization
         settings2 = {
@@ -1131,12 +1142,11 @@ class Energy(metaclass=EMeta):
         vals['method'] = 'NOOPT'
         del vals['gradient']
         del vals['fileout']
+        en2 = mol2.energy.mopac(mopac_path, vals)
 
         try:
-            en2 = mol2.energy.mopac(mopac_path, vals)
             # Calculate the IP (eV)
             ip = en2 - en1
-            # try:
             return ip
         except UnboundLocalError:
             raise _EnergyError('MOPAC ip calculation failed.')
