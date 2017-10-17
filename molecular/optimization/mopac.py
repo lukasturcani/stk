@@ -6,7 +6,7 @@ import os
 import subprocess as sp
 import psutil
 import time
-import loggin
+import logging
 import rdkit.Chem.AllChem as rdkit
 from uuid import uuid4
 
@@ -147,7 +147,7 @@ def _run_mopac(macro_mol, mopac_path, settings, timeout=7200,
             proc_out, _ = opt_proc.communicate()
     except sp.TimeoutExpired:
         logger.warning('\nMinimization took too long and was terminated '
-                       'by force - {}\n').format(macro_mol.name))
+                       'by force - {}\n'.format(macro_mol.name))
         _kill_mopac(macro_mol)
 
     return
