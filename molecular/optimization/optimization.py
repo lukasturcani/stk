@@ -340,3 +340,31 @@ def rdkit_ETKDG(macro_mol, logger=logger):
     """
 
     rdkit.EmbedMolecule(macro_mol.mol, rdkit.ETKDG())
+
+def rdkit_confs_ETKDG(macro_mol, confs=1, logger=logger):
+    """
+    Does a conformer search with the rdkit.ETKDG method:
+    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
+    A number of conformers is then generated.
+
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure should be optimized.
+
+    confs: :class:`int`, optional
+        Defines the number of conformers generated in the
+        conformer search.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
+
+    Returns
+    -------
+    conformers : list of rdkit molecules.
+
+    """
+
+    return rdkit.EmbedMultipleConfs(macro_mol.mol, confs, rdkit.ETKDG())
