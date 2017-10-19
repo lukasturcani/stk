@@ -341,17 +341,20 @@ def rdkit_ETKDG(macro_mol, logger=logger):
 
     rdkit.EmbedMolecule(macro_mol.mol, rdkit.ETKDG())
 
-def rdkit_confs_ETKDG(macro_mol, confs=1, logger=logger):
+def rdkit_confs_ETKDG(macro_mol, name='test', confs=1, logger=logger):
     """
     Does a conformer search with the rdkit.ETKDG method:
     http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
-    A number of conformers is then generated.
+    A number of mol files representing the conformers is then generated.
 
 
     Parameters
     ----------
     macro_mol : MacroMolecule
         The macromolecule who's structure should be optimized.
+
+    name: :class:`str`, optional
+        Name of the macro_mol that is used to name the new conformers.
 
     confs: :class:`int`, optional
         Defines the number of conformers generated in the
@@ -363,8 +366,14 @@ def rdkit_confs_ETKDG(macro_mol, confs=1, logger=logger):
 
     Returns
     -------
-    conformers : list of rdkit molecules.
+    conformers : list of conformer IDs for the rdkit molecule.
 
     """
 
-    return rdkit.EmbedMultipleConfs(macro_mol.mol, confs, rdkit.ETKDG())
+    cids = rdkit.EmbedMultipleConfs(macro_mol.mol, confs, rdkit.ETKDG())
+
+    for cid in cids:
+        conf_name = "{}_{}.mol".format(name.replace('.mol', ''), cid)
+        rdkit.MolToMolFile(macro_mol.mol, conf_name, confId=cid)
+
+    return cids
