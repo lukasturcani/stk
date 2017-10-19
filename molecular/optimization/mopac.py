@@ -246,7 +246,7 @@ def _create_mop(macro_mol, settings, logger=logger):
     mop_file = name + '.mop'
     mol = macro_mol.mol
 
-    logger.log('\nCreating .mop file - {}.'.format(macro_mol.name))
+    logger.info('\nCreating .mop file - {}.'.format(macro_mol.name))
 
     # Generate the mop file containing the MOPAC run info
     with open(mop_file, 'w') as mop:
@@ -295,7 +295,7 @@ def _convert_mopout_to_mol(macro_mol, logger=logger):
     name, ext = os.path.splitext(macro_mol._file)
     pdb_file = name + ".pdb"
 
-    logger.log("\nUpdating molecule with MOPAC optimized "
+    logger.info("\nUpdating molecule with MOPAC optimized "
                "one - {}.\n".format(macro_mol.name))
 
     new_mol = rdkit.MolFromPDBFile(pdb_file, sanitize=False,
