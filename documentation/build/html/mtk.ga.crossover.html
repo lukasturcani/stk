@@ -87,7 +87,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">mtk.ga.crossover module</a><ul>
-<li><a class="reference internal" href="#extending-mmea-adding-crossover-functions">Extending MMEA: Adding crossover functions.</a></li>
+<li><a class="reference internal" href="#extending-mtk-adding-crossover-functions">Extending mtk: Adding crossover functions.</a></li>
 </ul>
 </li>
 </ul>
@@ -156,15 +156,15 @@
   <div class="section" id="module-mtk.ga.crossover">
 <span id="mtk-ga-crossover-module"></span><h1>mtk.ga.crossover module<a class="headerlink" href="#module-mtk.ga.crossover" title="Permalink to this headline">¶</a></h1>
 <p>Defines crossover operations via the <a class="reference internal" href="#mtk.ga.crossover.Crossover" title="mtk.ga.crossover.Crossover"><code class="xref py py-class docutils literal"><span class="pre">Crossover</span></code></a> class.</p>
-<div class="section" id="extending-mmea-adding-crossover-functions">
-<h2>Extending MMEA: Adding crossover functions.<a class="headerlink" href="#extending-mmea-adding-crossover-functions" title="Permalink to this headline">¶</a></h2>
-<p>If a new crossover operation is to be added to MMEA it should be added
+<div class="section" id="extending-mtk-adding-crossover-functions">
+<h2>Extending mtk: Adding crossover functions.<a class="headerlink" href="#extending-mtk-adding-crossover-functions" title="Permalink to this headline">¶</a></h2>
+<p>If a new crossover operation is to be added to mtk it should be added
 as a method in the <a class="reference internal" href="#mtk.ga.crossover.Crossover" title="mtk.ga.crossover.Crossover"><code class="xref py py-class docutils literal"><span class="pre">Crossover</span></code></a> class defined in this module. The
 only requirements are that the first two arguments are <cite>macro_mol1</cite>
 and <cite>macro_mol2</cite> (excluding <cite>self</cite> or <cite>cls</cite>) and that any
 offspring are returned in a <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance.</p>
 <p>The naming requirement of <cite>macro_mol1</cite> and <cite>macro_mol2</cite> exists to
-help users identify which arguments are handled automatically by MMEA
+help users identify which arguments are handled automatically by mtk
 and which they need to define in the input file. The convention is that
 if the crossover function takes arguments called  <cite>macro_mol1</cite> and
 <cite>macro_mol2</cite> they do not have to be specified in the input file.</p>
@@ -204,7 +204,7 @@ given by <a class="reference internal" href="#mtk.ga.crossover.Crossover.weights
 <dl class="attribute">
 <dt id="mtk.ga.crossover.Crossover.weights">
 <code class="descname">weights</code><a class="headerlink" href="#mtk.ga.crossover.Crossover.weights" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional – Each float corresponds to the probability of selecting the
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – Each float corresponds to the probability of selecting the
 crossover function in <a class="reference internal" href="#mtk.ga.crossover.Crossover.funcs" title="mtk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal"><span class="pre">funcs</span></code></a> at the corresponding index.
 This means entries in this list must sum to 1 and the number of
 entries must be the same as in <a class="reference internal" href="#mtk.ga.crossover.Crossover.funcs" title="mtk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal"><span class="pre">funcs</span></code></a>. Defaults to
@@ -216,31 +216,32 @@ probability of selection.</p>
 <dt id="mtk.ga.crossover.Crossover.__call__">
 <code class="descname">__call__</code><span class="sig-paren">(</span><em>population</em>, <em>counter_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/crossover.html#Crossover.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.crossover.Crossover.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Carries out crossover operations on the supplied population.</p>
-<p>This function selects members of the population and crosses
+<p>This function selects members of <cite>population</cite> and crosses
 them until either all possible parents have been crossed or the
 required number of successful crossover operations has been
 performed.</p>
 <p>The offspring generated are returned together in a
-<code class="docutils literal"><span class="pre">Population</span></code> instance. Any molecules that are created via
-crossover and match a molecule present in the original
+<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance. Any molecules that are created
+via crossover and match a molecule present in the original
 population are removed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population instance who’s members are to crossed.</li>
-<li><strong>counter_path</strong> (<em>str</em><em> (</em><em>default = ''</em><em>)</em>) – The name of the .png file showing which members were
-selected for crossover. If ‘’ then no file is made.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population instance who’s members are to crossed.</li>
+<li><strong>counter_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The name of the <code class="docutils literal"><span class="pre">.png</span></code> file showing which members were
+selected for crossover. If <code class="docutils literal"><span class="pre">''</span></code>, then no file is made.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population with all the offspring generated held in the
-<cite>members</cite> attribute. This does not include offspring which
-correspond to molecules already present in <cite>population</cite>.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A population with all the offspring generated held in its
+<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population.members" title="mtk.ga.population.Population.members"><code class="xref py py-attr docutils literal"><span class="pre">members</span></code></a> attribute. This does not
+include offspring which correspond to molecules already
+present in <cite>population</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population">Population</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -249,13 +250,36 @@ correspond to molecules already present in <cite>population</cite>.</p>
 
 <dl class="attribute">
 <dt id="mtk.ga.crossover.Crossover.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__call__': &lt;function Crossover.__call__&gt;, '__init__': &lt;function Crossover.__init__&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Crossover' objects&gt;, 'bb_lk_exchange': &lt;function Crossover.bb_lk_exchange&gt;, '__module__': 'mtk.ga.crossover', '__doc__': '\n    Carries out crossover operations on the population.\n\n    Instances of :class:`~.Population` delegate crossover operations\n    to instances of this class. They do this by calling\n\n    &gt;&gt;&gt; offspring_pop = pop.gen_offspring()\n\n    where ``offspring_pop`` is a new :class:`~.Population`, holding\n    molecules generated by performing crossover operations on members\n    of ``pop``. This class uses the :class:`.Selection` instance in\n    ``pop.ga_tools.selection`` to select parents used in crossover.\n\n    Attributes\n    ----------\n    funcs : :class:`list` of :class:`.FunctionData`\n        This lists holds all the crossover functions which are to be\n        used. One will be chosen at random when crossover operation is\n        to be performed. The likelihood that each is selected is\n        given by :attr:`weights`.\n\n    num_mutations : :class:`int`\n        The number of crossover operations performed each time\n        :meth:`.Population.gen_offspring` is called.\n\n    weights : :class:`list` of :class:`float`, optional\n        Each float corresponds to the probability of selecting the\n        crossover function in :attr:`funcs` at the corresponding index.\n        This means entries in this list must sum to 1 and the number of\n        entries must be the same as in :attr:`funcs`. Defaults to\n        ``None``, which means all crossover functions have an equal\n        probability of selection.\n\n    ', '__dict__': &lt;attribute '__dict__' of 'Crossover' objects&gt;})</em><a class="headerlink" href="#mtk.ga.crossover.Crossover.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__doc__': '\n    Carries out crossover operations on the population.\n\n    Instances of :class:`.Population` delegate crossover operations\n    to instances of this class. They do this by calling\n\n    &gt;&gt;&gt; offspring_pop = pop.gen_offspring()\n\n    where ``offspring_pop`` is a new :class:`.Population`, holding\n    molecules generated by performing crossover operations on members\n    of ``pop``. This class uses the :class:`.Selection` instance in\n    ``pop.ga_tools.selection`` to select parents used in crossover.\n\n    Attributes\n    ----------\n    funcs : :class:`list` of :class:`.FunctionData`\n        This lists holds all the crossover functions which are to be\n        used. One will be chosen at random when crossover operation is\n        to be performed. The likelihood that each is selected is\n        given by :attr:`weights`.\n\n    num_mutations : :class:`int`\n        The number of crossover operations performed each time\n        :meth:`.Population.gen_offspring` is called.\n\n    weights : :class:`list` of :class:`float`\n        Each float corresponds to the probability of selecting the\n        crossover function in :attr:`funcs` at the corresponding index.\n        This means entries in this list must sum to 1 and the number of\n        entries must be the same as in :attr:`funcs`. Defaults to\n        ``None``, which means all crossover functions have an equal\n        probability of selection.\n\n    ', '__module__': 'mtk.ga.crossover', '__weakref__': &lt;attribute '__weakref__' of 'Crossover' objects&gt;, 'bb_lk_exchange': &lt;function Crossover.bb_lk_exchange&gt;, '__call__': &lt;function Crossover.__call__&gt;, '__dict__': &lt;attribute '__dict__' of 'Crossover' objects&gt;, '__init__': &lt;function Crossover.__init__&gt;})</em><a class="headerlink" href="#mtk.ga.crossover.Crossover.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="mtk.ga.crossover.Crossover.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>funcs</em>, <em>num_crossovers</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/crossover.html#Crossover.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.crossover.Crossover.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Intializes a <a class="reference internal" href="#mtk.ga.crossover.Crossover" title="mtk.ga.crossover.Crossover"><code class="xref py py-class docutils literal"><span class="pre">Crossover</span></code></a> object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>funcs</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – This lists holds all the crossover functions which are to
+be used. One will be chosen at random when crossover
+operation is to be performed. The likelihood that each is
+selected is given by <a class="reference internal" href="#mtk.ga.crossover.Crossover.weights" title="mtk.ga.crossover.Crossover.weights"><code class="xref py py-attr docutils literal"><span class="pre">weights</span></code></a>.</li>
+<li><strong>num_mutations</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of crossover operations performed each time
+<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population.gen_offspring" title="mtk.ga.population.Population.gen_offspring"><code class="xref py py-meth docutils literal"><span class="pre">Population.gen_offspring()</span></code></a> is called.</li>
+<li><strong>weights</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – Each float corresponds to the probability of selecting the
+crossover function in <a class="reference internal" href="#mtk.ga.crossover.Crossover.funcs" title="mtk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal"><span class="pre">funcs</span></code></a> at the corresponding
+index. This means entries in this list must sum to 1 and
+the number of entries must be the same as in <a class="reference internal" href="#mtk.ga.crossover.Crossover.funcs" title="mtk.ga.crossover.Crossover.funcs"><code class="xref py py-attr docutils literal"><span class="pre">funcs</span></code></a>.
+Defaults to <code class="docutils literal"><span class="pre">None</span></code>, which means all crossover functions
+have an equal probability of selection.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="mtk.ga.crossover.Crossover.__module__">
@@ -271,11 +295,11 @@ correspond to molecules already present in <cite>population</cite>.</p>
 <dl class="method">
 <dt id="mtk.ga.crossover.Crossover.bb_lk_exchange">
 <code class="descname">bb_lk_exchange</code><span class="sig-paren">(</span><em>macro_mol1</em>, <em>macro_mol2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/crossover.html#Crossover.bb_lk_exchange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.crossover.Crossover.bb_lk_exchange" title="Permalink to this definition">¶</a></dt>
-<dd><p>Exchanges the building-blocks* and linkers of cages.</p>
+<dd><p>Exchanges the building blocks and linkers of cages.</p>
 <p>This operation is basically:</p>
 <blockquote>
 <div>bb1-lk1 + bb2-lk2 –&gt; bb1-lk2 + bb2-lk1,</div></blockquote>
-<p>where bb-lk represents a building-block* - linker combination
+<p>where bb-lk represents a building block - linker combination
 of a cage.</p>
 <p>If the parent cages do not have the same topology the pair of
 offspring are created for each topology. This means that there
@@ -285,9 +309,9 @@ may be up to 4 offspring.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol1</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The first parent cage. Its building-block* and linker are
+<li><strong>macro_mol1</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The first parent cage. Its building-block* and linker are
 combined with those of <cite>cage2</cite> to form new cages.</li>
-<li><strong>macro_mol2</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The second parent cage. Its building-block* and linker are
+<li><strong>macro_mol2</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The second parent cage. Its building-block* and linker are
 combined with those of <cite>cage1</cite> to form new cages.</li>
 </ul>
 </td>
@@ -296,7 +320,7 @@ combined with those of <cite>cage1</cite> to form new cages.</li>
 <cite>macro_mol1</cite> with <cite>macro_mol2</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population">Population</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a></p>
 </td>
 </tr>
 </tbody>
