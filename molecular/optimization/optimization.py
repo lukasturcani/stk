@@ -44,6 +44,7 @@ import numpy as np
 import logging
 from threading import Thread
 from traceback import format_exc
+import psutil
 
 from .macromodel import macromodel_opt, macromodel_cage_opt
 
@@ -95,7 +96,7 @@ def _optimize_all(func_data, population):
 
     # Apply the function to every member of the population, in
     # parallel.
-    with mp.get_context('spawn').Pool() as pool:
+    with mp.get_context('spawn').Pool(psutil.cpu_count(False)) as pool:
         optimized = pool.map(p_func, population)
     # Make sure the cache is updated with the optimized versions.
     for member in optimized:
