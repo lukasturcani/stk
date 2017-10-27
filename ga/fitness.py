@@ -622,7 +622,7 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1),
                         dihedral_SMARTS,
-                        target_value
+                        target_value,
                         logger)
 
 
@@ -706,7 +706,7 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
                                      n5fold=n5fold,
                                      n2fold=n2fold),
                         dihedral_SMARTS,
-                        target_value
+                        target_value,
                         logger)
 
 
