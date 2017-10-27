@@ -58,10 +58,10 @@ class Exit:
 
         Parameters
         ----------
-        population : :class:`Population`
+        population : :class:`.Population`
             The GA population.
 
-        progress : :class:`Population`
+        progress : :class:`.Population`
             Population where each subpopulation is a previous generation.
 
         mol_name : :class:`str`
@@ -69,7 +69,7 @@ class Exit:
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if a molecule with `name` of  `mol_name` is found
             in `population`.
 

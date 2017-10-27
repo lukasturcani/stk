@@ -418,7 +418,7 @@ class Energy(metaclass=EMeta):
     Attributes
     ----------
     molecule : Molecule
-        The energy information held by an instance of ``Energy``
+        The energetic information held by an instance of ``Energy``
         concerns the molecule held in this attribute.
 
     values : dict of FunctionData instances
@@ -795,14 +795,8 @@ class Energy(metaclass=EMeta):
         _create_mop(file_root, self.molecule, vals)
         # Run MOPAC
         _run_mopac(file_root, mopac_path)
+        return _extract_MOPAC_en(file_root)
 
-        try:
-            # Extract the energy
-            energy_val = _extract_MOPAC_en(file_root)
-            return energy_val
-
-        except UnboundLocalError:
-            raise _EnergyError('MOPAC energy calculation failed.')
 
     @exclude('mopac_path')
     def mopac_dipole(self, mopac_path, settings={}):
@@ -890,13 +884,7 @@ class Energy(metaclass=EMeta):
         _create_mop(file_root, self.molecule, vals)
         # Run MOPAC
         _run_mopac(file_root, mopac_path)
-
-        try:
-            # Extract the dipole
-            dipole_val = _extract_MOPAC_dipole(file_root)
-            return dipole_val
-        except UnboundLocalError:
-            raise _EnergyError('MOPAC dipole calculation failed.')
+        return _extract_MOPAC_dipole(file_root)
 
     @exclude('mopac_path')
     def mopac_ea(self, mopac_path, settings={}):
@@ -992,10 +980,7 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        try:
-            en1 = _extract_MOPAC_en(file_root)
-        except FileNotFoundError:
-            en1 = 0.0
+        en1 = _extract_MOPAC_en(file_root)
 
         # Update the settings for the anion optimization
         settings2 = {
@@ -1016,13 +1001,9 @@ class Energy(metaclass=EMeta):
         del vals['gradient']
         del vals['fileout']
         en2 = mol2.energy.mopac(mopac_path, vals)
+        # Calculate the EA (eV)
+        return en2 - en1
 
-        try:
-            # Calculate the EA (eV)
-            ea = en2 - en1
-            return ea
-        except UnboundLocalError:
-            raise _EnergyError('MOPAC ea calculation failed.')
 
     @exclude('mopac_path')
     def mopac_ip(self, mopac_path, settings={}):
@@ -1118,11 +1099,7 @@ class Energy(metaclass=EMeta):
         _run_mopac(file_root, mopac_path)
 
         # Extract the neutral energy
-        try:
-            en1 = _extract_MOPAC_en(file_root)
-        except FileNotFoundError:
-            print(" There is an issue with the file")
-            en1 = 0.0
+        en1 = _extract_MOPAC_en(file_root)
 
         # Update the settings for the cation optimization
         settings2 = {
@@ -1143,14 +1120,8 @@ class Energy(metaclass=EMeta):
         del vals['gradient']
         del vals['fileout']
         en2 = mol2.energy.mopac(mopac_path, vals)
-
-        try:
-            # Calculate the IP (eV)
-            ip = en2 - en1
-            return ip
-        except UnboundLocalError:
-            raise _EnergyError('MOPAC ip calculation failed.')
-
+        # Calculate the IP (eV)
+        return en2 - en1
 
 def formation_key(fargs, fkwargs):
     """
@@ -1262,8 +1233,7 @@ def _run_mopac(file_root, mopac_path, timeout=3600):
 
     mop_file = file_root + '.mop'
 
-    print("", time.ctime(time.time()),
-          'Running MOPAC - {}.'.format(file_root), sep='\n')
+    logger.info(f'Running MOPAC - {file_root}.')
 
     # To run MOPAC a command is issued to the console via
     # ``subprocess.Popen``. The command is the full path of the
@@ -1280,8 +1250,8 @@ def _run_mopac(file_root, mopac_path, timeout=3600):
         else:
             proc_out, _ = opt_proc.communicate()
     except sp.TimeoutExpired:
-        print(('\nMinimization took too long and was terminated '
-               'by force - {}\n').format(file_root))
+        logger.info(('Minimization took too long and was terminated '
+                     'by force - {}').format(file_root))
         _kill_mopac(file_root)
 
 def _kill_mopac(file_root):
@@ -1359,7 +1329,7 @@ def _create_mop(file_root, molecule, settings):
     mop_file = file_root + '.mop'
     mol = molecule.mol
 
-    print('Creating .mop file - {}.'.format(file_root))
+    logger.info('Creating .mop file - {}.'.format(file_root))
 
     # Generate the mop file containing the MOPAC run info
     with open(mop_file, 'w') as mop:

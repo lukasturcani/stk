@@ -475,30 +475,28 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
     macro_mol : :class:`.Cage`
         The cage whose fitness is to be calculated.
 
-    dihedral_SMARTS : :class:`str` (default="")
+    dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
 
-    target_value : :class:`float` (default=180)
+    target_value : :class:`float`, optional
         Float representing the target value for the dihedral angle.
 
-    pseudoformation_params : dict (default =
-          { 'func' : FunctionData('rdkit', forcefield='uff') })
-
+    pseudoformation_params : dict, optional
         This fitness function calculates the formation energy using the
         ``Energy.pseudoformation()`` method. This parameter defines the
         arguments passed to this method via a dictionary. The name of
         the argument is the key and the value of the argument is the
         value.
 
-        Default initialized arguments of ``Energy.pseudoformation()`` only
+        Default initialized arguments of :meth:`.Energy.pseudoformation()` only
         need to be specified in ``energy_params`` if the user wishes to
         change the default value.
 
-        To see what arguments the ``Energy.pseudoformation()`` method
-        requires, try using the  `-h` option:
+        To see what arguments :meth:`.Energy.pseudoformation()` requires, try
+        using the  ``-h`` option::
 
-            python -m mmea -h energy
+            $ python -m mtk -h energy
 
     logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
         Used for logging. Not used by this function.
@@ -568,7 +566,7 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
         5. cavity of cage by itself
         6. asymmetry of cage by itself
         7. strain of cage by itself
-        8. strain in the relevant dihedral angles of the cage itself
+        8. strain in select dihedral angles of the cage by itself
 
     Notes
     -----
@@ -584,12 +582,6 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : :class:`str` (default="")
-        The SMARTS code for the dihedral of interest.
-
-    target_value : :class:`float` (default=180)
-        Float representing the target value for the dihedral angle.
-
     efunc : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the energy
         function used to calculate energies.
@@ -602,6 +594,12 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
         The number of times the target should be randomly rotated
         within the cage cavity in order to find the most stable
         conformation.
+
+    dihedral_SMARTS : :class:`str`, optional
+        The SMARTS code for the dihedral of interest.
+
+    target_value : :class:`float`, optional
+        Float representing the target value for the dihedral angle.
 
     logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
         Used for logging. Not used by this function.
@@ -623,7 +621,9 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
                         target_mol_file, efunc, ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1),
-                        logger, dihedral_SMARTS, target_value)
+                        dihedral_SMARTS,
+                        target_value
+                        logger)
 
 
 @_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
@@ -648,7 +648,7 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
         5. cavity of cage by itself
         6. asymmetry of cage by itself
         7. strain of cage by itself
-        8. strain in the relevant dihedral angles of the cage itself
+        8. strain in select dihedral angles of the cage by itself
 
     Notes
     -----
@@ -664,13 +664,6 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : :class:`str` (default="")
-        The SMARTS code for the dihedral of interest.
-
-
-    target_value : :class:`float` (default=180)
-        Float representing the target value for the dihedral angle.
-
     efunc : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the energy
         function used to calculate energies.
@@ -685,6 +678,12 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
     n2fold : :class:`int`
         The number of rotations along the 2 fold axis of symmetry per
         rotation along the 5-fold axis.
+
+    dihedral_SMARTS : :class:`str`, optional
+        The SMARTS code for the dihedral of interest.
+
+    target_value : :class:`float`, optional
+        Float representing the target value for the dihedral angle.
 
     logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
         Used for logging. Not used by this function.
@@ -706,11 +705,13 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold),
-                        logger, dihedral_SMARTS, target_value)
+                        dihedral_SMARTS,
+                        target_value
+                        logger)
 
 
 def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
-                 rotation_func, logger, dihedral_SMARTS, target_value):
+                 rotation_func,  dihedral_SMARTS, target_value, logger):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -727,7 +728,7 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
         5. cavity of cage by itself
         6. asymmetry of cage by itself
         7. strain of cage by itself
-        8. strain in the relevant dihedral angles of the cage itself
+        8. strain in select dihedral angles of the cage by itself
 
     Notes
     -----
@@ -747,13 +748,6 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
         The full path of the ``.mol`` file hodling the target molecule
         placed inside the cage.
 
-    dihedral_SMARTS : :class:`str` (default="")
-        The SMARTS code for the dihedral of interest.
-
-
-    target_value : :class:`float` (default=180)
-        Float representing the target value for the dihedral angle.
-
     efunc : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the energy
         function used to calculate energies.
@@ -765,6 +759,13 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
     rotation_func : :class:`.FunctionData`
         A :class:`.FunctionData` object representing the rotation
         function to be used.
+
+    dihedral_SMARTS : :class:`str`, optional
+        The SMARTS code for the dihedral of interest.
+
+
+    target_value : :class:`float`, optional
+        Float representing the target value for the dihedral angle.
 
     logger : :class:`.FakeLogger` or :class:`logging.Logger`
         Used for logging. Not used by this function.
