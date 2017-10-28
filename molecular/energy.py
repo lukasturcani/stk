@@ -13,7 +13,7 @@ requirements beyond this, just make sure the energy value is what the
 method returns.
 
 If the energy method does not fit neatly into a single method, feel
-free to split it up. Make sure sure that any helper methods are
+free to split it up. Make sure that any helper methods are
 private, ie that their names start with a leading underscore. Only the
 main method which the user will use should be public.
 
@@ -172,12 +172,17 @@ provided in the docstring of ``EMeta``.
 import os
 import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
+import time
+import psutil
+import copy
 from uuid import uuid4
 from types import MethodType
 from functools import wraps
 from inspect import signature as sig
 
+
 from ..convenience_tools import FunctionData
+from .optimization.mopac import mopac_opt
 
 
 class _EnergyError(Exception):
@@ -229,7 +234,6 @@ class EMethod:
             descriptor.
 
         """
-
         # If the Energy method is accessed as a class attribute return
         # the unbound method.
         if obj is None:
@@ -307,7 +311,7 @@ def e_logger(func, obj):
         result = func(self, *args, **kwargs)
 
         # Next create FunctionData object to store the values of the
-        # parameters used to to run that calculation.
+        # parameters used to run that calculation.
         key = func_key(func, (self,)+args, kwargs)
 
         # Update the `values` dictionary with the results of the
@@ -361,9 +365,7 @@ def func_key(func, fargs=None, fkwargs=None):
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key: value.default for key, value in
-               dict(fsig.parameters).items() if
-               key not in bound.keys()}
-
+              dict(fsig.parameters).items() if key not in bound.keys()}
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
     bound.update(default)
@@ -463,7 +465,7 @@ class Energy(metaclass=EMeta):
             found, as they keep this data stored elsewhere already.
 
         force_e_calc : bool (default = False)
-            If the this is ``True`` then all building blocks, products
+            If this is ``True`` then all building blocks, products
             and `self.molecule` will have their energies recalculated.
             Even if the energy values have already been found if the
             chosen forcefield/method. If ``False`` the energy is only
@@ -534,7 +536,7 @@ class Energy(metaclass=EMeta):
 
         Returns
         -------
-        float
+        float : :class:`float`
             The pseudoformation energy.
 
         """
@@ -683,7 +685,7 @@ class Energy(metaclass=EMeta):
         with open(file_root+'.com', 'w') as f:
             f.write(input_script)
 
-        cmd = [os.path.join(macromodel_path,'bmin'),
+        cmd = [os.path.join(macromodel_path, 'bmin'),
                file_root, "-WAIT", "-LOCAL"]
         sp.call(cmd)
 
@@ -706,6 +708,420 @@ class Energy(metaclass=EMeta):
         except UnboundLocalError:
             raise _EnergyError('MacroModel energy calculation failed.')
 
+    @exclude('mopac_path')
+    def mopac(self, mopac_path, settings={}):
+        """
+        Calculates the energy of `self.molecule` using MOPAC.
+
+        Note that this requires MOPAC to be installed and have a
+        valid license.
+
+        Parameters
+        ----------
+        settings: :class:`dict`, optional
+        A dictionary which maps the names of the optimization parameters to
+        their values. Valid values are:
+
+            'hamiltonian' : :class:`string`
+                A series of different methods can be selected:
+                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
+
+                PM7 is the latest version of the reparametrization of the NDDO
+                theory, where all the atomic and diatomic parameters were
+                re-optimized - update compared to PM6.
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
+
+                Defaults to PM7.
+
+            'method' : :class:`string`
+                This calculation consists in a single point energy calculation.
+
+            'eps' : :class:`float`
+                Sets the dielectric constant for the solvent. Presence of this
+                keyword will cause the COSMO (Conductor-like Screening Model)
+                method to be used to approximate the effect of a solvent model
+                surrounding the molecule. Solvents with low dielectric constant
+                are not likely to work well with this model.
+                0 means that the dielectric constant is not included in the
+                calculation.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
+
+            'charge' : :class:`list` of :class:`floats`
+                When the system being studied is an ion, the charge, n, on the
+                ion must be supplied as an integer. For cations n can be 1, 2,
+                3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
+
+
+            'timeout' : :class:`float`
+                The amount in seconds the optimization is allowed to run before
+                being terminated. The default value is 2 days =
+                172,800 seconds.
+
+        mopac_path : :class:`str`
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        Returns
+        -------
+        :class:`float`
+            The calculated energy.
+
+        """
+        # Define default vals for the MOPAC input
+        vals = {
+                'hamiltonian': 'PM7',
+                'method': 'NOOPT',
+                'eps': 80.1,
+                'charge': 0,
+                'timeout': 172800,
+                }
+
+        vals.update(settings)
+
+        # To prevent conflicts when running this function in parallel,
+        # a temporary copy of the molecular structure file is made and
+        # used for mopac calculations.
+
+        # Unique file name is generated by inserting a random int into
+        # the file path.
+        tmp_file = "{}.mol".format(uuid4().int)
+        self.molecule.write(tmp_file)
+
+        file_root, ext = os.path.splitext(tmp_file)
+
+        # Generate the input file
+        _create_mop(file_root, self.molecule, vals)
+        # Run MOPAC
+        _run_mopac(file_root, mopac_path)
+        return _extract_MOPAC_en(file_root)
+
+
+    @exclude('mopac_path')
+    def mopac_dipole(self, mopac_path, settings={}):
+        """
+        Calculates the dipole moment of the `self.molecule` using MOPAC.
+
+        Note that this requires MOPAC to be installed and have a
+        valid license.
+        Parameters
+        ----------
+        settings: :class:`dict`, optional
+        A dictionary which maps the names of the optimization parameters to
+        their values. Valid values are:
+
+            'hamiltonian' : :class:`string`
+                A series of different methods can be selected:
+                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
+
+                PM7 is the latest version of the reparametrization of the NDDO
+                theory, where all the atomic and diatomic parameters were
+                re-optimized - update compared to PM6.
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
+
+                Defaults to PM7.
+
+            'method' : :class:`string`
+                This calculation consists in a single point energy calculation.
+
+            'eps' : :class:`float`
+                Sets the dielectric constant for the solvent. Presence of this
+                keyword will cause the COSMO (Conductor-like Screening Model)
+                method to be used to approximate the effect of a solvent model
+                surrounding the molecule. Solvents with low dielectric constant
+                are not likely to work well with this model.
+                0 means that the dielectric constant is not included in the
+                calculation.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
+
+            'charge' : :class:`list` of :class:`floats`
+                When the system being studied is an ion, the charge, n, on the
+                ion must be supplied as an integer. For cations n can be 1, 2,
+                3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
+
+
+            'timeout' : :class:`float`
+                The amount in seconds the optimization is allowed to run before
+                being terminated. The default value is 2 days =
+                172,800 seconds.
+
+        mopac_path : :class:`str`
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        Returns
+        -------
+        :class:`float`
+            The calculated dipole.
+
+        """
+        # Define default vals for the MOPAC input
+        vals = {
+                'hamiltonian': 'PM7',
+                'method': 'NOOPT',
+                'eps': 80.1,
+                'charge': 0,
+                'timeout': 172800,
+                }
+
+        vals.update(settings)
+
+        # To prevent conflicts when running this function in parallel,
+        # a temporary copy of the molecular structure file is made and
+        # used for mopac calculations.
+
+        # Unique file name is generated by inserting a random int into
+        # the file path.
+        tmp_file = "{}.mol".format(uuid4().int)
+        self.molecule.write(tmp_file)
+
+        file_root, ext = os.path.splitext(tmp_file)
+
+        # Generate the input file
+        _create_mop(file_root, self.molecule, vals)
+        # Run MOPAC
+        _run_mopac(file_root, mopac_path)
+        return _extract_MOPAC_dipole(file_root)
+
+    @exclude('mopac_path')
+    def mopac_ea(self, mopac_path, settings={}):
+        """
+        Calculates the electron affinity of `self.molecule` using MOPAC.
+        Electron Affinity (EA): difference between energy of structure with
+                                N electrons and N+1 electrons - charge = -1
+                                (eV)
+        Note that this requires MOPAC to be installed and have a
+        valid license.
+
+        Parameters
+        ----------
+        settings: :class:`dict`, optional
+        A dictionary which maps the names of the optimization parameters to
+        their values. Valid values are:
+
+            'hamiltonian' : :class:`string`
+                A series of different methods can be selected:
+                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
+
+                PM7 is the latest version of the reparametrization of the NDDO
+                theory, where all the atomic and diatomic parameters were
+                re-optimized - update compared to PM6.
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
+
+                Defaults to PM7.
+
+            'method' : :class:`string`
+                This calculation consists in a single point energy calculation.
+
+            'eps' : :class:`float`
+                Sets the dielectric constant for the solvent. Presence of this
+                keyword will cause the COSMO (Conductor-like Screening Model)
+                method to be used to approximate the effect of a solvent model
+                surrounding the molecule. Solvents with low dielectric constant
+                are not likely to work well with this model.
+                0 means that the dielectric constant is not included in the
+                calculation.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
+
+            'charge' : :class:`list` of :class:`floats`
+                When the system being studied is an ion, the charge, n, on the
+                ion must be supplied as an integer. For cations n can be 1, 2,
+                3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
+
+            'timeout' : :class:`float`
+                The amount in seconds the optimization is allowed to run before
+                being terminated. The default value is 2 days =
+                172,800 seconds.
+
+        mopac_path : :class:`str`
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        mopac_path : str
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        Returns
+        -------
+        :class:`float`
+            The calculated energy.
+
+        """
+        # Define default vals for the MOPAC input
+        vals = {
+                'hamiltonian': 'PM7',
+                'method': 'NOOPT',
+                'eps': 80.1,
+                'charge': 0,
+                'timeout': 172800,
+                }
+        vals.update(settings)
+
+        # First check the energy of the neutral system
+        # To prevent conflicts when running this function in parallel,
+        # a temporary copy of the molecular structure file is made and
+        # used for mopac calculations.
+
+        # Unique file name is generated by inserting a random int into
+        # the file path.
+        tmp_file = "{}.mol".format(uuid4().int)
+        self.molecule.write(tmp_file)
+
+        file_root, ext = os.path.splitext(tmp_file)
+
+        # Generate the input file
+        _create_mop(file_root, self.molecule, vals)
+        # Run MOPAC
+        _run_mopac(file_root, mopac_path)
+
+        # Extract the neutral energy
+        en1 = _extract_MOPAC_en(file_root)
+
+        # Update the settings for the anion optimization
+        settings2 = {
+                    'method': 'OPT',
+                    'gradient': 0.01,
+                    'charge': -1,
+                    'fileout': 'PDBOUT'
+                    }
+
+        vals.update(settings2)
+
+        # Now generate a new molecule
+        mol2 = copy.deepcopy(self.molecule)
+        # Run the mopac optimisation
+        mopac_opt(mol2, mopac_path, vals)
+        # Extract the energy by using the self.mopac method
+        vals['method'] = 'NOOPT'
+        del vals['gradient']
+        del vals['fileout']
+        en2 = mol2.energy.mopac(mopac_path, vals)
+        # Calculate the EA (eV)
+        return en2 - en1
+
+
+    @exclude('mopac_path')
+    def mopac_ip(self, mopac_path, settings={}):
+        """
+        Calculates the ionization potential of `self.molecule` using MOPAC.
+        Ionization Potential (IP): difference between energy of structure with
+                                N electrons and N-1 electrons - charge = +1
+                                (eV)
+        Note that this requires MOPAC to be installed and have a
+        valid license.
+
+        Parameters
+        ----------
+        settings: :class:`dict`, optional
+        A dictionary which maps the names of the optimization parameters to
+        their values. Valid values are:
+
+            'hamiltonian' : :class:`string`
+                A series of different methods can be selected:
+                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
+
+                PM7 is the latest version of the reparametrization of the NDDO
+                theory, where all the atomic and diatomic parameters were
+                re-optimized - update compared to PM6.
+                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
+
+                Defaults to PM7.
+
+            'method' : :class:`string`
+                This calculation consists in a single point energy calculation.
+
+            'eps' : :class:`float`
+                Sets the dielectric constant for the solvent. Presence of this
+                keyword will cause the COSMO (Conductor-like Screening Model)
+                method to be used to approximate the effect of a solvent model
+                surrounding the molecule. Solvents with low dielectric constant
+                are not likely to work well with this model.
+                0 means that the dielectric constant is not included in the
+                calculation.
+                Defaults to 80.1 can be used to model a water environment at
+                room temperature.
+
+            'charge' : :class:`list` of :class:`floats`
+                When the system being studied is an ion, the charge, n, on the
+                ion must be supplied as an integer. For cations n can be 1, 2,
+                3, etc.; for anions -1, -2, -3, etc.
+                Defaults to 0.
+
+            'timeout' : :class:`float`
+                The amount in seconds the optimization is allowed to run before
+                being terminated. The default value is 2 days =
+                172,800 seconds.
+
+        mopac_path : :class:`str`
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        mopac_path : str
+            The full path of the MOPAC suite within the
+            user's machine.
+
+        Returns
+        -------
+        :class:`float`
+            The calculated energy.
+
+        """
+        # Define default vals for the MOPAC input
+        vals = {
+                'hamiltonian': 'PM7',
+                'method': 'NOOPT',
+                'eps': 80.1,
+                'charge': 0,
+                'timeout': 172800,
+                }
+        vals.update(settings)
+
+        # First check the energy of the neutral system
+        # To prevent conflicts when running this function in parallel,
+        # a temporary copy of the molecular structure file is made and
+        # used for mopac calculations.
+
+        # Unique file name is generated by inserting a random int into
+        # the file path.
+        tmp_file = "{}.mol".format(uuid4().int)
+        self.molecule.write(tmp_file)
+
+        file_root, ext = os.path.splitext(tmp_file)
+
+        # Generate the input file
+        _create_mop(file_root, self.molecule, vals)
+        # Run MOPAC
+        _run_mopac(file_root, mopac_path)
+
+        # Extract the neutral energy
+        en1 = _extract_MOPAC_en(file_root)
+
+        # Update the settings for the cation optimization
+        settings2 = {
+                    'method': 'OPT',
+                    'gradient': 0.01,
+                    'charge': 1,
+                    'fileout': 'PDBOUT'
+                    }
+
+        vals.update(settings2)
+
+        # Now generate a new molecule
+        mol2 = copy.deepcopy(self.molecule)
+        # Run the mopac optimisation
+        mopac_opt(mol2, mopac_path, vals)
+        # Extract the energy by using the self.mopac method
+        vals['method'] = 'NOOPT'
+        del vals['gradient']
+        del vals['fileout']
+        en2 = mol2.energy.mopac(mopac_path, vals)
+        # Calculate the IP (eV)
+        return en2 - en1
 
 def formation_key(fargs, fkwargs):
     """
@@ -812,3 +1228,143 @@ def pseudoformation_key(fargs, fkwargs):
 
 
 Energy.pseudoformation.key = pseudoformation_key
+
+def _run_mopac(file_root, mopac_path, timeout=3600):
+
+    mop_file = file_root + '.mop'
+
+    logger.info(f'Running MOPAC - {file_root}.')
+
+    # To run MOPAC a command is issued to the console via
+    # ``subprocess.Popen``. The command is the full path of the
+    # ``mopac`` program.
+    file_root, ext = os.path.splitext(mop_file)
+    opt_cmd = [mopac_path, file_root]
+    opt_proc = psutil.Popen(opt_cmd, stdout=sp.PIPE,
+                            stderr=sp.STDOUT,
+                            universal_newlines=True)
+
+    try:
+        if timeout:
+            proc_out, _ = opt_proc.communicate(timeout=timeout)
+        else:
+            proc_out, _ = opt_proc.communicate()
+    except sp.TimeoutExpired:
+        logger.info(('Minimization took too long and was terminated '
+                     'by force - {}').format(file_root))
+        _kill_mopac(file_root)
+
+def _kill_mopac(file_root):
+    """
+    To kill a MOPAC run for a specific structure it is enough to generate
+    a non empty file with the molecule's name with the `.end` extension.
+    """
+    end_file = file_root + '.end'
+
+    with open(end_file, 'w') as end:
+        end.write('SHUT')
+
+def _mop_line(settings):
+    """
+    Formats the settings dictionary with the correct keywords for MOPAC into
+    a string to be added to the MOPAC input.
+
+    Parameters
+    ----------
+    settings : dict
+        Dictionary defined in the mopac_opt function, where all the run details
+        are defined.
+
+    Returns
+    -------
+    mopac_run_str : str
+        String containing all the MOPAC keywords correctly formatted for the
+        input file.
+    """
+
+    # Generate an empty string
+    mopac_run_str = ""
+
+    # Add Hamiltonian info
+    mopac_run_str = mopac_run_str + settings['hamiltonian']
+    # Forcing a single point calculation
+    mopac_run_str = mopac_run_str + ' NOOPT '
+    # Add EPS info
+    eps_info = ' EPS={} '.format(settings['eps'])
+    mopac_run_str = mopac_run_str + eps_info
+    # Add Charge info
+    charge_info = ' CHARGE={} '.format(settings['charge'])
+    mopac_run_str = mopac_run_str + charge_info
+
+    return mopac_run_str
+
+
+def _create_mop(file_root, molecule, settings):
+    """
+    Creates the ``.mop`` file holding the molecule to be optimized.
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule which is to be optimized. Its molecular
+        structure file is converted to a ``.mop`` file. The original
+        file is also kept.
+
+    mopac_run_str : str
+        This string specifies the MOPAC keywords to be used in the input for
+        the calculation.
+
+    Modifies
+    --------
+    This function creates a new ``.mop`` file from the structure file
+    in `macro_mol._file`. This new file is placed in the same
+    folder as the original file and has the same name with the _charge info.
+
+    Returns
+    -------
+    str
+        The full path of the newly created ``.mop`` file.
+    """
+
+    mop_file = file_root + '.mop'
+    mol = molecule.mol
+
+    logger.info('Creating .mop file - {}.'.format(file_root))
+
+    # Generate the mop file containing the MOPAC run info
+    with open(mop_file, 'w') as mop:
+        # line for the run info
+        mop.write(_mop_line(settings) + "\n")
+        # line with the name of the molecule
+        mop.write(file_root + "\n\n")
+
+        # print the structural info
+        for atom in mol.GetAtoms():
+            atom_id = atom.GetIdx()
+            atom_symbol = atom.GetSymbol()
+            x, y, z = mol.GetConformer().GetAtomPosition(atom_id)
+            atom_info = "{}   {}   +1  {}   +1  {}   +1 \n".format(atom_symbol,
+                                                                   x, y, z)
+            mop.write(atom_info)
+
+    return mop_file
+
+def _extract_MOPAC_en(file_root):
+    mopac_out = file_root + '.arc'
+
+    with open(mopac_out) as outfile:
+        target = "TOTAL ENERGY"
+        energy_str = str([x for x in outfile.readlines() if target in x][0])
+        energy_val = float(energy_str.split()[3])
+
+    return energy_val
+
+def _extract_MOPAC_dipole(file_root):
+    mopac_out = file_root + '.arc'
+
+    with open(mopac_out) as outfile:
+        target = "DIPOLE"
+        energy_str = str([x for x in outfile.readlines() if target in x][0])
+        energy_val = float(energy_str.split()[2])
+
+    return energy_val

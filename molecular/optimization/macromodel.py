@@ -393,6 +393,7 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
             'gradient' : float (default = 0.05)
                 The gradient at which optimization is stopped.
 
+
     Modifies
     --------
     macro_mol.mol

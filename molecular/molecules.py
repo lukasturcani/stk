@@ -70,7 +70,7 @@ steps 1 to 4.)
        supplied to the initializer).
 
 What functional groups are recognized by MMEA?
-The module ``/mmea/molecular_tools/fg_info.py`` defines a class called
+The module ``/mmea/molecular/fg_info.py`` defines a class called
 FGInfo. Instances of this class are held in the list
 `functional_groups` (also in that module). If you put an FGInfo
 instance in that list, the functional group will be recognized.
@@ -99,7 +99,7 @@ instance in that list, the functional group will be recognized.
        molecule. Make sure that the building blocks are arranged in the
        shape of the macromolecule. All the manipulations available via
        the StructUnit class are useful here to make sure all the
-       building blocks are orientated correctly when forming the
+       building blocks are oriented correctly when forming the
        macromolecule.
 
     10) Create bonds between all the disjoined building block
@@ -139,6 +139,7 @@ import itertools as it
 import math
 import rdkit.Geometry.rdGeometry as rdkit_geo
 import rdkit.Chem.AllChem as rdkit
+from rdkit.Chem import rdMolTransforms
 
 from rdkit import DataStructs
 from glob import glob
@@ -239,7 +240,7 @@ class Molecule:
     """
     The most basic class representing molecules.
 
-    This class defines defines the operations which any class
+    This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
     such classes are ``StructUnit`` and ``MacroMolecule``. This calls
     is unlikely to be useful as in and of itself. It lacks an
@@ -463,6 +464,54 @@ class Molecule:
 
         centroid = sum(x for _, x in self.all_atom_coords())
         return np.divide(centroid, self.mol.GetNumAtoms())
+
+    # @classmethod
+    def dihedral_strain(self, dihedral_SMARTS="", target=180):
+        """
+        Calculates the relative % difference between all the average dihedral
+        angle values within the molecule and the target value.
+
+        Parameters
+        ----------
+        dihedral_SMARTS : :class:`str`
+            The SMARTS code for the dihedral of interest.
+
+        target : :class:`float`
+            Float representing the target value for the dihedral angle.
+
+        Returns
+        -------
+        diff : :class:`float`
+            Float representing the % relative difference between the average
+            dihedral value in the molecule and the target value.
+        """
+
+        # Sanitize the molecule
+        rdkit.SanitizeMol(self.mol)
+
+        match = rdkit.MolFromSmarts(dihedral_SMARTS)
+
+        atoms_dihedral = self.mol.GetSubstructMatches(match)
+
+        dihedral_info = []
+        if len(atoms_dihedral) > 0 and len(atoms_dihedral[0]) != 0:
+            for atoms_group in atoms_dihedral:
+                # Calculate the dihedral angle
+                dihedral_value = rdMolTransforms.GetDihedralDeg(
+                                    self.mol.GetConformer(), atoms_group[0],
+                                    atoms_group[1], atoms_group[2],
+                                    atoms_group[3])
+                dihedral_info.append(dihedral_value)
+
+            # Calculate the average dihedral value
+            avg_dihedral = np.mean([abs(x) for x in dihedral_info])
+            # Calculate the relative diff with the target dihedral value
+            diff = (abs(target - avg_dihedral) / target) * 100
+        else:
+            # If the molecule does not contain the bond, give 1% strain.
+            diff = 1
+
+        return diff
 
     def dump(self, path):
         """

@@ -311,3 +311,69 @@ def rdkit_optimization(macro_mol, embed=False, logger=logger):
     # Sanitize then optimize the rdkit molecule.
     rdkit.SanitizeMol(macro_mol.mol)
     rdkit.MMFFOptimizeMolecule(macro_mol.mol)
+
+def rdkit_ETKDG(macro_mol, logger=logger):
+    """
+    Does a conformer search with the rdkit.ETKDG method:
+    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
+
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure should be optimized.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
+    Modifies
+    --------
+    macro_mol.mol
+        The rdkit molecule held in this attribute has it's structure
+        changed as a result of the optimization. This means the
+        ``Conformer`` instance held by the rdkit molecule is changed.
+
+    Returns
+    -------
+    None : NoneType
+
+    """
+
+    rdkit.EmbedMolecule(macro_mol.mol, rdkit.ETKDG())
+
+def rdkit_confs_ETKDG(macro_mol, name='test', confs=1, logger=logger):
+    """
+    Does a conformer search with the rdkit.ETKDG method:
+    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
+    A number of mol files representing the conformers is then generated.
+
+
+    Parameters
+    ----------
+    macro_mol : MacroMolecule
+        The macromolecule who's structure should be optimized.
+
+    name: :class:`str`, optional
+        Name of the macro_mol that is used to name the new conformers.
+
+    confs: :class:`int`, optional
+        Defines the number of conformers generated in the
+        conformer search.
+
+    logger : FakeLogger or logging.Logger, optional
+        Used for logging. Not used by this function.
+
+
+    Returns
+    -------
+    conformers : list of conformer IDs for the rdkit molecule.
+
+    """
+
+    cids = rdkit.EmbedMultipleConfs(macro_mol.mol, confs, rdkit.ETKDG())
+
+    for cid in cids:
+        conf_name = "{}_{}.mol".format(name.replace('.mol', ''), cid)
+        rdkit.MolToMolFile(macro_mol.mol, conf_name, confId=cid)
+
+    return cids
