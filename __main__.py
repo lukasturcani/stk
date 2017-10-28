@@ -277,7 +277,7 @@ def ga_run(ga_input):
         progress.progress.add_subpopulation(pop)
         progress.debug_dump(pop, 'gen_{}_selected.json'.format(x))
         # Check if any user-defined exit criterion has been fulfilled.
-        if pop.exit():
+        if pop.exit(progress.progress):
             break
 
     kill_macromodel()

@@ -24,6 +24,9 @@ def fitness_epp(pop, plot_name=False,
 
     which is then dumped to the file `dump_name`.
 
+    The members with a standard fitness of 0.0001 are excluded from
+    this analysis.
+
     Parameters
     ----------
     pop : Population
@@ -60,8 +63,8 @@ def fitness_epp(pop, plot_name=False,
             mins.append(0)
         else:
             maxs.append(max(x.fitness for x in subpop))
-            means.append(subpop.mean(lambda x: x.fitness))
-            mins.append(min(x.fitness for x in subpop))
+            means.append(np.mean([x.fitness for x in subpop if x.fitness != 0.0001]))
+            mins.append(min(x.fitness for x in subpop if x.fitness != 0.0001))
 
     # Save the plot data.
     if plot_name and dump_name is None:
@@ -72,12 +75,18 @@ def fitness_epp(pop, plot_name=False,
 
     if plot_name:
         fig = plt.figure()
+        axes = plt.gca()
         plt.xlabel(xlabel)
         plt.ylabel('Fitness')
-        plt.scatter(xvals, maxs, color='red', marker='x', label='max')
-        plt.scatter(xvals, means,
-                    color='green', marker='x', label='mean')
-        plt.scatter(xvals, mins, color='blue', marker='x', label='min')
+        plt.scatter(xvals, maxs, color='red', marker='o', label='max',
+                    alpha=0.5)
+        plt.scatter(xvals, means, color='green', marker='o', label='mean',
+                    alpha=0.5)
+        plt.scatter(xvals, mins, color='blue', marker='o', label='min',
+                    alpha=0.5)
+        frame = (min(mins) + max(maxs))/50
+        axes.set_ylim([min(mins) - frame, max(maxs) + frame])
+
         lgd = plt.legend(bbox_to_anchor=(1.05, 1),
                          loc=2, borderaxespad=0.)
         fig.savefig(plot_name, dpi=1000,
@@ -187,14 +196,17 @@ def parameter_epp(pop, plot_name=False,
 
         if plot_name:
             fig = plt.figure()
+            axes = plt.gca()
             plt.xlabel(xlabel)
             plt.ylabel('Unscaled ' + fitness_func.param_labels[x])
             plt.scatter(xvals, y_mean,
-                        color='green', marker='x', label='mean')
+                        color='green', marker='o', label='mean')
             plt.scatter(xvals, y_min,
-                        color='blue', marker='x', label='min')
+                        color='blue', marker='o', label='min')
             plt.scatter(xvals, y_max,
-                        color='red', marker='x', label='max')
+                        color='red', marker='o', label='max')
+            frame = (min(y_min) + max(y_max))/50
+            axes.set_ylim([min(y_min) - frame, max(y_max) + frame])
             lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2,
                              borderaxespad=0.)
 

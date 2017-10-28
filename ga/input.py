@@ -3,15 +3,16 @@ Defines classes which deal with input.
 
 """
 
+import psutil
 from types import ModuleType
 from inspect import isclass
 import logging
 
 from . import fitness
-from .crossover import Crossover
 from .ga_tools import GATools
 from .selection import Selection
 from .mutation import Mutation
+from .crossover import Crossover
 from .population import Population
 from .normalization import Normalization
 from .ga_exit import Exit
@@ -75,16 +76,19 @@ class GAInput:
 
     Attributes
     ----------
-    pop_size : int
+    num_cores : :class:`int`
+        The number of CPUs to be used for the simulation.
+
+    pop_size : :class:`int`
         The size of the population.
 
-    num_generations : int
+    num_generations : :class:`int`
         The number of generations formed by MMEA.
 
-    num_mutations: int
+    num_mutations: :class:`int`
         The number of successful mutations per generation.
 
-    num_crossovers: int
+    num_crossovers: :class:`int`
         The number of successful crossovers per generation.
 
     init_func : dict
@@ -202,6 +206,9 @@ class GAInput:
 
         # If the input file did not specify some values, default
         # initialize them.
+        if not hasattr(self, 'num_cores'):
+            self.num_cores = psutil.cpu_count(logical=False)
+
         if not hasattr(self, 'num_crossovers'):
             self.num_crossovers = 0
 

@@ -8,7 +8,7 @@ from multiprocessing import Pool
 
 from .io_tools import Input, Output
 from .utilities import (
-    is_number, create_supercell, lattice_matrix_to_unit_cell,
+    is_number, create_supercell, lattice_array_to_unit_cell,
     make_JSON_serializable,
 )
 from .molecular import MolecularSystem
@@ -112,7 +112,6 @@ class DLPOLY(object):
                             header_flag = False
                     progress = progress + len(bline)
             self.no_of_frames = frame
-            self.get_frames = self._get_frames
 
     def _decode_head(self, header_coordinates):
         start, end = header_coordinates
@@ -131,11 +130,12 @@ class DLPOLY(object):
         self.no_of_atoms = header[2]
         return header
 
-    def _get_frames(self, frames, extract_data=True, override=False):
+    def get_frames(self, frames, override=False, **kwargs):
         if override is True:
             self.frames = {}
         if isinstance(frames, int):
-            frame = self._get_frame(self.trajectory_map[frames], extract_data)
+            frame = self._get_frame(
+                self.trajectory_map[frames], frames, **kwargs)
             if frames not in self.frames.keys():
                 self.frames[frames] = frame
             return frame
@@ -143,27 +143,31 @@ class DLPOLY(object):
             for frame in frames:
                 if frame not in self.frames.keys():
                     self.frames[frame] = self._get_frame(
-                        self.trajectory_map[frame], extract_data)
+                        self.trajectory_map[frame], frame, **kwargs)
         if isinstance(frames, tuple):
             for frame in range(frames[0], frames[1]):
                 if frame not in self.frames.keys():
                     self.frames[frame] = self._get_frame(
-                        self.trajectory_map[frame], extract_data)
+                        self.trajectory_map[frame], frame, **kwargs)
         if isinstance(frames, str):
             if frames in ['all', 'everything']:
                 for frame in range(0, self.no_of_frames):
                     if frame not in self.frames.keys():
                         self.frames[frame] = self._get_frame(
-                            self.trajectory_map[frame], extract_data)
+                            self.trajectory_map[frame], frame, **kwargs)
 
-    def _get_frame(self, frame_coordinates, extract_data):
+    def _get_frame(self, frame_coordinates, frame_no, **kwargs):
+        kwargs_ = {
+            "extract_data": True
+        }
+        kwargs_.update(kwargs)
         start, end = frame_coordinates
         with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
                         access=ACCESS_READ)) as mapped_file:
-                if extract_data is False:
+                if kwargs_["extract_data"] is False:
                     return mapped_file[start:end].decode("utf-8")
                 else:
                     # [:-1] because the split results in last list empty.
@@ -172,7 +176,15 @@ class DLPOLY(object):
                         for i in mapped_file[start:end].decode("utf-8").split(
                             '\n')
                     ][:-1]
-                    return self._decode_frame(frame)
+                    decoded_frame = self._decode_frame(frame)
+                    molsys = MolecularSystem.load_system(
+                        decoded_frame,
+                        "_".join([self.system_id, str(frame_no)]))
+                    if 'swap_atoms' in kwargs:
+                        molsys.swap_atom_keys(kwargs['swap_atoms'])
+                    if 'forcefield' in kwargs:
+                        molsys.decipher_atom_keys(kwargs['forcefield'])
+                    return molsys
 
     def _decode_frame(self, frame):
         frame_data = {
@@ -186,8 +198,8 @@ class DLPOLY(object):
         }
         start_line = 1
         if frame_data['frame_info']['imcon'] in [1, 2, 3]:
-            frame_data['lattice'] = np.array(frame[1:4], dtype=float)
-            frame_data['unit_cell'] = lattice_matrix_to_unit_cell(frame_data[
+            frame_data['lattice'] = np.array(frame[1:4], dtype=float).T
+            frame_data['unit_cell'] = lattice_array_to_unit_cell(frame_data[
                 'lattice'])
             start_line = 4
         # Depending on what the trajectory key is (see __init__) we need
@@ -225,9 +237,11 @@ class DLPOLY(object):
             frame_data['velocities'] = np.array(velocities, dtype=float)
         if forces:
             frame_data['forces'] = np.array(forces, dtype=float)
-        return MolecularSystem.load_system(frame_data, self.system_id)
+        return frame_data
 
-    def analysis(self, frames='all', ncpus=1, _ncpus=1, override=False, **kwargs):
+    def analysis(
+            self, frames='all', ncpus=1, _ncpus=1, override=False, **kwargs
+                ):
         """ """
         frames_for_analysis = []
         # First populate the frames_for_analysis list.
@@ -276,51 +290,54 @@ class DLPOLY(object):
 
     def _analysis_serial(self, frame, _ncpus, **kwargs):
         molecular_system = self._get_frame(
-            self.trajectory_map[frame], extract_data=True
+            self.trajectory_map[frame], frame, extract_data=True
         )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
         if 'forcefield' in kwargs:
             molecular_system.decipher_atom_keys(kwargs['forcefield'])
-        molecular_system.make_modular()
+        rebuild = False
+        if 'supercell' in kwargs:
+            if kwargs['supercell'] is True:
+                rebuild = True
+        molecular_system.make_modular(rebuild=rebuild)
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
-            print(mol.no_of_atoms)
-            if 'size' in kwargs:
-                size = kwargs['size']
-                if isinstance(size, int):
-                    if mol.no_of_atoms == size:
+            if 'molsize' in kwargs:
+                molsize = kwargs['molsize']
+                if isinstance(molsize, int):
+                    if mol.no_of_atoms == molsize:
                         results[molecule] = mol.full_analysis(
-                            ncpus=_ncpus, **kwargs)
-                if isinstance(size, tuple) and isinstance(size[0], str):
-                    if size[0] in ['bigger', 'greater', 'larger', 'more']:
-                        if mol.no_of_atoms > size[1]:
+                            _ncpus=_ncpus, **kwargs)
+                if isinstance(molsize, tuple) and isinstance(molsize[0], str):
+                    if molsize[0] in ['bigger', 'greater', 'larger', 'more']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=_ncpus, **kwargs)
-                    if size[0] in ['smaller', 'less']:
-                        if mol.no_of_atoms > size[1]:
+                                _ncpus=_ncpus, **kwargs)
+                    if molsize[0] in ['smaller', 'less']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=_ncpus, **kwargs)
-                    if size[0] in ['not', 'isnot', 'notequal', 'different']:
-                        if mol.no_of_atoms != size[1]:
+                                _ncpus=_ncpus, **kwargs)
+                    if molsize[0] in ['not', 'isnot', 'notequal', 'different']:
+                        if mol.no_of_atoms != molsize[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=_ncpus, **kwargs)
-                    if size[0] in ['is', 'equal', 'exactly']:
-                        if mol.no_of_atoms == size[1]:
+                                _ncpus=_ncpus, **kwargs)
+                    if molsize[0] in ['is', 'equal', 'exactly']:
+                        if mol.no_of_atoms == molsize[1]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=_ncpus, **kwargs)
-                    if size[0] in ['between', 'inbetween']:
-                        if size[1] < mol.no_of_atoms < size[2]:
+                                _ncpus=_ncpus, **kwargs)
+                    if molsize[0] in ['between', 'inbetween']:
+                        if molsize[1] < mol.no_of_atoms < molsize[2]:
                             results[molecule] = mol.full_analysis(
-                                ncpus=_ncpus, **kwargs)
+                                _ncpus=_ncpus, **kwargs)
             else:
-                results[molecule] = mol.full_analysis(ncpus=_ncpus, **kwargs)
+                results[molecule] = mol.full_analysis(_ncpus=_ncpus, **kwargs)
         return results
 
     def _analysis_parallel_execute(self, frame, **kwargs):
         molecular_system = self._get_frame(
-            self.trajectory_map[frame], extract_data=True
+            self.trajectory_map[frame], frame, extract_data=True
         )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
@@ -330,26 +347,26 @@ class DLPOLY(object):
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
-            if 'size' in kwargs:
-                size = kwargs['size']
-                if isinstance(size, int):
-                    if mol.no_of_atoms == size:
+            if 'molsize' in kwargs:
+                molsize = kwargs['molsize']
+                if isinstance(molsize, int):
+                    if mol.no_of_atoms == molsize:
                         results[molecule] = mol.full_analysis(**kwargs)
-                if isinstance(size, tuple) and isinstance(size[0], str):
-                    if size[0] in ['bigger', 'greater', 'larger', 'more']:
-                        if mol.no_of_atoms > size[1]:
+                if isinstance(molsize, tuple) and isinstance(molsize[0], str):
+                    if molsize[0] in ['bigger', 'greater', 'larger', 'more']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['smaller', 'less']:
-                        if mol.no_of_atoms > size[1]:
+                    if molsize[0] in ['smaller', 'less']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['not', 'isnot', 'notequal', 'different']:
-                        if mol.no_of_atoms != size[1]:
+                    if molsize[0] in ['not', 'isnot', 'notequal', 'different']:
+                        if mol.no_of_atoms != molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['is', 'equal', 'exactly']:
-                        if mol.no_of_atoms == size[1]:
+                    if molsize[0] in ['is', 'equal', 'exactly']:
+                        if mol.no_of_atoms == molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['between', 'inbetween']:
-                        if size[1] < mol.no_of_atoms < size[2]:
+                    if molsize[0] in ['between', 'inbetween']:
+                        if molsize[1] < mol.no_of_atoms < molsize[2]:
                             results[molecule] = mol.full_analysis(**kwargs)
             else:
                 results[molecule] = mol.full_analysis(**kwargs)
@@ -364,15 +381,7 @@ class DLPOLY(object):
                     args=(frame, ),
                     kwds=kwargs) for frame in frames
             ]
-            print('print start')
-            for p in parallel:
-                print(p)
-                try:
-                    print(p.get())
-                except TypeError:
-                    print('This one has failed')
-            print('printed all')
-            #results = [p.get() for p in parallel if p.get()]
+            results = [p.get() for p in parallel if p.get()]
             pool.terminate()
             for i in results:
                 self.analysis_output[i[0]] = i[1]
@@ -574,13 +583,13 @@ class XYZ(object):
                     # And also the periodic system type needed for later.
                     progress = progress + len(bline)
             self.no_of_frames = frame + 1
-            self.get_frames = self._get_frames
 
-    def _get_frames(self, frames, extract_data=True, override=False):
+    def get_frames(self, frames, override=False, **kwargs):
         if override is True:
             self.frames = {}
         if isinstance(frames, int):
-            frame = self._get_frame(self.trajectory_map[frames], extract_data)
+            frame = self._get_frame(
+                self.trajectory_map[frames], frames, **kwargs)
             if frames not in self.frames.keys():
                 self.frames[frames] = frame
             return frame
@@ -588,27 +597,31 @@ class XYZ(object):
             for frame in frames:
                 if frame not in self.frames.keys():
                     self.frames[frame] = self._get_frame(
-                        self.trajectory_map[frame], extract_data)
+                        self.trajectory_map[frame], frame, **kwargs)
         if isinstance(frames, tuple):
             for frame in range(frames[0], frames[1]):
                 if frame not in self.frames.keys():
                     self.frames[frame] = self._get_frame(
-                        self.trajectory_map[frame], extract_data)
+                        self.trajectory_map[frame], frame, **kwargs)
         if isinstance(frames, str):
             if frames in ['all', 'everything']:
                 for frame in range(0, self.no_of_frames):
                     if frame not in self.frames.keys():
                         self.frames[frame] = self._get_frame(
-                            self.trajectory_map[frame], extract_data)
+                            self.trajectory_map[frame], frame, **kwargs)
 
-    def _get_frame(self, frame_coordinates, extract_data):
+    def _get_frame(self, frame_coordinates, frame_no, **kwargs):
+        kwargs_ = {
+            "extract_data": True,
+            }
+        kwargs_.update(kwargs)
         start, end = frame_coordinates
         with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
                         access=ACCESS_READ)) as mapped_file:
-                if extract_data is False:
+                if kwargs_["extract_data"] is False:
                     return mapped_file[start:end].decode("utf-8")
                 else:
                     # [:-1] because the split results in last list empty.
@@ -617,7 +630,15 @@ class XYZ(object):
                         for i in mapped_file[start:end].decode("utf-8").split(
                             '\n')
                     ][:-1]
-                    return self._decode_frame(frame)
+                    decoded_frame = self._decode_frame(frame)
+                    molsys = MolecularSystem.load_system(
+                        decoded_frame,
+                        "_".join([self.system_id, str(frame_no)]))
+                    if 'swap_atoms' in kwargs:
+                        molsys.swap_atom_keys(kwargs['swap_atoms'])
+                    if 'forcefield' in kwargs:
+                        molsys.decipher_atom_keys(kwargs['forcefield'])
+                    return molsys
 
     def _decode_frame(self, frame):
         frame_data = {
@@ -634,7 +655,7 @@ class XYZ(object):
             coordinates.append(frame[i][1:])
         frame_data['atom_ids'] = np.array(elements)
         frame_data['coordinates'] = np.array(coordinates, dtype=float)
-        return MolecularSystem.load_system(frame_data, self.system_id)
+        return frame_data
 
     def analysis(self, frames='all', ncpus=1, override=False, **kwargs):
         if override is True:
@@ -663,7 +684,7 @@ class XYZ(object):
 
     def _analysis_serial(self, frame, ncpus, **kwargs):
         molecular_system = self._get_frame(
-            self.trajectory_map[frame], extract_data=True
+            self.trajectory_map[frame], frame, extract_data=True
         )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
@@ -673,31 +694,31 @@ class XYZ(object):
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
-            if 'size' in kwargs:
-                size = kwargs['size']
-                if isinstance(size, int):
-                    if mol.no_of_atoms == size:
+            if 'molsize' in kwargs:
+                molsize = kwargs['molsize']
+                if isinstance(molsize, int):
+                    if mol.no_of_atoms == molsize:
                         results[molecule] = mol.full_analysis(
                             ncpus=ncpus, **kwargs)
-                if isinstance(size, tuple) and isinstance(size[0], str):
-                    if size[0] in ['bigger', 'greater', 'larger', 'more']:
-                        if mol.no_of_atoms > size[1]:
+                if isinstance(molsize, tuple) and isinstance(molsize[0], str):
+                    if molsize[0] in ['bigger', 'greater', 'larger', 'more']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['smaller', 'less']:
-                        if mol.no_of_atoms > size[1]:
+                    if molsize[0] in ['smaller', 'less']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['not', 'isnot', 'notequal', 'different']:
-                        if mol.no_of_atoms != size[1]:
+                    if molsize[0] in ['not', 'isnot', 'notequal', 'different']:
+                        if mol.no_of_atoms != molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['is', 'equal', 'exactly']:
-                        if mol.no_of_atoms == size[1]:
+                    if molsize[0] in ['is', 'equal', 'exactly']:
+                        if mol.no_of_atoms == molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['between', 'inbetween']:
-                        if size[1] < mol.no_of_atoms < size[2]:
+                    if molsize[0] in ['between', 'inbetween']:
+                        if molsize[1] < mol.no_of_atoms < molsize[2]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
             else:
@@ -706,7 +727,7 @@ class XYZ(object):
 
     def _analysis_parallel_execute(self, frame, **kwargs):
         molecular_system = self._get_frame(
-            self.trajectory_map[frame], extract_data=True
+            self.trajectory_map[frame], frame, extract_data=True
         )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
@@ -716,26 +737,26 @@ class XYZ(object):
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
-            if 'size' in kwargs:
-                size = kwargs['size']
-                if isinstance(size, int):
-                    if mol.no_of_atoms == size:
+            if 'molsize' in kwargs:
+                molsize = kwargs['molsize']
+                if isinstance(molsize, int):
+                    if mol.no_of_atoms == molsize:
                         results[molecule] = mol.full_analysis(**kwargs)
-                if isinstance(size, tuple) and isinstance(size[0], str):
-                    if size[0] in ['bigger', 'greater', 'larger', 'more']:
-                        if mol.no_of_atoms > size[1]:
+                if isinstance(molsize, tuple) and isinstance(molsize[0], str):
+                    if molsize[0] in ['bigger', 'greater', 'larger', 'more']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['smaller', 'less']:
-                        if mol.no_of_atoms > size[1]:
+                    if molsize[0] in ['smaller', 'less']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['not', 'isnot', 'notequal', 'different']:
-                        if mol.no_of_atoms != size[1]:
+                    if molsize[0] in ['not', 'isnot', 'notequal', 'different']:
+                        if mol.no_of_atoms != molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['is', 'equal', 'exactly']:
-                        if mol.no_of_atoms == size[1]:
+                    if molsize[0] in ['is', 'equal', 'exactly']:
+                        if mol.no_of_atoms == molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['between', 'inbetween']:
-                        if size[1] < mol.no_of_atoms < size[2]:
+                    if molsize[0] in ['between', 'inbetween']:
+                        if molsize[1] < mol.no_of_atoms < molsize[2]:
                             results[molecule] = mol.full_analysis(**kwargs)
             else:
                 results[molecule] = mol.full_analysis(**kwargs)
@@ -805,13 +826,13 @@ class PDB(object):
                     # And also the periodic system type needed for later.
                     progress = progress + len(bline)
             self.no_of_frames = frame
-            self.get_frames = self._get_frames
 
-    def _get_frames(self, frames, extract_data=True, override=False):
+    def get_frames(self, frames, override=False, **kwargs):
         if override is True:
             self.frames = {}
         if isinstance(frames, int):
-            frame = self._get_frame(self.trajectory_map[frames], extract_data)
+            frame = self._get_frame(
+                self.trajectory_map[frames], frames, **kwargs)
             if frames not in self.frames.keys():
                 self.frames[frames] = frame
             return frame
@@ -819,32 +840,44 @@ class PDB(object):
             for frame in frames:
                 if frame not in self.frames.keys():
                     self.frames[frame] = self._get_frame(
-                        self.trajectory_map[frame], extract_data)
+                        self.trajectory_map[frame], frame, **kwargs)
         if isinstance(frames, tuple):
             for frame in range(frames[0], frames[1]):
                 if frame not in self.frames.keys():
                     self.frames[frame] = self._get_frame(
-                        self.trajectory_map[frame], extract_data)
+                        self.trajectory_map[frame], frame, **kwargs)
         if isinstance(frames, str):
             if frames in ['all', 'everything']:
                 for frame in range(0, self.no_of_frames):
                     if frame not in self.frames.keys():
                         self.frames[frame] = self._get_frame(
-                            self.trajectory_map[frame], extract_data)
+                            self.trajectory_map[frame], frame, **kwargs)
 
-    def _get_frame(self, frame_coordinates, extract_data):
+    def _get_frame(self, frame_coordinates, frame_no, **kwargs):
+        kwargs_ = {
+            "extract_data": True
+        }
+        kwargs_.update(kwargs)
         start, end = frame_coordinates
         with open(self.filepath, 'r') as trajectory_file:
             with closing(
                     mmap(
                         trajectory_file.fileno(), 0,
                         access=ACCESS_READ)) as mapped_file:
-                if extract_data is False:
+                if kwargs_["extract_data"] is False:
                     return mapped_file[start:end].decode("utf-8")
                 else:
                     # In case of PDB we do not split lines!
                     frame = mapped_file[start:end].decode("utf-8").split('\n')
-                    return self._decode_frame(frame)
+                    decoded_frame = self._decode_frame(frame)
+                    molsys = MolecularSystem.load_system(
+                        decoded_frame,
+                        "_".join([self.system_id, str(frame_no)]))
+                    if 'swap_atoms' in kwargs:
+                        molsys.swap_atom_keys(kwargs['swap_atoms'])
+                    if 'forcefield' in kwargs:
+                        molsys.decipher_atom_keys(kwargs['forcefield'])
+                    return molsys
 
     def _decode_frame(self, frame):
         frame_data = {}
@@ -872,7 +905,7 @@ class PDB(object):
                     [frame[i][30:38], frame[i][38:46], frame[i][46:54]])
         frame_data['atoms_ids'] = np.array(elements, dtype='<U8')
         frame_data['coordinates'] = np.array(coordinates, dtype=float)
-        return MolecularSystem.load_system(frame_data, self.system_id)
+        return frame_data
 
     def analysis(self, frames='all', ncpus=1, override=False, **kwargs):
         if override is True:
@@ -901,7 +934,7 @@ class PDB(object):
 
     def _analysis_serial(self, frame, ncpus, **kwargs):
         molecular_system = self._get_frame(
-            self.trajectory_map[frame], extract_data=True
+            self.trajectory_map[frame], frame, extract_data=True
         )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
@@ -911,31 +944,31 @@ class PDB(object):
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
-            if 'size' in kwargs:
-                size = kwargs['size']
-                if isinstance(size, int):
-                    if mol.no_of_atoms == size:
+            if 'molsize' in kwargs:
+                molsize = kwargs['molsize']
+                if isinstance(molsize, int):
+                    if mol.no_of_atoms == molsize:
                         results[molecule] = mol.full_analysis(
                             ncpus=ncpus, **kwargs)
-                if isinstance(size, tuple) and isinstance(size[0], str):
-                    if size[0] in ['bigger', 'greater', 'larger', 'more']:
-                        if mol.no_of_atoms > size[1]:
+                if isinstance(molsize, tuple) and isinstance(molsize[0], str):
+                    if molsize[0] in ['bigger', 'greater', 'larger', 'more']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['smaller', 'less']:
-                        if mol.no_of_atoms > size[1]:
+                    if molsize[0] in ['smaller', 'less']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['not', 'isnot', 'notequal', 'different']:
-                        if mol.no_of_atoms != size[1]:
+                    if molsize[0] in ['not', 'isnot', 'notequal', 'different']:
+                        if mol.no_of_atoms != molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['is', 'equal', 'exactly']:
-                        if mol.no_of_atoms == size[1]:
+                    if molsize[0] in ['is', 'equal', 'exactly']:
+                        if mol.no_of_atoms == molsize[1]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
-                    if size[0] in ['between', 'inbetween']:
-                        if size[1] < mol.no_of_atoms < size[2]:
+                    if molsize[0] in ['between', 'inbetween']:
+                        if molsize[1] < mol.no_of_atoms < molsize[2]:
                             results[molecule] = mol.full_analysis(
                                 ncpus=ncpus, **kwargs)
             else:
@@ -944,7 +977,7 @@ class PDB(object):
 
     def _analysis_parallel_execute(self, frame, **kwargs):
         molecular_system = self._get_frame(
-            self.trajectory_map[frame], extract_data=True
+            self.trajectory_map[frame], frame, extract_data=True
         )
         if 'swap_atoms' in kwargs:
             molecular_system.swap_atom_keys(kwargs['swap_atoms'])
@@ -954,26 +987,26 @@ class PDB(object):
         results = {}
         for molecule in molecular_system.molecules:
             mol = molecular_system.molecules[molecule]
-            if 'size' in kwargs:
-                size = kwargs['size']
-                if isinstance(size, int):
-                    if mol.no_of_atoms == size:
+            if 'molsize' in kwargs:
+                molsize = kwargs['molsize']
+                if isinstance(molsize, int):
+                    if mol.no_of_atoms == molsize:
                         results[molecule] = mol.full_analysis(**kwargs)
-                if isinstance(size, tuple) and isinstance(size[0], str):
-                    if size[0] in ['bigger', 'greater', 'larger', 'more']:
-                        if mol.no_of_atoms > size[1]:
+                if isinstance(molsize, tuple) and isinstance(molsize[0], str):
+                    if molsize[0] in ['bigger', 'greater', 'larger', 'more']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['smaller', 'less']:
-                        if mol.no_of_atoms > size[1]:
+                    if molsize[0] in ['smaller', 'less']:
+                        if mol.no_of_atoms > molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['not', 'isnot', 'notequal', 'different']:
-                        if mol.no_of_atoms != size[1]:
+                    if molsize[0] in ['not', 'isnot', 'notequal', 'different']:
+                        if mol.no_of_atoms != molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['is', 'equal', 'exactly']:
-                        if mol.no_of_atoms == size[1]:
+                    if molsize[0] in ['is', 'equal', 'exactly']:
+                        if mol.no_of_atoms == molsize[1]:
                             results[molecule] = mol.full_analysis(**kwargs)
-                    if size[0] in ['between', 'inbetween']:
-                        if size[1] < mol.no_of_atoms < size[2]:
+                    if molsize[0] in ['between', 'inbetween']:
+                        if molsize[1] < mol.no_of_atoms < molsize[2]:
                             results[molecule] = mol.full_analysis(**kwargs)
             else:
                 results[molecule] = mol.full_analysis(**kwargs)
