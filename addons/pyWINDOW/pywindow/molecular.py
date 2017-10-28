@@ -5,8 +5,9 @@ from copy import deepcopy
 
 from .utilities import (
     discrete_molecules, decipher_atom_key, molecular_weight, center_of_mass,
-    max_dim, void_diameter, opt_void_diameter, void_volume, shift_com,
-    find_windows, create_supercell, make_JSON_serializable
+    max_dim, void_diameter, opt_void_diameter, void_volume, find_windows,
+    shift_com, create_supercell, make_JSON_serializable, is_inside_polyhedron,
+    find_avarage_diameter, calculate_pore_shape,
 )
 from .io_tools import Input, Output
 
@@ -40,7 +41,7 @@ class Molecule(object):
 
     def full_analysis(self, ncpus=1, **kwargs):
         self.molecular_weight()
-        self.calculate_COM()
+        self.calculate_centre_of_mass()
         self.calculate_maximum_diameter()
         self.calculate_void_diameter()
         self.calculate_void_volume()
@@ -49,7 +50,7 @@ class Molecule(object):
         self.calculate_windows(ncpus=ncpus, **kwargs)
         return self.properties
 
-    def calculate_COM(self):
+    def calculate_centre_of_mass(self):
         self.centre_of_mass = center_of_mass(self.elements, self.coordinates)
         self.properties['centre_of_mass'] = self.centre_of_mass
         return self.centre_of_mass
@@ -59,17 +60,22 @@ class Molecule(object):
             self.elements, self.coordinates)
         self.properties['maximum_diameter'] = {
             'diameter': self.maximum_diameter,
-            'atom_id_1': int(self.maxd_atom_1),
-            'atom_id_2': int(self.maxd_atom_2),
+            'atom_1': int(self.maxd_atom_1),
+            'atom_2': int(self.maxd_atom_2),
         }
         return self.maximum_diameter
+
+    def calculate_avarage_diameter(self, **kwargs):
+        self.avarage_diameter = find_avarage_diameter(
+            self.elements, self.coordinates, **kwargs)
+        return self.avarage_diameter
 
     def calculate_void_diameter(self):
         self.void_diameter, self.void_closest_atom = void_diameter(
             self.elements, self.coordinates)
         self.properties['void_diameter'] = {
-            'void_diameter': self.void_diameter,
-            'atom_id_1': int(self.void_closest_atom),
+            'diameter': self.void_diameter,
+            'atom': int(self.void_closest_atom),
         }
         return self.void_diameter
 
@@ -83,28 +89,40 @@ class Molecule(object):
          self.void_opt_COM) = opt_void_diameter(self.elements,
                                                 self.coordinates, **kwargs)
         self.properties['void_diameter_opt'] = {
-            'void_diameter': self.void_diameter_opt,
-            'atom_id_1': int(self.void_opt_closest_atom),
-            'void_COM': self.void_opt_COM,
+            'diameter': self.void_diameter_opt,
+            'atom_1': int(self.void_opt_closest_atom),
+            'centre_of_mass': self.void_opt_COM,
         }
         return self.void_diameter_opt
 
     def calculate_void_volume_opt(self, **kwargs):
         self.void_volume_opt = void_volume(
             self.calculate_void_diameter_opt(**kwargs) / 2)
-        self.properties['void_void_volume_opt'] = self.void_volume_opt
+        self.properties['void_volume_opt'] = self.void_volume_opt
         return self.void_volume_opt
+
+    def calculate_void_shape(self, filepath='shape.xyz', **kwargs):
+        shape = calculate_pore_shape(self.elements, self.coordinates, **kwargs)
+        shape_obj = {'elements': shape[0], 'coordinates': shape[1]}
+        Output()._save_xyz(shape_obj, filepath)
+        return 1
 
     def calculate_windows(self, **kwargs):
         windows = find_windows(self.elements, self.coordinates, **kwargs)
         if 'output' in kwargs:
             if kwargs['output'] == 'windows':
-                self.properties['windows'] = {'windows_diameters': windows, }
+                self.properties['windows'] = {'diameter': windows, }
         else:
-            self.properties['windows'] = {
-                'windows_diameters': windows[0],
-                'windows_coms': windows[1],
-            }
+            if windows is not None:
+                self.properties['windows'] = {
+                    'diameter': windows[0],
+                    'centre_of_mass': windows[1],
+                }
+            else:
+                self.properties['windows'] = {
+                    'diameter': None,
+                    'centre_of_mass': None,
+                }
         return windows
 
     def shift_to_origin(self, **kwargs):
@@ -115,7 +133,7 @@ class Molecule(object):
         self.MW = molecular_weight(self.elements)
         return self.MW
 
-    def save_molecule_json(self, filepath=None, molecular=False, **kwargs):
+    def dump_properties_json(self, filepath=None, molecular=False, **kwargs):
         # We pass a copy of the properties dictionary.
         dict_obj = deepcopy(self.properties)
         # If molecular data is also required we update the dictionary.
@@ -132,7 +150,7 @@ class Molecule(object):
         # Dump the dictionary to json file.
         self._Output.dump2json(dict_obj, filepath, **kwargs)
 
-    def save_molecule(self, filepath=None, include_coms=False, **kwargs):
+    def dump_molecule(self, filepath=None, include_coms=False, **kwargs):
         # If no filepath is provided we create one.
         if filepath is None:
             filepath = "_".join(
@@ -153,28 +171,42 @@ class Molecule(object):
             # add centre of mass (centre of not optimised void) as 'He'.
             mmol['elements'] = np.concatenate(
                 (mmol['elements'], np.array(['He'])))
-            mmol['atom_ids'] = np.concatenate(
-                (mmol['atom_ids'], np.array(['He'])))
+            if 'atom_ids' not in self.mol.keys():
+                pass
+            else:
+                mmol['atom_ids'] = np.concatenate(
+                    (mmol['atom_ids'], np.array(['He'])))
             mmol['coordinates'] = np.concatenate(
-                (mmol['coordinates'], np.array(
-                    [self.properties['centre_of_mass']])))
+                (mmol['coordinates'],
+                 np.array([self.properties['centre_of_mass']])))
             # add centre of void optimised as 'Ne'.
             mmol['elements'] = np.concatenate(
                 (mmol['elements'], np.array(['Ne'])))
-            mmol['atom_ids'] = np.concatenate(
-                (mmol['atom_ids'], np.array(['Ne'])))
+            if 'atom_ids' not in self.mol.keys():
+                pass
+            else:
+                mmol['atom_ids'] = np.concatenate(
+                    (mmol['atom_ids'], np.array(['Ne'])))
             mmol['coordinates'] = np.concatenate(
                 (mmol['coordinates'], np.array(
-                    [self.properties['void_diameter_opt']['void_COM']])))
+                    [self.properties['void_diameter_opt']['centre_of_mass']])))
             # add centre of windows as 'Ar'.
-            for com in range(len(self.properties['windows']['windows_coms'])):
-                mmol['elements'] = np.concatenate(
-                    (mmol['elements'], np.array(['Ar'])))
-                mmol['atom_ids'] = np.concatenate(
-                    (mmol['atom_ids'], np.array(['Ar{0}'.format(com + 1)])))
-                mmol['coordinates'] = np.concatenate(
-                    (mmol['coordinates'], np.array(
-                        [self.properties['windows']['windows_coms'][com]])))
+            if self.properties['windows']['centre_of_mass'] is not None:
+                range_ = range(
+                    len(self.properties['windows']['centre_of_mass']))
+                for com in range_:
+                    mmol['elements'] = np.concatenate(
+                        (mmol['elements'], np.array(['Ar'])))
+                    if 'atom_ids' not in self.mol.keys():
+                        pass
+                    else:
+                        mmol['atom_ids'] = np.concatenate(
+                            (mmol['atom_ids'],
+                             np.array(['Ar{0}'.format(com + 1)])))
+                    mmol['coordinates'] = np.concatenate(
+                        (mmol['coordinates'], np.array([
+                            self.properties['windows']['centre_of_mass'][com]
+                        ])))
             self._Output.dump2file(mmol, filepath, atom_ids=atom_ids, **kwargs)
 
         else:
@@ -183,7 +215,7 @@ class Molecule(object):
 
     def _update(self):
         self.mol['coordinates'] = self.coordinates
-        self.calculate_COM()
+        self.calculate_centre_of_mass()
         self.calculate_void_diameter_opt()
 
 
@@ -215,14 +247,36 @@ class MolecularSystem(object):
         obj.system_id = system_id
         return obj
 
-    def reconstruct_system(self, **kwargs):
+    def rebuild_system(self, override=False, **kwargs):
         # First we create a 3x3x3 supercell with the initial unit cell in the
         # centre and the 26 unit cell translations around to provide all the
         # atom positions necessary for the molecules passing through periodic
         # boundary reconstruction step.
-        supercell = create_supercell(self.system, **kwargs)
-        discrete = discrete_molecules(supercell)
-        return discrete
+        supercell_333 = create_supercell(self.system, **kwargs)
+        #smolsys = self.load_system(supercell_333, self.system_id + '_311')
+        #smolsys.dump_system(override=True)
+        discrete = discrete_molecules(self.system, supercell=supercell_333)
+        # This function overrides the initial data for 'coordinates',
+        # 'atom_ids', and 'elements' instances in the 'system' dictionary.
+        coordinates = np.array([], dtype=np.float64).reshape(0, 3)
+        atom_ids = np.array([])
+        elements = np.array([])
+        for i in discrete:
+            coordinates = np.concatenate(
+                [coordinates, i['coordinates']], axis=0
+                )
+            atom_ids = np.concatenate([atom_ids, i['atom_ids']], axis=0)
+            elements = np.concatenate([elements, i['elements']], axis=0)
+        rebuild_system = {
+            'coordinates': coordinates,
+            'atom_ids': atom_ids,
+            'elements': elements
+            }
+        if override is True:
+            self.system.update(rebuild_system)
+            return None
+        else:
+            return rebuild_system
 
     def swap_atom_keys(self, swap_dict, dict_key='atom_ids'):
         """
@@ -302,12 +356,12 @@ class MolecularSystem(object):
                     temp[element], forcefield=forcefield))
         self.system['elements'] = temp
 
-    def make_modular(self, supercell=False):
-        if supercell is True:
+    def make_modular(self, rebuild=False):
+        if rebuild is True:
             supercell_333 = create_supercell(self.system)
         else:
             supercell_333 = None
-        dis = discrete_molecules(self.system, supercell=supercell_333)
+        dis = discrete_molecules(self.system, rebuild=supercell_333)
         self.no_of_discrete_molecules = len(dis)
         self.molecules = {}
         for i in range(len(dis)):
@@ -316,7 +370,7 @@ class MolecularSystem(object):
     def system_to_molecule(self):
         return Molecule(self.system, self.system_id, 0)
 
-    def save_system(self, filepath=None, modular=False, **kwargs):
+    def dump_system(self, filepath=None, modular=False, **kwargs):
         # If no filepath is provided we create one.
         if filepath is None:
             filepath = '/'.join((os.getcwd(), str(self.system_id)))
@@ -346,7 +400,7 @@ class MolecularSystem(object):
         self._Output.dump2file(
             system_dict, filepath, atom_ids=atom_ids, **kwargs)
 
-    def save_system_json(self, filepath=None, modular=False, **kwargs):
+    def dump_system_json(self, filepath=None, modular=False, **kwargs):
         # We pass a copy of the properties dictionary.
         dict_obj = deepcopy(self.system)
         # We make sure it is JSON serializable.
