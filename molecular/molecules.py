@@ -163,6 +163,8 @@ from ..convenience_tools import (flatten, periodic_table,
 
 
 logger = logging.getLogger(__name__)
+# Toggles caching when making molecules.
+USE_CACHE = True
 
 
 class Cached(type):
@@ -176,6 +178,9 @@ class Cached(type):
         self.cache = dict()
 
     def __call__(self, *args, **kwargs):
+        if not USE_CACHE:
+            return super().__call__(*args, **kwargs)
+
         sig = signature(self.__init__)
         sig = sig.bind_partial(self, *args, **kwargs)
         sig.apply_defaults()
@@ -202,6 +207,9 @@ class CachedStructUnit(type):
         self.cache = dict()
 
     def __call__(self, *args, **kwargs):
+        if not USE_CACHE:
+            return super().__call__(*args, **kwargs)
+
         # Get the arguments given to the initializer as a dictionary
         # mapping argument name to argument value.
         sig = signature(self.__init__)
@@ -2606,7 +2614,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         topology = eval(json_dict['topology'],  topologies.__dict__)
 
         key = cls.gen_key(bbs, topology)
-        if key in cls.cache:
+        if key in cls.cache and USE_CACHE:
             return cls.cache[key]
 
         obj = cls.__new__(cls)
@@ -2634,7 +2642,10 @@ class MacroMolecule(Molecule, metaclass=Cached):
              for x in json_dict['fragments'].keys()),
             (set(x) for x in json_dict['fragments'].values())
         ))
-        cls.cache[key] = obj
+
+        if USE_CACHE:
+            cls.cache[key] = obj
+
         return obj
 
     @staticmethod
