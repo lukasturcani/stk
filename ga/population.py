@@ -12,7 +12,6 @@ import json
 from glob import iglob, glob
 import multiprocessing as mp
 
-from .input import GAInput
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
