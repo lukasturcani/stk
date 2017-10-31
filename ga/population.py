@@ -12,6 +12,7 @@ import json
 from glob import iglob, glob
 import multiprocessing as mp
 
+from .input import GAInput
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
@@ -136,9 +137,14 @@ class Population:
                      " ``Molecule`` and ``GATools`` types."), arg)
 
     @classmethod
-    def init_all(cls, databases, bb_classes,
-                 topologies, macromol_class,
-                 ga_tools=GATools.init_empty(), duplicates=False):
+    def init_all(cls,
+                 databases,
+                 bb_classes,
+                 topologies,
+                 macromol_class,
+                 num_cores=None,
+                 ga_tools=GATools.init_empty(),
+                 duplicates=False):
         """
         Creates all possible molecules from a given set of databases.
 
@@ -189,6 +195,14 @@ class Population:
             The class of the :class:`.MacroMolecule` objects being
             built.
 
+        num_cores : :class:`int`, optional
+            The number of cores to use when building the molecules in
+            parallel.
+
+        ga_tools : :class:`.GATools`, optional
+            Stores the selection, mutation and crossover functions to
+            be used on the population.
+
         duplicates : :class:`bool`, optional
             If ``True``, duplicate structures are not removed from
             the population.
@@ -220,7 +234,7 @@ class Population:
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
             args.append((bbs, topology))
 
-        with mp.Pool(GAInput.num_cores) as pool:
+        with mp.Pool(num_cores) as pool:
             mols = pool.starmap(macromol_class, args)
 
         # Update the cache.

@@ -77,7 +77,8 @@ class GAInput:
     Attributes
     ----------
     num_cores : :class:`int`
-        The number of CPUs to be used for the simulation.
+        The number of CPUs to be used when running operations in
+        parallel.
 
     pop_size : :class:`int`
         The size of the population.
@@ -207,7 +208,7 @@ class GAInput:
         # If the input file did not specify some values, default
         # initialize them.
         if not hasattr(self, 'num_cores'):
-            self.num_cores = psutil.cpu_count(logical=False)
+            self.num_cores = psutil.cpu_count()
 
         if not hasattr(self, 'num_crossovers'):
             self.num_crossovers = 0
@@ -216,10 +217,10 @@ class GAInput:
             self.num_mutations = 0
 
         if not hasattr(self, 'mutation_weights'):
-            self.mutation_weights = [1]
+            self.mutation_weights = None
 
         if not hasattr(self, 'crossover_weights'):
-            self.crossover_weights = [1]
+            self.crossover_weights = None
 
         if not hasattr(self, 'normalization_funcs'):
             self.normalization_funcs = []
