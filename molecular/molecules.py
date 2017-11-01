@@ -154,7 +154,7 @@ from inspect import signature
 from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
-from ..addons.pyWINDOW import pywindow as pywindow
+import pywindow
 from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
