@@ -1,5 +1,5 @@
 """
-Defines the GATools class.
+Defines the :class:`.GATools`.
 
 """
 
@@ -8,58 +8,107 @@ class GATools:
     """
     Stores objects which carry out GA operations on populations.
 
-    Instances of this class are held by ``Population`` instances in
-    their `ga_tools` attribute. All the instances which carry out GA
-    operations on the population are held conveniently together in an
-    instance of this class. The optimization function used by the GA
-    is also stored here as is the fitness function.
-
     Attributes
     ----------
-    selection: Selection
-        The ``Selection`` instance which performes selections of a
+    selection: :class:`.Selection`
+        The :class:`.Selection` instance which performs selections of a
         population's members.
 
-    crossover : Crossover
-        The ``Crossover`` instance which crosses a population's members.
+    crossover : :class:`.Crossover`
+        The :class:`.Crossover` instance which crosses a population's
+        members.
 
-    mutation : Mutation
-        The ``Mutation`` instance which mutates a population's members
+    mutation : :class:`.Mutation`
+        The :class:`.Mutation` instance which mutates a population's
+        members
 
-    normalization : Normalization
-        A ``Normalization`` instance which rescales or normalizes the
-        fitness values of the population.
+    normalization : :class:`.Normalization`
+        A :class:`.Normalization` instance which rescales or normalizes
+        the fitness values in the population.
 
-    optimization : FuncionData
-        Holds the name of the function in ``optimization.py`` to be
-        used for ``MacroMolecule`` optimizations and any additional
-        parameters the function may require.
+    optimization : :class:`.FuncionData`
+        Holds the name and arguments of an optimization function
+        defined in :mod:`.optimization`. The function is used to
+        optimize the molecules in the population.
 
-    fitness : FunctionData
-        Holds the name of the function in ``fitness.py`` to be used for
-        calculating the fitness of ``MacroMolecule`` instances. It also
-        holds any additional paramters the function may require.
+    fitness : :class:`.FunctionData`
+        Holds the name and arguments of the function in :mod:`.fitness`
+        to be used for calculating the fitness of
+        :class:`.MacroMolecule` instances in the population.
 
-    exit : Exit
-        An exit object which checks if the population achieved the
-        exit criterion to stop the GA before all generations have been
-        made.
+    exit : :class:`.Exit`
+        An :class:`.Exit` object which checks if the population
+        satisfied the exit criterion to stop the GA early.
 
-    parallel : bool
+    parallel : :class:`bool`
         If ``True`` optimizations and fitness calculations are done on
         each molecule in parallel.
 
-    input : GAInput
-        The GAInput object holding data gathered from the input file.
+    input : :class:`.GAInput`
+        The :class:`.GAInput` object holding data gathered from the
+        input file.
 
     """
 
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
-                'optimization', 'fitness', 'exit', 'parallel', 'input']
+                 'optimization', 'fitness', 'exit', 'parallel', 'input']
 
-    def __init__(self, selection, crossover,
-                    mutation, normalization, optimization,
-                         fitness, exit_, parallel, ga_input):
+    def __init__(self,
+                 selection,
+                 crossover,
+                 mutation,
+                 normalization,
+                 optimization,
+                 fitness,
+                 exit_,
+                 parallel,
+                 ga_input):
+        """
+        Initializes a :class:`GATools` instance.
+
+        Parameters
+        ----------
+        selection: :class:`.Selection`
+            The :class:`.Selection` instance which performs selections
+            of a population's members.
+
+        crossover : :class:`.Crossover`
+            The :class:`.Crossover` instance which crosses a
+            population's members.
+
+        mutation : :class:`.Mutation`
+            The :class:`.Mutation` instance which mutates a
+            population's members
+
+        normalization : :class:`.Normalization`
+            A :class:`.Normalization` instance which rescales or
+            normalizes the fitness values in the population.
+
+        optimization : :class:`.FuncionData`
+            Holds the name and arguments of an optimization function
+            defined in :mod:`.optimization`. The function is used to
+            optimize the molecules in the population.
+
+        fitness : :class:`.FunctionData`
+            Holds the name and arguments of the function in
+            :mod:`.fitness` to be used for calculating the fitness of
+            :class:`.MacroMolecule` instances in the population.
+
+        exit : :class:`.Exit`
+            An :class:`.Exit` object which checks if the population
+            satisfied the exit criterion to stop the GA early.
+
+        parallel : :class:`bool`
+            If ``True`` optimizations and fitness calculations are done
+            on each molecule in parallel.
+
+        input : :class:`.GAInput`
+            The :class:`.GAInput` object holding data gathered from the
+            input file.
+
+
+        """
+
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
@@ -72,5 +121,10 @@ class GATools:
 
     @classmethod
     def init_empty(cls):
+        """
+        Initializer which sets all attributes to ``None``.
+
+        """
+
         return cls(None, None, None, None,
                    None, None, None, None, None)
