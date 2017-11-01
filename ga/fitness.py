@@ -610,22 +610,23 @@ def cage(macro_mol,
     The fitness vector consists of the following properties in the
     listed order
 
-        1) `cavity` - the diameter of the cage pore.
-        2) `window` - the diameter of the largest cage window.
-        3) `asymmetry` - the sum of the size differences of all the
+        1. `cavity` - the diameter of the cage pore.
+        2. `window` - the diameter of the largest cage window.
+        3. `asymmetry` - the sum of the size differences of all the
            windows in `macro_mol`.
-        4) `eng_per_bond` - The formation energy of `macro_mol` per
+        4. `eng_per_bond` - The formation energy of `macro_mol` per
            bond made.
-        5) `prec_strain` - The mean rmsd between the free building blocks
-           and those in the macromolecule.
-        6) `dihedral_strain` - The % relative difference between the average
-            dihedral angle within the molecule and a target value. The user
-            must provide the SMARTS for the dihedral and the target value.
+        5. `prec_strain` - The mean rmsd between the free building
+           block and those in the macromolecule.
+        6. `dihedral_strain` - The % relative difference between the
+           average dihedral angle within the molecule and a target
+           value. The user must provide the SMARTS for the dihedral and
+           the target value.
 
     Notes
     -----
     This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:``~.MacroMolecule.progress_params``.
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -635,35 +636,23 @@ def cage(macro_mol,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-
     target_value : :class:`float`, optional
         Float representing the target value for the dihedral angle.
 
     pseudoformation_params : dict, optional
-        This fitness function calculates the formation energy using the
-        ``Energy.pseudoformation()`` method. This parameter defines the
+        This fitness function calculates the formation energy using
+        :meth:`.Energy.pseudoformation`. This parameter defines the
         arguments passed to this method via a dictionary. The name of
         the argument is the key and the value of the argument is the
         value.
 
-        Default initialized arguments of :meth:`.Energy.pseudoformation()` only
-        need to be specified in ``energy_params`` if the user wishes to
-        change the default value.
-
-        To see what arguments :meth:`.Energy.pseudoformation()` requires, try
-        using the  ``-h`` option::
-
-            $ python -m mtk -h energy
-
     logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging. Not used by this function.
-
+        Used for logging.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -690,24 +679,41 @@ def cage(macro_mol,
     dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
                                                 target_value)
 
-    macro_mol.progress_params['cage'] = [cavity, window, asymmetry,
-                                         e_per_bond, prec_strain,
+    macro_mol.progress_params['cage'] = [cavity,
+                                         window,
+                                         asymmetry,
+                                         e_per_bond,
+                                         prec_strain,
                                          dihedral_strain]
 
     if None in macro_mol.progress_params['cage']:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
-    return np.array([cavity, window, asymmetry, e_per_bond, prec_strain,
+    return np.array([cavity,
+                     window,
+                     asymmetry,
+                     e_per_bond,
+                     prec_strain,
                      dihedral_strain])
 
 
-@_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
-               'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
+@_param_labels('Binding Energy',
+               'Complex Cavity',
+               'Complex Asymmetry',
+               'Complex Strain',
+               'Cavity',
+               'Asymmetry',
+               'Precursors Strain',
                'Dihedral Strain')
-def cage_target(macro_mol, target_mol_file, efunc, ofunc,
-                dihedral_SMARTS="", target_value=180,
-                rotations=0, logger=logger):
+def cage_target(macro_mol,
+                target_mol_file,
+                efunc,
+                ofunc,
+                dihedral_SMARTS="",
+                target_value=180,
+                rotations=0,
+                logger=logger):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -728,7 +734,7 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
     Notes
     -----
     This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:``~.MacroMolecule.progress_params``.
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -747,25 +753,24 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
         A :class:`.FunctionData` object representing the optimization
         function to be run on the generated complexes.
 
+    dihedral_SMARTS : :class:`str`, optional
+        The SMARTS code for the dihedral of interest.
+
+    target_value : :class:`float`, optional
+        A number representing the target value for the dihedral angle.
+
     rotations : :class:`int`, optional
         The number of times the target should be randomly rotated
         within the cage cavity in order to find the most stable
         conformation.
 
-    dihedral_SMARTS : :class:`str`, optional
-        The SMARTS code for the dihedral of interest.
-
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
-
     logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging. Not used by this function.
+        Used for logging.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -783,18 +788,30 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
                         logger)
 
 
-@_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
-               'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
+@_param_labels('Binding Energy',
+               'Complex Cavity',
+               'Complex Asymmetry',
+               'Complex Strain',
+               'Cavity',
+               'Asymmetry',
+               'Precursors Strain',
                'Dihedral Strain')
-def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
-             dihedral_SMARTS="", target_value=180, logger=logger):
+def cage_c60(macro_mol,
+             target_mol_file,
+             efunc,
+             ofunc,
+             n5fold,
+             n2fold,
+             dihedral_SMARTS="",
+             target_value=180,
+             logger=logger):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
     The difference between this function and :func:`cage_target` is
     that the rotations are specifically aimed at sampling C60 entirely
-    and systematically. Rather than the random sampling of the other
-    function.
+    and systematically. Rather than the random sampling used by the
+    other function.
 
     The function returns a fitness vector consisting of:
 
@@ -843,13 +860,12 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
         Float representing the target value for the dihedral angle.
 
     logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging. Not used by this function.
+        Used for logging.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -857,8 +873,11 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
         If the calculation of a fitness parameter fails.
 
     """
-    return _cage_target('cage_c60', macro_mol,
-                        target_mol_file, efunc, ofunc,
+    return _cage_target('cage_c60',
+                        macro_mol,
+                        target_mol_file,
+                        efunc,
+                        ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold),
@@ -867,12 +886,19 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
                         logger)
 
 
-def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
-                 rotation_func,  dihedral_SMARTS, target_value, logger):
+def _cage_target(func_name,
+                 macro_mol,
+                 target_mol_file,
+                 efunc,
+                 ofunc,
+                 rotation_func,
+                 dihedral_SMARTS,
+                 target_value,
+                 logger):
     """
     A general fitness function for calculating fitness of complexes.
 
-    This function should be inherited by other fitness functions which
+    This function should be wrapped by other fitness functions which
     define their own rotation function. For example :func:`cage_c60`
     and :func:`cage_target`.
 
@@ -920,18 +946,16 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-
     target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
+        A number representing the target value for the dihedral angle.
 
     logger : :class:`.FakeLogger` or :class:`logging.Logger`
-        Used for logging. Not used by this function.
+        Used for logging.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -1066,8 +1090,13 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
                          macro_mol.progress_params[func_name])
 
     return np.array([binding_energy,
-                     cmplx_cavity, cmplx_asymmetry, cmplx_strain,
-                     cavity, asymmetry, prec_strain, dihedral_strain])
+                     cmplx_cavity,
+                     cmplx_asymmetry,
+                     cmplx_strain,
+                     cavity,
+                     asymmetry,
+                     prec_strain,
+                     dihedral_strain])
 
 
 def _make_cage_target_folder():
@@ -1083,7 +1112,7 @@ def _make_cage_target_folder():
 
     Returns
     -------
-    str
+    :class:`str`
         The path of the ``cage_target`` folder.
 
     """
