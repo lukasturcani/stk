@@ -348,7 +348,8 @@
 
     <span class="c1"># Apply the function to every member of the population, in</span>
     <span class="c1"># parallel.</span>
-    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="n">num_cores</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">num_cores</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
         <span class="n">evaluated</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">p_func</span><span class="p">,</span> <span class="n">population</span><span class="p">)</span>
 
     <span class="c1"># Make sure the cache is updated with the evaluated versions.</span>
@@ -593,10 +594,11 @@
 
 <span class="c1"># Provides labels for the progress plotter.</span>
 <div class="viewcode-block" id="cage"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Cavity Difference &#39;</span><span class="p">,</span> <span class="s1">&#39;Window Difference &#39;</span><span class="p">,</span>
-               <span class="s1">&#39;Asymmetry &#39;</span><span class="p">,</span> <span class="s1">&#39;Energy per Bond &#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cage</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">pseudoformation_params</span><span class="o">=</span><span class="p">{</span>
-                     <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;mmff&#39;</span><span class="p">)},</span>
-         <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+               <span class="s1">&#39;Asymmetry &#39;</span><span class="p">,</span> <span class="s1">&#39;Energy per Bond &#39;</span><span class="p">,</span> <span class="s1">&#39;Precursors Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Dihedral Strain&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cage</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">pseudoformation_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span>
+                                                    <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;mmff&#39;</span><span class="p">)},</span>
+         <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the fitness vector of a cage.</span>
 
@@ -609,51 +611,58 @@
 <span class="sd">           windows in `macro_mol`.</span>
 <span class="sd">        4) `eng_per_bond` - The formation energy of `macro_mol` per</span>
 <span class="sd">           bond made.</span>
-<span class="sd">        5) `strain` - The mean rmsd between the free building blocks</span>
+<span class="sd">        5) `prec_strain` - The mean rmsd between the free building blocks</span>
 <span class="sd">           and those in the macromolecule.</span>
+<span class="sd">        6) `dihedral_strain` - The % relative difference between the average</span>
+<span class="sd">            dihedral angle within the molecule and a target value. The user</span>
+<span class="sd">            must provide the SMARTS for the dihedral and the target value.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
+<span class="sd">    fitness parameters into :attr:``~.MacroMolecule.progress_params``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : Cage</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
 <span class="sd">        The cage whose fitness is to be calculated.</span>
 
-<span class="sd">    pseudoformation_params : dict (default =</span>
-<span class="sd">          { &#39;func&#39; : FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;) })</span>
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
 
+
+<span class="sd">    target_value : :class:`float`, optional</span>
+<span class="sd">        Float representing the target value for the dihedral angle.</span>
+
+<span class="sd">    pseudoformation_params : dict, optional</span>
 <span class="sd">        This fitness function calculates the formation energy using the</span>
 <span class="sd">        ``Energy.pseudoformation()`` method. This parameter defines the</span>
 <span class="sd">        arguments passed to this method via a dictionary. The name of</span>
 <span class="sd">        the argument is the key and the value of the argument is the</span>
 <span class="sd">        value.</span>
 
-<span class="sd">        Default initialized arguments of Energy.pseudoformation() only</span>
-<span class="sd">        need to be specified in `energy_params` if the user wishes to</span>
+<span class="sd">        Default initialized arguments of :meth:`.Energy.pseudoformation()` only</span>
+<span class="sd">        need to be specified in ``energy_params`` if the user wishes to</span>
 <span class="sd">        change the default value.</span>
 
-<span class="sd">        To see what arguments the `Energy.pseudoformation()` method</span>
-<span class="sd">        requires, try using the  `-h` option:</span>
+<span class="sd">        To see what arguments :meth:`.Energy.pseudoformation()` requires, try</span>
+<span class="sd">        using the  ``-h`` option::</span>
 
-<span class="sd">            python -m mmea -h energy</span>
+<span class="sd">            $ python -m mtk -h energy</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
+<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
 
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.progress_params : dict</span>
-<span class="sd">        Places the calculated parameters in the dict. The order</span>
-<span class="sd">        corresponds to the arguments in the ``_param_labels()``</span>
-<span class="sd">        decorator applied to this function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
 <span class="sd">        The numpy array holds the fitness vector described in this</span>
 <span class="sd">        docstring.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
+<span class="sd">    :class:`ValueError`</span>
 <span class="sd">        If the calculation of a fitness parameter fails.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -671,22 +680,29 @@
                                            <span class="o">**</span><span class="n">pseudoformation_params</span><span class="p">)</span>
     <span class="n">e_per_bond</span> <span class="o">/=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonds_made</span>
 
-    <span class="n">strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+    <span class="n">prec_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+
+    <span class="n">dihedral_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">dihedral_strain</span><span class="p">(</span><span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                                                <span class="n">target_value</span><span class="p">)</span>
 
     <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;cage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cavity</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span>
-                                         <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">strain</span><span class="p">]</span>
+                                         <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">prec_strain</span><span class="p">,</span>
+                                         <span class="n">dihedral_strain</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;cage&#39;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;At least one&#39;</span>
                          <span class="s1">&#39; fitness parameter not calculated.&#39;</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cavity</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cavity</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">prec_strain</span><span class="p">,</span>
+                     <span class="n">dihedral_strain</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_target">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cage_target</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
-                <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Precursors Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Dihedral Strain&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cage_target</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span>
+                <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+                <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the fitness vector of a cage / target complex.</span>
 
@@ -702,11 +718,12 @@
 <span class="sd">        5. cavity of cage by itself</span>
 <span class="sd">        6. asymmetry of cage by itself</span>
 <span class="sd">        7. strain of cage by itself</span>
+<span class="sd">        8. strain in select dihedral angles of the cage by itself</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
-<span class="sd">    fitness parameters into :attr:`~.MacroMolecule.progress_params`.</span>
+<span class="sd">    fitness parameters into :attr:``~.MacroMolecule.progress_params``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -730,6 +747,12 @@
 <span class="sd">        within the cage cavity in order to find the most stable</span>
 <span class="sd">        conformation.</span>
 
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
+
+<span class="sd">    target_value : :class:`float`, optional</span>
+<span class="sd">        Float representing the target value for the dihedral angle.</span>
+
 <span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
 
@@ -750,13 +773,16 @@
                         <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span>
                         <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;_generate_complexes&#39;</span><span class="p">,</span>
                                      <span class="n">number</span><span class="o">=</span><span class="n">rotations</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+                        <span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                        <span class="n">target_value</span><span class="p">,</span>
                         <span class="n">logger</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="cage_c60"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_c60">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cage_c60</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
-             <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">n5fold</span><span class="p">,</span> <span class="n">n2fold</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Precursors Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Dihedral Strain&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cage_c60</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">n5fold</span><span class="p">,</span> <span class="n">n2fold</span><span class="p">,</span>
+             <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness vector of a cage / C60 complex.</span>
 
@@ -774,6 +800,7 @@
 <span class="sd">        5. cavity of cage by itself</span>
 <span class="sd">        6. asymmetry of cage by itself</span>
 <span class="sd">        7. strain of cage by itself</span>
+<span class="sd">        8. strain in select dihedral angles of the cage by itself</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -804,6 +831,12 @@
 <span class="sd">        The number of rotations along the 2 fold axis of symmetry per</span>
 <span class="sd">        rotation along the 5-fold axis.</span>
 
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
+
+<span class="sd">    target_value : :class:`float`, optional</span>
+<span class="sd">        Float representing the target value for the dihedral angle.</span>
+
 <span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
 
@@ -824,11 +857,13 @@
                         <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;_c60_rotations&#39;</span><span class="p">,</span>
                                      <span class="n">n5fold</span><span class="o">=</span><span class="n">n5fold</span><span class="p">,</span>
                                      <span class="n">n2fold</span><span class="o">=</span><span class="n">n2fold</span><span class="p">),</span>
+                        <span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                        <span class="n">target_value</span><span class="p">,</span>
                         <span class="n">logger</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._cage_target">[docs]</a><span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
-                 <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">rotation_func</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._cage_target">[docs]</a><span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span>
+                 <span class="n">rotation_func</span><span class="p">,</span>  <span class="n">dihedral_SMARTS</span><span class="p">,</span> <span class="n">target_value</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A general fitness function for calculating fitness of complexes.</span>
 
@@ -845,6 +880,7 @@
 <span class="sd">        5. cavity of cage by itself</span>
 <span class="sd">        6. asymmetry of cage by itself</span>
 <span class="sd">        7. strain of cage by itself</span>
+<span class="sd">        8. strain in select dihedral angles of the cage by itself</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -875,6 +911,13 @@
 <span class="sd">    rotation_func : :class:`.FunctionData`</span>
 <span class="sd">        A :class:`.FunctionData` object representing the rotation</span>
 <span class="sd">        function to be used.</span>
+
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
+
+
+<span class="sd">    target_value : :class:`float`, optional</span>
+<span class="sd">        Float representing the target value for the dihedral angle.</span>
 
 <span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`</span>
 <span class="sd">        Used for logging. Not used by this function.</span>
@@ -1000,14 +1043,17 @@
     <span class="c1"># Calculate fitness parameters of cage by itself.</span>
     <span class="n">cavity</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
     <span class="n">asymmetry</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">window_difference</span><span class="p">()</span>
-    <span class="n">strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+    <span class="n">prec_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+    <span class="n">dihedral_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">dihedral_strain</span><span class="p">(</span><span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                                                <span class="n">target_value</span><span class="p">)</span>
     <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">binding_energy</span><span class="p">,</span>
                                             <span class="n">cmplx_cavity</span><span class="p">,</span>
                                             <span class="n">cmplx_asymmetry</span><span class="p">,</span>
                                             <span class="n">cmplx_strain</span><span class="p">,</span>
                                             <span class="n">cavity</span><span class="p">,</span>
                                             <span class="n">asymmetry</span><span class="p">,</span>
-                                            <span class="n">strain</span><span class="p">]</span>
+                                            <span class="n">prec_strain</span><span class="p">,</span>
+                                            <span class="n">dihedral_strain</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;At least one&#39;</span>
@@ -1016,7 +1062,7 @@
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">binding_energy</span><span class="p">,</span>
                      <span class="n">cmplx_cavity</span><span class="p">,</span> <span class="n">cmplx_asymmetry</span><span class="p">,</span> <span class="n">cmplx_strain</span><span class="p">,</span>
-                     <span class="n">cavity</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
+                     <span class="n">cavity</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">prec_strain</span><span class="p">,</span> <span class="n">dihedral_strain</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="_make_cage_target_folder"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._make_cage_target_folder">[docs]</a><span class="k">def</span> <span class="nf">_make_cage_target_folder</span><span class="p">():</span>

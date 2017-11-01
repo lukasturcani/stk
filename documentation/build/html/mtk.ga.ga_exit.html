@@ -174,12 +174,12 @@ underscore.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="mtk.ga.ga_exit.Exit.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>pop</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>pop</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__call__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="mtk.ga.ga_exit.Exit.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__dict__': &lt;attribute '__dict__' of 'Exit' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Exit' objects&gt;, 'no_exit': &lt;function Exit.no_exit&gt;, '__call__': &lt;function Exit.__call__&gt;, '__module__': 'mtk.ga.ga_exit', '__doc__': None, 'mol_name_present': &lt;function Exit.mol_name_present&gt;, '__init__': &lt;function Exit.__init__&gt;, 'mol_present': &lt;function Exit.mol_present&gt;})</em><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.ga_exit', '__init__': &lt;function Exit.__init__&gt;, '__call__': &lt;function Exit.__call__&gt;, 'mol_present': &lt;function Exit.mol_present&gt;, 'mol_name_present': &lt;function Exit.mol_name_present&gt;, 'fitness_plateau': &lt;function Exit.fitness_plateau&gt;, 'no_exit': &lt;function Exit.no_exit&gt;, '__dict__': &lt;attribute '__dict__' of 'Exit' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Exit' objects&gt;, '__doc__': None})</em><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -199,16 +199,48 @@ underscore.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.ga.ga_exit.Exit.fitness_plateau">
+<code class="descname">fitness_plateau</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em>, <em>num</em>, <em>top_members=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.fitness_plateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.fitness_plateau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal"><span class="pre">True</span></code> if fitness function of the top x candidates do not
+change for n generations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>population</strong> (<code class="xref py py-class docutils literal"><span class="pre">Population</span></code>) – The GA population.</li>
+<li><strong>progress</strong> (<code class="xref py py-class docutils literal"><span class="pre">Population</span></code>) – Population where each subpopulation is a previous generation.</li>
+<li><strong>num</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Number of generations for which no the x top members did not
+change. This number is defined by the user.</li>
+<li><strong>top_members</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Number of members that are going to be considered for the plateau
+analysis. This number needs to be smaller than the total
+population. The user can define this number, which defaults to 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if the fitness function shows no improvement for n
+generations.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="mtk.ga.ga_exit.Exit.mol_name_present">
-<code class="descname">mol_name_present</code><span class="sig-paren">(</span><em>population</em>, <em>mol_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.mol_name_present"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.mol_name_present" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mol_name_present</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em>, <em>mol_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.mol_name_present"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.mol_name_present" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <code class="docutils literal"><span class="pre">True</span></code> if molecule with <cite>name</cite> in <cite>population</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The GA population.</li>
-<li><strong>mol_name</strong> (<em>str</em>) – The name of a molecule.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The GA population.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – Population where each subpopulation is a previous generation.</li>
+<li><strong>mol_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of a molecule.</li>
 </ul>
 </td>
 </tr>
@@ -216,7 +248,7 @@ underscore.</p>
 in <cite>population</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -250,11 +282,15 @@ stop.</li>
 
 <dl class="method">
 <dt id="mtk.ga.ga_exit.Exit.no_exit">
-<code class="descname">no_exit</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.no_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.no_exit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">no_exit</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.no_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.no_exit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <code class="docutils literal"><span class="pre">False</span></code>.</p>
 <p>Useful when you never want the GA to exit prematurely. This is
 used by default when no exit function is defined in the input
 file.</p>
+<dl class="docutils">
+<dt>progress <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></span></dt>
+<dd>population where each subpopulation is a previous generation.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

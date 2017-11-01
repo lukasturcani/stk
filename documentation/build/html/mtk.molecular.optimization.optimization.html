@@ -204,7 +204,7 @@ being run twice on the same molecule.</p>
 
 <dl class="attribute">
 <dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;, '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in _optimize_all(). It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__call__': &lt;function _OptimizationFunc.__call__&gt;, '__module__': 'mtk.molecular.optimization.optimization', '__init__': &lt;function _OptimizationFunc.__init__&gt;})</em><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.optimization.optimization', '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in _optimize_all(). It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__init__': &lt;function _OptimizationFunc.__init__&gt;, '__call__': &lt;function _OptimizationFunc.__call__&gt;, '__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -281,7 +281,7 @@ additional parameters the optimization function may need.</li>
 
 <dl class="function">
 <dt id="mtk.molecular.optimization.optimization.do_not_optimize">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Skips the optimization step.</p>
 <p>This is very useful when debugging so you do not waste your time
 waiting for molecules to get optimized. Use this in the input file
@@ -308,7 +308,7 @@ in place of an optimization function when necessary.</p>
 
 <dl class="function">
 <dt id="mtk.molecular.optimization.optimization.partial_raiser">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>ofunc</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.partial_raiser" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>ofunc</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.partial_raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises and optimizes at random.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -337,7 +337,7 @@ to be used.</li>
 
 <dl class="function">
 <dt id="mtk.molecular.optimization.optimization.raiser">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>param1</em>, <em>param2=2</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.raiser" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>param1</em>, <em>param2=2</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Doens’t optimize, raises an error instead.</p>
 <p>This function is used to test that when optimization functions
 raise errors during multiprocessing, they are handled correctly.</p>
@@ -366,8 +366,67 @@ raise errors during multiprocessing, they are handled correctly.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="mtk.molecular.optimization.optimization.rdkit_ETKDG">
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_ETKDG</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_ETKDG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does a conformer search with the rdkit.ETKDG method:
+<a class="reference external" href="http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654">http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule who’s structure should be optimized.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging. Not used by this function.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>macro_mol.mol</strong> – The rdkit molecule held in this attribute has it’s structure
+changed as a result of the optimization. This means the
+<code class="docutils literal"><span class="pre">Conformer</span></code> instance held by the rdkit molecule is changed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.optimization.optimization.rdkit_confs_ETKDG">
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_confs_ETKDG</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>name='test'</em>, <em>confs=1</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_confs_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_confs_ETKDG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does a conformer search with the rdkit.ETKDG method:
+<a class="reference external" href="http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654">http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</a>
+A number of mol files representing the conformers is then generated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule who’s structure should be optimized.</li>
+<li><strong>name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – Name of the macro_mol that is used to name the new conformers.</li>
+<li><strong>confs</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – Defines the number of conformers generated in the
+conformer search.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging. Not used by this function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>conformers</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of conformer IDs for the rdkit molecule.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="mtk.molecular.optimization.optimization.rdkit_optimization">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>embed=False</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>embed=False</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structure of the molecule using rdkit.</p>
 <p>Uses the MMFF forcefield.</p>
 <table class="docutils field-list" frame="void" rules="none">

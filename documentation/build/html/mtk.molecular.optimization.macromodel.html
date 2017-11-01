@@ -549,7 +549,7 @@ minimization did not occur due to a missing license.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule who’s structure must be optimized.</li>
 <li><strong>macromodel_path</strong> (<em>str</em>) – The full path of the <code class="docutils literal"><span class="pre">Schrodinger</span></code> suite within the user’s
 machine. For example, in a default Microsoft installation the
@@ -586,18 +586,23 @@ optimization.</dd>
 </dl>
 </div></blockquote>
 </li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.mol</strong> – The rdkit molecule held in this attribute is replaced by an
-rdkit molecule with an optimized structure.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>macro_mol.mol</dt>
+<dd>The rdkit molecule held in this attribute is replaced by an
+rdkit molecule with an optimized structure.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
 </tr>
 </tbody>
 </table>
@@ -646,7 +651,7 @@ returns.</li>
 
 <dl class="function">
 <dt id="mtk.molecular.optimization.macromodel.macromodel_cage_opt">
-<code class="descclassname">mtk.molecular.optimization.macromodel.</code><code class="descname">macromodel_cage_opt</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>macromodel_path</em>, <em>settings={}</em>, <em>md={}</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/macromodel.html#macromodel_cage_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.macromodel.macromodel_cage_opt" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.molecular.optimization.macromodel.</code><code class="descname">macromodel_cage_opt</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>macromodel_path</em>, <em>settings={}</em>, <em>md={}</em>, <em>logger=&lt;Logger mtk.molecular.optimization.macromodel (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/macromodel.html#macromodel_cage_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.macromodel.macromodel_cage_opt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the molecule using MacroModel.</p>
 <p>This function runs a restricted optimization. The structures of the
 building blocks are frozen and only the new bonds formed between
@@ -726,7 +731,7 @@ rdkit molecule with an optimized structure.</dd>
 
 <dl class="function">
 <dt id="mtk.molecular.optimization.macromodel.macromodel_opt">
-<code class="descclassname">mtk.molecular.optimization.macromodel.</code><code class="descname">macromodel_opt</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>macromodel_path</em>, <em>settings={}</em>, <em>md={}</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/macromodel.html#macromodel_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.macromodel.macromodel_opt" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.molecular.optimization.macromodel.</code><code class="descname">macromodel_opt</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>macromodel_path</em>, <em>settings={}</em>, <em>md={}</em>, <em>logger=&lt;Logger mtk.molecular.optimization.macromodel (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/macromodel.html#macromodel_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.macromodel.macromodel_opt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the molecule using MacroModel.</p>
 <p>This function runs a restricted optimization. The structures of the
 building blocks are frozen and only the new bonds formed between

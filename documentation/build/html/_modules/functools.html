@@ -172,6 +172,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">MappingProxyType</span>
 <span class="kn">from</span> <span class="nn">weakref</span> <span class="k">import</span> <span class="n">WeakKeyDictionary</span>
+<span class="kn">from</span> <span class="nn">reprlib</span> <span class="k">import</span> <span class="n">recursive_repr</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">_thread</span> <span class="k">import</span> <span class="n">RLock</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -388,26 +389,83 @@
 <span class="c1">################################################################################</span>
 
 <span class="c1"># Purely functional, no descriptor behaviour</span>
-<span class="k">def</span> <span class="nf">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">partial</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;New function with partial application of the given arguments</span>
 <span class="sd">    and keywords.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;func&#39;</span><span class="p">):</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">args</span> <span class="o">+</span> <span class="n">args</span>
-        <span class="n">tmpkw</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">tmpkw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">keywords</span><span class="p">)</span>
-        <span class="n">keywords</span> <span class="o">=</span> <span class="n">tmpkw</span>
-        <span class="k">del</span> <span class="n">tmpkw</span>
-        <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">func</span>
 
-    <span class="k">def</span> <span class="nf">newfunc</span><span class="p">(</span><span class="o">*</span><span class="n">fargs</span><span class="p">,</span> <span class="o">**</span><span class="n">fkeywords</span><span class="p">):</span>
-        <span class="n">newkeywords</span> <span class="o">=</span> <span class="n">keywords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">newkeywords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fkeywords</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">args</span> <span class="o">+</span> <span class="n">fargs</span><span class="p">),</span> <span class="o">**</span><span class="n">newkeywords</span><span class="p">)</span>
-    <span class="n">newfunc</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
-    <span class="n">newfunc</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
-    <span class="n">newfunc</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">keywords</span>
-    <span class="k">return</span> <span class="n">newfunc</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">,</span> <span class="s2">&quot;keywords&quot;</span><span class="p">,</span> <span class="s2">&quot;__dict__&quot;</span><span class="p">,</span> <span class="s2">&quot;__weakref__&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;descriptor &#39;__new__&#39; of partial needs an argument&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;type &#39;partial&#39; takes at least one argument&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;the first argument must be callable&quot;</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s2">&quot;func&quot;</span><span class="p">):</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">args</span> <span class="o">+</span> <span class="n">args</span>
+            <span class="n">tmpkw</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">tmpkw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">keywords</span><span class="p">)</span>
+            <span class="n">keywords</span> <span class="o">=</span> <span class="n">tmpkw</span>
+            <span class="k">del</span> <span class="n">tmpkw</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">func</span>
+
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">partial</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">keywords</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;descriptor &#39;__call__&#39; of partial needs an argument&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">newkeywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">newkeywords</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">keywords</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">newkeywords</span><span class="p">)</span>
+
+    <span class="nd">@recursive_repr</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">qualname</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__qualname__</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{k}</span><span class="s2">=</span><span class="si">{v!r}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">==</span> <span class="s2">&quot;functools&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;functools.</span><span class="si">{qualname}</span><span class="s2">({&#39;, &#39;.join(args)})&quot;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{qualname}</span><span class="s2">({&#39;, &#39;.join(args)})&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;argument to __setstate__ must be a tuple&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;expected 4 items in state, got {len(state)}&quot;</span><span class="p">)</span>
+        <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwds</span><span class="p">,</span> <span class="n">namespace</span> <span class="o">=</span> <span class="n">state</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span>
+           <span class="p">(</span><span class="n">kwds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwds</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span> <span class="ow">or</span>
+           <span class="p">(</span><span class="n">namespace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;invalid partial state&quot;</span><span class="p">)</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="c1"># just in case it&#39;s a subclass</span>
+        <span class="k">if</span> <span class="n">kwds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwds</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">kwds</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">dict</span><span class="p">:</span> <span class="c1"># XXX does it need to be *exactly* dict?</span>
+            <span class="n">kwds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">namespace</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">namespace</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">namespace</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">kwds</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">_functools</span> <span class="k">import</span> <span class="n">partial</span>
@@ -514,7 +572,7 @@
 <span class="k">def</span> <span class="nf">_make_key</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwds</span><span class="p">,</span> <span class="n">typed</span><span class="p">,</span>
              <span class="n">kwd_mark</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">(),),</span>
              <span class="n">fasttypes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)},</span>
-             <span class="nb">sorted</span><span class="o">=</span><span class="nb">sorted</span><span class="p">,</span> <span class="nb">tuple</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="nb">len</span><span class="o">=</span><span class="nb">len</span><span class="p">):</span>
+             <span class="nb">tuple</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="nb">len</span><span class="o">=</span><span class="nb">len</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Make a cache key from optionally typed positional and keyword arguments</span>
 
 <span class="sd">    The key is constructed in a way that is flat as possible rather than</span>
@@ -527,14 +585,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">key</span> <span class="o">=</span> <span class="n">args</span>
     <span class="k">if</span> <span class="n">kwds</span><span class="p">:</span>
-        <span class="n">sorted_items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="n">key</span> <span class="o">+=</span> <span class="n">kwd_mark</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sorted_items</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">key</span> <span class="o">+=</span> <span class="n">item</span>
     <span class="k">if</span> <span class="n">typed</span><span class="p">:</span>
         <span class="n">key</span> <span class="o">+=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwds</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">+=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_items</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">+=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwds</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">in</span> <span class="n">fasttypes</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">_HashedSeq</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -586,6 +643,7 @@
     <span class="n">hits</span> <span class="o">=</span> <span class="n">misses</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">full</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">cache_get</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span>    <span class="c1"># bound method to lookup a key or return None</span>
+    <span class="n">cache_len</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="fm">__len__</span>  <span class="c1"># get cache size without calling len()</span>
     <span class="n">lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">()</span>           <span class="c1"># because linkedlist updates aren&#39;t threadsafe</span>
     <span class="n">root</span> <span class="o">=</span> <span class="p">[]</span>                <span class="c1"># root of the circular doubly linked list</span>
     <span class="n">root</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">root</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>     <span class="c1"># initialize by pointing to self</span>
@@ -667,16 +725,16 @@
                     <span class="n">last</span> <span class="o">=</span> <span class="n">root</span><span class="p">[</span><span class="n">PREV</span><span class="p">]</span>
                     <span class="n">link</span> <span class="o">=</span> <span class="p">[</span><span class="n">last</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span>
                     <span class="n">last</span><span class="p">[</span><span class="n">NEXT</span><span class="p">]</span> <span class="o">=</span> <span class="n">root</span><span class="p">[</span><span class="n">PREV</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">link</span>
-                    <span class="c1"># Use the __len__() method instead of the len() function</span>
+                    <span class="c1"># Use the cache_len bound method instead of the len() function</span>
                     <span class="c1"># which could potentially be wrapped in an lru_cache itself.</span>
-                    <span class="n">full</span> <span class="o">=</span> <span class="p">(</span><span class="n">cache</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">maxsize</span><span class="p">)</span>
+                    <span class="n">full</span> <span class="o">=</span> <span class="p">(</span><span class="n">cache_len</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">maxsize</span><span class="p">)</span>
                 <span class="n">misses</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">cache_info</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Report cache statistics&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">lock</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_CacheInfo</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">misses</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">,</span> <span class="n">cache</span><span class="o">.</span><span class="fm">__len__</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">_CacheInfo</span><span class="p">(</span><span class="n">hits</span><span class="p">,</span> <span class="n">misses</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">,</span> <span class="n">cache_len</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">cache_clear</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Clear the cache and cache statistics&quot;&quot;&quot;</span>
