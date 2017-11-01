@@ -404,9 +404,14 @@
         <span class="k">return</span> <span class="n">p</span></div>
 
 <div class="viewcode-block" id="Population.init_diverse_cages"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_diverse_cages">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_diverse_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
-                           <span class="n">topologies</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">,</span>
-                           <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">init_diverse_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                           <span class="n">bb_db</span><span class="p">,</span>
+                           <span class="n">lk_db</span><span class="p">,</span>
+                           <span class="n">topologies</span><span class="p">,</span>
+                           <span class="n">size</span><span class="p">,</span>
+                           <span class="n">ga_tools</span><span class="p">,</span>
+                           <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a population of cages built from provided databases.</span>
 
@@ -549,9 +554,14 @@
                      <span class="n">iglob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">glob_pattern</span><span class="p">))))</span></div>
 
 <div class="viewcode-block" id="Population.init_random_cages"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_random_cages">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_random_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
-                          <span class="n">topologies</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">,</span>
-                          <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">init_random_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                          <span class="n">bb_db</span><span class="p">,</span>
+                          <span class="n">lk_db</span><span class="p">,</span>
+                          <span class="n">topologies</span><span class="p">,</span>
+                          <span class="n">size</span><span class="p">,</span>
+                          <span class="n">ga_tools</span><span class="p">,</span>
+                          <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a population of cages built from provided databases.</span>
 
@@ -1176,8 +1186,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_optimize_all_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.remove_duplicates"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">between_subpops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">top_seen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.remove_duplicates"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">between_subpops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">key</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+                          <span class="n">top_seen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes duplicates from the population and preserves structure.</span>
 

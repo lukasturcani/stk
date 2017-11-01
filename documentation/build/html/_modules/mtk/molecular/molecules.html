@@ -305,7 +305,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">topologies</span>
 <span class="kn">from</span> <span class="nn">.fg_info</span> <span class="k">import</span> <span class="n">functional_groups</span>
 <span class="kn">from</span> <span class="nn">.energy</span> <span class="k">import</span> <span class="n">Energy</span>
-<span class="kn">from</span> <span class="nn">..addons.pyWINDOW</span> <span class="k">import</span> <span class="n">pywindow</span> <span class="k">as</span> <span class="n">pywindow</span>
+<span class="kn">import</span> <span class="nn">pywindow</span>
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">flatten</span><span class="p">,</span> <span class="n">periodic_table</span><span class="p">,</span>
                                  <span class="n">normalize_vector</span><span class="p">,</span> <span class="n">rotation_matrix</span><span class="p">,</span>
                                  <span class="n">vector_theta</span><span class="p">,</span> <span class="n">mol_from_mae_file</span><span class="p">,</span>
@@ -3284,7 +3284,7 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># ccel as in &quot;connected cell&quot;.</span>
                     <span class="n">ccell</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">][</span><span class="n">z</span><span class="p">]</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">continue</span>
 
                 <span class="c1"># `bonder1` is the id of a bonder atom, found in `cell`</span>
