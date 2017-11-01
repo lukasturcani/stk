@@ -163,41 +163,46 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">switch_backend</span><span class="p">(</span><span class="s1">&#39;agg&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="fitness_epp"><a class="viewcode-back" href="../../../mtk.ga.plotting.html#mtk.ga.plotting.fitness_epp">[docs]</a><span class="k">def</span> <span class="nf">fitness_epp</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">plot_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">dump_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Generation&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="fitness_epp"><a class="viewcode-back" href="../../../mtk.ga.plotting.html#mtk.ga.plotting.fitness_epp">[docs]</a><span class="k">def</span> <span class="nf">fitness_epp</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span>
+                <span class="n">plot_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">dump_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Generation&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plots the min, max and avg fitness values of each subpopulation.</span>
 
 <span class="sd">    Also saves the plot data. The min, mean and max values for each</span>
-<span class="sd">    generation are placed in an array:</span>
+<span class="sd">    subpopulation of `pop` are placed in an array:</span>
 
-<span class="sd">        &gt;&gt;&gt; dmp_array = np.array(mins, means, maxs)</span>
+<span class="sd">        &gt;&gt;&gt; dmp_array = np.array([mins, means, maxs])</span>
 
 <span class="sd">    which is then dumped to the file `dump_name`.</span>
 
-<span class="sd">    The members with a standard fitness of 0.0001 are excluded from</span>
-<span class="sd">    this analysis.</span>
+<span class="sd">    The members with a fitness of ``0.0001`` (indicating a failed</span>
+<span class="sd">    fitness calculation) are excluded from this analysis.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    pop : Population</span>
+<span class="sd">    pop : :class:`.Population`</span>
 <span class="sd">        A population containing any number of subpopulations and no</span>
-<span class="sd">        direct members.</span>
+<span class="sd">        direct members. Each subpopulation represents a generation of</span>
+<span class="sd">        the GA.</span>
 
-<span class="sd">    plot_name : str (default = False)</span>
-<span class="sd">        The full path of where the plot should be saved. If ``False``</span>
-<span class="sd">        then no plot is made. Useful if you only want the dump file.</span>
+<span class="sd">    plot_name : :class:`str` or :class:`bool`, optional</span>
+<span class="sd">        The full path to where the plot should be saved. If ``False``</span>
+<span class="sd">        then no plot is made. Useful if you only want the dump file and</span>
+<span class="sd">        not graph.</span>
 
-<span class="sd">    dump_name : str (default = None)</span>
-<span class="sd">        If ``None`` then `plot_name` is used only with the extension</span>
-<span class="sd">        ``.dmp``.</span>
+<span class="sd">    dump_name : :class:`str`, optional</span>
+<span class="sd">        The path to the file where the data to make the graph is</span>
+<span class="sd">        dumped. If ``None`` then `plot_name` is used but with a</span>
+<span class="sd">        ``.dmp`` extension.</span>
 
-<span class="sd">    xlabel : str (default = &#39;Generation&#39;)</span>
+<span class="sd">    xlabel : :class:`str`, optional</span>
 <span class="sd">        The label on the x-axis.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -214,8 +219,10 @@
             <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span><span class="p">))</span>
-            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="o">!=</span> <span class="mf">0.0001</span><span class="p">]))</span>
-            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="o">!=</span> <span class="mf">0.0001</span><span class="p">))</span>
+            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span>
+                                  <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="o">!=</span> <span class="mf">0.0001</span><span class="p">]))</span>
+            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span> <span class="k">if</span>
+                            <span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="o">!=</span> <span class="mf">0.0001</span><span class="p">))</span>
 
     <span class="c1"># Save the plot data.</span>
     <span class="k">if</span> <span class="n">plot_name</span> <span class="ow">and</span> <span class="n">dump_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -231,8 +238,8 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Fitness&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">maxs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">,</span>
                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
-                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xvals</span><span class="p">,</span> <span class="n">mins</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;min&#39;</span><span class="p">,</span>
                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">mins</span><span class="p">)</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxs</span><span class="p">))</span><span class="o">/</span><span class="mi">50</span>
@@ -245,42 +252,48 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="parameter_epp"><a class="viewcode-back" href="../../../mtk.ga.plotting.html#mtk.ga.plotting.parameter_epp">[docs]</a><span class="k">def</span> <span class="nf">parameter_epp</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">plot_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">dump_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Generation&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="parameter_epp"><a class="viewcode-back" href="../../../mtk.ga.plotting.html#mtk.ga.plotting.parameter_epp">[docs]</a><span class="k">def</span> <span class="nf">parameter_epp</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span>
+                  <span class="n">plot_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">dump_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Generation&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plots the progress_params values across subpopulations.</span>
+<span class="sd">    Plots the :attr:`.MacroMolecule.progress_params` values.</span>
 
-<span class="sd">    For each progress_param a plot will be produced. Each will show</span>
-<span class="sd">    subpopulations on the x-axis and the min, max and avg values</span>
-<span class="sd">    of that progress param on the y axis.</span>
+<span class="sd">    For each element in :attr:`~.MacroMolecule.progress_params` a</span>
+<span class="sd">    separate graph will be produced. Each will show subpopulations on</span>
+<span class="sd">    the x-axis and the min, max and avg values of that</span>
+<span class="sd">    :attr:`~.MacroMolecule.progress_params` element on the y-axis.</span>
 
 <span class="sd">    Also saves the plot data. The min, mean and max values for each</span>
-<span class="sd">    generation are placed in an array:</span>
+<span class="sd">    subpopulation are placed in an array:</span>
 
-<span class="sd">        &gt;&gt;&gt; dmp_array = np.array(mins, means, maxs)</span>
+<span class="sd">        &gt;&gt;&gt; dmp_array = np.array([mins, means, maxs])</span>
 
 <span class="sd">    which is then dumped to the file `dump_name`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    pop : Population</span>
-<span class="sd">        A population holding any number of subpopulations and no</span>
-<span class="sd">        direct members.</span>
+<span class="sd">    pop : :class:`.Population`</span>
+<span class="sd">        A population containing any number of subpopulations and no</span>
+<span class="sd">        direct members. Each subpopulation represents a generation of</span>
+<span class="sd">        the GA.</span>
 
-<span class="sd">    plot_name : str (default = False)</span>
-<span class="sd">        The full path of where the plot should be saved. If ``False``</span>
-<span class="sd">        then no plot is made. Useful if you only want the dump file.</span>
+<span class="sd">    plot_name : :class:`str` or :class:`bool`, optional</span>
+<span class="sd">        The full path to where the plot should be saved. If ``False``</span>
+<span class="sd">        then no plot is made. Useful if you only want the dump file and</span>
+<span class="sd">        not graph.</span>
 
-<span class="sd">    dump_name : str (default = None)</span>
-<span class="sd">        If ``None`` then `plot_name` is used only with the extension</span>
-<span class="sd">        ``.dmp``.</span>
+<span class="sd">    dump_name : :class:`str`, optional</span>
+<span class="sd">        The path to the file where the data to make the graph is</span>
+<span class="sd">        dumped. If ``None`` then `plot_name` is used but with a</span>
+<span class="sd">        ``.dmp`` extension.</span>
 
-<span class="sd">    xlabel : str (default = &#39;Generation&#39;)</span>
+<span class="sd">    xlabel : :class:`str`, optional</span>
 <span class="sd">        The label on the x-axis.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -370,22 +383,22 @@
 
 <div class="viewcode-block" id="plot_counter"><a class="viewcode-back" href="../../../mtk.ga.plotting.html#mtk.ga.plotting.plot_counter">[docs]</a><span class="k">def</span> <span class="nf">plot_counter</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">plot_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Saves a .png file holding a plot of `counter`.</span>
+<span class="sd">    Saves a ``.png`` file holding a plot of `counter`.</span>
 
 <span class="sd">    The counter should hold the number of times a certain population</span>
 <span class="sd">    member was selected.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    counter : Counter</span>
-<span class="sd">        A counter of which members of a population were picked.</span>
+<span class="sd">    counter : :class:`collections.Counter`</span>
+<span class="sd">        A counter of which members of a population were selected.</span>
 
-<span class="sd">    plot_name : str</span>
-<span class="sd">        The full path of the .png where the plot is to be saved.</span>
+<span class="sd">    plot_name : :class:`str`</span>
+<span class="sd">        The full path of the ``.png`` where the plot is to be saved.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
