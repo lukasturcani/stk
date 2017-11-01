@@ -4,28 +4,24 @@ Defines selection functions via :class:`Selection`.
 Extending mtk: Adding selection functions.
 ------------------------------------------
 
-If a new selection operation is to be added to MMEA it should be added
-as a method in the ``Selection`` class defined in this module. The only
-requirements are that the first argument is ``population`` (excluding
-any ``self`` or ``cls`` arguments) and that the method is decorated
-wit the ``mutation()``, ``crossover()`` and ``generational()``
-decorators to highlight which selection it is to be used for. The
-decorators can be applied in sequence for functions which are suitable
-for more than one kind of selection.
+If a new selection operation is to be added to ``mtk`` it should be
+added as a method in :class:`Selection`. The only requirements are
+that the first argument is `population` (excluding any `self` or `cls`
+arguments).
 
-The naming requirement of ``population`` exists to help users identify
-which arguments are handled automatically by MMEA and which they need
-to defined in the input file. The convention is that if the mutation
-function takes an argument called  ``macro_mol`` it does not have to be
-specified in the input file.
+The naming requirement exists to help users identify which arguments
+are handled automatically by the GA and which they need to define in
+the input file. The convention is that if the selection function takes
+an argument called  `population` it does not have to be specified in
+the input file.
 
-All selection functios should be defined as generators, which yield an
-member of ``population``. In the case of crossover selection functions,
-they should yield a tuple of selected parents. Generational selection
-function should yield each molecule at most once.
+All selection functions should be defined as generators, which yield a
+member of the population. In the case of crossover selection functions,
+they should yield a tuple of members. Generational selection functions
+should yield each molecule at most once.
 
 If the selection function does not fit neatly into a single function
-make sure that any helper functions are private, ie that their names
+make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.
 
 """
@@ -34,82 +30,16 @@ import itertools
 import numpy as np
 
 
-def mutation(func):
-    """
-    Identifies a function as suitable for mutation selections.
-
-    Parameters
-    ----------
-    func : function
-        A ``Selection`` class method which can be used for selecting
-        molecules for mutation.
-
-    Returns
-    -------
-    func : function
-        The function received as an argument. The attribute
-        ``mutation`` is added and set to ``True``.
-
-    """
-
-    func.mutation = True
-    return func
-
-
-def crossover(func):
-    """
-    Identifies a function as suitable for crossover selections.
-
-    Parameters
-    ----------
-    func : function
-        A ``Selection`` class method which can be used for selecting
-        molecules for crossover.
-
-    Returns
-    -------
-    func : function
-        The function received as an argument. The attribute
-        ``crossover`` is added and set to ``True``.
-
-    """
-
-    func.crossover = True
-    return func
-
-
-def generational(func):
-    """
-    Identifies a function as suitable for generational selections.
-
-    Parameters
-    ----------
-    func : function
-        A ``Selection`` class method which can be used for selecting
-        molecules for the next generation.
-
-    Returns
-    -------
-    func : function
-        The function received as an argument. The attribute
-        ``generational`` is added and set to ``True``.
-
-    """
-
-    func.generational = True
-    return func
-
-
 class Selection:
     """
     A class for handling all types of selection in the GA.
 
     Whenever a population needs to have some of its members selected
-    for the creation of a parent pool or the next generation it
-    delegates this task to an instance of this class. The population
-    has this instance stored in its `ga_tools.selection` attribute.
+    for GA operations such as mutation, selection and generational
+    selection it delegates this task to an instance of this class. The
+    population holds the instance in :attr:`.Population.ga_tools`.
 
-    Each instance of this class supports being called. What a calling
+    Each instance of this class supports being called. What calling
     an instance does depends on the arguments the instance was
     initialized with and what arguments were supplied during the call.
     In all cases the call implements returns a generator. This
@@ -237,8 +167,6 @@ class Selection:
         # parameters which may be necessary.
         yield from func(unique_pop, **func_data.params)
 
-    @mutation
-    @generational
     def fittest(self, population):
         """
         Yields members of the population, fittest first.
@@ -259,8 +187,6 @@ class Selection:
         for ind in sorted(population, reverse=True):
             yield ind
 
-    @mutation
-    @generational
     def roulette(self, population, elites=0,
                  truncation=None, duplicates=False):
         """
@@ -324,7 +250,6 @@ class Selection:
             yielded.add(selected) if not duplicates else None
             yield selected
 
-    @mutation
     def deterministic_sampling(self, population, truncation=None):
         """
         Yields individuals using deterministic sampling.
@@ -374,8 +299,6 @@ class Selection:
         for r, mem in sorted(decimals, reverse=True):
             yield mem
 
-    @mutation
-    @generational
     def stochastic_sampling(self, population,
                             elites=0, truncation=None,
                             duplicates=False, use_rank=False):
@@ -522,7 +445,6 @@ class Selection:
             yielded.add(selected) if not duplicates else None
             yield selected
 
-    @crossover
     def all_combinations(self, population):
         """
         Yields every possible pairing of individuals from a population.
@@ -548,7 +470,6 @@ class Selection:
         for mol1, mol2 in itertools.combinations(population, 2):
             yield mol1, mol2
 
-    @crossover
     def all_combinations_n_fittest(self, population, n):
         """
         Yields all pairings of the `n` fittest individuals.
@@ -576,7 +497,6 @@ class Selection:
         for ind1, ind2 in itertools.combinations(n_fittest, 2):
             yield ind1, ind2
 
-    @crossover
     def crossover_roulette(self, population, truncation=None):
         """
         Yields parents using roulette selection.
@@ -618,7 +538,6 @@ class Selection:
             weights = [ind.fitness / total for ind in pop]
             yield np.random.choice(pop, 2, False, weights)
 
-    @crossover
     def crossover_deterministic_sampling(self, population,
                                          truncation=None):
         """

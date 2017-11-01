@@ -3133,7 +3133,7 @@ class Periodic(MacroMolecule):
                 try:
                     # ccel as in "connected cell".
                     ccell = cells[x][y][z]
-                except:
+                except Exception:
                     continue
 
                 # `bonder1` is the id of a bonder atom, found in `cell`

@@ -150,104 +150,35 @@
             
   <h1>Source code for mtk.ga.selection</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Defines selection functions via the ``Selection`` class.</span>
+<span class="sd">Defines selection functions via :class:`Selection`.</span>
 
-<span class="sd">Extending MMEA: Adding selection functions</span>
+<span class="sd">Extending mtk: Adding selection functions.</span>
 <span class="sd">------------------------------------------</span>
-<span class="sd">If a new selection operation is to be added to MMEA it should be added</span>
-<span class="sd">as a method in the ``Selection`` class defined in this module. The only</span>
-<span class="sd">requirements are that the first argument is ``population`` (excluding</span>
-<span class="sd">any ``self`` or ``cls`` arguments) and that the method is decorated</span>
-<span class="sd">wit the ``mutation()``, ``crossover()`` and ``generational()``</span>
-<span class="sd">decorators to highlight which selection it is to be used for. The</span>
-<span class="sd">decorators can be applied in sequence for functions which are suitable</span>
-<span class="sd">for more than one kind of selection.</span>
 
-<span class="sd">The naming requirement of ``population`` exists to help users identify</span>
-<span class="sd">which arguments are handled automatically by MMEA and which they need</span>
-<span class="sd">to defined in the input file. The convention is that if the mutation</span>
-<span class="sd">function takes an argument called  ``macro_mol`` it does not have to be</span>
-<span class="sd">specified in the input file.</span>
+<span class="sd">If a new selection operation is to be added to ``mtk`` it should be</span>
+<span class="sd">added as a method in the :class:`Selection`. The only requirements are</span>
+<span class="sd">that the first argument is `population` (excluding any `self` or `cls`</span>
+<span class="sd">arguments).</span>
 
-<span class="sd">All selection functios should be defined as generators, which yield an</span>
-<span class="sd">member of ``population``. In the case of crossover selection functions,</span>
-<span class="sd">they should yield a tuple of selected parents. Generational selection</span>
-<span class="sd">function should yield each molecule at most once.</span>
+<span class="sd">The naming requirement of exists to help users identify which arguments</span>
+<span class="sd">are handled automatically by the GA and which they need to define in</span>
+<span class="sd">the input file. The convention is that if the selection function takes</span>
+<span class="sd">an argument called  `population` it does not have to be specified in</span>
+<span class="sd">the input file.</span>
+
+<span class="sd">All selection functions should be defined as generators, which yield a</span>
+<span class="sd">member of the population. In the case of crossover selection functions,</span>
+<span class="sd">they should yield a tuple of members. Generational selection functions</span>
+<span class="sd">should yield each molecule at most once.</span>
 
 <span class="sd">If the selection function does not fit neatly into a single function</span>
-<span class="sd">make sure that any helper functions are private, ie that their names</span>
+<span class="sd">make sure that any helper functions are private, i.e. that their names</span>
 <span class="sd">start with a leading underscore.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-
-<div class="viewcode-block" id="mutation"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.mutation">[docs]</a><span class="k">def</span> <span class="nf">mutation</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Identifies a function as suitable for mutation selections.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    func : function</span>
-<span class="sd">        A ``Selection`` class method which can be used for selecting</span>
-<span class="sd">        molecules for mutation.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    func : function</span>
-<span class="sd">        The function received as an argument. The attribute</span>
-<span class="sd">        ``mutation`` is added and set to ``True``.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">func</span><span class="o">.</span><span class="n">mutation</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="n">func</span></div>
-
-
-<div class="viewcode-block" id="crossover"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.crossover">[docs]</a><span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Identifies a function as suitable for crossover selections.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    func : function</span>
-<span class="sd">        A ``Selection`` class method which can be used for selecting</span>
-<span class="sd">        molecules for crossover.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    func : function</span>
-<span class="sd">        The function received as an argument. The attribute</span>
-<span class="sd">        ``crossover`` is added and set to ``True``.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">func</span><span class="o">.</span><span class="n">crossover</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="n">func</span></div>
-
-
-<div class="viewcode-block" id="generational"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.generational">[docs]</a><span class="k">def</span> <span class="nf">generational</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Identifies a function as suitable for generational selections.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    func : function</span>
-<span class="sd">        A ``Selection`` class method which can be used for selecting</span>
-<span class="sd">        molecules for the next generation.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    func : function</span>
-<span class="sd">        The function received as an argument. The attribute</span>
-<span class="sd">        ``generational`` is added and set to ``True``.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">func</span><span class="o">.</span><span class="n">generational</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="n">func</span></div>
 
 
 <div class="viewcode-block" id="Selection"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection">[docs]</a><span class="k">class</span> <span class="nc">Selection</span><span class="p">:</span>
@@ -387,9 +318,7 @@
         <span class="c1"># parameters which may be necessary.</span>
         <span class="k">yield from</span> <span class="n">func</span><span class="p">(</span><span class="n">unique_pop</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Selection.fittest"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.fittest">[docs]</a>    <span class="nd">@mutation</span>
-    <span class="nd">@generational</span>
-    <span class="k">def</span> <span class="nf">fittest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="Selection.fittest"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.fittest">[docs]</a>    <span class="k">def</span> <span class="nf">fittest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields members of the population, fittest first.</span>
 
@@ -409,9 +338,7 @@
         <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">ind</span></div>
 
-<div class="viewcode-block" id="Selection.roulette"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.roulette">[docs]</a>    <span class="nd">@mutation</span>
-    <span class="nd">@generational</span>
-    <span class="k">def</span> <span class="nf">roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">elites</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<div class="viewcode-block" id="Selection.roulette"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.roulette">[docs]</a>    <span class="k">def</span> <span class="nf">roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">elites</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields individuals using roulette selection.</span>
@@ -474,8 +401,7 @@
             <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">yield</span> <span class="n">selected</span></div>
 
-<div class="viewcode-block" id="Selection.deterministic_sampling"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.deterministic_sampling">[docs]</a>    <span class="nd">@mutation</span>
-    <span class="k">def</span> <span class="nf">deterministic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Selection.deterministic_sampling"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.deterministic_sampling">[docs]</a>    <span class="k">def</span> <span class="nf">deterministic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields individuals using deterministic sampling.</span>
 
@@ -524,9 +450,7 @@
         <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">mem</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">decimals</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">mem</span></div>
 
-<div class="viewcode-block" id="Selection.stochastic_sampling"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.stochastic_sampling">[docs]</a>    <span class="nd">@mutation</span>
-    <span class="nd">@generational</span>
-    <span class="k">def</span> <span class="nf">stochastic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span>
+<div class="viewcode-block" id="Selection.stochastic_sampling"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.stochastic_sampling">[docs]</a>    <span class="k">def</span> <span class="nf">stochastic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span>
                             <span class="n">elites</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                             <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_rank</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -672,8 +596,7 @@
             <span class="n">yielded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">duplicates</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">yield</span> <span class="n">selected</span></div>
 
-<div class="viewcode-block" id="Selection.all_combinations"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.all_combinations">[docs]</a>    <span class="nd">@crossover</span>
-    <span class="k">def</span> <span class="nf">all_combinations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="Selection.all_combinations"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.all_combinations">[docs]</a>    <span class="k">def</span> <span class="nf">all_combinations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields every possible pairing of individuals from a population.</span>
 
@@ -698,8 +621,7 @@
         <span class="k">for</span> <span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span></div>
 
-<div class="viewcode-block" id="Selection.all_combinations_n_fittest"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.all_combinations_n_fittest">[docs]</a>    <span class="nd">@crossover</span>
-    <span class="k">def</span> <span class="nf">all_combinations_n_fittest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="Selection.all_combinations_n_fittest"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.all_combinations_n_fittest">[docs]</a>    <span class="k">def</span> <span class="nf">all_combinations_n_fittest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields all pairings of the `n` fittest individuals.</span>
 
@@ -726,8 +648,7 @@
         <span class="k">for</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">n_fittest</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span></div>
 
-<div class="viewcode-block" id="Selection.crossover_roulette"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.crossover_roulette">[docs]</a>    <span class="nd">@crossover</span>
-    <span class="k">def</span> <span class="nf">crossover_roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Selection.crossover_roulette"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.crossover_roulette">[docs]</a>    <span class="k">def</span> <span class="nf">crossover_roulette</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields parents using roulette selection.</span>
 
@@ -768,8 +689,7 @@
             <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">ind</span><span class="o">.</span><span class="n">fitness</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">]</span>
             <span class="k">yield</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Selection.crossover_deterministic_sampling"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.crossover_deterministic_sampling">[docs]</a>    <span class="nd">@crossover</span>
-    <span class="k">def</span> <span class="nf">crossover_deterministic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span>
+<div class="viewcode-block" id="Selection.crossover_deterministic_sampling"><a class="viewcode-back" href="../../../mtk.ga.selection.html#mtk.ga.selection.Selection.crossover_deterministic_sampling">[docs]</a>    <span class="k">def</span> <span class="nf">crossover_deterministic_sampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span>
                                          <span class="n">truncation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields parents according to determnistic sampling.</span>
