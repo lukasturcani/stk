@@ -3,6 +3,7 @@ Defines selection functions via :class:`Selection`.
 
 Extending mtk: Adding selection functions.
 ------------------------------------------
+
 If a new selection operation is to be added to MMEA it should be added
 as a method in the ``Selection`` class defined in this module. The only
 requirements are that the first argument is ``population`` (excluding
