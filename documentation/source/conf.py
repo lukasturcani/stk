@@ -32,10 +32,10 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
-    'sphinx.ext.imgmath',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon']
+              'sphinx.ext.coverage',
+              'sphinx.ext.imgmath',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.napoleon']
 
 # autodoc settings
 autodoc_default_flags = ['private-members', 'special-members']
@@ -159,6 +159,3 @@ texinfo_documents = [
      author, 'mtk', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

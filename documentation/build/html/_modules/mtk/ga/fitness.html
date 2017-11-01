@@ -1252,10 +1252,10 @@
 
 <div class="viewcode-block" id="_make_cage_target_folder"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._make_cage_target_folder">[docs]</a><span class="k">def</span> <span class="nf">_make_cage_target_folder</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a folder to store molecules made by _cage_target().</span>
+<span class="sd">    Creates a folder to store molecules made by :func:`_cage_target`.</span>
 
-<span class="sd">    The function creates a folder called `cage_target`.</span>
-<span class="sd">    Inside will be any complexes formed by the function _cage_target().</span>
+<span class="sd">    The function creates a folder called ``cage_target``.</span>
+<span class="sd">    Inside will be any complexes formed by the :func:`_cage_target`.</span>
 <span class="sd">    The folder will be placed in the current working directory, or</span>
 <span class="sd">    if the GA is running, 1 above the current working dirctory. This</span>
 <span class="sd">    prevents the generated molecules from being cleaned up by the GA</span>
@@ -1276,7 +1276,7 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">pass</span>
 
     <span class="k">return</span> <span class="n">dir_path</span></div>
@@ -1284,26 +1284,26 @@
 
 <div class="viewcode-block" id="_generate_complexes"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._generate_complexes">[docs]</a><span class="k">def</span> <span class="nf">_generate_complexes</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Yields rdkit instances of cage / target complexes.</span>
+<span class="sd">    Yields ``rdkit`` molecules of cage / target complexes.</span>
 
 <span class="sd">    If multiple complexes are returned, they will be different via a</span>
 <span class="sd">    random rotation accross the x, y and z axes.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : Cage</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
 <span class="sd">        The cage used to form the complex.</span>
 
-<span class="sd">    target : StructUnit</span>
+<span class="sd">    target : :class:`.StructUnit`</span>
 <span class="sd">        The target used to form the complex.</span>
 
-<span class="sd">    number : int (default = 1)</span>
+<span class="sd">    number : :class:`int`, optional</span>
 <span class="sd">        The number of complexes to be returned.</span>
 
 <span class="sd">    Yields</span>
 <span class="sd">    ------</span>
-<span class="sd">    rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        An rdkit instance holding the cage / target complex.</span>
+<span class="sd">    :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        An ``rdkit`` instance holding the cage / target complex.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1341,23 +1341,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">        The cage which should have C60 placed inside it.</span>
 
-<span class="sd">    c60 : StructUnit</span>
+<span class="sd">    c60 : :class:`.StructUnit`</span>
 <span class="sd">        A StructUnit instance of C60.</span>
 
-<span class="sd">    n5fold : int</span>
+<span class="sd">    n5fold : :class:`int`</span>
 <span class="sd">        The number of rotations along the 5-fold axis of symmetry.</span>
 
-<span class="sd">    n2fold : int</span>
-<span class="sd">        The number of rotations along the 2 fold axis of symmetry per</span>
+<span class="sd">    n2fold : :class:`int`</span>
+<span class="sd">        The number of rotations along the 2-fold axis of symmetry per</span>
 <span class="sd">        rotation along the 5-fold axis.</span>
 
 <span class="sd">    Yields</span>
 <span class="sd">    ------</span>
-<span class="sd">    rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        An rdkit instance holding the cage / C60 complex.</span>
+<span class="sd">    :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        An ``rdkit`` instance holding the cage / C60 complex.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
