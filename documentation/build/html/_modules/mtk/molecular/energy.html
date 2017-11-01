@@ -164,7 +164,7 @@
 <span class="sd">method returns.</span>
 
 <span class="sd">If the energy method does not fit neatly into a single method, feel</span>
-<span class="sd">free to split it up. Make sure sure that any helper methods are</span>
+<span class="sd">free to split it up. Make sure that any helper methods are</span>
 <span class="sd">private, ie that their names start with a leading underscore. Only the</span>
 <span class="sd">main method which the user will use should be public.</span>
 
@@ -323,12 +323,17 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
 <span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">MethodType</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span> <span class="k">as</span> <span class="n">sig</span>
 
+
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FunctionData</span>
+<span class="kn">from</span> <span class="nn">.optimization.mopac</span> <span class="k">import</span> <span class="n">mopac_opt</span>
 
 
 <div class="viewcode-block" id="_EnergyError"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._EnergyError">[docs]</a><span class="k">class</span> <span class="nc">_EnergyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -380,7 +385,6 @@
 <span class="sd">            descriptor.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># If the Energy method is accessed as a class attribute return</span>
         <span class="c1"># the unbound method.</span>
         <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -458,7 +462,7 @@
         <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Next create FunctionData object to store the values of the</span>
-        <span class="c1"># parameters used to to run that calculation.</span>
+        <span class="c1"># parameters used to run that calculation.</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">func_key</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="p">,)</span><span class="o">+</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># Update the `values` dictionary with the results of the</span>
@@ -512,9 +516,7 @@
     <span class="n">bound</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fsig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">fargs</span><span class="p">,</span> <span class="o">**</span><span class="n">fkwargs</span><span class="p">)</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
     <span class="c1"># Get a dictionary of all the default initialized parameters.</span>
     <span class="n">default</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">default</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span>
-               <span class="nb">dict</span><span class="p">(</span><span class="n">fsig</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-               <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bound</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
-
+              <span class="nb">dict</span><span class="p">(</span><span class="n">fsig</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bound</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
     <span class="c1"># Combine the two sets of parameters and get rid of the `self`</span>
     <span class="c1"># parameter, if present.</span>
     <span class="n">bound</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
@@ -614,7 +616,7 @@
 <span class="sd">            found, as they keep this data stored elsewhere already.</span>
 
 <span class="sd">        force_e_calc : bool (default = False)</span>
-<span class="sd">            If the this is ``True`` then all building blocks, products</span>
+<span class="sd">            If this is ``True`` then all building blocks, products</span>
 <span class="sd">            and `self.molecule` will have their energies recalculated.</span>
 <span class="sd">            Even if the energy values have already been found if the</span>
 <span class="sd">            chosen forcefield/method. If ``False`` the energy is only</span>
@@ -685,7 +687,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        float</span>
+<span class="sd">        float : :class:`float`</span>
 <span class="sd">            The pseudoformation energy.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -834,7 +836,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_root</span><span class="o">+</span><span class="s1">&#39;.com&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">input_script</span><span class="p">)</span>
 
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span><span class="s1">&#39;bmin&#39;</span><span class="p">),</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span> <span class="s1">&#39;bmin&#39;</span><span class="p">),</span>
                <span class="n">file_root</span><span class="p">,</span> <span class="s2">&quot;-WAIT&quot;</span><span class="p">,</span> <span class="s2">&quot;-LOCAL&quot;</span><span class="p">]</span>
         <span class="n">sp</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
@@ -855,8 +857,422 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">eng</span>
         <span class="k">except</span> <span class="ne">UnboundLocalError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_EnergyError</span><span class="p">(</span><span class="s1">&#39;MacroModel energy calculation failed.&#39;</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="n">_EnergyError</span><span class="p">(</span><span class="s1">&#39;MacroModel energy calculation failed.&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Energy.mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac">[docs]</a>    <span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;mopac_path&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mopac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the energy of `self.molecule` using MOPAC.</span>
+
+<span class="sd">        Note that this requires MOPAC to be installed and have a</span>
+<span class="sd">        valid license.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings: :class:`dict`, optional</span>
+<span class="sd">        A dictionary which maps the names of the optimization parameters to</span>
+<span class="sd">        their values. Valid values are:</span>
+
+<span class="sd">            &#39;hamiltonian&#39; : :class:`string`</span>
+<span class="sd">                A series of different methods can be selected:</span>
+<span class="sd">                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..</span>
+
+<span class="sd">                PM7 is the latest version of the reparametrization of the NDDO</span>
+<span class="sd">                theory, where all the atomic and diatomic parameters were</span>
+<span class="sd">                re-optimized - update compared to PM6.</span>
+<span class="sd">                http://openmopac.net/PM7_accuracy/PM7_accuracy.html</span>
+
+<span class="sd">                Defaults to PM7.</span>
+
+<span class="sd">            &#39;method&#39; : :class:`string`</span>
+<span class="sd">                This calculation consists in a single point energy calculation.</span>
+
+<span class="sd">            &#39;eps&#39; : :class:`float`</span>
+<span class="sd">                Sets the dielectric constant for the solvent. Presence of this</span>
+<span class="sd">                keyword will cause the COSMO (Conductor-like Screening Model)</span>
+<span class="sd">                method to be used to approximate the effect of a solvent model</span>
+<span class="sd">                surrounding the molecule. Solvents with low dielectric constant</span>
+<span class="sd">                are not likely to work well with this model.</span>
+<span class="sd">                0 means that the dielectric constant is not included in the</span>
+<span class="sd">                calculation.</span>
+<span class="sd">                Defaults to 80.1 can be used to model a water environment at</span>
+<span class="sd">                room temperature.</span>
+
+<span class="sd">            &#39;charge&#39; : :class:`list` of :class:`floats`</span>
+<span class="sd">                When the system being studied is an ion, the charge, n, on the</span>
+<span class="sd">                ion must be supplied as an integer. For cations n can be 1, 2,</span>
+<span class="sd">                3, etc.; for anions -1, -2, -3, etc.</span>
+<span class="sd">                Defaults to 0.</span>
+
+
+<span class="sd">            &#39;timeout&#39; : :class:`float`</span>
+<span class="sd">                The amount in seconds the optimization is allowed to run before</span>
+<span class="sd">                being terminated. The default value is 2 days =</span>
+<span class="sd">                172,800 seconds.</span>
+
+<span class="sd">        mopac_path : :class:`str`</span>
+<span class="sd">            The full path of the MOPAC suite within the</span>
+<span class="sd">            user&#39;s machine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The calculated energy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define default vals for the MOPAC input</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;hamiltonian&#39;</span><span class="p">:</span> <span class="s1">&#39;PM7&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;NOOPT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="mf">80.1</span><span class="p">,</span>
+                <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">172800</span><span class="p">,</span>
+                <span class="p">}</span>
+
+        <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+        <span class="c1"># To prevent conflicts when running this function in parallel,</span>
+        <span class="c1"># a temporary copy of the molecular structure file is made and</span>
+        <span class="c1"># used for mopac calculations.</span>
+
+        <span class="c1"># Unique file name is generated by inserting a random int into</span>
+        <span class="c1"># the file path.</span>
+        <span class="n">tmp_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.mol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="n">file_root</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="c1"># Generate the input file</span>
+        <span class="n">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Run MOPAC</span>
+        <span class="n">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Energy.mopac_dipole"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac_dipole">[docs]</a>    <span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;mopac_path&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mopac_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the dipole moment of the `self.molecule` using MOPAC.</span>
+
+<span class="sd">        Note that this requires MOPAC to be installed and have a</span>
+<span class="sd">        valid license.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings: :class:`dict`, optional</span>
+<span class="sd">        A dictionary which maps the names of the optimization parameters to</span>
+<span class="sd">        their values. Valid values are:</span>
+
+<span class="sd">            &#39;hamiltonian&#39; : :class:`string`</span>
+<span class="sd">                A series of different methods can be selected:</span>
+<span class="sd">                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..</span>
+
+<span class="sd">                PM7 is the latest version of the reparametrization of the NDDO</span>
+<span class="sd">                theory, where all the atomic and diatomic parameters were</span>
+<span class="sd">                re-optimized - update compared to PM6.</span>
+<span class="sd">                http://openmopac.net/PM7_accuracy/PM7_accuracy.html</span>
+
+<span class="sd">                Defaults to PM7.</span>
+
+<span class="sd">            &#39;method&#39; : :class:`string`</span>
+<span class="sd">                This calculation consists in a single point energy calculation.</span>
+
+<span class="sd">            &#39;eps&#39; : :class:`float`</span>
+<span class="sd">                Sets the dielectric constant for the solvent. Presence of this</span>
+<span class="sd">                keyword will cause the COSMO (Conductor-like Screening Model)</span>
+<span class="sd">                method to be used to approximate the effect of a solvent model</span>
+<span class="sd">                surrounding the molecule. Solvents with low dielectric constant</span>
+<span class="sd">                are not likely to work well with this model.</span>
+<span class="sd">                0 means that the dielectric constant is not included in the</span>
+<span class="sd">                calculation.</span>
+<span class="sd">                Defaults to 80.1 can be used to model a water environment at</span>
+<span class="sd">                room temperature.</span>
+
+<span class="sd">            &#39;charge&#39; : :class:`list` of :class:`floats`</span>
+<span class="sd">                When the system being studied is an ion, the charge, n, on the</span>
+<span class="sd">                ion must be supplied as an integer. For cations n can be 1, 2,</span>
+<span class="sd">                3, etc.; for anions -1, -2, -3, etc.</span>
+<span class="sd">                Defaults to 0.</span>
+
+
+<span class="sd">            &#39;timeout&#39; : :class:`float`</span>
+<span class="sd">                The amount in seconds the optimization is allowed to run before</span>
+<span class="sd">                being terminated. The default value is 2 days =</span>
+<span class="sd">                172,800 seconds.</span>
+
+<span class="sd">        mopac_path : :class:`str`</span>
+<span class="sd">            The full path of the MOPAC suite within the</span>
+<span class="sd">            user&#39;s machine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The calculated dipole.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define default vals for the MOPAC input</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;hamiltonian&#39;</span><span class="p">:</span> <span class="s1">&#39;PM7&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;NOOPT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="mf">80.1</span><span class="p">,</span>
+                <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">172800</span><span class="p">,</span>
+                <span class="p">}</span>
+
+        <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+        <span class="c1"># To prevent conflicts when running this function in parallel,</span>
+        <span class="c1"># a temporary copy of the molecular structure file is made and</span>
+        <span class="c1"># used for mopac calculations.</span>
+
+        <span class="c1"># Unique file name is generated by inserting a random int into</span>
+        <span class="c1"># the file path.</span>
+        <span class="n">tmp_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.mol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="n">file_root</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="c1"># Generate the input file</span>
+        <span class="n">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Run MOPAC</span>
+        <span class="n">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_extract_MOPAC_dipole</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Energy.mopac_ea"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac_ea">[docs]</a>    <span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;mopac_path&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mopac_ea</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the electron affinity of `self.molecule` using MOPAC.</span>
+<span class="sd">        Electron Affinity (EA): difference between energy of structure with</span>
+<span class="sd">                                N electrons and N+1 electrons - charge = -1</span>
+<span class="sd">                                (eV)</span>
+<span class="sd">        Note that this requires MOPAC to be installed and have a</span>
+<span class="sd">        valid license.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings: :class:`dict`, optional</span>
+<span class="sd">        A dictionary which maps the names of the optimization parameters to</span>
+<span class="sd">        their values. Valid values are:</span>
+
+<span class="sd">            &#39;hamiltonian&#39; : :class:`string`</span>
+<span class="sd">                A series of different methods can be selected:</span>
+<span class="sd">                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..</span>
+
+<span class="sd">                PM7 is the latest version of the reparametrization of the NDDO</span>
+<span class="sd">                theory, where all the atomic and diatomic parameters were</span>
+<span class="sd">                re-optimized - update compared to PM6.</span>
+<span class="sd">                http://openmopac.net/PM7_accuracy/PM7_accuracy.html</span>
+
+<span class="sd">                Defaults to PM7.</span>
+
+<span class="sd">            &#39;method&#39; : :class:`string`</span>
+<span class="sd">                This calculation consists in a single point energy calculation.</span>
+
+<span class="sd">            &#39;eps&#39; : :class:`float`</span>
+<span class="sd">                Sets the dielectric constant for the solvent. Presence of this</span>
+<span class="sd">                keyword will cause the COSMO (Conductor-like Screening Model)</span>
+<span class="sd">                method to be used to approximate the effect of a solvent model</span>
+<span class="sd">                surrounding the molecule. Solvents with low dielectric constant</span>
+<span class="sd">                are not likely to work well with this model.</span>
+<span class="sd">                0 means that the dielectric constant is not included in the</span>
+<span class="sd">                calculation.</span>
+<span class="sd">                Defaults to 80.1 can be used to model a water environment at</span>
+<span class="sd">                room temperature.</span>
+
+<span class="sd">            &#39;charge&#39; : :class:`list` of :class:`floats`</span>
+<span class="sd">                When the system being studied is an ion, the charge, n, on the</span>
+<span class="sd">                ion must be supplied as an integer. For cations n can be 1, 2,</span>
+<span class="sd">                3, etc.; for anions -1, -2, -3, etc.</span>
+<span class="sd">                Defaults to 0.</span>
+
+<span class="sd">            &#39;timeout&#39; : :class:`float`</span>
+<span class="sd">                The amount in seconds the optimization is allowed to run before</span>
+<span class="sd">                being terminated. The default value is 2 days =</span>
+<span class="sd">                172,800 seconds.</span>
+
+<span class="sd">        mopac_path : :class:`str`</span>
+<span class="sd">            The full path of the MOPAC suite within the</span>
+<span class="sd">            user&#39;s machine.</span>
+
+<span class="sd">        mopac_path : str</span>
+<span class="sd">            The full path of the MOPAC suite within the</span>
+<span class="sd">            user&#39;s machine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The calculated energy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define default vals for the MOPAC input</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;hamiltonian&#39;</span><span class="p">:</span> <span class="s1">&#39;PM7&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;NOOPT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="mf">80.1</span><span class="p">,</span>
+                <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">172800</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+        <span class="c1"># First check the energy of the neutral system</span>
+        <span class="c1"># To prevent conflicts when running this function in parallel,</span>
+        <span class="c1"># a temporary copy of the molecular structure file is made and</span>
+        <span class="c1"># used for mopac calculations.</span>
+
+        <span class="c1"># Unique file name is generated by inserting a random int into</span>
+        <span class="c1"># the file path.</span>
+        <span class="n">tmp_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.mol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="n">file_root</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="c1"># Generate the input file</span>
+        <span class="n">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Run MOPAC</span>
+        <span class="n">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">)</span>
+
+        <span class="c1"># Extract the neutral energy</span>
+        <span class="n">en1</span> <span class="o">=</span> <span class="n">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span>
+
+        <span class="c1"># Update the settings for the anion optimization</span>
+        <span class="n">settings2</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;OPT&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;gradient&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                    <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="s1">&#39;fileout&#39;</span><span class="p">:</span> <span class="s1">&#39;PDBOUT&#39;</span>
+                    <span class="p">}</span>
+
+        <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings2</span><span class="p">)</span>
+
+        <span class="c1"># Now generate a new molecule</span>
+        <span class="n">mol2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="p">)</span>
+        <span class="c1"># Run the mopac optimisation</span>
+        <span class="n">mopac_opt</span><span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Extract the energy by using the self.mopac method</span>
+        <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NOOPT&#39;</span>
+        <span class="k">del</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;gradient&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;fileout&#39;</span><span class="p">]</span>
+        <span class="n">en2</span> <span class="o">=</span> <span class="n">mol2</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">mopac</span><span class="p">(</span><span class="n">mopac_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Calculate the EA (eV)</span>
+        <span class="k">return</span> <span class="n">en2</span> <span class="o">-</span> <span class="n">en1</span></div>
+
+
+<div class="viewcode-block" id="Energy.mopac_ip"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac_ip">[docs]</a>    <span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;mopac_path&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">mopac_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the ionization potential of `self.molecule` using MOPAC.</span>
+<span class="sd">        Ionization Potential (IP): difference between energy of structure with</span>
+<span class="sd">                                N electrons and N-1 electrons - charge = +1</span>
+<span class="sd">                                (eV)</span>
+<span class="sd">        Note that this requires MOPAC to be installed and have a</span>
+<span class="sd">        valid license.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings: :class:`dict`, optional</span>
+<span class="sd">        A dictionary which maps the names of the optimization parameters to</span>
+<span class="sd">        their values. Valid values are:</span>
+
+<span class="sd">            &#39;hamiltonian&#39; : :class:`string`</span>
+<span class="sd">                A series of different methods can be selected:</span>
+<span class="sd">                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..</span>
+
+<span class="sd">                PM7 is the latest version of the reparametrization of the NDDO</span>
+<span class="sd">                theory, where all the atomic and diatomic parameters were</span>
+<span class="sd">                re-optimized - update compared to PM6.</span>
+<span class="sd">                http://openmopac.net/PM7_accuracy/PM7_accuracy.html</span>
+
+<span class="sd">                Defaults to PM7.</span>
+
+<span class="sd">            &#39;method&#39; : :class:`string`</span>
+<span class="sd">                This calculation consists in a single point energy calculation.</span>
+
+<span class="sd">            &#39;eps&#39; : :class:`float`</span>
+<span class="sd">                Sets the dielectric constant for the solvent. Presence of this</span>
+<span class="sd">                keyword will cause the COSMO (Conductor-like Screening Model)</span>
+<span class="sd">                method to be used to approximate the effect of a solvent model</span>
+<span class="sd">                surrounding the molecule. Solvents with low dielectric constant</span>
+<span class="sd">                are not likely to work well with this model.</span>
+<span class="sd">                0 means that the dielectric constant is not included in the</span>
+<span class="sd">                calculation.</span>
+<span class="sd">                Defaults to 80.1 can be used to model a water environment at</span>
+<span class="sd">                room temperature.</span>
+
+<span class="sd">            &#39;charge&#39; : :class:`list` of :class:`floats`</span>
+<span class="sd">                When the system being studied is an ion, the charge, n, on the</span>
+<span class="sd">                ion must be supplied as an integer. For cations n can be 1, 2,</span>
+<span class="sd">                3, etc.; for anions -1, -2, -3, etc.</span>
+<span class="sd">                Defaults to 0.</span>
+
+<span class="sd">            &#39;timeout&#39; : :class:`float`</span>
+<span class="sd">                The amount in seconds the optimization is allowed to run before</span>
+<span class="sd">                being terminated. The default value is 2 days =</span>
+<span class="sd">                172,800 seconds.</span>
+
+<span class="sd">        mopac_path : :class:`str`</span>
+<span class="sd">            The full path of the MOPAC suite within the</span>
+<span class="sd">            user&#39;s machine.</span>
+
+<span class="sd">        mopac_path : str</span>
+<span class="sd">            The full path of the MOPAC suite within the</span>
+<span class="sd">            user&#39;s machine.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The calculated energy.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define default vals for the MOPAC input</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;hamiltonian&#39;</span><span class="p">:</span> <span class="s1">&#39;PM7&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;NOOPT&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;eps&#39;</span><span class="p">:</span> <span class="mf">80.1</span><span class="p">,</span>
+                <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">172800</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+        <span class="c1"># First check the energy of the neutral system</span>
+        <span class="c1"># To prevent conflicts when running this function in parallel,</span>
+        <span class="c1"># a temporary copy of the molecular structure file is made and</span>
+        <span class="c1"># used for mopac calculations.</span>
+
+        <span class="c1"># Unique file name is generated by inserting a random int into</span>
+        <span class="c1"># the file path.</span>
+        <span class="n">tmp_file</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.mol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="n">file_root</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">tmp_file</span><span class="p">)</span>
+
+        <span class="c1"># Generate the input file</span>
+        <span class="n">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Run MOPAC</span>
+        <span class="n">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">)</span>
+
+        <span class="c1"># Extract the neutral energy</span>
+        <span class="n">en1</span> <span class="o">=</span> <span class="n">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span>
+
+        <span class="c1"># Update the settings for the cation optimization</span>
+        <span class="n">settings2</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;OPT&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;gradient&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                    <span class="s1">&#39;charge&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s1">&#39;fileout&#39;</span><span class="p">:</span> <span class="s1">&#39;PDBOUT&#39;</span>
+                    <span class="p">}</span>
+
+        <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings2</span><span class="p">)</span>
+
+        <span class="c1"># Now generate a new molecule</span>
+        <span class="n">mol2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="p">)</span>
+        <span class="c1"># Run the mopac optimisation</span>
+        <span class="n">mopac_opt</span><span class="p">(</span><span class="n">mol2</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Extract the energy by using the self.mopac method</span>
+        <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;NOOPT&#39;</span>
+        <span class="k">del</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;gradient&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;fileout&#39;</span><span class="p">]</span>
+        <span class="n">en2</span> <span class="o">=</span> <span class="n">mol2</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">mopac</span><span class="p">(</span><span class="n">mopac_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="c1"># Calculate the IP (eV)</span>
+        <span class="k">return</span> <span class="n">en2</span> <span class="o">-</span> <span class="n">en1</span></div></div>
 
 <div class="viewcode-block" id="formation_key"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.formation_key">[docs]</a><span class="k">def</span> <span class="nf">formation_key</span><span class="p">(</span><span class="n">fargs</span><span class="p">,</span> <span class="n">fkwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -963,6 +1379,146 @@
 
 
 <span class="n">Energy</span><span class="o">.</span><span class="n">pseudoformation</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">pseudoformation_key</span>
+
+<div class="viewcode-block" id="_run_mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._run_mopac">[docs]</a><span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">):</span>
+
+    <span class="n">mop_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Running MOPAC - </span><span class="si">{file_root}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># To run MOPAC a command is issued to the console via</span>
+    <span class="c1"># ``subprocess.Popen``. The command is the full path of the</span>
+    <span class="c1"># ``mopac`` program.</span>
+    <span class="n">file_root</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mop_file</span><span class="p">)</span>
+    <span class="n">opt_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">mopac_path</span><span class="p">,</span> <span class="n">file_root</span><span class="p">]</span>
+    <span class="n">opt_proc</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">opt_cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                            <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                            <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">proc_out</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">opt_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">proc_out</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">opt_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s1">&#39;Minimization took too long and was terminated &#39;</span>
+                     <span class="s1">&#39;by force - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_root</span><span class="p">))</span>
+        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_kill_mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._kill_mopac">[docs]</a><span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    To kill a MOPAC run for a specific structure it is enough to generate</span>
+<span class="sd">    a non empty file with the molecule&#39;s name with the `.end` extension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">end_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.end&#39;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">end_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">end</span><span class="p">:</span>
+        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_mop_line"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._mop_line">[docs]</a><span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats the settings dictionary with the correct keywords for MOPAC into</span>
+<span class="sd">    a string to be added to the MOPAC input.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    settings : dict</span>
+<span class="sd">        Dictionary defined in the mopac_opt function, where all the run details</span>
+<span class="sd">        are defined.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mopac_run_str : str</span>
+<span class="sd">        String containing all the MOPAC keywords correctly formatted for the</span>
+<span class="sd">        input file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Generate an empty string</span>
+    <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Add Hamiltonian info</span>
+    <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;hamiltonian&#39;</span><span class="p">]</span>
+    <span class="c1"># Forcing a single point calculation</span>
+    <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="s1">&#39; NOOPT &#39;</span>
+    <span class="c1"># Add EPS info</span>
+    <span class="n">eps_info</span> <span class="o">=</span> <span class="s1">&#39; EPS=</span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;eps&#39;</span><span class="p">])</span>
+    <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="n">eps_info</span>
+    <span class="c1"># Add Charge info</span>
+    <span class="n">charge_info</span> <span class="o">=</span> <span class="s1">&#39; CHARGE=</span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">])</span>
+    <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="n">charge_info</span>
+
+    <span class="k">return</span> <span class="n">mopac_run_str</span></div>
+
+
+<div class="viewcode-block" id="_create_mop"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._create_mop">[docs]</a><span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates the ``.mop`` file holding the molecule to be optimized.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">        The macromolecule which is to be optimized. Its molecular</span>
+<span class="sd">        structure file is converted to a ``.mop`` file. The original</span>
+<span class="sd">        file is also kept.</span>
+
+<span class="sd">    mopac_run_str : str</span>
+<span class="sd">        This string specifies the MOPAC keywords to be used in the input for</span>
+<span class="sd">        the calculation.</span>
+
+<span class="sd">    Modifies</span>
+<span class="sd">    --------</span>
+<span class="sd">    This function creates a new ``.mop`` file from the structure file</span>
+<span class="sd">    in `macro_mol._file`. This new file is placed in the same</span>
+<span class="sd">    folder as the original file and has the same name with the _charge info.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The full path of the newly created ``.mop`` file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">mop_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">mol</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating .mop file - </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_root</span><span class="p">))</span>
+
+    <span class="c1"># Generate the mop file containing the MOPAC run info</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mop_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mop</span><span class="p">:</span>
+        <span class="c1"># line for the run info</span>
+        <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># line with the name of the molecule</span>
+        <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_root</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># print the structural info</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+            <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+            <span class="n">atom_symbol</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
+            <span class="n">atom_info</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">   </span><span class="si">{}</span><span class="s2">   +1  </span><span class="si">{}</span><span class="s2">   +1  </span><span class="si">{}</span><span class="s2">   +1 </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atom_symbol</span><span class="p">,</span>
+                                                                   <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom_info</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mop_file</span></div>
+
+<div class="viewcode-block" id="_extract_MOPAC_en"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_en">[docs]</a><span class="k">def</span> <span class="nf">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+    <span class="n">mopac_out</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.arc&#39;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mopac_out</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;TOTAL ENERGY&quot;</span>
+        <span class="n">energy_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outfile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">energy_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">energy_val</span></div>
+
+<div class="viewcode-block" id="_extract_MOPAC_dipole"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_dipole">[docs]</a><span class="k">def</span> <span class="nf">_extract_MOPAC_dipole</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+    <span class="n">mopac_out</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.arc&#39;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mopac_out</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;DIPOLE&quot;</span>
+        <span class="n">energy_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outfile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">energy_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">energy_val</span></div>
 </pre></div>
 
            </div>

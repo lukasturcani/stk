@@ -154,15 +154,16 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">ModuleType</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">isclass</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">fitness</span>
-<span class="kn">from</span> <span class="nn">.crossover</span> <span class="k">import</span> <span class="n">Crossover</span>
 <span class="kn">from</span> <span class="nn">.ga_tools</span> <span class="k">import</span> <span class="n">GATools</span>
 <span class="kn">from</span> <span class="nn">.selection</span> <span class="k">import</span> <span class="n">Selection</span>
 <span class="kn">from</span> <span class="nn">.mutation</span> <span class="k">import</span> <span class="n">Mutation</span>
+<span class="kn">from</span> <span class="nn">.crossover</span> <span class="k">import</span> <span class="n">Crossover</span>
 <span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">.normalization</span> <span class="k">import</span> <span class="n">Normalization</span>
 <span class="kn">from</span> <span class="nn">.ga_exit</span> <span class="k">import</span> <span class="n">Exit</span>
@@ -226,16 +227,20 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    pop_size : int</span>
+<span class="sd">    num_cores : :class:`int`</span>
+<span class="sd">        The number of CPUs to be used when running operations in</span>
+<span class="sd">        parallel.</span>
+
+<span class="sd">    pop_size : :class:`int`</span>
 <span class="sd">        The size of the population.</span>
 
-<span class="sd">    num_generations : int</span>
+<span class="sd">    num_generations : :class:`int`</span>
 <span class="sd">        The number of generations formed by MMEA.</span>
 
-<span class="sd">    num_mutations: int</span>
+<span class="sd">    num_mutations: :class:`int`</span>
 <span class="sd">        The number of successful mutations per generation.</span>
 
-<span class="sd">    num_crossovers: int</span>
+<span class="sd">    num_crossovers: :class:`int`</span>
 <span class="sd">        The number of successful crossovers per generation.</span>
 
 <span class="sd">    init_func : dict</span>
@@ -353,6 +358,9 @@
 
         <span class="c1"># If the input file did not specify some values, default</span>
         <span class="c1"># initialize them.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;num_cores&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;num_crossovers&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_crossovers</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -360,10 +368,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mutation_weights&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mutation_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mutation_weights</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;crossover_weights&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">crossover_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crossover_weights</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;normalization_funcs&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">normalization_funcs</span> <span class="o">=</span> <span class="p">[]</span>

@@ -291,7 +291,7 @@ by them in the <cite>unscaled_fitness</cite> dictionary.</p>
 
 <dl class="attribute">
 <dt id="mtk.ga.fitness._FitnessFunc.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__dict__': &lt;attribute '__dict__' of '_FitnessFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_FitnessFunc' objects&gt;, '__doc__': '\n    A decorator for fitness functions.\n\n    This decorator is applied to all fitness functions automatically in\n    _calc_fitness(). It should not be applied explicitly when defining\n    the functions.\n\n    The decorator prevents fitness functions from raising if\n    they fail (necessary for multiprocessing), prevents them from\n    being run twice on the same molecule and stores the value returned\n    by them in the `unscaled_fitness` dictionary.\n\n    ', '__call__': &lt;function _FitnessFunc.__call__&gt;, '__module__': 'mtk.ga.fitness', '__init__': &lt;function _FitnessFunc.__init__&gt;})</em><a class="headerlink" href="#mtk.ga.fitness._FitnessFunc.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.fitness', '__doc__': '\n    A decorator for fitness functions.\n\n    This decorator is applied to all fitness functions automatically in\n    _calc_fitness(). It should not be applied explicitly when defining\n    the functions.\n\n    The decorator prevents fitness functions from raising if\n    they fail (necessary for multiprocessing), prevents them from\n    being run twice on the same molecule and stores the value returned\n    by them in the `unscaled_fitness` dictionary.\n\n    ', '__init__': &lt;function _FitnessFunc.__init__&gt;, '__call__': &lt;function _FitnessFunc.__call__&gt;, '__dict__': &lt;attribute '__dict__' of '_FitnessFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_FitnessFunc' objects&gt;})</em><a class="headerlink" href="#mtk.ga.fitness._FitnessFunc.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -338,7 +338,7 @@ rotation along the 5-fold axis.</li>
 
 <dl class="function">
 <dt id="mtk.ga.fitness._cage_target">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">_cage_target</code><span class="sig-paren">(</span><em>func_name</em>, <em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotation_func</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#_cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness._cage_target" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">_cage_target</code><span class="sig-paren">(</span><em>func_name</em>, <em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotation_func</em>, <em>dihedral_SMARTS</em>, <em>target_value</em>, <em>logger</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#_cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness._cage_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>A general fitness function for calculating fitness of complexes.</p>
 <p>This function should be inherited by other fitness functions which
 define their own rotation function. For example <a class="reference internal" href="#mtk.ga.fitness.cage_c60" title="mtk.ga.fitness.cage_c60"><code class="xref py py-func docutils literal"><span class="pre">cage_c60()</span></code></a>
@@ -353,6 +353,7 @@ and <a class="reference internal" href="#mtk.ga.fitness.cage_target" title="mtk.
 <li>cavity of cage by itself</li>
 <li>asymmetry of cage by itself</li>
 <li>strain of cage by itself</li>
+<li>strain in select dihedral angles of the cage by itself</li>
 </ol>
 </div></blockquote>
 <p class="rubric">Notes</p>
@@ -362,7 +363,7 @@ fitness parameters into <a class="reference internal" href="mtk.molecular.molecu
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>func_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of the external fitness function calling this one.
 Used for the key in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</li>
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage which is to have its fitness calculated.</li>
@@ -374,19 +375,28 @@ function used to calculate energies.</li>
 function to be run on the generated complexes.</li>
 <li><strong>rotation_func</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the rotation
 function to be used.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>) – Used for logging. Not used by this function.</li>
+<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holds the fitness vector described in this
-docstring.</p>
-</td>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>target_value <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional</span></dt>
+<dd>Float representing the target value for the dihedral angle.</dd>
+<dt>logger <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code></span></dt>
+<dd>Used for logging. Not used by this function.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The numpy array holds the fitness vector described in this
+docstring.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</td>
 </tr>
 </tbody>
 </table>
@@ -516,7 +526,7 @@ should correspond to the order of the <code class="docutils literal"><span class
 
 <dl class="function">
 <dt id="mtk.ga.fitness.cage">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>pseudoformation_params={'func': FunctionData('rdkit'</em>, <em>forcefield='mmff')}</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>pseudoformation_params={'func': FunctionData('rdkit'</em>, <em>forcefield='mmff')}</em>, <em>dihedral_SMARTS=''</em>, <em>target_value=180</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the fitness vector of a cage.</p>
 <p>The fitness vector consists of the following properties in the
 listed order</p>
@@ -528,48 +538,62 @@ listed order</p>
 windows in <cite>macro_mol</cite>.</li>
 <li><cite>eng_per_bond</cite> - The formation energy of <cite>macro_mol</cite> per
 bond made.</li>
-<li><cite>strain</cite> - The mean rmsd between the free building blocks
+<li><cite>prec_strain</cite> - The mean rmsd between the free building blocks
 and those in the macromolecule.</li>
+<li><dl class="first docutils">
+<dt><cite>dihedral_strain</cite> - The % relative difference between the average</dt>
+<dd>dihedral angle within the molecule and a target value. The user
+must provide the SMARTS for the dihedral and the target value.</dd>
+</dl>
+</li>
 </ol>
 </div></blockquote>
+<p class="rubric">Notes</p>
+<p>This function modifies <cite>macro_mol</cite>. It places the calculated
+fitness parameters into :attr:<code class="docutils literal"><span class="pre">~.MacroMolecule.progress_params</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage whose fitness is to be calculated.</li>
-<li><strong>pseudoformation_params</strong> (<em>dict</em><em> (</em><em>default =</em>) – <p>{ ‘func’ : FunctionData(‘rdkit’, forcefield=’uff’) })</p>
-<p>This fitness function calculates the formation energy using the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage whose fitness is to be calculated.</li>
+<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>target_value <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional</span></dt>
+<dd>Float representing the target value for the dihedral angle.</dd>
+<dt>pseudoformation_params <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
+<dd><p class="first">This fitness function calculates the formation energy using the
 <code class="docutils literal"><span class="pre">Energy.pseudoformation()</span></code> method. This parameter defines the
 arguments passed to this method via a dictionary. The name of
 the argument is the key and the value of the argument is the
 value.</p>
-<p>Default initialized arguments of Energy.pseudoformation() only
-need to be specified in <cite>energy_params</cite> if the user wishes to
+<p>Default initialized arguments of <a class="reference internal" href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a> only
+need to be specified in <code class="docutils literal"><span class="pre">energy_params</span></code> if the user wishes to
 change the default value.</p>
-<p>To see what arguments the <cite>Energy.pseudoformation()</cite> method
-requires, try using the  <cite>-h</cite> option:</p>
-<blockquote>
-<div>python -m mmea -h energy</div></blockquote>
-</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging. Not used by this function.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.progress_params</strong> (<em>dict</em>) – Places the calculated parameters in the dict. The order
-corresponds to the arguments in the <code class="docutils literal"><span class="pre">_param_labels()</span></code>
-decorator applied to this function.</li>
-</ul>
-</td>
+<p>To see what arguments <a class="reference internal" href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a> requires, try
+using the  <code class="docutils literal"><span class="pre">-h</span></code> option:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span>$ python -m mtk -h energy
+</pre></div>
+</div>
+</dd>
+<dt>logger <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>, optional</span></dt>
+<dd>Used for logging. Not used by this function.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The numpy array holds the fitness vector described in this
+docstring.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The numpy array holds the fitness vector described in this
-docstring.</p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">numpy.array</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code> – If the calculation of a fitness parameter fails.</td>
 </tr>
 </tbody>
 </table>
@@ -577,7 +601,7 @@ docstring.</p>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.cage_c60">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage_c60</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>n5fold</em>, <em>n2fold</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage_c60"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage_c60" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage_c60</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>n5fold</em>, <em>n2fold</em>, <em>dihedral_SMARTS=''</em>, <em>target_value=180</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage_c60"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage_c60" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fitness vector of a cage / C60 complex.</p>
 <p>The difference between this function and <a class="reference internal" href="#mtk.ga.fitness.cage_target" title="mtk.ga.fitness.cage_target"><code class="xref py py-func docutils literal"><span class="pre">cage_target()</span></code></a> is
 that the rotations are specifically aimed at sampling C60 entirely
@@ -593,6 +617,7 @@ function.</p>
 <li>cavity of cage by itself</li>
 <li>asymmetry of cage by itself</li>
 <li>strain of cage by itself</li>
+<li>strain in select dihedral angles of the cage by itself</li>
 </ol>
 </div></blockquote>
 <p class="rubric">Notes</p>
@@ -613,6 +638,8 @@ function to be run on the generated complexes.</li>
 <li><strong>n5fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</li>
 <li><strong>n2fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 2 fold axis of symmetry per
 rotation along the 5-fold axis.</li>
+<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
+<li><strong>target_value</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – Float representing the target value for the dihedral angle.</li>
 <li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>, optional) – Used for logging. Not used by this function.</li>
 </ul>
 </td>
@@ -633,7 +660,7 @@ docstring.</p>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.cage_target">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage_target</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotations=0</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage_target" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage_target</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>dihedral_SMARTS=''</em>, <em>target_value=180</em>, <em>rotations=0</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the fitness vector of a cage / target complex.</p>
 <p>The target is randomly rotated inside the cage’s cavity and the
 most stable conformation found is used.</p>
@@ -647,11 +674,12 @@ most stable conformation found is used.</p>
 <li>cavity of cage by itself</li>
 <li>asymmetry of cage by itself</li>
 <li>strain of cage by itself</li>
+<li>strain in select dihedral angles of the cage by itself</li>
 </ol>
 </div></blockquote>
 <p class="rubric">Notes</p>
 <p>This function modifies <cite>macro_mol</cite>. It places the calculated
-fitness parameters into <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
+fitness parameters into :attr:<code class="docutils literal"><span class="pre">~.MacroMolecule.progress_params</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -667,6 +695,8 @@ function to be run on the generated complexes.</li>
 <li><strong>rotations</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of times the target should be randomly rotated
 within the cage cavity in order to find the most stable
 conformation.</li>
+<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
+<li><strong>target_value</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – Float representing the target value for the dihedral angle.</li>
 <li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><code class="xref py py-class docutils literal"><span class="pre">FakeLogger</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">logging.Logger</span></code>, optional) – Used for logging. Not used by this function.</li>
 </ul>
 </td>
@@ -687,7 +717,7 @@ docstring.</p>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.partial_raiser">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.partial_raiser" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.partial_raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates fitness or raises at random.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -714,7 +744,7 @@ docstring.</p>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.raiser">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>param1</em>, <em>param2=2</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.raiser" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>param1</em>, <em>param2=2</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Doens’t calculate a fitness value, raises an error instead.</p>
 <p>This function is used to test that when fitness functions raise
 errors during multiprocessing, they are handled correctly.</p>
@@ -744,7 +774,7 @@ errors during multiprocessing, they are handled correctly.</p>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.random_fitness">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">random_fitness</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#random_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.random_fitness" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">random_fitness</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#random_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.random_fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a random fitness value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -768,7 +798,7 @@ errors during multiprocessing, they are handled correctly.</p>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.random_fitness_vector">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">random_fitness_vector</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;logging.Logger object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#random_fitness_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.random_fitness_vector" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">random_fitness_vector</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.ga.fitness (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#random_fitness_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.random_fitness_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a size 4 array of random numbers.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
