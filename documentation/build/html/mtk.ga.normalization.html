@@ -87,7 +87,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">mtk.ga.normalization module</a><ul>
-<li><a class="reference internal" href="#extending-mmea-adding-normalization-functions">Extending MMEA: Adding normalization functions.</a></li>
+<li><a class="reference internal" href="#extending-mtk-adding-normalization-functions">Extending mtk: Adding normalization functions.</a></li>
 </ul>
 </li>
 </ul>
@@ -155,40 +155,42 @@
             
   <div class="section" id="module-mtk.ga.normalization">
 <span id="mtk-ga-normalization-module"></span><h1>mtk.ga.normalization module<a class="headerlink" href="#module-mtk.ga.normalization" title="Permalink to this headline">¶</a></h1>
-<p>Defines normalization functions via the Normalization class.</p>
+<p>Defines normalization functions via the <a class="reference internal" href="#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> class.</p>
 <p>Normalization functions are functions that recalculate the fitness
-values of members in a population. The difference between fitness
-and normalization functions is that fitness functions are only use the
-MacroMolecule to calculate its fitness. Normalzation functions have
-access to all MacroMolecules in a population. As a result they can
-scale the fitness values across the entire population. This is useful
-if you want to ensure a spread of fitness values in the population.</p>
-<p>Each generation, a number of normalizatoin functions can be applied
+values of members of a population. The difference between fitness
+and normalization functions is that fitness functions only use the
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> to calculate fitness. Normalzation functions
+have access to all <code class="xref py py-class docutils literal"><span class="pre">MacroMolecules</span></code> in a population. As a
+result, they can scale the fitness values across the entire population.
+This is useful if you want to ensure a spread of fitness values in the
+population.</p>
+<p>At each generation, a number of normalization functions can be applied
 in sequence.</p>
-<div class="section" id="extending-mmea-adding-normalization-functions">
-<h2>Extending MMEA: Adding normalization functions.<a class="headerlink" href="#extending-mmea-adding-normalization-functions" title="Permalink to this headline">¶</a></h2>
-<p>If a new normalization function is to be added to MMEA it should be
-added as a method in the <code class="docutils literal"><span class="pre">Normalization</span></code> class defined in this
-module. The only requirements are that the first argument is
-<code class="docutils literal"><span class="pre">population</span></code> (excluding <code class="docutils literal"><span class="pre">self</span></code>).</p>
+<div class="section" id="extending-mtk-adding-normalization-functions">
+<h2>Extending mtk: Adding normalization functions.<a class="headerlink" href="#extending-mtk-adding-normalization-functions" title="Permalink to this headline">¶</a></h2>
+<p>If a new normalization function is to be added to <code class="docutils literal"><span class="pre">mtk</span></code> it should be
+added as a method in <a class="reference internal" href="#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a>. The only requirements are
+that the first argument is <cite>population</cite> (excluding <cite>self</cite>).</p>
 <p>The naming requirement exists to help users identify which arguments
-are handled automatically by MMEA and which they need to define in the
-input file. The convention is that if the normalization function takes
-an argument called  <code class="docutils literal"><span class="pre">population</span></code> it does not have to be specified in
-the input file.</p>
-<p>Normalization functions should not interact with the <cite>unscaled_fitness</cite>
-attribute in any way. They should only modify the value in <cite>fitness</cite>.
-Before the first normalization function is applied each generation, the
-value in <cite>unscaled_fitness</cite> is copied into <cite>fitness</cite>. This happens
-automatically.</p>
+are handled automatically by the GA and which they need to define in
+the input file. The convention is that if the normalization function
+takes an argument called  <cite>population</cite>, it does not have to be
+specified in the input file.</p>
+<p>Normalization functions should not interact with
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.unscaled_fitness" title="mtk.molecular.molecules.MacroMolecule.unscaled_fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.unscaled_fitness</span></code></a> in any way. They should only
+modify the value in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>. Before the first
+normalization function is applied by a <a class="reference internal" href="#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> instance,
+the value in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.unscaled_fitness" title="mtk.molecular.molecules.MacroMolecule.unscaled_fitness"><code class="xref py py-attr docutils literal"><span class="pre">unscaled_fitness</span></code></a> is copied into
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">fitness</span></code></a>. The <a class="reference internal" href="#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> instance
+does this automatically.</p>
 <p>Normalization functions calculate the fitness value of a molecule and
-place it in the <cite>fitness</cite> attribute. Multiple normalization functions
-can be applied in sequence. Only the last normalization function
-applied needs to place a value between 0 (exlusive) and infinity in the
-<cite>fitness</cite> attribute. The others can do whatever scaling is necessary
-to for the problem at hand.</p>
+place it in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>. Multiple normalization
+functions can be applied in sequence. Only the last normalization
+function applied needs to place a value between 0 (exlusive) and
+infinity into <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>. The others can do
+whatever scaling and data manipulation is necessary.</p>
 <p>If a normalization function does not fit neatly into a single function
-make sure that any helper functions are private, ie that their names
+make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.</p>
 <dl class="class">
 <dt id="mtk.ga.normalization.Normalization">
@@ -196,21 +198,26 @@ start with a leading underscore.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A class for carrying out normalization of fitness values.</p>
 <dl class="attribute">
-<dt id="mtk.ga.normalization.Normalization.scaling_func">
-<code class="descname">scaling_func</code><a class="headerlink" href="#mtk.ga.normalization.Normalization.scaling_func" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>functools. partial</em></p>
+<dt id="mtk.ga.normalization.Normalization.funcs">
+<code class="descname">funcs</code><a class="headerlink" href="#mtk.ga.normalization.Normalization.funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds all the normalization functions to be applied each
+generation, in the order in which they are to be applied.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.__call__">
 <code class="descname">__call__</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies the normalization function on <cite>population</cite>.</p>
+<dd><p>Applies the normalization functions on <cite>population</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population whose members need to have their fitness
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose members need to have their fitness
 values normalized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -218,18 +225,18 @@ values normalized.</td>
 
 <dl class="attribute">
 <dt id="mtk.ga.normalization.Normalization.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.normalization', '__doc__': '\n    A class for carrying out normalization of fitness values.\n\n    Attributes\n    ----------\n    scaling_func : functools. partial\n\n    ', '__init__': &lt;function Normalization.__init__&gt;, '__call__': &lt;function Normalization.__call__&gt;, 'cage': &lt;function Normalization.cage&gt;, 'combine': &lt;function Normalization.combine&gt;, 'divide': &lt;function Normalization.divide&gt;, 'magnitudes': &lt;function Normalization.magnitudes&gt;, 'shift_elements': &lt;function Normalization.shift_elements&gt;, 'invert': &lt;function Normalization.invert&gt;, '__dict__': &lt;attribute '__dict__' of 'Normalization' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Normalization' objects&gt;})</em><a class="headerlink" href="#mtk.ga.normalization.Normalization.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.normalization', '__doc__': '\n    A class for carrying out normalization of fitness values.\n\n    Attributes\n    ----------\n    funcs : :class:`list` of :class:`.FunctionData`\n        Holds all the normalization functions to be applied each\n        generation, in the order in which they are to be applied.\n\n    ', '__init__': &lt;function Normalization.__init__&gt;, '__call__': &lt;function Normalization.__call__&gt;, 'cage': &lt;function Normalization.cage&gt;, 'combine': &lt;function Normalization.combine&gt;, 'divide': &lt;function Normalization.divide&gt;, 'magnitudes': &lt;function Normalization.magnitudes&gt;, 'shift_elements': &lt;function Normalization.shift_elements&gt;, 'invert': &lt;function Normalization.invert&gt;, '__dict__': &lt;attribute '__dict__' of 'Normalization' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Normalization' objects&gt;})</em><a class="headerlink" href="#mtk.ga.normalization.Normalization.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>funcs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a Normalization instance.</p>
+<dd><p>Initializes a <a class="reference internal" href="#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>funcs</strong> (<em>list of FunctionData instances</em>) – Holds all the normalization functions to be applied each
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>funcs</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds all the normalization functions to be applied each
 generation, in the order in which they are to be applied.</td>
 </tr>
 </tbody>
@@ -250,26 +257,23 @@ generation, in the order in which they are to be applied.</td>
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.cage">
 <code class="descname">cage</code><span class="sig-paren">(</span><em>population</em>, <em>cavity</em>, <em>window</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.cage" title="Permalink to this definition">¶</a></dt>
-<dd><p>A normalization function for the <cite>cage</cite> fitness function.</p>
+<dd><p>A normalization function for use with <a class="reference internal" href="mtk.ga.fitness.html#mtk.ga.fitness.cage" title="mtk.ga.fitness.cage"><code class="xref py py-func docutils literal"><span class="pre">cage()</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population whose members need to have their fitness
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose members need to have their fitness
 values normalized.</li>
-<li><strong>cavity</strong> (<em>float</em>) – The desired size of the cage cavity.</li>
-<li><strong>window</strong> (<em>float</em>) – The desired size of the largest cage window.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>fitness</strong> (<em>numpy.array</em>) – The fitness attribute of members is updated.</li>
+<li><strong>cavity</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The desired size of the cage cavity.</li>
+<li><strong>window</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The desired size of the largest cage window.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -279,34 +283,32 @@ values normalized.</li>
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.combine">
 <code class="descname">combine</code><span class="sig-paren">(</span><em>population</em>, <em>coefficients</em>, <em>exponents</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.combine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.combine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Combines elements in the <cite>fitness</cite> attribute of members.</p>
-<p>This function assumes that the <cite>fitness</cite> attribute
-of the population’s members is an array. It raises the members
-of the array to the values in <cite>exponents</cite> and then multiplies
-them with the values in <cite>coefficients</cite>. Lastly, the individual
+<dd><p>Combines elements in the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>.</p>
+<p>This function assumes that <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>
+of the population’s members is an array. It raises the elements
+of the array to the powers in <cite>exponents</cite> and then multiplies
+them by the values in <cite>coefficients</cite>. Lastly, the individual
 array elements are summed to create a final value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population whose members need to have their fitness
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose members need to have their fitness
 values normalized.</li>
-<li><strong>coefficients</strong> (<em>list of ints</em><em> or </em><em>floats</em>) – Before summing all the elements in the <cite>fitness</cite> attribute,
-their values are multiplied by the numbers in this list.</li>
-<li><strong>exponents</strong> (<em>list of ints</em><em> or </em><em>floats</em>) – Before summing all the elements in the <cite>fitness</cite> attribute,
-their values are raised to the numbers in this list.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>fitness</strong> (<em>numpy.array</em>) – This attribute is altered for the populations members. It
-is changed from an array to a float.</li>
+<li><strong>coefficients</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – Before summing all the elements in
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">fitness</span></code></a>, they are multiplied by the
+values in this list.</li>
+<li><strong>exponents</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – Before summing all the elements in the
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">fitness</span></code></a>, they are raised to the
+powers in this list.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -322,19 +324,15 @@ is changed from an array to a float.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population being normalized.</li>
-<li><strong>val</strong> (<em>numerical</em><em> or </em><em>numpy.array of numericals</em>) – The value by which each fitness value is divided.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>fitness</strong> (<em>numerical</em><em> or </em><em>numpy.array of numericals</em>) – Each fitness value of a population member is divided by
-<cite>val</cite>.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population being normalized.</li>
+<li><strong>val</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">float</span></code> or <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code>) – The value by which each fitness value is divided.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -344,25 +342,16 @@ is changed from an array to a float.</li>
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.invert">
 <code class="descname">invert</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.invert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.invert" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convertes a fitness value to 1/fitness.</p>
+<dd><p>Raises fitness values to the power of <code class="docutils literal"><span class="pre">-1</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population to be normalized.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>fitness</strong> (<em>float</em>) – The <cite>fitness</cite> attribute of the population’s members is
-changed to 1/<cite>fitness</cite>.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population to be normalized.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -371,28 +360,31 @@ changed to 1/<cite>fitness</cite>.</li>
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.magnitudes">
 <code class="descname">magnitudes</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.magnitudes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.magnitudes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalizes the relative values of elements in <cite>fitness</cite>.</p>
-<p>This normalization function assumes that the value in <cite>fitness</cite>
-is a numpy array:</p>
-<blockquote>
-<div>macro_mol.fitness = np.array([1000, 5e-5, 25])</div></blockquote>
+<dd><p>Sacles values of elements in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a>.</p>
+<p>This normalization function assumes that the value in
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">fitness</span></code></a> is a numpy array:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">macro_mol</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mf">5e-5</span><span class="p">,</span> <span class="mi">25</span><span class="p">])</span>
+</pre></div>
+</div>
 <p>Notice that each element has a very different order of
-magnitude. For example if the fitness function calculated the
+magnitude. For example, if the fitness function calculated the
 energy value of the molecule, its radius and the number of
-atoms in it, this could be the data placed in the <cite>fitness</cite>
-attribute.</p>
+atoms in it, this could be the data placed into
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">fitness</span></code></a> as an array.</p>
 <p>When calculating the total fitness based on these values, it
 would be useful to make them comparable. As it is, you can’t
-compare 10,000 kJ mol-1 and 5e-5 Angstroms. However what you
-can do is check how much bigger or smaller than average
+compare 10,000 kJ mol-1 and 5e-5 Angstroms. However, what you
+can do is check how much bigger or smaller than the average
 10,000 kJ mol-1 and 5e-5 Angstrom are. Then replace these
-values with the size relative to the average. For example:</p>
-<blockquote>
-<div>macro_mol.fitness = np.array([2, 0.5, 3])</div></blockquote>
-<p>This would be the output of this function. It shows that the
-energy of a given <cite>macro_mol</cite> is twice as large as the mean
-energy of the population. The radius is half the average
-molecular radius of the population and so on.</p>
+values with the size divided by the average. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">average_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">500</span><span class="p">,</span> <span class="mf">1e-5</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">macro_mol</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">fitness</span> <span class="o">/</span> <span class="n">average_vals</span>
+<span class="n">macro_mol</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([2, 0.5, 5])</span>
+</pre></div>
+</div>
+<p>It shows that the energy of a given <cite>macro_mol</cite> is twice as
+large as the mean energy of the population. The radius is half
+the average molecular radius of the population and so on.</p>
 <p>Now these values can be combined in a reasonable way. However,
 that will have to be done by other normalization functions.
 This one only scales relative to the population average.</p>
@@ -400,19 +392,11 @@ This one only scales relative to the population average.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The population whose fitness values are normalized.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>fitness</strong> (<em>numpy.array</em>) – This attribute is altered for the populations members.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose fitness values are normalized.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -421,58 +405,60 @@ This one only scales relative to the population average.</p>
 <dl class="method">
 <dt id="mtk.ga.normalization.Normalization.shift_elements">
 <code class="descname">shift_elements</code><span class="sig-paren">(</span><em>population</em>, <em>indices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.shift_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.shift_elements" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maps elements in <cite>fitness</cite> array to positive values.</p>
-<p>Assumy you have a fitness array,</p>
-<blockquote>
-<div>macro_mol.fitness = [1, -10, 1]</div></blockquote>
+<dd><p>Makes all elements in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a> positive.</p>
+<p>Assume you have a fitness array,</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">macro_mol</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
 <p>One way to convert the fitness array into a fitness value is
-by summing the elements (see the combine() normalization
-function for this)</p>
-<blockquote>
-<div>macro_mol.fitness = -8</div></blockquote>
+by summing the elements (see <a class="reference internal" href="#mtk.ga.normalization.Normalization.combine" title="mtk.ga.normalization.Normalization.combine"><code class="xref py py-meth docutils literal"><span class="pre">Normalization.combine()</span></code></a> for
+this). The result would be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># After summing all values.</span>
+<span class="n">macro_mol</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># -8</span>
+</pre></div>
+</div>
 <p>Clearly this doesn’t work, because the resulting fitness value
-is not a positive number. To fix this the -10 should be shifted
-to a positive value.</p>
+is not a positive number. To fix this, the <code class="docutils literal"><span class="pre">-10</span></code> should be
+shifted to a positive value.</p>
 <p>This normalization function looks at the elements specified by
 by <cite>indices</cite>. It then finds the minimum value of these elements
 in the population. It then shifts the elements by this value.</p>
-<p>For example, take a population of</p>
-<blockquote>
-<div>mol1.fitness = [1, -5, 5]
-mol2.fitness = [3, -10, 2]
-mol3.fitness = [2, 20, 1]</div></blockquote>
-<p>If the value of <cite>indices</cite> was [1] the after this normalization
-function was applied the result would be</p>
-<blockquote>
-<div>mol1.fitness = [1, 5.1, 5]
-mol2.fitness = [3, 0.1, 2]
-mol3.fitness = [2, 30.1, 1]</div></blockquote>
-<p>If <cite>indices</cite> was [0,1]</p>
-<blockquote>
-<div>mol1.fitness = [2.01, 5.1, 5]
-mol2.fitness = [4.01, 0.1, 2]
-mol3.fitness = [3.01, 30.1, 1]</div></blockquote>
-<p>The shift is  1.01 * magnitude of smallest value. This prevents
-0s in the array.</p>
+<p>For example, take a population with the fitness values</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol1</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">mol2</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">mol3</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>If the value of <cite>indices</cite> was <code class="docutils literal"><span class="pre">[1]</span></code> then after this
+normalization function was applied the result would be</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol1</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([1, 5.1, 5])</span>
+<span class="n">mol2</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([3, 0.1, 2])</span>
+<span class="n">mol3</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([2, 30.1, 1])</span>
+</pre></div>
+</div>
+<p>Notice that all in all the fitness arrays the second element
+has been shifted by <code class="docutils literal"><span class="pre">-10.1</span></code>. This is the smallest value of the
+second element in the population multiplied by <code class="docutils literal"><span class="pre">1.01</span></code> to
+prevent any of the values being <code class="docutils literal"><span class="pre">0</span></code>.</p>
+<p>If <cite>indices</cite> was <code class="docutils literal"><span class="pre">[0,1]</span></code></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol1</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([2.01, 5.1, 5])</span>
+<span class="n">mol2</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([4.01, 0.1, 2])</span>
+<span class="n">mol3</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># np.array([3.01, 30.1, 1])</span>
+</pre></div>
+</div>
+<p>The result is the same as before, only now all the first and
+second elements have been shifted.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>indices</strong> (<em>list of ints</em>) – This holds the indices of elements in the <cite>fitness</cite>
-array which should be shifted to positive values.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>fitness</strong> (<em>numpy.array</em>) – The <cite>fitness</cite> atttribute of the population’s members is
-changed in accordance to the docstring.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>indices</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – This holds the indices of elements in the
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">fitness</span></code></a> array which should be
+shifted.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
