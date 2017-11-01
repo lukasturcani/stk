@@ -158,17 +158,17 @@
 <p>Defines mutation operations via the <a class="reference internal" href="#mtk.ga.mutation.Mutation" title="mtk.ga.mutation.Mutation"><code class="xref py py-class docutils literal"><span class="pre">Mutation</span></code></a> class.</p>
 <div class="section" id="extending-mtk-adding-mutation-functions">
 <h2>Extending mtk: Adding mutation functions.<a class="headerlink" href="#extending-mtk-adding-mutation-functions" title="Permalink to this headline">¶</a></h2>
-<p>If a new mutation operation is to be added to mtk it should be added
-as a method in the <a class="reference internal" href="#mtk.ga.mutation.Mutation" title="mtk.ga.mutation.Mutation"><code class="xref py py-class docutils literal"><span class="pre">Mutation</span></code></a> class defined in this module. The
-only requirement is that the first argument is <cite>macro_mol</cite>, excluding
-any <cite>self</cite> or <cite>cls</cite> arguments.</p>
+<p>If a new mutation operation is to be added to <code class="docutils literal"><span class="pre">mtk</span></code> it should be
+added as a method in the <a class="reference internal" href="#mtk.ga.mutation.Mutation" title="mtk.ga.mutation.Mutation"><code class="xref py py-class docutils literal"><span class="pre">Mutation</span></code></a> class defined in this
+module. The only requirement is that the first argument is <cite>macro_mol</cite>,
+excluding any <cite>self</cite> or <cite>cls</cite> arguments.</p>
 <p>The naming requirement of <cite>macro_mol</cite> exists to help users identify
-which arguments are handled automatically by mtk and which they need
-to define in the input file. The convention is that if the mutation
-function takes an argument called  <cite>macro_mol</cite> it does not have to be
-specified in the input file.</p>
-<p>If the mutation function does not fit neatly into a single function
-make sure that any helper functions are private, ie that their names
+which arguments are handled automatically by <code class="docutils literal"><span class="pre">mtk</span></code> and which they
+need to define in the input file. The convention is that if the
+mutation function takes an argument called  <cite>macro_mol</cite> it does not
+have to be specified in the input file.</p>
+<p>If the mutation function does not fit neatly into a single function,
+make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.</p>
 <dl class="class">
 <dt id="mtk.ga.mutation.Mutation">
@@ -203,10 +203,10 @@ generation.</p>
 <dl class="attribute">
 <dt id="mtk.ga.mutation.Mutation.weights">
 <code class="descname">weights</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.weights" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">floats</span></code> – If <cite>weights</cite> is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal"><span class="pre">float</span></code>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – If <a class="reference internal" href="#mtk.ga.mutation.Mutation.weights" title="mtk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal"><span class="pre">weights</span></code></a> is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal"><span class="pre">float</span></code>
 corresponds to the probability of selecting the mutation
-function at the corresponding index. If <cite>weights</cite> is
-<code class="docutils literal"><span class="pre">None</span></code> each mutation function has equal likelihood of
+function at the corresponding index. If <a class="reference internal" href="#mtk.ga.mutation.Mutation.weights" title="mtk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal"><span class="pre">weights</span></code></a> is
+<code class="docutils literal"><span class="pre">None</span></code>, each mutation function has equal likelihood of
 being picked.</p>
 </dd></dl>
 
@@ -219,7 +219,7 @@ and mutates them. This goes on until either all possible
 molecules have been mutated or the required number of
 mutation operations have been performed.</p>
 <p>The mutants generated are returned together in a
-<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> object. Any mutants created present in
+<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> object. Any mutants already present in
 <cite>population</cite> are removed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -247,7 +247,7 @@ which correspond to molecules already present in
 
 <dl class="attribute">
 <dt id="mtk.ga.mutation.Mutation.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.mutation', '__doc__': '\n    Carries out mutations operations on a population.\n\n    Instances of :class:`.Population` delegate mutation operations\n    to instances of this class. They do this by calling\n\n    &gt;&gt;&gt; mutant_pop = pop.gen_mutants()\n\n    which returns a new population consisting of molecules generated by\n    performing mutation operations on members of ``pop``. This class\n    uses the :class:`.Selection` instance in ``pop.ga_tools.selection``\n    to select molecules for mutation.\n\n    Attributes\n    ----------\n    funcs : :class:`list` of :class:`.FunctionData`\n        This lists holds all the mutation functions which are to be\n        used by the GA. One will be chosen at random when a mutation\n        is desired. The likelihood that each is selected is given by\n        `weights`.\n\n    num_mutations : :class:`int`\n        The number of mutations that needs to be performed each\n        generation.\n\n    weights : :class:`list` of :class:`floats`\n        If `weights` is a :class:`list`, each :class:`float`\n        corresponds to the probability of selecting the mutation\n        function at the corresponding index. If `weights` is\n        ``None`` each mutation function has equal likelihood of\n        being picked.\n\n    ', '__init__': &lt;function Mutation.__init__&gt;, '__call__': &lt;function Mutation.__call__&gt;, 'cage_random_bb': &lt;function Mutation.cage_random_bb&gt;, 'cage_random_lk': &lt;function Mutation.cage_random_lk&gt;, 'cage_similar_bb': &lt;function Mutation.cage_similar_bb&gt;, 'cage_similar_lk': &lt;function Mutation.cage_similar_lk&gt;, 'random_topology': &lt;function Mutation.random_topology&gt;, '__dict__': &lt;attribute '__dict__' of 'Mutation' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Mutation' objects&gt;})</em><a class="headerlink" href="#mtk.ga.mutation.Mutation.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.mutation', '__doc__': '\n    Carries out mutations operations on a population.\n\n    Instances of :class:`.Population` delegate mutation operations\n    to instances of this class. They do this by calling\n\n    &gt;&gt;&gt; mutant_pop = pop.gen_mutants()\n\n    which returns a new population consisting of molecules generated by\n    performing mutation operations on members of ``pop``. This class\n    uses the :class:`.Selection` instance in ``pop.ga_tools.selection``\n    to select molecules for mutation.\n\n    Attributes\n    ----------\n    funcs : :class:`list` of :class:`.FunctionData`\n        This lists holds all the mutation functions which are to be\n        used by the GA. One will be chosen at random when a mutation\n        is desired. The likelihood that each is selected is given by\n        `weights`.\n\n    num_mutations : :class:`int`\n        The number of mutations that needs to be performed each\n        generation.\n\n    weights : :class:`list` of :class:`float`\n        If :attr:`weights` is a :class:`list`, each :class:`float`\n        corresponds to the probability of selecting the mutation\n        function at the corresponding index. If :attr:`weights` is\n        ``None``, each mutation function has equal likelihood of\n        being picked.\n\n    ', '__init__': &lt;function Mutation.__init__&gt;, '__call__': &lt;function Mutation.__call__&gt;, 'cage_random_bb': &lt;function Mutation.cage_random_bb&gt;, 'cage_random_lk': &lt;function Mutation.cage_random_lk&gt;, 'cage_similar_bb': &lt;function Mutation.cage_similar_bb&gt;, 'cage_similar_lk': &lt;function Mutation.cage_similar_lk&gt;, 'random_topology': &lt;function Mutation.random_topology&gt;, '__dict__': &lt;attribute '__dict__' of 'Mutation' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Mutation' objects&gt;})</em><a class="headerlink" href="#mtk.ga.mutation.Mutation.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -265,7 +265,7 @@ is desired. The likelihood that each is selected is given by
 <cite>weights</cite>.</li>
 <li><strong>num_mutations</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of mutations that needs to be performed each
 generation.</li>
-<li><strong>weights</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">floats</span></code>, optional) – If <cite>weights</cite> is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal"><span class="pre">float</span></code>
+<li><strong>weights</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – If <cite>weights</cite> is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal"><span class="pre">float</span></code>
 corresponds to the probability of selecting the mutation
 function at the corresponding index. If <cite>weights</cite> is
 <code class="docutils literal"><span class="pre">None</span></code> each mutation function has equal likelihood of
@@ -297,25 +297,25 @@ being picked.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage who’s building block will be exchanged. Note that
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage who’s building block will be swtiched. Note that
 the cage is not destroyed. It is used a template for a new
 cage.</li>
-<li><strong>database</strong> (<em>str</em>) – The full path of the database from which a new
-building block is to be found.</li>
-<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
-<cite>database</cite> must have this functional group. This is the
-functional group which is used to assemble the
-macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
+<li><strong>database</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the database from which a new
+building block is selected.</li>
+<li><strong>fg</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The name of a functional group defined in <a class="reference internal" href="mtk.molecular.fg_info.html#module-mtk.molecular.fg_info" title="mtk.molecular.fg_info"><code class="xref py py-mod docutils literal"><span class="pre">fg_info</span></code></a>.
+All molecules in <cite>database</cite> must have this functional
+group. This is the functional group which used to assemble
+the macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
 path <cite>database</cite> holds the name of the functional group.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A cage instance generated by taking all attributes of
-<cite>macro_mol</cite> except its building-block* which is replaced by
-a random building-block* from <cite>database</cite>.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A cage generated by taking all attributes of
+<cite>macro_mol</cite> except its building block. The building block
+is replaced by a random building block from <cite>database</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -331,16 +331,16 @@ a random building-block* from <cite>database</cite>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage who’s linker will be exchanged. Note that
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage who’s linker will be exchanged. Note that
 the cage is not destroyed. It is used a template for a new
 cage.</li>
-<li><strong>database</strong> (<em>str</em>) – The full path of the database from which a new linker is to
+<li><strong>database</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the database from which a new linker is to
 be found.</li>
-<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
-<cite>database</cite> must have this functional group. This is the
-functional group which is used to assemble the
-macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
-path <cite>database</cite> holds the name of the functional group.</li>
+<li><strong>fg</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The name of a functional group defined in <a class="reference internal" href="mtk.molecular.fg_info.html#module-mtk.molecular.fg_info" title="mtk.molecular.fg_info"><code class="xref py py-mod docutils literal"><span class="pre">fg_info</span></code></a>.
+All molecules in <cite>database</cite> must have this functional
+group. This is the functional group which is used to
+assemble the macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that
+the path <cite>database</cite> holds the name of the functional group.</li>
 </ul>
 </td>
 </tr>
@@ -349,7 +349,7 @@ path <cite>database</cite> holds the name of the functional group.</li>
 linker from <cite>database</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -371,28 +371,22 @@ second most similar molecule from <cite>database</cite> is used and so on.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its building-block* substituted.</li>
-<li><strong>database</strong> (<em>str</em>) – The full path of the database from which molecules are used
-to substitute the building-block* of <cite>macro_mol</cite>.</li>
-<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
-<cite>database</cite> must have this functional group. This is the
-functional group which is used to assemble the
-macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
-path <cite>database</cite> holds the name of the functional group.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol._similar_bb_mols</strong> (<em>generator</em>) – Creates this attribute on the <cite>macro_mol</cite> instance. This
-allows the function to keep track of which molecule from
-<cite>database</cite> should be used in the substitution.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage which is to have its building block substituted.</li>
+<li><strong>database</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the database from which molecules are used
+to substitute the building block of <cite>macro_mol</cite>.</li>
+<li><strong>fg</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The name of a functional group defined in <a class="reference internal" href="mtk.molecular.fg_info.html#module-mtk.molecular.fg_info" title="mtk.molecular.fg_info"><code class="xref py py-mod docutils literal"><span class="pre">fg_info</span></code></a>.
+All molecules in <cite>database</cite> must have this functional
+group. This is the functional group which is used to
+assemble the macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that
+the path <cite>database</cite> holds the name of the functional group.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new cage with the same linker as <cite>macro_mol</cite> but a
-different building-block*. The building-block* is selected
-according to the description in this docstring.</p>
+different building block.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -414,28 +408,22 @@ similar molecule from <cite>database</cite> is used and so on.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage which is to have its linker substituted.</li>
-<li><strong>database</strong> (<em>str</em>) – The full path of the database from which molecules are used
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage which is to have its linker substituted.</li>
+<li><strong>database</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the database from which molecules are used
 to substitute the linker of <cite>macro_mol</cite>.</li>
-<li><strong>fg</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – The name of a functional group. All molecules in
-<cite>database</cite> must have this functional group. This is the
-functional group which is used to assemble the
-macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that the
-path <cite>database</cite> holds the name of the functional group.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol._similar_lk_mols</strong> (<em>generator</em>) – Creates this attribute on the <cite>macro_mol</cite> instance. This
-allows the function to keep track of which molecule from
-<cite>database</cite> should be used in the substitution.</li>
+<li><strong>fg</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The name of a functional group defined in <a class="reference internal" href="mtk.molecular.fg_info.html#module-mtk.molecular.fg_info" title="mtk.molecular.fg_info"><code class="xref py py-mod docutils literal"><span class="pre">fg_info</span></code></a>.
+All molecules in <cite>database</cite> must have this functional
+group. This is the functional group which is used to
+assemble the macromolecules. If <code class="docutils literal"><span class="pre">None</span></code> it is assumed that
+the path <cite>database</cite> holds the name of the functional group.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new cage with the same building-block* as <cite>macro_mol</cite> but
-a different linker. The linker is selected according to the
-description in this docstring.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new cage with the same building block as <cite>macro_mol</cite> but
+a different linker.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage">Cage</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -446,16 +434,16 @@ description in this docstring.</p>
 <dt id="mtk.ga.mutation.Mutation.random_topology">
 <code class="descname">random_topology</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.random_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.random_topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Changes <cite>macro_mol</cite> topology to a random one from <cite>topologies</cite>.</p>
-<p>A new instance of the same type as <cite>macro_mol</cite> is created. Ie
-if <cite>macro_mol</cite> was a Polymer instance then a Polymer instance
-will be returned.</p>
+<p>A new instance of the same type as <cite>macro_mol</cite> is created. I.e.
+if <cite>macro_mol</cite> was a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a> instance then a
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a> instance will be returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule which is to be mutated.</li>
-<li><strong>topologies</strong> (<em>list of Topology instances</em>) – This lists holds the topology instances from which one is
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule which is to be mutated.</li>
+<li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – This lists holds the topology instances from which one is
 selected at random to form a new molecule.</li>
 </ul>
 </td>
@@ -465,7 +453,7 @@ with all the same parameters as <cite>macro_mol</cite> except for the
 topology.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule">MacroMolecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -478,6 +466,7 @@ topology.</p>
 <dt id="mtk.ga.mutation.MutationError">
 <em class="property">exception </em><code class="descclassname">mtk.ga.mutation.</code><code class="descname">MutationError</code><a class="reference internal" href="_modules/mtk/ga/mutation.html#MutationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.MutationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Used for errors which occuring during mutation operations.</p>
 <dl class="attribute">
 <dt id="mtk.ga.mutation.MutationError.__module__">
 <code class="descname">__module__</code><em class="property"> = 'mtk.ga.mutation'</em><a class="headerlink" href="#mtk.ga.mutation.MutationError.__module__" title="Permalink to this definition">¶</a></dt>
