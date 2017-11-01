@@ -175,9 +175,9 @@
 <div class="viewcode-block" id="Exit.__init__"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_data</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span> <span class="o">=</span> <span class="n">func_data</span></div>
 
-<div class="viewcode-block" id="Exit.__call__"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">):</span>
+<div class="viewcode-block" id="Exit.__call__"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Exit.mol_present"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.mol_present">[docs]</a>    <span class="k">def</span> <span class="nf">mol_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -203,21 +203,24 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Exit.mol_name_present"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.mol_name_present">[docs]</a>    <span class="k">def</span> <span class="nf">mol_name_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">mol_name</span><span class="p">):</span>
+<div class="viewcode-block" id="Exit.mol_name_present"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.mol_name_present">[docs]</a>    <span class="k">def</span> <span class="nf">mol_name_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mol_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns ``True`` if molecule with `name` in `population`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : Population</span>
+<span class="sd">        population : :class:`.Population`</span>
 <span class="sd">            The GA population.</span>
 
-<span class="sd">        mol_name : str</span>
+<span class="sd">        progress : :class:`.Population`</span>
+<span class="sd">            Population where each subpopulation is a previous generation.</span>
+
+<span class="sd">        mol_name : :class:`str`</span>
 <span class="sd">            The name of a molecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool</span>
+<span class="sd">        :class:`bool`</span>
 <span class="sd">            ``True`` if a molecule with `name` of  `mol_name` is found</span>
 <span class="sd">            in `population`.</span>
 
@@ -225,13 +228,56 @@
 
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">mol_name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">population</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Exit.no_exit"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.no_exit">[docs]</a>    <span class="k">def</span> <span class="nf">no_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="Exit.fitness_plateau"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.fitness_plateau">[docs]</a>    <span class="k">def</span> <span class="nf">fitness_plateau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">top_members</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns ``True`` if fitness function of the top x candidates do not</span>
+<span class="sd">        change for n generations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : :class:`Population`</span>
+<span class="sd">            The GA population.</span>
+
+<span class="sd">        progress : :class:`Population`</span>
+<span class="sd">            Population where each subpopulation is a previous generation.</span>
+
+<span class="sd">        num : :class:`int`</span>
+<span class="sd">            Number of generations for which no the x top members did not</span>
+<span class="sd">            change. This number is defined by the user.</span>
+
+<span class="sd">        top_members : :class:`int`</span>
+<span class="sd">            Number of members that are going to be considered for the plateau</span>
+<span class="sd">            analysis. This number needs to be smaller than the total</span>
+<span class="sd">            population. The user can define this number, which defaults to 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            ``True`` if the fitness function shows no improvement for n</span>
+<span class="sd">            generations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check that the GA has run for more than num generations</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">populations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num</span><span class="p">:</span>
+            <span class="n">gens</span> <span class="o">=</span> <span class="p">{</span><span class="nb">frozenset</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">populations</span><span class="p">[</span><span class="o">-</span><span class="n">x</span><span class="p">],</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">top_members</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="p">)}</span>
+            <span class="n">unique_gens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gens</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unique_gens</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Exit.no_exit"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.no_exit">[docs]</a>    <span class="k">def</span> <span class="nf">no_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns ``False``.</span>
 
 <span class="sd">        Useful when you never want the GA to exit prematurely. This is</span>
 <span class="sd">        used by default when no exit function is defined in the input</span>
 <span class="sd">        file.</span>
+
+<span class="sd">        progress : :class:`Population`</span>
+<span class="sd">            population where each subpopulation is a previous generation.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

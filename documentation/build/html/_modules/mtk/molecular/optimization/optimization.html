@@ -247,7 +247,8 @@
 
     <span class="c1"># Apply the function to every member of the population, in</span>
     <span class="c1"># parallel.</span>
-    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="n">num_cores</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">num_cores</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
         <span class="n">optimized</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">p_func</span><span class="p">,</span> <span class="n">population</span><span class="p">)</span>
     <span class="c1"># Make sure the cache is updated with the optimized versions.</span>
     <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">optimized</span><span class="p">:</span>
@@ -462,6 +463,72 @@
     <span class="c1"># Sanitize then optimize the rdkit molecule.</span>
     <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
     <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rdkit_ETKDG"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Does a conformer search with the rdkit.ETKDG method:</span>
+<span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">        The macromolecule who&#39;s structure should be optimized.</span>
+
+<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
+<span class="sd">        Used for logging. Not used by this function.</span>
+
+<span class="sd">    Modifies</span>
+<span class="sd">    --------</span>
+<span class="sd">    macro_mol.mol</span>
+<span class="sd">        The rdkit molecule held in this attribute has it&#39;s structure</span>
+<span class="sd">        changed as a result of the optimization. This means the</span>
+<span class="sd">        ``Conformer`` instance held by the rdkit molecule is changed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : NoneType</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="rdkit_confs_ETKDG"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_confs_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_confs_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">confs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Does a conformer search with the rdkit.ETKDG method:</span>
+<span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
+<span class="sd">    A number of mol files representing the conformers is then generated.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">        The macromolecule who&#39;s structure should be optimized.</span>
+
+<span class="sd">    name: :class:`str`, optional</span>
+<span class="sd">        Name of the macro_mol that is used to name the new conformers.</span>
+
+<span class="sd">    confs: :class:`int`, optional</span>
+<span class="sd">        Defines the number of conformers generated in the</span>
+<span class="sd">        conformer search.</span>
+
+<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
+<span class="sd">        Used for logging. Not used by this function.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conformers : list of conformer IDs for the rdkit molecule.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cids</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMultipleConfs</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">confs</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">cids</span><span class="p">:</span>
+        <span class="n">conf_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.mol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">cid</span><span class="p">)</span>
+        <span class="n">rdkit</span><span class="o">.</span><span class="n">MolToMolFile</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">conf_name</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">cid</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cids</span></div>
 </pre></div>
 
            </div>

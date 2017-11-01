@@ -642,7 +642,13 @@
 </li>
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._create_mae">_create_mae() (in module mtk.molecular.optimization.macromodel)</a>
 </li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._create_mop">_create_mop() (in module mtk.molecular.energy)</a>
+</li>
       <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._EnergyError">_EnergyError</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_dipole">_extract_MOPAC_dipole() (in module mtk.molecular.energy)</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_en">_extract_MOPAC_en() (in module mtk.molecular.energy)</a>
 </li>
       <li><a href="mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc">_FitnessFunc (class in mtk.ga.fitness)</a>
 </li>
@@ -676,6 +682,8 @@
       </ul></li>
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._kill_bmin">_kill_bmin() (in module mtk.molecular.optimization.macromodel)</a>
 </li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._kill_mopac">_kill_mopac() (in module mtk.molecular.energy)</a>
+</li>
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._LewisStructureError">_LewisStructureError</a>
 </li>
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._license_found">_license_found() (in module mtk.molecular.optimization.macromodel)</a>
@@ -683,6 +691,8 @@
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._macromodel_md_opt">_macromodel_md_opt() (in module mtk.molecular.optimization.macromodel)</a>
 </li>
       <li><a href="mtk.ga.fitness.html#mtk.ga.fitness._make_cage_target_folder">_make_cage_target_folder() (in module mtk.ga.fitness)</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._mop_line">_mop_line() (in module mtk.molecular.energy)</a>
 </li>
       <li><a href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology">_NoLinkerCageTopology (class in mtk.molecular.topologies.cage.base)</a>
 </li>
@@ -703,6 +713,8 @@
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._run_applyhtreat">_run_applyhtreat() (in module mtk.molecular.optimization.macromodel)</a>
 </li>
       <li><a href="mtk.molecular.optimization.macromodel.html#mtk.molecular.optimization.macromodel._run_bmin">_run_bmin() (in module mtk.molecular.optimization.macromodel)</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._run_mopac">_run_mopac() (in module mtk.molecular.energy)</a>
 </li>
       <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit._set_orientation2">_set_orientation2() (mtk.molecular.molecules.StructUnit method)</a>
 </li>
@@ -1072,10 +1084,10 @@
 </li>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger.debug">debug() (mtk.convenience_tools.FakeLogger method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.dedupe">dedupe() (in module mtk.convenience_tools)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.del_atoms">del_atoms() (mtk.molecular.topologies.base.Linear method)</a>
 
       <ul>
@@ -1089,6 +1101,8 @@
       <li><a href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.determine_bond_type">determine_bond_type() (mtk.molecular.topologies.base.Topology static method)</a>
 </li>
       <li><a href="mtk.ga.selection.html#mtk.ga.selection.Selection.deterministic_sampling">deterministic_sampling() (mtk.ga.selection.Selection method)</a>
+</li>
+      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.dihedral_strain">dihedral_strain() (mtk.molecular.molecules.Molecule method)</a>
 </li>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.PeriodicBond.direction">direction (mtk.convenience_tools.PeriodicBond attribute)</a>
 
@@ -1238,7 +1252,7 @@
 </li>
       <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.exiter">exiter() (mtk.ga.input.GAInput method)</a>
 </li>
-      <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.MAEExtractor.extract_conformer">extract_conformer() (mtk.convenience_tools.MAEExtractor method)</a>
+      <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.MAEExtractor.extract_conformers">extract_conformers() (mtk.convenience_tools.MAEExtractor method)</a>
 </li>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.MAEExtractor.extract_energy">extract_energy() (mtk.convenience_tools.MAEExtractor method)</a>
 </li>
@@ -1268,13 +1282,9 @@
       </ul></li>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger">FakeLogger (class in mtk.convenience_tools)</a>
 </li>
-      <li><a href="mtk.export_tools.html#mtk.export_tools.fg_distance_prune">fg_distance_prune() (in module mtk.export_tools)</a>
-</li>
       <li><a href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear.fg_ends">fg_ends() (mtk.molecular.topologies.base.Linear method)</a>
 </li>
       <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fg_ids">fg_ids (mtk.molecular.molecules.MacroMolecule attribute)</a>
-</li>
-      <li><a href="mtk.export_tools.html#mtk.export_tools.fg_prune">fg_prune() (in module mtk.export_tools)</a>
 </li>
       <li><a href="mtk.molecular.fg_info.html#mtk.molecular.fg_info.FGInfo.fg_smarts">fg_smarts (mtk.molecular.fg_info.FGInfo attribute)</a>, <a href="mtk.molecular.fg_info.html#mtk.molecular.fg_info.FGInfo.fg_smarts">[1]</a>
 </li>
@@ -1291,6 +1301,8 @@
       <li><a href="mtk.ga.plotting.html#mtk.ga.plotting.fitness_epp">fitness_epp() (in module mtk.ga.plotting)</a>
 </li>
       <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.fitness_func">fitness_func (mtk.ga.input.GAInput attribute)</a>
+</li>
+      <li><a href="mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.fitness_plateau">fitness_plateau() (mtk.ga.ga_exit.Exit method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1536,7 +1548,7 @@
       </ul></li>
       <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.logging_level">logging_level (mtk.ga.input.GAInput attribute)</a>
 </li>
-      <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.MAEExtractor.lowest_energy_conformer">lowest_energy_conformer() (mtk.convenience_tools.MAEExtractor method)</a>
+      <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.MAEExtractor.lowest_energy_conformers">lowest_energy_conformers() (mtk.convenience_tools.MAEExtractor method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1612,16 +1624,22 @@
 </li>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.MolFileError">MolFileError</a>
 </li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac">mopac() (mtk.molecular.energy.Energy method)</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac_dipole">mopac_dipole() (mtk.molecular.energy.Energy method)</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac_ea">mopac_ea() (mtk.molecular.energy.Energy method)</a>
+</li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.mopac_ip">mopac_ip() (mtk.molecular.energy.Energy method)</a>
+</li>
       <li><a href="mtk.convenience_tools.html#mtk.convenience_tools.mplogger">mplogger() (in module mtk.convenience_tools)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mtk.html#module-mtk">mtk (module)</a>
 </li>
       <li><a href="mtk.convenience_tools.html#module-mtk.convenience_tools">mtk.convenience_tools (module)</a>
 </li>
-      <li><a href="mtk.export_tools.html#module-mtk.export_tools">mtk.export_tools (module)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mtk.ga.html#module-mtk.ga">mtk.ga (module)</a>
 </li>
       <li><a href="mtk.ga.crossover.html#module-mtk.ga.crossover">mtk.ga.crossover (module)</a>
@@ -1802,15 +1820,19 @@
         <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.note">(mtk.molecular.molecules.StructUnit attribute)</a>
 </li>
       </ul></li>
-      <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_crossovers">num_crossovers (mtk.ga.input.GAInput attribute)</a>
+      <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_cores">num_cores (mtk.ga.input.GAInput attribute)</a>
 </li>
-      <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_generations">num_generations (mtk.ga.input.GAInput attribute)</a>
-</li>
-      <li><a href="mtk.ga.crossover.html#mtk.ga.crossover.Crossover.num_mutations">num_mutations (mtk.ga.crossover.Crossover attribute)</a>
+      <li><a href="mtk.ga.crossover.html#mtk.ga.crossover.Crossover.num_crossovers">num_crossovers (mtk.ga.crossover.Crossover attribute)</a>
 
       <ul>
-        <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_mutations">(mtk.ga.input.GAInput attribute)</a>
+        <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_crossovers">(mtk.ga.input.GAInput attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_generations">num_generations (mtk.ga.input.GAInput attribute)</a>
+</li>
+      <li><a href="mtk.ga.input.html#mtk.ga.input.GAInput.num_mutations">num_mutations (mtk.ga.input.GAInput attribute)</a>
+
+      <ul>
         <li><a href="mtk.ga.mutation.html#mtk.ga.mutation.Mutation.num_mutations">(mtk.ga.mutation.Mutation attribute)</a>
 </li>
       </ul></li>
@@ -1835,8 +1857,6 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.optimization">optimization (mtk.ga.ga_tools.GATools attribute)</a>, <a href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.optimization">[1]</a>
-</li>
-      <li><a href="mtk.export_tools.html#mtk.export_tools.optimize_folder">optimize_folder() (in module mtk.export_tools)</a>
 </li>
       <li><a href="mtk.ga.population.html#mtk.ga.population.Population.optimize_population">optimize_population() (mtk.ga.population.Population method)</a>
 </li>
@@ -2024,13 +2044,15 @@
 </li>
       <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.rdkit">rdkit() (mtk.molecular.energy.Energy method)</a>
 </li>
-      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rdkit_init">rdkit_init() (mtk.molecular.molecules.StructUnit class method)</a>
+      <li><a href="mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_confs_ETKDG">rdkit_confs_ETKDG() (in module mtk.molecular.optimization.optimization)</a>
 </li>
-      <li><a href="mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_optimization">rdkit_optimization() (in module mtk.molecular.optimization.optimization)</a>
+      <li><a href="mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_ETKDG">rdkit_ETKDG() (in module mtk.molecular.optimization.optimization)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mtk.export_tools.html#mtk.export_tools.redump_pop">redump_pop() (in module mtk.export_tools)</a>
+      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rdkit_init">rdkit_init() (mtk.molecular.molecules.StructUnit class method)</a>
+</li>
+      <li><a href="mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_optimization">rdkit_optimization() (in module mtk.molecular.optimization.optimization)</a>
 </li>
       <li><a href="mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">remove_duplicates() (mtk.ga.population.Population method)</a>
 </li>
@@ -2115,8 +2137,6 @@
       <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2">StructUnit2 (class in mtk.molecular.molecules)</a>
 </li>
       <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3">StructUnit3 (class in mtk.molecular.molecules)</a>
-</li>
-      <li><a href="mtk.export_tools.html#mtk.export_tools.substruct_prune">substruct_prune() (in module mtk.export_tools)</a>
 </li>
   </ul></td>
 </tr></table>

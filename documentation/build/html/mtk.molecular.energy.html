@@ -168,7 +168,7 @@ as a method to the <code class="docutils literal"><span class="pre">Energy</span
 requirements beyond this, just make sure the energy value is what the
 method returns.</p>
 <p>If the energy method does not fit neatly into a single method, feel
-free to split it up. Make sure sure that any helper methods are
+free to split it up. Make sure that any helper methods are
 private, ie that their names start with a leading underscore. Only the
 main method which the user will use should be public.</p>
 <p>To calculate the energy of some <code class="docutils literal"><span class="pre">Molecule</span></code> object the only thing that
@@ -378,7 +378,7 @@ dictionary of the object which used the method.</p>
 
 <dl class="attribute">
 <dt id="mtk.molecular.energy.EMethod.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__dict__': &lt;attribute '__dict__' of 'EMethod' objects&gt;, '__get__': &lt;function EMethod.__get__&gt;, '__weakref__': &lt;attribute '__weakref__' of 'EMethod' objects&gt;, '__doc__': '\n    A descriptor for methods of the ``Energy`` class.\n\n    Attributes\n    ----------\n    func : function\n        The method which the descriptor acts as a getter for.\n\n    ', '__module__': 'mtk.molecular.energy', '__init__': &lt;function EMethod.__init__&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.EMethod.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.energy', '__doc__': '\n    A descriptor for methods of the ``Energy`` class.\n\n    Attributes\n    ----------\n    func : function\n        The method which the descriptor acts as a getter for.\n\n    ', '__init__': &lt;function EMethod.__init__&gt;, '__get__': &lt;function EMethod.__get__&gt;, '__dict__': &lt;attribute '__dict__' of 'EMethod' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'EMethod' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.EMethod.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -457,7 +457,7 @@ were used to calculate the energy. The values are the energies.</p>
 
 <dl class="attribute">
 <dt id="mtk.molecular.energy.Energy.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'formation': &lt;mtk.molecular.energy.EMethod object&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Energy' objects&gt;, '__doc__': '\n    Handles all things related to a molecules energy.\n\n    An instance of this class will be placed in the `energy` attribute\n    of each ``Molecule`` instance.\n\n    Attributes\n    ----------\n    molecule : Molecule\n        The energetic information held by an instance of ``Energy``\n        concerns the molecule held in this attribute.\n\n    values : dict of FunctionData instances\n        The keys in the dict code for the function and parameters which\n        were used to calculate the energy. The values are the energies.\n\n    ', '__module__': 'mtk.molecular.energy', 'macromodel': &lt;mtk.molecular.energy.EMethod object&gt;, '__init__': &lt;function Energy.__init__&gt;, '__dict__': &lt;attribute '__dict__' of 'Energy' objects&gt;, 'pseudoformation': &lt;mtk.molecular.energy.EMethod object&gt;, 'rdkit': &lt;mtk.molecular.energy.EMethod object&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.Energy.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.energy', '__doc__': '\n    Handles all things related to a molecules energy.\n\n    An instance of this class will be placed in the `energy` attribute\n    of each ``Molecule`` instance.\n\n    Attributes\n    ----------\n    molecule : Molecule\n        The energetic information held by an instance of ``Energy``\n        concerns the molecule held in this attribute.\n\n    values : dict of FunctionData instances\n        The keys in the dict code for the function and parameters which\n        were used to calculate the energy. The values are the energies.\n\n    ', '__init__': &lt;function Energy.__init__&gt;, 'formation': &lt;mtk.molecular.energy.EMethod object&gt;, 'pseudoformation': &lt;mtk.molecular.energy.EMethod object&gt;, 'rdkit': &lt;mtk.molecular.energy.EMethod object&gt;, 'macromodel': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac_dipole': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac_ea': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac_ip': &lt;mtk.molecular.energy.EMethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'Energy' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Energy' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.Energy.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -504,7 +504,7 @@ required to build a single molecule held in
 <cite>self.molecule</cite>. This argument can be omitted when the
 formation energy of a MacroMolecule instance is being
 found, as they keep this data stored elsewhere already.</li>
-<li><strong>force_e_calc</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – If the this is <code class="docutils literal"><span class="pre">True</span></code> then all building blocks, products
+<li><strong>force_e_calc</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – If this is <code class="docutils literal"><span class="pre">True</span></code> then all building blocks, products
 and <cite>self.molecule</cite> will have their energies recalculated.
 Even if the energy values have already been found if the
 chosen forcefield/method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only
@@ -557,6 +557,274 @@ forcefield error.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac">
+<code class="descname">mopac</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the energy of <cite>self.molecule</cite> using MOPAC.</p>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – </li>
+<li><strong>dictionary which maps the names of the optimization parameters to</strong> (<a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+<li><strong>values. Valid values are</strong> (<em>their</em>) – <blockquote>
+<div><dl class="docutils">
+<dt>‘hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p>PM7 is the latest version of the reparametrization of the NDDO
+theory, where all the atomic and diatomic parameters were
+re-optimized - update compared to PM6.
+<a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></p>
+<p class="last">Defaults to PM7.</p>
+</dd>
+<dt>’method’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>This calculation consists in a single point energy calculation.</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>Sets the dielectric constant for the solvent. Presence of this
+keyword will cause the COSMO (Conductor-like Screening Model)
+method to be used to approximate the effect of a solvent model
+surrounding the molecule. Solvents with low dielectric constant
+are not likely to work well with this model.
+0 means that the dielectric constant is not included in the
+calculation.
+Defaults to 80.1 can be used to model a water environment at
+room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">floats</span></code></span></dt>
+<dd>When the system being studied is an ion, the charge, n, on the
+ion must be supplied as an integer. For cations n can be 1, 2,
+3, etc.; for anions -1, -2, -3, etc.
+Defaults to 0.</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>The amount in seconds the optimization is allowed to run before
+being terminated. The default value is 2 days =
+172,800 seconds.</dd>
+</dl>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>mopac_path <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></span></dt>
+<dd>The full path of the MOPAC suite within the
+user’s machine.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The calculated energy.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac_dipole">
+<code class="descname">mopac_dipole</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac_dipole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the dipole moment of the <cite>self.molecule</cite> using MOPAC.</p>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.
+:param settings:
+:type settings: <code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional
+:param A dictionary which maps the names of the optimization parameters to:
+:param their values. Valid values are:</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="docutils">
+<dt>‘hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd><p class="first">A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..</p>
+<p>PM7 is the latest version of the reparametrization of the NDDO
+theory, where all the atomic and diatomic parameters were
+re-optimized - update compared to PM6.
+<a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></p>
+<p class="last">Defaults to PM7.</p>
+</dd>
+<dt>‘method’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>This calculation consists in a single point energy calculation.</dd>
+<dt>‘eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>Sets the dielectric constant for the solvent. Presence of this
+keyword will cause the COSMO (Conductor-like Screening Model)
+method to be used to approximate the effect of a solvent model
+surrounding the molecule. Solvents with low dielectric constant
+are not likely to work well with this model.
+0 means that the dielectric constant is not included in the
+calculation.
+Defaults to 80.1 can be used to model a water environment at
+room temperature.</dd>
+<dt>‘charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">floats</span></code></span></dt>
+<dd>When the system being studied is an ion, the charge, n, on the
+ion must be supplied as an integer. For cations n can be 1, 2,
+3, etc.; for anions -1, -2, -3, etc.
+Defaults to 0.</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>‘timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>The amount in seconds the optimization is allowed to run before
+being terminated. The default value is 2 days =
+172,800 seconds.</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>mopac_path <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></span></dt>
+<dd>The full path of the MOPAC suite within the
+user’s machine.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The calculated dipole.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac_ea">
+<code class="descname">mopac_ea</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac_ea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the electron affinity of <cite>self.molecule</cite> using MOPAC.
+Electron Affinity (EA): difference between energy of structure with</p>
+<blockquote>
+<div>N electrons and N+1 electrons - charge = -1
+(eV)</div></blockquote>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – </li>
+<li><strong>dictionary which maps the names of the optimization parameters to</strong> (<a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+<li><strong>values. Valid values are</strong> (<em>their</em>) – <dl class="docutils">
+<dt>‘hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p>PM7 is the latest version of the reparametrization of the NDDO
+theory, where all the atomic and diatomic parameters were
+re-optimized - update compared to PM6.
+<a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></p>
+<p class="last">Defaults to PM7.</p>
+</dd>
+<dt>’method’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>This calculation consists in a single point energy calculation.</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>Sets the dielectric constant for the solvent. Presence of this
+keyword will cause the COSMO (Conductor-like Screening Model)
+method to be used to approximate the effect of a solvent model
+surrounding the molecule. Solvents with low dielectric constant
+are not likely to work well with this model.
+0 means that the dielectric constant is not included in the
+calculation.
+Defaults to 80.1 can be used to model a water environment at
+room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">floats</span></code></span></dt>
+<dd>When the system being studied is an ion, the charge, n, on the
+ion must be supplied as an integer. For cations n can be 1, 2,
+3, etc.; for anions -1, -2, -3, etc.
+Defaults to 0.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>The amount in seconds the optimization is allowed to run before
+being terminated. The default value is 2 days =
+172,800 seconds.</dd>
+</dl>
+</li>
+<li><strong>mopac_path</strong> (<em>str</em>) – The full path of the MOPAC suite within the
+user’s machine.</li>
+<li><strong>mopac_path</strong> – The full path of the MOPAC suite within the
+user’s machine.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac_ip">
+<code class="descname">mopac_ip</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the ionization potential of <cite>self.molecule</cite> using MOPAC.
+Ionization Potential (IP): difference between energy of structure with</p>
+<blockquote>
+<div>N electrons and N-1 electrons - charge = +1
+(eV)</div></blockquote>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – </li>
+<li><strong>dictionary which maps the names of the optimization parameters to</strong> (<a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+<li><strong>values. Valid values are</strong> (<em>their</em>) – <dl class="docutils">
+<dt>‘hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p>PM7 is the latest version of the reparametrization of the NDDO
+theory, where all the atomic and diatomic parameters were
+re-optimized - update compared to PM6.
+<a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></p>
+<p class="last">Defaults to PM7.</p>
+</dd>
+<dt>’method’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">string</span></code></span></dt>
+<dd>This calculation consists in a single point energy calculation.</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>Sets the dielectric constant for the solvent. Presence of this
+keyword will cause the COSMO (Conductor-like Screening Model)
+method to be used to approximate the effect of a solvent model
+surrounding the molecule. Solvents with low dielectric constant
+are not likely to work well with this model.
+0 means that the dielectric constant is not included in the
+calculation.
+Defaults to 80.1 can be used to model a water environment at
+room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">floats</span></code></span></dt>
+<dd>When the system being studied is an ion, the charge, n, on the
+ion must be supplied as an integer. For cations n can be 1, 2,
+3, etc.; for anions -1, -2, -3, etc.
+Defaults to 0.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
+<dd>The amount in seconds the optimization is allowed to run before
+being terminated. The default value is 2 days =
+172,800 seconds.</dd>
+</dl>
+</li>
+<li><strong>mopac_path</strong> (<em>str</em>) – The full path of the MOPAC suite within the
+user’s machine.</li>
+<li><strong>mopac_path</strong> – The full path of the MOPAC suite within the
+user’s machine.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="mtk.molecular.energy.Energy.pseudoformation">
 <code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.pseudoformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the formation energy, sans other products.</p>
@@ -587,10 +855,10 @@ calculated if the value has not already been foud.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The pseudoformation energy.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>float</strong> – The pseudoformation energy.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -645,6 +913,81 @@ in the dictionary <cite>self.values</cite>.</p>
 </dd></dl>
 
 </dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._create_mop">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>file_root</em>, <em>molecule</em>, <em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._create_mop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule which is to be optimized. Its molecular
+structure file is converted to a <code class="docutils literal"><span class="pre">.mop</span></code> file. The original
+file is also kept.</li>
+<li><strong>mopac_run_str</strong> (<em>str</em>) – This string specifies the MOPAC keywords to be used in the input for
+the calculation.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>function creates a new .mop file from the structure file</strong> (<em>This</em>) – </li>
+<li><strong>macro_mol._file. This new file is placed in the same</strong> (<em>in</em>) – </li>
+<li><strong>as the original file and has the same name with the _charge info.</strong> (<em>folder</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full path of the newly created <code class="docutils literal"><span class="pre">.mop</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._extract_MOPAC_dipole">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_dipole</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_dipole" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._extract_MOPAC_en">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_en</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_en"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_en" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._kill_mopac">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._kill_mopac" title="Permalink to this definition">¶</a></dt>
+<dd><p>To kill a MOPAC run for a specific structure it is enough to generate
+a non empty file with the molecule’s name with the <cite>.end</cite> extension.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._mop_line">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._mop_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats the settings dictionary with the correct keywords for MOPAC into
+a string to be added to the MOPAC input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<em>dict</em>) – Dictionary defined in the mopac_opt function, where all the run details
+are defined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>mopac_run_str</strong> – String containing all the MOPAC keywords correctly formatted for the
+input file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._run_mopac">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>file_root</em>, <em>mopac_path</em>, <em>timeout=3600</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._run_mopac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="mtk.molecular.energy.e_logger">

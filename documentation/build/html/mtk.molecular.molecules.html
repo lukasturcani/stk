@@ -219,7 +219,7 @@ supplied to the initializer).</li>
 </ol>
 </div></blockquote>
 <p>What functional groups are recognized by MMEA?
-The module <code class="docutils literal"><span class="pre">/mmea/molecular_tools/fg_info.py</span></code> defines a class called
+The module <code class="docutils literal"><span class="pre">/mmea/molecular/fg_info.py</span></code> defines a class called
 FGInfo. Instances of this class are held in the list
 <cite>functional_groups</cite> (also in that module). If you put an FGInfo
 instance in that list, the functional group will be recognized.</p>
@@ -246,7 +246,7 @@ However the basic structure is the same (steps 9 - 11).</li>
 molecule. Make sure that the building blocks are arranged in the
 shape of the macromolecule. All the manipulations available via
 the StructUnit class are useful here to make sure all the
-building blocks are orientated correctly when forming the
+building blocks are oriented correctly when forming the
 macromolecule.</li>
 <li>Create bonds between all the disjoined building block
 molecules. This is where the tagging done by StructUnit is
@@ -856,7 +856,7 @@ and ‘mol_index’ properties.</dd>
 <em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>The most basic class representing molecules.</p>
-<p>This class defines defines the operations which any class
+<p>This class defines the operations which any class
 describing molecules should inherit or may find useful. Examples of
 such classes are <code class="docutils literal"><span class="pre">StructUnit</span></code> and <code class="docutils literal"><span class="pre">MacroMolecule</span></code>. This calls
 is unlikely to be useful as in and of itself. It lacks an
@@ -905,7 +905,7 @@ be useful for labelling and debugging.</p>
 
 <dl class="attribute">
 <dt id="mtk.molecular.molecules.Molecule.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'set_position': &lt;function Molecule.set_position&gt;, '__module__': 'mtk.molecular.molecules', 'max_diameter': &lt;function Molecule.max_diameter&gt;, 'center_of_mass': &lt;function Molecule.center_of_mass&gt;, 'dump': &lt;function Molecule.dump&gt;, 'atom_coords': &lt;function Molecule.atom_coords&gt;, 'atom_symbol': &lt;function Molecule.atom_symbol&gt;, '__doc__': '\n    The most basic class representing molecules.\n\n    This class defines defines the operations which any class\n    describing molecules should inherit or may find useful. Examples of\n    such classes are ``StructUnit`` and ``MacroMolecule``. This calls\n    is unlikely to be useful as in and of itself. It lacks an\n    `__init__()` method because it does not need one. Child classes\n    should define it.\n\n    It is assumed that child classes will have some basic attributes.\n\n    Attributes\n    ----------\n    mol : rdkit.Chem.rdchem.Mol\n        A rdkit molecule instance representing the molecule.\n\n    inchi : str\n        The InChI of the molecule.\n\n    energy : Energy\n        An instance of the ``Energy`` class. It handles all things\n        energy.\n\n    optimized : bool\n        Indicates whether a Molecule has been passed through an\n        optimization function or not.\n\n    name : str (default = &quot;&quot;)\n        A name which can be optionally given to the molecule for easy\n        identification.\n\n    note : str (default = &quot;&quot;)\n        A note or comment about the molecule. Purely optional but can\n        be useful for labelling and debugging.\n\n    ', '__init__': &lt;function Molecule.__init__&gt;, 'fromdict': &lt;classmethod object&gt;, 'all_atom_coords': &lt;function Molecule.all_atom_coords&gt;, '__dict__': &lt;attribute '__dict__' of 'Molecule' objects&gt;, 'graph': &lt;function Molecule.graph&gt;, 'set_orientation': &lt;function Molecule.set_orientation&gt;, 'rotate': &lt;function Molecule.rotate&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Molecule' objects&gt;, 'update_stereochemistry': &lt;function Molecule.update_stereochemistry&gt;, 'load': &lt;classmethod object&gt;, 'set_position_from_matrix': &lt;function Molecule.set_position_from_matrix&gt;, '_cavity_size': &lt;function Molecule._cavity_size&gt;, 'position_matrix': &lt;function Molecule.position_matrix&gt;, 'mdl_mol_block': &lt;function Molecule.mdl_mol_block&gt;, 'inchi': &lt;property object&gt;, 'centroid': &lt;function Molecule.centroid&gt;, '_write_mdl_mol_file': &lt;function Molecule._write_mdl_mol_file&gt;, '_write_pdb_file': &lt;function Molecule._write_pdb_file&gt;, 'cavity_size': &lt;function Molecule.cavity_size&gt;, 'atom_distance': &lt;function Molecule.atom_distance&gt;, 'same': &lt;function Molecule.same&gt;, 'shift': &lt;function Molecule.shift&gt;, 'save_bonders': &lt;function Molecule.save_bonders&gt;, 'write': &lt;function Molecule.write&gt;, 'update_from_mae': &lt;function Molecule.update_from_mae&gt;})</em><a class="headerlink" href="#mtk.molecular.molecules.Molecule.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.molecules', '__doc__': '\n    The most basic class representing molecules.\n\n    This class defines the operations which any class\n    describing molecules should inherit or may find useful. Examples of\n    such classes are ``StructUnit`` and ``MacroMolecule``. This calls\n    is unlikely to be useful as in and of itself. It lacks an\n    `__init__()` method because it does not need one. Child classes\n    should define it.\n\n    It is assumed that child classes will have some basic attributes.\n\n    Attributes\n    ----------\n    mol : rdkit.Chem.rdchem.Mol\n        A rdkit molecule instance representing the molecule.\n\n    inchi : str\n        The InChI of the molecule.\n\n    energy : Energy\n        An instance of the ``Energy`` class. It handles all things\n        energy.\n\n    optimized : bool\n        Indicates whether a Molecule has been passed through an\n        optimization function or not.\n\n    name : str (default = &quot;&quot;)\n        A name which can be optionally given to the molecule for easy\n        identification.\n\n    note : str (default = &quot;&quot;)\n        A note or comment about the molecule. Purely optional but can\n        be useful for labelling and debugging.\n\n    ', '__init__': &lt;function Molecule.__init__&gt;, 'all_atom_coords': &lt;function Molecule.all_atom_coords&gt;, 'atom_coords': &lt;function Molecule.atom_coords&gt;, 'atom_distance': &lt;function Molecule.atom_distance&gt;, 'atom_symbol': &lt;function Molecule.atom_symbol&gt;, '_cavity_size': &lt;function Molecule._cavity_size&gt;, 'cavity_size': &lt;function Molecule.cavity_size&gt;, 'center_of_mass': &lt;function Molecule.center_of_mass&gt;, 'centroid': &lt;function Molecule.centroid&gt;, 'dihedral_strain': &lt;function Molecule.dihedral_strain&gt;, 'dump': &lt;function Molecule.dump&gt;, 'fromdict': &lt;classmethod object&gt;, 'graph': &lt;function Molecule.graph&gt;, 'inchi': &lt;property object&gt;, 'load': &lt;classmethod object&gt;, 'max_diameter': &lt;function Molecule.max_diameter&gt;, 'mdl_mol_block': &lt;function Molecule.mdl_mol_block&gt;, 'position_matrix': &lt;function Molecule.position_matrix&gt;, 'same': &lt;function Molecule.same&gt;, 'rotate': &lt;function Molecule.rotate&gt;, 'save_bonders': &lt;function Molecule.save_bonders&gt;, 'set_orientation': &lt;function Molecule.set_orientation&gt;, 'set_position': &lt;function Molecule.set_position&gt;, 'set_position_from_matrix': &lt;function Molecule.set_position_from_matrix&gt;, 'shift': &lt;function Molecule.shift&gt;, 'update_from_mae': &lt;function Molecule.update_from_mae&gt;, 'update_stereochemistry': &lt;function Molecule.update_stereochemistry&gt;, 'write': &lt;function Molecule.write&gt;, '_write_mdl_mol_file': &lt;function Molecule._write_mdl_mol_file&gt;, '_write_pdb_file': &lt;function Molecule._write_pdb_file&gt;, '__dict__': &lt;attribute '__dict__' of 'Molecule' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Molecule' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.molecules.Molecule.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1126,6 +1126,32 @@ coordinates are being yielded.</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A numpy array holding the position of the centroid.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.dihedral_strain">
+<code class="descname">dihedral_strain</code><span class="sig-paren">(</span><em>dihedral_SMARTS=''</em>, <em>target=180</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.dihedral_strain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.dihedral_strain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the relative % difference between all the average dihedral
+angle values within the molecule and the target value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The SMARTS code for the dihedral of interest.</li>
+<li><strong>target</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – Float representing the target value for the dihedral angle.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>diff</strong> – Float representing the % relative difference between the average
+dihedral value in the molecule and the target value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -2186,7 +2212,7 @@ macromolecules.</li>
 
 <dl class="attribute">
 <dt id="mtk.molecular.molecules.StructUnit.init_funcs">
-<code class="descname">init_funcs</code><em class="property"> = {'.mol2': functools.partial(&lt;Boost.Python.function object&gt;, removeHs=False, sanitize=False), '.mae': &lt;function mol_from_mae_file&gt;, '.pdb': functools.partial(&lt;Boost.Python.function object&gt;, removeHs=False, sanitize=False), '.mol': functools.partial(&lt;Boost.Python.function object&gt;, removeHs=False, sanitize=False), '.sdf': functools.partial(&lt;Boost.Python.function object&gt;, removeHs=False, sanitize=False)}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init_funcs</code><em class="property"> = {'.mol': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.sdf': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mol2': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False), '.mae': &lt;function mol_from_mae_file&gt;, '.pdb': functools.partial(&lt;Boost.Python.function object&gt;, sanitize=False, removeHs=False)}</em><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.init_funcs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
