@@ -446,15 +446,15 @@ process where they are logged.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The cage which should have C60 placed inside it.</li>
-<li><strong>c60</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><em>StructUnit</em></a>) – A StructUnit instance of C60.</li>
-<li><strong>n5fold</strong> (<em>int</em>) – The number of rotations along the 5-fold axis of symmetry.</li>
-<li><strong>n2fold</strong> (<em>int</em>) – The number of rotations along the 2 fold axis of symmetry per
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The cage which should have C60 placed inside it.</li>
+<li><strong>c60</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – A StructUnit instance of C60.</li>
+<li><strong>n5fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 5-fold axis of symmetry.</li>
+<li><strong>n2fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 2-fold axis of symmetry per
 rotation along the 5-fold axis.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>rdkit.Chem.rdchem.Mol</em> – An rdkit instance holding the cage / C60 complex.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal"><span class="pre">rdkit</span></code> instance holding the cage / C60 complex.</p>
 </td>
 </tr>
 </tbody>
@@ -574,7 +574,7 @@ calculated.</li>
 <dl class="function">
 <dt id="mtk.ga.fitness._generate_complexes">
 <code class="descclassname">mtk.ga.fitness.</code><code class="descname">_generate_complexes</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target</em>, <em>number=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#_generate_complexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness._generate_complexes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Yields rdkit instances of cage / target complexes.</p>
+<dd><p>Yields <code class="docutils literal"><span class="pre">rdkit</span></code> molecules of cage / target complexes.</p>
 <p>If multiple complexes are returned, they will be different via a
 random rotation accross the x, y and z axes.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -582,13 +582,13 @@ random rotation accross the x, y and z axes.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><em>Cage</em></a>) – The cage used to form the complex.</li>
-<li><strong>target</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><em>StructUnit</em></a>) – The target used to form the complex.</li>
-<li><strong>number</strong> (<em>int</em><em> (</em><em>default = 1</em><em>)</em>) – The number of complexes to be returned.</li>
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage used to form the complex.</li>
+<li><strong>target</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – The target used to form the complex.</li>
+<li><strong>number</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of complexes to be returned.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>rdkit.Chem.rdchem.Mol</em> – An rdkit instance holding the cage / target complex.</p>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code> – An <code class="docutils literal"><span class="pre">rdkit</span></code> instance holding the cage / target complex.</p>
 </td>
 </tr>
 </tbody>
@@ -598,9 +598,9 @@ random rotation accross the x, y and z axes.</p>
 <dl class="function">
 <dt id="mtk.ga.fitness._make_cage_target_folder">
 <code class="descclassname">mtk.ga.fitness.</code><code class="descname">_make_cage_target_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#_make_cage_target_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness._make_cage_target_folder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a folder to store molecules made by _cage_target().</p>
-<p>The function creates a folder called <cite>cage_target</cite>.
-Inside will be any complexes formed by the function _cage_target().
+<dd><p>Creates a folder to store molecules made by <a class="reference internal" href="#mtk.ga.fitness._cage_target" title="mtk.ga.fitness._cage_target"><code class="xref py py-func docutils literal"><span class="pre">_cage_target()</span></code></a>.</p>
+<p>The function creates a folder called <code class="docutils literal"><span class="pre">cage_target</span></code>.
+Inside will be any complexes formed by the <a class="reference internal" href="#mtk.ga.fitness._cage_target" title="mtk.ga.fitness._cage_target"><code class="xref py py-func docutils literal"><span class="pre">_cage_target()</span></code></a>.
 The folder will be placed in the current working directory, or
 if the GA is running, 1 above the current working dirctory. This
 prevents the generated molecules from being cleaned up by the GA
