@@ -1,7 +1,7 @@
 """
-Defines selection functions via the ``Selection`` class.
+Defines selection functions via :class:`Selection`.
 
-Extending MMEA: Adding selection functions
+Extending mtk: Adding selection functions.
 ------------------------------------------
 If a new selection operation is to be added to MMEA it should be added
 as a method in the ``Selection`` class defined in this module. The only

@@ -253,9 +253,14 @@ class Population:
         return p
 
     @classmethod
-    def init_diverse_cages(cls, bb_db, lk_db,
-                           topologies, size, ga_tools,
-                           bb_fg=None, lk_fg=None):
+    def init_diverse_cages(cls,
+                           bb_db,
+                           lk_db,
+                           topologies,
+                           size,
+                           ga_tools,
+                           bb_fg=None,
+                           lk_fg=None):
         """
         Creates a population of cages built from provided databases.
 
@@ -398,9 +403,14 @@ class Population:
                      iglob(join(folder, glob_pattern))))
 
     @classmethod
-    def init_random_cages(cls, bb_db, lk_db,
-                          topologies, size, ga_tools,
-                          bb_fg=None, lk_fg=None):
+    def init_random_cages(cls,
+                          bb_db,
+                          lk_db,
+                          topologies,
+                          size,
+                          ga_tools,
+                          bb_fg=None,
+                          lk_fg=None):
         """
         Creates a population of cages built from provided databases.
 
@@ -1025,8 +1035,10 @@ class Population:
         else:
             _optimize_all_serial(self.ga_tools.optimization, self)
 
-    def remove_duplicates(self, between_subpops=True,
-                          key=lambda x: id(x), top_seen=None):
+    def remove_duplicates(self,
+                          between_subpops=True,
+                          key=id,
+                          top_seen=None):
         """
         Removes duplicates from the population and preserves structure.
 
