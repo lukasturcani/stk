@@ -1,53 +1,55 @@
 """
-Defines normalization functions via the Normalization class.
+Defines normalization functions via the :class:`.Normalization` class.
 
 Normalization functions are functions that recalculate the fitness
-values of members in a population. The difference between fitness
-and normalization functions is that fitness functions are only use the
-MacroMolecule to calculate its fitness. Normalzation functions have
-access to all MacroMolecules in a population. As a result they can
-scale the fitness values across the entire population. This is useful
-if you want to ensure a spread of fitness values in the population.
+values of members of a population. The difference between fitness
+and normalization functions is that fitness functions only use the
+:class:`.MacroMolecule` to calculate fitness. Normalzation functions
+have access to all :class:`.MacroMolecules` in a population. As a
+result, they can scale the fitness values across the entire population.
+This is useful if you want to ensure a spread of fitness values in the
+population.
 
-Each generation, a number of normalizatoin functions can be applied
+At each generation, a number of normalization functions can be applied
 in sequence.
 
-Extending MMEA: Adding normalization functions.
------------------------------------------------
-If a new normalization function is to be added to MMEA it should be
-added as a method in the ``Normalization`` class defined in this
-module. The only requirements are that the first argument is
-``population`` (excluding ``self``).
+Extending mtk: Adding normalization functions.
+----------------------------------------------
+
+If a new normalization function is to be added to ``mtk`` it should be
+added as a method in :class:`.Normalization`. The only requirements are
+that the first argument is `population` (excluding `self`).
 
 The naming requirement exists to help users identify which arguments
-are handled automatically by MMEA and which they need to define in the
-input file. The convention is that if the normalization function takes
-an argument called  ``population`` it does not have to be specified in
-the input file.
+are handled automatically by the GA and which they need to define in
+the input file. The convention is that if the normalization function
+takes an argument called  `population`, it does not have to be
+specified in the input file.
 
-Normalization functions should not interact with the `unscaled_fitness`
-attribute in any way. They should only modify the value in `fitness`.
-Before the first normalization function is applied each generation, the
-value in `unscaled_fitness` is copied into `fitness`. This happens
-automatically.
+Normalization functions should not interact with
+:attr:`.MacroMolecule.unscaled_fitness` in any way. They should only
+modify the value in :attr:`.MacroMolecule.fitness`. Before the first
+normalization function is applied by a :class:`Normalization` instance,
+the value in :attr:`~.MacroMolecule.unscaled_fitness` is copied into
+:attr:`~.MacroMolecule.fitness`. The :class:`Normalization` instance
+does this automatically.
 
 Normalization functions calculate the fitness value of a molecule and
-place it in the `fitness` attribute. Multiple normalization functions
-can be applied in sequence. Only the last normalization function
-applied needs to place a value between 0 (exlusive) and infinity in the
-`fitness` attribute. The others can do whatever scaling is necessary
-to for the problem at hand.
+place it in :attr:`.MacroMolecule.fitness`. Multiple normalization
+functions can be applied in sequence. Only the last normalization
+function applied needs to place a value between 0 (exlusive) and
+infinity into :attr:`.MacroMolecule.fitness`. The others can do
+whatever scaling and data manipulation is necessary.
 
 If a normalization function does not fit neatly into a single function
-make sure that any helper functions are private, ie that their names
+make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.
 
 """
 
-
-from functools import partial
 import numpy as np
-import sys, copy, logging
+import copy
+import logging
 
 from .population import Population
 
@@ -61,17 +63,19 @@ class Normalization:
 
     Attributes
     ----------
-    scaling_func : functools. partial
+    funcs : :class:`list` of :class:`.FunctionData`
+        Holds all the normalization functions to be applied each
+        generation, in the order in which they are to be applied.
 
     """
 
     def __init__(self, funcs):
         """
-        Initializes a Normalization instance.
+        Initializes a :class:`Normalization` instance.
 
         Parameters
         ----------
-        funcs : list of FunctionData instances
+        funcs : :class:`list` of :class:`.FunctionData`
             Holds all the normalization functions to be applied each
             generation, in the order in which they are to be applied.
 
@@ -81,13 +85,17 @@ class Normalization:
 
     def __call__(self, population):
         """
-        Applies the normalization function on `population`.
+        Applies the normalization functions on `population`.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population whose members need to have their fitness
             values normalized.
+
+        Returns
+        -------
+        None : :class:`NoneType`
 
         """
 
@@ -129,28 +137,23 @@ class Normalization:
 
     def cage(self, population, cavity, window):
         """
-        A normalization function for the `cage` fitness function.
+        A normalization function for use with :func:`.cage`
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population whose members need to have their fitness
             values normalized.
 
-        cavity : float
+        cavity : :class:`float`
             The desired size of the cage cavity.
 
-        window : float
+        window : :class:`float`
             The desired size of the largest cage window.
-
-        Modifies
-        --------
-        fitness : numpy.array
-            The fitness attribute of members is updated.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -162,37 +165,33 @@ class Normalization:
 
     def combine(self, population, coefficients, exponents):
         """
-        Combines elements in the `fitness` attribute of members.
+        Combines elements in the :attr:`.MacroMolecule.fitness`.
 
-        This function assumes that the `fitness` attribute
-        of the population's members is an array. It raises the members
-        of the array to the values in `exponents` and then multiplies
-        them with the values in `coefficients`. Lastly, the individual
+        This function assumes that :attr:`.MacroMolecule.fitness`
+        of the population's members is an array. It raises the elements
+        of the array to the powers in `exponents` and then multiplies
+        them by the values in `coefficients`. Lastly, the individual
         array elements are summed to create a final value.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population whose members need to have their fitness
             values normalized.
 
-        coefficients : list of ints or floats
-            Before summing all the elements in the `fitness` attribute,
-            their values are multiplied by the numbers in this list.
+        coefficients : :class:`list` of :class:`int` or :class:`float`
+            Before summing all the elements in
+            :attr:`~.MacroMolecule.fitness`, they are multiplied by the
+            values in this list.
 
-        exponents : list of ints or floats
-            Before summing all the elements in the `fitness` attribute,
-            their values are raised to the numbers in this list.
-
-        Modifies
-        --------
-        fitness : numpy.array
-            This attribute is altered for the populations members. It
-            is changed from an array to a float.
+        exponents : :class:`list` of :class:`int` or :class:`float`
+            Before summing all the elements in the
+            :attr:`~.MacroMolecule.fitness`, they are raised to the
+            powers in this list.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -207,21 +206,15 @@ class Normalization:
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population being normalized.
 
-        val : numerical or numpy.array of numericals
+        val : :class:`int` or :class:`float` or :class:`numpy.ndarray`
             The value by which each fitness value is divided.
-
-        Modifies
-        --------
-        fitness : numerical or numpy.array of numericals
-            Each fitness value of a population member is divided by
-            `val`.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -230,32 +223,37 @@ class Normalization:
 
     def magnitudes(self, population):
         """
-        Normalizes the relative values of elements in `fitness`.
+        Sacles values of elements in :attr:`.MacroMolecule.fitness`.
 
-        This normalization function assumes that the value in `fitness`
-        is a numpy array:
+        This normalization function assumes that the value in
+        :attr:`~.MacroMolecule.fitness` is a numpy array:
+
+        .. code-block:: python
 
             macro_mol.fitness = np.array([1000, 5e-5, 25])
 
         Notice that each element has a very different order of
-        magnitude. For example if the fitness function calculated the
+        magnitude. For example, if the fitness function calculated the
         energy value of the molecule, its radius and the number of
-        atoms in it, this could be the data placed in the `fitness`
-        attribute.
+        atoms in it, this could be the data placed into
+        :attr:`~.MacroMolecule.fitness` as an array.
 
         When calculating the total fitness based on these values, it
         would be useful to make them comparable. As it is, you can't
-        compare 10,000 kJ mol-1 and 5e-5 Angstroms. However what you
-        can do is check how much bigger or smaller than average
+        compare 10,000 kJ mol-1 and 5e-5 Angstroms. However, what you
+        can do is check how much bigger or smaller than the average
         10,000 kJ mol-1 and 5e-5 Angstrom are. Then replace these
-        values with the size relative to the average. For example:
+        values with the size divided by the average. For example:
 
-            macro_mol.fitness = np.array([2, 0.5, 3])
+        .. code-block:: python
 
-        This would be the output of this function. It shows that the
-        energy of a given `macro_mol` is twice as large as the mean
-        energy of the population. The radius is half the average
-        molecular radius of the population and so on.
+            average_vals = np.array([500, 1e-5, 5])
+            macro_mol.fitness = macro_mol.fitness / average_vals
+            macro_mol.fitness  # np.array([2, 0.5, 5])
+
+        It shows that the energy of a given `macro_mol` is twice as
+        large as the mean energy of the population. The radius is half
+        the average molecular radius of the population and so on.
 
         Now these values can be combined in a reasonable way. However,
         that will have to be done by other normalization functions.
@@ -263,17 +261,12 @@ class Normalization:
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population whose fitness values are normalized.
-
-        Modifies
-        --------
-        fitness : numpy.array
-            This attribute is altered for the populations members.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -286,63 +279,74 @@ class Normalization:
 
     def shift_elements(self, population, indices):
         """
-        Maps elements in `fitness` array to positive values.
+        Makes all elements in :attr:`.MacroMolecule.fitness` positive.
 
-        Assumy you have a fitness array,
+        Assume you have a fitness array,
 
-            macro_mol.fitness = [1, -10, 1]
+        .. code-block:: python
+
+            macro_mol.fitness = np.array([1, -10, 1])
 
         One way to convert the fitness array into a fitness value is
-        by summing the elements (see the combine() normalization
-        function for this)
+        by summing the elements (see :meth:`Normalization.combine` for
+        this). The result would be:
 
-            macro_mol.fitness = -8
+        .. code-block:: python
+
+            # After summing all values.
+            macro_mol.fitness  # -8
 
         Clearly this doesn't work, because the resulting fitness value
-        is not a positive number. To fix this the -10 should be shifted
-        to a positive value.
+        is not a positive number. To fix this, the ``-10`` should be
+        shifted to a positive value.
 
         This normalization function looks at the elements specified by
         by `indices`. It then finds the minimum value of these elements
         in the population. It then shifts the elements by this value.
 
-        For example, take a population of
+        For example, take a population with the fitness values
 
-            mol1.fitness = [1, -5, 5]
-            mol2.fitness = [3, -10, 2]
-            mol3.fitness = [2, 20, 1]
+        .. code-block:: python
 
-        If the value of `indices` was [1] the after this normalization
-        function was applied the result would be
+            mol1.fitness = np.array([1, -5, 5])
+            mol2.fitness = np.array([3, -10, 2])
+            mol3.fitness = np.array([2, 20, 1])
 
-            mol1.fitness = [1, 5.1, 5]
-            mol2.fitness = [3, 0.1, 2]
-            mol3.fitness = [2, 30.1, 1]
+        If the value of `indices` was ``[1]`` then after this
+        normalization function was applied the result would be
 
-        If `indices` was [0,1]
+        .. code-block:: python
 
-            mol1.fitness = [2.01, 5.1, 5]
-            mol2.fitness = [4.01, 0.1, 2]
-            mol3.fitness = [3.01, 30.1, 1]
+            mol1.fitness  # np.array([1, 5.1, 5])
+            mol2.fitness  # np.array([3, 0.1, 2])
+            mol3.fitness  # np.array([2, 30.1, 1])
 
-        The shift is  1.01 * magnitude of smallest value. This prevents
-        0s in the array.
+        Notice that all in all the fitness arrays the second element
+        has been shifted by ``-10.1``. This is the smallest value of the
+        second element in the population multiplied by ``1.01`` to
+        prevent any of the values being ``0``.
+
+        If `indices` was ``[0,1]``
+
+        .. code-block:: python
+
+            mol1.fitness  # np.array([2.01, 5.1, 5])
+            mol2.fitness  # np.array([4.01, 0.1, 2])
+            mol3.fitness  # np.array([3.01, 30.1, 1])
+
+        The result is the same as before, only now all the first and
+        second elements have been shifted.
 
         Parameters
         ----------
-        indices : list of ints
-            This holds the indices of elements in the `fitness`
-            array which should be shifted to positive values.
-
-        Modifies
-        --------
-        fitness : numpy.array
-            The `fitness` atttribute of the population's members is
-            changed in accordance to the docstring.
+        indices : :class:`list` of :class:`int`
+            This holds the indices of elements in the
+            :attr:`~.MacroMolecule.fitness` array which should be
+            shifted.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -363,22 +367,16 @@ class Normalization:
 
     def invert(self, population):
         """
-        Convertes a fitness value to 1/fitness.
+        Raises fitness values to the power of ``-1``.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population to be normalized.
-
-        Modifies
-        --------
-        fitness : float
-            The `fitness` attribute of the population's members is
-            changed to 1/`fitness`.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
