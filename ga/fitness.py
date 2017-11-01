@@ -1101,10 +1101,10 @@ def _cage_target(func_name,
 
 def _make_cage_target_folder():
     """
-    Creates a folder to store molecules made by _cage_target().
+    Creates a folder to store molecules made by :func:`_cage_target`.
 
-    The function creates a folder called `cage_target`.
-    Inside will be any complexes formed by the function _cage_target().
+    The function creates a folder called ``cage_target``.
+    Inside will be any complexes formed by the :func:`_cage_target`.
     The folder will be placed in the current working directory, or
     if the GA is running, 1 above the current working dirctory. This
     prevents the generated molecules from being cleaned up by the GA
@@ -1125,7 +1125,7 @@ def _make_cage_target_folder():
 
     try:
         os.mkdir(dir_path)
-    except:
+    except Exception:
         pass
 
     return dir_path
@@ -1133,26 +1133,26 @@ def _make_cage_target_folder():
 
 def _generate_complexes(macro_mol, target, number=1):
     """
-    Yields rdkit instances of cage / target complexes.
+    Yields ``rdkit`` molecules of cage / target complexes.
 
     If multiple complexes are returned, they will be different via a
     random rotation accross the x, y and z axes.
 
     Parameters
     ----------
-    macro_mol : Cage
+    macro_mol : :class:`.Cage`
         The cage used to form the complex.
 
-    target : StructUnit
+    target : :class:`.StructUnit`
         The target used to form the complex.
 
-    number : int (default = 1)
+    number : :class:`int`, optional
         The number of complexes to be returned.
 
     Yields
     ------
-    rdkit.Chem.rdchem.Mol
-        An rdkit instance holding the cage / target complex.
+    :class:`rdkit.Chem.rdchem.Mol`
+        An ``rdkit`` instance holding the cage / target complex.
 
     """
 
@@ -1190,23 +1190,23 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    macro_mol : :class:`.MacroMolecule`
         The cage which should have C60 placed inside it.
 
-    c60 : StructUnit
+    c60 : :class:`.StructUnit`
         A StructUnit instance of C60.
 
-    n5fold : int
+    n5fold : :class:`int`
         The number of rotations along the 5-fold axis of symmetry.
 
-    n2fold : int
-        The number of rotations along the 2 fold axis of symmetry per
+    n2fold : :class:`int`
+        The number of rotations along the 2-fold axis of symmetry per
         rotation along the 5-fold axis.
 
     Yields
     ------
-    rdkit.Chem.rdchem.Mol
-        An rdkit instance holding the cage / C60 complex.
+    :class:`rdkit.Chem.rdchem.Mol`
+        An ``rdkit`` instance holding the cage / C60 complex.
 
     """
 
