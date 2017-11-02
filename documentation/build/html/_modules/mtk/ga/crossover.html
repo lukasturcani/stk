@@ -180,7 +180,6 @@
 
 <span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
-<span class="kn">from</span> <span class="nn">..molecular.molecules</span> <span class="k">import</span> <span class="n">Cage</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -387,6 +386,8 @@
 <span class="sd">            `macro_mol1` with `macro_mol2`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Cage</span> <span class="o">=</span> <span class="n">macro_mol1</span><span class="o">.</span><span class="vm">__class__</span>
 
         <span class="c1"># Make a variable for each building-block* and linker of each</span>
         <span class="c1"># each cage. Make a set consisting of topologies of the cages</span>
