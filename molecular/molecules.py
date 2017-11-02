@@ -1888,27 +1888,32 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         return self.mol
 
-    def similar_molecules(self, database):
+    def similar_molecules(self, mols):
         """
-        Returns molecules from `database` ordered by similarity.
+        Returns molecules from `mols` ordered by similarity.
 
         The most similar molecule is at index 0.
 
         This method uses the Morgan fingerprints of radius 4 to
-        evaluate how similar the molecules in `database` are.
+        evaluate how similar the molecules in `mols` are.
 
         Parameters
         ----------
-        database : str
-            The full path of the database from which the molecules are
-            checked for similarity.
+        mols : :class:`iterable` of :class:`rdkit.Chem.rdchem.Mol`
+            A group of molecules to which similarity is compared.
 
         Returns
         -------
-        list of tuples of form (float, str)
-            The float is the similarity of a given molecule in the
-            database to `mol` while the str is the full path of the
-            structure file of that molecule.
+        :class:`list`
+            A :class:`list` of the form,
+
+            .. code-block:: python
+
+                returned_list = [(8.9, mol1), (7.3, mol2), (3.4, mol3)]
+
+            where the :class:`float` is the similarity of a given
+            molecule in `mols` while the ```mol`` is corresponding
+            ``rdkit`` molecule.
 
         """
 
@@ -1919,23 +1924,15 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # For every structure file in the database create a rdkit
         # molecule. Place these in a list.
-        mols = []
-        for file in os.listdir(database):
-            path = os.path.join(database, file)
-            # Ignore files which are not structure files and the
-            # structure file of the molecule itself.
-            _, ext = os.path.splitext(path)
-            if ext not in self.init_funcs:
-                continue
-
-            mol = self.init_funcs[ext](path)
+        similarities = []
+        for mol in mols:
             rdkit.GetSSSR(mol)
             mol.UpdatePropertyCache(strict=False)
             mol_fp = rdkit.GetMorganFingerprint(mol, 4)
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
-            mols.append((similarity, path))
+            similarities.append((similarity, mol))
 
-        return sorted(mols, reverse=True)
+        return sorted(similarities, reverse=True)
 
     @classmethod
     def smarts_init(cls, smarts,
