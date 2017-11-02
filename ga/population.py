@@ -672,7 +672,7 @@ class Population:
                 pop_list = [{...}, [{...}], [{...}, {...}], {...}]
 
             ``pop_list`` represents the population, sublists represent
-            its subpopulations and the :class:`dict` ``{..}``
+            its subpopulations and the :class:`dict` ``{...}``
             represents the members.
 
         member_init : :class:`function`
