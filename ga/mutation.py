@@ -29,7 +29,6 @@ from itertools import islice
 
 from .population import Population
 from .plotting import plot_counter
-from ..molecular import StructUnit3, Cage
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +215,10 @@ class Mutation:
         _, og_bb = min(zip(macro_mol.bb_counter.values(),
                            macro_mol.bb_counter.keys()))
 
+        # Define the molecular classes.
+        Cage = macro_mol.__class__
+        StructUnit3 = og_bb.__class__
+
         while True:
             try:
                 bb_file = np.random.choice(os.listdir(database))
@@ -266,6 +269,8 @@ class Mutation:
             linker from `database`.
 
         """
+
+        Cage = macro_mol.__class__
 
         _, og_lk = max(zip(macro_mol.bb_counter.values(),
                            macro_mol.bb_counter.keys()))
@@ -343,6 +348,10 @@ class Mutation:
         _, og_bb = min(zip(macro_mol.bb_counter.values(),
                            macro_mol.bb_counter.keys()))
 
+        # Define the molecular classes.
+        Cage = macro_mol.__class__
+        StructUnit3 = og_bb.__class__
+
         if macro_mol not in self._similar_bb_mols:
             self._similar_bb_mols[macro_mol] = iter(
                                     og_bb.similar_molecules(database))
@@ -394,6 +403,8 @@ class Mutation:
             a different linker.
 
         """
+
+        Cage = macro_mol.__class__
 
         if not hasattr(self, '_similar_lk_mols'):
             self._similar_lk_mols = {}

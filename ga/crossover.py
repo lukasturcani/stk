@@ -29,7 +29,6 @@ from itertools import islice
 
 from .population import Population
 from .plotting import plot_counter
-from ..molecular.molecules import Cage
 
 
 logger = logging.getLogger(__name__)
@@ -236,6 +235,8 @@ class Crossover:
             `macro_mol1` with `macro_mol2`.
 
         """
+
+        Cage = macro_mol1.__class__
 
         # Make a variable for each building-block* and linker of each
         # each cage. Make a set consisting of topologies of the cages

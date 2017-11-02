@@ -54,7 +54,7 @@ def test_crosser():
     crosser = i.crosser()
     assert crosser.funcs == [FunctionData('bb_lk_exchange')]
     assert crosser.num_crossovers == i.num_crossovers
-    assert crosser.weights == [1]
+    assert crosser.weights is None
 
 
 def test_exiter():
@@ -70,25 +70,27 @@ def test_fitnessor():
 def test_selector():
     sel = i.selector()
     assert sel.generational == FunctionData('stochastic_sampling',
-                                             use_rank=True)
+                                            use_rank=True)
     assert sel.crossover == FunctionData('crossover_roulette')
     assert sel.mutation == FunctionData('stochastic_sampling',
-                                          duplicates=True)
+                                        duplicates=True)
 
 
 def test_mutator():
     mut = i.mutator()
     assert mut.funcs == [FunctionData('cage_random_bb',
-    database='path1'),
-    FunctionData('cage_random_lk', database='path2')]
-    assert mut.weights == [1/4,1/4,1/4,1/4]
+                                      database='path1'),
+                         FunctionData('cage_random_lk',
+                                      database='path2')]
+    assert mut.weights == [1/4, 1/4, 1/4, 1/4]
     assert mut.num_mutations == 2
 
 
 def test_normalizer():
     norm = i.normalizer()
     assert norm.funcs == [FunctionData('shift_elements',
-    indices=[-1]), FunctionData('magnitudes')]
+                                       indices=[-1]),
+                          FunctionData('magnitudes')]
 
 
 def test_opter():
