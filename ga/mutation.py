@@ -21,7 +21,6 @@ start with a leading underscore.
 
 """
 
-import os
 import logging
 import numpy as np
 from collections import Counter
