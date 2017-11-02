@@ -35,70 +35,74 @@ class Selection:
     A class for handling all types of selection in the GA.
 
     Whenever a population needs to have some of its members selected
-    for GA operations such as mutation, selection and generational
-    selection it delegates this task to an instance of this class. The
+    for GA operations such as mutation, selection or generational
+    selection, it delegates this task to an instance of this class. The
     population holds the instance in :attr:`.Population.ga_tools`.
 
-    Each instance of this class supports being called. What calling
-    an instance does depends on the arguments the instance was
-    initialized with and what arguments were supplied during the call.
-    In all cases the call implements returns a generator. This
-    generator yields members of a ``Population`` instance in accordance
-    to some selection algorithm.
+    To illustrate how a :class:`Selection` instance works it is best
+    to use an example.
 
-    Initialization of this class takes the names of methods defined in
-    this class (as strings) and saves them into the instance's
-    `generational`, `crossover` and `mutation` attributes. These
-    attributes should therefore always hold the names of methods that
-    are to be used for the given purpose - such as generational
-    selection. The selection algorithms should be written as methods
-    within this class.
+    .. code-block:: python
 
-    When an instance of this class is called it requires a
-    ``Population`` instance and a string to be provided as arguments.
-    The ``Population`` instance is the population which is to have some
-    of its members selected. Consider the following code:
+        # 1. Create FunctionData objects which describe the selection
+        #    functions to be used. These will correspond to methods
+        #    in the Selection class.
 
-        >>> pop.select('generational')
+        # For selecting members of the next generation.
+        gen_select_fn = FunctionData('fittest')
 
-    Here ``pop`` is a ``Population`` instance with a `ga_tools`
-    attribute, which holds an initialized ``Selection`` instance.
+        # For selecting molecules for crossover.
+        crossover_select_fn = FunctionData('crossover_roulette', n=5)
 
-    The method `select` invoked in the code automatically provides
-    the instance ``pop`` to the ``Selection`` instance it contains. The
-    function then calls the ``Selection`` instance. This means that
-    each time `select` is called on a population, the ``Selection``
-    instance will always act on the population it is held by. Different
-    populations can use different selection algorithms by holding
-    different ``Selection`` instances. Alternatively, they can perform
-    the same selection algorithms by sharing a ``Selection`` instance.
+        # For selecting molecules to mutate.
+        mutation_select_fn = FunctionData('stochastic_sampling',
+                                          elites=2, duplicates=True)
 
-    The string provided to the `select` method is passed all the way
-    down to the ``Selection`` instance being called. This is the second
-    argument a ``Selection`` instance requires when it is being called.
-    This is the string `generational` in the code example above. The
-    string should be the name of one of the attributes of the
-    ``Selection`` class. This means that 'generational', 'crossover'
-    and 'mutation' are valid strings at the time of this being written.
-    If more types of selection are added to MMEA, an attribute named
-    after that type of selection should be added to the ``Selection``
-    class. If one wishes to invoke that type of selection on a
-    population, `select` must be called with the name of that attribute
-    as a parameter.
 
-    There was a slight simplifcation in the paragraph describing
-    initialization. When the ``Selection`` instance is initialzed it
-    is not just with the names of the selection methods to be used. It
-    provided with the names of the methods and any paramters that the
-    methods will need to use. These parameters are packed into the
-    ``FunctionData`` class. The ``FunctionData`` instance holding the
-    method name and the appropriate parameter values is passed to
-    the initializer of ``Selection``.
 
-    Selection algorithms are to be implemented as generators. Selection
-    algorithms which produce parents pools must yield a tuple of
-    ``MacroMolecule`` instances. Selection algorithms should be grouped
-    together by their expected use when written into the class body.
+        # 2. Create a Selection instance using the chosen functions.
+
+        sel = Selection(gen_select_fn,
+                        crossover_select_fn,
+                        mutation_select_fn)
+
+        # 3. Create a population from which "sel" will select members.
+        pop = Population(mol1, mol2, mol3, mol4)
+
+        # 4. Now the selection instance can be used to select members
+        #    of "pop".
+
+        # To select members of the next generation, call the selection
+        # instance with the population as an argument, and a string
+        # to indicate generational selection is desired.
+        next_gen = sel(pop, 'generational')
+
+        # Note that next_gen is a generator, which yields the
+        # selected molecules.
+        next_gen  # <generator object ... >
+
+        for mol in next_gen:
+            mol  # A molecule in "pop".
+
+        # To select members for crossover, the same idea as for
+        # generational selection applies.
+        crossover_mols = sel(pop, 'crossover')
+
+        # Again, "crossover_mols" is a generator. This time it yields
+        # tuples of molecules however. This is because 2 or more
+        # molecules are required per crossover operation.
+
+
+        # Finally, to select molecules for mutation.
+        mols_to_mutate = sel(pop, 'mutation')
+
+        # Again, "mols_to_mutate" is a generator yielding single
+        # molecules.
+
+    By providing the strings ``'generational'``, ``'crossover'`` and
+    ``'mutation'``, the :class:`Selection` instance knows to pick the
+    correct function from the :class:`.FunctionData` instances provided
+    during initialization.
 
     Note that duplicates are not considered during selection. If a
     molecule is present in the population twice, its chance of
@@ -106,24 +110,43 @@ class Selection:
 
     Attributes
     ----------
-    generational : FunctionData
-        This holds the ``FunctionData`` object representing the
+    generational : :class:`.FunctionData`
+        This holds the :class:`.FunctionData` object representing the
         selection function used for selecting the next generation of
-        individuals along with any parameters the function may require.
+        molecules.
 
-    crossover : FunctionData
-        Holds the ``FunctionData`` object representing the selection
-        function used for selecting parents, along with any parameters
-        the function may require.
+    crossover : :class:`.FunctionData`
+        Holds the :class:`.FunctionData` object representing the
+        selection function used for selecting molecules for crossover.
 
-    mutation : FunctionData
-        Holds the ``FunctionData`` object representing the selection
-        function used for selection individuals for mutation, along
-        with any parameters the function may require.
+    mutation : :class:`.FunctionData`
+        Holds the :class:`.FunctionData` object representing the
+        selection function used for selecting molecules to mutate.
 
     """
 
     def __init__(self, generational, crossover, mutation):
+        """
+        Initializes a :class:`Selection` instance.
+
+        Parameters
+        ----------
+        generational : :class:`.FunctionData`
+            This holds the :class:`.FunctionData` object representing
+            the selection function used for selecting the next
+            generation of molecules.
+
+        crossover : :class:`.FunctionData`
+            Holds the :class:`.FunctionData` object representing the
+            selection function used for selecting molecules for
+            crossover.
+
+        mutation : :class:`.FunctionData`
+            Holds the :class:`.FunctionData` object representing the
+            selection function used for selecting molecules to mutate.
+
+        """
+
         self.generational = generational
         self.crossover = crossover
         self.mutation = mutation
@@ -134,20 +157,20 @@ class Selection:
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which members should be selected.
 
-        type_ : str
-            The name of a ``Selection`` attribute. The name corresponds
-            to the type of selection that is desired: 'generational',
-            'crossover' or 'mutation'.
+        type_ : :class:`str`
+            The name of a :class:`.Selection` attribute. The name
+            corresponds to the type of selection that is desired:
+            ``'generational'``, ``'crossover'`` or ``'mutation'``.
 
         Yields
         -------
-        MacroMolecule or tuple of MacroMolecules
-            ``MacroMolecule`` instances are yielded unless `type_` is
-            'crossover'. In this case a tuple of ``MacroMolecule``
-            instances is yielded.
+        :class:`.MacroMolecule` or :class:`tuple`
+            :class:`.MacroMolecule` instances are yielded unless
+            `type_` is ``'crossover'``. In this case a tuple of
+            :class:`.MacroMolecule` instances is yielded.
 
         """
 
@@ -173,14 +196,14 @@ class Selection:
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population who's members need to be selected.
 
         Yields
         ------
-        MacroMolecule
-            The next fittest ``MacroMolecule`` instance held by the
-            population.
+        :class:`.MacroMolecule`
+            The next fittest :class:`.MacroMolecule` instance held by
+            `population`.
 
         """
 
@@ -195,37 +218,37 @@ class Selection:
         In roulette selection the probability an individual is selected
         is given by its fitness. If the total fitness is the sum of all
         fitness values, the chance an individuals is selected is given
-        by
+        by::
 
-        p = individual fitness / total fitness,
+            p = individual fitness / total fitness,
 
-        where p is the probability of selection [1].
+        where ``p`` is the probability of selection [#]_.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which individuals are to be selected.
 
-        elites : int, optional
+        elites : :class:`int`, optional
             The number of the fittest members which are guaranteed to
             be yielded first.
 
-        truncation : int, optional
+        truncation : :class:`int`, optional
             The number of least fit members which will never be
             yielded.
 
-        duplicates : bool, optional
+        duplicates : :class:`bool`, optional
             If ``True`` the same member can be yielded more than
             once.
 
         Yields
         ------
-        MacroMolecule
+        :class:`.MacroMolecule`
             The next selected population member.
 
         References
         ----------
-        [1] http://tinyurl.com/csc3djm
+        .. [#] http://tinyurl.com/csc3djm
 
         """
 
@@ -255,33 +278,33 @@ class Selection:
         Yields individuals using deterministic sampling.
 
         This algorithm can only be used for selection of mutants. It
-        will return duplicates. The results of ``fittest()`` are
+        will return duplicates. The results of :meth:`fittest` are
         equivalent to algorithm without duplicates.
 
         In determnistic sampling the mean fitness value of the
-        population is calculated, <f>. For each individual a
-        normalized fitness value is then calculated via
+        population is calculated, ``<f>``. For each individual a
+        normalized fitness value is then calculated via::
 
             fn = f / <f>
 
-        where fn is the normalized fitness value and f is the original
-        fitness value. An individual will be selected n times, where
-        n is the integer value of fn. After all individuals where
-        n > 0 are yielded, all inidividuals are yielded again. Largest
-        decimal part of fn first.
+        where ``fn`` is the normalized fitness value and ``f`` is the
+        original fitness value. An individual will be selected ``n``
+        times, where ``n`` is the integer value of ``fn``. After all
+        individuals where ``n > 0`` are yielded, all inidividuals are
+        yielded again, largest decimal part of ``fn`` first.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which individuals are to be selected.
 
-        truncation : int, optional
+        truncation : :class:`int`, optional
             The number of least fit members which will never be
             yielded.
 
         Yields
         ------
-        MacroMolecule
+        :class:`.MacroMolecule`
             The next selected population member.
 
         """
@@ -306,45 +329,46 @@ class Selection:
         Yields individuals via stochastic sampling.
 
         Each fitness value is used to calculate the normalized fitness
-        of an individual
+        of an individual::
 
             fn = f / <f>
 
-        where fn is the normalized fitness value, f is the original
-        fitness value and <f> is the mean fitness of the population. If
-        f is greater than 1 then the individual is guaranteed to be
-        selected. If duplicates are allowed, individuals are guaranteed
-        to be selected n times, where n is the integer part of fn.
+        where ``fn`` is the normalized fitness value, ``f`` is the
+        original fitness value and ``<f>`` is the mean fitness of the
+        population. If ``fn`` is greater than ``1`` then the individual
+        is guaranteed to be selected. If duplicates are allowed,
+        individuals are guaranteed to be selected ``n`` times, where
+        ``n`` is the integer part of ``fn``.
 
         Once all the guarnteed individuals have been yielded, the
         remaining individuals are yielded via the roulette method. The
         weights in the roulette method are based on the decimal part of
-        fn.
+        ``fn``.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which individuals are to be selected.
 
-        elites : int, optional
+        elites : :class:`int`, optional
             The number of the fittest members which are guaranteed to
             be yielded first.
 
-        truncation : int, optional
+        truncation : :class:`int`, optional
             The number of least fit members which will never be
             yielded.
 
-        duplicates : bool, optional
+        duplicates : :class:`bool`, optional
             If ``True`` the same member can be yielded more than
             once.
 
-        use_rank : bool, optional
+        use_rank : :class:`bool`, optional
             When ``True`` the fitness value of an individual is
-            calculated as, f = 1/rank.
+            calculated as, ``f = 1/rank``.
 
         Yields
         ------
-        MacroMolecule
+        :class:`.MacroMolecule`
             The next selected population member.
 
         """
@@ -374,18 +398,18 @@ class Selection:
 
         Parameters
         ----------
-        pop : list of MacroMolecules
+        pop : :class:`list` of :class:`.MacroMolecule`
             The molecules which are being selected.
 
-        yielded : set of MacroMolecule instances
+        yielded : :class:`set` of :class:`.MacroMolecule`
             Holds all previously yielded molecules.
 
-        duplicates : bool
+        duplicates : :class:`bool`
             Indicates whether a member can be yielded more than once.
 
         Yields
         ------
-        MacroMolecule
+        :class:`.MacroMolecule`
             The next member whose normalized fitness integer component
             is greater than 0.
 
@@ -411,18 +435,18 @@ class Selection:
 
         Parameters
         ----------
-        pop : list of MacroMolecules
+        pop : :class:`list` of :class:`.MacroMolecule`
             The molecules which are being selected.
 
-        yielded : set of MacroMolecule instances
+        yielded : :class:`set` of :class:`.MacroMolecule`
             Holds all previously yielded molecules.
 
-        duplicates : bool
+        duplicates : :class:`bool`
             Indicates whether a member can be yielded more than once.
 
         Yields
         ------
-        MacroMolecule
+        :class:`.MacroMolecule`
             The seleceted population member.
 
         """
@@ -450,19 +474,19 @@ class Selection:
         Yields every possible pairing of individuals from a population.
 
         This yields members regardless of which subpopulation they are
-        in. Each pair is only returned once. This means if (1,2) is
-        returned (2,1) will not be.
+        in. Each pair is only returned once. This means if ``(1,2)`` is
+        yielded ``(2,1)`` will not be.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which parents should be selected.
 
         Yields
         ------
-        tuple of 2 MacroMolecule instances
-            The ``MacroMolecule`` instances which together form a
-            parent pair.
+        :class:`tuple` of :class:`.MacroMolecule`
+            The :class:`.MacroMolecule` instances which are to be
+            crossed.
 
         """
 
@@ -479,17 +503,17 @@ class Selection:
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which parents should be selected.
 
-        n : int
+        n : :class:`int`
             The number of individuals used for making offspring.
 
         Yields
         ------
-        tuple of 2 MacroMolecule instances
-            The ``MacroMolecule`` instances which together form a parent
-            pair.
+        :class:`tuple` of :class:`.MacroMolecule`
+            The :class:`.MacroMolecule` instances which are to be
+            crossed.
 
         """
 
@@ -504,29 +528,29 @@ class Selection:
         In roulette selection the probability an individual is selected
         is given by its fitness. If the total fitness is the sum of all
         fitness values, the chance an individuals is selected is given
-        by
+        by::
 
-        p = individual fitness / total fitness,
+            p = individual fitness / total fitness,
 
-        where p is the probability of selection [1].
+        where ``p`` is the probability of selection [#]_.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which parents are selected.
 
-        truncation : int, optional
+        truncation : :class:`int`, optional
             The number of least fit members which will never be
             yielded.
 
         Yields
         ------
-        numpy.ndarray of MacroMolecule instances
+        :class:`numpy.ndarray` of :class:`.MacroMolecule`
             The selected parent pair.
 
         References
         ----------
-        [1] http://tinyurl.com/csc3djm
+        .. [#] http://tinyurl.com/csc3djm
 
         """
 
@@ -544,35 +568,35 @@ class Selection:
         Yields parents according to determnistic sampling.
 
         In determnistic sampling the mean fitness value of the
-        population is calculated, <f>. For each individual a
-        normalized fitness value is then calculated via
+        population is calculated, ``<f>``. For each individual a
+        normalized fitness value is then calculated via::
 
             fn = f / <f>
 
-        where fn is the normalized fitness value and f is the original
-        fitness value.
+        where ``fn`` is the normalized fitness value and ``f`` is the
+        original fitness value.
 
         Deterministic sampling then creates a temporary, parent
         population of the same size as the original population. An
         individual is guaranteed to be placed into the parent
-        population n times, where n is the integer part of fn. Any
-        remaining slots are to individuals with the largest decimal
-        values.
+        population ``n`` times, where ``n`` is the integer part of
+        ``fn``. Any remaining slots are given to individuals with the
+        largest decimal values.
 
         Parents are then randomly selected from the parent population.
 
         Parameters
         ----------
-        population : Population
+        population : :class:`.Population`
             The population from which parents are selected.
 
-        truncation : int, optional
+        truncation : :class:`int`, optional
             The number of least fit members which will never be
             yielded.
 
         Yields
         ------
-        numpy.ndarray of MacroMolecule instances
+        :class:`numpy.ndarray` of :class:`.MacroMolecule`
             The selected parent pair.
 
         """
