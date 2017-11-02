@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from os.path import join
 import copy
 
-from ..molecular import Cage, MacroMolecule, FourPlusSix, StructUnit
+from ..molecular import Cage, MacroMolecule
 from ..ga import Population, GATools
 
 pop = Population.load(join('data', 'population', 'population.json'))
@@ -20,15 +20,13 @@ def generate_population(offset=False):
 
     values = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-    #Generate a bunch of cages.
+    # Generate a bunch of cages.
     if offset:
         cages = [Cage.testing_init(values[x+1], values[x],
-                 SimpleNamespace(a=values[x]))
-                                                for x in range(0,22)]
+                 SimpleNamespace(a=values[x])) for x in range(0, 22)]
     if not offset:
         cages = [Cage.testing_init(values[x], values[x],
-                 SimpleNamespace(a=values[x]))
-                                                for x in range(0,22)]
+                 SimpleNamespace(a=values[x])) for x in range(0, 22)]
 
     # Generate a couple of populations to be used as subpopulations.
     sub1 = Population(*cages[0:4])
@@ -43,6 +41,7 @@ def generate_population(offset=False):
     # Initialize final population of subpopulations and cages.
     return Population(sub1, sub2, *cages[-3:])
 
+
 pop = generate_population()
 
 
@@ -56,8 +55,8 @@ def test_init():
     # for initialization as well as a single ``GATools`` instnace, as
     # intended. Should pass.
     Population(Cage.__new__(Cage), Cage.__new__(Cage),
-           Population.__new__(Population), Cage.__new__(Cage),
-           Population.__new__(Population), GATools.__new__(GATools))
+               Population.__new__(Population), Cage.__new__(Cage),
+               Population.__new__(Population), GATools.__new__(GATools))
 
     # Only ``Cage`` and ``Population`` instances are used for
     # initialization, no ``GATools`` instance. Valid, should pass.
@@ -72,13 +71,6 @@ def test_init():
                    Population.__new__(Population), Cage.__new__(Cage),
                    Population.__new__(Population),
                    GATools.__new__(GATools), 12)
-
-
-def test_init_cage_isomers():
-    lk_file = join('data', 'struct_unit2', 'amine.mol2')
-    bb_file = join('data', 'struct_unit3', 'amine.mol2')
-    pop = Population.init_cage_isomers(lk_file, bb_file, FourPlusSix)
-    assert len(pop) == 5184
 
 
 def test_add_members_duplicates():
@@ -103,11 +95,11 @@ def test_add_members_duplicates():
     # Identity needs to be compared by with lists equality
     # (via ``__eq__``) is compared.
     assert all(cage in Population(*receiver.members)
-                                                for cage in supplier)
+               for cage in supplier)
 
     # The reverse should not be true.
     assert not all(cage in Population(*supplier.members)
-                                                for cage in receiver)
+                   for cage in receiver)
 
     # Count the frequency of each cage` in `receiver.members`.
     count = Counter(receiver.members)
@@ -126,7 +118,6 @@ def test_add_members_no_duplicates():
     Duplicate additions not allowed.
 
     """
-
 
     # Generate an initial populaiton, initialize the cage's `bb`, `lk`
     # and `topology` attributes.
@@ -171,7 +162,7 @@ def test_add_subpopulation():
     pop1 = generate_population()
     pop2 = generate_population()
     pop1.add_subpopulation(pop2)
-    assert not pop2 in pop1.populations
+    assert pop2 not in pop1.populations
     assert all(x in pop1 for x in pop2)
 
 
@@ -217,8 +208,8 @@ def test_all_members():
     """
 
     # Generate a bunch of cages.
-    cages = [Cage.testing_init(x,'a', SimpleNamespace(a=1)) for x in
-                                                           range(0,22)]
+    cages = [Cage.testing_init(x, 'a', SimpleNamespace(a=1)) for x in
+             range(0, 22)]
 
     # Generate a couple of ``Populations`` to be used as
     # subpopulations.
@@ -243,7 +234,7 @@ def test_all_members():
     # Add a cage to `cages`. Now there should be a cage in `cages`, not
     # present in main. Should fail.
     cages.append(Cage.testing_init('alpha', 'beta',
-                                         SimpleNamespace(a='gamma')))
+                                   SimpleNamespace(a='gamma')))
 
     with pytest.raises(AssertionError):
         assert all(cage in all_members for cage in cages)
@@ -256,8 +247,8 @@ def test_max():
         mem.fitness = i
         mem.unscaled_fitness = [i, 2*i, 3*i, 4*i]
 
-    maxf = pop.max(lambda x : x.fitness)
-    maxuf = pop.max(lambda x : x.unscaled_fitness)
+    maxf = pop.max(lambda x: x.fitness)
+    maxuf = pop.max(lambda x: x.unscaled_fitness)
     m = np.matrix([x.unscaled_fitness for x in pop])
 
     assert np.max([x.fitness for x in pop]) == maxf
@@ -271,8 +262,8 @@ def test_mean():
         mem.fitness = i
         mem.unscaled_fitness = [i, 2*i, 3*i, 4*i]
 
-    avgf = pop.mean(lambda x : x.fitness)
-    avguf = pop.mean(lambda x : x.unscaled_fitness)
+    avgf = pop.mean(lambda x: x.fitness)
+    avguf = pop.mean(lambda x: x.unscaled_fitness)
     m = np.matrix([x.unscaled_fitness for x in pop])
 
     assert np.mean([x.fitness for x in pop]) == avgf
@@ -286,8 +277,8 @@ def test_min():
         mem.fitness = i
         mem.unscaled_fitness = [i, 2*i, 3*i, 4*i]
 
-    minf = pop.min(lambda x : x.fitness)
-    minuf = pop.min(lambda x : x.unscaled_fitness)
+    minf = pop.min(lambda x: x.fitness)
+    minuf = pop.min(lambda x: x.unscaled_fitness)
     m = np.matrix([x.unscaled_fitness for x in pop])
 
     assert np.min([x.fitness for x in pop]) == minf
@@ -385,7 +376,7 @@ def remove_members():
     for x in range(5):
         pop[x].remove_me = True
 
-    pop.remove_members(lambda x : hasattr('remove_me'))
+    pop.remove_members(lambda x: hasattr('remove_me'))
     assert len(pop) == og_length - 5
 
 
@@ -424,7 +415,6 @@ def test_sub():
     subtractee = generate_population()
     subtractor_same = generate_population()
     subtractor_different = generate_population(offset=True)
-
 
     # Removing cages not present in a population should return the
     # same population.
