@@ -256,118 +256,95 @@ class Population:
         return p
 
     @classmethod
-    def init_diverse_cages(cls,
-                           bb_db,
-                           lk_db,
-                           topologies,
-                           size,
-                           ga_tools,
-                           bb_fg=None,
-                           lk_fg=None):
+    def init_diverse(cls,
+                     macromol_class,
+                     building_blocks,
+                     topologies,
+                     size,
+                     ga_tools):
         """
-        Creates a population of cages built from provided databases.
+        Assembles a population of :class:`.MacroMolecule`.
 
-        All cages are held in the population's `members` attribute.
+        All molecules are held in the :attr:`members`.
 
-        From the supplied databases a random linker and building block
-        molecule is selected to form a cage. The next linker and
-        building block selected are those which have the most different
-        Morgan fingerprints to the first pair. The next pair random
-        again and so on. This is done until `size` cages have been
+        From the supplied sublists of building blocks, a random
+        molecule is selected to initialize a :class:`.MacroMolecule`
+        per sublist. The next molecule selected from the same sublist
+        is the one most with the most different Morgan fingerprint. The
+        next molecule is picked at random again and so on. This is done
+        until `size` :class:`.MacroMolecule` instances have been
         formed.
 
         Parameters
         ----------
-        bb_db : str
-            The full path of the database of building-block* molecules.
+        macromol_class : :class:`type`
+            The class of :class:`.MacroMolecule` to be assembled.
 
-        lk_db : str
-            The full path of the database of linker molecules.
+        building_blocks : :class:`list`
+            A :class:`list` of the form
 
-        topolgies : iterable of Topology objects
+            .. code-block:: python
+
+                building_blocks = [[StructUnit2(), StructUnit2(), ...],
+                                   [StructUnit3(), StructUnit3(), ...],
+                                   [StructUnit2(), StructUnit2(), ...]]
+
+            To assemble a new :class:`.MacroMolecule`, a
+            :class:`.StructUnit` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.StructUnit`
+            instances are then supplied to the macromolecule:
+
+            .. code-block:: python
+
+                macro_mol = MacroMolecule([pick1, pick2, pick3],
+                                          Topology())
+
+            The order of picked :class:`.StructUnit` instances
+            corresponds to the order of the sublists.
+
+        topolgies : :class:`iterable` of :class:`.Topology`
             An iterable holding topologies which should be randomly
-            selected for cage initialization.
+            selected during initialization of :class:`.MacroMolecule`.
 
-        size : int
+        size : :class:`int`
             The size of the population to be initialized.
 
-        ga_tools : GATools
-            The GATools instance to be used by created population.
-
-        bb_fg : str (default = None)
-            The name of the functional group present in molecules in
-            `bb_db`. It is the name of the functional group used to
-            build the macromolecules. If ``None`` it is assumed that
-            the name is present in `bb_db`.
-
-        lk_fg : str (default = None)
-            The name of the functional group present in molecules in
-            `lk_db`. It is the name of the functional group used to
-            build the macromolecules. If ``None`` it is assumed that
-            the name is present in `lk_db`.
+        ga_tools : :class:`.GATools`
+            The :class:`.GATools` instance to be used by created
+            population.
 
         Returns
         -------
-        Population
-            A population filled with random cages.
+        :class:`.Population`
+            A population filled with generated molecules.
 
         """
 
         pop = cls(ga_tools)
-        bb_files = glob(join(bb_db, '*'))
-        # Remove any files which are not valid structure files.
-        bb_files = [x for x in bb_files if
-                    os.path.splitext(x)[1] in StructUnit.init_funcs]
-        lk_files = glob(join(lk_db, '*'))
-        lk_files = [x for x in lk_files if
-                    os.path.splitext(x)[1] in StructUnit.init_funcs]
 
-        pairs = defaultdict(list)
-        bbindices = list(range(len(bb_files)))
-        i = -1
-        while bbindices:
-            i += 1
+        building_blocks = []
 
-            topology = np.random.choice(topologies)
-            if i % 2 == 0:
-                # First pick the index of a building block file.
-                bbi = np.random.choice(bbindices)
-                # Next get the indices of all linker files which are
-                # not already used together with `bbi`.
-                lkindices = list(range(len(lk_files)))
-                for pairedi in pairs[bbi]:
-                    lkindices.remove(pairedi)
-                # If `bbi` has been paired with all linkers already,
-                # remove it from the list of possible indices and try
-                # again.
-                if not lkindices:
-                    bbindices.remove(bbi)
-                    i -= 1
-                    continue
-                # Pick a linker index and note the pairing.
-                lki = np.random.choice(lkindices)
-                pairs[bbi].append(lki)
+        # Shuffle the sublists.
+        for db in building_blocks:
+            np.random.shuffle(db)
 
-                bb = StructUnit3(bb_files[bbi], bb_fg)
-                lk = StructUnit(lk_files[lki], lk_fg)
+        # Go through every possible macromolecule.
+        for *bbs, top in it.product(*building_blocks, topologies):
+            # Generate the random macromolecule.
+            macro_mol = macromol_class(bbs, top)
+            if macro_mol not in pop:
+                pop.members.append(macro_mol)
 
-            else:
-                bb_file = bb.similar_molecules(bb_db)[-1][1]
-                bb = StructUnit3(bb_file, bb_fg)
+            if len(pop) == size:
+                break
 
-                lk_file = lk.similar_molecules(lk_db)[-1][1]
-                lk = StructUnit(lk_file, lk_fg)
+            # Generate the most different macromolecule.
+            diff_bbs = [bb.similar_molecules() for bb in bbs]
+            macro_mol = macromol_class(diff_bbs, top)
+            if macro_mol not in pop:
+                pop.members.append(macro_mol)
 
-            if len(lk.bonder_ids) >= 3:
-                lk = StructUnit3(lk.file, lk_fg)
-            else:
-                lk = StructUnit2(lk.file, lk_fg)
-
-            cage = Cage([bb, lk], topology)
-            if cage not in pop:
-                pop.members.append(cage)
-
-            if len(pop) >= size:
+            if len(pop) == size:
                 break
 
         assert len(pop) == size
