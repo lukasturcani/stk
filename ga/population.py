@@ -677,8 +677,8 @@ class Population:
 
         member_init : :class:`function`
             The initialization function for the populations members.
-            The function which converts the member represenations in
-            `pop_list` into desired objects.
+            It converts the member represenations it `pop_list` into
+            desired objects.
 
         load_names : :class:`bool`, optional
             If ``True``, then the :meth:`.Molecule.name` attribute
