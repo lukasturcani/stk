@@ -94,16 +94,18 @@ class Population:
         ----------
         *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`
             A population is initialized with the :class:`.Molecule` and
-            :class:`Population` instances it should hold. These are placed
-            into the :attr:`members` or :attr:`populations` attributes,
-            respectively. A :class:`.GATools` instance may be included
-            and will be placed into the :attr:`ga_tools` attribute.
+            :class:`Population` instances it should hold. These are
+            placed into the :attr:`members` or :attr:`populations`
+            attributes, respectively. A :class:`.GATools` instance may
+            be included and will be placed into the :attr:`ga_tools`
+            attribute.
 
         Raises
         ------
-        TypeError
-            If initialized with something other than :class:`.Molecule`,
-            :class:`Population` or :class:`.GATools` instances.
+        :class:`TypeError`
+            If initialized with something other than
+            :class:`.Molecule`, :class:`Population` or
+            :class:`.GATools` instances.
 
         """
 
