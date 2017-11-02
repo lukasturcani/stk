@@ -1913,7 +1913,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
             where the :class:`float` is the similarity of a given
             molecule in `mols` while the ```mol`` is corresponding
-            ``rdkit`` molecule.
+            ``rdkit`` molecule. Most similar molecule yielded first.
 
         """
 
@@ -1932,7 +1932,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
             similarities.append((similarity, mol))
 
-        return sorted(similarities, reverse=True)
+        return sorted(similarities, reverse=True, key=lambda x: x[0])
 
     @classmethod
     def smarts_init(cls, smarts,

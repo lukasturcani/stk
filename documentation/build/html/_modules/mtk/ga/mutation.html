@@ -180,7 +180,6 @@
 
 <span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
-<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">StructUnit3</span><span class="p">,</span> <span class="n">Cage</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -367,6 +366,10 @@
         <span class="n">_</span><span class="p">,</span> <span class="n">og_bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                            <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
+        <span class="c1"># Define the molecular classes.</span>
+        <span class="n">Cage</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="n">StructUnit3</span> <span class="o">=</span> <span class="n">og_bb</span><span class="o">.</span><span class="vm">__class__</span>
+
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">bb_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
@@ -417,6 +420,8 @@
 <span class="sd">            linker from `database`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Cage</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span>
 
         <span class="n">_</span><span class="p">,</span> <span class="n">og_lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                            <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
@@ -494,6 +499,10 @@
         <span class="n">_</span><span class="p">,</span> <span class="n">og_bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                            <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
+        <span class="c1"># Define the molecular classes.</span>
+        <span class="n">Cage</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="n">StructUnit3</span> <span class="o">=</span> <span class="n">og_bb</span><span class="o">.</span><span class="vm">__class__</span>
+
         <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
                                     <span class="n">og_bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
@@ -545,6 +554,8 @@
 <span class="sd">            a different linker.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Cage</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_similar_lk_mols&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span> <span class="o">=</span> <span class="p">{}</span>

@@ -2401,23 +2401,26 @@ instance as held in <cite>mol</cite>.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.similar_molecules">
-<code class="descname">similar_molecules</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.similar_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.similar_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns molecules from <cite>database</cite> ordered by similarity.</p>
+<code class="descname">similar_molecules</code><span class="sig-paren">(</span><em>mols</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.similar_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.similar_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns molecules from <cite>mols</cite> ordered by similarity.</p>
 <p>The most similar molecule is at index 0.</p>
 <p>This method uses the Morgan fingerprints of radius 4 to
-evaluate how similar the molecules in <cite>database</cite> are.</p>
+evaluate how similar the molecules in <cite>mols</cite> are.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>database</strong> (<em>str</em>) – The full path of the database from which the molecules are
-checked for similarity.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mols</strong> (<code class="xref py py-class docutils literal"><span class="pre">iterable</span></code> of <code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A group of molecules to which similarity is compared.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The float is the similarity of a given molecule in the
-database to <cite>mol</cite> while the str is the full path of the
-structure file of that molecule.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form,<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">returned_list</span> <span class="o">=</span> <span class="p">[(</span><span class="mf">8.9</span><span class="p">,</span> <span class="n">mol1</span><span class="p">),</span> <span class="p">(</span><span class="mf">7.3</span><span class="p">,</span> <span class="n">mol2</span><span class="p">),</span> <span class="p">(</span><span class="mf">3.4</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>where the <code class="xref py py-class docutils literal"><span class="pre">float</span></code> is the similarity of a given
+molecule in <cite>mols</cite> while the <code class="docutils literal"><span class="pre">`mol</span></code> is corresponding
+<code class="docutils literal"><span class="pre">rdkit</span></code> molecule. Most similar molecule yielded first.</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of tuples of form (float, str)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">list</span></code></td>
 </tr>
 </tbody>
 </table>

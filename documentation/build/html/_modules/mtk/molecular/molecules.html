@@ -2039,27 +2039,32 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
-<div class="viewcode-block" id="StructUnit.similar_molecules"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.similar_molecules">[docs]</a>    <span class="k">def</span> <span class="nf">similar_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.similar_molecules"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.similar_molecules">[docs]</a>    <span class="k">def</span> <span class="nf">similar_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mols</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns molecules from `database` ordered by similarity.</span>
+<span class="sd">        Returns molecules from `mols` ordered by similarity.</span>
 
 <span class="sd">        The most similar molecule is at index 0.</span>
 
 <span class="sd">        This method uses the Morgan fingerprints of radius 4 to</span>
-<span class="sd">        evaluate how similar the molecules in `database` are.</span>
+<span class="sd">        evaluate how similar the molecules in `mols` are.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        database : str</span>
-<span class="sd">            The full path of the database from which the molecules are</span>
-<span class="sd">            checked for similarity.</span>
+<span class="sd">        mols : :class:`iterable` of :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            A group of molecules to which similarity is compared.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list of tuples of form (float, str)</span>
-<span class="sd">            The float is the similarity of a given molecule in the</span>
-<span class="sd">            database to `mol` while the str is the full path of the</span>
-<span class="sd">            structure file of that molecule.</span>
+<span class="sd">        :class:`list`</span>
+<span class="sd">            A :class:`list` of the form,</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                returned_list = [(8.9, mol1), (7.3, mol2), (3.4, mol3)]</span>
+
+<span class="sd">            where the :class:`float` is the similarity of a given</span>
+<span class="sd">            molecule in `mols` while the ```mol`` is corresponding</span>
+<span class="sd">            ``rdkit`` molecule. Most similar molecule yielded first.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2070,23 +2075,15 @@
 
         <span class="c1"># For every structure file in the database create a rdkit</span>
         <span class="c1"># molecule. Place these in a list.</span>
-        <span class="n">mols</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">database</span><span class="p">):</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-            <span class="c1"># Ignore files which are not structure files and the</span>
-            <span class="c1"># structure file of the molecule itself.</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">:</span>
-                <span class="k">continue</span>
-
-            <span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">similarities</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">:</span>
             <span class="n">rdkit</span><span class="o">.</span><span class="n">GetSSSR</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
             <span class="n">mol</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">mol_fp</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">GetMorganFingerprint</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
             <span class="n">similarity</span> <span class="o">=</span> <span class="n">DataStructs</span><span class="o">.</span><span class="n">DiceSimilarity</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">mol_fp</span><span class="p">)</span>
-            <span class="n">mols</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">similarity</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+            <span class="n">similarities</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">similarity</span><span class="p">,</span> <span class="n">mol</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">similarities</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="StructUnit.smarts_init"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.smarts_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">smarts_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">smarts</span><span class="p">,</span>
