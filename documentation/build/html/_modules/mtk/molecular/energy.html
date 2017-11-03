@@ -329,10 +329,13 @@
 <span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">MethodType</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span> <span class="k">as</span> <span class="n">sig</span>
-
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FunctionData</span>
 <span class="kn">from</span> <span class="nn">..optimization.mopac</span> <span class="k">import</span> <span class="n">mopac_opt</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="_EnergyError"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._EnergyError">[docs]</a><span class="k">class</span> <span class="nc">_EnergyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -751,13 +754,15 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Starting rdkit energy calculation.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">forcefield</span> <span class="o">==</span> <span class="s1">&#39;uff&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
             <span class="n">ff</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">UFFGetMoleculeForceField</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">forcefield</span> <span class="o">==</span> <span class="s1">&#39;mmff&#39;</span><span class="p">:</span>
             <span class="n">rdkit</span><span class="o">.</span><span class="n">GetSSSR</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
-            <span class="n">ff</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFGetMoleculeForceField</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+            <span class="n">ff</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFGetMoleculeForceField</span><span class="p">(</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
                   <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFGetMoleculeProperties</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">mol</span><span class="p">))</span>
 
         <span class="n">eng</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">CalcEnergy</span><span class="p">()</span>

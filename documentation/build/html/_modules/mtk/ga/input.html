@@ -217,11 +217,11 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    num_cores : :class:`int`</span>
-<span class="sd">        The number of CPUs to be used when running operations in</span>
-<span class="sd">        parallel. This does not have to be specified in the input file.</span>
-<span class="sd">        If not specified, the number will default to the value returned</span>
-<span class="sd">        by :func:`psutil.cpu_count`</span>
+<span class="sd">    processes : :class:`int`</span>
+<span class="sd">        The number of parallel processes to create when running</span>
+<span class="sd">        parallel operations. This does not have to be specified in the</span>
+<span class="sd">        input file. If not specified, the number will default to the</span>
+<span class="sd">        value returned by :func:`psutil.cpu_count`</span>
 
 <span class="sd">    pop_size : :class:`int`</span>
 <span class="sd">        The size of the population.</span>
@@ -297,11 +297,6 @@
 <span class="sd">        re-optimized or have fitness values recalculated when</span>
 <span class="sd">        encountered by the GA.</span>
 
-<span class="sd">    parallel : :class:`bool`</span>
-<span class="sd">        If ``True`` the GA does optimization and fitness calculation of</span>
-<span class="sd">        each molecule in parallel. Can be omitted from the input file</span>
-<span class="sd">        in which case the it defaults to ``True``.</span>
-
 <span class="sd">    progress_dump : :class:`bool`</span>
 <span class="sd">        If ``True`` a ``.json`` :class:`.Population` dump is made at</span>
 <span class="sd">        the end of the GA run called ``progress.json``. The population</span>
@@ -364,8 +359,8 @@
 
         <span class="c1"># If the input file did not specify some values, default</span>
         <span class="c1"># initialize them.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;num_cores&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">num_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;processes&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processes</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;num_crossovers&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_crossovers</span> <span class="o">=</span> <span class="mi">0</span>
@@ -387,9 +382,6 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;databases&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;parallel&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;progress_dump&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">progress_dump</span> <span class="o">=</span> <span class="kc">True</span>
@@ -488,7 +480,6 @@
                        <span class="bp">self</span><span class="o">.</span><span class="n">opter</span><span class="p">(),</span>
                        <span class="bp">self</span><span class="o">.</span><span class="n">fitnessor</span><span class="p">(),</span>
                        <span class="bp">self</span><span class="o">.</span><span class="n">exiter</span><span class="p">(),</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span><span class="p">,</span>
                        <span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GAInput.initer"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.initer">[docs]</a>    <span class="k">def</span> <span class="nf">initer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
