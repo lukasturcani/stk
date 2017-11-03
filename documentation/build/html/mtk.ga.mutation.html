@@ -300,7 +300,7 @@ being picked.</li>
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The cage which is to have its building block substituted.</li>
 <li><strong>mols</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – A group of molecules from which one is used for
 substitution.</li>
-<li><strong>key</strong> (<em>:class`function`</em>) – A function which takes a building block of <cite>macro_mol</cite> and
+<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which takes a building block of <cite>macro_mol</cite> and
 returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>. For all building blocks
 which return <code class="docutils literal"><span class="pre">True</span></code>, one is chosen at random to undergo
 mutation.</li>
@@ -349,29 +349,27 @@ topology.</p>
 
 <dl class="method">
 <dt id="mtk.ga.mutation.Mutation.similar_bb">
-<code class="descname">similar_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mols</em>, <em>mol_map</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.similar_bb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.similar_bb" title="Permalink to this definition">¶</a></dt>
+<code class="descname">similar_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mols</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.similar_bb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.similar_bb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Substitute a building block with a similar one.</p>
 <p>This function first selects a building block of <cite>macro_mol</cite> for
 mutation. One is chosen at random from the building blocks
 where <code class="docutils literal"><span class="pre">key(building_block)</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p>
-<p>All of the molecules in <cite>mols</cite> are then checked for similarity
-to the building block. The first time this mutation function is
-run on a <cite>macro_mol</cite>, the most similar molecule in <cite>mols</cite> to
-the chosen building block is used to substitute it. The
-next time this mutation function is run on the same <cite>macro_mol</cite>
-and the same building block is chosen, the second most similar
-molecule from <cite>mols</cite> is used for substitution and so on.</p>
+<p>All  molecules in <cite>mols</cite> are then checked for similarity to the
+building block. The first time this mutation function is run on
+a <cite>macro_mol</cite>, the most similar molecule in <cite>mols</cite> to the
+chosen building block is used to substitute it. The next time
+this mutation function is run on the same <cite>macro_mol</cite> and the
+same building block is chosen, the second most similar molecule
+from <cite>mols</cite> is used for substitution and so on.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The cage which is to have its building block substituted.</li>
-<li><strong>mols</strong> (<code class="xref py py-class docutils literal"><span class="pre">iterable</span></code> of <code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – A group of molecules to which similarity is compared.</li>
-<li><strong>mol_map</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the <code class="docutils literal"><span class="pre">rdkit</span></code> molecules in <cite>mols</cite> to
-<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> instances which are used to for
-substiuting a building block.</li>
-<li><strong>key</strong> (<em>:class`function`</em>) – A function which takes a building block of <cite>macro_mol</cite> and
+<li><strong>mols</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – A group of molecules from which one is used for
+substitution.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which takes a building block of <cite>macro_mol</cite> and
 returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>. For all building blocks
 which return <code class="docutils literal"><span class="pre">True</span></code>, one is chosen at random to undergo
 mutation.</li>
