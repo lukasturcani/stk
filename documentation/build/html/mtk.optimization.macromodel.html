@@ -283,7 +283,7 @@ versions are kept.</li>
 <li><strong>macromodel_path</strong> (<em>str</em>) – The full path of the installation directory of the Schrodinger
 suite. By default on a Windows machine it should be something
 like: “C:Program FilesSchrodinger2016-2”.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
+<li><strong>logger</strong> (<em>FakeLogger</em><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
 <li><strong>Modifies</strong> – </li>
 <li><strong>--------</strong> – </li>
 <li><strong>function creates a new .mae file from a .maegz file.</strong> (<em>This</em>) – </li>
@@ -322,7 +322,7 @@ file is also kept.</li>
 <li><strong>macromodel_path</strong> (<em>str</em>) – The full path of the installation directory of the Schrodinger
 suite. By default on a Windows machine it should be something
 like: “C:Program FilesSchrodinger2016-2”.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
+<li><strong>logger</strong> (<em>FakeLogger</em><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
 <li><strong>Modifies</strong> – </li>
 <li><strong>--------</strong> – </li>
 <li><strong>function creates a new .mae file from the structure file</strong> (<em>This</em>) – </li>
@@ -482,7 +482,7 @@ because it should probably not be used outside of this context.</p>
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule which is to be optimized.</li>
 <li><strong>settings</strong> (<em>dict</em>) – A dictionary of settings for the optimization. See
 macromodel_opt() documentation.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
+<li><strong>logger</strong> (<em>FakeLogger</em><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
 <li><strong>Modifies</strong> – </li>
 <li><strong>--------</strong> – </li>
 <li><strong>function creates a new .com file holding the instructions</strong> (<em>This</em>) – </li>
@@ -555,7 +555,7 @@ minimization did not occur due to a missing license.</p>
 machine. For example, in a default Microsoft installation the
 folder will probably be something like
 <code class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\Schrodinger2016-2</span></code>.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
+<li><strong>logger</strong> (<em>FakeLogger</em><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
 <li><strong>settings</strong> (<em>dict</em><em> (</em><em>default = {}</em><em>)</em>) – <p>Each key is a string describing an MD parameter. The value is
 the corresponding value. Only values which need to be changed
 from the default need to be specified. The allowed parameters
@@ -633,7 +633,7 @@ rdkit molecule with an optimized structure.</dd>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>file_name</strong> (<em>str</em>) – The full path of the file which should be waited for.</li>
-<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
+<li><strong>logger</strong> (<em>FakeLogger</em><em> or </em><em>logging.Logger</em>) – Used for logging.</li>
 <li><strong>timeout</strong> (<em>int</em><em> or </em><em>float</em>) – The number of seconds before the function stops waiting and
 returns.</li>
 </ul>

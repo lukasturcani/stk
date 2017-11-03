@@ -155,7 +155,7 @@
 <p>Defines the <a class="reference internal" href="#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a>.</p>
 <dl class="class">
 <dt id="mtk.ga.ga_tools.GATools">
-<em class="property">class </em><code class="descclassname">mtk.ga.ga_tools.</code><code class="descname">GATools</code><span class="sig-paren">(</span><em>selection</em>, <em>crossover</em>, <em>mutation</em>, <em>normalization</em>, <em>optimization</em>, <em>fitness</em>, <em>exit_</em>, <em>parallel</em>, <em>ga_input</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_tools.html#GATools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_tools.GATools" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.ga.ga_tools.</code><code class="descname">GATools</code><span class="sig-paren">(</span><em>selection</em>, <em>crossover</em>, <em>mutation</em>, <em>normalization</em>, <em>optimization</em>, <em>fitness</em>, <em>exit_</em>, <em>ga_input</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_tools.html#GATools"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_tools.GATools" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Stores objects which carry out GA operations on populations.</p>
 <dl class="attribute">
@@ -189,7 +189,7 @@ the fitness values in the population.</p>
 <dl class="attribute">
 <dt id="mtk.ga.ga_tools.GATools.optimization">
 <code class="descname">optimization</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.optimization" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">FuncionData</span></code> – Holds the name and arguments of an optimization function
+<dd><p><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the name and arguments of an optimization function
 defined in <a class="reference internal" href="mtk.optimization.html#module-mtk.optimization" title="mtk.optimization"><code class="xref py py-mod docutils literal"><span class="pre">optimization</span></code></a>. The function is used to
 optimize the molecules in the population.</p>
 </dd></dl>
@@ -197,7 +197,7 @@ optimize the molecules in the population.</p>
 <dl class="attribute">
 <dt id="mtk.ga.ga_tools.GATools.fitness">
 <code class="descname">fitness</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.fitness" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the name and arguments of the function in <a class="reference internal" href="mtk.ga.fitness.html#module-mtk.ga.fitness" title="mtk.ga.fitness"><code class="xref py py-mod docutils literal"><span class="pre">fitness</span></code></a>
+<dd><p><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the name and arguments of the function in <a class="reference internal" href="mtk.ga.fitness.html#module-mtk.ga.fitness" title="mtk.ga.fitness"><code class="xref py py-mod docutils literal"><span class="pre">fitness</span></code></a>
 to be used for calculating the fitness of
 <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances in the population.</p>
 </dd></dl>
@@ -210,13 +210,6 @@ satisfied the exit criterion to stop the GA early.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="mtk.ga.ga_tools.GATools.parallel">
-<code class="descname">parallel</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.parallel" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – If <code class="docutils literal"><span class="pre">True</span></code> optimizations and fitness calculations are done on
-each molecule in parallel.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="mtk.ga.ga_tools.GATools.input">
 <code class="descname">input</code><a class="headerlink" href="#mtk.ga.ga_tools.GATools.input" title="Permalink to this definition">¶</a></dt>
 <dd><p><a class="reference internal" href="mtk.ga.input.html#mtk.ga.input.GAInput" title="mtk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a> – The <a class="reference internal" href="mtk.ga.input.html#mtk.ga.input.GAInput" title="mtk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a> object holding data gathered from the
@@ -225,7 +218,7 @@ input file.</p>
 
 <dl class="method">
 <dt id="mtk.ga.ga_tools.GATools.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>selection</em>, <em>crossover</em>, <em>mutation</em>, <em>normalization</em>, <em>optimization</em>, <em>fitness</em>, <em>exit_</em>, <em>parallel</em>, <em>ga_input</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_tools.html#GATools.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_tools.GATools.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>selection</em>, <em>crossover</em>, <em>mutation</em>, <em>normalization</em>, <em>optimization</em>, <em>fitness</em>, <em>exit_</em>, <em>ga_input</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_tools.html#GATools.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_tools.GATools.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a <a class="reference internal" href="#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a> instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -243,13 +236,11 @@ normalizes the fitness values in the population.</li>
 <li><strong>optimization</strong> (<code class="xref py py-class docutils literal"><span class="pre">FuncionData</span></code>) – Holds the name and arguments of an optimization function
 defined in <a class="reference internal" href="mtk.optimization.html#module-mtk.optimization" title="mtk.optimization"><code class="xref py py-mod docutils literal"><span class="pre">optimization</span></code></a>. The function is used to
 optimize the molecules in the population.</li>
-<li><strong>fitness</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the name and arguments of the function in
+<li><strong>fitness</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the name and arguments of the function in
 <a class="reference internal" href="mtk.ga.fitness.html#module-mtk.ga.fitness" title="mtk.ga.fitness"><code class="xref py py-mod docutils literal"><span class="pre">fitness</span></code></a> to be used for calculating the fitness of
 <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances in the population.</li>
 <li><strong>exit</strong> (<a class="reference internal" href="mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit" title="mtk.ga.ga_exit.Exit"><code class="xref py py-class docutils literal"><span class="pre">Exit</span></code></a>) – An <a class="reference internal" href="mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit" title="mtk.ga.ga_exit.Exit"><code class="xref py py-class docutils literal"><span class="pre">Exit</span></code></a> object which checks if the population
 satisfied the exit criterion to stop the GA early.</li>
-<li><strong>parallel</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – If <code class="docutils literal"><span class="pre">True</span></code> optimizations and fitness calculations are done
-on each molecule in parallel.</li>
 <li><strong>input</strong> (<a class="reference internal" href="mtk.ga.input.html#mtk.ga.input.GAInput" title="mtk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a>) – The <a class="reference internal" href="mtk.ga.input.html#mtk.ga.input.GAInput" title="mtk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a> object holding data gathered from the
 input file.</li>
 </ul>
@@ -266,7 +257,7 @@ input file.</li>
 
 <dl class="attribute">
 <dt id="mtk.ga.ga_tools.GATools.__slots__">
-<code class="descname">__slots__</code><em class="property"> = ['selection', 'crossover', 'mutation', 'normalization', 'optimization', 'fitness', 'exit', 'parallel', 'input']</em><a class="headerlink" href="#mtk.ga.ga_tools.GATools.__slots__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__slots__</code><em class="property"> = ['selection', 'crossover', 'mutation', 'normalization', 'optimization', 'fitness', 'exit', 'input']</em><a class="headerlink" href="#mtk.ga.ga_tools.GATools.__slots__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -308,11 +299,6 @@ input file.</li>
 <dl class="attribute">
 <dt>
 <code class="descname">optimization</code></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="descname">parallel</code></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

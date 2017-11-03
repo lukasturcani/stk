@@ -17,29 +17,6 @@ import gzip
 import re
 from collections import deque
 import tarfile
-import logging
-
-# Define the formatter for logging messages.
-try:
-    f = '\n' + '='*os.get_terminal_size().columns + '\n\n'
-except OSError as ex:
-    # When testing os.get_terminal_size() will fail because stdout is
-    # not connceted to a terminal.
-    f = '\n' + '='*100 + '\n\n'
-formatter = logging.Formatter(fmt=f+('%(asctime)s - %(levelname)s - '
-                                     '%(name)s - %(message)s'),
-                              datefmt='%H:%M:%S')
-
-
-# Define logging handlers.
-errorhandler = logging.FileHandler('output/scratch/errors.log',
-                                   delay=True)
-errorhandler.setLevel(logging.ERROR)
-
-streamhandler = logging.StreamHandler()
-
-errorhandler.setFormatter(formatter)
-streamhandler.setFormatter(formatter)
 
 # Holds the elements Van der Waals radii in Angstroms.
 atom_vdw_radii = {
@@ -143,26 +120,6 @@ class MolFileError(Exception):
 class PopulationSizeError(Exception):
     def __init__(self, msg):
         self.msg = msg
-
-
-class FakeLogger:
-    def __init__(self, q):
-        self.q = q
-
-    def debug(self, msg):
-        self.q.put((logging.DEBUG, msg))
-
-    def info(self, msg):
-        self.q.put((logging.INFO, msg))
-
-    def warning(self, msg):
-        self.q.put((logging.WARNING, msg))
-
-    def error(self, msg):
-        self.q.put((logging.ERROR, msg))
-
-    def critical(self, msg):
-        self.q.put((logging.CRITICAL, msg))
 
 
 class FunctionData:
@@ -861,14 +818,6 @@ def mol_from_mol_file(mol_file):
     mol = e_mol.GetMol()
     mol.AddConformer(conf)
     return mol
-
-
-def mplogger(que, logger):
-    while True:
-        lvl, msg = que.get()
-        if isinstance(lvl, StopLogging):
-            break
-        logger.log(lvl, msg)
 
 
 def normalize_vector(vector):
