@@ -190,7 +190,7 @@ class Mutation:
             A group of molecules from which one is used for
             substitution.
 
-        key : :class`function`
+        key : :class:`function`
             A function which takes a building block of `macro_mol` and
             returns ``True`` or ``False``. For all building blocks
             which return ``True``, one is chosen at random to undergo
@@ -219,7 +219,7 @@ class Mutation:
         new_bbs.append(replacement)
         return macro_mol.__class__(new_bbs, macro_mol.topology)
 
-    def similar_bb(self, macro_mol, mols, mol_map, key):
+    def similar_bb(self, macro_mol, mols, key):
         """
         Substitute a building block with a similar one.
 
@@ -227,28 +227,24 @@ class Mutation:
         mutation. One is chosen at random from the building blocks
         where ``key(building_block) == True``.
 
-        All of the molecules in `mols` are then checked for similarity
-        to the building block. The first time this mutation function is
-        run on a `macro_mol`, the most similar molecule in `mols` to
-        the chosen building block is used to substitute it. The
-        next time this mutation function is run on the same `macro_mol`
-        and the same building block is chosen, the second most similar
-        molecule from `mols` is used for substitution and so on.
+        All  molecules in `mols` are then checked for similarity to the
+        building block. The first time this mutation function is run on
+        a `macro_mol`, the most similar molecule in `mols` to the
+        chosen building block is used to substitute it. The next time
+        this mutation function is run on the same `macro_mol` and the
+        same building block is chosen, the second most similar molecule
+        from `mols` is used for substitution and so on.
 
         Parameters
         ----------
         macro_mol : :class:`.MacroMolecule`
             The cage which is to have its building block substituted.
 
-        mols : :class:`iterable` of :class:`rdkit.Chem.rdchem.Mol`
-            A group of molecules to which similarity is compared.
+        mols : :class:`list` of :class:`.StructUnit`
+            A group of molecules from which one is used for
+            substitution.
 
-        mol_map : :class:`dict`
-            Maps the ``rdkit`` molecules in `mols` to
-            :class:`.StructUnit` instances which are used to for
-            substiuting a building block.
-
-        key : :class`function`
+        key : :class:`function`
             A function which takes a building block of `macro_mol` and
             returns ``True`` or ``False``. For all building blocks
             which return ``True``, one is chosen at random to undergo
@@ -266,6 +262,7 @@ class Mutation:
             # yield the most similar building blocks. 1 iterator for
             # each previously chosen building block.
             self._similar_bb = {}
+        if macro_mol not in self._similar_bb:
             # Maps the building blocks to iterators which yield the
             # next most similar molecule in `mols` to the building
             # block.
@@ -275,11 +272,14 @@ class Mutation:
         valid_bbs = [bb for bb in macro_mol.building_blocks if key(bb)]
         chosen_bb = np.random.choice(valid_bbs)
 
+        # Create a mapping from rdkit molecules to the StructUnits.
+        mol_map = {struct_unit.mol: struct_unit for struct_unit in mols}
+
         # If the building block has not been chosen before, create an
         # iterator yielding similar molecules from `mols` for it.
         if chosen_bb not in self._similar_bb[macro_mol]:
             self._similar_bb[macro_mol][chosen_bb] = iter(
-                                    chosen_bb.similar_molecules(mols))
+                           chosen_bb.similar_molecules(mol_map.keys()))
 
         sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
         sim_struct_unit = mol_map[sim_mol]
