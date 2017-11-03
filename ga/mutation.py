@@ -207,6 +207,9 @@ class Mutation:
         valid_bbs = [bb for bb in macro_mol.building_blocks if key(bb)]
         chosen_bb = np.random.choice(valid_bbs)
 
+        # Make sure that the building block itself will not be picked.
+        mols = [mol for mol in mols if mol is not chosen_bb]
+
         # Choose a replacement building block.
         replacement = np.random.choice(mols)
 
