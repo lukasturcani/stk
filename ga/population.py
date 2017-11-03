@@ -11,6 +11,7 @@ from collections import Counter
 import json
 from glob import iglob, glob
 import multiprocessing as mp
+import psutil
 
 from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
@@ -125,7 +126,7 @@ class Population:
                  bb_classes,
                  topologies,
                  macromol_class,
-                 num_cores=None,
+                 processes=None,
                  ga_tools=GATools.init_empty(),
                  duplicates=False):
         """
@@ -178,9 +179,9 @@ class Population:
             The class of the :class:`.MacroMolecule` objects being
             built.
 
-        num_cores : :class:`int`, optional
-            The number of cores to use when building the molecules in
-            parallel.
+        processes : :class:`int`, optional
+            The number of parallel processes to create when building
+            the molecules.
 
         ga_tools : :class:`.GATools`, optional
             Stores the selection, mutation and crossover functions to
@@ -217,7 +218,7 @@ class Population:
             bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
             args.append((bbs, topology))
 
-        with mp.Pool(num_cores) as pool:
+        with mp.Pool(processes) as pool:
             mols = pool.starmap(macromol_class, args)
 
         # Update the cache.
@@ -575,7 +576,7 @@ class Population:
 
         return n
 
-    def calculate_member_fitness(self):
+    def calculate_member_fitness(self, processes=psutil.cpu_count()):
         """
         Applies the fitness function to all members.
 
@@ -596,16 +597,21 @@ class Population:
         :attr:`.MacroMolecule.unscaled_fitness` attribute of molecules
         held by the population.
 
+        Parameters
+        ----------
+        processes : :class:`int`
+            The number of parallel processes to create.
+
         Returns
         -------
         None : :class:`NoneType`
 
         """
 
-        if self.ga_tools.parallel:
-            _calc_fitness(self.ga_tools.fitness, self)
-        else:
+        if processes == 1:
             _calc_fitness_serial(self.ga_tools.fitness, self)
+        else:
+            _calc_fitness(self.ga_tools.fitness, self, processes)
 
     def dump(self, path):
         """
@@ -970,7 +976,7 @@ class Population:
 
         return self.ga_tools.normalization(self)
 
-    def optimize_population(self):
+    def optimize_population(self, processes=psutil.cpu_count()):
         """
         Optimizes the structures of molecules in the population.
 
@@ -988,16 +994,21 @@ class Population:
         population. This means their :attr:`.Molecule.mol` attributes
         are modified.
 
+        Parameters
+        ----------
+        processes : :class:`int`
+            The number of parallel processes to create.
+
         Returns
         -------
         None : :class:`NoneType`
 
         """
 
-        if self.ga_tools.parallel:
-            _optimize_all(self.ga_tools.optimization, self)
-        else:
+        if processes == 1:
             _optimize_all_serial(self.ga_tools.optimization, self)
+        else:
+            _optimize_all(self.ga_tools.optimization, self, processes)
 
     def remove_duplicates(self,
                           between_subpops=True,

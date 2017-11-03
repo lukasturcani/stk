@@ -43,17 +43,16 @@ from functools import partial, wraps
 import numpy as np
 import logging
 from threading import Thread
-from traceback import format_exc
 
 from .macromodel import macromodel_opt, macromodel_cage_opt
 
-from ..convenience_tools import FakeLogger, mplogger, StopLogging
+from ..convenience_tools import daemon_logger, logged_call
 
 
 logger = logging.getLogger(__name__)
 
 
-def _optimize_all(func_data, population):
+def _optimize_all(func_data, population, processes):
     """
     Run opt function on all population members in parallel.
 
@@ -68,20 +67,18 @@ def _optimize_all(func_data, population):
     population : Population
         The ``Population`` instance who's members must be optimized.
 
+    processes : :class:`int`
+        The number of parallel processes to create.
+
     Returns
     -------
     None : NoneType
 
     """
 
-    # In order for logging to work with multiprocessing properly, each
-    # subprocess will log into the que. A thread in the main process
-    # will then log.
-    m = mp.Manager()
-    logq = m.Queue()
-    exit_ = StopLogging()
-    log_thread = Thread(target=mplogger, args=(logq, logger))
-    log_thread.daemon = True
+    manager = mp.Manager()
+    logq = manager.Queue()
+    log_thread = Thread(target=daemon_logger, args=(logq, ))
     log_thread.start()
 
     # Using the name of the function stored in `func_data` get the
@@ -90,19 +87,19 @@ def _optimize_all(func_data, population):
     func = globals()[func_data.name]
     # Provide the function with any additional paramters it may
     # require.
-    p_func = _OptimizationFunc(partial(func, **func_data.params),
-                               logq=logq)
+    p_func = _OptimizationFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population, in
     # parallel.
-    num_cores = population.ga_tools.input.num_cores
-    with mp.get_context('spawn').Pool(num_cores) as pool:
-        optimized = pool.map(p_func, population)
+    with mp.get_context('spawn').Pool(processes) as pool:
+        optimized = pool.starmap(logged_call,
+                                 ((logq, p_func, mem) for
+                                  mem in population))
     # Make sure the cache is updated with the optimized versions.
     for member in optimized:
         member.update_cache()
 
-    logq.put((exit_, exit_))
+    logq.put(None)
     log_thread.join()
 
 
@@ -155,35 +152,31 @@ class _OptimizationFunc:
 
     """
 
-    def __init__(self, func, logq=None):
+    def __init__(self, func):
         wraps(func)(self)
-        self.logq = logq
 
-    def __call__(self, macro_mol, *args, **kwargs):
-        logger = logging.getLogger(__name__)
-        if self.logq is not None:
-            logger = FakeLogger(self.logq)
+    def __call__(self, macro_mol):
 
         if macro_mol.optimized:
-            logger.info('Skipping {}.'.format(macro_mol.name))
+            logger.info(f'Skipping {macro_mol.name}.')
             return macro_mol
 
         try:
-            logger.info('Optimizing {}.'.format(macro_mol.name))
-            self.__wrapped__(macro_mol, *args, **kwargs, logger=logger)
+            logger.info(f'Optimizing {macro_mol.name}.')
+            self.__wrapped__(macro_mol)
 
         except Exception as ex:
-            errormsg = ('Optimization function "{}()" '
-                        'failed on molecule "{}".').format(
-                        self.__wrapped__.func.__name__, macro_mol.name)
-            logger.error((errormsg+'\n'+format_exc()).strip())
+            errormsg = (f'Optimization function '
+                        f'"{self.__wrapped__.func.__name__}()" '
+                        f'failed on molecule "{macro_mol.name}".')
+            logger.error(errormsg, exc_info=True)
 
         finally:
             macro_mol.optimized = True
             return macro_mol
 
 
-def do_not_optimize(macro_mol, logger=logger):
+def do_not_optimize(macro_mol):
     """
     Skips the optimization step.
 
@@ -196,9 +189,6 @@ def do_not_optimize(macro_mol, logger=logger):
     macro_mol : MacroMolecule
         A macromolecule which will not be optimized.
 
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
-
     Returns
     -------
     None : NoneType
@@ -208,7 +198,7 @@ def do_not_optimize(macro_mol, logger=logger):
     return
 
 
-def partial_raiser(macro_mol, ofunc, logger=logger):
+def partial_raiser(macro_mol, ofunc):
     """
     Raises and optimizes at random.
 
@@ -220,14 +210,6 @@ def partial_raiser(macro_mol, ofunc, logger=logger):
     ofunc : FunctionData
         A FunctionData object representing the optimization function
         to be used.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit instance is optimized.
 
     Returns
     -------
@@ -241,7 +223,7 @@ def partial_raiser(macro_mol, ofunc, logger=logger):
     globals()[ofunc.name](macro_mol, **ofunc.params)
 
 
-def raiser(macro_mol, param1, param2=2, logger=logger):
+def raiser(macro_mol, param1, param2=2):
     """
     Doens't optimize, raises an error instead.
 
@@ -255,9 +237,6 @@ def raiser(macro_mol, param1, param2=2, logger=logger):
 
     param2 : object (default = 2)
         Dummy keyword parameter, does nothing.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
 
     Returns
     -------
@@ -273,7 +252,7 @@ def raiser(macro_mol, param1, param2=2, logger=logger):
     raise Exception('Raiser optimization function used.')
 
 
-def rdkit_optimization(macro_mol, embed=False, logger=logger):
+def rdkit_optimization(macro_mol, embed=False):
     """
     Optimizes the structure of the molecule using rdkit.
 
@@ -289,16 +268,6 @@ def rdkit_optimization(macro_mol, embed=False, logger=logger):
         is carried out. This guess structure overrides any previous
         structure.
 
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute has it's structure
-        changed as a result of the optimization. This means the
-        ``Conformer`` instance held by the rdkit molecule is changed.
-
     Returns
     -------
     None : NoneType
@@ -312,26 +281,16 @@ def rdkit_optimization(macro_mol, embed=False, logger=logger):
     rdkit.SanitizeMol(macro_mol.mol)
     rdkit.MMFFOptimizeMolecule(macro_mol.mol)
 
-def rdkit_ETKDG(macro_mol, logger=logger):
+
+def rdkit_ETKDG(macro_mol):
     """
     Does a conformer search with the rdkit.ETKDG method:
     http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
-
 
     Parameters
     ----------
     macro_mol : MacroMolecule
         The macromolecule who's structure should be optimized.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute has it's structure
-        changed as a result of the optimization. This means the
-        ``Conformer`` instance held by the rdkit molecule is changed.
 
     Returns
     -------
@@ -341,12 +300,12 @@ def rdkit_ETKDG(macro_mol, logger=logger):
 
     rdkit.EmbedMolecule(macro_mol.mol, rdkit.ETKDG())
 
-def rdkit_confs_ETKDG(macro_mol, name='test', confs=1, logger=logger):
+
+def rdkit_confs_ETKDG(macro_mol, name='test', confs=1):
     """
     Does a conformer search with the rdkit.ETKDG method:
     http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
     A number of mol files representing the conformers is then generated.
-
 
     Parameters
     ----------
@@ -359,10 +318,6 @@ def rdkit_confs_ETKDG(macro_mol, name='test', confs=1, logger=logger):
     confs: :class:`int`, optional
         Defines the number of conformers generated in the
         conformer search.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
-
 
     Returns
     -------

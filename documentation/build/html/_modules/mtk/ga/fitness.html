@@ -261,39 +261,22 @@
 
 <span class="sd">To add a new fitness function simply write it as a function in this</span>
 <span class="sd">module. It will need to take the :class:`.MacroMolecule` instance as</span>
-<span class="sd">its first argument and this argument should be called `macro_mol`. It</span>
-<span class="sd">should also hold a keyword argument called `logger`. The purpose of</span>
-<span class="sd">this is to help users identify which arguments are handled</span>
+<span class="sd">its first argument and this argument should be called `macro_mol`. The</span>
+<span class="sd">purpose of this is to help users identify which arguments are handled</span>
 <span class="sd">automatically by ``mtk`` and which they need to define in the input</span>
 <span class="sd">file. The convention is that if the fitness function takes an argument</span>
-<span class="sd">called `macro_mol` or `logger` they do not have to specify that</span>
-<span class="sd">argument in the input file.</span>
-
-<span class="sd">When defining fitness functions the `logger` argument should be used</span>
-<span class="sd">for logging as a normal logger from the ``logging`` library would.</span>
-<span class="sd">When running the GA, a special logger compatible with</span>
-<span class="sd">``multiprocessing`` is automatically placed into this argument. It may</span>
-<span class="sd">be useful to define the logger argument as a keyword argument of the</span>
-<span class="sd">form</span>
-
-<span class="sd">.. code-block:: python</span>
-
-<span class="sd">    def random_fitness(macro_mol, logger=logging.getLogger(__name__)):</span>
-<span class="sd">        ...</span>
-
-<span class="sd">In this way, if the fitness function is used outside of the GA, are</span>
-<span class="sd">regular logger from the ``logging`` library will be used by the</span>
-<span class="sd">fitness function.</span>
+<span class="sd">called `macro_mol`, they do not have to specify that argument in the</span>
+<span class="sd">input file.</span>
 
 <span class="sd">A fitness function must return the value which represents the fitness</span>
-<span class="sd">of the molecule in `macro_mol`. If a fitness function is meant to be</span>
-<span class="sd">paired with a normalization funtion it can return any value or</span>
+<span class="sd">of the molecule `macro_mol`. If a fitness function is meant to be</span>
+<span class="sd">paired with a normalization function it can return any value or</span>
 <span class="sd">object it likes. Just as long as the normalization functions know how</span>
 <span class="sd">to deal with it and convert it to a number.</span>
 
 <span class="sd">.. code-block:: python</span>
 
-<span class="sd">    def random_fitness(macro_mol, logger=logging.getLogger(__name__)):</span>
+<span class="sd">    def random_fitness(macro_mol):</span>
 <span class="sd">        return abs(np.random.normal(50, 20))</span>
 
 <span class="sd">Obviously, this is a just toy example but all the key components of</span>
@@ -304,7 +287,7 @@
 
 <span class="sd">.. code-block:: python</span>
 
-<span class="sd">    def size(macro_mol, desired_size, logger=logging.getLogger(__name__)):</span>
+<span class="sd">    def size(macro_mol, desired_size):</span>
 <span class="sd">        return abs(macro_mol.max_diameter() - desired_size)</span>
 
 <span class="sd">A fitness function may be complex and may not fit neatly into a single</span>
@@ -332,7 +315,7 @@
 
 <span class="sd">.. code-block:: python</span>
 
-<span class="sd">    def example_func(macro_mol, logger=logging.getLogger(__name__)):</span>
+<span class="sd">    def example_func(macro_mol):</span>
 <span class="sd">        mol_energy = macro_mol.energy.some_energy_func()</span>
 <span class="sd">        macro_mol.progress_params[&#39;example_func&#39;] = [mol_energy]</span>
 <span class="sd">        ...</span>
@@ -344,7 +327,7 @@
 
 <span class="sd">.. code-block:: python</span>
 
-<span class="sd">    def example_func(macro_mol, logger=logging.getLogger(__name__)):</span>
+<span class="sd">    def example_func(macro_mol):</span>
 <span class="sd">        mol_energy = macro_mol.energy.some_energy_func()</span>
 <span class="sd">        mol_radius = macro_mol.max_diamater() / 2</span>
 <span class="sd">        macro_mol.progress_params[&#39;example_func&#39;] = [mol_energy,</span>
@@ -391,12 +374,12 @@
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
-<span class="kn">from</span> <span class="nn">traceback</span> <span class="k">import</span> <span class="n">format_exc</span>
 
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">matrix_centroid</span><span class="p">,</span>
                                  <span class="n">FunctionData</span><span class="p">,</span>
                                  <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
-                                 <span class="n">StopLogging</span><span class="p">,</span> <span class="n">mplogger</span><span class="p">,</span> <span class="n">FakeLogger</span><span class="p">)</span>
+                                 <span class="n">daemon_logger</span><span class="p">,</span>
+                                 <span class="n">logged_call</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">Cage</span><span class="p">,</span> <span class="n">StructUnit</span><span class="p">,</span> <span class="n">Energy</span><span class="p">,</span> <span class="n">func_key</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">optimization</span>
@@ -404,7 +387,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_calc_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._calc_fitness">[docs]</a><span class="k">def</span> <span class="nf">_calc_fitness</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="_calc_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._calc_fitness">[docs]</a><span class="k">def</span> <span class="nf">_calc_fitness</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">processes</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness values of all members of a population.</span>
 
@@ -418,38 +401,37 @@
 <span class="sd">        The population whose members must have their fitness</span>
 <span class="sd">        calculated.</span>
 
+<span class="sd">    processes : :class:`int`</span>
+<span class="sd">        The number of parallel processes to create.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># In order for logging to work with multiprocessing properly, each</span>
-    <span class="c1"># subprocess will log into the que. A thread in the main process</span>
-    <span class="c1"># will then log.</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
-    <span class="n">logq</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
-    <span class="n">exit_</span> <span class="o">=</span> <span class="n">StopLogging</span><span class="p">()</span>
-    <span class="n">log_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">mplogger</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">logq</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
-    <span class="n">log_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+    <span class="n">logq</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="n">log_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">daemon_logger</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">logq</span><span class="p">,</span> <span class="p">))</span>
     <span class="n">log_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="c1"># Get the fitness function object.</span>
     <span class="n">func</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="c1"># Make sure it won&#39;t raise errors while using multiprocessing.</span>
-    <span class="n">p_func</span> <span class="o">=</span> <span class="n">_FitnessFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">),</span> <span class="n">logq</span><span class="p">)</span>
+    <span class="n">p_func</span> <span class="o">=</span> <span class="n">_FitnessFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
 
     <span class="c1"># Apply the function to every member of the population, in</span>
     <span class="c1"># parallel.</span>
-    <span class="n">num_cores</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">input</span><span class="o">.</span><span class="n">num_cores</span>
-    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
-        <span class="n">evaluated</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">p_func</span><span class="p">,</span> <span class="n">population</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">evaluated</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">logged_call</span><span class="p">,</span>
+                                 <span class="p">((</span><span class="n">logq</span><span class="p">,</span> <span class="n">p_func</span><span class="p">,</span> <span class="n">mem</span><span class="p">)</span> <span class="k">for</span>
+                                  <span class="n">mem</span> <span class="ow">in</span> <span class="n">population</span><span class="p">))</span>
 
     <span class="c1"># Make sure the cache is updated with the evaluated versions.</span>
     <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">evaluated</span><span class="p">:</span>
         <span class="n">member</span><span class="o">.</span><span class="n">update_cache</span><span class="p">()</span>
 
-    <span class="n">logq</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">exit_</span><span class="p">,</span> <span class="n">exit_</span><span class="p">))</span>
+    <span class="n">logq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">log_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 
 
@@ -537,15 +519,9 @@
 <span class="sd">    the value returned by them in</span>
 <span class="sd">    :attr:`.MacroMolecule.unscaled_fitness`.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    logq : :class:`multiprocessing.Queue`</span>
-<span class="sd">        A queue for passing logging messages into the main process</span>
-<span class="sd">        where they are logged.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_FitnessFunc.__init__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">logq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_FitnessFunc.__init__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`_FitnessFunc` instance.</span>
 
@@ -554,16 +530,11 @@
 <span class="sd">        func : :class:`function`</span>
 <span class="sd">            The fitness function to be decorated.</span>
 
-<span class="sd">        logq : :class:`multiprocessing.Queue`, optional</span>
-<span class="sd">            The a queue for passing logging messages into the main</span>
-<span class="sd">            process where they are logged.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="o">=</span> <span class="n">logq</span></div>
+        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="_FitnessFunc.__call__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="_FitnessFunc.__call__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decorates and calls the fitness function.</span>
 
@@ -572,22 +543,12 @@
 <span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">            The molecule to have its fitness calculated.</span>
 
-<span class="sd">        *args</span>
-<span class="sd">            The arguments for the fitness function.</span>
-
-<span class="sd">        **kwargs</span>
-<span class="sd">            The keyword argumetns for the fitness function.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`.MacroMolecule`</span>
 <span class="sd">            `macro_mol` with its fitness calculated.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">FakeLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logq</span><span class="p">)</span>
 
         <span class="n">func_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
 
@@ -599,23 +560,20 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Calculating fitness of </span><span class="si">{macro_mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
-                                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-                                   <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;Fitness function &quot;</span><span class="si">{func_name}</span><span class="s1">()&quot; &#39;</span>
                         <span class="n">f</span><span class="s1">&#39;failed on molecule &quot;</span><span class="si">{macro_mol.name}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">((</span><span class="n">errormsg</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">format_exc</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">macro_mol</span><span class="o">.</span><span class="n">unscaled_fitness</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
             <span class="k">return</span> <span class="n">macro_mol</span></div></div>
 
 
-<div class="viewcode-block" id="random_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness">[docs]</a><span class="k">def</span> <span class="nf">random_fitness</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="random_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness">[docs]</a><span class="k">def</span> <span class="nf">random_fitness</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a random fitness value.</span>
 
@@ -623,9 +581,6 @@
 <span class="sd">    ----------</span>
 <span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">        The molecule for which a fitness value is to be calculated.</span>
-
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -638,7 +593,7 @@
 
 
 <div class="viewcode-block" id="random_fitness_vector"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness_vector">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;var1&#39;</span><span class="p">,</span> <span class="s1">&#39;var2&#39;</span><span class="p">,</span> <span class="s1">&#39;var3&#39;</span><span class="p">,</span> <span class="s1">&#39;var4&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">random_fitness_vector</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">random_fitness_vector</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a 4 element array of random numbers.</span>
 
@@ -651,9 +606,6 @@
 <span class="sd">    ----------</span>
 <span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">        The molecule for which a fitness value is to be calculated.</span>
-
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -672,7 +624,7 @@
     <span class="k">return</span> <span class="n">f</span></div>
 
 
-<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Doens&#39;t calculate a fitness value, raises an error instead.</span>
 
@@ -686,9 +638,6 @@
 
 <span class="sd">    param2 : :class:`object`, optional</span>
 <span class="sd">        Dummy keyword parameter, does nothing.</span>
-
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -706,7 +655,7 @@
 
 
 <div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.partial_raiser">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;var1&#39;</span><span class="p">,</span> <span class="s1">&#39;var2&#39;</span><span class="p">,</span> <span class="s1">&#39;var3&#39;</span><span class="p">,</span> <span class="s1">&#39;var4&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates fitness or raises at random.</span>
 
@@ -714,9 +663,6 @@
 <span class="sd">    ----------</span>
 <span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">        The molecule having its fitness calculated.</span>
-
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -731,7 +677,9 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
+    <span class="n">macro_mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Partial raiser.&#39;</span><span class="p">)</span>
 
     <span class="n">r</span> <span class="o">=</span> <span class="n">random_fitness_vector</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
@@ -752,8 +700,7 @@
          <span class="n">pseudoformation_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span>
                                                       <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;mmff&#39;</span><span class="p">)},</span>
          <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-         <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
-         <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+         <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the fitness vector of a cage.</span>
 
@@ -795,9 +742,6 @@
 <span class="sd">        arguments passed to this method via a dictionary. The name of</span>
 <span class="sd">        the argument is the key and the value of the argument is the</span>
 <span class="sd">        value.</span>
-
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -862,8 +806,7 @@
                 <span class="n">ofunc</span><span class="p">,</span>
                 <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                 <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
-                <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+                <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the fitness vector of a cage / target complex.</span>
 
@@ -914,9 +857,6 @@
 <span class="sd">        within the cage cavity in order to find the most stable</span>
 <span class="sd">        conformation.</span>
 
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :class:`numpy.ndarray`</span>
@@ -953,8 +893,7 @@
              <span class="n">n5fold</span><span class="p">,</span>
              <span class="n">n2fold</span><span class="p">,</span>
              <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-             <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
-             <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+             <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness vector of a cage / C60 complex.</span>
 
@@ -1009,9 +948,6 @@
 <span class="sd">    target_value : :class:`float`, optional</span>
 <span class="sd">        Float representing the target value for the dihedral angle.</span>
 
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :class:`numpy.ndarray`</span>
@@ -1032,8 +968,7 @@
                                      <span class="n">n5fold</span><span class="o">=</span><span class="n">n5fold</span><span class="p">,</span>
                                      <span class="n">n2fold</span><span class="o">=</span><span class="n">n2fold</span><span class="p">),</span>
                         <span class="n">dihedral_SMARTS</span><span class="p">,</span>
-                        <span class="n">target_value</span><span class="p">,</span>
-                        <span class="n">logger</span><span class="p">)</span></div>
+                        <span class="n">target_value</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._cage_target">[docs]</a><span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span>
@@ -1043,8 +978,7 @@
                  <span class="n">ofunc</span><span class="p">,</span>
                  <span class="n">rotation_func</span><span class="p">,</span>
                  <span class="n">dihedral_SMARTS</span><span class="p">,</span>
-                 <span class="n">target_value</span><span class="p">,</span>
-                 <span class="n">logger</span><span class="p">):</span>
+                 <span class="n">target_value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A general fitness function for calculating fitness of complexes.</span>
 
@@ -1098,9 +1032,6 @@
 
 <span class="sd">    target_value : :class:`float`, optional</span>
 <span class="sd">        A number representing the target value for the dihedral angle.</span>
-
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`</span>
-<span class="sd">        Used for logging.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

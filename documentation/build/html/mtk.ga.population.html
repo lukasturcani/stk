@@ -493,13 +493,13 @@ by one between members.</li>
 
 <dl class="method">
 <dt id="mtk.ga.population.Population.calculate_member_fitness">
-<code class="descname">calculate_member_fitness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.calculate_member_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.calculate_member_fitness" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calculate_member_fitness</code><span class="sig-paren">(</span><em>processes=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.calculate_member_fitness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.calculate_member_fitness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the fitness function to all members.</p>
 <p>The fitness function is defined in the attribute
 <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.fitness" title="mtk.ga.ga_tools.GATools.fitness"><code class="xref py py-attr docutils literal"><span class="pre">GATools.fitness</span></code></a> of the <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a> instance
 held in the <a class="reference internal" href="#mtk.ga.population.Population.ga_tools" title="mtk.ga.population.Population.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">ga_tools</span></code></a> attribute of the population.</p>
 <p>The calculation will be performed serially or in parallel
-depending on the flag <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.parallel" title="mtk.ga.ga_tools.GATools.parallel"><code class="xref py py-attr docutils literal"><span class="pre">GATools.parallel</span></code></a>. The serial
+depending on the flag <code class="xref py py-attr docutils literal"><span class="pre">GATools.parallel</span></code>. The serial
 version may be faster in cases where all molecules have already
 had their fitness values calcluated. This is because all
 calculations will be skipped. In this case creating a parallel
@@ -512,9 +512,11 @@ held by the population.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of parallel processes to create.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -712,7 +714,7 @@ is held by the population.</td>
 
 <dl class="classmethod">
 <dt id="mtk.ga.population.Population.init_all">
-<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>databases</em>, <em>bb_classes</em>, <em>topologies</em>, <em>macromol_class</em>, <em>num_cores=None</em>, <em>ga_tools=&lt;mtk.ga.ga_tools.GATools object&gt;</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>databases</em>, <em>bb_classes</em>, <em>topologies</em>, <em>macromol_class</em>, <em>processes=None</em>, <em>ga_tools=&lt;mtk.ga.ga_tools.GATools object&gt;</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates all possible molecules from a given set of databases.</p>
 <p>All possible combinations of building blocks from <cite>databases</cite>
 and topologies from <cite>topologies</cite> are built. The initialization
@@ -750,8 +752,8 @@ molecules in <code class="docutils literal"><span class="pre">aldehydes3f</span>
 <li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> objects being
 built.</li>
-<li><strong>num_cores</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of cores to use when building the molecules in
-parallel.</li>
+<li><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of parallel processes to create when building
+the molecules.</li>
 <li><strong>ga_tools</strong> (<a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a>, optional) – Stores the selection, mutation and crossover functions to
 be used on the population.</li>
 <li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code>, duplicate structures are not removed from
@@ -1046,10 +1048,10 @@ attribute of molecules held by the population.</p>
 
 <dl class="method">
 <dt id="mtk.ga.population.Population.optimize_population">
-<code class="descname">optimize_population</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.optimize_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.optimize_population" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize_population</code><span class="sig-paren">(</span><em>processes=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.optimize_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.optimize_population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
-on the flag <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.parallel" title="mtk.ga.ga_tools.GATools.parallel"><code class="xref py py-attr docutils literal"><span class="pre">GATools.parallel</span></code></a> of the <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a>
+on the flag <code class="xref py py-attr docutils literal"><span class="pre">GATools.parallel</span></code> of the <a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a>
 instance held by the population. The serial version may be
 faster in cases where all molecules have already been
 optimized. This is because all optimizations will be skipped.
@@ -1063,9 +1065,11 @@ are modified.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of parallel processes to create.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>

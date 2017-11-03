@@ -177,7 +177,7 @@
 <span class="sd">        A :class:`.Normalization` instance which rescales or normalizes</span>
 <span class="sd">        the fitness values in the population.</span>
 
-<span class="sd">    optimization : :class:`.FuncionData`</span>
+<span class="sd">    optimization : :class:`.FunctionData`</span>
 <span class="sd">        Holds the name and arguments of an optimization function</span>
 <span class="sd">        defined in :mod:`.optimization`. The function is used to</span>
 <span class="sd">        optimize the molecules in the population.</span>
@@ -191,10 +191,6 @@
 <span class="sd">        An :class:`.Exit` object which checks if the population</span>
 <span class="sd">        satisfied the exit criterion to stop the GA early.</span>
 
-<span class="sd">    parallel : :class:`bool`</span>
-<span class="sd">        If ``True`` optimizations and fitness calculations are done on</span>
-<span class="sd">        each molecule in parallel.</span>
-
 <span class="sd">    input : :class:`.GAInput`</span>
 <span class="sd">        The :class:`.GAInput` object holding data gathered from the</span>
 <span class="sd">        input file.</span>
@@ -202,7 +198,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;selection&#39;</span><span class="p">,</span> <span class="s1">&#39;crossover&#39;</span><span class="p">,</span> <span class="s1">&#39;mutation&#39;</span><span class="p">,</span> <span class="s1">&#39;normalization&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optimization&#39;</span><span class="p">,</span> <span class="s1">&#39;fitness&#39;</span><span class="p">,</span> <span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">]</span>
+                 <span class="s1">&#39;optimization&#39;</span><span class="p">,</span> <span class="s1">&#39;fitness&#39;</span><span class="p">,</span> <span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="GATools.__init__"><a class="viewcode-back" href="../../../mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">selection</span><span class="p">,</span>
@@ -212,7 +208,6 @@
                  <span class="n">optimization</span><span class="p">,</span>
                  <span class="n">fitness</span><span class="p">,</span>
                  <span class="n">exit_</span><span class="p">,</span>
-                 <span class="n">parallel</span><span class="p">,</span>
                  <span class="n">ga_input</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`GATools` instance.</span>
@@ -249,10 +244,6 @@
 <span class="sd">            An :class:`.Exit` object which checks if the population</span>
 <span class="sd">            satisfied the exit criterion to stop the GA early.</span>
 
-<span class="sd">        parallel : :class:`bool`</span>
-<span class="sd">            If ``True`` optimizations and fitness calculations are done</span>
-<span class="sd">            on each molecule in parallel.</span>
-
 <span class="sd">        input : :class:`.GAInput`</span>
 <span class="sd">            The :class:`.GAInput` object holding data gathered from the</span>
 <span class="sd">            input file.</span>
@@ -267,7 +258,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">optimization</span> <span class="o">=</span> <span class="n">optimization</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fitness</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">ga_input</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span> <span class="o">=</span> <span class="n">parallel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exit</span> <span class="o">=</span> <span class="n">exit_</span></div>
 
 <div class="viewcode-block" id="GATools.init_empty"><a class="viewcode-back" href="../../../mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools.init_empty">[docs]</a>    <span class="nd">@classmethod</span>
@@ -277,8 +267,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

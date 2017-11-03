@@ -66,11 +66,11 @@ class GAInput:
 
     Attributes
     ----------
-    num_cores : :class:`int`
-        The number of CPUs to be used when running operations in
-        parallel. This does not have to be specified in the input file.
-        If not specified, the number will default to the value returned
-        by :func:`psutil.cpu_count`
+    processes : :class:`int`
+        The number of parallel processes to create when running
+        parallel operations. This does not have to be specified in the
+        input file. If not specified, the number will default to the
+        value returned by :func:`psutil.cpu_count`
 
     pop_size : :class:`int`
         The size of the population.
@@ -146,11 +146,6 @@ class GAInput:
         re-optimized or have fitness values recalculated when
         encountered by the GA.
 
-    parallel : :class:`bool`
-        If ``True`` the GA does optimization and fitness calculation of
-        each molecule in parallel. Can be omitted from the input file
-        in which case the it defaults to ``True``.
-
     progress_dump : :class:`bool`
         If ``True`` a ``.json`` :class:`.Population` dump is made at
         the end of the GA run called ``progress.json``. The population
@@ -213,8 +208,8 @@ class GAInput:
 
         # If the input file did not specify some values, default
         # initialize them.
-        if not hasattr(self, 'num_cores'):
-            self.num_cores = psutil.cpu_count()
+        if not hasattr(self, 'processes'):
+            self.processes = psutil.cpu_count()
 
         if not hasattr(self, 'num_crossovers'):
             self.num_crossovers = 0
@@ -236,9 +231,6 @@ class GAInput:
 
         if not hasattr(self, 'databases'):
             self.databases = []
-
-        if not hasattr(self, 'parallel'):
-            self.parallel = True
 
         if not hasattr(self, 'progress_dump'):
             self.progress_dump = True
@@ -337,7 +329,6 @@ class GAInput:
                        self.opter(),
                        self.fitnessor(),
                        self.exiter(),
-                       self.parallel,
                        self)
 
     def initer(self):

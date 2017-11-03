@@ -178,10 +178,13 @@ from uuid import uuid4
 from types import MethodType
 from functools import wraps
 from inspect import signature as sig
-
+import logging
 
 from ..convenience_tools import FunctionData
 from ..optimization.mopac import mopac_opt
+
+
+logger = logging.getLogger(__name__)
 
 
 class _EnergyError(Exception):
@@ -600,13 +603,15 @@ class Energy(metaclass=EMeta):
 
         """
 
+        logger.debug('Starting rdkit energy calculation.')
         if forcefield == 'uff':
             self.molecule.mol.UpdatePropertyCache()
             ff = rdkit.UFFGetMoleculeForceField(self.molecule.mol)
         if forcefield == 'mmff':
             rdkit.GetSSSR(self.molecule.mol)
             self.molecule.mol.UpdatePropertyCache()
-            ff = rdkit.MMFFGetMoleculeForceField(self.molecule.mol,
+            ff = rdkit.MMFFGetMoleculeForceField(
+                  self.molecule.mol,
                   rdkit.MMFFGetMoleculeProperties(self.molecule.mol))
 
         eng = ff.CalcEnergy()

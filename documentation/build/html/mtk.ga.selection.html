@@ -243,7 +243,7 @@ to use an example.</p>
 </div>
 <p>By providing the strings <code class="docutils literal"><span class="pre">'generational'</span></code>, <code class="docutils literal"><span class="pre">'crossover'</span></code> and
 <code class="docutils literal"><span class="pre">'mutation'</span></code>, the <a class="reference internal" href="#mtk.ga.selection.Selection" title="mtk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance knows to pick the
-correct function from the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instances provided
+correct function from the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instances provided
 during initialization.</p>
 <p>Note that duplicates are not considered during selection. If a
 molecule is present in the population twice, its chance of
@@ -251,7 +251,7 @@ selection does not double.</p>
 <dl class="attribute">
 <dt id="mtk.ga.selection.Selection.generational">
 <code class="descname">generational</code><a class="headerlink" href="#mtk.ga.selection.Selection.generational" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – This holds the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<dd><p><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – This holds the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting the next generation of
 molecules.</p>
 </dd></dl>
@@ -259,14 +259,14 @@ molecules.</p>
 <dl class="attribute">
 <dt id="mtk.ga.selection.Selection.crossover">
 <code class="descname">crossover</code><a class="headerlink" href="#mtk.ga.selection.Selection.crossover" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<dd><p><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting molecules for crossover.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mtk.ga.selection.Selection.mutation">
 <code class="descname">mutation</code><a class="headerlink" href="#mtk.ga.selection.Selection.mutation" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<dd><p><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – Holds the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting molecules to mutate.</p>
 </dd></dl>
 
@@ -309,13 +309,13 @@ corresponds to the type of selection that is desired:
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>generational</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – This holds the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing
+<li><strong>generational</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – This holds the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing
 the selection function used for selecting the next
 generation of molecules.</li>
-<li><strong>crossover</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<li><strong>crossover</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting molecules for
 crossover.</li>
-<li><strong>mutation</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the <a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FunctionData" title="mtk.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
+<li><strong>mutation</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the
 selection function used for selecting molecules to mutate.</li>
 </ul>
 </td>

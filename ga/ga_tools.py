@@ -26,7 +26,7 @@ class GATools:
         A :class:`.Normalization` instance which rescales or normalizes
         the fitness values in the population.
 
-    optimization : :class:`.FuncionData`
+    optimization : :class:`.FunctionData`
         Holds the name and arguments of an optimization function
         defined in :mod:`.optimization`. The function is used to
         optimize the molecules in the population.
@@ -40,10 +40,6 @@ class GATools:
         An :class:`.Exit` object which checks if the population
         satisfied the exit criterion to stop the GA early.
 
-    parallel : :class:`bool`
-        If ``True`` optimizations and fitness calculations are done on
-        each molecule in parallel.
-
     input : :class:`.GAInput`
         The :class:`.GAInput` object holding data gathered from the
         input file.
@@ -51,7 +47,7 @@ class GATools:
     """
 
     __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
-                 'optimization', 'fitness', 'exit', 'parallel', 'input']
+                 'optimization', 'fitness', 'exit', 'input']
 
     def __init__(self,
                  selection,
@@ -61,7 +57,6 @@ class GATools:
                  optimization,
                  fitness,
                  exit_,
-                 parallel,
                  ga_input):
         """
         Initializes a :class:`GATools` instance.
@@ -98,10 +93,6 @@ class GATools:
             An :class:`.Exit` object which checks if the population
             satisfied the exit criterion to stop the GA early.
 
-        parallel : :class:`bool`
-            If ``True`` optimizations and fitness calculations are done
-            on each molecule in parallel.
-
         input : :class:`.GAInput`
             The :class:`.GAInput` object holding data gathered from the
             input file.
@@ -116,7 +107,6 @@ class GATools:
         self.optimization = optimization
         self.fitness = fitness
         self.input = ga_input
-        self.parallel = parallel
         self.exit = exit_
 
     @classmethod
@@ -126,5 +116,4 @@ class GATools:
 
         """
 
-        return cls(None, None, None, None,
-                   None, None, None, None, None)
+        return cls(None, None, None, None, None, None, None, None)

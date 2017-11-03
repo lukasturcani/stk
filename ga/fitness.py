@@ -110,39 +110,22 @@ Extending mtk: Adding fitness functions.
 
 To add a new fitness function simply write it as a function in this
 module. It will need to take the :class:`.MacroMolecule` instance as
-its first argument and this argument should be called `macro_mol`. It
-should also hold a keyword argument called `logger`. The purpose of
-this is to help users identify which arguments are handled
+its first argument and this argument should be called `macro_mol`. The
+purpose of this is to help users identify which arguments are handled
 automatically by ``mtk`` and which they need to define in the input
 file. The convention is that if the fitness function takes an argument
-called `macro_mol` or `logger` they do not have to specify that
-argument in the input file.
-
-When defining fitness functions the `logger` argument should be used
-for logging as a normal logger from the ``logging`` library would.
-When running the GA, a special logger compatible with
-``multiprocessing`` is automatically placed into this argument. It may
-be useful to define the logger argument as a keyword argument of the
-form
-
-.. code-block:: python
-
-    def random_fitness(macro_mol, logger=logging.getLogger(__name__)):
-        ...
-
-In this way, if the fitness function is used outside of the GA, are
-regular logger from the ``logging`` library will be used by the
-fitness function.
+called `macro_mol`, they do not have to specify that argument in the
+input file.
 
 A fitness function must return the value which represents the fitness
-of the molecule in `macro_mol`. If a fitness function is meant to be
-paired with a normalization funtion it can return any value or
+of the molecule `macro_mol`. If a fitness function is meant to be
+paired with a normalization function it can return any value or
 object it likes. Just as long as the normalization functions know how
 to deal with it and convert it to a number.
 
 .. code-block:: python
 
-    def random_fitness(macro_mol, logger=logging.getLogger(__name__)):
+    def random_fitness(macro_mol):
         return abs(np.random.normal(50, 20))
 
 Obviously, this is a just toy example but all the key components of
@@ -153,7 +136,7 @@ molecules for having a desired size.
 
 .. code-block:: python
 
-    def size(macro_mol, desired_size, logger=logging.getLogger(__name__)):
+    def size(macro_mol, desired_size):
         return abs(macro_mol.max_diameter() - desired_size)
 
 A fitness function may be complex and may not fit neatly into a single
@@ -181,7 +164,7 @@ this is the case, the fitness function may assign to the
 
 .. code-block:: python
 
-    def example_func(macro_mol, logger=logging.getLogger(__name__)):
+    def example_func(macro_mol):
         mol_energy = macro_mol.energy.some_energy_func()
         macro_mol.progress_params['example_func'] = [mol_energy]
         ...
@@ -193,7 +176,7 @@ What if two things are needed to be kept track of? Simple,
 
 .. code-block:: python
 
-    def example_func(macro_mol, logger=logging.getLogger(__name__)):
+    def example_func(macro_mol):
         mol_energy = macro_mol.energy.some_energy_func()
         mol_radius = macro_mol.max_diamater() / 2
         macro_mol.progress_params['example_func'] = [mol_energy,
@@ -240,12 +223,12 @@ from os.path import join
 from uuid import uuid4
 import logging
 from threading import Thread
-from traceback import format_exc
 
 from ..convenience_tools import (matrix_centroid,
                                  FunctionData,
                                  rotation_matrix_arbitrary_axis,
-                                 StopLogging, mplogger, FakeLogger)
+                                 daemon_logger,
+                                 logged_call)
 
 from ..molecular import Cage, StructUnit, Energy, func_key
 from .. import optimization
@@ -253,7 +236,7 @@ from .. import optimization
 logger = logging.getLogger(__name__)
 
 
-def _calc_fitness(func_data, population):
+def _calc_fitness(func_data, population, processes):
     """
     Calculates the fitness values of all members of a population.
 
@@ -267,38 +250,37 @@ def _calc_fitness(func_data, population):
         The population whose members must have their fitness
         calculated.
 
+    processes : :class:`int`
+        The number of parallel processes to create.
+
     Returns
     -------
     None : :class:`NoneType`
 
     """
 
-    # In order for logging to work with multiprocessing properly, each
-    # subprocess will log into the que. A thread in the main process
-    # will then log.
-    m = mp.Manager()
-    logq = m.Queue()
-    exit_ = StopLogging()
-    log_thread = Thread(target=mplogger, args=(logq, logger))
-    log_thread.daemon = True
+    manager = mp.Manager()
+    logq = manager.Queue()
+    log_thread = Thread(target=daemon_logger, args=(logq, ))
     log_thread.start()
 
     # Get the fitness function object.
     func = globals()[func_data.name]
     # Make sure it won't raise errors while using multiprocessing.
-    p_func = _FitnessFunc(partial(func, **func_data.params), logq)
+    p_func = _FitnessFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population, in
     # parallel.
-    num_cores = population.ga_tools.input.num_cores
-    with mp.get_context('spawn').Pool(num_cores) as pool:
-        evaluated = pool.map(p_func, population)
+    with mp.get_context('spawn').Pool(processes) as pool:
+        evaluated = pool.starmap(logged_call,
+                                 ((logq, p_func, mem) for
+                                  mem in population))
 
     # Make sure the cache is updated with the evaluated versions.
     for member in evaluated:
         member.update_cache()
 
-    logq.put((exit_, exit_))
+    logq.put(None)
     log_thread.join()
 
 
@@ -386,15 +368,9 @@ class _FitnessFunc:
     the value returned by them in
     :attr:`.MacroMolecule.unscaled_fitness`.
 
-    Attributes
-    ----------
-    logq : :class:`multiprocessing.Queue`
-        A queue for passing logging messages into the main process
-        where they are logged.
-
     """
 
-    def __init__(self, func, logq=None):
+    def __init__(self, func):
         """
         Initializes a :class:`_FitnessFunc` instance.
 
@@ -403,16 +379,11 @@ class _FitnessFunc:
         func : :class:`function`
             The fitness function to be decorated.
 
-        logq : :class:`multiprocessing.Queue`, optional
-            The a queue for passing logging messages into the main
-            process where they are logged.
-
         """
 
         wraps(func)(self)
-        self.logq = logq
 
-    def __call__(self, macro_mol, *args,  **kwargs):
+    def __call__(self, macro_mol):
         """
         Decorates and calls the fitness function.
 
@@ -421,22 +392,12 @@ class _FitnessFunc:
         macro_mol : :class:`.MacroMolecule`
             The molecule to have its fitness calculated.
 
-        *args
-            The arguments for the fitness function.
-
-        **kwargs
-            The keyword argumetns for the fitness function.
-
         Returns
         -------
         :class:`.MacroMolecule`
             `macro_mol` with its fitness calculated.
 
         """
-
-        logger = logging.getLogger(__name__)
-        if self.logq is not None:
-            logger = FakeLogger(self.logq)
 
         func_name = self.__wrapped__.func.__name__
 
@@ -448,23 +409,20 @@ class _FitnessFunc:
 
         try:
             logger.info(f'Calculating fitness of {macro_mol.name}.')
-            val = self.__wrapped__(macro_mol,
-                                   *args,
-                                   **kwargs,
-                                   logger=logger)
+            val = self.__wrapped__(macro_mol)
 
         except Exception as ex:
             val = None
             errormsg = (f'Fitness function "{func_name}()" '
                         f'failed on molecule "{macro_mol.name}".')
-            logger.error((errormsg+'\n'+format_exc()).strip())
+            logger.error(errormsg, exc_info=True)
 
         finally:
             macro_mol.unscaled_fitness[func_name] = val
             return macro_mol
 
 
-def random_fitness(macro_mol, logger=logger):
+def random_fitness(macro_mol):
     """
     Returns a random fitness value.
 
@@ -472,9 +430,6 @@ def random_fitness(macro_mol, logger=logger):
     ----------
     macro_mol : :class:`.MacroMolecule`
         The molecule for which a fitness value is to be calculated.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
 
     Returns
     -------
@@ -487,7 +442,7 @@ def random_fitness(macro_mol, logger=logger):
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
-def random_fitness_vector(macro_mol, logger=logger):
+def random_fitness_vector(macro_mol):
     """
     Returns a 4 element array of random numbers.
 
@@ -500,9 +455,6 @@ def random_fitness_vector(macro_mol, logger=logger):
     ----------
     macro_mol : :class:`.MacroMolecule`
         The molecule for which a fitness value is to be calculated.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
 
     Returns
     -------
@@ -521,7 +473,7 @@ def random_fitness_vector(macro_mol, logger=logger):
     return f
 
 
-def raiser(macro_mol, param1, param2=2, logger=logger):
+def raiser(macro_mol, param1, param2=2):
     """
     Doens't calculate a fitness value, raises an error instead.
 
@@ -535,9 +487,6 @@ def raiser(macro_mol, param1, param2=2, logger=logger):
 
     param2 : :class:`object`, optional
         Dummy keyword parameter, does nothing.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
 
     Returns
     -------
@@ -555,7 +504,7 @@ def raiser(macro_mol, param1, param2=2, logger=logger):
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
-def partial_raiser(macro_mol, logger=logger):
+def partial_raiser(macro_mol):
     """
     Calculates fitness or raises at random.
 
@@ -563,9 +512,6 @@ def partial_raiser(macro_mol, logger=logger):
     ----------
     macro_mol : :class:`.MacroMolecule`
         The molecule having its fitness calculated.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
 
     Returns
     -------
@@ -580,7 +526,9 @@ def partial_raiser(macro_mol, logger=logger):
 
     """
 
-    if not np.random.choice([0, 1]):
+    macro_mol.energy.rdkit('uff')
+
+    if np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
     r = random_fitness_vector(macro_mol)
@@ -601,8 +549,7 @@ def cage(macro_mol,
          pseudoformation_params={'func': FunctionData('rdkit',
                                                       forcefield='mmff')},
          dihedral_SMARTS="",
-         target_value=180,
-         logger=logger):
+         target_value=180):
     """
     Returns the fitness vector of a cage.
 
@@ -644,9 +591,6 @@ def cage(macro_mol,
         arguments passed to this method via a dictionary. The name of
         the argument is the key and the value of the argument is the
         value.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
 
     Returns
     -------
@@ -711,8 +655,7 @@ def cage_target(macro_mol,
                 ofunc,
                 dihedral_SMARTS="",
                 target_value=180,
-                rotations=0,
-                logger=logger):
+                rotations=0):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -763,9 +706,6 @@ def cage_target(macro_mol,
         within the cage cavity in order to find the most stable
         conformation.
 
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
-
     Returns
     -------
     :class:`numpy.ndarray`
@@ -802,8 +742,7 @@ def cage_c60(macro_mol,
              n5fold,
              n2fold,
              dihedral_SMARTS="",
-             target_value=180,
-             logger=logger):
+             target_value=180):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
@@ -858,9 +797,6 @@ def cage_c60(macro_mol,
     target_value : :class:`float`, optional
         Float representing the target value for the dihedral angle.
 
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging.
-
     Returns
     -------
     :class:`numpy.ndarray`
@@ -881,8 +817,7 @@ def cage_c60(macro_mol,
                                      n5fold=n5fold,
                                      n2fold=n2fold),
                         dihedral_SMARTS,
-                        target_value,
-                        logger)
+                        target_value)
 
 
 def _cage_target(func_name,
@@ -892,8 +827,7 @@ def _cage_target(func_name,
                  ofunc,
                  rotation_func,
                  dihedral_SMARTS,
-                 target_value,
-                 logger):
+                 target_value):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -947,9 +881,6 @@ def _cage_target(func_name,
 
     target_value : :class:`float`, optional
         A number representing the target value for the dihedral angle.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`
-        Used for logging.
 
     Returns
     -------

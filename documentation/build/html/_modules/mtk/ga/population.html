@@ -162,6 +162,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">iglob</span><span class="p">,</span> <span class="n">glob</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
 
 <span class="kn">from</span> <span class="nn">.fitness</span> <span class="k">import</span> <span class="n">_calc_fitness</span><span class="p">,</span> <span class="n">_calc_fitness_serial</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
@@ -276,7 +277,7 @@
                  <span class="n">bb_classes</span><span class="p">,</span>
                  <span class="n">topologies</span><span class="p">,</span>
                  <span class="n">macromol_class</span><span class="p">,</span>
-                 <span class="n">num_cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">processes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span>
                  <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -329,9 +330,9 @@
 <span class="sd">            The class of the :class:`.MacroMolecule` objects being</span>
 <span class="sd">            built.</span>
 
-<span class="sd">        num_cores : :class:`int`, optional</span>
-<span class="sd">            The number of cores to use when building the molecules in</span>
-<span class="sd">            parallel.</span>
+<span class="sd">        processes : :class:`int`, optional</span>
+<span class="sd">            The number of parallel processes to create when building</span>
+<span class="sd">            the molecules.</span>
 
 <span class="sd">        ga_tools : :class:`.GATools`, optional</span>
 <span class="sd">            Stores the selection, mutation and crossover functions to</span>
@@ -368,7 +369,7 @@
             <span class="n">bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">su</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">su</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bb_classes</span><span class="p">,</span> <span class="n">bb_files</span><span class="p">)]</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span><span class="p">))</span>
 
-        <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
             <span class="n">mols</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">macromol_class</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
         <span class="c1"># Update the cache.</span>
@@ -726,7 +727,7 @@
 
         <span class="k">return</span> <span class="n">n</span></div>
 
-<div class="viewcode-block" id="Population.calculate_member_fitness"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.calculate_member_fitness">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_member_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.calculate_member_fitness"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.calculate_member_fitness">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_member_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies the fitness function to all members.</span>
 
@@ -747,16 +748,21 @@
 <span class="sd">        :attr:`.MacroMolecule.unscaled_fitness` attribute of molecules</span>
 <span class="sd">        held by the population.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        processes : :class:`int`</span>
+<span class="sd">            The number of parallel processes to create.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
-            <span class="n">_calc_fitness</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">processes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_calc_fitness_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_calc_fitness_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+            <span class="n">_calc_fitness</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.dump"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1121,7 +1127,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">normalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.optimize_population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.optimize_population">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.optimize_population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.optimize_population">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Optimizes the structures of molecules in the population.</span>
 
@@ -1139,16 +1145,21 @@
 <span class="sd">        population. This means their :attr:`.Molecule.mol` attributes</span>
 <span class="sd">        are modified.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        processes : :class:`int`</span>
+<span class="sd">            The number of parallel processes to create.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
-            <span class="n">_optimize_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">processes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_optimize_all_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_optimize_all_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+            <span class="n">_optimize_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.remove_duplicates"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                           <span class="n">between_subpops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
