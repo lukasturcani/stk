@@ -164,10 +164,6 @@
 <span class="kn">from</span> <span class="nn">.normalization</span> <span class="k">import</span> <span class="n">Normalization</span>
 <span class="kn">from</span> <span class="nn">.ga_exit</span> <span class="k">import</span> <span class="n">Exit</span>
 
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">ga</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">molecular</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">convenience_tools</span>
-
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FunctionData</span>
 
 
@@ -360,11 +356,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inp</span><span class="p">:</span>
-            <span class="n">mtk_namespace</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">mtk_namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">convenience_tools</span><span class="p">))</span>
-            <span class="n">mtk_namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">molecular</span><span class="p">))</span>
-            <span class="n">mtk_namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">ga</span><span class="p">))</span>
-            <span class="n">exec</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">mtk_namespace</span><span class="p">,</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="n">exec</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;plot_epp&#39;</span><span class="p">)</span> <span class="ow">and</span>
            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;plot_epp&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>

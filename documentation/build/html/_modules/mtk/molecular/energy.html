@@ -323,7 +323,6 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
 <span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sp</span>
-<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
@@ -333,7 +332,7 @@
 
 
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FunctionData</span>
-<span class="kn">from</span> <span class="nn">.optimization.mopac</span> <span class="k">import</span> <span class="n">mopac_opt</span>
+<span class="kn">from</span> <span class="nn">..optimization.mopac</span> <span class="k">import</span> <span class="n">mopac_opt</span>
 
 
 <div class="viewcode-block" id="_EnergyError"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._EnergyError">[docs]</a><span class="k">class</span> <span class="nc">_EnergyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>

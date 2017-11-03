@@ -16,8 +16,8 @@ from .fitness import _calc_fitness, _calc_fitness_serial
 from .plotting import plot_counter
 from .ga_tools import GATools
 from ..convenience_tools import dedupe
-from ..molecular.optimization.optimization import (
-                                   _optimize_all_serial, _optimize_all)
+from ..optimization.optimization import (_optimize_all_serial,
+                                         _optimize_all)
 
 
 class Population:

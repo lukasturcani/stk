@@ -247,9 +247,8 @@ from ..convenience_tools import (matrix_centroid,
                                  rotation_matrix_arbitrary_axis,
                                  StopLogging, mplogger, FakeLogger)
 
-from ..molecular import (Cage, StructUnit,
-                         Energy, optimization, func_key)
-
+from ..molecular import Cage, StructUnit, Energy, func_key
+from .. import optimization
 
 logger = logging.getLogger(__name__)
 

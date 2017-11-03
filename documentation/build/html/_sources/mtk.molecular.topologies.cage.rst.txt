@@ -1,5 +1,5 @@
-mtk.molecular.topologies.cage package
-=====================================
+mtk\.molecular\.topologies\.cage package
+========================================
 
 Submodules
 ----------

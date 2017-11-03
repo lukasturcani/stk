@@ -1,5 +1,5 @@
-mtk.ga package
-==============
+mtk\.ga package
+===============
 
 Submodules
 ----------

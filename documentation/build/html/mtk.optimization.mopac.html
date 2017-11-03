@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.optimization.mopac module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.optimization.mopac module</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.optimization.mopac module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.optimization.mopac.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.optimization.mopac">
+<span id="mtk-optimization-mopac-module"></span><h1>mtk.optimization.mopac module<a class="headerlink" href="#module-mtk.optimization.mopac" title="Permalink to this headline">¶</a></h1>
+<p>Defines optimization functions which use MOPAC.</p>
+<dl class="function">
+<dt id="mtk.optimization.mopac._convert_mopout_to_mol">
+<code class="descclassname">mtk.optimization.mopac.</code><code class="descname">_convert_mopout_to_mol</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.optimization.mopac (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#_convert_mopout_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac._convert_mopout_to_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the molecule information (coords) if the opt is successful.
+Takes the <code class="docutils literal"><span class="pre">.pdb</span></code> file of the neutral file generated from the MOPAC run
+and initiates a new rdkit molecule with that coordinates.
+The macro_mol instance is then updated with the new molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being optimized. The <code class="docutils literal"><span class="pre">.pdb</span></code> file holding
+its optimized structure is converted to a rdkit molecule.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>function updates the macro_mol instance.</strong> (<em>This</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.mopac._create_mop">
+<code class="descclassname">mtk.optimization.mopac.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>settings</em>, <em>logger=&lt;Logger mtk.optimization.mopac (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac._create_mop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.
+The name of the input file will contain info about its charge:
+charge = 0: name_neu
+charge = -1: name_an1
+charge = +1: name_cat 1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule which is to be optimized. Its molecular
+structure file is converted to a <code class="docutils literal"><span class="pre">.mop</span></code> file. The original
+file is also kept.</li>
+<li><strong>mopac_run_str</strong> (<em>str</em>) – This string specifies the MOPAC keywords to be used in the input for
+the calculation.</li>
+<li><strong>logger</strong> (<a class="reference internal" href="mtk.convenience_tools.html#mtk.convenience_tools.FakeLogger" title="mtk.convenience_tools.FakeLogger"><em>FakeLogger</em></a><em> or </em><em>logging.Logger</em><em>, </em><em>optional</em>) – Used for logging.</li>
+<li><strong>Modifies</strong> – </li>
+<li><strong>--------</strong> – </li>
+<li><strong>function creates a new .mop file from the structure file</strong> (<em>This</em>) – </li>
+<li><strong>macro_mol._file. This new file is placed in the same</strong> (<em>in</em>) – </li>
+<li><strong>as the original file and has the same name with the _charge info.</strong> (<em>folder</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full path of the newly created <code class="docutils literal"><span class="pre">.mop</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.mopac._kill_mopac">
+<code class="descclassname">mtk.optimization.mopac.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac._kill_mopac" title="Permalink to this definition">¶</a></dt>
+<dd><p>To kill a MOPAC run for a specific structure it is enough to generate
+a non empty file with the molecule’s name with the <cite>.end</cite> extension.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.mopac._mop_line">
+<code class="descclassname">mtk.optimization.mopac.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac._mop_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats the settings dictionary with the correct keywords for MOPAC into
+a string to be added to the MOPAC input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<em>dict</em>) – Dictionary defined in the mopac_opt function, where all the run details
+are defined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>mopac_run_str</strong> – String containing all the MOPAC keywords correctly formatted for the
+input file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.mopac._run_mopac">
+<code class="descclassname">mtk.optimization.mopac.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mopac_path</em>, <em>settings</em>, <em>timeout=7200</em>, <em>logger=&lt;Logger mtk.optimization.mopac (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac._run_mopac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.mopac.mopac_opt">
+<code class="descclassname">mtk.optimization.mopac.</code><code class="descname">mopac_opt</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mopac_path</em>, <em>settings={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#mopac_opt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac.mopac_opt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optimizes the molecule using MOPAC.</p>
+<p>This function runs an optimization. It is possible to provide different
+options, which correspond to the input keywords from MOPAC:
+<a class="reference external" href="http://openmopac.net/Manual/index.html">http://openmopac.net/Manual/index.html</a></p>
+<ul class="simple">
+<li>need to create a tool for generating mopac inputs</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule who’s structure must be optimized.</li>
+<li><strong>mopac_path</strong> (<em>str</em>) – The full path of the <code class="docutils literal"><span class="pre">MOPAC</span></code> suite within the user’s
+machine. For example, in a default MacOS installation the
+folder will probably be something like
+<code class="docutils literal"><span class="pre">/opt/mopac/MOPAC2016.exe</span></code>.</li>
+<li><strong>settings</strong> – <p>A dictionary which maps the names of the optimization parameters to
+their values. Valid values are:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>’hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier">string(default = ‘PM7’)</span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p class="last">PM7 is the latest version of the reparametrization of the NDDO
+theory, where all the atomic and diatomic parameters were
+re-optimized - update compared to PM6.
+<a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></p>
+</dd>
+<dt>’method’ <span class="classifier-delimiter">:</span> <span class="classifier">string (default = ‘OPT’)</span></dt>
+<dd>The default calculation consists in a geometry optimization.
+You can run single point calculations (SCF) or transition
+search algorithms (TS). Refer to the MOPAC website for specific
+keywords.</dd>
+<dt>’gradient’ <span class="classifier-delimiter">:</span> <span class="classifier">float (default = 0.01)</span></dt>
+<dd>The gradient at which the geometry optimization reaches the
+convergence criteria (kcal/mol/Angstrom). For small system high
+precision work, 0.01 is recommended, as these results are
+easily good enough for all high precision work.</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier">float (detault = 80.1)</span></dt>
+<dd>Sets the dielectric constant for the solvent. Presence of this
+keyword will cause the COSMO (Conductor-like Screening Model)
+method to be used to approximate the effect of a solvent model
+surrounding the molecule. Solvents with low dielectric constant
+are not likely to work well with this model.
+0 means that the dielectric constant is not included in the
+calculation.
+80.1 can be used to model a water environment at room
+temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier">list of floats (default = 0)</span></dt>
+<dd>When the system being studied is an ion, the charge, n, on the
+ion must be supplied as an integer. For cations n can be 1, 2,
+3, etc.; for anions -1, -2, -3, etc.</dd>
+</dl>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>macro_mol.mol</dt>
+<dd>The rdkit molecule held in this attribute is replaced by an
+rdkit molecule with an optimized structure.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
