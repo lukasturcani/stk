@@ -172,7 +172,6 @@ provided in the docstring of ``EMeta``.
 import os
 import rdkit.Chem.AllChem as rdkit
 import subprocess as sp
-import time
 import psutil
 import copy
 from uuid import uuid4
@@ -182,7 +181,7 @@ from inspect import signature as sig
 
 
 from ..convenience_tools import FunctionData
-from .optimization.mopac import mopac_opt
+from ..optimization.mopac import mopac_opt
 
 
 class _EnergyError(Exception):

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mtk.molecular.optimization.optimization module &mdash; mtk  documentation</title>
+  <title>mtk.optimization.optimization module &mdash; mtk  documentation</title>
   
 
   
@@ -86,7 +86,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">mtk.molecular.optimization.optimization module</a><ul>
+<li><a class="reference internal" href="#">mtk.optimization.optimization module</a><ul>
 <li><a class="reference internal" href="#extending-mmea-adding-optimization-functions">Extending MMEA: Adding optimization functions</a></li>
 </ul>
 </li>
@@ -134,13 +134,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>mtk.molecular.optimization.optimization module</li>
+      <li>mtk.optimization.optimization module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/mtk.molecular.optimization.optimization.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/mtk.optimization.optimization.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -153,8 +153,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-mtk.molecular.optimization.optimization">
-<span id="mtk-molecular-optimization-optimization-module"></span><h1>mtk.molecular.optimization.optimization module<a class="headerlink" href="#module-mtk.molecular.optimization.optimization" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mtk.optimization.optimization">
+<span id="mtk-optimization-optimization-module"></span><h1>mtk.optimization.optimization module<a class="headerlink" href="#module-mtk.optimization.optimization" title="Permalink to this headline">¶</a></h1>
 <p>Defines optimization functions.</p>
 <div class="section" id="extending-mmea-adding-optimization-functions">
 <h2>Extending MMEA: Adding optimization functions<a class="headerlink" href="#extending-mmea-adding-optimization-functions" title="Permalink to this headline">¶</a></h2>
@@ -187,8 +187,8 @@ file. See <code class="docutils literal"><span class="pre">macromodel.py</span><
 optimization functions are imported back into this file, not any of the
 helper functions or classes.</p>
 <dl class="class">
-<dt id="mtk.molecular.optimization.optimization._OptimizationFunc">
-<em class="property">class </em><code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_OptimizationFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._OptimizationFunc">
+<em class="property">class </em><code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_OptimizationFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A decorator for optimziation functions.</p>
 <p>This decorator is applied to all optimization functions
@@ -198,36 +198,36 @@ explicitly when defining the functions.</p>
 they fail (necessary for multiprocessing) and prevents them from
 being run twice on the same molecule.</p>
 <dl class="method">
-<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_OptimizationFunc.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__call__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._OptimizationFunc.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_OptimizationFunc.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__call__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.optimization.optimization', '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in _optimize_all(). It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__init__': &lt;function _OptimizationFunc.__init__&gt;, '__call__': &lt;function _OptimizationFunc.__call__&gt;, '__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._OptimizationFunc.__dict__">
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.optimization.optimization', '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in _optimize_all(). It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__init__': &lt;function _OptimizationFunc.__init__&gt;, '__call__': &lt;function _OptimizationFunc.__call__&gt;, '__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;})</em><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_OptimizationFunc.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._OptimizationFunc.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>func</em>, <em>logq=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_OptimizationFunc.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.optimization.optimization'</em><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__module__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._OptimizationFunc.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.optimization.optimization'</em><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mtk.molecular.optimization.optimization._OptimizationFunc.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.optimization.optimization._OptimizationFunc.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._OptimizationFunc.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization._optimize_all">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">_optimize_all</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_optimize_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._optimize_all" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._optimize_all">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_optimize_all</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_optimize_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._optimize_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run opt function on all population members in parallel.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -253,8 +253,8 @@ additional parameters the optimization function may need.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization._optimize_all_serial">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">_optimize_all_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#_optimize_all_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization._optimize_all_serial" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization._optimize_all_serial">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_optimize_all_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_optimize_all_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._optimize_all_serial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run opt function on all population members sequentially.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -280,8 +280,8 @@ additional parameters the optimization function may need.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization.do_not_optimize">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization.do_not_optimize">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Skips the optimization step.</p>
 <p>This is very useful when debugging so you do not waste your time
 waiting for molecules to get optimized. Use this in the input file
@@ -307,8 +307,8 @@ in place of an optimization function when necessary.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization.partial_raiser">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>ofunc</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.partial_raiser" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization.partial_raiser">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">partial_raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>ofunc</em>, <em>logger=&lt;Logger mtk.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#partial_raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.partial_raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises and optimizes at random.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -336,8 +336,8 @@ to be used.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization.raiser">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>param1</em>, <em>param2=2</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.raiser" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization.raiser">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">raiser</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>param1</em>, <em>param2=2</em>, <em>logger=&lt;Logger mtk.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#raiser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.raiser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Doens’t optimize, raises an error instead.</p>
 <p>This function is used to test that when optimization functions
 raise errors during multiprocessing, they are handled correctly.</p>
@@ -366,8 +366,8 @@ raise errors during multiprocessing, they are handled correctly.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization.rdkit_ETKDG">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_ETKDG</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_ETKDG" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization.rdkit_ETKDG">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">rdkit_ETKDG</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>logger=&lt;Logger mtk.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#rdkit_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.rdkit_ETKDG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does a conformer search with the rdkit.ETKDG method:
 <a class="reference external" href="http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654">http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</a></p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -396,8 +396,8 @@ changed as a result of the optimization. This means the
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization.rdkit_confs_ETKDG">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_confs_ETKDG</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>name='test'</em>, <em>confs=1</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_confs_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_confs_ETKDG" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization.rdkit_confs_ETKDG">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">rdkit_confs_ETKDG</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>name='test'</em>, <em>confs=1</em>, <em>logger=&lt;Logger mtk.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#rdkit_confs_ETKDG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.rdkit_confs_ETKDG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Does a conformer search with the rdkit.ETKDG method:
 <a class="reference external" href="http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654">http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</a>
 A number of mol files representing the conformers is then generated.</p>
@@ -425,8 +425,8 @@ conformer search.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="mtk.molecular.optimization.optimization.rdkit_optimization">
-<code class="descclassname">mtk.molecular.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>embed=False</em>, <em>logger=&lt;Logger mtk.molecular.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/optimization/optimization.html#rdkit_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.optimization.optimization.rdkit_optimization">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>embed=False</em>, <em>logger=&lt;Logger mtk.optimization.optimization (NOTSET)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#rdkit_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structure of the molecule using rdkit.</p>
 <p>Uses the MMFF forcefield.</p>
 <table class="docutils field-list" frame="void" rules="none">

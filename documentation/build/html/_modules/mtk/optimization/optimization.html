@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mtk.molecular.optimization.optimization &mdash; mtk  documentation</title>
+  <title>mtk.optimization.optimization &mdash; mtk  documentation</title>
   
 
   
@@ -26,20 +26,20 @@
 
   
   
-    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   
 
   
 
   
         <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="mtk  documentation" href="../../../../index.html"/>
-        <link rel="up" title="Module code" href="../../../index.html"/> 
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="mtk  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
 
   
-  <script src="../../../../_static/js/modernizr.min.js"></script>
+  <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -55,7 +55,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> mtk
+            <a href="../../../index.html" class="icon icon-home"> mtk
           
 
           
@@ -68,7 +68,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -99,7 +99,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html">mtk</a>
+          <a href="../../../index.html">mtk</a>
         
       </nav>
 
@@ -127,11 +127,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>mtk.molecular.optimization.optimization</li>
+      <li>mtk.optimization.optimization</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -148,7 +148,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for mtk.molecular.optimization.optimization</h1><div class="highlight"><pre>
+  <h1>Source code for mtk.optimization.optimization</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Defines optimization functions.</span>
 
@@ -195,17 +195,16 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
 <span class="kn">from</span> <span class="nn">traceback</span> <span class="k">import</span> <span class="n">format_exc</span>
-<span class="kn">import</span> <span class="nn">psutil</span>
 
 <span class="kn">from</span> <span class="nn">.macromodel</span> <span class="k">import</span> <span class="n">macromodel_opt</span><span class="p">,</span> <span class="n">macromodel_cage_opt</span>
 
-<span class="kn">from</span> <span class="nn">...convenience_tools</span> <span class="k">import</span> <span class="n">FakeLogger</span><span class="p">,</span> <span class="n">mplogger</span><span class="p">,</span> <span class="n">StopLogging</span>
+<span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FakeLogger</span><span class="p">,</span> <span class="n">mplogger</span><span class="p">,</span> <span class="n">StopLogging</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_optimize_all"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization._optimize_all">[docs]</a><span class="k">def</span> <span class="nf">_optimize_all</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="_optimize_all"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._optimize_all">[docs]</a><span class="k">def</span> <span class="nf">_optimize_all</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run opt function on all population members in parallel.</span>
 
@@ -258,7 +257,7 @@
     <span class="n">log_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="_optimize_all_serial"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization._optimize_all_serial">[docs]</a><span class="k">def</span> <span class="nf">_optimize_all_serial</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="_optimize_all_serial"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._optimize_all_serial">[docs]</a><span class="k">def</span> <span class="nf">_optimize_all_serial</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run opt function on all population members sequentially.</span>
 
@@ -293,7 +292,7 @@
         <span class="n">p_func</span><span class="p">(</span><span class="n">member</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_OptimizationFunc"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization._OptimizationFunc">[docs]</a><span class="k">class</span> <span class="nc">_OptimizationFunc</span><span class="p">:</span>
+<div class="viewcode-block" id="_OptimizationFunc"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc">[docs]</a><span class="k">class</span> <span class="nc">_OptimizationFunc</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A decorator for optimziation functions.</span>
 
@@ -307,11 +306,11 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_OptimizationFunc.__init__"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization._OptimizationFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">logq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_OptimizationFunc.__init__"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">logq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="o">=</span> <span class="n">logq</span></div>
 
-<div class="viewcode-block" id="_OptimizationFunc.__call__"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization._OptimizationFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="_OptimizationFunc.__call__"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span> <span class="o">=</span> <span class="n">FakeLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logq</span><span class="p">)</span>
@@ -335,7 +334,7 @@
             <span class="k">return</span> <span class="n">macro_mol</span></div></div>
 
 
-<div class="viewcode-block" id="do_not_optimize"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.do_not_optimize">[docs]</a><span class="k">def</span> <span class="nf">do_not_optimize</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="do_not_optimize"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.do_not_optimize">[docs]</a><span class="k">def</span> <span class="nf">do_not_optimize</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Skips the optimization step.</span>
 
@@ -360,7 +359,7 @@
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.partial_raiser">[docs]</a><span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.partial_raiser">[docs]</a><span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raises and optimizes at random.</span>
 
@@ -393,7 +392,7 @@
     <span class="nb">globals</span><span class="p">()[</span><span class="n">ofunc</span><span class="o">.</span><span class="n">name</span><span class="p">](</span><span class="n">macro_mol</span><span class="p">,</span> <span class="o">**</span><span class="n">ofunc</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Doens&#39;t optimize, raises an error instead.</span>
 
@@ -425,7 +424,7 @@
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Raiser optimization function used.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rdkit_optimization"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_optimization">[docs]</a><span class="k">def</span> <span class="nf">rdkit_optimization</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">embed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="rdkit_optimization"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_optimization">[docs]</a><span class="k">def</span> <span class="nf">rdkit_optimization</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">embed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes the structure of the molecule using rdkit.</span>
 
@@ -464,7 +463,7 @@
     <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
     <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="rdkit_ETKDG"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="rdkit_ETKDG"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Does a conformer search with the rdkit.ETKDG method:</span>
 <span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
@@ -493,7 +492,7 @@
 
     <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="rdkit_confs_ETKDG"><a class="viewcode-back" href="../../../../mtk.molecular.optimization.optimization.html#mtk.molecular.optimization.optimization.rdkit_confs_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_confs_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">confs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="rdkit_confs_ETKDG"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_confs_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_confs_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">confs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Does a conformer search with the rdkit.ETKDG method:</span>
 <span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
@@ -564,7 +563,7 @@
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
+            URL_ROOT:'../../../',
             VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -572,15 +571,15 @@
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
   

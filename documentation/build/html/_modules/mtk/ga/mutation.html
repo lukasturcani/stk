@@ -172,7 +172,6 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
@@ -358,6 +357,9 @@
         <span class="c1"># Choose the building block which undergoes mutation.</span>
         <span class="n">valid_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">bb</span><span class="p">)]</span>
         <span class="n">chosen_bb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_bbs</span><span class="p">)</span>
+
+        <span class="c1"># Make sure that the building block itself will not be picked.</span>
+        <span class="n">mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">mols</span> <span class="k">if</span> <span class="n">mol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">chosen_bb</span><span class="p">]</span>
 
         <span class="c1"># Choose a replacement building block.</span>
         <span class="n">replacement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>

@@ -1,5 +1,5 @@
-mtk.molecular.topologies package
-================================
+mtk\.molecular\.topologies package
+==================================
 
 Subpackages
 -----------
