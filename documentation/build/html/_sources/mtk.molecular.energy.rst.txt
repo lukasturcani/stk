@@ -1,5 +1,5 @@
-mtk.molecular.energy module
-===========================
+mtk\.molecular\.energy module
+=============================
 
 .. automodule:: mtk.molecular.energy
     :members:

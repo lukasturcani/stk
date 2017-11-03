@@ -167,8 +167,8 @@
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
 <span class="kn">from</span> <span class="nn">.ga_tools</span> <span class="k">import</span> <span class="n">GATools</span>
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">dedupe</span>
-<span class="kn">from</span> <span class="nn">..molecular.optimization.optimization</span> <span class="k">import</span> <span class="p">(</span>
-                                   <span class="n">_optimize_all_serial</span><span class="p">,</span> <span class="n">_optimize_all</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..optimization.optimization</span> <span class="k">import</span> <span class="p">(</span><span class="n">_optimize_all_serial</span><span class="p">,</span>
+                                         <span class="n">_optimize_all</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population">[docs]</a><span class="k">class</span> <span class="nc">Population</span><span class="p">:</span>
@@ -828,8 +828,8 @@
 
 <span class="sd">        member_init : :class:`function`</span>
 <span class="sd">            The initialization function for the populations members.</span>
-<span class="sd">            The function which converts the member represenations in</span>
-<span class="sd">            `pop_list` into desired objects.</span>
+<span class="sd">            It converts the member represenations it `pop_list` into</span>
+<span class="sd">            desired objects.</span>
 
 <span class="sd">        load_names : :class:`bool`, optional</span>
 <span class="sd">            If ``True``, then the :meth:`.Molecule.name` attribute</span>

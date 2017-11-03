@@ -12,6 +12,7 @@ from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
+
 def mopac_opt(macro_mol, mopac_path, settings={}):
     """
     Optimizes the molecule using MOPAC.

@@ -1,5 +1,5 @@
-mtk.ga.mutation module
-======================
+mtk\.ga\.mutation module
+========================
 
 .. automodule:: mtk.ga.mutation
     :members:
