@@ -341,7 +341,7 @@
 <span class="sd">            A group of molecules from which one is used for</span>
 <span class="sd">            substitution.</span>
 
-<span class="sd">        key : :class`function`</span>
+<span class="sd">        key : :class:`function`</span>
 <span class="sd">            A function which takes a building block of `macro_mol` and</span>
 <span class="sd">            returns ``True`` or ``False``. For all building blocks</span>
 <span class="sd">            which return ``True``, one is chosen at random to undergo</span>
@@ -370,7 +370,7 @@
         <span class="n">new_bbs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">replacement</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">new_bbs</span><span class="p">,</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Mutation.similar_bb"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.similar_bb">[docs]</a>    <span class="k">def</span> <span class="nf">similar_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">mols</span><span class="p">,</span> <span class="n">mol_map</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="Mutation.similar_bb"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.similar_bb">[docs]</a>    <span class="k">def</span> <span class="nf">similar_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">mols</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Substitute a building block with a similar one.</span>
 
@@ -378,28 +378,24 @@
 <span class="sd">        mutation. One is chosen at random from the building blocks</span>
 <span class="sd">        where ``key(building_block) == True``.</span>
 
-<span class="sd">        All of the molecules in `mols` are then checked for similarity</span>
-<span class="sd">        to the building block. The first time this mutation function is</span>
-<span class="sd">        run on a `macro_mol`, the most similar molecule in `mols` to</span>
-<span class="sd">        the chosen building block is used to substitute it. The</span>
-<span class="sd">        next time this mutation function is run on the same `macro_mol`</span>
-<span class="sd">        and the same building block is chosen, the second most similar</span>
-<span class="sd">        molecule from `mols` is used for substitution and so on.</span>
+<span class="sd">        All  molecules in `mols` are then checked for similarity to the</span>
+<span class="sd">        building block. The first time this mutation function is run on</span>
+<span class="sd">        a `macro_mol`, the most similar molecule in `mols` to the</span>
+<span class="sd">        chosen building block is used to substitute it. The next time</span>
+<span class="sd">        this mutation function is run on the same `macro_mol` and the</span>
+<span class="sd">        same building block is chosen, the second most similar molecule</span>
+<span class="sd">        from `mols` is used for substitution and so on.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">            The cage which is to have its building block substituted.</span>
 
-<span class="sd">        mols : :class:`iterable` of :class:`rdkit.Chem.rdchem.Mol`</span>
-<span class="sd">            A group of molecules to which similarity is compared.</span>
+<span class="sd">        mols : :class:`list` of :class:`.StructUnit`</span>
+<span class="sd">            A group of molecules from which one is used for</span>
+<span class="sd">            substitution.</span>
 
-<span class="sd">        mol_map : :class:`dict`</span>
-<span class="sd">            Maps the ``rdkit`` molecules in `mols` to</span>
-<span class="sd">            :class:`.StructUnit` instances which are used to for</span>
-<span class="sd">            substiuting a building block.</span>
-
-<span class="sd">        key : :class`function`</span>
+<span class="sd">        key : :class:`function`</span>
 <span class="sd">            A function which takes a building block of `macro_mol` and</span>
 <span class="sd">            returns ``True`` or ``False``. For all building blocks</span>
 <span class="sd">            which return ``True``, one is chosen at random to undergo</span>
@@ -417,6 +413,7 @@
             <span class="c1"># yield the most similar building blocks. 1 iterator for</span>
             <span class="c1"># each previously chosen building block.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">:</span>
             <span class="c1"># Maps the building blocks to iterators which yield the</span>
             <span class="c1"># next most similar molecule in `mols` to the building</span>
             <span class="c1"># block.</span>
@@ -426,11 +423,14 @@
         <span class="n">valid_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">bb</span><span class="p">)]</span>
         <span class="n">chosen_bb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_bbs</span><span class="p">)</span>
 
+        <span class="c1"># Create a mapping from rdkit molecules to the StructUnits.</span>
+        <span class="n">mol_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">struct_unit</span><span class="o">.</span><span class="n">mol</span><span class="p">:</span> <span class="n">struct_unit</span> <span class="k">for</span> <span class="n">struct_unit</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">}</span>
+
         <span class="c1"># If the building block has not been chosen before, create an</span>
         <span class="c1"># iterator yielding similar molecules from `mols` for it.</span>
         <span class="k">if</span> <span class="n">chosen_bb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">][</span><span class="n">chosen_bb</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
-                                    <span class="n">chosen_bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">mols</span><span class="p">))</span>
+                           <span class="n">chosen_bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">mol_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
         <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">][</span><span class="n">chosen_bb</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">sim_struct_unit</span> <span class="o">=</span> <span class="n">mol_map</span><span class="p">[</span><span class="n">sim_mol</span><span class="p">]</span>
