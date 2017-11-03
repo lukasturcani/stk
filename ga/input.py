@@ -13,10 +13,6 @@ from .crossover import Crossover
 from .normalization import Normalization
 from .ga_exit import Exit
 
-from .. import ga
-from .. import molecular
-from .. import convenience_tools
-
 from ..convenience_tools import FunctionData
 
 
@@ -209,11 +205,7 @@ class GAInput:
         """
 
         with open(input_file, 'r') as inp:
-            mtk_namespace = {}
-            mtk_namespace.update(vars(convenience_tools))
-            mtk_namespace.update(vars(molecular))
-            mtk_namespace.update(vars(ga))
-            exec(inp.read(), mtk_namespace, vars(self))
+            exec(inp.read(), vars(self))
 
         if (hasattr(self, 'plot_epp') and
            getattr(self, 'plot_epp') is True):
