@@ -50,6 +50,48 @@ from ..fg_info import double_bond_combs
 from ...convenience_tools import dedupe, flatten, add_fragment_props
 
 
+def remove_confs(building_blocks, keep):
+    """
+    Removes all conformers from `building_blocks` except `keep`.
+
+    All kept conformers have their id set to 0.
+
+    Parameters
+    ----------
+    building_blocks : iterable of ``StructUnit`` instances
+        A set of ``StructUnit`` instances which represent the
+        building blocks forming a macromolecule.
+
+    keep : :class:`list` of :class:`int`
+        The ids of the building block conformers to be used for
+        assembling the :class:`.MacroMolecule`. Must be equal in length
+        to `building_blocks` and orders must correspond.
+
+    Returns
+    -------
+    :class:`list`
+        A :class:`list` of the form,
+
+        .. code-block:: python
+
+        returned = [[conf1, conf2, conf3],
+                    [conf4, conf5],
+                    [conf6, conf7, conf8, conf9]]
+
+        where each sublist holds all the original conformers of a
+        particular building block.
+
+    """
+
+    original_confs = [bb.mol.GetConformers() for bb in building_blocks]
+    for bb, conf in zip(building_blocks, keep):
+        keep_conf = rdkit.Conformer(bb.mol.GetConformer(conf))
+        keep_conf.SetId(0)
+        bb.mol.RemoveAllConformers()
+        bb.mol.AddConformer(keep_conf)
+    return original_confs
+
+
 class TopologyMeta(type):
     """
     Makes a repr of an instance, based on __init__ arguments used.
@@ -98,7 +140,7 @@ class Topology(metaclass=TopologyMeta):
 
     """
 
-    def build(self, macro_mol):
+    def build(self, macro_mol, bb_conformers):
         """
         Assembles rdkit instances of macromolecules.
 
@@ -106,6 +148,12 @@ class Topology(metaclass=TopologyMeta):
         ----------
         macro_mol : MacroMolecule
             The MacroMolecule instance which needs to be built.
+
+        bb_conformers : :class:`list` of :class:`int`
+            The ids of the building block conformers to be used. Must
+            be equal in length to `building_blocks` and orders must
+            correspond. If ``None``, then ``-1`` is used for all
+            building blocks.
 
         Modifies
         --------
@@ -133,10 +181,11 @@ class Topology(metaclass=TopologyMeta):
         for bb in macro_mol.building_blocks:
             bb.tag_atoms()
 
-        # Building should return building blocks to original positions
-        # when done.
-        ipositions = [x.position_matrix() for x in
-                      macro_mol.building_blocks]
+        # When building, only a single conformer should exist per
+        # building block. Otherwise, rdkit.CombineMols won't work. It
+        # only combines conformers with the same id.
+        original_confs = remove_confs(macro_mol.building_blocks,
+                                      bb_conformers)
 
         self.place_mols(macro_mol)
         self.join_mols(macro_mol)
@@ -151,8 +200,11 @@ class Topology(metaclass=TopologyMeta):
         # lost due to parallelism.
         macro_mol.update_fragments()
 
-        for x, pos_mat in zip(macro_mol.building_blocks, ipositions):
-            x.set_position_from_matrix(pos_mat)
+        # Restore the original conformers.
+        for bb, confs in zip(macro_mol.building_blocks, original_confs):
+            bb.mol.RemoveAllConformers()
+            for conf in confs:
+                bb.mol.AddConformer(conf)
 
     def del_atoms(self, macro_mol):
         """
