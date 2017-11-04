@@ -960,17 +960,19 @@ class Molecule:
 
         """
 
+        conf_id = self.mol.GetConformer(conformer).GetId()
+
         # Get the original centroid.
-        centroid = self.centroid(conformer)
+        centroid = self.centroid(conf_id)
         # Find out how much it needs to shift to reach `position`.
         shift = position - centroid
         # Apply the shift and get the resulting rdkit conformer object.
-        new_conf = self.shift(shift).GetConformer()
-        new_conf.SetId(conformer)
+        new_conf = self.shift(shift, conf_id).GetConformer()
+        new_conf.SetId(conf_id)
 
         # Replace the old rkdit conformer with one where the centroid
         # is at `position`.
-        self.mol.RemoveConformer(conformer)
+        self.mol.RemoveConformer(conf_id)
         self.mol.AddConformer(new_conf)
 
         return self.mol
@@ -1073,7 +1075,7 @@ class Molecule:
         # conformer is then given to the rdkit molecule, which is
         # returned.
         new_mol.RemoveAllConformers()
-        new_mol.AddConformer(conformer)
+        new_mol.AddConformer(conf)
         return new_mol
 
     def update_from_mae(self, path, conformer=-1):
@@ -1094,6 +1096,9 @@ class Molecule:
         None : :class:`NoneType`
 
         """
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
 
         mol = mol_from_mae_file(path)
         conf = rdkit.Conformer(mol.GetConformer())
@@ -1119,6 +1124,9 @@ class Molecule:
         None : :class:`NoneType`
 
         """
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
 
         mol = rdkit.MolFromMolFile(path, sanitize=False, removeHs=False)
         conf = rdkit.Conformer(mol.GetConformer())
@@ -1891,13 +1899,15 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        center = self.bonder_centroid(conformer)
+        conf_id = self.mol.GetConformer(conformer).GetId()
+
+        center = self.bonder_centroid(conf_id)
         shift = position - center
-        new_conf = self.shift(shift, conformer).GetConformer()
-        new_conf.SetId(conformer)
+        new_conf = self.shift(shift, conf_id).GetConformer()
+        new_conf.SetId(conf_id)
 
         # Make sure the rkdit molecule has only one conformer.
-        self.mol.RemoveConformer(conformer)
+        self.mol.RemoveConformer(conf_id)
         self.mol.AddConformer(new_conf)
 
         return self.mol

@@ -83,8 +83,13 @@ def remove_confs(building_blocks, keep):
 
     """
 
-    original_confs = [bb.mol.GetConformers() for bb in building_blocks]
-    for bb, conf in zip(building_blocks, keep):
+    keep_ids = [bb.mol.GetConformer(id_).GetId() for
+                bb, id_ in zip(building_blocks, keep)]
+
+    original_confs = [[rdkit.Conformer(conf) for
+                       conf in bb.mol.GetConformers()]
+                      for bb in building_blocks]
+    for bb, conf in zip(building_blocks, keep_ids):
         keep_conf = rdkit.Conformer(bb.mol.GetConformer(conf))
         keep_conf.SetId(0)
         bb.mol.RemoveAllConformers()
