@@ -1076,14 +1076,14 @@ class Molecule:
         new_mol.AddConformer(conformer)
         return new_mol
 
-    def update_from_mae(self, mae_path, conformer=-1):
+    def update_from_mae(self, path, conformer=-1):
         """
-        Updates molecular structure to match an .mae file.
+        Updates molecular structure to match an ``.mae`` file.
 
         Parameters
         ----------
-        mae_path : str
-            The full path of the .mae file from which the structure
+        path : :class:`str`
+            The full path of the ``.mae`` file from which the structure
             should be updated.
 
         conformer : :class:`int`, optional
@@ -1091,12 +1091,37 @@ class Molecule:
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
-        mol = mol_from_mae_file(mae_path)
-        conf = mol.GetConformer()
+        mol = mol_from_mae_file(path)
+        conf = rdkit.Conformer(mol.GetConformer())
+        conf.SetId(conformer)
+        self.mol.RemoveConformer(conformer)
+        self.mol.AddConformer(conf)
+
+    def update_from_mol(self, path, conformer=-1):
+        """
+        Updates molecular structure to match an ``.mol`` file.
+
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        conformer : :class:`int`, optional
+            The conformer to be updated.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        mol = rdkit.MolFromMolFile(path, sanitize=False, removeHs=False)
+        conf = rdkit.Conformer(mol.GetConformer())
         conf.SetId(conformer)
         self.mol.RemoveConformer(conformer)
         self.mol.AddConformer(conf)
