@@ -2568,6 +2568,61 @@ class MacroMolecule(Molecule, metaclass=Cached):
         super().__init__(name, note)
         self.save_ids()
 
+    def add_conformer(self, bb_conformers):
+        """
+        Assembles a new conformer.
+
+        Parameters
+        ----------
+        bb_conformers : :class:`list` of :class:`int`
+            The ids of the building block conformers to be used. Must
+            be equal in length to :attr:`building_blocks` and orders
+            must correspond. If ``None``, then ``-1`` is used for all
+            building blocks.
+
+        Returns
+        -------
+        :class:`int`
+            The id of the new conformer.
+
+        """
+
+        # Save the original rdkit molecule.
+        original_mol = self.mol
+        # Build a new molecule.
+        try:
+            # Ask the ``Topology`` instance to assemble/build the
+            # macromolecule. This creates the `mol` attribute.
+            self.topology.build(self, bb_conformers)
+
+        except Exception as ex:
+            self.mol = rdkit.Mol()
+            errormsg = ('Build failure.\n'
+                        '\n'
+                        'topology\n'
+                        '--------\n'
+                        '{}\n'
+                        '\n'
+                        'building blocks\n'
+                        '---------------\n').format(self.topology)
+
+            bb_blocks = []
+            for bb in self.building_blocks:
+                bb_blocks.append(
+                    ('{0.__class__.__name__} {0.func_grp.name}\n'
+                     '{1}').format(bb, bb.mdl_mol_block()))
+
+            errormsg += '\n'.join(bb_blocks)
+
+            logger.error(errormsg, exc_info=True)
+
+        # Get the new conformer.
+        new_conf = rdkit.Conformer(self.mol.GetConformer())
+        # Add it to the original molecule.
+        new_id = original_mol.AddConformer(new_conf, True)
+        self.mol = original_mol
+        return new_id
+
     def building_block_cores(self, bb):
         """
         Yields the "cores" of a building block molecule.
