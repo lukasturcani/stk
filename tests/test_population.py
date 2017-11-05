@@ -5,11 +5,13 @@ from types import SimpleNamespace
 from os.path import join
 import copy
 
-from ..molecular import Cage, MacroMolecule
+from ..molecular import Cage, MacroMolecule, Molecule
 from ..ga import Population, GATools
 
-pop = Population.load(join('data', 'population', 'population.json'))
-pop2 = Population.load('data/population/init_cage_isomers.json')
+pop = Population.load(join('data', 'population', 'population.json'),
+                      Molecule.fromdict)
+pop2 = Population.load('data/population/init_cage_isomers.json',
+                       Molecule.fromdict)
 
 
 def generate_population(offset=False):
@@ -63,14 +65,6 @@ def test_init():
     Population(Cage.__new__(Cage), Cage.__new__(Cage),
                Population.__new__(Population), Cage.__new__(Cage),
                Population.__new__(Population))
-
-    # Non ``GATools``, ``Cage`` or ``Population`` instance used for
-    # initialization (``int``). Invalid, should raise TypeError.
-    with pytest.raises(TypeError):
-        Population(Cage.__new__(Cage), Cage.__new__(Cage),
-                   Population.__new__(Population), Cage.__new__(Cage),
-                   Population.__new__(Population),
-                   GATools.__new__(GATools), 12)
 
 
 def test_add_members_duplicates():
@@ -186,17 +180,17 @@ def test_has_structure():
 
 
 def test_load():
-
     og_cache = dict(Cage.cache)
 
     pname = join('data', 'population', 'pop2.json')
-    p = Population.load(pname, load_names=False)
+    p = Population.load(pname,
+                        lambda x: Molecule.fromdict(x, load_names=False))
     for mem in p:
         assert not mem.name
 
     Cage.cache = og_cache
 
-    p = Population.load(pname, load_names=True)
+    p = Population.load(pname, Molecule.fromdict)
     for mem in p:
         assert mem.name
 

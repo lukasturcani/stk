@@ -692,10 +692,10 @@ class Molecule:
 
         """
 
-        maxid1, maxid2 = max((x for x in
-                              it.combinations(
-                                range(self.mol.GetNumAtoms()), 2)),
-                             key=lambda x: self.atom_distance(*x, conformer))
+        maxid1, maxid2 = max(
+            (x for x in it.combinations(range(self.mol.GetNumAtoms()),
+                                        2)),
+            key=lambda x: self.atom_distance(*x, conformer))
 
         maxd = self.atom_distance(maxid1, maxid2, conformer)
         maxd += (atom_vdw_radii[self.atom_symbol(maxid1)] +
