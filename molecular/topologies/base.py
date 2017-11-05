@@ -145,7 +145,7 @@ class Topology(metaclass=TopologyMeta):
 
     """
 
-    def build(self, macro_mol, bb_conformers):
+    def build(self, macro_mol, bb_conformers=None):
         """
         Assembles rdkit instances of macromolecules.
 
@@ -154,7 +154,7 @@ class Topology(metaclass=TopologyMeta):
         macro_mol : MacroMolecule
             The MacroMolecule instance which needs to be built.
 
-        bb_conformers : :class:`list` of :class:`int`
+        bb_conformers : :class:`list` of :class:`int`, optional
             The ids of the building block conformers to be used. Must
             be equal in length to `building_blocks` and orders must
             correspond. If ``None``, then ``-1`` is used for all
@@ -179,6 +179,10 @@ class Topology(metaclass=TopologyMeta):
         None : NoneType
 
         """
+
+        if bb_conformers is None:
+            bb_conformers = [-1 for _ in
+                             range(len(macro_mol.building_blocks))]
 
         # When running ``build()`` in parallel, the atom tags are
         # cleared by the multiprocessing module. Make sure to reapply

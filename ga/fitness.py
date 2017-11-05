@@ -609,7 +609,7 @@ def cage(macro_mol,
     warnings.filterwarnings('ignore')
 
     cavity = macro_mol.cavity_size()
-    window = max(macro_mol.windows)
+    window = max(macro_mol.windows())
     asymmetry = macro_mol.window_difference()
 
     logger.debug('Calculating cage energy.')
@@ -718,13 +718,15 @@ def cage_target(macro_mol,
 
     """
 
-    return _cage_target('cage_target', macro_mol,
-                        target_mol_file, efunc, ofunc,
+    return _cage_target('cage_target',
+                        macro_mol,
+                        target_mol_file,
+                        efunc,
+                        ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1),
                         dihedral_SMARTS,
-                        target_value,
-                        logger)
+                        target_value)
 
 
 @_param_labels('Binding Energy',

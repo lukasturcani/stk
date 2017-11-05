@@ -682,14 +682,9 @@ class Population:
             represents the members.
 
         member_init : :class:`function`
-            The initialization function for the populations members.
-            It converts the member represenations it `pop_list` into
+            The initialization function for the population's members.
+            It converts the member represenations in `pop_list` into
             desired objects.
-
-        load_names : :class:`bool`, optional
-            If ``True``, then the :meth:`.Molecule.name` attribute
-            stored in the JSON objects is loaded. If ``False``,
-            then it's not.
 
         Returns
         -------
@@ -834,7 +829,7 @@ class Population:
         return any(x.same(mol) for x in self)
 
     @classmethod
-    def load(cls, path, load_names=True):
+    def load(cls, path, member_init):
         """
         Initializes a :class:`Population` from one dumped to a file.
 
@@ -843,9 +838,10 @@ class Population:
         path : :class:`str`
             The full path of the file holding the dumped population.
 
-        load_names : :class:`bool`, optional
-            If ``True``, then the `name` attribute stored in the JSON
-            objects is loaded. If ``False``, then it's not.
+        member_init : :class:`function`
+            The initialization function for the population's members.
+            It converts the member represenations in `pop_list` into
+            desired objects.
 
         Returns
         -------
@@ -857,7 +853,7 @@ class Population:
         with open(path, 'r') as f:
             pop_list = json.load(f)
 
-        pop = cls.fromlist(pop_list, load_names)
+        pop = cls.fromlist(pop_list, member_init)
         pop.ga_tools = GATools.init_empty()
         return pop
 
