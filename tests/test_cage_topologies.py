@@ -122,9 +122,16 @@ def test_multiconformer():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb1.update_from_mol(join(data_dir, 'amine2_conf2.mol'), 1)
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
+    bb2.update_from_mol(join(data_dir, 'aldehyde3_conf2.mol'), 1)
+
     c = Cage([bb1, bb2],
              FourPlusSix(),
              bb_conformers=[0, 0])
     c.add_conformer([1, 0])
+    c.add_conformer([0, 1])
+    c.add_conformer([1, 1])
+
     c.write(join(test_dir, 'FourPlusSix_conf1.pdb'), 0)
     c.write(join(test_dir, 'FourPlusSix_conf2.pdb'), 1)
+    c.write(join(test_dir, 'FourPlusSix_conf3.pdb'), 2)
+    c.write(join(test_dir, 'FourPlusSix_conf4.pdb'), 3)
