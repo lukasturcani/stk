@@ -8,6 +8,7 @@ if not os.path.exists(test_dir):
     os.mkdir(test_dir)
 data_dir = os.path.join(os.getcwd(), 'data', 'cage_topologies')
 
+
 # 3 + 4 topology tests.
 def test_SixPlusEight():
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
@@ -115,3 +116,15 @@ def test_Dodecahedron():
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], Dodecahedron())
     c.write(join(test_dir, 'Dodecahedron.pdb'))
+
+
+def test_multiconformer():
+    bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
+    bb1.update_from_mol(join(data_dir, 'amine2_conf2.mol'), 1)
+    bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
+    c = Cage([bb1, bb2],
+             FourPlusSix(),
+             bb_conformers=[0, 0])
+    c.add_conformer([1, 0])
+    c.write(join(test_dir, 'FourPlusSix_conf1.pdb'), 0)
+    c.write(join(test_dir, 'FourPlusSix_conf2.pdb'), 1)
