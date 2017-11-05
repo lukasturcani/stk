@@ -8,7 +8,7 @@ i = GAInput(join('data', 'gainput', 'test.py'))
 
 def test_init():
 
-    assert i.parallel is False
+    assert i.processes == 1
 
     assert i.init_func == {'NAME': 'init_random_cages',
                            'bb_db': 'path1',
@@ -32,7 +32,7 @@ def test_init():
         {'NAME': 'cage_random_lk',
          'database': 'path2'}]
 
-    assert i.mutation_weights == [1/4, 1/4, 1/4, 1/4]
+    assert i.mutation_weights is None
     assert i.opt_func == {'NAME': 'do_not_optimize'}
     assert i.fitness_func == {'NAME': 'random_fitness_vector'}
 
@@ -82,7 +82,7 @@ def test_mutator():
                                       database='path1'),
                          FunctionData('cage_random_lk',
                                       database='path2')]
-    assert mut.weights == [1/4, 1/4, 1/4, 1/4]
+    assert mut.weights is None
     assert mut.num_mutations == 2
 
 
