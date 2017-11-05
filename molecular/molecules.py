@@ -2591,10 +2591,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
                         '---------------\n').format(topology)
 
             bb_blocks = []
-            for bb in building_blocks:
+            for i, bb in enumerate(building_blocks):
+                bb_conf = bb_conformers[i]
                 bb_blocks.append(
                     ('{0.__class__.__name__} {0.func_grp.name}\n'
-                     '{1}').format(bb, bb.mdl_mol_block()))
+                     '{1}').format(bb, bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
 
@@ -2642,10 +2643,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
                         '---------------\n').format(self.topology)
 
             bb_blocks = []
-            for bb in self.building_blocks:
+            for i, bb in enumerate(self.building_blocks):
+                bb_conf = bb_conformers[i]
                 bb_blocks.append(
                     ('{0.__class__.__name__} {0.func_grp.name}\n'
-                     '{1}').format(bb, bb.mdl_mol_block()))
+                     '{1}').format(bb, bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
 
