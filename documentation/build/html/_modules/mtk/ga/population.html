@@ -833,14 +833,9 @@
 <span class="sd">            represents the members.</span>
 
 <span class="sd">        member_init : :class:`function`</span>
-<span class="sd">            The initialization function for the populations members.</span>
-<span class="sd">            It converts the member represenations it `pop_list` into</span>
+<span class="sd">            The initialization function for the population&#39;s members.</span>
+<span class="sd">            It converts the member represenations in `pop_list` into</span>
 <span class="sd">            desired objects.</span>
-
-<span class="sd">        load_names : :class:`bool`, optional</span>
-<span class="sd">            If ``True``, then the :meth:`.Molecule.name` attribute</span>
-<span class="sd">            stored in the JSON objects is loaded. If ``False``,</span>
-<span class="sd">            then it&#39;s not.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -985,7 +980,7 @@
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">same</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.load"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.load">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">member_init</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`Population` from one dumped to a file.</span>
 
@@ -994,9 +989,10 @@
 <span class="sd">        path : :class:`str`</span>
 <span class="sd">            The full path of the file holding the dumped population.</span>
 
-<span class="sd">        load_names : :class:`bool`, optional</span>
-<span class="sd">            If ``True``, then the `name` attribute stored in the JSON</span>
-<span class="sd">            objects is loaded. If ``False``, then it&#39;s not.</span>
+<span class="sd">        member_init : :class:`function`</span>
+<span class="sd">            The initialization function for the population&#39;s members.</span>
+<span class="sd">            It converts the member represenations in `pop_list` into</span>
+<span class="sd">            desired objects.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1008,7 +1004,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pop_list</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">pop_list</span><span class="p">,</span> <span class="n">load_names</span><span class="p">)</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">pop_list</span><span class="p">,</span> <span class="n">member_init</span><span class="p">)</span>
         <span class="n">pop</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">pop</span></div>
 

@@ -4,11 +4,11 @@ Defines optimization functions.
 Extending MMEA: Adding optimization functions
 ---------------------------------------------
 New optimization functions are added by writing them into this module.
-The only requirement is that the first argument is ``macro_mol`` and
+The only requirement is that the first argument is ``mol`` and
 there is a keyword argument ``logger``. This allows users to identify
 which arguments are handled automatically by MMEA and which need to be
 defined in the input file. The convention is that if the optimization
-function takes the arguments ``macro_mol`` and ``logger``, the user
+function takes the arguments ``mol`` and ``logger``, the user
 does not have to specify them argument in the input file.
 
 When defining optimization functions the ``logger`` argument should be
@@ -17,7 +17,7 @@ When running the GA a special logger compatible with multiprocessing
 is automatically placed in this argument. It may be useful to define
 the logger argument as a keyword argument::
 
-    opt_func(macro_mol, somearg, logger=logging.getLogger(__name__)):
+    opt_func(mol, somearg, logger=logging.getLogger(__name__)):
         ...
 
 In this way, if the optimization function is used outside of the GA,
@@ -155,28 +155,28 @@ class _OptimizationFunc:
     def __init__(self, func):
         wraps(func)(self)
 
-    def __call__(self, macro_mol):
+    def __call__(self, mol):
 
-        if macro_mol.optimized:
-            logger.info(f'Skipping {macro_mol.name}.')
-            return macro_mol
+        if mol.optimized:
+            logger.info(f'Skipping {mol.name}.')
+            return mol
 
         try:
-            logger.info(f'Optimizing {macro_mol.name}.')
-            self.__wrapped__(macro_mol)
+            logger.info(f'Optimizing {mol.name}.')
+            self.__wrapped__(mol)
 
         except Exception as ex:
             errormsg = (f'Optimization function '
                         f'"{self.__wrapped__.func.__name__}()" '
-                        f'failed on molecule "{macro_mol.name}".')
+                        f'failed on molecule "{mol.name}".')
             logger.error(errormsg, exc_info=True)
 
         finally:
-            macro_mol.optimized = True
-            return macro_mol
+            mol.optimized = True
+            return mol
 
 
-def do_not_optimize(macro_mol):
+def do_not_optimize(mol):
     """
     Skips the optimization step.
 
@@ -186,7 +186,7 @@ def do_not_optimize(macro_mol):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    mol : MacroMolecule
         A macromolecule which will not be optimized.
 
     Returns
@@ -198,13 +198,13 @@ def do_not_optimize(macro_mol):
     return
 
 
-def partial_raiser(macro_mol, ofunc):
+def partial_raiser(mol, ofunc):
     """
     Raises and optimizes at random.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    mol : MacroMolecule
         The macromolecule being optimized.
 
     ofunc : FunctionData
@@ -220,10 +220,10 @@ def partial_raiser(macro_mol, ofunc):
     if not np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
-    globals()[ofunc.name](macro_mol, **ofunc.params)
+    globals()[ofunc.name](mol, **ofunc.params)
 
 
-def raiser(macro_mol, param1, param2=2):
+def raiser(mol, param1, param2=2):
     """
     Doens't optimize, raises an error instead.
 
@@ -252,15 +252,15 @@ def raiser(macro_mol, param1, param2=2):
     raise Exception('Raiser optimization function used.')
 
 
-def rdkit_optimization(macro_mol, embed=False):
+def rdkit_optimization(mol, embed=False, conformer=-1):
     """
     Optimizes the structure of the molecule using rdkit.
 
-    Uses the MMFF forcefield.
+    Uses the ``MMFF`` forcefield.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    mol : MacroMolecule
         The macromolecule who's structure should be optimized.
 
     embed : bool (default = False)
@@ -268,67 +268,59 @@ def rdkit_optimization(macro_mol, embed=False):
         is carried out. This guess structure overrides any previous
         structure.
 
+    conformer : :class:`int`, optional
+        The conformer to use.
+
     Returns
     -------
     None : NoneType
 
     """
+
+    if conformer == -1:
+        conformer = mol.mol.GetConformer(conformer).GetId()
 
     if embed:
-        rdkit.EmbedMolecule(macro_mol.mol)
+        conf_id = rdkit.EmbedMolecule(mol.mol, clearConfs=False)
+        new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
+        mol.mol.RemoveConformer(conf_id)
+        mol.mol.RemoveConformer(conformer)
+        new_conf.SetId(conformer)
+        mol.mol.AddConformer(new_conf)
 
     # Sanitize then optimize the rdkit molecule.
-    rdkit.SanitizeMol(macro_mol.mol)
-    rdkit.MMFFOptimizeMolecule(macro_mol.mol)
+    rdkit.SanitizeMol(mol.mol)
+    rdkit.MMFFOptimizeMolecule(mol.mol, confId=conformer)
 
 
-def rdkit_ETKDG(macro_mol):
+def rdkit_ETKDG(mol, conformer=-1):
     """
-    Does a conformer search with the rdkit.ETKDG method:
-    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
+    Does a conformer search with :func:`rdkit.ETKDG` [#]_.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    mol : MacroMolecule
         The macromolecule who's structure should be optimized.
+
+    conformer : :class:`int`, optional
+        The conformer to use.
 
     Returns
     -------
     None : NoneType
 
-    """
-
-    rdkit.EmbedMolecule(macro_mol.mol, rdkit.ETKDG())
-
-
-def rdkit_confs_ETKDG(macro_mol, name='test', confs=1):
-    """
-    Does a conformer search with the rdkit.ETKDG method:
-    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
-    A number of mol files representing the conformers is then generated.
-
-    Parameters
+    References
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure should be optimized.
-
-    name: :class:`str`, optional
-        Name of the macro_mol that is used to name the new conformers.
-
-    confs: :class:`int`, optional
-        Defines the number of conformers generated in the
-        conformer search.
-
-    Returns
-    -------
-    conformers : list of conformer IDs for the rdkit molecule.
+    .. [#] http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654
 
     """
 
-    cids = rdkit.EmbedMultipleConfs(macro_mol.mol, confs, rdkit.ETKDG())
+    if conformer == -1:
+        conformer = mol.mol.GetConformer(conformer).GetId()
 
-    for cid in cids:
-        conf_name = "{}_{}.mol".format(name.replace('.mol', ''), cid)
-        rdkit.MolToMolFile(macro_mol.mol, conf_name, confId=cid)
-
-    return cids
+    conf_id = rdkit.EmbedMolecule(mol.mol, rdkit.ETKDG())
+    new_conf = rdkit.Conformer(mol.mol.GetConformer(conf_id))
+    mol.mol.RemoveConformer(conf_id)
+    mol.mol.RemoveConformer(conformer)
+    new_conf.SetId(conformer)
+    mol.mol.AddConformer(new_conf)

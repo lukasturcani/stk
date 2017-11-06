@@ -489,7 +489,7 @@ also updated.</p>
 
 <dl class="class">
 <dt id="mtk.molecular.topologies.cage.base._CageTopology">
-<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_CageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_CageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.base.Topology</span></code></a></p>
 <p>A topology class which cage topologies should inherit.</p>
 <dl class="attribute">
@@ -552,14 +552,20 @@ with <cite>id</cite> 2 and so on. For this to work the edge defined by
 the class must have their <cite>id</cite> attributes defined.</p>
 </dd>
 </dl>
+<p>bb_assignments : <code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional</p>
 <dl class="method">
 <dt id="mtk.molecular.topologies.cage.base._CageTopology.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="mtk.molecular.topologies.cage.base._CageTopology.__module__">
 <code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.topologies.cage.base._CageTopology._bb_maps">
+<code class="descname">_bb_maps</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology._bb_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology._bb_maps" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -723,14 +729,9 @@ the vertex.</dd>
 
 <dl class="class">
 <dt id="mtk.molecular.topologies.cage.base._VertexOnlyCageTopology">
-<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_VertexOnlyCageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_VertexOnlyCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_VertexOnlyCageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_VertexOnlyCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.topologies.cage.base._CageTopology" title="mtk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.cage.base._CageTopology</span></code></a></p>
 <p>Cage topolgies where all building block/linker mols have 3+ fgs.</p>
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_VertexOnlyCageTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="attribute">
 <dt id="mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__module__">
 <code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__module__" title="Permalink to this definition">¶</a></dt>

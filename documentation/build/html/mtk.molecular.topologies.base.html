@@ -432,7 +432,7 @@ place the building blocks in approriate positions.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.topologies.base.Topology.build">
-<code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
+<code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assembles rdkit instances of macromolecules.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -440,6 +440,10 @@ place the building blocks in approriate positions.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The MacroMolecule instance which needs to be built.</li>
+<li><strong>bb_conformers</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The ids of the building block conformers to be used. Must
+be equal in length to <cite>building_blocks</cite> and orders must
+correspond. If <code class="docutils literal"><span class="pre">None</span></code>, then <code class="docutils literal"><span class="pre">-1</span></code> is used for all
+building blocks.</li>
 <li><strong>Modifies</strong> – </li>
 <li><strong>--------</strong> – </li>
 <li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – An rdkit instance of the assembled macromolecule is placed
@@ -532,6 +536,46 @@ double bond.</li>
 <code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.topologies.base.remove_confs">
+<code class="descclassname">mtk.molecular.topologies.base.</code><code class="descname">remove_confs</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>keep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#remove_confs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.remove_confs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all conformers from <cite>building_blocks</cite> except <cite>keep</cite>.</p>
+<p>All kept conformers have their id set to 0.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>building_blocks</strong> (iterable of <code class="docutils literal"><span class="pre">StructUnit</span></code> instances) – A set of <code class="docutils literal"><span class="pre">StructUnit</span></code> instances which represent the
+building blocks forming a macromolecule.</li>
+<li><strong>keep</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The ids of the building block conformers to be used for
+assembling the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>. Must be equal in length
+to <cite>building_blocks</cite> and orders must correspond.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form,</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>returned = [[conf1, conf2, conf3],</dt>
+<dd><p class="first last">[conf4, conf5],
+[conf6, conf7, conf8, conf9]]</p>
+</dd>
+</dl>
+<p>where each sublist holds all the original conformers of a
+particular building block.</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

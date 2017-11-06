@@ -339,8 +339,6 @@
 </li>
         <li><a href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__init__">(mtk.molecular.topologies.cage.base._NoLinkerCageTopology method)</a>
 </li>
-        <li><a href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__init__">(mtk.molecular.topologies.cage.base._VertexOnlyCageTopology method)</a>
-</li>
         <li><a href="mtk.optimization.macromodel.html#mtk.optimization.macromodel._ConversionError.__init__">(mtk.optimization.macromodel._ConversionError method)</a>
 </li>
         <li><a href="mtk.optimization.macromodel.html#mtk.optimization.macromodel._ForceFieldError.__init__">(mtk.optimization.macromodel._ForceFieldError method)</a>
@@ -413,7 +411,7 @@
 </li>
         <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.__module__">(mtk.molecular.energy.Energy attribute)</a>
 </li>
-        <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._EnergyError.__module__">(mtk.molecular.energy._EnergyError attribute)</a>
+        <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.EnergyError.__module__">(mtk.molecular.energy.EnergyError attribute)</a>
 </li>
         <li><a href="mtk.molecular.fg_info.html#mtk.molecular.fg_info.FGInfo.__module__">(mtk.molecular.fg_info.FGInfo attribute)</a>
 </li>
@@ -585,7 +583,7 @@
 </li>
         <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.__weakref__">(mtk.molecular.energy.Energy attribute)</a>
 </li>
-        <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._EnergyError.__weakref__">(mtk.molecular.energy._EnergyError attribute)</a>
+        <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.EnergyError.__weakref__">(mtk.molecular.energy.EnergyError attribute)</a>
 </li>
         <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.__weakref__">(mtk.molecular.molecules.Molecule attribute)</a>
 </li>
@@ -608,6 +606,8 @@
         <li><a href="mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc.__weakref__">(mtk.optimization.optimization._OptimizationFunc attribute)</a>
 </li>
       </ul></li>
+      <li><a href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology._bb_maps">_bb_maps() (mtk.molecular.topologies.cage.base._CageTopology method)</a>
+</li>
       <li><a href="mtk.ga.fitness.html#mtk.ga.fitness._c60_rotations">_c60_rotations() (in module mtk.ga.fitness)</a>
 </li>
       <li><a href="mtk.ga.fitness.html#mtk.ga.fitness._cage_target">_cage_target() (in module mtk.ga.fitness)</a>
@@ -636,8 +636,6 @@
         <li><a href="mtk.optimization.mopac.html#mtk.optimization.mopac._create_mop">(in module mtk.optimization.mopac)</a>
 </li>
       </ul></li>
-      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._EnergyError">_EnergyError</a>
-</li>
       <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_dipole">_extract_MOPAC_dipole() (in module mtk.molecular.energy)</a>
 </li>
       <li><a href="mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_en">_extract_MOPAC_en() (in module mtk.molecular.energy)</a>
@@ -779,6 +777,8 @@
 </li>
       </ul></li>
       <li><a href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.A_alignments">A_alignments (mtk.molecular.topologies.cage.base._CageTopology attribute)</a>
+</li>
+      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.add_conformer">add_conformer() (mtk.molecular.molecules.MacroMolecule method)</a>
 </li>
       <li><a href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.add_fragment_props">add_fragment_props() (in module mtk.convenience_tools.convenience_tools)</a>
 </li>
@@ -1232,6 +1232,8 @@
         <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.energy">(mtk.molecular.molecules.StructUnit attribute)</a>
 </li>
       </ul></li>
+      <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.EnergyError">EnergyError</a>
+</li>
       <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.exclude">exclude() (in module mtk.molecular.energy)</a>
 </li>
       <li><a href="mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit">Exit (class in mtk.ga.ga_exit)</a>
@@ -2040,15 +2042,15 @@
 </li>
       <li><a href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.rdkit">rdkit() (mtk.molecular.energy.Energy method)</a>
 </li>
-      <li><a href="mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_confs_ETKDG">rdkit_confs_ETKDG() (in module mtk.optimization.optimization)</a>
-</li>
       <li><a href="mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_ETKDG">rdkit_ETKDG() (in module mtk.optimization.optimization)</a>
+</li>
+      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rdkit_init">rdkit_init() (mtk.molecular.molecules.StructUnit class method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rdkit_init">rdkit_init() (mtk.molecular.molecules.StructUnit class method)</a>
-</li>
       <li><a href="mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_optimization">rdkit_optimization() (in module mtk.optimization.optimization)</a>
+</li>
+      <li><a href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.remove_confs">remove_confs() (in module mtk.molecular.topologies.base)</a>
 </li>
       <li><a href="mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">remove_duplicates() (mtk.ga.population.Population method)</a>
 </li>
@@ -2192,6 +2194,8 @@
 </li>
       <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_from_mae">update_from_mae() (mtk.molecular.molecules.Molecule method)</a>
 </li>
+      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_from_mol">update_from_mol() (mtk.molecular.molecules.Molecule method)</a>
+</li>
       <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_stereochemistry">update_stereochemistry() (mtk.molecular.molecules.Molecule method)</a>
 </li>
   </ul></td>
@@ -2238,7 +2242,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage.windows">windows (mtk.molecular.molecules.Cage attribute)</a>
+      <li><a href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage.windows">windows() (mtk.molecular.molecules.Cage method)</a>
 </li>
       <li><a href="mtk.ga.population.html#mtk.ga.population.Population.write">write() (mtk.ga.population.Population method)</a>
 

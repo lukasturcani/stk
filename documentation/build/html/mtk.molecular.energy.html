@@ -478,7 +478,7 @@ were used to calculate the energy. The values are the energies.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.energy.Energy.formation">
-<code class="descname">formation</code><span class="sig-paren">(</span><em>func</em>, <em>products</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.formation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.formation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">formation</code><span class="sig-paren">(</span><em>func</em>, <em>products</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.formation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.formation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the formation energy.</p>
 <p>The formation energy is calculated under the assumption that
 the molecule in <cite>self.molecule</cite> is composed of the molecules in
@@ -509,6 +509,7 @@ and <cite>self.molecule</cite> will have their energies recalculated.
 Even if the energy values have already been found if the
 chosen forcefield/method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only
 calculated if the value has not already been foud.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -524,7 +525,7 @@ calculated if the value has not already been foud.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.energy.Energy.macromodel">
-<code class="descname">macromodel</code><span class="sig-paren">(</span><em>forcefield</em>, <em>macromodel_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.macromodel" title="Permalink to this definition">¶</a></dt>
+<code class="descname">macromodel</code><span class="sig-paren">(</span><em>forcefield</em>, <em>macromodel_path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.macromodel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the energy of <cite>self.molecule</cite> using macromodel.</p>
 <p>Note that this requires macromodel to be installed and have a
 valid license.</p>
@@ -538,6 +539,7 @@ valid license.</p>
 user’s machine. For example, in a default Microsoft
 installation the folder will probably be something like
 <code class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\Schrodinger2016-2</span></code>.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -547,7 +549,7 @@ installation the folder will probably be something like
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><em>_EnergyError : Exception</em> – This exception is raised if no energy value if found in the
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><em>EnergyError : Exception</em> – This exception is raised if no energy value if found in the
 MacroModel calculation’s .log file. Likely due to a
 forcefield error.</p>
 </td>
@@ -826,7 +828,7 @@ user’s machine.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.energy.Energy.pseudoformation">
-<code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.pseudoformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.pseudoformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the formation energy, sans other products.</p>
 <p>This is the formation energy if the energy of the other
 products of the reaction is not taken into account.</p>
@@ -852,6 +854,7 @@ and <cite>self.molecule</cite> will have their energies recalculated.
 Even if the energy values have already been found if the
 chosen forcefield/method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only
 calculated if the value has not already been foud.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -867,7 +870,7 @@ calculated if the value has not already been foud.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.energy.Energy.rdkit">
-<code class="descname">rdkit</code><span class="sig-paren">(</span><em>forcefield</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.rdkit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.rdkit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rdkit</code><span class="sig-paren">(</span><em>forcefield</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.rdkit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.rdkit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses rdkit to calculate the energy of <cite>self.molecule</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -875,6 +878,7 @@ calculated if the value has not already been foud.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>forcefield</strong> (<em>str</em>) – The name of the forcefield to be used.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 <li><strong>Modifies</strong> – </li>
 <li><strong>--------</strong> – </li>
 <li><strong>self.values</strong> (<em>dict</em>) – Adds an entry to this dictionary. The key is a tuple of the
@@ -897,18 +901,18 @@ in the dictionary <cite>self.values</cite>.</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="mtk.molecular.energy._EnergyError">
-<em class="property">exception </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">_EnergyError</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#_EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._EnergyError" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.molecular.energy.EnergyError">
+<em class="property">exception </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EnergyError</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EnergyError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 <p>A class for errors in Energy methods.</p>
 <dl class="attribute">
-<dt id="mtk.molecular.energy._EnergyError.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy._EnergyError.__module__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.molecular.energy.EnergyError.__module__">
+<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.EnergyError.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="mtk.molecular.energy._EnergyError.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy._EnergyError.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.molecular.energy.EnergyError.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy.EnergyError.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
