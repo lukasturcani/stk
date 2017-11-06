@@ -426,10 +426,16 @@ class _CageTopology(Topology):
         with `id` 2 and so on. For this to work the edge defined by
         the class must have their `id` attributes defined.
 
+    bb_assignments : :class:`dict`, optional
+
     """
 
-    def __init__(self, A_alignments=None, B_alignments=None,
-                 edge_alignments=None):
+    def __init__(self,
+                 A_alignments=None,
+                 B_alignments=None,
+                 edge_alignments=None,
+                 bb_assignments=None):
+
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
         if B_alignments is None:
@@ -442,6 +448,38 @@ class _CageTopology(Topology):
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
         self.edge_alignments = edge_alignments
+        self.bb_assignments = bb_assignments
+
+    def _bb_maps(self, macro_mol):
+        """
+
+        """
+
+        bb_fgs = max(len(bb.functional_group_atoms()) for
+                     bb in macro_mol.building_blocks)
+        bb_map, lk_map = {}, {}
+
+        if self.bb_assignments is None:
+            bbs = [bb for bb in macro_mol.building_blocks if
+                   len(bb.functional_group_atoms()) == bb_fgs]
+            lks = [bb for bb in macro_mol.building_blocks if
+                   len(bb.functional_group_atoms()) != bb_fgs]
+
+            for i in range(len(self.positions_A)):
+                bb_map[i] = np.random.choice(bbs)
+            for i in range(len(self.positions_B)):
+                lk_map[i] = np.random.choice(lks)
+
+        else:
+
+            for bb_index, positions in self.bb_assignments.items():
+                bb = macro_mol.building_blocks[bb_index]
+                n_fgs = len(bb.functional_group_atoms())
+                map_ = bb_map if n_fgs == bb_fgs else lk_map
+                for position in positions:
+                    map_[position] = bb
+
+        return bb_map, lk_map
 
     def join_mols(self, macro_mol):
         """
@@ -594,32 +632,14 @@ class _CageTopology(Topology):
         """
 
         macro_mol.mol = rdkit.Mol()
+        bb_map, lk_map = self._bb_maps(macro_mol)
 
-        # Get the StructUnit instances of the building blocks.
-        bb1, bb2 = macro_mol.building_blocks
-        # Get the number of functional groups in each building block.
-        n_fg1 = len(bb1.functional_group_atoms())
-        n_fg2 = len(bb2.functional_group_atoms())
-
-        # Depending on the number of functional groups, assigned a
-        # building block to be either a linker or a building-block*.
-        if n_fg1 < n_fg2:
-            lk = bb1
-            n_lk = n_fg1
-            bb = bb2
-            n_bb = n_fg2
-        else:
-            lk = bb2
-            n_lk = n_fg2
-            bb = bb1
-            n_bb = n_fg1
-
-        # Save the original orientations of the linker and building
-        # block. This means that when orienation of molecules is done,
+        # Save the original orientationss of building blocks.
+        # This means that when orienation of molecules is done,
         # the starting position is always the same. Ensures
         # consistency.
-        lk_pos = lk.position_matrix()
-        bb_pos = bb.position_matrix()
+        ipositions = {bb: bb.position_matrix() for
+                      bb in macro_mol.building_blocks}
 
         # This loop places all building-blocks* on the points at
         # `positions_A`. It then pairs all atoms which form a new bond
@@ -627,6 +647,9 @@ class _CageTopology(Topology):
         # counts the nubmer of building-blocks* which make up the
         # structure.
         for i, position in enumerate(self.positions_A):
+            bb = bb_map[i]
+            bb_pos = ipositions[bb]
+            n_bb = len(bb.functional_group_atoms())
             # Position the molecule on the vertex.
             bb.set_position_from_matrix(bb_pos)
             aligner_edge_id = self.edge_alignments[i]
@@ -659,6 +682,10 @@ class _CageTopology(Topology):
         # they are found at. It also counts the number of linkers which
         # make up the structure.
         for i, position in enumerate(self.positions_B):
+            lk = lk_map[i]
+            lk_pos = ipositions[lk]
+            n_lk = len(lk.functional_group_atoms())
+
             lk.set_position_from_matrix(lk_pos)
             lk_mol = position.place_mol(lk,  int(self.B_alignments[i]))
             add_fragment_props(lk_mol,
@@ -685,20 +712,7 @@ class _VertexOnlyCageTopology(_CageTopology):
 
     """
 
-    def __init__(self, A_alignments=None, B_alignments=None,
-                 edge_alignments=None):
-
-        if A_alignments is None:
-            A_alignments = np.zeros(len(self.positions_A))
-        if B_alignments is None:
-            B_alignments = np.zeros(len(self.positions_B))
-        if edge_alignments is None:
-            edge_alignments = [None for x in
-                               range(len(self.positions_A))]
-
-        self.A_alignments = A_alignments
-        self.B_alignments = B_alignments
-        self.edge_alignments = edge_alignments
+    ...
 
 
 class _NoLinkerCageTopology(_CageTopology):
