@@ -90,6 +90,29 @@ def test_FourPlusSix():
     c.write(join(test_dir, 'FourPlusSix.pdb'))
 
 
+def test_multiFourPlusSix():
+    bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
+    bb2 = StructUnit2(join(data_dir, 'amine2_1.mol'))
+    bb3 = StructUnit2(join(data_dir, 'amine2_2.mol'))
+
+    bb4 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
+    bb5 = StructUnit3(join(data_dir, 'aldehyde3_1.mol'))
+    bb6 = StructUnit3(join(data_dir, 'aldehyde3_2.mol'))
+
+    c1 = Cage([bb1, bb2, bb3, bb4, bb5, bb6], FourPlusSix())
+
+    c2 = Cage([bb1, bb2, bb3, bb4, bb5, bb6],
+              FourPlusSix(bb_assignments={0: [0, 1],
+                                          1: [2, 3, 4],
+                                          2: [5],
+                                          3: [0],
+                                          4: [1, 2],
+                                          5: [3]}))
+
+    c1.write(join(test_dir, 'multi_FourPlusSix_1.mol'))
+    c2.write(join(test_dir, 'multi_FourPlusSix_2.mol'))
+
+
 def test_FourPlusSix2():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
