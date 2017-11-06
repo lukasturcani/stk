@@ -201,6 +201,53 @@
 <span class="kn">from</span> <span class="nn">...convenience_tools</span> <span class="k">import</span> <span class="n">dedupe</span><span class="p">,</span> <span class="n">flatten</span><span class="p">,</span> <span class="n">add_fragment_props</span>
 
 
+<div class="viewcode-block" id="remove_confs"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.remove_confs">[docs]</a><span class="k">def</span> <span class="nf">remove_confs</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">keep</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes all conformers from `building_blocks` except `keep`.</span>
+
+<span class="sd">    All kept conformers have their id set to 0.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    building_blocks : iterable of ``StructUnit`` instances</span>
+<span class="sd">        A set of ``StructUnit`` instances which represent the</span>
+<span class="sd">        building blocks forming a macromolecule.</span>
+
+<span class="sd">    keep : :class:`list` of :class:`int`</span>
+<span class="sd">        The ids of the building block conformers to be used for</span>
+<span class="sd">        assembling the :class:`.MacroMolecule`. Must be equal in length</span>
+<span class="sd">        to `building_blocks` and orders must correspond.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`list`</span>
+<span class="sd">        A :class:`list` of the form,</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">        returned = [[conf1, conf2, conf3],</span>
+<span class="sd">                    [conf4, conf5],</span>
+<span class="sd">                    [conf6, conf7, conf8, conf9]]</span>
+
+<span class="sd">        where each sublist holds all the original conformers of a</span>
+<span class="sd">        particular building block.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">keep_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span> <span class="k">for</span>
+                <span class="n">bb</span><span class="p">,</span> <span class="n">id_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">keep</span><span class="p">)]</span>
+
+    <span class="n">original_confs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span> <span class="k">for</span>
+                       <span class="n">conf</span> <span class="ow">in</span> <span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformers</span><span class="p">()]</span>
+                      <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">bb</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">keep_ids</span><span class="p">):</span>
+        <span class="n">keep_conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">))</span>
+        <span class="n">keep_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+        <span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">keep_conf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">original_confs</span></div>
+
+
 <div class="viewcode-block" id="TopologyMeta"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.TopologyMeta">[docs]</a><span class="k">class</span> <span class="nc">TopologyMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Makes a repr of an instance, based on __init__ arguments used.</span>
@@ -249,7 +296,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Topology.build"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="Topology.build"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assembles rdkit instances of macromolecules.</span>
 
@@ -257,6 +304,12 @@
 <span class="sd">        ----------</span>
 <span class="sd">        macro_mol : MacroMolecule</span>
 <span class="sd">            The MacroMolecule instance which needs to be built.</span>
+
+<span class="sd">        bb_conformers : :class:`list` of :class:`int`, optional</span>
+<span class="sd">            The ids of the building block conformers to be used. Must</span>
+<span class="sd">            be equal in length to `building_blocks` and orders must</span>
+<span class="sd">            correspond. If ``None``, then ``-1`` is used for all</span>
+<span class="sd">            building blocks.</span>
 
 <span class="sd">        Modifies</span>
 <span class="sd">        --------</span>
@@ -278,16 +331,21 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="n">bb_conformers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bb_conformers</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span>
+                             <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">))]</span>
+
         <span class="c1"># When running ``build()`` in parallel, the atom tags are</span>
         <span class="c1"># cleared by the multiprocessing module. Make sure to reapply</span>
         <span class="c1"># the tags before running ``build()``.</span>
         <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">:</span>
             <span class="n">bb</span><span class="o">.</span><span class="n">tag_atoms</span><span class="p">()</span>
 
-        <span class="c1"># Building should return building blocks to original positions</span>
-        <span class="c1"># when done.</span>
-        <span class="n">ipositions</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
-                      <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">]</span>
+        <span class="c1"># When building, only a single conformer should exist per</span>
+        <span class="c1"># building block. Otherwise, rdkit.CombineMols won&#39;t work. It</span>
+        <span class="c1"># only combines conformers with the same id.</span>
+        <span class="n">original_confs</span> <span class="o">=</span> <span class="n">remove_confs</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span>
+                                      <span class="n">bb_conformers</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">place_mols</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">join_mols</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
@@ -302,8 +360,11 @@
         <span class="c1"># lost due to parallelism.</span>
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_fragments</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">pos_mat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">ipositions</span><span class="p">):</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">pos_mat</span><span class="p">)</span></div>
+        <span class="c1"># Restore the original conformers.</span>
+        <span class="k">for</span> <span class="n">bb</span><span class="p">,</span> <span class="n">confs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">original_confs</span><span class="p">):</span>
+            <span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">confs</span><span class="p">:</span>
+                <span class="n">bb</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Topology.del_atoms"><a class="viewcode-back" href="../../../../mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology.del_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">del_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

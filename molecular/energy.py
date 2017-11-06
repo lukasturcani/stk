@@ -187,7 +187,7 @@ from ..optimization.mopac import mopac_opt
 logger = logging.getLogger(__name__)
 
 
-class _EnergyError(Exception):
+class EnergyError(Exception):
     """
     A class for errors in Energy methods.
 
@@ -367,7 +367,8 @@ def func_key(func, fargs=None, fkwargs=None):
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
     default = {key: value.default for key, value in
-              dict(fsig.parameters).items() if key not in bound.keys()}
+               dict(fsig.parameters).items() if
+               key not in bound.keys()}
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
     bound.update(default)
@@ -434,8 +435,12 @@ class Energy(metaclass=EMeta):
         self.values = {}
 
     @exclude('force_e_calc')
-    def formation(self, func, products,
-                  building_blocks=None, force_e_calc=False):
+    def formation(self,
+                  func,
+                  products,
+                  building_blocks=None,
+                  force_e_calc=False,
+                  conformer=-1):
         """
         Calculates the formation energy.
 
@@ -473,6 +478,9 @@ class Energy(metaclass=EMeta):
             chosen forcefield/method. If ``False`` the energy is only
             calculated if the value has not already been foud.
 
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
         float
@@ -500,12 +508,18 @@ class Energy(metaclass=EMeta):
 
             e_products += n * mol.energy.values[fkey]
 
-        eng = self.pseudoformation(func, building_blocks, force_e_calc)
+        eng = self.pseudoformation(func,
+                                   building_blocks,
+                                   force_e_calc,
+                                   conformer)
         eng -= e_products
         return eng
 
-    def pseudoformation(self, func,
-                        building_blocks=None,  force_e_calc=False):
+    def pseudoformation(self,
+                        func,
+                        building_blocks=None,
+                        force_e_calc=False,
+                        conformer=-1):
         """
         Calculates the formation energy, sans other products.
 
@@ -536,6 +550,9 @@ class Energy(metaclass=EMeta):
             chosen forcefield/method. If ``False`` the energy is only
             calculated if the value has not already been foud.
 
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
         float : :class:`float`
@@ -550,7 +567,7 @@ class Energy(metaclass=EMeta):
 
         if building_blocks is None:
             building_blocks = ((n, mol) for mol, n in
-                            self.molecule.bb_counter.items())
+                               self.molecule.bb_counter.items())
 
         # Recalculate energies if requested.
         if force_e_calc:
@@ -566,7 +583,7 @@ class Energy(metaclass=EMeta):
         for n, mol in building_blocks:
             # If the calculation has not been done already, perform it.
             if fkey not in mol.energy.values.keys():
-                molf= getattr(mol.energy, func.name)
+                molf = getattr(mol.energy, func.name)
                 molf(**func.params)
 
             e_reactants += n * mol.energy.values[fkey]
@@ -574,12 +591,12 @@ class Energy(metaclass=EMeta):
         # Get the energy of `self.molecule`. The only product whose
         # energy matters in pseudoformation.
         e_products = (self.values[fkey] if fkey in self.values.keys()
-             else getattr(self, func.name)(**func.params))
+                      else getattr(self, func.name)(**func.params))
 
         eng = e_reactants - e_products
         return eng
 
-    def rdkit(self, forcefield):
+    def rdkit(self, forcefield, conformer=-1):
         """
         Uses rdkit to calculate the energy of `self.molecule`.
 
@@ -587,6 +604,9 @@ class Energy(metaclass=EMeta):
         ----------
         forcefield : str
             The name of the forcefield to be used.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Modifies
         --------
@@ -606,19 +626,21 @@ class Energy(metaclass=EMeta):
         logger.debug('Starting rdkit energy calculation.')
         if forcefield == 'uff':
             self.molecule.mol.UpdatePropertyCache()
-            ff = rdkit.UFFGetMoleculeForceField(self.molecule.mol)
+            ff = rdkit.UFFGetMoleculeForceField(self.molecule.mol,
+                                                confId=conformer)
         if forcefield == 'mmff':
             rdkit.GetSSSR(self.molecule.mol)
             self.molecule.mol.UpdatePropertyCache()
             ff = rdkit.MMFFGetMoleculeForceField(
                   self.molecule.mol,
-                  rdkit.MMFFGetMoleculeProperties(self.molecule.mol))
+                  rdkit.MMFFGetMoleculeProperties(self.molecule.mol),
+                  confId=conformer)
 
         eng = ff.CalcEnergy()
         return eng
 
     @exclude('macromodel_path')
-    def macromodel(self, forcefield, macromodel_path):
+    def macromodel(self, forcefield, macromodel_path, conformer=-1):
         """
         Calculates the energy of `self.molecule` using macromodel.
 
@@ -636,6 +658,9 @@ class Energy(metaclass=EMeta):
             installation the folder will probably be something like
             ``C:\Program Files\Schrodinger2016-2``.
 
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
         float
@@ -643,7 +668,7 @@ class Energy(metaclass=EMeta):
 
         Raises
         ------
-        _EnergyError : Exception
+        EnergyError : Exception
             This exception is raised if no energy value if found in the
             MacroModel calculation's .log file. Likely due to a
             forcefield error.
@@ -657,40 +682,44 @@ class Energy(metaclass=EMeta):
         # Unique file name is generated by inserting a random int into
         # the file path.
         tmp_file = "{}.mol".format(uuid4().int)
-        self.molecule.write(tmp_file)
+        self.molecule.write(tmp_file, conformer)
 
         file_root, ext = os.path.splitext(tmp_file)
-        convrt_app = os.path.join(macromodel_path, 'utilities',
-                                                    'structconvert')
+        convrt_app = os.path.join(macromodel_path,
+                                  'utilities',
+                                  'structconvert')
         convrt_cmd = [convrt_app,
-                     tmp_file, file_root+'.mae']
+                      tmp_file,
+                      file_root+'.mae']
         sp.call(convrt_cmd, stdout=sp.PIPE, stderr=sp.PIPE)
 
         # Create an input file and run it.
         input_script = (
-        "{0}.mae\n"
-        "{0}-out.maegz\n"
-        " MMOD       0      1      0      0     0.0000     0.0000     "
-        "0.0000     0.0000\n"
-        " FFLD{1:8}      1      0      0     1.0000     0.0000     "
-        "0.0000     0.0000\n"
-        " BGIN       0      0      0      0     0.0000     0.0000     "
-        "0.0000     0.0000\n"
-        " READ      -1      0      0      0     0.0000     0.0000     "
-        "0.0000     0.0000\n"
-        " ELST      -1      0      0      0     0.0000     0.0000     "
-        "0.0000     0.0000\n"
-        " WRIT       0      0      0      0     0.0000     0.0000     "
-        "0.0000     0.0000\n"
-        " END       0      0      0      0     0.0000     0.0000     "
-        "0.0000     0.0000\n\n"
+         "{0}.mae\n"
+         "{0}-out.maegz\n"
+         " MMOD       0      1      0      0     0.0000     0.0000     "
+         "0.0000     0.0000\n"
+         " FFLD{1:8}      1      0      0     1.0000     0.0000     "
+         "0.0000     0.0000\n"
+         " BGIN       0      0      0      0     0.0000     0.0000     "
+         "0.0000     0.0000\n"
+         " READ      -1      0      0      0     0.0000     0.0000     "
+         "0.0000     0.0000\n"
+         " ELST      -1      0      0      0     0.0000     0.0000     "
+         "0.0000     0.0000\n"
+         " WRIT       0      0      0      0     0.0000     0.0000     "
+         "0.0000     0.0000\n"
+         " END       0      0      0      0     0.0000     0.0000     "
+         "0.0000     0.0000\n\n"
         ).format(file_root, forcefield)
 
         with open(file_root+'.com', 'w') as f:
             f.write(input_script)
 
         cmd = [os.path.join(macromodel_path, 'bmin'),
-               file_root, "-WAIT", "-LOCAL"]
+               file_root,
+               "-WAIT",
+               "-LOCAL"]
         sp.call(cmd)
 
         # Check if the license was found. If not run the function
@@ -698,8 +727,10 @@ class Energy(metaclass=EMeta):
         with open(file_root+'.log', 'r') as f:
             log_content = f.read()
         if ('FATAL -96: Could not check out a license for mmlibs' in
-            log_content):
-            return self.macromodel(forcefield, macromodel_path)
+           log_content):
+            return self.macromodel(forcefield,
+                                   macromodel_path,
+                                   conformer)
 
         # Read the .log file and return the energy.
         with open(file_root+'.log', 'r') as f:
@@ -710,7 +741,7 @@ class Energy(metaclass=EMeta):
         try:
             return eng
         except UnboundLocalError:
-            raise _EnergyError('MacroModel energy calculation failed.')
+            raise EnergyError('MacroModel energy calculation failed.')
 
     @exclude('mopac_path')
     def mopac(self, mopac_path, settings={}):
@@ -800,7 +831,6 @@ class Energy(metaclass=EMeta):
         # Run MOPAC
         _run_mopac(file_root, mopac_path)
         return _extract_MOPAC_en(file_root)
-
 
     @exclude('mopac_path')
     def mopac_dipole(self, mopac_path, settings={}):
@@ -1008,7 +1038,6 @@ class Energy(metaclass=EMeta):
         # Calculate the EA (eV)
         return en2 - en1
 
-
     @exclude('mopac_path')
     def mopac_ip(self, mopac_path, settings={}):
         """
@@ -1127,6 +1156,7 @@ class Energy(metaclass=EMeta):
         # Calculate the IP (eV)
         return en2 - en1
 
+
 def formation_key(fargs, fkwargs):
     """
     Generates the key of the `formation()` method in the `values` dict.
@@ -1153,8 +1183,9 @@ def formation_key(fargs, fkwargs):
     # Get a dictionary of all the supplied parameters.
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
-    default = {key : value.default for key,value in
-           dict(fsig.parameters).items() if key not in bound.keys()}
+    default = {key: value.default for key, value in
+               dict(fsig.parameters).items() if
+               key not in bound.keys()}
 
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
@@ -1207,8 +1238,9 @@ def pseudoformation_key(fargs, fkwargs):
     # Get a dictionary of all the supplied parameters.
     bound = dict(fsig.bind_partial(*fargs, **fkwargs).arguments)
     # Get a dictionary of all the default initialized parameters.
-    default = {key : value.default for key,value in
-           dict(fsig.parameters).items() if key not in bound.keys()}
+    default = {key: value.default for key, value in
+               dict(fsig.parameters).items() if
+               key not in bound.keys()}
 
     # Combine the two sets of parameters and get rid of the `self`
     # parameter, if present.
@@ -1232,6 +1264,7 @@ def pseudoformation_key(fargs, fkwargs):
 
 
 Energy.pseudoformation.key = pseudoformation_key
+
 
 def _run_mopac(file_root, mopac_path, timeout=3600):
 
@@ -1258,6 +1291,7 @@ def _run_mopac(file_root, mopac_path, timeout=3600):
                      'by force - {}').format(file_root))
         _kill_mopac(file_root)
 
+
 def _kill_mopac(file_root):
     """
     To kill a MOPAC run for a specific structure it is enough to generate
@@ -1267,6 +1301,7 @@ def _kill_mopac(file_root):
 
     with open(end_file, 'w') as end:
         end.write('SHUT')
+
 
 def _mop_line(settings):
     """
@@ -1353,6 +1388,7 @@ def _create_mop(file_root, molecule, settings):
 
     return mop_file
 
+
 def _extract_MOPAC_en(file_root):
     mopac_out = file_root + '.arc'
 
@@ -1362,6 +1398,7 @@ def _extract_MOPAC_en(file_root):
         energy_val = float(energy_str.split()[3])
 
     return energy_val
+
 
 def _extract_MOPAC_dipole(file_root):
     mopac_out = file_root + '.arc'

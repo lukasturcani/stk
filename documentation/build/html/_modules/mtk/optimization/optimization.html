@@ -155,11 +155,11 @@
 <span class="sd">Extending MMEA: Adding optimization functions</span>
 <span class="sd">---------------------------------------------</span>
 <span class="sd">New optimization functions are added by writing them into this module.</span>
-<span class="sd">The only requirement is that the first argument is ``macro_mol`` and</span>
+<span class="sd">The only requirement is that the first argument is ``mol`` and</span>
 <span class="sd">there is a keyword argument ``logger``. This allows users to identify</span>
 <span class="sd">which arguments are handled automatically by MMEA and which need to be</span>
 <span class="sd">defined in the input file. The convention is that if the optimization</span>
-<span class="sd">function takes the arguments ``macro_mol`` and ``logger``, the user</span>
+<span class="sd">function takes the arguments ``mol`` and ``logger``, the user</span>
 <span class="sd">does not have to specify them argument in the input file.</span>
 
 <span class="sd">When defining optimization functions the ``logger`` argument should be</span>
@@ -168,7 +168,7 @@
 <span class="sd">is automatically placed in this argument. It may be useful to define</span>
 <span class="sd">the logger argument as a keyword argument::</span>
 
-<span class="sd">    opt_func(macro_mol, somearg, logger=logging.getLogger(__name__)):</span>
+<span class="sd">    opt_func(mol, somearg, logger=logging.getLogger(__name__)):</span>
 <span class="sd">        ...</span>
 
 <span class="sd">In this way, if the optimization function is used outside of the GA,</span>
@@ -306,28 +306,28 @@
 <div class="viewcode-block" id="_OptimizationFunc.__init__"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="_OptimizationFunc.__call__"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_OptimizationFunc.__call__"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization._OptimizationFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">optimized</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Skipping </span><span class="si">{macro_mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">macro_mol</span>
+        <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">optimized</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Skipping </span><span class="si">{mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mol</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Optimizing </span><span class="si">{macro_mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Optimizing </span><span class="si">{mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;Optimization function &#39;</span>
                         <span class="n">f</span><span class="s1">&#39;&quot;</span><span class="si">{self.__wrapped__.func.__name__}</span><span class="s1">()&quot; &#39;</span>
-                        <span class="n">f</span><span class="s1">&#39;failed on molecule &quot;</span><span class="si">{macro_mol.name}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+                        <span class="n">f</span><span class="s1">&#39;failed on molecule &quot;</span><span class="si">{mol.name}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">finally</span><span class="p">:</span>
-            <span class="n">macro_mol</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="n">macro_mol</span></div></div>
+            <span class="n">mol</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">mol</span></div></div>
 
 
-<div class="viewcode-block" id="do_not_optimize"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.do_not_optimize">[docs]</a><span class="k">def</span> <span class="nf">do_not_optimize</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="do_not_optimize"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.do_not_optimize">[docs]</a><span class="k">def</span> <span class="nf">do_not_optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Skips the optimization step.</span>
 
@@ -337,7 +337,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    mol : MacroMolecule</span>
 <span class="sd">        A macromolecule which will not be optimized.</span>
 
 <span class="sd">    Returns</span>
@@ -349,13 +349,13 @@
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.partial_raiser">[docs]</a><span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">):</span>
+<div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.partial_raiser">[docs]</a><span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raises and optimizes at random.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    mol : MacroMolecule</span>
 <span class="sd">        The macromolecule being optimized.</span>
 
 <span class="sd">    ofunc : FunctionData</span>
@@ -371,10 +371,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Partial raiser.&#39;</span><span class="p">)</span>
 
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">ofunc</span><span class="o">.</span><span class="n">name</span><span class="p">](</span><span class="n">macro_mol</span><span class="p">,</span> <span class="o">**</span><span class="n">ofunc</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">ofunc</span><span class="o">.</span><span class="n">name</span><span class="p">](</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">ofunc</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Doens&#39;t optimize, raises an error instead.</span>
 
@@ -403,7 +403,7 @@
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Raiser optimization function used.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rdkit_optimization"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_optimization">[docs]</a><span class="k">def</span> <span class="nf">rdkit_optimization</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">embed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="rdkit_optimization"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_optimization">[docs]</a><span class="k">def</span> <span class="nf">rdkit_optimization</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">embed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes the structure of the molecule using rdkit.</span>
 
@@ -411,7 +411,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    mol : MacroMolecule</span>
 <span class="sd">        The macromolecule who&#39;s structure should be optimized.</span>
 
 <span class="sd">    embed : bool (default = False)</span>
@@ -419,70 +419,62 @@
 <span class="sd">        is carried out. This guess structure overrides any previous</span>
 <span class="sd">        structure.</span>
 
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The conformer to use.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None : NoneType</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">embed</span><span class="p">:</span>
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">conf_id</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">clearConfs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">new_conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">))</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="n">new_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">)</span>
 
     <span class="c1"># Sanitize then optimize the rdkit molecule.</span>
-    <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
-    <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span></div>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">conformer</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rdkit_ETKDG"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="rdkit_ETKDG"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_ETKDG</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Does a conformer search with the rdkit.ETKDG method:</span>
-<span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
+<span class="sd">    Does a conformer search with :func:`rdkit.ETKDG` [#]_.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    mol : MacroMolecule</span>
 <span class="sd">        The macromolecule who&#39;s structure should be optimized.</span>
+
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The conformer to use.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None : NoneType</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="rdkit_confs_ETKDG"><a class="viewcode-back" href="../../../mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_confs_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_confs_ETKDG</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">confs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Does a conformer search with the rdkit.ETKDG method:</span>
-<span class="sd">    http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
-<span class="sd">    A number of mol files representing the conformers is then generated.</span>
-
-<span class="sd">    Parameters</span>
+<span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule who&#39;s structure should be optimized.</span>
-
-<span class="sd">    name: :class:`str`, optional</span>
-<span class="sd">        Name of the macro_mol that is used to name the new conformers.</span>
-
-<span class="sd">    confs: :class:`int`, optional</span>
-<span class="sd">        Defines the number of conformers generated in the</span>
-<span class="sd">        conformer search.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    conformers : list of conformer IDs for the rdkit molecule.</span>
+<span class="sd">    .. [#] http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">cids</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMultipleConfs</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">confs</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">cids</span><span class="p">:</span>
-        <span class="n">conf_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.mol&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">cid</span><span class="p">)</span>
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">MolToMolFile</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">conf_name</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">cid</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">cids</span></div>
+    <span class="n">conf_id</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+    <span class="n">new_conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">))</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+    <span class="n">new_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
