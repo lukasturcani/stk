@@ -760,7 +760,7 @@
     <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 
     <span class="n">cavity</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
-    <span class="n">window</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">windows</span><span class="p">())</span>
     <span class="n">asymmetry</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">window_difference</span><span class="p">()</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Calculating cage energy.&#39;</span><span class="p">)</span>
@@ -869,13 +869,15 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">_cage_target</span><span class="p">(</span><span class="s1">&#39;cage_target&#39;</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span>
-                        <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">_cage_target</span><span class="p">(</span><span class="s1">&#39;cage_target&#39;</span><span class="p">,</span>
+                        <span class="n">macro_mol</span><span class="p">,</span>
+                        <span class="n">target_mol_file</span><span class="p">,</span>
+                        <span class="n">efunc</span><span class="p">,</span>
+                        <span class="n">ofunc</span><span class="p">,</span>
                         <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;_generate_complexes&#39;</span><span class="p">,</span>
                                      <span class="n">number</span><span class="o">=</span><span class="n">rotations</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
                         <span class="n">dihedral_SMARTS</span><span class="p">,</span>
-                        <span class="n">target_value</span><span class="p">,</span>
-                        <span class="n">logger</span><span class="p">)</span></div>
+                        <span class="n">target_value</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="cage_c60"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_c60">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span>

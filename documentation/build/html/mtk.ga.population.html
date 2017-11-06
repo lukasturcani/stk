@@ -586,12 +586,9 @@ ones created by <a class="reference internal" href="#mtk.ga.population.Populatio
 its subpopulations and the <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> <code class="docutils literal"><span class="pre">{...}</span></code>
 represents the members.</p>
 </li>
-<li><strong>member_init</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – The initialization function for the populations members.
-It converts the member represenations it <cite>pop_list</cite> into
+<li><strong>member_init</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – The initialization function for the population’s members.
+It converts the member represenations in <cite>pop_list</cite> into
 desired objects.</li>
-<li><strong>load_names</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code>, then the <code class="xref py py-meth docutils literal"><span class="pre">Molecule.name()</span></code> attribute
-stored in the JSON objects is loaded. If <code class="docutils literal"><span class="pre">False</span></code>,
-then it’s not.</li>
 </ul>
 </td>
 </tr>
@@ -917,7 +914,7 @@ population.</li>
 
 <dl class="classmethod">
 <dt id="mtk.ga.population.Population.load">
-<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>load_names=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.load" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">load</code><span class="sig-paren">(</span><em>path</em>, <em>member_init</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a <a class="reference internal" href="#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> from one dumped to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -925,8 +922,9 @@ population.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the file holding the dumped population.</li>
-<li><strong>load_names</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code>, then the <cite>name</cite> attribute stored in the JSON
-objects is loaded. If <code class="docutils literal"><span class="pre">False</span></code>, then it’s not.</li>
+<li><strong>member_init</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – The initialization function for the population’s members.
+It converts the member represenations in <cite>pop_list</cite> into
+desired objects.</li>
 </ul>
 </td>
 </tr>

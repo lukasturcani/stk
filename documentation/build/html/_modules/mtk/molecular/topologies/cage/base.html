@@ -577,10 +577,16 @@
 <span class="sd">        with `id` 2 and so on. For this to work the edge defined by</span>
 <span class="sd">        the class must have their `id` attributes defined.</span>
 
+<span class="sd">    bb_assignments : :class:`dict`, optional</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_CageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">edge_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">edge_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bb_assignments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
         <span class="k">if</span> <span class="n">A_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">A_alignments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">B_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -592,7 +598,39 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A_alignments</span> <span class="o">=</span> <span class="n">A_alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">B_alignments</span> <span class="o">=</span> <span class="n">B_alignments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span> <span class="o">=</span> <span class="n">bb_assignments</span></div>
+
+<div class="viewcode-block" id="_CageTopology._bb_maps"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology._bb_maps">[docs]</a>    <span class="k">def</span> <span class="nf">_bb_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">bb_fgs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span> <span class="k">for</span>
+                     <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">)</span>
+        <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span>
+                   <span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span> <span class="o">==</span> <span class="n">bb_fgs</span><span class="p">]</span>
+            <span class="n">lks</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span>
+                   <span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span> <span class="o">!=</span> <span class="n">bb_fgs</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">)):</span>
+                <span class="n">bb_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bbs</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_B</span><span class="p">)):</span>
+                <span class="n">lk_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lks</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">bb_index</span><span class="p">,</span> <span class="n">positions</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">bb</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">[</span><span class="n">bb_index</span><span class="p">]</span>
+                <span class="n">n_fgs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span>
+                <span class="n">map_</span> <span class="o">=</span> <span class="n">bb_map</span> <span class="k">if</span> <span class="n">n_fgs</span> <span class="o">==</span> <span class="n">bb_fgs</span> <span class="k">else</span> <span class="n">lk_map</span>
+                <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+                    <span class="n">map_</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">bb</span>
+
+        <span class="k">return</span> <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span></div>
 
 <div class="viewcode-block" id="_CageTopology.join_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -745,32 +783,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
+        <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bb_maps</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
-        <span class="c1"># Get the StructUnit instances of the building blocks.</span>
-        <span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span>
-        <span class="c1"># Get the number of functional groups in each building block.</span>
-        <span class="n">n_fg1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bb1</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span>
-        <span class="n">n_fg2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bb2</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span>
-
-        <span class="c1"># Depending on the number of functional groups, assigned a</span>
-        <span class="c1"># building block to be either a linker or a building-block*.</span>
-        <span class="k">if</span> <span class="n">n_fg1</span> <span class="o">&lt;</span> <span class="n">n_fg2</span><span class="p">:</span>
-            <span class="n">lk</span> <span class="o">=</span> <span class="n">bb1</span>
-            <span class="n">n_lk</span> <span class="o">=</span> <span class="n">n_fg1</span>
-            <span class="n">bb</span> <span class="o">=</span> <span class="n">bb2</span>
-            <span class="n">n_bb</span> <span class="o">=</span> <span class="n">n_fg2</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">lk</span> <span class="o">=</span> <span class="n">bb2</span>
-            <span class="n">n_lk</span> <span class="o">=</span> <span class="n">n_fg2</span>
-            <span class="n">bb</span> <span class="o">=</span> <span class="n">bb1</span>
-            <span class="n">n_bb</span> <span class="o">=</span> <span class="n">n_fg1</span>
-
-        <span class="c1"># Save the original orientations of the linker and building</span>
-        <span class="c1"># block. This means that when orienation of molecules is done,</span>
+        <span class="c1"># Save the original orientationss of building blocks.</span>
+        <span class="c1"># This means that when orienation of molecules is done,</span>
         <span class="c1"># the starting position is always the same. Ensures</span>
         <span class="c1"># consistency.</span>
-        <span class="n">lk_pos</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span>
-        <span class="n">bb_pos</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span>
+        <span class="n">ipositions</span> <span class="o">=</span> <span class="p">{</span><span class="n">bb</span><span class="p">:</span> <span class="n">bb</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span> <span class="k">for</span>
+                      <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">}</span>
 
         <span class="c1"># This loop places all building-blocks* on the points at</span>
         <span class="c1"># `positions_A`. It then pairs all atoms which form a new bond</span>
@@ -778,6 +798,9 @@
         <span class="c1"># counts the nubmer of building-blocks* which make up the</span>
         <span class="c1"># structure.</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">):</span>
+            <span class="n">bb</span> <span class="o">=</span> <span class="n">bb_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">bb_pos</span> <span class="o">=</span> <span class="n">ipositions</span><span class="p">[</span><span class="n">bb</span><span class="p">]</span>
+            <span class="n">n_bb</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span>
             <span class="c1"># Position the molecule on the vertex.</span>
             <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">bb_pos</span><span class="p">)</span>
             <span class="n">aligner_edge_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -810,6 +833,10 @@
         <span class="c1"># they are found at. It also counts the number of linkers which</span>
         <span class="c1"># make up the structure.</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_B</span><span class="p">):</span>
+            <span class="n">lk</span> <span class="o">=</span> <span class="n">lk_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">lk_pos</span> <span class="o">=</span> <span class="n">ipositions</span><span class="p">[</span><span class="n">lk</span><span class="p">]</span>
+            <span class="n">n_lk</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">functional_group_atoms</span><span class="p">())</span>
+
             <span class="n">lk</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">lk_pos</span><span class="p">)</span>
             <span class="n">lk_mol</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">place_mol</span><span class="p">(</span><span class="n">lk</span><span class="p">,</span>  <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">B_alignments</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
             <span class="n">add_fragment_props</span><span class="p">(</span><span class="n">lk_mol</span><span class="p">,</span>
@@ -836,20 +863,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_VertexOnlyCageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">edge_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
-        <span class="k">if</span> <span class="n">A_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">A_alignments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">B_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">B_alignments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_B</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">edge_alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">edge_alignments</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
-                               <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">))]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">A_alignments</span> <span class="o">=</span> <span class="n">A_alignments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">B_alignments</span> <span class="o">=</span> <span class="n">B_alignments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span></div></div>
+    <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="_NoLinkerCageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>

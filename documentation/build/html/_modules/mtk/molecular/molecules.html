@@ -437,9 +437,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">note</span> <span class="o">=</span> <span class="n">note</span></div>
 
-<div class="viewcode-block" id="Molecule.all_atom_coords"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.all_atom_coords">[docs]</a>    <span class="k">def</span> <span class="nf">all_atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.all_atom_coords"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.all_atom_coords">[docs]</a>    <span class="k">def</span> <span class="nf">all_atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields the coordinates of atoms in `mol`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
@@ -452,17 +457,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Get the conformer from the rdkit instance.</span>
-        <span class="n">conformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
 
         <span class="c1"># Go through all the atoms and ask the conformer to return</span>
         <span class="c1"># the position of each atom. This is done by supplying the</span>
         <span class="c1"># conformers `GetAtomPosition` method with the atom&#39;s id.</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
-            <span class="n">atom_position</span> <span class="o">=</span> <span class="n">conformer</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
+            <span class="n">atom_position</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
             <span class="k">yield</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">atom_position</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="Molecule.atom_coords"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.atom_coords">[docs]</a>    <span class="k">def</span> <span class="nf">atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.atom_coords"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.atom_coords">[docs]</a>    <span class="k">def</span> <span class="nf">atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return coordinates of an atom.</span>
 
@@ -471,6 +476,9 @@
 <span class="sd">        atom_id : int</span>
 <span class="sd">            The id of the atom whose coordinates are desired.</span>
 
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        numpy.array</span>
@@ -478,11 +486,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
         <span class="n">atom_position</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="n">atom_position</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="Molecule.atom_distance"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.atom_distance">[docs]</a>    <span class="k">def</span> <span class="nf">atom_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.atom_distance"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.atom_distance">[docs]</a>    <span class="k">def</span> <span class="nf">atom_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the distance between 2 atoms.</span>
 
@@ -494,6 +502,9 @@
 <span class="sd">        atom2_id : int</span>
 <span class="sd">            The id of the second atom.</span>
 
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        scipy.double</span>
@@ -503,8 +514,8 @@
 
         <span class="c1"># Get the atomic positions of each atom and use the scipy</span>
         <span class="c1"># function to calculate their distance in Euclidean space.</span>
-        <span class="n">atom1_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
-        <span class="n">atom2_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
+        <span class="n">atom1_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="n">atom2_coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">euclidean</span><span class="p">(</span><span class="n">atom1_coords</span><span class="p">,</span> <span class="n">atom2_coords</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.atom_symbol"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.atom_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">atom_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">):</span>
@@ -525,7 +536,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Molecule._cavity_size"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._cavity_size"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates diameter of the molecule&#39;s from `origin`.</span>
 
@@ -542,6 +553,9 @@
 <span class="sd">            Holds the x, y and z coordinate of the position from which</span>
 <span class="sd">            the cavity is measured.</span>
 
+<span class="sd">        conformer : :class:`int`</span>
+<span class="sd">            The id of the conformer to be used.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
@@ -552,14 +566,19 @@
         <span class="n">atom_vdw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">atom_vdw_radii</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()]</span> <span class="k">for</span> <span class="n">x</span>
                             <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()])</span>
 
-        <span class="n">distances</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
                                         <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">origin</span><span class="p">))</span>
         <span class="n">distances</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">-</span> <span class="n">atom_vdw</span>
         <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.cavity_size"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.cavity_size"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the diameter of the molecule&#39;s cavity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -574,18 +593,23 @@
         <span class="c1"># What this function does is finds the value of `origin` which</span>
         <span class="c1"># causes _cavity_size() to calculate the largest possible</span>
         <span class="c1"># cavity.</span>
-        <span class="n">ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_of_mass</span><span class="p">()</span>
-        <span class="n">icavity</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_of_mass</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="n">icavity</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="n">bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="n">coord</span><span class="o">+</span><span class="n">icavity</span><span class="p">,</span> <span class="n">coord</span><span class="o">-</span><span class="n">icavity</span><span class="p">)</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">ref</span><span class="p">]</span>
-        <span class="n">cavity_origin</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">,</span>
+        <span class="n">cavity_origin</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">conformer</span><span class="p">),</span>
                                  <span class="n">x0</span><span class="o">=</span><span class="n">ref</span><span class="p">,</span>
                                  <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span><span class="o">.</span><span class="n">x</span>
-        <span class="n">cavity</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">cavity_origin</span><span class="p">)</span>
+        <span class="n">cavity</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_cavity_size</span><span class="p">(</span><span class="n">cavity_origin</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">cavity</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">cavity</span></div>
 
-<div class="viewcode-block" id="Molecule.center_of_mass"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.center_of_mass">[docs]</a>    <span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.center_of_mass"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.center_of_mass">[docs]</a>    <span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the centre of mass of the molecule.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -600,15 +624,20 @@
 
         <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
         <span class="n">total_mass</span> <span class="o">=</span> <span class="mf">0.</span>
-        <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_atom_coords</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_atom_coords</span><span class="p">(</span><span class="n">conformer</span><span class="p">):</span>
             <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetMass</span><span class="p">()</span>
             <span class="n">total_mass</span> <span class="o">+=</span> <span class="n">mass</span>
             <span class="n">center</span> <span class="o">+=</span> <span class="n">mass</span><span class="o">*</span><span class="n">coord</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">total_mass</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.centroid"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.centroid"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the centroid of the molecule.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -617,11 +646,13 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">centroid</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_atom_coords</span><span class="p">())</span>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_atom_coords</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">centroid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">())</span></div>
 
-    <span class="c1"># @classmethod</span>
-<div class="viewcode-block" id="Molecule.dihedral_strain"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.dihedral_strain">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_strain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.dihedral_strain"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.dihedral_strain">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_strain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">target</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+                        <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the relative % difference between all the average dihedral</span>
 <span class="sd">        angle values within the molecule and the target value.</span>
@@ -633,6 +664,9 @@
 
 <span class="sd">        target : :class:`float`</span>
 <span class="sd">            Float representing the target value for the dihedral angle.</span>
+
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -653,8 +687,10 @@
             <span class="k">for</span> <span class="n">atoms_group</span> <span class="ow">in</span> <span class="n">atoms_dihedral</span><span class="p">:</span>
                 <span class="c1"># Calculate the dihedral angle</span>
                 <span class="n">dihedral_value</span> <span class="o">=</span> <span class="n">rdMolTransforms</span><span class="o">.</span><span class="n">GetDihedralDeg</span><span class="p">(</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(),</span> <span class="n">atoms_group</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">atoms_group</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">atoms_group</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span>
+                                    <span class="n">atoms_group</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="n">atoms_group</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">atoms_group</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
                                     <span class="n">atoms_group</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
                 <span class="n">dihedral_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dihedral_value</span><span class="p">)</span>
 
@@ -790,9 +826,14 @@
 
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromdict</span><span class="p">(</span><span class="n">json_dict</span><span class="p">,</span> <span class="n">optimized</span><span class="p">,</span> <span class="n">load_names</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.max_diameter"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.max_diameter">[docs]</a>    <span class="k">def</span> <span class="nf">max_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.max_diameter"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.max_diameter">[docs]</a>    <span class="k">def</span> <span class="nf">max_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the largest distance between 2 atoms in the molecule.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -802,20 +843,25 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
-                              <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span>
-                                <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()),</span> <span class="mi">2</span><span class="p">)),</span>
-                             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()),</span>
+                                        <span class="mi">2</span><span class="p">)),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">conformer</span><span class="p">))</span>
 
-        <span class="n">maxd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span><span class="p">)</span>
+        <span class="n">maxd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="n">maxd</span> <span class="o">+=</span> <span class="p">(</span><span class="n">atom_vdw_radii</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="n">maxid1</span><span class="p">)]</span> <span class="o">+</span>
                  <span class="n">atom_vdw_radii</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="n">maxid2</span><span class="p">)])</span>
 
         <span class="k">return</span> <span class="n">maxd</span><span class="p">,</span> <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span></div>
 
-<div class="viewcode-block" id="Molecule.mdl_mol_block"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.mdl_mol_block">[docs]</a>    <span class="k">def</span> <span class="nf">mdl_mol_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.mdl_mol_block"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.mdl_mol_block">[docs]</a>    <span class="k">def</span> <span class="nf">mdl_mol_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a V3000 mol block of the molecule.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -858,7 +904,7 @@
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
             <span class="n">atom_sym</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()]</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
             <span class="n">atom_block</span> <span class="o">+=</span> <span class="n">atom_line</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atom_id</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
                                            <span class="n">atom_sym</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
 
@@ -876,9 +922,14 @@
         <span class="k">return</span> <span class="n">main_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
                             <span class="s2">&quot;!!!BOND!!!BLOCK!!!HERE!!!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bond_block</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.position_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.position_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">position_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.position_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.position_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">position_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the position of all atoms in the as a matrix.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -892,7 +943,7 @@
         <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
-            <span class="n">pos_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)])</span>
+            <span class="n">pos_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)])</span>
             <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos_array</span><span class="p">,</span> <span class="n">pos_vect</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">pos_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
@@ -917,7 +968,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inchi</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">inchi</span></div>
 
-<div class="viewcode-block" id="Molecule.rotate"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.rotate"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule by `theta` about `axis`.</span>
 
@@ -931,11 +982,8 @@
 <span class="sd">        axis : numpy.array</span>
 <span class="sd">            The axis about which the rotation happens.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The positions of all the atoms are changed due to the</span>
-<span class="sd">            rotation.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -944,32 +992,27 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Save the original position.</span>
-        <span class="n">og_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span>
+        <span class="n">og_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># Move the centroid of the molecule to the origin, so that the</span>
         <span class="c1"># rotation occurs about this point.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># Get the rotation matrix.</span>
         <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
         <span class="c1"># Apply the rotation matrix on the position matrix, to get the</span>
         <span class="c1"># new position matrix.</span>
-        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
+        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
         <span class="c1"># Apply the rotation.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># Return the centroid of the molecule to the origin position.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">og_position</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">og_position</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.save_bonders"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.save_bonders">[docs]</a>    <span class="k">def</span> <span class="nf">save_bonders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds atoms tagged with &#39;bonder&#39; to `bonder_ids`.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        bonder_ids : list of ints</span>
-<span class="sd">            Updates this set with the ids of atoms tagged &#39;bonder&#39;.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -979,7 +1022,7 @@
             <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">HasProp</span><span class="p">(</span><span class="s1">&#39;bonder&#39;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="Molecule.set_orientation"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.set_orientation">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.set_orientation"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.set_orientation">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule by a rotation from `start` to `end`.</span>
 
@@ -1014,11 +1057,8 @@
 <span class="sd">        end : numpy.array</span>
 <span class="sd">            This array holds the vector, onto which `start` is rotated.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed due to</span>
-<span class="sd">            rotation of the molecule about its centroid.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1034,23 +1074,23 @@
         <span class="c1"># Record the position of the molecule then translate the</span>
         <span class="c1"># centroid to the origin. This is so that the rotation occurs</span>
         <span class="c1"># about this point.</span>
-        <span class="n">og_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">og_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">conformer</span><span class="p">)</span>
 
         <span class="c1"># Get the rotation matrix.</span>
         <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
         <span class="c1"># Apply the rotation matrix to the atomic positions to yield</span>
         <span class="c1"># the new atomic positions.</span>
-        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
+        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
 
         <span class="c1"># Set the positions of the molecule.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">og_center</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">og_center</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
-<div class="viewcode-block" id="Molecule.set_position"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.set_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.set_position"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.set_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the centroid of the molecule to `position`.</span>
 
@@ -1060,11 +1100,8 @@
 <span class="sd">            This array holds the position on which the centroid of the</span>
 <span class="sd">            molecule should be placed.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed so that its</span>
-<span class="sd">            centroid falls on `position`.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1074,21 +1111,24 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">conf_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
+
         <span class="c1"># Get the original centroid.</span>
-        <span class="n">centroid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
         <span class="c1"># Find out how much it needs to shift to reach `position`.</span>
         <span class="n">shift</span> <span class="o">=</span> <span class="n">position</span> <span class="o">-</span> <span class="n">centroid</span>
         <span class="c1"># Apply the shift and get the resulting rdkit conformer object.</span>
-        <span class="n">new_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">new_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">shift</span><span class="p">,</span> <span class="n">conf_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">new_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
 
         <span class="c1"># Replace the old rkdit conformer with one where the centroid</span>
         <span class="c1"># is at `position`.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
-<div class="viewcode-block" id="Molecule.set_position_from_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.set_position_from_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">set_position_from_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_mat</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.set_position_from_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.set_position_from_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">set_position_from_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_mat</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set atomic positions of the molecule to those in `pos_mat`.</span>
 
@@ -1104,11 +1144,8 @@
 <span class="sd">            column sets the coordinate of the atom with id 1, and so</span>
 <span class="sd">            on.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The coordinates of atoms in this molecule are set to the</span>
-<span class="sd">            coordinates in `pos_mat`.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1116,14 +1153,14 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord_mat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pos_mat</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
             <span class="n">coord</span> <span class="o">=</span> <span class="n">rdkit_geo</span><span class="o">.</span><span class="n">Point3D</span><span class="p">(</span><span class="n">coord_mat</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
                                       <span class="n">coord_mat</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
                                       <span class="n">coord_mat</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
             <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">coord</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.shift"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.shift"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.shift">[docs]</a>    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shifts the coordinates of all atoms.</span>
 
@@ -1135,6 +1172,9 @@
 <span class="sd">            A numpy array holding the value of the shift along each</span>
 <span class="sd">            axis.</span>
 
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
@@ -1145,7 +1185,7 @@
 
         <span class="c1"># The function does not modify the existing conformer, as a</span>
         <span class="c1"># result a new instance is created and used for modification.</span>
-        <span class="n">conformer</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">())</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
 
         <span class="c1"># For each atom, get the atomic positions from the conformer</span>
         <span class="c1"># and shift them. Create a new geometry instance from these new</span>
@@ -1163,8 +1203,7 @@
             <span class="c1"># `atom_position` in an instance holding in the x, y and z</span>
             <span class="c1"># coordinates of an atom in its &#39;x&#39;, &#39;y&#39; and &#39;z&#39;</span>
             <span class="c1"># attributes.</span>
-            <span class="n">atom_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                                    <span class="n">conformer</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">))</span>
+            <span class="n">atom_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">))</span>
 
             <span class="c1"># Inducing the shift.</span>
             <span class="n">new_atom_position</span> <span class="o">=</span> <span class="n">atom_position</span> <span class="o">+</span> <span class="n">shift</span>
@@ -1174,7 +1213,7 @@
 
             <span class="c1"># Changes the position of the atom in the conformer to the</span>
             <span class="c1"># values stored in the new geometry instance.</span>
-            <span class="n">conformer</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">new_coords</span><span class="p">)</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">new_coords</span><span class="p">)</span>
 
         <span class="c1"># Create a new copy of the rdkit molecule instance representing</span>
         <span class="c1"># the molecule - the original instance is not to be modified.</span>
@@ -1187,43 +1226,73 @@
         <span class="c1"># conformer is then given to the rdkit molecule, which is</span>
         <span class="c1"># returned.</span>
         <span class="n">new_mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
-        <span class="n">new_mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="n">new_mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_mol</span></div>
 
-<div class="viewcode-block" id="Molecule.update_from_mae"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_from_mae">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_mae</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mae_path</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.update_from_mae"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_from_mae">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_mae</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates molecular structure to match an .mae file.</span>
+<span class="sd">        Updates molecular structure to match an ``.mae`` file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mae_path : str</span>
-<span class="sd">            The full path of the .mae file from which the structure</span>
+<span class="sd">        path : :class:`str`</span>
+<span class="sd">            The full path of the ``.mae`` file from which the structure</span>
 <span class="sd">            should be updated.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule held in this attribute is changed so</span>
-<span class="sd">            that it matches the moleclue held in the .mae file.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to be updated.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol_from_mae_file</span><span class="p">(</span><span class="n">mae_path</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">conformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Molecule.update_stereochemistry"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">mol_from_mae_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">())</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Molecule.update_from_mol"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_from_mol">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates molecular structure to match an ``.mol`` file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : :class:`str`</span>
+<span class="sd">            The full path of the ``.mol`` file from which the structure</span>
+<span class="sd">            should be updated.</span>
+
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to be updated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None : :class:`NoneType`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">conformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
+
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromMolFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">())</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Molecule.update_stereochemistry"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates stereochemistry tags on `mol` attribute.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The &#39;_CIPCode&#39; property on each atom of the rkdit molecule</span>
-<span class="sd">            is updated to reflect the R or S configuration of the atom</span>
-<span class="sd">            in the current geometry.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1233,10 +1302,10 @@
 
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom</span><span class="o">.</span><span class="n">UpdatePropertyCache</span><span class="p">()</span>
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">AssignAtomChiralTagsFromStructure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">rdkit</span><span class="o">.</span><span class="n">AssignAtomChiralTagsFromStructure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="n">rdkit</span><span class="o">.</span><span class="n">AssignStereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule.write"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule.write"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a molecular structure file of the molecule.</span>
 
@@ -1249,6 +1318,9 @@
 <span class="sd">        path : str</span>
 <span class="sd">            The `path` to which the molecule should be written.</span>
 
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None : NoneType</span>
@@ -1260,9 +1332,9 @@
 
         <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">write_func</span> <span class="o">=</span> <span class="n">write_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
-        <span class="n">write_func</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+        <span class="n">write_func</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Molecule._write_mdl_mol_file"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._write_mdl_mol_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._write_mdl_mol_file"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._write_mdl_mol_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a V3000 .mol file of the molecule</span>
 
@@ -1274,9 +1346,8 @@
 <span class="sd">        path : str</span>
 <span class="sd">            The full path to which to the file should be written.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        A file is created/ changed at `path`.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1285,9 +1356,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">())</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Molecule._write_pdb_file"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._write_pdb_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._write_pdb_file"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._write_pdb_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a .pdb file of the molecule</span>
 
@@ -1299,9 +1370,8 @@
 <span class="sd">        path : str</span>
 <span class="sd">            The full path to which to the file should be written.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        A file is created/ changed at `path`.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1310,7 +1380,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># First write the file using rdkit.</span>
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">MolToPDBFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="n">rdkit</span><span class="o">.</span><span class="n">MolToPDBFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
         <span class="c1"># Edit the file because rkdit does poor atom labelling.</span>
         <span class="n">new_content</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -1527,7 +1597,7 @@
                     <span class="s1">&#39;Could not initialize </span><span class="si">{}</span><span class="s1"> from </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                                 <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">molfile</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StructUnit.all_bonder_distances"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.all_bonder_distances">[docs]</a>    <span class="k">def</span> <span class="nf">all_bonder_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.all_bonder_distances"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.all_bonder_distances">[docs]</a>    <span class="k">def</span> <span class="nf">all_bonder_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yield distances between all pairs of bonder atoms.</span>
 
@@ -1535,6 +1605,11 @@
 <span class="sd">        distance between atoms with ids ``1`` and ``2``is yielded as</span>
 <span class="sd">        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be</span>
 <span class="sd">        yielded.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
@@ -1547,11 +1622,18 @@
         <span class="c1"># Iterate through each pair of atoms - do not allow</span>
         <span class="c1"># recombinations.</span>
         <span class="k">for</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-                <span class="k">yield</span> <span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">))</span></div>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">atom1</span><span class="p">,</span>
+                       <span class="n">atom2</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">conformer</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StructUnit.bonder_centroid"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.bonder_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.bonder_centroid"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.bonder_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the centroid of the bonder atoms.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1560,15 +1642,21 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">centroid</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span>
+        <span class="n">centroid</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span> <span class="k">for</span>
+                       <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">centroid</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="StructUnit.bonder_direction_vectors"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.bonder_direction_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_direction_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.bonder_direction_vectors"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.bonder_direction_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_direction_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields the direction vectors between all pairs of bonder atoms.</span>
 
 <span class="sd">        The yielded vector is normalized. If a pair (1,2) is yielded,</span>
 <span class="sd">        the pair (2,1) will not be.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
@@ -1580,14 +1668,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
-            <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
             <span class="k">yield</span> <span class="n">atom2_id</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit.bonder_position_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.bonder_position_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_position_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.bonder_position_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.bonder_position_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_position_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a matrix holding the positions of bonder atoms.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1601,18 +1694,23 @@
         <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
         <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">:</span>
-            <span class="n">pos_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)])</span>
+            <span class="n">pos_vect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)])</span>
             <span class="n">pos_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos_array</span><span class="p">,</span> <span class="n">pos_vect</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">pos_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit.centroid_centroid_dir_vector"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector">[docs]</a>    <span class="k">def</span> <span class="nf">centroid_centroid_dir_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.centroid_centroid_dir_vector"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector">[docs]</a>    <span class="k">def</span> <span class="nf">centroid_centroid_dir_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the direction vector between the 2 molecular centroids.</span>
 
 <span class="sd">        The first molecule centroid is the centroid of the entire</span>
 <span class="sd">        molecule. The second molecular centroid is the centroid of the</span>
 <span class="sd">        bonder atoms.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1625,9 +1723,9 @@
         <span class="c1"># If the bonder centroid and centroid are in the same position,</span>
         <span class="c1"># the centroid - centroid vector should be orthogonal to the</span>
         <span class="c1"># bonder direction vector.</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(),</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
-            <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">bvec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+            <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">bvec</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
             <span class="c1"># Construct a secondary vector by finding the minimum</span>
             <span class="c1"># component of bvec and setting it to 0.</span>
             <span class="n">vec2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bvec</span><span class="p">)</span>
@@ -1638,8 +1736,8 @@
             <span class="k">return</span> <span class="n">a</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span> <span class="o">-</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">())</span></div>
+            <span class="k">return</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span> <span class="o">-</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="StructUnit.core"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.core">[docs]</a>    <span class="k">def</span> <span class="nf">core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1795,7 +1893,7 @@
 
         <span class="k">return</span> <span class="n">functional_group</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolToInchi</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit.minimize_theta"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.minimize_theta">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">centroid</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.minimize_theta"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.minimize_theta">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">centroid</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotate mol to minimize angle between `v1` and `v2`.</span>
 
@@ -1815,11 +1913,8 @@
 <span class="sd">        centroid : numpy.array</span>
 <span class="sd">            The position vector at the center of the rotation.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed due to the</span>
-<span class="sd">            rotation.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1834,8 +1929,8 @@
 
         <span class="c1"># Save the initial position and change the origin to</span>
         <span class="c1"># `centroid`.</span>
-        <span class="n">iposition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="n">centroid</span><span class="p">)</span>
+        <span class="n">iposition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="n">centroid</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
         <span class="c1"># 1. First transform the problem.</span>
         <span class="c1"># 2. The rotation axis is set equal to the z-axis.</span>
@@ -1851,7 +1946,7 @@
         <span class="c1"># If the `tstart` vector is 0 after these transformations it</span>
         <span class="c1"># means that it is parallel to the rotation axis, stop.</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">tstart</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">tend</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
@@ -1870,9 +1965,9 @@
             <span class="n">angle</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="n">rotmat</span> <span class="o">=</span> <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
-        <span class="n">posmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">posmat</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">)</span></div>
+        <span class="n">posmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">posmat</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">iposition</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StructUnit.rdkit_init"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rdkit_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">rdkit_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -1896,7 +1991,7 @@
             <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">functional_group</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit.rotate2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rotate2">[docs]</a>    <span class="k">def</span> <span class="nf">rotate2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.rotate2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.rotate2">[docs]</a>    <span class="k">def</span> <span class="nf">rotate2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule by `theta` about `axis`.</span>
 
@@ -1910,10 +2005,8 @@
 <span class="sd">        axis : numpy.array</span>
 <span class="sd">            The axis about which rotation happens.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The atoms in this molecule are rotated.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1922,21 +2015,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Save the origin position of the bonder atom centroid.</span>
-        <span class="n">og_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">()</span>
+        <span class="n">og_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># Change the position of the centroid of the bonder atoms to</span>
         <span class="c1"># the origin so that the rotation occurs about this point.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># Get the rotation matrix.</span>
         <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
         <span class="c1"># Apply the rotation on the original atomic coordinates to get</span>
         <span class="c1"># the new ones.</span>
-        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
+        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
         <span class="c1"># Set the atomic positions to the new coordinates.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># Return the centroid to its original position.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">og_position</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">og_position</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit.set_bonder_centroid"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.set_bonder_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit.set_bonder_centroid"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.set_bonder_centroid">[docs]</a>    <span class="k">def</span> <span class="nf">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Move the molecule so that the bonder centroid is on `position`.</span>
 
@@ -1946,11 +2039,8 @@
 <span class="sd">            A numpy array holding the desired the position. It holds</span>
 <span class="sd">            the x, y and z coordinates, respectively.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The position of the molecule in this rdkit instance is</span>
-<span class="sd">            changed, as described in this docstring.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1960,17 +2050,20 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">()</span>
+        <span class="n">conf_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
+
+        <span class="n">center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
         <span class="n">shift</span> <span class="o">=</span> <span class="n">position</span> <span class="o">-</span> <span class="n">center</span>
-        <span class="n">new_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">new_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">shift</span><span class="p">,</span> <span class="n">conf_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+        <span class="n">new_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
 
         <span class="c1"># Make sure the rkdit molecule has only one conformer.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
-<div class="viewcode-block" id="StructUnit._set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit._set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit._set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit._set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Note: The difference between this method and</span>
 <span class="sd">        ``set_orientation()`` is about which point the rotation</span>
@@ -2003,11 +2096,8 @@
 <span class="sd">        end : numpy.array</span>
 <span class="sd">            This array holds the vector, onto which `start` is rotated.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed due to</span>
-<span class="sd">            rotation of the molecule about its centroid.</span>
+<span class="sd">        conformer : :class:`int`</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2023,19 +2113,19 @@
         <span class="c1"># Record the position of the molecule then translate the bonder</span>
         <span class="c1"># atom centroid to the origin. This is so that the rotation</span>
         <span class="c1"># occurs about this point.</span>
-        <span class="n">og_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">og_center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">conformer</span><span class="p">)</span>
 
         <span class="c1"># Get the rotation matrix.</span>
         <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
         <span class="c1"># Apply the rotation matrix to the atomic positions to yield</span>
         <span class="c1"># the new atomic positions.</span>
-        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">())</span>
+        <span class="n">new_pos_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
 
         <span class="c1"># Set the positions in the rdkit molecule.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">og_center</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">og_center</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
@@ -2086,8 +2176,11 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">similarities</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="StructUnit.smarts_init"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.smarts_init">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">smarts_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">smarts</span><span class="p">,</span>
-                    <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">smarts_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                    <span class="n">smarts</span><span class="p">,</span>
+                    <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize from a SMARTS string.</span>
 
@@ -2230,7 +2323,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StructUnit2.set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2.set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit2.set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2.set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotate the molecule so that bonder atoms lie on `end`.</span>
 
@@ -2244,12 +2337,8 @@
 <span class="sd">            The vector with which the molecule&#39;s bonder atoms should be</span>
 <span class="sd">            aligned.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed due to</span>
-<span class="sd">            rotation of the molecule about the centroid of the bonder</span>
-<span class="sd">            atoms.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2258,10 +2347,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">())</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_orientation2</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+        <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_orientation2</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit2.minimize_theta2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2.minimize_theta2">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit2.minimize_theta2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2.minimize_theta2">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates molecule about `axis` to minimze theta with `vector`.</span>
 
@@ -2277,12 +2366,7 @@
 <span class="sd">        axis : numpy.array</span>
 <span class="sd">            The direction vector along which the rotation happens.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed due to</span>
-<span class="sd">            rotation of the molecule about the centroid of the bonder</span>
-<span class="sd">            atoms.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2290,8 +2374,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_centroid_dir_vector</span><span class="p">(),</span>
-                            <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">())</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_centroid_dir_vector</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span>
+                            <span class="n">vector</span><span class="p">,</span>
+                            <span class="n">axis</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span>
+                            <span class="n">conformer</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="StructUnit3"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3">[docs]</a><span class="k">class</span> <span class="nc">StructUnit3</span><span class="p">(</span><span class="n">StructUnit</span><span class="p">):</span>
@@ -2300,7 +2387,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="StructUnit3.bonder_plane"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.bonder_plane">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit3.bonder_plane"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.bonder_plane">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the coefficients of the plane formed by bonder atoms.</span>
 
@@ -2317,6 +2404,11 @@
 <span class="sd">        coordinate of some point on the plane. For example, the</span>
 <span class="sd">        position of one of the bonder atoms.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        numpy.array</span>
@@ -2329,16 +2421,21 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">bonder_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">()</span> <span class="o">*</span> <span class="n">bonder_coord</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(),</span> <span class="n">d</span><span class="p">)</span></div>
+        <span class="n">bonder_coord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">conformer</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span> <span class="o">*</span> <span class="n">bonder_coord</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span> <span class="n">d</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit3.bonder_plane_normal"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.bonder_plane_normal">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_plane_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit3.bonder_plane_normal"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.bonder_plane_normal">[docs]</a>    <span class="k">def</span> <span class="nf">bonder_plane_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the normal vector to the plane formed by bonder atoms.</span>
 
 <span class="sd">        The normal of the plane is defined such that it goes in the</span>
 <span class="sd">        direction toward the centroid of the molecule.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2348,24 +2445,24 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;StructUnit3 molecule &quot;</span>
                              <span class="s2">&quot;has fewer than 3 functional groups.&quot;</span><span class="p">))</span>
 
-        <span class="n">vgen</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">())</span>
+        <span class="n">vgen</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_direction_vectors</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
         <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">vgen</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="n">normal_v</span> <span class="o">=</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">))</span>
 
         <span class="n">theta</span> <span class="o">=</span> <span class="n">vector_theta</span><span class="p">(</span><span class="n">normal_v</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">centroid_centroid_dir_vector</span><span class="p">())</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">centroid_centroid_dir_vector</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">theta</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
             <span class="n">normal_v</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="k">return</span> <span class="n">normal_v</span></div>
 
-<div class="viewcode-block" id="StructUnit3.minimize_theta2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.minimize_theta2">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit3.minimize_theta2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.minimize_theta2">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates molecule to minimize angle between `atom` and `vector`.</span>
 
@@ -2383,10 +2480,8 @@
 <span class="sd">        axis : numpy.array</span>
 <span class="sd">            The vector about which the rotation happens.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule is changed to reflect the rotation.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2394,10 +2489,15 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">v1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">())</span></div>
+        <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span> <span class="o">-</span>
+              <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minimize_theta</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span>
+                            <span class="n">vector</span><span class="p">,</span>
+                            <span class="n">axis</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">conformer</span><span class="p">),</span>
+                            <span class="n">conformer</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StructUnit3.set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit3.set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3.set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule so the plane normal is aligned with `end`.</span>
 
@@ -2412,12 +2512,8 @@
 <span class="sd">            The vector with which the normal of plane of bonder atoms</span>
 <span class="sd">            shoould be aligned.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer in this rdkit instance is changed due to</span>
-<span class="sd">            rotation of the molecule about the centroid of the bonder</span>
-<span class="sd">            atoms.</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2426,8 +2522,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_orientation2</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div></div>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_plane_normal</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_orientation2</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="MacroMolecule"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule">[docs]</a><span class="nd">@total_ordering</span>
@@ -2578,7 +2674,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MacroMolecule.__init__"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="MacroMolecule.__init__"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">building_blocks</span><span class="p">,</span>
+                 <span class="n">topology</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">bb_conformers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a ``MacroMolecule`` instance.</span>
 
@@ -2603,8 +2704,16 @@
 <span class="sd">            A name which can be optionally given to the molcule for</span>
 <span class="sd">            easy identification.</span>
 
+<span class="sd">        bb_conformers : :class:`list` of :class:`int`</span>
+<span class="sd">            The ids of the building block conformers to be used. Must</span>
+<span class="sd">            be equal in length to `building_blocks` and orders must</span>
+<span class="sd">            correspond. If ``None``, then ``-1`` is used for all</span>
+<span class="sd">            building blocks.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">bb_conformers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bb_conformers</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">))]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unscaled_fitness</span> <span class="o">=</span> <span class="p">{}</span>
@@ -2619,7 +2728,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Ask the ``Topology`` instance to assemble/build the</span>
             <span class="c1"># macromolecule. This creates the `mol` attribute.</span>
-            <span class="n">topology</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">topology</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
@@ -2633,10 +2742,11 @@
                         <span class="s1">&#39;---------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
 
             <span class="n">bb_blocks</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">):</span>
+                <span class="n">bb_conf</span> <span class="o">=</span> <span class="n">bb_conformers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">bb_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">(</span><span class="s1">&#39;</span><span class="si">{0.__class__.__name__}</span><span class="s1"> </span><span class="si">{0.func_grp.name}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                     <span class="s1">&#39;</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">bb</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">()))</span>
+                     <span class="s1">&#39;</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">bb</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">(</span><span class="n">bb_conf</span><span class="p">)))</span>
 
             <span class="n">errormsg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bb_blocks</span><span class="p">)</span>
 
@@ -2644,6 +2754,62 @@
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MacroMolecule.add_conformer"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.add_conformer">[docs]</a>    <span class="k">def</span> <span class="nf">add_conformer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assembles a new conformer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bb_conformers : :class:`list` of :class:`int`</span>
+<span class="sd">            The ids of the building block conformers to be used. Must</span>
+<span class="sd">            be equal in length to :attr:`building_blocks` and orders</span>
+<span class="sd">            must correspond. If ``None``, then ``-1`` is used for all</span>
+<span class="sd">            building blocks.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`int`</span>
+<span class="sd">            The id of the new conformer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Save the original rdkit molecule.</span>
+        <span class="n">original_mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
+        <span class="c1"># Build a new molecule.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Ask the ``Topology`` instance to assemble/build the</span>
+            <span class="c1"># macromolecule. This creates the `mol` attribute.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
+            <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Build failure.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;topology</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;--------</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;building blocks</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;---------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+
+            <span class="n">bb_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">):</span>
+                <span class="n">bb_conf</span> <span class="o">=</span> <span class="n">bb_conformers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">bb_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s1">&#39;</span><span class="si">{0.__class__.__name__}</span><span class="s1"> </span><span class="si">{0.func_grp.name}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                     <span class="s1">&#39;</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">bb</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">(</span><span class="n">bb_conf</span><span class="p">)))</span>
+
+            <span class="n">errormsg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bb_blocks</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Get the new conformer.</span>
+        <span class="n">new_conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">())</span>
+        <span class="c1"># Add it to the original molecule.</span>
+        <span class="n">new_id</span> <span class="o">=</span> <span class="n">original_mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">original_mol</span>
+        <span class="k">return</span> <span class="n">new_id</span></div>
 
 <div class="viewcode-block" id="MacroMolecule.building_block_cores"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.building_block_cores">[docs]</a>    <span class="k">def</span> <span class="nf">building_block_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2815,7 +2981,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">),</span>
                 <span class="nb">repr</span><span class="p">(</span><span class="n">topology</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="MacroMolecule.bb_distortion"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.bb_distortion">[docs]</a>    <span class="k">def</span> <span class="nf">bb_distortion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MacroMolecule.bb_distortion"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.bb_distortion">[docs]</a>    <span class="k">def</span> <span class="nf">bb_distortion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb_conformers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rmsd difference of building blocks before and after assembly.</span>
 
@@ -2827,6 +2993,17 @@
 <span class="sd">        Atoms which form the functional group of the building blocks</span>
 <span class="sd">        and hydrogens are excluded from the calculation.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bb_conformers : :class:`list` of :class:`int`</span>
+<span class="sd">            The ids of building block conformers to use. 1 id for each</span>
+<span class="sd">            building block, in an order corresponding to</span>
+<span class="sd">            :attr:`building_blocks`. If ``None``, all conformer ids</span>
+<span class="sd">            default to ``-1``.</span>
+
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
@@ -2834,6 +3011,9 @@
 <span class="sd">            &quot;free&quot; counterparts.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">bb_conformers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bb_conformers</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">))]</span>
 
         <span class="c1"># Go through each of the building blocks. For each building</span>
         <span class="c1"># block get the core. Get the corrospending cores in the</span>
@@ -2845,7 +3025,11 @@
             <span class="n">free</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">core</span><span class="p">()</span>
             <span class="n">am</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">free</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">())]</span>
             <span class="k">for</span> <span class="n">frag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">building_block_cores</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-                <span class="n">rmsd</span> <span class="o">+=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">AlignMol</span><span class="p">(</span><span class="n">free</span><span class="p">,</span> <span class="n">frag</span><span class="p">,</span> <span class="n">atomMap</span><span class="o">=</span><span class="n">am</span><span class="p">)</span>
+                <span class="n">rmsd</span> <span class="o">+=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">AlignMol</span><span class="p">(</span><span class="n">free</span><span class="p">,</span>
+                                       <span class="n">frag</span><span class="p">,</span>
+                                       <span class="n">bb_conformers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                       <span class="n">conformer</span><span class="p">,</span>
+                                       <span class="n">atomMap</span><span class="o">=</span><span class="n">am</span><span class="p">)</span>
                 <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">rmsd</span> <span class="o">/</span> <span class="n">n</span></div>
 
@@ -2972,7 +3156,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Cage.window_difference"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Cage.window_difference">[docs]</a>    <span class="k">def</span> <span class="nf">window_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Cage.window_difference"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Cage.window_difference">[docs]</a>    <span class="k">def</span> <span class="nf">window_difference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The total difference in all window sizes.</span>
 
@@ -2985,6 +3169,11 @@
 <span class="sd">        cage will have triangular windows and square windows. You</span>
 <span class="sd">        only want to compare the triangulars with other</span>
 <span class="sd">        triangular windows and squares only with other squares.</span>
+
+<span class="sd">        Paramters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -3005,8 +3194,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span>
-           <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">):</span>
+        <span class="n">windows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">windows</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">windows</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Cluster the windows into groups so that only size</span>
@@ -3017,7 +3207,6 @@
         <span class="c1"># sizes have the biggest difference. If there are three</span>
         <span class="c1"># types split it at the two biggest differences and so</span>
         <span class="c1"># on.</span>
-        <span class="n">windows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span>
 
         <span class="n">diffs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ediff1d</span><span class="p">(</span><span class="n">windows</span><span class="p">)))</span>
         <span class="n">sorted_diffs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">diffs</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -3051,10 +3240,14 @@
 
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">diff_sums</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">windows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Cage.windows"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Cage.windows">[docs]</a>    <span class="k">def</span> <span class="nf">windows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns window sizes found by pyWindow.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -3075,7 +3268,14 @@
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
             <span class="c1"># Load an RDKit molecule object to pyWINDOW.</span>
-            <span class="n">pw_molecule</span> <span class="o">=</span> <span class="n">pywindow</span><span class="o">.</span><span class="n">molecular</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">load_rdkit_mol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+
+            <span class="c1"># As pyWindow doesnt support multiple conformers, first</span>
+            <span class="c1"># make an rdkit molecule holding only the desired conformer.</span>
+            <span class="n">new_mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+            <span class="n">new_mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>
+            <span class="n">new_mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+
+            <span class="n">pw_molecule</span> <span class="o">=</span> <span class="n">pywindow</span><span class="o">.</span><span class="n">molecular</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">load_rdkit_mol</span><span class="p">(</span><span class="n">new_mol</span><span class="p">)</span>
             <span class="c1"># Find windows and get a single array with windows&#39; sizes.</span>
             <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;windows&#39;</span><span class="p">)</span>
 
@@ -3091,7 +3291,7 @@
             <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="n">all_windows</span></div>
+        <span class="k">return</span> <span class="n">all_windows</span></div></div>
 
 
 <div class="viewcode-block" id="Polymer"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer">[docs]</a><span class="k">class</span> <span class="nc">Polymer</span><span class="p">(</span><span class="n">MacroMolecule</span><span class="p">):</span>
@@ -3222,8 +3422,11 @@
 
         <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_island</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
         <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_island</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span>
-                                      <span class="n">terminator</span><span class="p">,</span> <span class="n">bond_dict</span><span class="p">[</span><span class="n">bond_type</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span>
+                                      <span class="n">bonded</span><span class="p">,</span>
+                                      <span class="n">bonder_map</span><span class="p">,</span>
+                                      <span class="n">terminator</span><span class="p">,</span>
+                                      <span class="n">bond_dict</span><span class="p">[</span><span class="n">bond_type</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="Periodic._join_island"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic._join_island">[docs]</a>    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

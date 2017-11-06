@@ -315,7 +315,7 @@ by the macromolecular class.</p>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.Cage">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Cage</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent molecular cages.</p>
 <dl class="attribute">
@@ -330,7 +330,7 @@ by the macromolecular class.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Cage.window_difference">
-<code class="descname">window_difference</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage.window_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage.window_difference" title="Permalink to this definition">¶</a></dt>
+<code class="descname">window_difference</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage.window_difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage.window_difference" title="Permalink to this definition">¶</a></dt>
 <dd><p>The total difference in all window sizes.</p>
 <p>Every combination of windows is considered and all the
 size differences are summed and returned. Only
@@ -340,6 +340,10 @@ considered.</p>
 cage will have triangular windows and square windows. You
 only want to compare the triangulars with other
 triangular windows and squares only with other squares.</p>
+<dl class="docutils">
+<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional</span></dt>
+<dd>The id of the conformer to use.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -359,15 +363,17 @@ cage.</td>
 </table>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="mtk.molecular.molecules.Cage.windows">
-<code class="descname">windows</code><a class="headerlink" href="#mtk.molecular.molecules.Cage.windows" title="Permalink to this definition">¶</a></dt>
+<code class="descname">windows</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Cage.windows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Cage.windows" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns window sizes found by pyWindow.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
 <li><strong>None</strong> (<em>NoneType</em>) – If the function for finding windows and their sizes
 found fewer than the required number of windows or
 if it failed for some other reason.</li>
@@ -387,7 +393,7 @@ number of expected windows.</li>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.MacroMolecule">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">MacroMolecule</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.Molecule</span></code></a></p>
 <p>A class for assembled macromolecules.</p>
 <p>The goal of this class is to represent an individual used by the
@@ -596,7 +602,7 @@ atom ids belonging to a particular molecule before assembly.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.MacroMolecule.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a <code class="docutils literal"><span class="pre">MacroMolecule</span></code> instance.</p>
 <p>When an exception occurs during initialization, all parameters
 which were provided to the initializer are saved to a file
@@ -613,6 +619,10 @@ assembles the marcormolecule from the building_blocks.</li>
 <li><strong>note</strong> (<em>str</em><em> (</em><em>default = &quot;&quot;</em><em>)</em>) – A note or comment about the molecule.</li>
 <li><strong>name</strong> (<em>str</em><em> (</em><em>default = &quot;&quot;</em><em>)</em>) – A name which can be optionally given to the molcule for
 easy identification.</li>
+<li><strong>bb_conformers</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The ids of the building block conformers to be used. Must
+be equal in length to <cite>building_blocks</cite> and orders must
+correspond. If <code class="docutils literal"><span class="pre">None</span></code>, then <code class="docutils literal"><span class="pre">-1</span></code> is used for all
+building blocks.</li>
 </ul>
 </td>
 </tr>
@@ -668,8 +678,29 @@ automatically call this one.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.molecular.molecules.MacroMolecule.add_conformer">
+<code class="descname">add_conformer</code><span class="sig-paren">(</span><em>bb_conformers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.add_conformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.add_conformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assembles a new conformer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bb_conformers</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The ids of the building block conformers to be used. Must
+be equal in length to <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule.building_blocks" title="mtk.molecular.molecules.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal"><span class="pre">building_blocks</span></code></a> and orders
+must correspond. If <code class="docutils literal"><span class="pre">None</span></code>, then <code class="docutils literal"><span class="pre">-1</span></code> is used for all
+building blocks.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The id of the new conformer.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="mtk.molecular.molecules.MacroMolecule.bb_distortion">
-<code class="descname">bb_distortion</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.bb_distortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.bb_distortion" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bb_distortion</code><span class="sig-paren">(</span><em>bb_conformers=None</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#MacroMolecule.bb_distortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.MacroMolecule.bb_distortion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rmsd difference of building blocks before and after assembly.</p>
 <p>The function looks at each building block in the macromolecule
 and calculates the rmsd between the “free” verson and the one
@@ -681,10 +712,21 @@ and hydrogens are excluded from the calculation.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The mean rmsd of the macromole’s building blocks to their
-“free” counterparts.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bb_conformers</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The ids of building block conformers to use. 1 id for each
+building block, in an order corresponding to
+<a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule.building_blocks" title="mtk.molecular.molecules.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal"><span class="pre">building_blocks</span></code></a>. If <code class="docutils literal"><span class="pre">None</span></code>, all conformer ids
+default to <code class="docutils literal"><span class="pre">-1</span></code>.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The mean rmsd of the macromole’s building blocks to their
+“free” counterparts.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -905,7 +947,7 @@ be useful for labelling and debugging.</p>
 
 <dl class="attribute">
 <dt id="mtk.molecular.molecules.Molecule.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.molecules', '__doc__': '\n    The most basic class representing molecules.\n\n    This class defines the operations which any class\n    describing molecules should inherit or may find useful. Examples of\n    such classes are ``StructUnit`` and ``MacroMolecule``. This calls\n    is unlikely to be useful as in and of itself. It lacks an\n    `__init__()` method because it does not need one. Child classes\n    should define it.\n\n    It is assumed that child classes will have some basic attributes.\n\n    Attributes\n    ----------\n    mol : rdkit.Chem.rdchem.Mol\n        A rdkit molecule instance representing the molecule.\n\n    inchi : str\n        The InChI of the molecule.\n\n    energy : Energy\n        An instance of the ``Energy`` class. It handles all things\n        energy.\n\n    optimized : bool\n        Indicates whether a Molecule has been passed through an\n        optimization function or not.\n\n    name : str (default = &quot;&quot;)\n        A name which can be optionally given to the molecule for easy\n        identification.\n\n    note : str (default = &quot;&quot;)\n        A note or comment about the molecule. Purely optional but can\n        be useful for labelling and debugging.\n\n    ', '__init__': &lt;function Molecule.__init__&gt;, 'all_atom_coords': &lt;function Molecule.all_atom_coords&gt;, 'atom_coords': &lt;function Molecule.atom_coords&gt;, 'atom_distance': &lt;function Molecule.atom_distance&gt;, 'atom_symbol': &lt;function Molecule.atom_symbol&gt;, '_cavity_size': &lt;function Molecule._cavity_size&gt;, 'cavity_size': &lt;function Molecule.cavity_size&gt;, 'center_of_mass': &lt;function Molecule.center_of_mass&gt;, 'centroid': &lt;function Molecule.centroid&gt;, 'dihedral_strain': &lt;function Molecule.dihedral_strain&gt;, 'dump': &lt;function Molecule.dump&gt;, 'fromdict': &lt;classmethod object&gt;, 'graph': &lt;function Molecule.graph&gt;, 'inchi': &lt;property object&gt;, 'load': &lt;classmethod object&gt;, 'max_diameter': &lt;function Molecule.max_diameter&gt;, 'mdl_mol_block': &lt;function Molecule.mdl_mol_block&gt;, 'position_matrix': &lt;function Molecule.position_matrix&gt;, 'same': &lt;function Molecule.same&gt;, 'rotate': &lt;function Molecule.rotate&gt;, 'save_bonders': &lt;function Molecule.save_bonders&gt;, 'set_orientation': &lt;function Molecule.set_orientation&gt;, 'set_position': &lt;function Molecule.set_position&gt;, 'set_position_from_matrix': &lt;function Molecule.set_position_from_matrix&gt;, 'shift': &lt;function Molecule.shift&gt;, 'update_from_mae': &lt;function Molecule.update_from_mae&gt;, 'update_stereochemistry': &lt;function Molecule.update_stereochemistry&gt;, 'write': &lt;function Molecule.write&gt;, '_write_mdl_mol_file': &lt;function Molecule._write_mdl_mol_file&gt;, '_write_pdb_file': &lt;function Molecule._write_pdb_file&gt;, '__dict__': &lt;attribute '__dict__' of 'Molecule' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Molecule' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.molecules.Molecule.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.molecules', '__doc__': '\n    The most basic class representing molecules.\n\n    This class defines the operations which any class\n    describing molecules should inherit or may find useful. Examples of\n    such classes are ``StructUnit`` and ``MacroMolecule``. This calls\n    is unlikely to be useful as in and of itself. It lacks an\n    `__init__()` method because it does not need one. Child classes\n    should define it.\n\n    It is assumed that child classes will have some basic attributes.\n\n    Attributes\n    ----------\n    mol : rdkit.Chem.rdchem.Mol\n        A rdkit molecule instance representing the molecule.\n\n    inchi : str\n        The InChI of the molecule.\n\n    energy : Energy\n        An instance of the ``Energy`` class. It handles all things\n        energy.\n\n    optimized : bool\n        Indicates whether a Molecule has been passed through an\n        optimization function or not.\n\n    name : str (default = &quot;&quot;)\n        A name which can be optionally given to the molecule for easy\n        identification.\n\n    note : str (default = &quot;&quot;)\n        A note or comment about the molecule. Purely optional but can\n        be useful for labelling and debugging.\n\n    ', '__init__': &lt;function Molecule.__init__&gt;, 'all_atom_coords': &lt;function Molecule.all_atom_coords&gt;, 'atom_coords': &lt;function Molecule.atom_coords&gt;, 'atom_distance': &lt;function Molecule.atom_distance&gt;, 'atom_symbol': &lt;function Molecule.atom_symbol&gt;, '_cavity_size': &lt;function Molecule._cavity_size&gt;, 'cavity_size': &lt;function Molecule.cavity_size&gt;, 'center_of_mass': &lt;function Molecule.center_of_mass&gt;, 'centroid': &lt;function Molecule.centroid&gt;, 'dihedral_strain': &lt;function Molecule.dihedral_strain&gt;, 'dump': &lt;function Molecule.dump&gt;, 'fromdict': &lt;classmethod object&gt;, 'graph': &lt;function Molecule.graph&gt;, 'inchi': &lt;property object&gt;, 'load': &lt;classmethod object&gt;, 'max_diameter': &lt;function Molecule.max_diameter&gt;, 'mdl_mol_block': &lt;function Molecule.mdl_mol_block&gt;, 'position_matrix': &lt;function Molecule.position_matrix&gt;, 'same': &lt;function Molecule.same&gt;, 'rotate': &lt;function Molecule.rotate&gt;, 'save_bonders': &lt;function Molecule.save_bonders&gt;, 'set_orientation': &lt;function Molecule.set_orientation&gt;, 'set_position': &lt;function Molecule.set_position&gt;, 'set_position_from_matrix': &lt;function Molecule.set_position_from_matrix&gt;, 'shift': &lt;function Molecule.shift&gt;, 'update_from_mae': &lt;function Molecule.update_from_mae&gt;, 'update_from_mol': &lt;function Molecule.update_from_mol&gt;, 'update_stereochemistry': &lt;function Molecule.update_stereochemistry&gt;, 'write': &lt;function Molecule.write&gt;, '_write_mdl_mol_file': &lt;function Molecule._write_mdl_mol_file&gt;, '_write_pdb_file': &lt;function Molecule._write_pdb_file&gt;, '__dict__': &lt;attribute '__dict__' of 'Molecule' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Molecule' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.molecules.Molecule.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -926,7 +968,7 @@ be useful for labelling and debugging.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule._cavity_size">
-<code class="descname">_cavity_size</code><span class="sig-paren">(</span><em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule._cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule._cavity_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_cavity_size</code><span class="sig-paren">(</span><em>origin</em>, <em>conformer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule._cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule._cavity_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates diameter of the molecule’s from <cite>origin</cite>.</p>
 <p>The cavity is measured by finding the atom nearest to
 <cite>origin</cite>, correcting for van der Waals diameter and multiplying
@@ -937,12 +979,18 @@ cavity_size() finds the optimal value of <cite>origin</cite> to use.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>origin</strong> (<em>numpy.array</em>) – Holds the x, y and z coordinate of the position from which
-the cavity is measured.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>origin</strong> (<em>numpy.array</em>) – Holds the x, y and z coordinate of the position from which
+the cavity is measured.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of the conformer to be used.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The (negative) diameter of the molecules cavity.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The (negative) diameter of the molecules cavity.</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -950,7 +998,7 @@ the cavity is measured.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule._write_mdl_mol_file">
-<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule._write_mdl_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule._write_mdl_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a V3000 .mol file of the molecule</p>
 <p>This function should not be used directly, only via the
 <code class="docutils literal"><span class="pre">write()</span></code> method.</p>
@@ -960,9 +1008,7 @@ the cavity is measured.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>path</strong> (<em>str</em>) – The full path to which to the file should be written.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>file is created/ changed at path.</strong> (<a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -978,7 +1024,7 @@ the cavity is measured.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule._write_pdb_file">
-<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule._write_pdb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule._write_pdb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a .pdb file of the molecule</p>
 <p>This function should not be used directly, only via the
 <code class="docutils literal"><span class="pre">write()</span></code> method.</p>
@@ -988,9 +1034,7 @@ the cavity is measured.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>path</strong> (<em>str</em>) – The full path to which to the file should be written.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>file is created/ changed at path.</strong> (<a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A" title="mtk.molecular.topologies.cage.two_plus_three.Dodecahedron.A"><em>A</em></a>) – </li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -1006,13 +1050,16 @@ the cavity is measured.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.all_atom_coords">
-<code class="descname">all_atom_coords</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.all_atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.all_atom_coords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_atom_coords</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.all_atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.all_atom_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields the coordinates of atoms in <cite>mol</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><p class="first"><em>tuple of (int, numpy.array)</em> – The <code class="docutils literal"><span class="pre">int</span></code> represents the atom id of the atom whose
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first"><em>tuple of (int, numpy.array)</em> – The <code class="docutils literal"><span class="pre">int</span></code> represents the atom id of the atom whose
 coordinates are being yielded.</p>
 <p class="last">The array represents the position.</p>
 </td>
@@ -1023,17 +1070,23 @@ coordinates are being yielded.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.atom_coords">
-<code class="descname">atom_coords</code><span class="sig-paren">(</span><em>atom_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_coords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom_coords</code><span class="sig-paren">(</span><em>atom_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return coordinates of an atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom_id</strong> (<em>int</em>) – The id of the atom whose coordinates are desired.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atom_id</strong> (<em>int</em>) – The id of the atom whose coordinates are desired.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An array holding the x, y and z coordinates of the atom.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An array holding the x, y and z coordinates of the atom.</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.array</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1041,7 +1094,7 @@ coordinates are being yielded.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.atom_distance">
-<code class="descname">atom_distance</code><span class="sig-paren">(</span><em>atom1_id</em>, <em>atom2_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_distance" title="Permalink to this definition">¶</a></dt>
+<code class="descname">atom_distance</code><span class="sig-paren">(</span><em>atom1_id</em>, <em>atom2_id</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.atom_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.atom_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the distance between 2 atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1050,6 +1103,7 @@ coordinates are being yielded.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>atom1_id</strong> (<em>int</em>) – The id of the first atom.</li>
 <li><strong>atom2_id</strong> (<em>int</em>) – The id of the second atom.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
 </ul>
 </td>
 </tr>
@@ -1083,15 +1137,17 @@ coordinates are being yielded.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.cavity_size">
-<code class="descname">cavity_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.cavity_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cavity_size</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.cavity_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the diameter of the molecule’s cavity.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">The diameter of the molecule’s cavity in Angstroms.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">The diameter of the molecule’s cavity in Angstroms.</td>
 </tr>
 </tbody>
 </table>
@@ -1099,8 +1155,12 @@ coordinates are being yielded.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.center_of_mass">
-<code class="descname">center_of_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<code class="descname">center_of_mass</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.center_of_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centre of mass of the molecule.</p>
+<dl class="docutils">
+<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional</span></dt>
+<dd>The id of the conformer to use.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1117,8 +1177,12 @@ coordinates are being yielded.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.centroid">
-<code class="descname">centroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the molecule.</p>
+<dl class="docutils">
+<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional</span></dt>
+<dd>The id of the conformer to use.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1133,7 +1197,7 @@ coordinates are being yielded.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.dihedral_strain">
-<code class="descname">dihedral_strain</code><span class="sig-paren">(</span><em>dihedral_SMARTS=''</em>, <em>target=180</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.dihedral_strain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.dihedral_strain" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dihedral_strain</code><span class="sig-paren">(</span><em>dihedral_SMARTS=''</em>, <em>target=180</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.dihedral_strain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.dihedral_strain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the relative % difference between all the average dihedral
 angle values within the molecule and the target value.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1143,6 +1207,7 @@ angle values within the molecule and the target value.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The SMARTS code for the dihedral of interest.</li>
 <li><strong>target</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – Float representing the target value for the dihedral angle.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
 </ul>
 </td>
 </tr>
@@ -1259,16 +1324,18 @@ objects is loaded. If <code class="docutils literal"><span class="pre">False</sp
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.max_diameter">
-<code class="descname">max_diameter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.max_diameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.max_diameter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">max_diameter</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.max_diameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.max_diameter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the largest distance between 2 atoms in the molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The float represents the largest inter-atomic distance on
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The float represents the largest inter-atomic distance on
 the molecule. The ints are the ids of the atoms.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple of form (float, int, int)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple of form (float, int, int)</td>
 </tr>
 </tbody>
 </table>
@@ -1276,8 +1343,12 @@ the molecule. The ints are the ids of the atoms.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.mdl_mol_block">
-<code class="descname">mdl_mol_block</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.mdl_mol_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.mdl_mol_block" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mdl_mol_block</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.mdl_mol_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.mdl_mol_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a V3000 mol block of the molecule.</p>
+<dl class="docutils">
+<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional</span></dt>
+<dd>The id of the conformer to use.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1292,8 +1363,12 @@ the molecule. The ints are the ids of the atoms.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.position_matrix">
-<code class="descname">position_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.position_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the position of all atoms in the as a matrix.</p>
+<dl class="docutils">
+<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional</span></dt>
+<dd>The id of the conformer to use.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1310,7 +1385,7 @@ to the id of the atom in the molecule.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.rotate">
-<code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rotate</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
 <p>The rotation occurs about the molecular centroid.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1320,10 +1395,7 @@ to the id of the atom in the molecule.</td>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>theta</strong> (<em>float</em>) – The size of the rotation in radians.</li>
 <li><strong>axis</strong> (<em>numpy.array</em>) – The axis about which the rotation happens.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The positions of all the atoms are changed due to the
-rotation.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -1361,17 +1433,13 @@ of the macromolecules are the same.</td>
 <dt id="mtk.molecular.molecules.Molecule.save_bonders">
 <code class="descname">save_bonders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.save_bonders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.save_bonders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds atoms tagged with ‘bonder’ to <cite>bonder_ids</cite>.</p>
-<dl class="docutils">
-<dt>bonder_ids <span class="classifier-delimiter">:</span> <span class="classifier">list of ints</span></dt>
-<dd>Updates this set with the ids of atoms tagged ‘bonder’.</dd>
-</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -1379,7 +1447,7 @@ of the macromolecules are the same.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.set_orientation">
-<code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_orientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_orientation</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_orientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_orientation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
 <p>Note: The difference between this method and
 <a class="reference internal" href="#mtk.molecular.molecules.StructUnit._set_orientation2" title="mtk.molecular.molecules.StructUnit._set_orientation2"><code class="xref py py-meth docutils literal"><span class="pre">StructUnit._set_orientation2()</span></code></a> is about which point the
@@ -1407,10 +1475,7 @@ can be easily aligned with any arbitrary axis.</p>
 <li><strong>start</strong> (<em>numpy.array</em>) – A vector which is to be rotated so that it transforms to
 the <cite>end</cite> vector.</li>
 <li><strong>end</strong> (<em>numpy.array</em>) – This array holds the vector, onto which <cite>start</cite> is rotated.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
-rotation of the molecule about its centroid.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -1426,7 +1491,7 @@ rotation of the molecule about its centroid.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.set_position">
-<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_position" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the centroid of the molecule to <cite>position</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1435,10 +1500,7 @@ rotation of the molecule about its centroid.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>position</strong> (<em>numpy.array</em>) – This array holds the position on which the centroid of the
 molecule should be placed.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed so that its
-centroid falls on <cite>position</cite>.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
 </ul>
 </td>
 </tr>
@@ -1455,7 +1517,7 @@ This is the same instance as that in <cite>mol</cite>.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.set_position_from_matrix">
-<code class="descname">set_position_from_matrix</code><span class="sig-paren">(</span><em>pos_mat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_position_from_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_position_from_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_position_from_matrix</code><span class="sig-paren">(</span><em>pos_mat</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.set_position_from_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.set_position_from_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set atomic positions of the molecule to those in <cite>pos_mat</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1470,10 +1532,7 @@ sets the coordinate of the atom with id of 0. The next
 column sets the coordinate of the atom with id 1, and so
 on.</p>
 </li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The coordinates of atoms in this molecule are set to the
-coordinates in <cite>pos_mat</cite>.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to be used.</li>
 </ul>
 </td>
 </tr>
@@ -1489,20 +1548,26 @@ coordinates in <cite>pos_mat</cite>.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.shift">
-<code class="descname">shift</code><span class="sig-paren">(</span><em>shift</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.shift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.shift" title="Permalink to this definition">¶</a></dt>
+<code class="descname">shift</code><span class="sig-paren">(</span><em>shift</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.shift"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.shift" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shifts the coordinates of all atoms.</p>
 <p>This does not modify the molecule. A modified copy is returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>shift</strong> (<em>numpy.array</em>) – A numpy array holding the value of the shift along each
-axis.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shift</strong> (<em>numpy.array</em>) – A numpy array holding the value of the shift along each
+axis.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The id of the conformer to use.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A copy of the molecule where the coordinates have been
-shifted by <cite>shift</cite>.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A copy of the molecule where the coordinates have been
+shifted by <cite>shift</cite>.</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1510,26 +1575,48 @@ shifted by <cite>shift</cite>.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.update_from_mae">
-<code class="descname">update_from_mae</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_from_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_from_mae" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates molecular structure to match an .mae file.</p>
+<code class="descname">update_from_mae</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_from_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_from_mae" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates molecular structure to match an <code class="docutils literal"><span class="pre">.mae</span></code> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mae_path</strong> (<em>str</em>) – The full path of the .mae file from which the structure
+<li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal"><span class="pre">.mae</span></code> file from which the structure
 should be updated.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The rdkit molecule held in this attribute is changed so
-that it matches the moleclue held in the .mae file.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to be updated.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.molecules.Molecule.update_from_mol">
+<code class="descname">update_from_mol</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_from_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_from_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates molecular structure to match an <code class="docutils literal"><span class="pre">.mol</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal"><span class="pre">.mol</span></code> file from which the structure
+should be updated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to be updated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -1538,21 +1625,17 @@ that it matches the moleclue held in the .mae file.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.update_stereochemistry">
-<code class="descname">update_stereochemistry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_stereochemistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_stereochemistry" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_stereochemistry</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.update_stereochemistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.update_stereochemistry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates stereochemistry tags on <cite>mol</cite> attribute.</p>
-<dl class="docutils">
-<dt>mol <span class="classifier-delimiter">:</span> <span class="classifier">rdkit.Chem.rdchem.Mol</span></dt>
-<dd>The ‘_CIPCode’ property on each atom of the rkdit molecule
-is updated to reflect the R or S configuration of the atom
-in the current geometry.</dd>
-</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
 </tr>
 </tbody>
 </table>
@@ -1560,7 +1643,7 @@ in the current geometry.</dd>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Molecule.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Molecule.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Molecule.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a molecular structure file of the molecule.</p>
 <p>This bypasses the need to use rdkit’s writing functions, which
 have issues with macromolecules due to poor ring finding and
@@ -1569,11 +1652,17 @@ sanitization issues.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) – The <cite>path</cite> to which the molecule should be written.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1838,7 +1927,7 @@ atom.</li>
 
 <dl class="class">
 <dt id="mtk.molecular.molecules.Polymer">
-<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Polymer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">mtk.molecular.molecules.</code><code class="descname">Polymer</code><span class="sig-paren">(</span><em>building_blocks</em>, <em>topology</em>, <em>name=''</em>, <em>note=''</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Polymer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Polymer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.molecules.MacroMolecule</span></code></a></p>
 <p>Used to represent polymers.</p>
 <dl class="attribute">
@@ -2009,7 +2098,7 @@ automatically call this one.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit._set_orientation2">
-<code class="descname">_set_orientation2</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit._set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit._set_orientation2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_set_orientation2</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit._set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit._set_orientation2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Note: The difference between this method and
 <code class="docutils literal"><span class="pre">set_orientation()</span></code> is about which point the rotation
 occurs: centroid of bonder atoms versus centroid of entire
@@ -2036,10 +2125,7 @@ can be easily aligned with any arbitrary axis.</p>
 <li><strong>start</strong> (<em>numpy.array</em>) – A vector which is to be rotated so that it transforms to
 the <cite>end</cite> vector.</li>
 <li><strong>end</strong> (<em>numpy.array</em>) – This array holds the vector, onto which <cite>start</cite> is rotated.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
-rotation of the molecule about its centroid.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -2055,7 +2141,7 @@ rotation of the molecule about its centroid.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.all_bonder_distances">
-<code class="descname">all_bonder_distances</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.all_bonder_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.all_bonder_distances" title="Permalink to this definition">¶</a></dt>
+<code class="descname">all_bonder_distances</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.all_bonder_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.all_bonder_distances" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield distances between all pairs of bonder atoms.</p>
 <p>All distances are only yielded once. This means that if the
 distance between atoms with ids <code class="docutils literal"><span class="pre">1</span></code> and <code class="docutils literal"><span class="pre">2``is</span> <span class="pre">yielded</span> <span class="pre">as</span>
@@ -2065,7 +2151,9 @@ yielded.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of form (int, int, scipy.double)</em> – The ints represnt the atoms ids and the double is their
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of form (int, int, scipy.double)</em> – The ints represnt the atoms ids and the double is their
 distance.</td>
 </tr>
 </tbody>
@@ -2074,15 +2162,17 @@ distance.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.bonder_centroid">
-<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the bonder atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A numpy array holding the midpoint of the bonder atoms.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A numpy array holding the midpoint of the bonder atoms.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
 </tr>
 </tbody>
 </table>
@@ -2090,7 +2180,7 @@ distance.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.bonder_direction_vectors">
-<code class="descname">bonder_direction_vectors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_direction_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_direction_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_direction_vectors</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_direction_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_direction_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields the direction vectors between all pairs of bonder atoms.</p>
 <p>The yielded vector is normalized. If a pair (1,2) is yielded,
 the pair (2,1) will not be.</p>
@@ -2098,7 +2188,9 @@ the pair (2,1) will not be.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of (int, int, numpy.array)</em> – The ints in the tuple represent the ids of the start and
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><em>tuple of (int, int, numpy.array)</em> – The ints in the tuple represent the ids of the start and
 end atoms, respectively. The array is the direciont vector
 running between the atomic positions.</td>
 </tr>
@@ -2108,17 +2200,19 @@ running between the atomic positions.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.bonder_position_matrix">
-<code class="descname">bonder_position_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_position_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_position_matrix</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.bonder_position_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.bonder_position_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a matrix holding the positions of bonder atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The matrix is 3 x n. Each column holds the x, y and z
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The matrix is 3 x n. Each column holds the x, y and z
 coordinates of a bonder atom. The index of the column
 corresponds to the index of the atom id in <cite>bonder_ids</cite>.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.matrix</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.matrix</td>
 </tr>
 </tbody>
 </table>
@@ -2131,11 +2225,15 @@ corresponds to the index of the atom id in <cite>bonder_ids</cite>.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector">
-<code class="descname">centroid_centroid_dir_vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.centroid_centroid_dir_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector" title="Permalink to this definition">¶</a></dt>
+<code class="descname">centroid_centroid_dir_vector</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.centroid_centroid_dir_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.centroid_centroid_dir_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the direction vector between the 2 molecular centroids.</p>
 <p>The first molecule centroid is the centroid of the entire
 molecule. The second molecular centroid is the centroid of the
 bonder atoms.</p>
+<dl class="docutils">
+<dt>conformer <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional</span></dt>
+<dd>The conformer to use.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2295,7 +2393,7 @@ core.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.minimize_theta">
-<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.minimize_theta" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimize_theta</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>axis</em>, <em>centroid</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.minimize_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.minimize_theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate mol to minimize angle between <cite>v1</cite> and <cite>v2</cite>.</p>
 <p>The rotation is done about the vector <cite>axis</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2307,10 +2405,7 @@ core.</td>
 <li><strong>v2</strong> (<em>numpy.array</em>) – The vector which is stationary.</li>
 <li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
 <li><strong>centroid</strong> (<em>numpy.array</em>) – The position vector at the center of the rotation.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to the
-rotation.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -2344,7 +2439,7 @@ rotation.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.rotate2">
-<code class="descname">rotate2</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.rotate2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.rotate2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rotate2</code><span class="sig-paren">(</span><em>theta</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.rotate2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.rotate2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule by <cite>theta</cite> about <cite>axis</cite>.</p>
 <p>The rotation occurs about the centroid of the bonder atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2354,9 +2449,7 @@ rotation.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>theta</strong> (<em>float</em>) – The size of the rotation in radians.</li>
 <li><strong>axis</strong> (<em>numpy.array</em>) – The axis about which rotation happens.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The atoms in this molecule are rotated.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -2372,7 +2465,7 @@ rotation.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit.set_bonder_centroid">
-<code class="descname">set_bonder_centroid</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.set_bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.set_bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_bonder_centroid</code><span class="sig-paren">(</span><em>position</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit.set_bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit.set_bonder_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move the molecule so that the bonder centroid is on <cite>position</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2381,10 +2474,7 @@ rotation.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>position</strong> (<em>numpy.array</em>) – A numpy array holding the desired the position. It holds
 the x, y and z coordinates, respectively.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The position of the molecule in this rdkit instance is
-changed, as described in this docstring.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -2527,7 +2617,7 @@ during reactions have the property ‘del’ set to ‘1’.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit2.minimize_theta2">
-<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.minimize_theta2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>vector</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.minimize_theta2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates molecule about <cite>axis</cite> to minimze theta with <cite>vector</cite>.</p>
 <p>The molecule is rotated about <cite>axis</cite> passing through the bonder
 centroid. It is rotated so that the vector between the bonder
@@ -2539,11 +2629,7 @@ and molecular centroids lies on the same plane as <cite>vector</cite>.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>vector</strong> (<em>numpy.array</em>) – The vector to which the distance should be minimized.</li>
 <li><strong>axis</strong> (<em>numpy.array</em>) – The direction vector along which the rotation happens.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
-rotation of the molecule about the centroid of the bonder
-atoms.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – </li>
 </ul>
 </td>
 </tr>
@@ -2559,7 +2645,7 @@ atoms.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit2.set_orientation2">
-<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.set_orientation2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit2.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit2.set_orientation2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate the molecule so that bonder atoms lie on <cite>end</cite>.</p>
 <p>The molecule is rotated about the centroid of the bonder atoms.
 It is rotated so that the direction vector running between the
@@ -2571,11 +2657,7 @@ It is rotated so that the direction vector running between the
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>end</strong> (<em>numpy.array</em>) – The vector with which the molecule’s bonder atoms should be
 aligned.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
-rotation of the molecule about the centroid of the bonder
-atoms.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -2603,7 +2685,7 @@ atoms.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit3.bonder_plane">
-<code class="descname">bonder_plane</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.bonder_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.bonder_plane" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_plane</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.bonder_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.bonder_plane" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the coefficients of the plane formed by bonder atoms.</p>
 <p>A plane is defined by the scalar plane equation,</p>
 <blockquote>
@@ -2620,10 +2702,12 @@ position of one of the bonder atoms.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This array has the form [a, b, c, d] and represents the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">This array has the form [a, b, c, d] and represents the
 scalar equation of the plane formed by the bonder atoms.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
 </tr>
 </tbody>
 </table>
@@ -2633,7 +2717,7 @@ scalar equation of the plane formed by the bonder atoms.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit3.bonder_plane_normal">
-<code class="descname">bonder_plane_normal</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.bonder_plane_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.bonder_plane_normal" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bonder_plane_normal</code><span class="sig-paren">(</span><em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.bonder_plane_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.bonder_plane_normal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the normal vector to the plane formed by bonder atoms.</p>
 <p>The normal of the plane is defined such that it goes in the
 direction toward the centroid of the molecule.</p>
@@ -2641,10 +2725,12 @@ direction toward the centroid of the molecule.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A unit vector which describes the normal to the plane of
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A unit vector which describes the normal to the plane of
 the bonder atoms.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
 </tr>
 </tbody>
 </table>
@@ -2657,7 +2743,7 @@ the bonder atoms.</td>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit3.minimize_theta2">
-<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>atom</em>, <em>vector</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.minimize_theta2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">minimize_theta2</code><span class="sig-paren">(</span><em>atom</em>, <em>vector</em>, <em>axis</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.minimize_theta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.minimize_theta2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates molecule to minimize angle between <cite>atom</cite> and <cite>vector</cite>.</p>
 <p>The rotation is done about <cite>axis</cite> and is centered on the
 bonder centroid.</p>
@@ -2669,9 +2755,7 @@ bonder centroid.</p>
 <li><strong>atom</strong> (<em>int</em>) – The id of atom which is to have angle minimized.</li>
 <li><strong>vector</strong> (<em>numpy.array</em>) – A vector with which the angle is minimized.</li>
 <li><strong>axis</strong> (<em>numpy.array</em>) – The vector about which the rotation happens.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The rdkit molecule is changed to reflect the rotation.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
@@ -2687,7 +2771,7 @@ bonder centroid.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.StructUnit3.set_orientation2">
-<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.set_orientation2" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_orientation2</code><span class="sig-paren">(</span><em>end</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#StructUnit3.set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.StructUnit3.set_orientation2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotates the molecule so the plane normal is aligned with <cite>end</cite>.</p>
 <p>Here <code class="docutils literal"><span class="pre">plane</span> <span class="pre">normal</span></code> referes to the normal of the plane formed
 by the bonder atoms in the substituted molecule. The molecule
@@ -2700,11 +2784,7 @@ results in the normal of their plane being aligned with <cite>end</cite>.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>end</strong> (<em>numpy.array</em>) – The vector with which the normal of plane of bonder atoms
 shoould be aligned.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – The conformer in this rdkit instance is changed due to
-rotation of the molecule about the centroid of the bonder
-atoms.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
 </tr>
