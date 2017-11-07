@@ -44,8 +44,11 @@ class _LewisStructureError(Exception):
         self.message = message
 
 
-def macromodel_opt(macro_mol, macromodel_path,
-                   settings={}, md={}, logger=logger):
+def macromodel_opt(macro_mol,
+                   macromodel_path,
+                   settings={},
+                   md={},
+                   conformer=-1):
     """
     Optimizes the molecule using MacroModel.
 
@@ -103,8 +106,8 @@ def macromodel_opt(macro_mol, macromodel_path,
         the values effect the MD only. See docstring of
         macromodel_md_opt() for valid values.
 
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging.
+    conformer : :class:`int`, optional
+        The id of the conformer to be optimized.
 
     Modifies
     --------
@@ -137,22 +140,26 @@ def macromodel_opt(macro_mol, macromodel_path,
     try:
         macro_mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
-        macro_mol.write(macro_mol._file)
+        macro_mol.write(macro_mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
-        _create_mae(macro_mol, macromodel_path, logger)
+        _create_mae(macro_mol, macromodel_path)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(macro_mol, vals, logger)
+        _generate_com(macro_mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, logger, vals['timeout'])
+        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(macro_mol, macromodel_path, logger)
+        _convert_maegz_to_mae(macro_mol, macromodel_path)
         macro_mol.update_from_mae(macro_mol._file.replace('.mol',
-                                                          '.mae'))
+                                                          '.mae'),
+                                  conformer)
 
         if vals['md']:
-            _macromodel_md_opt(macro_mol, macromodel_path, logger, md)
+            _macromodel_md_opt(macro_mol,
+                               macromodel_path,
+                               md,
+                               conformer)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -164,8 +171,11 @@ def macromodel_opt(macro_mol, macromodel_path,
                         'Trying OPLS_2005.').format(macro_mol.name))
 
         vals['force_field'] = 14
-        return macromodel_opt(macro_mol, macromodel_path,
-                              vals, md, logger)
+        return macromodel_opt(macro_mol,
+                              macromodel_path,
+                              vals,
+                              md,
+                              conformer)
 
     # The 'lewis_fixed' parameter should not be used by the user.
     # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
@@ -176,16 +186,22 @@ def macromodel_opt(macro_mol, macromodel_path,
         logger.warning(('Attempting to fix Lewis '
                         'structure of "{}".'.format(macro_mol.name)))
         if not vals['lewis_fixed']:
-            _run_applyhtreat(macro_mol, macromodel_path, logger)
+            _run_applyhtreat(macro_mol, macromodel_path)
             vals['lewis_fixed'] = True
-            return macromodel_opt(macro_mol, macromodel_path,
-                                  vals, md, logger)
+            return macromodel_opt(macro_mol,
+                                  macromodel_path,
+                                  vals,
+                                  md,
+                                  conformer)
         else:
             raise ex
 
 
-def macromodel_cage_opt(macro_mol, macromodel_path,
-                        settings={}, md={}, logger=logger):
+def macromodel_cage_opt(macro_mol,
+                        macromodel_path,
+                        settings={},
+                        md={},
+                        conformer=-1):
     """
     Optimizes the molecule using MacroModel.
 
@@ -248,8 +264,8 @@ def macromodel_cage_opt(macro_mol, macromodel_path,
         the values effect the MD only. See docstring of
         macromodel_md_opt() for valid values.
 
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging.
+    conformer : :class:`int`, optional
+        The id of the conformer to be optimized.
 
     Modifies
     --------
@@ -282,19 +298,20 @@ def macromodel_cage_opt(macro_mol, macromodel_path,
     try:
         macro_mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
-        macro_mol.write(macro_mol._file)
+        macro_mol.write(macro_mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
-        _create_mae(macro_mol, macromodel_path, logger)
+        _create_mae(macro_mol, macromodel_path)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(macro_mol, vals, logger)
+        _generate_com(macro_mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, logger, vals['timeout'])
+        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(macro_mol, macromodel_path, logger)
+        _convert_maegz_to_mae(macro_mol, macromodel_path)
         macro_mol.update_from_mae(macro_mol._file.replace('.mol',
-                                                          '.mae'))
+                                                          '.mae'),
+                                  conformer)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -303,8 +320,10 @@ def macromodel_cage_opt(macro_mol, macromodel_path,
                                macro_mol.topology.n_windows)
 
                 if vals['md'] and all_windows:
-                    _macromodel_md_opt(macro_mol, macromodel_path,
-                                       logger, md)
+                    _macromodel_md_opt(macro_mol,
+                                       macromodel_path,
+                                       md,
+                                       conformer)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -316,8 +335,11 @@ def macromodel_cage_opt(macro_mol, macromodel_path,
                         'Trying OPLS_2005.').format(macro_mol.name))
 
         vals['force_field'] = 14
-        return macromodel_cage_opt(macro_mol, macromodel_path,
-                                   vals, logger)
+        return macromodel_cage_opt(macro_mol,
+                                   macromodel_path,
+                                   vals,
+                                   md,
+                                   conformer)
 
     # The 'lewis_fixed' parameter should not be used by the user.
     # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
@@ -328,16 +350,21 @@ def macromodel_cage_opt(macro_mol, macromodel_path,
         logger.warning(('Attempting to fix Lewis '
                         'structure of "{}".'.format(macro_mol.name)))
         if not vals['lewis_fixed']:
-            _run_applyhtreat(macro_mol, macromodel_path, logger)
+            _run_applyhtreat(macro_mol, macromodel_path)
             vals['lewis_fixed'] = True
             return macromodel_cage_opt(macro_mol,
-                                       macromodel_path, vals, logger)
+                                       macromodel_path,
+                                       vals,
+                                       md,
+                                       conformer)
         else:
             raise ex
 
 
-def _macromodel_md_opt(macro_mol, macromodel_path,
-                       logger, settings={}):
+def _macromodel_md_opt(macro_mol,
+                       macromodel_path,
+                       settings={},
+                       conformer=-1):
     """
     Runs a MD conformer search on `macro_mol`.
 
@@ -351,9 +378,6 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
         machine. For example, in a default Microsoft installation the
         folder will probably be something like
         ``C:\Program Files\Schrodinger2016-2``.
-
-    logger : FakeLogger or logging.Logger
-        Used for logging.
 
     settings : dict (default = {})
         Each key is a string describing an MD parameter. The value is
@@ -391,6 +415,8 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
             'gradient' : float (default = 0.05)
                 The gradient at which optimization is stopped.
 
+    conformer : :class:`int`, optional
+        The id of the conformer to be optimized.
 
     Modifies
     --------
@@ -428,17 +454,17 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
     try:
         macro_mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
-        macro_mol.write(macro_mol._file)
+        macro_mol.write(macro_mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
-        _create_mae(macro_mol, macromodel_path, logger)
+        _create_mae(macro_mol, macromodel_path)
         # Generate the ``.com`` file for the MacroModel MD run.
-        _generate_md_com(macro_mol, vals, logger)
+        _generate_md_com(macro_mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, logger, vals['timeout'])
+        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
         # Extract the lowest energy conformer into its own .mae file.
         conformer_mae = MAEExtractor(macro_mol._file).path
-        macro_mol.update_from_mae(conformer_mae)
+        macro_mol.update_from_mae(conformer_mae, conformer)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -449,8 +475,10 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
                         'Trying OPLS_2005.').format(macro_mol.name))
 
         vals['force_field'] = 14
-        return _macromodel_md_opt(macro_mol, macromodel_path, logger,
-                                  vals)
+        return _macromodel_md_opt(macro_mol,
+                                  macromodel_path,
+                                  vals,
+                                  conformer)
 
     # The 'lewis_fixed' parameter should not be used by the user.
     # Sometimes the Lewis structure of `macro_mol` is wrong. If this is
@@ -462,14 +490,16 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
                         'structure of "{}".'.format(macro_mol.name)))
         if not vals['lewis_fixed']:
             vals['lewis_fixed'] = True
-            _run_applyhtreat(macro_mol, macromodel_path, logger)
+            _run_applyhtreat(macro_mol, macromodel_path)
             return _macromodel_md_opt(macro_mol,
-                                      macromodel_path, logger, vals)
+                                      macromodel_path,
+                                      vals,
+                                      conformer)
         else:
             raise ex
 
 
-def _run_bmin(macro_mol, macromodel_path, logger, timeout=0):
+def _run_bmin(macro_mol, macromodel_path, timeout=0):
 
     logger.info('Running bmin on "{}".'.format(macro_mol.name))
 
@@ -533,11 +563,11 @@ def _run_bmin(macro_mol, macromodel_path, logger, timeout=0):
     # If optimization fails because the license is not found, rerun the
     # function.
     if not _license_found(proc_out, macro_mol):
-        return _run_bmin(macro_mol, macromodel_path, logger, timeout)
+        return _run_bmin(macro_mol, macromodel_path, timeout)
 
     # Make sure the .maegz file created by the optimization is present.
     maegz = file_root + '-out.maegz'
-    _wait_for_file(maegz, logger)
+    _wait_for_file(maegz)
     if not os.path.exists(log_file) or not os.path.exists(maegz):
         raise _OptimizationError(('The .log and/or .maegz '
                                   'files were not created by '
@@ -570,11 +600,11 @@ def _kill_bmin(macro_mol, macromodel_path):
             break
 
 
-def _run_applyhtreat(macro_mol, macromodel_path, logger):
+def _run_applyhtreat(macro_mol, macromodel_path):
     name, ext = os.path.splitext(macro_mol._file)
     mae = name + '.mae'
     mae_out = name + '_htreated.mae'
-    _create_mae(macro_mol, macromodel_path, logger)
+    _create_mae(macro_mol, macromodel_path)
 
     app = os.path.join(macromodel_path, 'utilities', 'applyhtreat')
     cmd = [app, mae, mae_out]
@@ -583,7 +613,7 @@ def _run_applyhtreat(macro_mol, macromodel_path, logger):
 
     # If no license if found, keep re-running the function until it is.
     if not _license_found(out.stdout):
-        return _run_applyhtreat(macro_mol, macromodel_path, logger)
+        return _run_applyhtreat(macro_mol, macromodel_path)
 
     macro_mol.update_from_mae(mae_out)
 
@@ -641,7 +671,7 @@ def _com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
                                          arg5, arg6, arg7, arg8, arg9)
 
 
-def _generate_com(macro_mol, settings, logger):
+def _generate_com(macro_mol, settings):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -664,9 +694,6 @@ def _generate_com(macro_mol, settings, logger):
     settings : dict
         A dictionary of settings for the optimization. See
         macromodel_opt() documentation.
-
-    logger : FakeLogger or logging.Logger
-        Used for logging.
 
     Modifies
     --------
@@ -723,7 +750,7 @@ def _generate_com(macro_mol, settings, logger):
         com.write(main_string)
 
 
-def _generate_md_com(macro_mol, settings, logger):
+def _generate_md_com(macro_mol, settings):
     logger.debug('Creating .com file for "{}".'.format(macro_mol.name))
 
     main_string = "\n".join([
@@ -766,7 +793,7 @@ def _generate_md_com(macro_mol, settings, logger):
         com.write(main_string)
 
 
-def _create_mae(macro_mol, macromodel_path, logger):
+def _create_mae(macro_mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.
 
@@ -781,9 +808,6 @@ def _create_mae(macro_mol, macromodel_path, logger):
         The full path of the installation directory of the Schrodinger
         suite. By default on a Windows machine it should be something
         like: "C:\Program Files\Schrodinger2016-2".
-
-    logger : FakeLogger or logging.Logger
-        Used for logging.
 
     Modifies
     --------
@@ -808,11 +832,11 @@ def _create_mae(macro_mol, macromodel_path, logger):
     # original structure file, including the same path. Only the
     # extensions are different.
     mae_file = macro_mol._file.replace(ext, '.mae')
-    _structconvert(macro_mol._file, mae_file, macromodel_path, logger)
+    _structconvert(macro_mol._file, mae_file, macromodel_path)
     return mae_file
 
 
-def _convert_maegz_to_mae(macro_mol, macromodel_path, logger):
+def _convert_maegz_to_mae(macro_mol, macromodel_path):
     """
     Converts a ``.maegz`` file to a ``.mae`` file.
 
@@ -827,9 +851,6 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path, logger):
         The full path of the installation directory of the Schrodinger
         suite. By default on a Windows machine it should be something
         like: "C:\Program Files\Schrodinger2016-2".
-
-    logger : FakeLogger or logging.Logger
-        Used for logging.
 
     Modifies
     --------
@@ -857,10 +878,10 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path, logger):
     maegz = name + '-out.maegz'
     # Replace extensions to get the names of the various files.
     mae = name + '.mae'
-    return _structconvert(maegz, mae, macromodel_path, logger)
+    return _structconvert(maegz, mae, macromodel_path)
 
 
-def _structconvert(iname, oname, macromodel_path, logger):
+def _structconvert(iname, oname, macromodel_path):
 
     convrt_app = os.path.join(macromodel_path, 'utilities',
                               'structconvert')
@@ -881,13 +902,13 @@ def _structconvert(iname, oname, macromodel_path, logger):
 
     # If no license if found, keep re-running the function until it is.
     if not _license_found(convrt_return.stdout):
-        return _structconvert(iname, oname, macromodel_path, logger)
+        return _structconvert(iname, oname, macromodel_path)
 
     # If force field failed, raise.
     if 'number 1' in convrt_return.stdout:
         raise _ForceFieldError(convrt_return.stdout)
 
-    _wait_for_file(oname, logger)
+    _wait_for_file(oname)
     if not os.path.exists(oname):
         raise _ConversionError(
          ('Conversion output file {} was not found.'
@@ -1087,7 +1108,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     return fix_block
 
 
-def _wait_for_file(file_name, logger, timeout=10):
+def _wait_for_file(file_name, timeout=10):
     """
     Stalls until a given file exists or `timeout` expires.
 
@@ -1095,9 +1116,6 @@ def _wait_for_file(file_name, logger, timeout=10):
     ----------
     file_name : str
         The full path of the file which should be waited for.
-
-    logger : FakeLogger or logging.Logger
-        Used for logging.
 
     timeout : int or float
         The number of seconds before the function stops waiting and
