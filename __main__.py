@@ -6,6 +6,7 @@ import argparse
 from rdkit import RDLogger
 from os.path import join, basename, abspath
 
+from .molecular import Molecule
 from .ga import Population, GAInput
 from .convenience_tools import (tar_output,
                                 errorhandler,
@@ -318,7 +319,7 @@ if __name__ == '__main__':
     logger.info('Loading molecules from any provided databases.')
     dbs = []
     for db in ga_input.databases:
-        dbs.append(Population.load(db))
+        dbs.append(Population.load(db, Molecule.fromdict))
 
     for x in range(args.loops):
         ga_run(ga_input)
