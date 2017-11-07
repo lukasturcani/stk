@@ -546,8 +546,8 @@ def partial_raiser(macro_mol):
 def cage(macro_mol,
          pseudoformation_params={'func': FunctionData('rdkit',
                                                       forcefield='mmff')},
-         dihedral_SMARTS="",
-         target_value=180):
+         dihedral_SMARTS='',
+         target_dihedral=180):
     """
     Returns the fitness vector of a cage.
 
@@ -567,11 +567,6 @@ def cage(macro_mol,
            value. The user must provide the SMARTS for the dihedral and
            the target value.
 
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
-
     Parameters
     ----------
     macro_mol : :class:`.Cage`
@@ -580,8 +575,8 @@ def cage(macro_mol,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
+    target_dihedral : :class:`float`, optional
+        The target value for the dihedral angle.
 
     pseudoformation_params : dict, optional
         This fitness function calculates the formation energy using
@@ -618,7 +613,7 @@ def cage(macro_mol,
     prec_strain = macro_mol.bb_distortion()
 
     dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
-                                                target_value)
+                                                target_dihedral)
 
     macro_mol.progress_params['cage'] = [cavity,
                                          window,
@@ -742,7 +737,7 @@ def cage_c60(macro_mol,
              n5fold,
              n2fold,
              dihedral_SMARTS="",
-             target_value=180):
+             target_dihedral=180):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
@@ -761,11 +756,6 @@ def cage_c60(macro_mol,
         6. asymmetry of cage by itself
         7. strain of cage by itself
         8. strain in select dihedral angles of the cage by itself
-
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -794,8 +784,8 @@ def cage_c60(macro_mol,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
+    target_dihedral : :class:`float`, optional
+        The target value for the dihedral angle.
 
     Returns
     -------
@@ -817,7 +807,7 @@ def cage_c60(macro_mol,
                                      n5fold=n5fold,
                                      n2fold=n2fold),
                         dihedral_SMARTS,
-                        target_value)
+                        target_dihedral)
 
 
 def _cage_target(func_name,
@@ -827,7 +817,7 @@ def _cage_target(func_name,
                  ofunc,
                  rotation_func,
                  dihedral_SMARTS,
-                 target_value):
+                 target_dihedral):
     """
     A general fitness function for calculating fitness of complexes.
 
@@ -845,11 +835,6 @@ def _cage_target(func_name,
         6. asymmetry of cage by itself
         7. strain of cage by itself
         8. strain in select dihedral angles of the cage by itself
-
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -879,8 +864,8 @@ def _cage_target(func_name,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`, optional
-        A number representing the target value for the dihedral angle.
+    target_dihedral : :class:`float`, optional
+        The target value for the dihedral angle.
 
     Returns
     -------
@@ -1004,7 +989,7 @@ def _cage_target(func_name,
     asymmetry = macro_mol.window_difference()
     prec_strain = macro_mol.bb_distortion()
     dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
-                                                target_value)
+                                                target_dihedral)
     macro_mol.progress_params[func_name] = [binding_energy,
                                             cmplx_cavity,
                                             cmplx_asymmetry,
