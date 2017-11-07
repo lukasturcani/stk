@@ -501,6 +501,12 @@ class Molecule:
                                     self.mol.GetConformer(), atoms_group[0],
                                     atoms_group[1], atoms_group[2],
                                     atoms_group[3])
+                # check that the dihedral is calculated in the right direction
+                if abs(dihedral_value) > 90:
+                    dihedral_value = abs(dihedral_value)
+                else:
+                    dihedral_value = 180 - abs(dihedral_value)
+
                 dihedral_info.append(dihedral_value)
 
             # Calculate the average dihedral value
