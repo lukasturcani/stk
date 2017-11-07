@@ -736,7 +736,7 @@ def cage_c60(macro_mol,
              ofunc,
              n5fold,
              n2fold,
-             dihedral_SMARTS="",
+             dihedral_SMARTS='',
              target_dihedral=180):
     """
     Calculates the fitness vector of a cage / C60 complex.
