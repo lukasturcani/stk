@@ -68,10 +68,8 @@ def fitness_epp(pop,
             mins.append(0)
         else:
             maxs.append(max(x.fitness for x in subpop))
-            means.append(np.mean([x.fitness for
-                                  x in subpop if x.fitness != 0.0001]))
-            mins.append(min(x.fitness for x in subpop if
-                            x.fitness != 0.0001))
+            means.append(np.mean([x.fitness for x in subpop]))
+            mins.append(min(x.fitness for x in subpop))
 
     # Save the plot data.
     if plot_name and dump_name is None:
