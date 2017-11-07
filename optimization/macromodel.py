@@ -135,8 +135,7 @@ def macromodel_opt(macro_mol, macromodel_path,
         vals['lewis_fixed'] = False
 
     try:
-        macro_mol._file = getattr(macro_mol, '_file',
-                                  '{}.mol'.format(uuid4().int))
+        macro_mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
         macro_mol.write(macro_mol._file)
         # MacroModel requires a ``.mae`` file as input. This creates a
@@ -281,8 +280,7 @@ def macromodel_cage_opt(macro_mol, macromodel_path,
         vals['lewis_fixed'] = False
 
     try:
-        macro_mol._file = getattr(macro_mol, '_file',
-                                  '{}.mol'.format(uuid4().int))
+        macro_mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
         macro_mol.write(macro_mol._file)
         # MacroModel requires a ``.mae`` file as input. This creates a
@@ -428,8 +426,7 @@ def _macromodel_md_opt(macro_mol, macromodel_path,
 
     logger.info('Running MD on "{}".'.format(macro_mol.name))
     try:
-        macro_mol._file = getattr(macro_mol, '_file',
-                                  '{}.mol'.format(uuid4().int))
+        macro_mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
         macro_mol.write(macro_mol._file)
         # MacroModel requires a ``.mae`` file as input. This creates a
