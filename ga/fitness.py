@@ -526,8 +526,6 @@ def partial_raiser(macro_mol):
 
     """
 
-    macro_mol.energy.rdkit('uff')
-
     if np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
