@@ -175,6 +175,7 @@ import subprocess as sp
 import time
 import psutil
 import copy
+import logging
 from uuid import uuid4
 from types import MethodType
 from functools import wraps
@@ -183,6 +184,8 @@ from inspect import signature as sig
 
 from ..convenience_tools import FunctionData
 from .optimization.mopac import mopac_opt
+
+logger = logging.getLogger(__name__)
 
 
 class _EnergyError(Exception):
@@ -887,12 +890,15 @@ class Energy(metaclass=EMeta):
         return _extract_MOPAC_dipole(file_root)
 
     @exclude('mopac_path')
-    def mopac_ea(self, mopac_path, settings={}):
+    def mopac_ea(self, mopac_path, adiabatic=False, settings={}):
         """
         Calculates the electron affinity of `self.molecule` using MOPAC.
-        Electron Affinity (EA): difference between energy of structure with
+        Electron Affinity (EA): difference between energy of system with
                                 N electrons and N+1 electrons - charge = -1
-                                (eV)
+                                (eV).
+        By default a vertical EA is calculated (no optimisation involved), if
+        the adiabatic flag is set to True then an adiabatic calculation will
+        be performed.
         Note that this requires MOPAC to be installed and have a
         valid license.
 
@@ -942,9 +948,10 @@ class Energy(metaclass=EMeta):
             The full path of the MOPAC suite within the
             user's machine.
 
-        mopac_path : str
-            The full path of the MOPAC suite within the
-            user's machine.
+        adiabatic : :class:`bool`, optional
+            This defines if the calculation involves a vertical calculation
+            (adiabatic=False) or an adiabatic calculation, where the geometry is
+            optimised with the negative charge.
 
         Returns
         -------
@@ -982,36 +989,49 @@ class Energy(metaclass=EMeta):
         # Extract the neutral energy
         en1 = _extract_MOPAC_en(file_root)
 
-        # Update the settings for the anion optimization
-        settings2 = {
-                    'method': 'OPT',
-                    'gradient': 0.01,
-                    'charge': -1,
-                    'fileout': 'PDBOUT'
-                    }
+        if adiabatic == False:
+            # Update the settings for the anion single point
+            vals['charge'] = -1
+            # Now generate a new molecule
+            mol2 = copy.deepcopy(self.molecule)
+            en2 = mol2.energy.mopac(mopac_path, vals)
+            # Calculate the EA (eV)
+            return en2 - en1
 
-        vals.update(settings2)
+        else:
+            # Update the settings for the anion optimization
+            settings2 = {
+                        'method': 'OPT',
+                        'gradient': 0.01,
+                        'charge': -1,
+                        'fileout': 'PDBOUT'
+                        }
 
-        # Now generate a new molecule
-        mol2 = copy.deepcopy(self.molecule)
-        # Run the mopac optimisation
-        mopac_opt(mol2, mopac_path, vals)
-        # Extract the energy by using the self.mopac method
-        vals['method'] = 'NOOPT'
-        del vals['gradient']
-        del vals['fileout']
-        en2 = mol2.energy.mopac(mopac_path, vals)
-        # Calculate the EA (eV)
-        return en2 - en1
+            vals.update(settings2)
+
+            # Now generate a new molecule
+            mol2 = copy.deepcopy(self.molecule)
+            # Run the mopac optimisation
+            mopac_opt(mol2, mopac_path, vals)
+            # Extract the energy by using the self.mopac method
+            vals['method'] = 'NOOPT'
+            del vals['gradient']
+            del vals['fileout']
+            en2 = mol2.energy.mopac(mopac_path, vals)
+            # Calculate the EA (eV)
+            return en2 - en1
 
 
     @exclude('mopac_path')
-    def mopac_ip(self, mopac_path, settings={}):
+    def mopac_ip(self, mopac_path, adiabatic=False, settings={}):
         """
         Calculates the ionization potential of `self.molecule` using MOPAC.
-        Ionization Potential (IP): difference between energy of structure with
+        Ionization Potential (IP): difference between energy of system with
                                 N electrons and N-1 electrons - charge = +1
-                                (eV)
+                                (eV).
+        By default a vertical IP is calculated (no optimisation involved), if
+        the adiabatic flag is set to True then an adiabatic calculation will
+        be performed.
         Note that this requires MOPAC to be installed and have a
         valid license.
 
@@ -1061,9 +1081,10 @@ class Energy(metaclass=EMeta):
             The full path of the MOPAC suite within the
             user's machine.
 
-        mopac_path : str
-            The full path of the MOPAC suite within the
-            user's machine.
+        adiabatic : :class:`bool`, optional
+            This defines if the calculation involves a vertical calculation
+            (adiabatic=False) or an adiabatic calculation, where the geometry is
+            optimised with the negative charge.
 
         Returns
         -------
@@ -1101,27 +1122,37 @@ class Energy(metaclass=EMeta):
         # Extract the neutral energy
         en1 = _extract_MOPAC_en(file_root)
 
-        # Update the settings for the cation optimization
-        settings2 = {
-                    'method': 'OPT',
-                    'gradient': 0.01,
-                    'charge': 1,
-                    'fileout': 'PDBOUT'
-                    }
+        if adiabatic == False:
+            # Update the settings for the cation single point
+            vals['charge'] = 1
+            # Now generate a new molecule
+            mol2 = copy.deepcopy(self.molecule)
+            en2 = mol2.energy.mopac(mopac_path, vals)
+            # Calculate the IP (eV)
+            return en2 - en1
 
-        vals.update(settings2)
+        else:
+            # Update the settings for the cation optimization
+            settings2 = {
+                        'method': 'OPT',
+                        'gradient': 0.01,
+                        'charge': 1,
+                        'fileout': 'PDBOUT'
+                        }
 
-        # Now generate a new molecule
-        mol2 = copy.deepcopy(self.molecule)
-        # Run the mopac optimisation
-        mopac_opt(mol2, mopac_path, vals)
-        # Extract the energy by using the self.mopac method
-        vals['method'] = 'NOOPT'
-        del vals['gradient']
-        del vals['fileout']
-        en2 = mol2.energy.mopac(mopac_path, vals)
-        # Calculate the IP (eV)
-        return en2 - en1
+            vals.update(settings2)
+
+            # Now generate a new molecule
+            mol2 = copy.deepcopy(self.molecule)
+            # Run the mopac optimisation
+            mopac_opt(mol2, mopac_path, vals)
+            # Extract the energy by using the self.mopac method
+            vals['method'] = 'NOOPT'
+            del vals['gradient']
+            del vals['fileout']
+            en2 = mol2.energy.mopac(mopac_path, vals)
+            # Calculate the IP (eV)
+            return en2 - en1
 
 def formation_key(fargs, fkwargs):
     """
