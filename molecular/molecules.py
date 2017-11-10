@@ -748,8 +748,13 @@ class Molecule:
                                          self.mol.GetNumBonds())
         # Kekulize the mol, which means that each aromatic bond is
         # converted to a single or double. This is necessary because
-        # .mol V3000 only supports integer bonds.
-        rdkit.Kekulize(self.mol)
+        # .mol V3000 only supports integer bonds. However, this fails
+        # sometimes on big molecules.
+        try:
+            rdkit.Kekulize(self.mol)
+        except ValueError:
+            pass
+
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
@@ -762,6 +767,9 @@ class Molecule:
             atom1_id = bond.GetBeginAtomIdx() + 1
             atom2_id = bond.GetEndAtomIdx() + 1
             bond_order = int(bond.GetBondTypeAsDouble())
+            # Ensure that no information was lost when converting
+            # double to int.
+            assert bond_order == bond.GetBondTypeAsDouble()
             bond_block += bond_line.format(bond_id, bond_order,
                                            atom1_id, atom2_id)
 
@@ -2778,7 +2786,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         obj = cls.__new__(cls)
         obj.mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
-                                        sanitize=False, removeHs=False)
+                                        sanitize=False,
+                                        removeHs=False)
         obj.topology = topology
         obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
                                     np.__dict__)
