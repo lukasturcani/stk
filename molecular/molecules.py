@@ -499,7 +499,7 @@ class Molecule:
         return np.divide(centroid, self.mol.GetNumAtoms())
 
     def dihedral_strain(self,
-                        dihedral_SMARTS="",
+                        dihedral_SMARTS='',
                         target=180,
                         conformer=-1):
         """
@@ -524,11 +524,7 @@ class Molecule:
             dihedral value in the molecule and the target value.
         """
 
-        # Sanitize the molecule
-        rdkit.SanitizeMol(self.mol)
-
         match = rdkit.MolFromSmarts(dihedral_SMARTS)
-
         atoms_dihedral = self.mol.GetSubstructMatches(match)
 
         dihedral_info = []
