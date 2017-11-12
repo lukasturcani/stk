@@ -221,12 +221,8 @@
 <span class="sd">                ``80.1`` can be used to model a water environment at</span>
 <span class="sd">                room temperature.</span>
 
-<span class="sd">            &#39;charge&#39; : :class:`list` of :class:`float` (default = ``0``)</span>
-<span class="sd">                When the system being studied is an ion, the charge,</span>
-<span class="sd">                ``n``, on the ion must be supplied as an integer. For</span>
-<span class="sd">                cations ``n`` can be ``1``, ``2``, ``3``, etc., for</span>
-<span class="sd">                anions ``-1``, ``-2``, ``-3``, etc.</span>
-
+<span class="sd">            &#39;charge&#39; : :class:`float` (default = ``0``)</span>
+<span class="sd">                The charge of the system.</span>
 
 <span class="sd">            &#39;fileout&#39; : :class:`str` (default = ``&#39;PDBOUT&#39;``)</span>
 <span class="sd">                Determines the output file type.</span>
@@ -308,9 +304,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kills an in-progress MOPAC run.</span>
 
-<span class="sd">    To kill a MOPAC run for a specific structure it is enough to</span>
-<span class="sd">    generate a non empty file with the molecule&#39;s name with the</span>
-<span class="sd">    ``.end`` extension.</span>
+<span class="sd">    To kill a MOPAC run, a file with the molecule&#39;s name and a ``.end``</span>
+<span class="sd">    extension is written.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
