@@ -206,9 +206,8 @@ details are defined.</li>
 <dt id="mtk.optimization.mopac._kill_mopac">
 <code class="descclassname">mtk.optimization.mopac.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/mopac.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.mopac._kill_mopac" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kills an in-progress MOPAC run.</p>
-<p>To kill a MOPAC run for a specific structure it is enough to
-generate a non empty file with the molecule’s name with the
-<code class="docutils literal"><span class="pre">.end</span></code> extension.</p>
+<p>To kill a MOPAC run, a file with the molecule’s name and a <code class="docutils literal"><span class="pre">.end</span></code>
+extension is written.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -266,7 +265,7 @@ MOPAC:</p>
 machine. For example, in a default MacOS installation the
 folder will probably be something like
 <code class="docutils literal"><span class="pre">/opt/mopac/MOPAC2016.exe</span></code>.</li>
-<li><strong>settings</strong> – <p>A dictionary which maps the names of the optimization
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of the optimization
 parameters to their values. Valid values are:</p>
 <blockquote>
 <div><dl class="docutils">
@@ -296,11 +295,14 @@ to work well with this model. <code class="docutils literal"><span class="pre">0
 dielectric constant is not included in the calculation.
 <code class="docutils literal"><span class="pre">80.1</span></code> can be used to model a water environment at
 room temperature.</dd>
-<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">0</span></code>)</span></dt>
-<dd>When the system being studied is an ion, the charge,
-<code class="docutils literal"><span class="pre">n</span></code>, on the ion must be supplied as an integer. For
-cations <code class="docutils literal"><span class="pre">n</span></code> can be <code class="docutils literal"><span class="pre">1</span></code>, <code class="docutils literal"><span class="pre">2</span></code>, <code class="docutils literal"><span class="pre">3</span></code>, etc., for
-anions <code class="docutils literal"><span class="pre">-1</span></code>, <code class="docutils literal"><span class="pre">-2</span></code>, <code class="docutils literal"><span class="pre">-3</span></code>, etc.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">0</span></code>)</span></dt>
+<dd>The charge of the system.</dd>
+<dt>’fileout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code> (default = <code class="docutils literal"><span class="pre">'PDBOUT'</span></code>)</span></dt>
+<dd>Determines the output file type.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">172800</span></code>)</span></dt>
+<dd>The amount in seconds the optimization is allowed to
+run before being terminated. The default value is <code class="docutils literal"><span class="pre">2</span></code>
+days or <code class="docutils literal"><span class="pre">172,800</span></code> seconds.</dd>
 </dl>
 </div></blockquote>
 </li>
