@@ -650,7 +650,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">centroid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="Molecule.dihedral_strain"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.dihedral_strain">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral_strain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                        <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                        <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                         <span class="n">target</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
                         <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -675,11 +675,7 @@
 <span class="sd">            dihedral value in the molecule and the target value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Sanitize the molecule</span>
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
-
         <span class="n">match</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">dihedral_SMARTS</span><span class="p">)</span>
-
         <span class="n">atoms_dihedral</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
 
         <span class="n">dihedral_info</span> <span class="o">=</span> <span class="p">[]</span>
@@ -899,8 +895,13 @@
                                          <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumBonds</span><span class="p">())</span>
         <span class="c1"># Kekulize the mol, which means that each aromatic bond is</span>
         <span class="c1"># converted to a single or double. This is necessary because</span>
-        <span class="c1"># .mol V3000 only supports integer bonds.</span>
-        <span class="n">rdkit</span><span class="o">.</span><span class="n">Kekulize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="c1"># .mol V3000 only supports integer bonds. However, this fails</span>
+        <span class="c1"># sometimes on big molecules.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rdkit</span><span class="o">.</span><span class="n">Kekulize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
             <span class="n">atom_sym</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()]</span>
@@ -913,6 +914,9 @@
             <span class="n">atom1_id</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtomIdx</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">atom2_id</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtomIdx</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">bond_order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">GetBondTypeAsDouble</span><span class="p">())</span>
+            <span class="c1"># Ensure that no information was lost when converting</span>
+            <span class="c1"># double to int.</span>
+            <span class="k">assert</span> <span class="n">bond_order</span> <span class="o">==</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBondTypeAsDouble</span><span class="p">()</span>
             <span class="n">bond_block</span> <span class="o">+=</span> <span class="n">bond_line</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bond_id</span><span class="p">,</span> <span class="n">bond_order</span><span class="p">,</span>
                                            <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">)</span>
 
@@ -2929,7 +2933,8 @@
 
         <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromMolBlock</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;mol_block&#39;</span><span class="p">],</span>
-                                        <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                                        <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                        <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">topology</span> <span class="o">=</span> <span class="n">topology</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">unscaled_fitness</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;unscaled_fitness&#39;</span><span class="p">],</span>
                                     <span class="n">np</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
