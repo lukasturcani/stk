@@ -430,7 +430,7 @@ rotation along the 5-fold axis.</li>
 
 <dl class="function">
 <dt id="mtk.ga.fitness._cage_target">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">_cage_target</code><span class="sig-paren">(</span><em>func_name</em>, <em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotation_func</em>, <em>dihedral_SMARTS</em>, <em>target_value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#_cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness._cage_target" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">_cage_target</code><span class="sig-paren">(</span><em>func_name</em>, <em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>rotation_func</em>, <em>dihedral_SMARTS</em>, <em>target_dihedral</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#_cage_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness._cage_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>A general fitness function for calculating fitness of complexes.</p>
 <p>This function should be wrapped by other fitness functions which
 define their own rotation function. For example <a class="reference internal" href="#mtk.ga.fitness.cage_c60" title="mtk.ga.fitness.cage_c60"><code class="xref py py-func docutils literal"><span class="pre">cage_c60()</span></code></a>
@@ -448,9 +448,6 @@ and <a class="reference internal" href="#mtk.ga.fitness.cage_target" title="mtk.
 <li>strain in select dihedral angles of the cage by itself</li>
 </ol>
 </div></blockquote>
-<p class="rubric">Notes</p>
-<p>This function modifies <cite>macro_mol</cite>. It places the calculated
-fitness parameters into <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -468,7 +465,7 @@ function to be run on the generated complexes.</li>
 <li><strong>rotation_func</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the rotation
 function to be used.</li>
 <li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_value</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – A number representing the target value for the dihedral angle.</li>
+<li><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</li>
 </ul>
 </td>
 </tr>
@@ -619,7 +616,7 @@ added. <code class="xref py py-attr docutils literal"><span class="pre">param_la
 
 <dl class="function">
 <dt id="mtk.ga.fitness.cage">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>pseudoformation_params={'func': FunctionData('rdkit'</em>, <em>forcefield='mmff')}</em>, <em>dihedral_SMARTS=''</em>, <em>target_value=180</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>pseudoformation_params={'func': FunctionData('rdkit'</em>, <em>forcefield='mmff')}</em>, <em>dihedral_SMARTS=''</em>, <em>target_dihedral=180</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the fitness vector of a cage.</p>
 <p>The fitness vector consists of the following properties in the
 listed order</p>
@@ -639,9 +636,6 @@ value. The user must provide the SMARTS for the dihedral and
 the target value.</li>
 </ol>
 </div></blockquote>
-<p class="rubric">Notes</p>
-<p>This function modifies <cite>macro_mol</cite>. It places the calculated
-fitness parameters into <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -649,7 +643,7 @@ fitness parameters into <a class="reference internal" href="mtk.molecular.molecu
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a>) – The cage whose fitness is to be calculated.</li>
 <li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_value</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – Float representing the target value for the dihedral angle.</li>
+<li><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</li>
 <li><strong>pseudoformation_params</strong> (<em>dict</em><em>, </em><em>optional</em>) – This fitness function calculates the formation energy using
 <a class="reference internal" href="mtk.molecular.energy.html#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a>. This parameter defines the
 arguments passed to this method via a dictionary. The name of
@@ -673,7 +667,7 @@ value.</li>
 
 <dl class="function">
 <dt id="mtk.ga.fitness.cage_c60">
-<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage_c60</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>n5fold</em>, <em>n2fold</em>, <em>dihedral_SMARTS=''</em>, <em>target_value=180</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage_c60"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage_c60" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">mtk.ga.fitness.</code><code class="descname">cage_c60</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>target_mol_file</em>, <em>efunc</em>, <em>ofunc</em>, <em>n5fold</em>, <em>n2fold</em>, <em>dihedral_SMARTS=''</em>, <em>target_dihedral=180</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/fitness.html#cage_c60"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.fitness.cage_c60" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fitness vector of a cage / C60 complex.</p>
 <p>The difference between this function and <a class="reference internal" href="#mtk.ga.fitness.cage_target" title="mtk.ga.fitness.cage_target"><code class="xref py py-func docutils literal"><span class="pre">cage_target()</span></code></a> is
 that the rotations are specifically aimed at sampling C60 entirely
@@ -692,9 +686,6 @@ other function.</p>
 <li>strain in select dihedral angles of the cage by itself</li>
 </ol>
 </div></blockquote>
-<p class="rubric">Notes</p>
-<p>This function modifies <cite>macro_mol</cite>. It places the calculated
-fitness parameters into <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -711,7 +702,7 @@ function to be run on the generated complexes.</li>
 <li><strong>n2fold</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of rotations along the 2 fold axis of symmetry per
 rotation along the 5-fold axis.</li>
 <li><strong>dihedral_SMARTS</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The SMARTS code for the dihedral of interest.</li>
-<li><strong>target_value</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – Float representing the target value for the dihedral angle.</li>
+<li><strong>target_dihedral</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>, optional) – The target value for the dihedral angle.</li>
 </ul>
 </td>
 </tr>
