@@ -330,7 +330,7 @@ def e_logger(func, obj):
 
     Returns
     -------
-    class:`types.MethodType`
+    :class:`types.MethodType`
         The function `func` bound to `obj` and modified so that when
         called the results update :attr:`Energy.values`.
 
