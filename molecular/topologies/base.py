@@ -1,36 +1,40 @@
 """
-Defines the base ``Topology`` type.
+Defines the base :class:`Topology` type.
 
-Extending MMEA: Adding new topologies
+Extending mtk: Adding new topologies.
 -------------------------------------
-> Cages
+
+Cages
+.....
+
 To add a new cage topology a new class should be created, named
-after the topology. This class should inhertic the ``CageTopology``
-class. This will give access to various methods which are necessary
+after the topology. This class should inherit :class:`._CageTopology`.
+This will give access to various methods which are necessary
 for dealing with any cage molecule. See the documenation of
-``CageTopology`` for more details.
+:class:`._CageTopology` for more details.
 
 The new class will only need to have five class attributes added:
-    1) a list called `vertices`
-    2) a list called `edges`
-    3) `n_windows` which holds the number of windows the cage
-       topology has
-    4) `n_window_types` which holds the number of different window
-       types. For example, if `n_window_types` is 2 then the
-       topology will have two kinds of windows, each with a
-       different expected size even in a perfectly symmetrical case.
-       Windows of the same type are expected to be of the same size.
 
-The `vertices` list holds instances of the class ``Vertex``. Each
+    1. a :class:`list` called :attr:`vertices`
+    2. a :class:`list` called :attr:`edges`
+    3. :attr:`n_windows`, which holds the number of windows the cage
+       topology has.
+    4. :attr:`n_window_types`, which holds the number of different
+       window types. For example, if :attr:`n_window_types` is ``2``,
+       then the topology will have two kinds of windows, each with a
+       different expected size. Windows of the same type are expected
+       to be of the same size.
+
+:attr:`vertices` holds instances of :class:`.Vertex`. Each
 instance represents a vertex of a cage and needs to be initialized
 with the coordinates of that vertex. Vertices of a cage are where
-building-blocks* of cages are placed.
+building blocks of cages are placed.
 
-The `edges` list holds instances of the class ``Edge``. Each
+:attr:`edges` holds instances of the :class:`.Edge`. Each
 instance represents an edge of a cage and needs to be initialized
-with two instnaces of the ``Vertex`` class. The ``Vertex`` instances
-should be held in the `vertices` list mentioned above. These are
-the two vertices which the edge connects. Linkers of cages are
+with two instances of :class:`.Vertex`. The :class:`.Vertex` instances
+should be held in :attr:`vertices`, as mentioned above. The two
+vertices are the ones which the edge connects. Linkers of cages are
 placed on edges. The edge instances automatically derive their
 positions from the vertices supplied during initialization.
 
@@ -99,7 +103,7 @@ def remove_confs(building_blocks, keep):
 
 class TopologyMeta(type):
     """
-    Makes a repr of an instance, based on __init__ arguments used.
+    Makes a repr of an instance, based initialization arguments used.
 
     """
 
@@ -128,16 +132,16 @@ class Topology(metaclass=TopologyMeta):
     """
     Builds macromolecules.
 
-    More accurately, child classes of ``Topology`` class take care of
+    More accurately, child classes of :class:`Topology` take care of
     building macromolecules.
 
     This class directly defines any operations and attributes that are
     needed by any topology during assembly. However, this class is not
-    used directly by MMEA. It is intended to be inherited from. All
-    macromolecules within MMEA have a `topology` attribute which hold
-    an instance of a Topology child class. Child classes of Topology
+    used directly. It is intended to be inherited from. All
+    :attr:`.MacroMolecule.topology` attributes hold an instance of a
+    :class:`Topology` child class. Child classes of :class:`Topology`
     define operations specific to that one topology. For example, each
-    child class must define a `join_mols()` method which creates bonds
+    child class must define a :meth:`join_mols`, which creates bonds
     between the building blocks of a macromolecule. The way in which
     this is done will depend on what kind of macromolecules are being
     built. In addition, each child class must define methods which
@@ -147,12 +151,19 @@ class Topology(metaclass=TopologyMeta):
 
     def build(self, macro_mol, bb_conformers=None):
         """
-        Assembles rdkit instances of macromolecules.
+        Assembles ``rdkit`` instances of macromolecules.
+
+        This method places an ``rdkit`` molecule of the assembled
+        macromolecule into the :attr:`~.Molecule.mol` attribute of
+        :class:`.MacroMolecule`. It also updates the
+        :attr:`.MacroMolecule.bb_counter` and
+        :attr:`.MacroMolecule.bonds_made` attributes.
 
         Parameters
         ----------
-        macro_mol : MacroMolecule
-            The MacroMolecule instance which needs to be built.
+        macro_mol : :class:`.MacroMolecule`
+            The :class:`.MacroMolecule` instance which needs to be
+            built.
 
         bb_conformers : :class:`list` of :class:`int`, optional
             The ids of the building block conformers to be used. Must
@@ -160,23 +171,9 @@ class Topology(metaclass=TopologyMeta):
             correspond. If ``None``, then ``-1`` is used for all
             building blocks.
 
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            An rdkit instance of the assembled macromolecule is placed
-            in this attribute.
-
-        macro_mol.bb_counter : Counter
-            The counter is updated with the amounts of building blocks
-            used to make the macromolecule.
-
-        macro_mol.bonds_made : int
-            This count is updated with the number of bonds made during
-            assembly.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -219,14 +216,14 @@ class Topology(metaclass=TopologyMeta):
         """
         Deletes the atoms which are lost during assembly.
 
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            Atoms are removed from this molecule.
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -245,30 +242,31 @@ class Topology(metaclass=TopologyMeta):
         Returns the bond order to be formed between the atoms.
 
         Some atoms will need to have a double bond created between
-        them. This is defined in the `double_bond_combs` list. If the
-        atom ids provided as paramters belong to functional grups found
-        in this list, the rdkit double bond type will be returned.
-        If not the rdkit single bond type will be returned. These types
-        are needed when adding bonds using ``EditableMol`` instances.
+        them. This is defined in the :data:`fg_info.double_bond_combs`.
+        If the atom ids provided as parameters belong to functional
+        groups found in this list, the ``rdkit`` double bond type will
+        be returned. If not, the ``rdkit`` single bond type will be
+        returned. These types are needed when adding bonds to an
+        ``rdkit`` molecule.
 
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
 
-        atom1_id : int
+        atom1_id : :class:`int`
             The id number of the first atom.
 
-        atom2_id : int
+        atom2_id : :class:`int`
             The id number of the second atom.
 
         Returns
         -------
-        rdkit.Chem.rdchem.BondType.SINGLE
+        :class:`rdkit.Chem.rdchem.BondType.SINGLE`
             If the atoms don't belong to functional groups which form
             a double bond.
 
-        rdkit.Chem.rdchem.BondType.DOUBLE
+        :class:`rdkit.Chem.rdchem.BondType.DOUBLE`
             If the atoms belong to functional groups which form a
             double bond.
 
@@ -314,37 +312,83 @@ class Linear(Topology):
 
     Attributes
     ----------
-    repeating_unit : str
-        A string showing the repeating unit of the Polymer. For
-        example, "AB" or "ABB". The building block with index 0 in
-        `building-blocks` is labelled as "A" while index 1 as "B" and
-        so on.
+    repeating_unit : :class:`str`
+        A string showing the repeating unit of the :class:`.Polymer`.
+        For example, ``"AB"`` or ``"ABB"``. The building block with
+        index ``0`` in :attr:`.MacroMolecule.building_blocks` is
+        labelled as ``"A"`` while index ``1`` as ``"B"`` and so on.
 
-    orientation : tuple of ints
-        For each character in the repeating unit, a value of -1, 0 or
-        1 must be given as a list. It indicates the direction at
-        which each monomer of the repeating unit is placed. 0 means
-        that the direction is random.
+    orientation : :class:`tuple` of :class:`int`
+        For each character in the repeating unit, a value of ``-1``,
+        ``0`` or ``1`` must be given in a :class:`list`. It indicates
+        the direction at which each monomer of the repeating unit is
+        placed along the chain. ``0`` means that the direction is
+        random.
 
-    n : int
+    n : :class:`int`
         The number of repeating units which are used to make the
         polymer.
 
-    ends : str (default = 'h')
+    ends : :class:`str`
         The string represents how the end groups of the polymer are
-        treated. If 'h' the functional groups at the end of the polymer
-        are converted into hydrogem atoms. If 'fg' they are kept as the
-        original functional group.
+        treated. If ``'h'`` the functional groups at the end of the
+        polymer are converted into hydrogem atoms. If ``'fg'`` they are
+        kept as the original functional group.
 
     """
 
     def __init__(self, repeating_unit, orientation, n, ends='h'):
+        """
+        Initializes a :class:`Linear` instance.
+
+        Parameters
+        ----------
+        repeating_unit : :class:`str`
+            A string showing the repeating unit of the
+            :class:`.Polymer`. For example, ``"AB"`` or ``"ABB"``. The
+            building block with index ``0`` in
+            :attr:`.MacroMolecule.building_blocks` is labelled as
+            ``"A"`` while index ``1`` as ``"B"`` and so on.
+
+        orientation : :class:`tuple` of :class:`int`
+            For each character in the repeating unit, a value of
+            ``-1``, ``0`` or ``1`` must be given in a :class:`list`. It
+            indicates the direction at which each monomer of the
+            repeating unit is placed along the chain. ``0`` means that
+            the direction is random.
+
+        n : :class:`int`
+            The number of repeating units which are used to make the
+            polymer.
+
+        ends : :class:`str`, optional
+            The string represents how the end groups of the polymer are
+            treated. If ``'h'`` the functional groups at the end of the
+            polymer are converted into hydrogem atoms. If ``'fg'`` they
+            are kept as the original functional group.
+
+        """
+
         self.repeating_unit = repeating_unit
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
 
     def del_atoms(self, macro_mol):
+        """
+        Deletes the atoms which are lost during assembly.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.Polymer`
+            The polymer being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         if self.ends == 'h':
             self.hygrogen_ends(macro_mol)
         elif self.ends == 'fg':
@@ -354,22 +398,17 @@ class Linear(Topology):
         """
         Removes almost all atoms tagged for deletion.
 
-        In polymers, you don't want to delete the atoms on the
-        functional groups
+        In polymers, you don't want to delete the atoms at the ends of
+        the chain.
 
         Parameters
         ----------
-        macro_mol : Polymer
+        macro_mol : :class:`.Polymer`
             The polymer being assembled.
-
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            Redundant atoms are removed.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -399,24 +438,19 @@ class Linear(Topology):
 
     def hygrogen_ends(self, macro_mol):
         """
-        Removes all atoms tagged for deletion and adds Hs.
+        Removes all atoms tagged for deletion and adds hydrogens.
 
         In polymers, you want to replace the functional groups at the
         ends with hydrogen atoms.
 
         Parameters
         ----------
-        macro_mol : Polymer
+        macro_mol : :class:`.Polymer`
             The polymer being assembled.
-
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            Redundant atoms are removed.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -436,17 +470,12 @@ class Linear(Topology):
 
         Parameters
         ----------
-        macro_mol : Polymer
+        macro_mol : :class:`.Polymer`
             The polymer being assembled.
-
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            The monomers are placed.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -495,17 +524,12 @@ class Linear(Topology):
 
         Parameters
         ----------
-        macro_mol : Polymer
+        macro_mol : :class:`.Polymer`
             The polymer being assembled.
-
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            The polymer with the monomers connected.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -528,16 +552,16 @@ class Linear(Topology):
 
     def join_mols(self, macro_mol):
         """
-        Does nothing, place_mols() joins up the molecules too.
+        Does nothing, :meth:`place_mols` joins up the molecules too.
 
         Parameters
         ----------
-        macro_mol : Polymer
+        macro_mol : :class:`.Polymer`
             The polymer being assembled.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 

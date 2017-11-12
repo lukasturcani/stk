@@ -161,54 +161,85 @@
                                    <span class="n">normalize_vector</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="WindowError"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.WindowError">[docs]</a><span class="k">class</span> <span class="nc">WindowError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<div class="viewcode-block" id="WindowError.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.WindowError.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div></div>
-
-
 <div class="viewcode-block" id="Vertex"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex">[docs]</a><span class="k">class</span> <span class="nc">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Used to represent the vertices of Cage polyhedra.</span>
+<span class="sd">    Used to represent the vertices of cage polyhedra.</span>
 
 <span class="sd">    This class stores information about the vertices which make up a</span>
-<span class="sd">    Cage&#39;s structure.</span>
+<span class="sd">    cage&#39;s structure.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    coord : numpy.array of floats</span>
-<span class="sd">        A numpy array which holds the x, y and z coordinates of the</span>
+<span class="sd">    coord : :class:`numpy.array`</span>
+<span class="sd">        An array which holds the x, y and z coordinates of the</span>
 <span class="sd">        vertex, in that order.</span>
 
-<span class="sd">    connected : list of Edge or Vertex instances</span>
-<span class="sd">        This list holds the Edge or Vertex instances which represent</span>
-<span class="sd">        the edges or vertices connected to the `self` vertex.</span>
+<span class="sd">    connected : :class:`list` of :class:`Edge` or :class:`Vertex`</span>
+<span class="sd">        This :class:`list` holds the :class:`Edge` or :class:`Vertex`</span>
+<span class="sd">        instances which represent the edges or vertices connected to</span>
+<span class="sd">        this one.</span>
 
-<span class="sd">    bonder_ids : list of ints</span>
-<span class="sd">        This list holds the ids of atoms which belong to the building</span>
-<span class="sd">        block placed on the vertex and will form bonds. The ids reflect</span>
-<span class="sd">        those in the macromolecule not in the building block itself.</span>
+<span class="sd">    bonder_ids : :class:`list` of :class:`int`</span>
+<span class="sd">        This :class:`list` holds the ids of atoms which belong to the</span>
+<span class="sd">        building block placed on the vertex and will form bonds. The</span>
+<span class="sd">        ids reflect those in the macromolecule not in the building block</span>
+<span class="sd">        itself.</span>
 
-<span class="sd">    atom_position_pairs : list of tuples of form (int, Vertex)</span>
+<span class="sd">    atom_position_pairs : :class:`list`</span>
+<span class="sd">        A :class:`list` of the form</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            atom_position_pairs = [(4, v1), (8, v2)]</span>
+
+<span class="sd">        Where ``v1`` and ``v2`` are :class:`Vertex` instances.</span>
+
 <span class="sd">        Each atom which  is paired to a neighboring vertex or</span>
-<span class="sd">        edge first. Only after this is the atom - atom pairing</span>
-<span class="sd">        performed. The atom - edge/vertex pairing is stored here. The</span>
+<span class="sd">        edge first. Only after this is the atom-atom pairing</span>
+<span class="sd">        performed. The atom-edge/vertex pairing is stored here. The</span>
 <span class="sd">        int represents the id of the atom.</span>
 
-<span class="sd">    distances : list of tuples of form (float, int, int)</span>
+<span class="sd">    distances : :class:`list`</span>
+<span class="sd">        A :class:`list` of the form</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            distances = [(15.2, 5, 10), (18.4, 3, 8), ...]</span>
+
 <span class="sd">        After bonder atoms have been associated with vertices to which</span>
 <span class="sd">        they join, the idividual atoms are paired up. To do this the</span>
 <span class="sd">        distance between every bonder atom on the paired vertex and the</span>
 <span class="sd">        bonder atom which is paired to the vertex is found. This</span>
-<span class="sd">        information is stored here where float is the distance, the</span>
-<span class="sd">        first int is the bonder atom and the second int is the bonder</span>
-<span class="sd">        atom on the vertex paired to the first atom.</span>
+<span class="sd">        information is stored here the first element of each</span>
+<span class="sd">        :class:`tuple` the distance, and the second and third elements</span>
+<span class="sd">        represent the bonder atoms.</span>
 
-<span class="sd">    id : object, optional</span>
-<span class="sd">        An id to identify the vertex. Used by `place_mols()`</span>
+<span class="sd">    id : :class:`object`, optional</span>
+<span class="sd">        An id to identify the vertex. Used by</span>
+<span class="sd">        :meth:`CageTopology.place_mols`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Vertex.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a :class:`Vertex`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : :class:`int` or :class:`float`</span>
+<span class="sd">            The x coordinate.</span>
+
+<span class="sd">        y : :class:`int` or :class:`float`</span>
+<span class="sd">            The y coordiante</span>
+
+<span class="sd">        z : :class:`int` or :class:`float`</span>
+<span class="sd">            The z coordiante</span>
+
+<span class="sd">        id : :class:`object`, optional</span>
+<span class="sd">            An id to identify the vertex.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
@@ -219,24 +250,24 @@
 <div class="viewcode-block" id="Vertex.vertex_init"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.vertex_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">vertex_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Intializes the Vertex from  a list of other vertices.</span>
+<span class="sd">        Intializes the :class:`Vertex` from other vertices.</span>
 
 <span class="sd">        This initalizer automatically calculates the position of the</span>
 <span class="sd">        vertex from the positions of the vertices provided to the</span>
 <span class="sd">        initializer. Its position is set to the centroid of the</span>
 <span class="sd">        provided vertices.</span>
 
-<span class="sd">        The `connected` attributes of all the involved vertices are</span>
-<span class="sd">        also updated.</span>
+<span class="sd">        The :attr:`connected` attributes of all the involved vertices</span>
+<span class="sd">        are also updated.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        vertices : tuple</span>
-<span class="sd">            A tuple of Vertex objects.</span>
+<span class="sd">        vertices : :class:`tuple` pf :class:`Vertex`</span>
+<span class="sd">            Holds :class:`Vertex` objects used for initialization.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Vertex</span>
+<span class="sd">        :class:`Vertex`</span>
 <span class="sd">            The initialized vertex.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -252,7 +283,7 @@
 
 <div class="viewcode-block" id="Vertex.place_mol"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.place_mol">[docs]</a>    <span class="k">def</span> <span class="nf">place_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">building_block</span><span class="p">,</span> <span class="n">aligner</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">aligner_edge</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Place a StructUnit3 building block on the coords of the vertex.</span>
+<span class="sd">        Place a :class:`.StructUnit3` building block on the vertex.</span>
 
 <span class="sd">        The orientation of the building block is aligned with 2</span>
 <span class="sd">        parameters. Firstly, the normal of the plane of bonder atoms of</span>
@@ -270,29 +301,24 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        building_block : StructUnit3</span>
+<span class="sd">        building_block : :class:`.StructUnit3`</span>
 <span class="sd">            The building block molecule to be placed on a vertex.</span>
 
-<span class="sd">        aligner : int, optional</span>
-<span class="sd">            The index of the atom within `bonder_ids` which is to be</span>
-<span class="sd">            aligned with an edge.</span>
+<span class="sd">        aligner : :class:`int`, optional</span>
+<span class="sd">            The index of the atom within</span>
+<span class="sd">            :attr`.StructUnit.bonder_ids` which is to be aligned</span>
+<span class="sd">            with an edge.</span>
 
-<span class="sd">        aligner_edge : int, optional</span>
-<span class="sd">            The index of an edge in `connected`. It is the edge with</span>
-<span class="sd">            which `aligner` is aligned.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        building_block.mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer of the rdkit instance in this attribute is</span>
-<span class="sd">            modified as per the description in the docstring.</span>
+<span class="sd">        aligner_edge : :class:`int`, optional</span>
+<span class="sd">            The index of an edge in :attr:`connected`. It is the edge</span>
+<span class="sd">            with which `aligner` is aligned.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit instance holding the building block molecule with</span>
-<span class="sd">            the coordinates placed on the vertex and orientation set as</span>
-<span class="sd">            described in the docstring.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` instance holding the building block molecule</span>
+<span class="sd">            with the coordinates placed on the vertex and orientation</span>
+<span class="sd">            set as described in the docstring.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -329,7 +355,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            A normalized vector which defines the normal pointed away</span>
 <span class="sd">            from the origin.</span>
 
@@ -362,23 +388,24 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return coefficients of plane of edges connected to the vertex.</span>
 
-<span class="sd">        A plane is defined by the scalar plane equation,</span>
+<span class="sd">        A plane is defined by the scalar plane equation::</span>
 
 <span class="sd">            ax + by + cz = d.</span>
 
-<span class="sd">        This method returns the a, b, c and d coefficients of this</span>
-<span class="sd">        equation for the plane formed by the connected edges. The</span>
-<span class="sd">        coefficents a, b and c decribe the normal vector to the plane.</span>
-<span class="sd">        The coefficent d is found by substituting these coefficients</span>
-<span class="sd">        along with the x, y and z variables in the scalar equation and</span>
-<span class="sd">        solving for d. The variables x, y and z are substituted by the</span>
-<span class="sd">        coordinate of some point on the plane. For example, the</span>
+<span class="sd">        This method returns the ``a``, ``b``, ``c`` and ``d``</span>
+<span class="sd">        coefficients of this equation for the plane formed by the</span>
+<span class="sd">        connected edges. The coefficents ``a``, ``b`` and ``c`` decribe</span>
+<span class="sd">        the normal vector to the plane. The coefficent ``d`` is found</span>
+<span class="sd">        by substituting these coefficients along with the ``x``, ``y``</span>
+<span class="sd">        and ``z`` variables in the scalar equation and solving for</span>
+<span class="sd">        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by</span>
+<span class="sd">        the coordinate of some point on the plane. For example, the</span>
 <span class="sd">        position of one of the connected edges.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
-<span class="sd">            This array has the form [a, b, c, d] and represents the</span>
+<span class="sd">        :class:`numpy.array`</span>
+<span class="sd">            This array has the form ``[a, b, c, d]`` and represents the</span>
 <span class="sd">            scalar equation of the plane formed by the connected edges.</span>
 
 <span class="sd">        References</span>
@@ -397,7 +424,7 @@
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            A normalized direction vector running from one edge</span>
 <span class="sd">            connected to the vertex to another.</span>
 
@@ -412,10 +439,10 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.matrix</span>
-<span class="sd">            The matrix is n x 3, where n is the number of edges</span>
-<span class="sd">            connected to the vertex. The row holds the x, y and z</span>
-<span class="sd">            coordinates, respectively.</span>
+<span class="sd">        :class:`numpy.matrix`</span>
+<span class="sd">            The matrix of shape ``[n, 3]``, where ``n`` is the number</span>
+<span class="sd">            of edges connected to the vertex. The row holds the x, y</span>
+<span class="sd">            and z coordinates, respectively.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -430,7 +457,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            An array which holds the x, y and z positions of the</span>
 <span class="sd">            centroid of the edges connected to the vertex.</span>
 
@@ -452,13 +479,30 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    direction : numpy.array</span>
+<span class="sd">    direction : :class:`numpy.array`</span>
 <span class="sd">        This vector represents the orientation of the edge. It is a</span>
-<span class="sd">        normalized direction vector which runs from `v2` to `v1`.</span>
+<span class="sd">        normalized direction vector which runs from `v2` to `v1`,</span>
+<span class="sd">        provided in the initalizer.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Edge.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Edge.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes an :class:`Edge` instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        v1 : :class:`Vertex`</span>
+<span class="sd">            A vertex joined to the edge.</span>
+
+<span class="sd">        v2 : :class:`Vertex`</span>
+<span class="sd">            Another vertex joined to the edge.</span>
+
+<span class="sd">        id_ : :class`str`, optional</span>
+<span class="sd">            An id for the edge.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">Vertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">centroid</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">),</span> <span class="n">id_</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">])</span>
@@ -475,25 +519,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        linker : StructUnit2</span>
+<span class="sd">        linker : :class:`.StructUnit2`</span>
 <span class="sd">            The linker which is to be placed and orientated as</span>
 <span class="sd">            described in the docstring.</span>
 
-<span class="sd">        alignment : int</span>
-<span class="sd">            1 for parallel alignment with `self.direction` and -1 for</span>
-<span class="sd">            anti-parallel alignment with `self.direction`.</span>
-
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        linker.mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The conformer of the rdkit instance in this attribute is</span>
-<span class="sd">            modified as per the description in the docstring.</span>
+<span class="sd">        alignment : :class:`int`</span>
+<span class="sd">            ``1`` for parallel alignment with :attr:`direction` and</span>
+<span class="sd">            ``-1`` for anti-parallel alignment with :attr:`direction`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit instance holding the linker molecule with the</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` instance holding the linker molecule with the</span>
 <span class="sd">            coordinates placed on the edge and orientation set as</span>
 <span class="sd">            described in the docstring.</span>
 
@@ -521,9 +558,6 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    In addition to all the attributes defined within ``Topology`` this</span>
-<span class="sd">    class has the following attributes:</span>
-
 <span class="sd">    A_alignments : list of ints (default = None)</span>
 <span class="sd">        The length of this list must be equal to the number of</span>
 <span class="sd">        building blocks in the cage. When cages are built one of the</span>

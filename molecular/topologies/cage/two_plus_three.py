@@ -35,11 +35,8 @@ class FourPlusSix(_CageTopology):
     """
     Defines the tetrahedral, 4+6, topology.
 
-    This is a topology of cages where 4 building-blocks* are placed on
-    vertices and 6 linkers are placed on the edges between them. This
-    class defines functions which place these molecules in the correct
-    positions within an rdkit instance. The rdkit instance is stored in
-    the `heavy_mol` attribute of a ``Cage`` instance.
+    This is a topology of cages where 4 building blocks are placed on
+    vertices and 6 linkers are placed on the edges between them.
 
     """
 
