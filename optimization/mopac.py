@@ -1,5 +1,6 @@
 """
 Defines optimization functions which use MOPAC.
+
 """
 
 import os
@@ -13,89 +14,89 @@ from uuid import uuid4
 logger = logging.getLogger(__name__)
 
 
-def mopac_opt(macro_mol, mopac_path, settings={}):
+def mopac_opt(mol, mopac_path, settings=None):
     """
     Optimizes the molecule using MOPAC.
 
-    This function runs an optimization. It is possible to provide different
-    options, which correspond to the input keywords from MOPAC:
-    http://openmopac.net/Manual/index.html
+    This function runs an optimization. It is possible to provide
+    different options, which correspond to the input keywords from
+    MOPAC:
 
-    * need to create a tool for generating mopac inputs
+    http://openmopac.net/Manual/index.html
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure must be optimized.
+    mol : :class:`.Molecule`
+        The molecule to be optimized.
 
-    mopac_path : str
-        The full path of the ``MOPAC`` suite within the user's
+    mopac_path : :class:`str`
+        The full path to the MOPAC suite on the user's
         machine. For example, in a default MacOS installation the
         folder will probably be something like
         ``/opt/mopac/MOPAC2016.exe``.
 
-    settings: dict (default = {})
-        A dictionary which maps the names of the optimization parameters to
-        their values. Valid values are:
+    settings: :class:`dict`, optional
+        A dictionary which maps the names of the optimization
+        parameters to their values. Valid values are:
 
-            'hamiltonian' : string(default = 'PM7')
+            'hamiltonian' : :class:`str` (default = ``'PM7'``)
                 A series of different methods can be selected:
                 PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..
 
-                PM7 is the latest version of the reparametrization of the NDDO
-                theory, where all the atomic and diatomic parameters were
-                re-optimized - update compared to PM6.
-                http://openmopac.net/PM7_accuracy/PM7_accuracy.html
+                PM7 is the latest version of the reparametrization of
+                NDDO theory, where all the atomic and diatomic
+                parameters were re-optimized / updated from PM6 [#]_.
 
-            'method' : string (default = 'OPT')
-                The default calculation consists in a geometry optimization.
-                You can run single point calculations (SCF) or transition
-                search algorithms (TS). Refer to the MOPAC website for specific
-                keywords.
+            'method' : :class:`str` (default = ``'OPT'``)
+                The default calculation consists of a geometry
+                optimization. You can run single point calculations
+                (SCF) or transition search algorithms (TS). Refer to
+                the MOPAC website for specific keywords.
 
-            'gradient' : float (default = 0.01)
-                The gradient at which the geometry optimization reaches the
-                convergence criteria (kcal/mol/Angstrom). For small system high
-                precision work, 0.01 is recommended, as these results are
-                easily good enough for all high precision work.
+            'gradient' : :class:`float` (default = ``0.01``)
+                The gradient at which the geometry optimization reaches
+                the convergence criteria (``kcal`` / ``mol`` /
+                ``Angstrom``). For small system and high precision
+                work, ``0.01`` is recommended.
 
-            'eps' : float (detault = 80.1)
-                Sets the dielectric constant for the solvent. Presence of this
-                keyword will cause the COSMO (Conductor-like Screening Model)
-                method to be used to approximate the effect of a solvent model
-                surrounding the molecule. Solvents with low dielectric constant
-                are not likely to work well with this model.
-                0 means that the dielectric constant is not included in the
-                calculation.
-                80.1 can be used to model a water environment at room
-                temperature.
+            'eps' : :class:`float` (default = ``80.1``)
+                Sets the dielectric constant for the solvent. Presence
+                of this keyword will cause the COSMO (Conductor-like
+                Screening Model) method to be used to approximate the
+                effect of a solvent model surrounding the molecule.
+                Solvents with a low dielectric constant are not likely
+                to work well with this model. ``0`` means that the
+                dielectric constant is not included in the calculation.
+                ``80.1`` can be used to model a water environment at
+                room temperature.
 
-            'charge' : list of floats (default = 0)
-                When the system being studied is an ion, the charge, n, on the
-                ion must be supplied as an integer. For cations n can be 1, 2,
-                3, etc.; for anions -1, -2, -3, etc.
-
-
-            'fileout' : string (default = 'PDBOUT')
-                This generates the pdb file with the optimized structure.
-
-            'timeout' : float (default = 172800)
-                The amount in seconds the optimization is allowed to run before
-                being terminated. The default value is 2 days =
-                172,800 seconds.
+            'charge' : :class:`list` of :class:`float` (default = ``0``)
+                When the system being studied is an ion, the charge,
+                ``n``, on the ion must be supplied as an integer. For
+                cations ``n`` can be ``1``, ``2``, ``3``, etc., for
+                anions ``-1``, ``-2``, ``-3``, etc.
 
 
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute is replaced by an
-        rdkit molecule with an optimized structure.
+            'fileout' : :class:`str` (default = ``'PDBOUT'``)
+                Determines the output file type.
+
+            'timeout' : :class:`float` (default = ``172800``)
+                The amount in seconds the optimization is allowed to
+                run before being terminated. The default value is ``2``
+                days or ``172,800`` seconds.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
+
+    References
+    ----------
+    .. [#] http://openmopac.net/PM7_accuracy/PM7_accuracy.html
 
     """
+
+    if settings is None:
+        settings = {}
 
     vals = {
             'hamiltonian': 'PM7',
@@ -108,29 +109,27 @@ def mopac_opt(macro_mol, mopac_path, settings={}):
             }
     vals.update(settings)
 
-    macro_mol._file = getattr(macro_mol, '_file',
-                              '{}.mol'.format(uuid4().int))
+    mol._file = '{}.mol'.format(uuid4().int)
 
     # First write a .mol file of the molecule.
-    macro_mol.write(macro_mol._file)
+    mol.write(mol._file)
     # MOPAC requires a ``.mop`` file as input. This creates a ``.mop``
     # file holding the molecule.
-    _create_mop(macro_mol, vals)
+    _create_mop(mol, vals)
     # Run the optimization
-    _run_mopac(macro_mol, mopac_path, settings)
+    _run_mopac(mol, mopac_path, settings)
     # Update the rdkit mol info with the ``.pdb`` file generated from
     # the MOPAC run
-    _convert_mopout_to_mol(macro_mol)
+    _convert_mopout_to_mol(mol)
 
 
-def _run_mopac(macro_mol, mopac_path, settings, timeout=7200,
-                                        logger=logger):
+def _run_mopac(mol, mopac_path, settings, timeout=7200):
 
-    name, ext = os.path.splitext(macro_mol._file)
+    name, ext = os.path.splitext(mol._file)
     mop_file = name + '.mop'
 
     print("", time.ctime(time.time()),
-          'Running MOPAC - {}.'.format(macro_mol.name), sep='\n')
+          'Running MOPAC - {}.'.format(mol.name), sep='\n')
 
     # To run MOPAC a command is issued to the console via
     # ``subprocess.Popen``. The command is the full path of the
@@ -148,18 +147,31 @@ def _run_mopac(macro_mol, mopac_path, settings, timeout=7200,
             proc_out, _ = opt_proc.communicate()
     except sp.TimeoutExpired:
         logger.warning('\nMinimization took too long and was terminated '
-                       'by force - {}\n'.format(macro_mol.name))
-        _kill_mopac(macro_mol)
+                       'by force - {}\n'.format(mol.name))
+        _kill_mopac(mol)
 
     return
 
 
-def _kill_mopac(macro_mol):
+def _kill_mopac(mol):
     """
-    To kill a MOPAC run for a specific structure it is enough to generate
-    a non empty file with the molecule's name with the `.end` extension.
+    Kills an in-progress MOPAC run.
+
+    To kill a MOPAC run for a specific structure it is enough to
+    generate a non empty file with the molecule's name with the
+    ``.end`` extension.
+
+    Parameters
+    ----------
+    mol : :class:`.Molecule`
+        The molecule being optimized.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
     """
-    name, ext = os.path.splitext(macro_mol._file)
+    name, ext = os.path.splitext(mol._file)
     end_file = name + '.end'
 
     with open(end_file, 'w') as end:
@@ -168,20 +180,20 @@ def _kill_mopac(macro_mol):
 
 def _mop_line(settings):
     """
-    Formats the settings dictionary with the correct keywords for MOPAC into
-    a string to be added to the MOPAC input.
+    Formats `settings` into a MOPAC input string.
 
     Parameters
     ----------
-    settings : dict
-        Dictionary defined in the mopac_opt function, where all the run details
-        are defined.
+    settings : :class:`dict`
+        Dictionary defined in :func:`mopac_opt`, where all the run
+        details are defined.
 
     Returns
     -------
-    mopac_run_str : str
-        String containing all the MOPAC keywords correctly formatted for the
-        input file.
+    :class:`str`
+        String containing all the MOPAC keywords correctly formatted
+        for the input file.
+
     """
 
     # Generate an empty string
@@ -210,44 +222,32 @@ def _mop_line(settings):
     return mopac_run_str
 
 
-def _create_mop(macro_mol, settings, logger=logger):
+def _create_mop(mol, settings):
     """
     Creates the ``.mop`` file holding the molecule to be optimized.
-    The name of the input file will contain info about its charge:
-    charge = 0: name_neu
-    charge = -1: name_an1
-    charge = +1: name_cat 1
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule which is to be optimized. Its molecular
+    mol : :class:`.Molecule`
+        The molecule which is to be optimized. Its molecular
         structure file is converted to a ``.mop`` file. The original
         file is also kept.
 
-    mopac_run_str : str
-        This string specifies the MOPAC keywords to be used in the input for
-        the calculation.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging.
-
-    Modifies
-    --------
-    This function creates a new ``.mop`` file from the structure file
-    in `macro_mol._file`. This new file is placed in the same
-    folder as the original file and has the same name with the _charge info.
+    settings : :class:`dict`
+        Dictionary defined in :func:`mopac_opt`, where all the run
+        details are defined.
 
     Returns
     -------
-    str
+    :class:`str`
         The full path of the newly created ``.mop`` file.
-    """
-    name, ext = os.path.splitext(macro_mol._file)
-    mop_file = name + '.mop'
-    mol = macro_mol.mol
 
-    logger.info('\nCreating .mop file - {}.'.format(macro_mol.name))
+    """
+    name, ext = os.path.splitext(mol._file)
+    mop_file = name + '.mop'
+    mol = mol.mol
+
+    logger.info('\nCreating .mop file - {}.'.format(mol.name))
 
     # Generate the mop file containing the MOPAC run info
     with open(mop_file, 'w') as mop:
@@ -261,45 +261,39 @@ def _create_mop(macro_mol, settings, logger=logger):
             atom_id = atom.GetIdx()
             atom_symbol = atom.GetSymbol()
             x, y, z = mol.GetConformer().GetAtomPosition(atom_id)
-            atom_info = "{}   {}   +1  {}   +1  {}   +1 \n".format(atom_symbol,
-                                                                   x, y, z)
+            atom_info = f"{atom_symbol}   {x}   +1  {y}   +1  {z}   +1 \n"
             mop.write(atom_info)
 
     return mop_file
 
 
-def _convert_mopout_to_mol(macro_mol, logger=logger):
+def _convert_mopout_to_mol(mol):
     """
-    Updates the molecule information (coords) if the opt is successful.
-    Takes the ``.pdb`` file of the neutral file generated from the MOPAC run
-    and initiates a new rdkit molecule with that coordinates.
-    The macro_mol instance is then updated with the new molecule.
+    Updates the molecular structure if the optimization is successful.
+
+    Takes the ``.pdb`` file of the neutral file generated from the
+    MOPAC run and initializes a new ``rdkit`` molecule with those
+    coordinates. `mol` is then updated to hold the new molecule.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    mol : :class:`.Molecule`
         The macromolecule being optimized. The ``.pdb`` file holding
         its optimized structure is converted to a rdkit molecule.
 
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging.
-
-    Modifies
-    --------
-    This function updates the macro_mol instance.
-
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
-    name, ext = os.path.splitext(macro_mol._file)
+    name, ext = os.path.splitext(mol._file)
     pdb_file = name + ".pdb"
 
     logger.info("\nUpdating molecule with MOPAC optimized "
-               "one - {}.\n".format(macro_mol.name))
+                "one - {}.\n".format(mol.name))
 
-    new_mol = rdkit.MolFromPDBFile(pdb_file, sanitize=False,
+    new_mol = rdkit.MolFromPDBFile(pdb_file,
+                                   sanitize=False,
                                    removeHs=False)
     # Updating the macro_mol.mol infos with the new mol
-    macro_mol.mol = new_mol
+    mol.mol = new_mol

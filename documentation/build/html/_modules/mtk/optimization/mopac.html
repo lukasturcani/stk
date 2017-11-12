@@ -151,6 +151,7 @@
   <h1>Source code for mtk.optimization.mopac</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Defines optimization functions which use MOPAC.</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
@@ -164,89 +165,89 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="mopac_opt"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac.mopac_opt">[docs]</a><span class="k">def</span> <span class="nf">mopac_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{}):</span>
+<div class="viewcode-block" id="mopac_opt"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac.mopac_opt">[docs]</a><span class="k">def</span> <span class="nf">mopac_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes the molecule using MOPAC.</span>
 
-<span class="sd">    This function runs an optimization. It is possible to provide different</span>
-<span class="sd">    options, which correspond to the input keywords from MOPAC:</span>
-<span class="sd">    http://openmopac.net/Manual/index.html</span>
+<span class="sd">    This function runs an optimization. It is possible to provide</span>
+<span class="sd">    different options, which correspond to the input keywords from</span>
+<span class="sd">    MOPAC:</span>
 
-<span class="sd">    * need to create a tool for generating mopac inputs</span>
+<span class="sd">    http://openmopac.net/Manual/index.html</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule who&#39;s structure must be optimized.</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule to be optimized.</span>
 
-<span class="sd">    mopac_path : str</span>
-<span class="sd">        The full path of the ``MOPAC`` suite within the user&#39;s</span>
+<span class="sd">    mopac_path : :class:`str`</span>
+<span class="sd">        The full path to the MOPAC suite on the user&#39;s</span>
 <span class="sd">        machine. For example, in a default MacOS installation the</span>
 <span class="sd">        folder will probably be something like</span>
 <span class="sd">        ``/opt/mopac/MOPAC2016.exe``.</span>
 
-<span class="sd">    settings: dict (default = {})</span>
-<span class="sd">        A dictionary which maps the names of the optimization parameters to</span>
-<span class="sd">        their values. Valid values are:</span>
+<span class="sd">    settings: :class:`dict`, optional</span>
+<span class="sd">        A dictionary which maps the names of the optimization</span>
+<span class="sd">        parameters to their values. Valid values are:</span>
 
-<span class="sd">            &#39;hamiltonian&#39; : string(default = &#39;PM7&#39;)</span>
+<span class="sd">            &#39;hamiltonian&#39; : :class:`str` (default = ``&#39;PM7&#39;``)</span>
 <span class="sd">                A series of different methods can be selected:</span>
 <span class="sd">                PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..</span>
 
-<span class="sd">                PM7 is the latest version of the reparametrization of the NDDO</span>
-<span class="sd">                theory, where all the atomic and diatomic parameters were</span>
-<span class="sd">                re-optimized - update compared to PM6.</span>
-<span class="sd">                http://openmopac.net/PM7_accuracy/PM7_accuracy.html</span>
+<span class="sd">                PM7 is the latest version of the reparametrization of</span>
+<span class="sd">                NDDO theory, where all the atomic and diatomic</span>
+<span class="sd">                parameters were re-optimized / updated from PM6 [#]_.</span>
 
-<span class="sd">            &#39;method&#39; : string (default = &#39;OPT&#39;)</span>
-<span class="sd">                The default calculation consists in a geometry optimization.</span>
-<span class="sd">                You can run single point calculations (SCF) or transition</span>
-<span class="sd">                search algorithms (TS). Refer to the MOPAC website for specific</span>
-<span class="sd">                keywords.</span>
+<span class="sd">            &#39;method&#39; : :class:`str` (default = ``&#39;OPT&#39;``)</span>
+<span class="sd">                The default calculation consists of a geometry</span>
+<span class="sd">                optimization. You can run single point calculations</span>
+<span class="sd">                (SCF) or transition search algorithms (TS). Refer to</span>
+<span class="sd">                the MOPAC website for specific keywords.</span>
 
-<span class="sd">            &#39;gradient&#39; : float (default = 0.01)</span>
-<span class="sd">                The gradient at which the geometry optimization reaches the</span>
-<span class="sd">                convergence criteria (kcal/mol/Angstrom). For small system high</span>
-<span class="sd">                precision work, 0.01 is recommended, as these results are</span>
-<span class="sd">                easily good enough for all high precision work.</span>
+<span class="sd">            &#39;gradient&#39; : :class:`float` (default = ``0.01``)</span>
+<span class="sd">                The gradient at which the geometry optimization reaches</span>
+<span class="sd">                the convergence criteria (``kcal`` / ``mol`` /</span>
+<span class="sd">                ``Angstrom``). For small system and high precision</span>
+<span class="sd">                work, ``0.01`` is recommended.</span>
 
-<span class="sd">            &#39;eps&#39; : float (detault = 80.1)</span>
-<span class="sd">                Sets the dielectric constant for the solvent. Presence of this</span>
-<span class="sd">                keyword will cause the COSMO (Conductor-like Screening Model)</span>
-<span class="sd">                method to be used to approximate the effect of a solvent model</span>
-<span class="sd">                surrounding the molecule. Solvents with low dielectric constant</span>
-<span class="sd">                are not likely to work well with this model.</span>
-<span class="sd">                0 means that the dielectric constant is not included in the</span>
-<span class="sd">                calculation.</span>
-<span class="sd">                80.1 can be used to model a water environment at room</span>
-<span class="sd">                temperature.</span>
+<span class="sd">            &#39;eps&#39; : :class:`float` (default = ``80.1``)</span>
+<span class="sd">                Sets the dielectric constant for the solvent. Presence</span>
+<span class="sd">                of this keyword will cause the COSMO (Conductor-like</span>
+<span class="sd">                Screening Model) method to be used to approximate the</span>
+<span class="sd">                effect of a solvent model surrounding the molecule.</span>
+<span class="sd">                Solvents with a low dielectric constant are not likely</span>
+<span class="sd">                to work well with this model. ``0`` means that the</span>
+<span class="sd">                dielectric constant is not included in the calculation.</span>
+<span class="sd">                ``80.1`` can be used to model a water environment at</span>
+<span class="sd">                room temperature.</span>
 
-<span class="sd">            &#39;charge&#39; : list of floats (default = 0)</span>
-<span class="sd">                When the system being studied is an ion, the charge, n, on the</span>
-<span class="sd">                ion must be supplied as an integer. For cations n can be 1, 2,</span>
-<span class="sd">                3, etc.; for anions -1, -2, -3, etc.</span>
-
-
-<span class="sd">            &#39;fileout&#39; : string (default = &#39;PDBOUT&#39;)</span>
-<span class="sd">                This generates the pdb file with the optimized structure.</span>
-
-<span class="sd">            &#39;timeout&#39; : float (default = 172800)</span>
-<span class="sd">                The amount in seconds the optimization is allowed to run before</span>
-<span class="sd">                being terminated. The default value is 2 days =</span>
-<span class="sd">                172,800 seconds.</span>
+<span class="sd">            &#39;charge&#39; : :class:`list` of :class:`float` (default = ``0``)</span>
+<span class="sd">                When the system being studied is an ion, the charge,</span>
+<span class="sd">                ``n``, on the ion must be supplied as an integer. For</span>
+<span class="sd">                cations ``n`` can be ``1``, ``2``, ``3``, etc., for</span>
+<span class="sd">                anions ``-1``, ``-2``, ``-3``, etc.</span>
 
 
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.mol</span>
-<span class="sd">        The rdkit molecule held in this attribute is replaced by an</span>
-<span class="sd">        rdkit molecule with an optimized structure.</span>
+<span class="sd">            &#39;fileout&#39; : :class:`str` (default = ``&#39;PDBOUT&#39;``)</span>
+<span class="sd">                Determines the output file type.</span>
+
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``172800``)</span>
+<span class="sd">                The amount in seconds the optimization is allowed to</span>
+<span class="sd">                run before being terminated. The default value is ``2``</span>
+<span class="sd">                days or ``172,800`` seconds.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [#] http://openmopac.net/PM7_accuracy/PM7_accuracy.html</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;hamiltonian&#39;</span><span class="p">:</span> <span class="s1">&#39;PM7&#39;</span><span class="p">,</span>
@@ -259,29 +260,27 @@
             <span class="p">}</span>
     <span class="n">vals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
 
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="s1">&#39;_file&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 
     <span class="c1"># First write a .mol file of the molecule.</span>
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="c1"># MOPAC requires a ``.mop`` file as input. This creates a ``.mop``</span>
     <span class="c1"># file holding the molecule.</span>
-    <span class="n">_create_mop</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+    <span class="n">_create_mop</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
     <span class="c1"># Run the optimization</span>
-    <span class="n">_run_mopac</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+    <span class="n">_run_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
     <span class="c1"># Update the rdkit mol info with the ``.pdb`` file generated from</span>
     <span class="c1"># the MOPAC run</span>
-    <span class="n">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+    <span class="n">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_run_mopac"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._run_mopac">[docs]</a><span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
-                                        <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_run_mopac"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._run_mopac">[docs]</a><span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">7200</span><span class="p">):</span>
 
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="n">mop_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
-          <span class="s1">&#39;Running MOPAC - </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+          <span class="s1">&#39;Running MOPAC - </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="c1"># To run MOPAC a command is issued to the console via</span>
     <span class="c1"># ``subprocess.Popen``. The command is the full path of the</span>
@@ -299,18 +298,31 @@
             <span class="n">proc_out</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">opt_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
     <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Minimization took too long and was terminated &#39;</span>
-                       <span class="s1">&#39;by force - </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
+                       <span class="s1">&#39;by force - </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 
     <span class="k">return</span></div>
 
 
-<div class="viewcode-block" id="_kill_mopac"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._kill_mopac">[docs]</a><span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_kill_mopac"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._kill_mopac">[docs]</a><span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    To kill a MOPAC run for a specific structure it is enough to generate</span>
-<span class="sd">    a non empty file with the molecule&#39;s name with the `.end` extension.</span>
+<span class="sd">    Kills an in-progress MOPAC run.</span>
+
+<span class="sd">    To kill a MOPAC run for a specific structure it is enough to</span>
+<span class="sd">    generate a non empty file with the molecule&#39;s name with the</span>
+<span class="sd">    ``.end`` extension.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule being optimized.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="n">end_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.end&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">end_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">end</span><span class="p">:</span>
@@ -319,20 +331,20 @@
 
 <div class="viewcode-block" id="_mop_line"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._mop_line">[docs]</a><span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Formats the settings dictionary with the correct keywords for MOPAC into</span>
-<span class="sd">    a string to be added to the MOPAC input.</span>
+<span class="sd">    Formats `settings` into a MOPAC input string.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    settings : dict</span>
-<span class="sd">        Dictionary defined in the mopac_opt function, where all the run details</span>
-<span class="sd">        are defined.</span>
+<span class="sd">    settings : :class:`dict`</span>
+<span class="sd">        Dictionary defined in :func:`mopac_opt`, where all the run</span>
+<span class="sd">        details are defined.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    mopac_run_str : str</span>
-<span class="sd">        String containing all the MOPAC keywords correctly formatted for the</span>
-<span class="sd">        input file.</span>
+<span class="sd">    :class:`str`</span>
+<span class="sd">        String containing all the MOPAC keywords correctly formatted</span>
+<span class="sd">        for the input file.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Generate an empty string</span>
@@ -361,44 +373,32 @@
     <span class="k">return</span> <span class="n">mopac_run_str</span></div>
 
 
-<div class="viewcode-block" id="_create_mop"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._create_mop">[docs]</a><span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_create_mop"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._create_mop">[docs]</a><span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the ``.mop`` file holding the molecule to be optimized.</span>
-<span class="sd">    The name of the input file will contain info about its charge:</span>
-<span class="sd">    charge = 0: name_neu</span>
-<span class="sd">    charge = -1: name_an1</span>
-<span class="sd">    charge = +1: name_cat 1</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule which is to be optimized. Its molecular</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule which is to be optimized. Its molecular</span>
 <span class="sd">        structure file is converted to a ``.mop`` file. The original</span>
 <span class="sd">        file is also kept.</span>
 
-<span class="sd">    mopac_run_str : str</span>
-<span class="sd">        This string specifies the MOPAC keywords to be used in the input for</span>
-<span class="sd">        the calculation.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    This function creates a new ``.mop`` file from the structure file</span>
-<span class="sd">    in `macro_mol._file`. This new file is placed in the same</span>
-<span class="sd">    folder as the original file and has the same name with the _charge info.</span>
+<span class="sd">    settings : :class:`dict`</span>
+<span class="sd">        Dictionary defined in :func:`mopac_opt`, where all the run</span>
+<span class="sd">        details are defined.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        The full path of the newly created ``.mop`` file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
-    <span class="n">mop_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
-    <span class="n">mol</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Creating .mop file - </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">mop_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Creating .mop file - </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
     <span class="c1"># Generate the mop file containing the MOPAC run info</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mop_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mop</span><span class="p">:</span>
@@ -412,48 +412,42 @@
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
             <span class="n">atom_symbol</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span><span class="o">.</span><span class="n">GetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span>
-            <span class="n">atom_info</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">   </span><span class="si">{}</span><span class="s2">   +1  </span><span class="si">{}</span><span class="s2">   +1  </span><span class="si">{}</span><span class="s2">   +1 </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atom_symbol</span><span class="p">,</span>
-                                                                   <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">atom_info</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{atom_symbol}</span><span class="s2">   </span><span class="si">{x}</span><span class="s2">   +1  </span><span class="si">{y}</span><span class="s2">   +1  </span><span class="si">{z}</span><span class="s2">   +1 </span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom_info</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">mop_file</span></div>
 
 
-<div class="viewcode-block" id="_convert_mopout_to_mol"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._convert_mopout_to_mol">[docs]</a><span class="k">def</span> <span class="nf">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_convert_mopout_to_mol"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._convert_mopout_to_mol">[docs]</a><span class="k">def</span> <span class="nf">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Updates the molecule information (coords) if the opt is successful.</span>
-<span class="sd">    Takes the ``.pdb`` file of the neutral file generated from the MOPAC run</span>
-<span class="sd">    and initiates a new rdkit molecule with that coordinates.</span>
-<span class="sd">    The macro_mol instance is then updated with the new molecule.</span>
+<span class="sd">    Updates the molecular structure if the optimization is successful.</span>
+
+<span class="sd">    Takes the ``.pdb`` file of the neutral file generated from the</span>
+<span class="sd">    MOPAC run and initializes a new ``rdkit`` molecule with those</span>
+<span class="sd">    coordinates. `mol` is then updated to hold the new molecule.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
 <span class="sd">        The macromolecule being optimized. The ``.pdb`` file holding</span>
 <span class="sd">        its optimized structure is converted to a rdkit molecule.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    This function updates the macro_mol instance.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.pdb&quot;</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Updating molecule with MOPAC optimized &quot;</span>
-               <span class="s2">&quot;one - </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="s2">&quot;one - </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
-    <span class="n">new_mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromPDBFile</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">new_mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromPDBFile</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">,</span>
+                                   <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                    <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="c1"># Updating the macro_mol.mol infos with the new mol</span>
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">new_mol</span></div>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">new_mol</span></div>
 </pre></div>
 
            </div>

@@ -195,8 +195,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div></div>
 
 
-<div class="viewcode-block" id="macromodel_opt"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_opt">[docs]</a><span class="k">def</span> <span class="nf">macromodel_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                   <span class="n">settings</span><span class="o">=</span><span class="p">{},</span> <span class="n">md</span><span class="o">=</span><span class="p">{},</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="macromodel_opt"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_opt">[docs]</a><span class="k">def</span> <span class="nf">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                   <span class="n">macromodel_path</span><span class="p">,</span>
+                   <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes the molecule using MacroModel.</span>
 
@@ -206,68 +209,68 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule who&#39;s structure must be optimized.</span>
+<span class="sd">    mol : `.Molecule`</span>
+<span class="sd">        The molecule who&#39;s structure must be optimized.</span>
 
-<span class="sd">    macromodel_path : str</span>
-<span class="sd">        The full path of the ``Schrodinger`` suite within the user&#39;s</span>
-<span class="sd">        machine. For example, in a default Microsoft installation the</span>
-<span class="sd">        folder will probably be something like</span>
-<span class="sd">        ``C:\Program Files\Schrodinger2016-2``.</span>
+<span class="sd">    macromodel_path : :class:`str`</span>
+<span class="sd">        The full path of the Schrodinger suite within the user&#39;s</span>
+<span class="sd">        machine. For example, on a Linux machine this may be something</span>
+<span class="sd">        like ``&#39;/opt/schrodinger2017-2&#39;``.</span>
 
-<span class="sd">    settings : dict (default = {})</span>
+<span class="sd">    settings : :class:`dict`, optional</span>
 <span class="sd">        A dictionary which maps the names of optimization parameters to</span>
 <span class="sd">        their values. Valid values are:</span>
 
-<span class="sd">            &#39;restricted&#39; : bool (default = True)</span>
-<span class="sd">                If False then all bonds are optimized, not just the</span>
+<span class="sd">            &#39;restricted&#39; : :class:`bool` (default = ``True``)</span>
+<span class="sd">                If ``False`` then all bonds are optimized, not just the</span>
 <span class="sd">                ones created during macromolecular assembly.</span>
 
-<span class="sd">            &#39;timeout&#39; : float (default = 0)</span>
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
 <span class="sd">                The amount in seconds the optimization is allowed to</span>
-<span class="sd">                run before being terminated. 0 means there is no</span>
+<span class="sd">                run before being terminated. ``0`` means there is no</span>
 <span class="sd">                timeout.</span>
 
-<span class="sd">            &#39;force_field&#39; : int (default = 16)</span>
+<span class="sd">            &#39;force_field&#39; : :class:`int` (default = ``16``)</span>
 <span class="sd">                The number of the force field to be used.</span>
 
-<span class="sd">            &#39;max_iter&#39; : int (default = 2500)</span>
+<span class="sd">            &#39;max_iter&#39; : :class:`int` (default = ``2500``)</span>
 <span class="sd">                The maximum number of iterations done during the</span>
 <span class="sd">                optimization.</span>
 
-<span class="sd">            &#39;gradient&#39; : float (default = 0.05)</span>
+<span class="sd">            &#39;gradient&#39; : :class:`float` (default = ``0.05``)</span>
 <span class="sd">                The gradient at which optimization is stopped.</span>
 
-<span class="sd">            &#39;md&#39; : bool (default=False)</span>
+<span class="sd">            &#39;md&#39; : :class:`bool` (default = ``False``)</span>
 <span class="sd">                Toggles whether a MD conformer search should be</span>
 <span class="sd">                performed.</span>
 
 <span class="sd">        Only values which need to be changed from the default need to</span>
-<span class="sd">        be specified. For exmaple:</span>
+<span class="sd">        be specified. For exmaple,</span>
+
+<span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            macromodel_opt(mol, &#39;path&#39;, {&#39;max_iter&#39; : 10})</span>
 
 
-<span class="sd">    md : dict (default = {})</span>
+<span class="sd">    md : :class:`dict`, optional</span>
 <span class="sd">        A dictionary holding settings for the MD conformer search.</span>
 <span class="sd">        This parameter is used in the same way as `settings` except</span>
 <span class="sd">        the values effect the MD only. See docstring of</span>
-<span class="sd">        macromodel_md_opt() for valid values.</span>
+<span class="sd">        :func:`_macromodel_md_opt` for valid values.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.mol</span>
-<span class="sd">        The rdkit molecule held in this attribute is replaced by an</span>
-<span class="sd">        rdkit molecule with an optimized structure.</span>
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The id of the conformer to be optimized.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">md</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
              <span class="s1">&#39;restricted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
@@ -286,25 +289,27 @@
         <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="s1">&#39;_file&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
         <span class="c1"># First write a .mol file of the molecule.</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># MacroModel requires a ``.mae`` file as input. This creates a</span>
         <span class="c1"># ``.mae`` file holding the molecule.</span>
-        <span class="n">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">_create_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
         <span class="c1"># generate the ``.com`` file for the MacroModel run.</span>
-        <span class="n">_generate_com</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">_generate_com</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
         <span class="c1"># Run the optimization.</span>
-        <span class="n">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
+        <span class="n">_run_bmin</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
         <span class="c1"># Get the ``.maegz`` file output from the optimization and</span>
         <span class="c1"># convert it to a ``.mae`` file.</span>
-        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span>
-                                                          <span class="s1">&#39;.mae&#39;</span><span class="p">))</span>
+        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">),</span>
+                            <span class="n">conformer</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;md&#39;</span><span class="p">]:</span>
-            <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">md</span><span class="p">)</span>
+            <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                               <span class="n">macromodel_path</span><span class="p">,</span>
+                               <span class="n">md</span><span class="p">,</span>
+                               <span class="n">conformer</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="n">_ForceFieldError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="c1"># If OPLS_2005 has been tried already - record an exception.</span>
@@ -313,11 +318,14 @@
 
         <span class="c1"># If OPLSE_2005 has not been tried - try it.</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Minimization with OPLS3 failed on &quot;</span><span class="si">{}</span><span class="s1">&quot;. &#39;</span>
-                        <span class="s1">&#39;Trying OPLS_2005.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                        <span class="s1">&#39;Trying OPLS_2005.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
         <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;force_field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">14</span>
-        <span class="k">return</span> <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                              <span class="n">vals</span><span class="p">,</span> <span class="n">md</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                              <span class="n">macromodel_path</span><span class="p">,</span>
+                              <span class="n">vals</span><span class="p">,</span>
+                              <span class="n">md</span><span class="p">,</span>
+                              <span class="n">conformer</span><span class="p">)</span>
 
     <span class="c1"># The &#39;lewis_fixed&#39; parameter should not be used by the user.</span>
     <span class="c1"># Sometimes the Lewis structure of `macro_mol` is wrong. If this is</span>
@@ -326,18 +334,24 @@
     <span class="c1"># tried to prevent infinite recursion.</span>
     <span class="k">except</span> <span class="n">_LewisStructureError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Attempting to fix Lewis &#39;</span>
-                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]:</span>
-            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
             <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                                  <span class="n">vals</span><span class="p">,</span> <span class="n">md</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                                  <span class="n">macromodel_path</span><span class="p">,</span>
+                                  <span class="n">vals</span><span class="p">,</span>
+                                  <span class="n">md</span><span class="p">,</span>
+                                  <span class="n">conformer</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ex</span></div>
 
 
-<div class="viewcode-block" id="macromodel_cage_opt"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_cage_opt">[docs]</a><span class="k">def</span> <span class="nf">macromodel_cage_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                        <span class="n">settings</span><span class="o">=</span><span class="p">{},</span> <span class="n">md</span><span class="o">=</span><span class="p">{},</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="macromodel_cage_opt"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_cage_opt">[docs]</a><span class="k">def</span> <span class="nf">macromodel_cage_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                        <span class="n">macromodel_path</span><span class="p">,</span>
+                        <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">md</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimizes the molecule using MacroModel.</span>
 
@@ -352,68 +366,68 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule who&#39;s structure must be optimized.</span>
+<span class="sd">    mol : `.Molecule`</span>
+<span class="sd">        The molecule who&#39;s structure must be optimized.</span>
 
-<span class="sd">    macromodel_path : str</span>
-<span class="sd">        The full path of the ``Schrodinger`` suite within the user&#39;s</span>
-<span class="sd">        machine. For example, in a default Microsoft installation the</span>
-<span class="sd">        folder will probably be something like</span>
-<span class="sd">        ``C:\Program Files\Schrodinger2016-2``.</span>
+<span class="sd">    macromodel_path : :class:`str`</span>
+<span class="sd">        The full path of the Schrodinger suite within the user&#39;s</span>
+<span class="sd">        machine. For example, on a Linux machine this may be something</span>
+<span class="sd">        like ``&#39;/opt/schrodinger2017-2&#39;``.</span>
 
-<span class="sd">    settings : dict (default = {})</span>
+<span class="sd">    settings : :class:`dict`, optional</span>
 <span class="sd">        A dictionary which maps the names of optimization parameters to</span>
 <span class="sd">        their values. Valid values are:</span>
 
-<span class="sd">            &#39;restricted&#39; : bool (default = True)</span>
-<span class="sd">                If False then all bonds are optimized, not just the</span>
+<span class="sd">            &#39;restricted&#39; : :class:`bool` (default = ``True``)</span>
+<span class="sd">                If ``False`` then all bonds are optimized, not just the</span>
 <span class="sd">                ones created during macromolecular assembly.</span>
 
-<span class="sd">            &#39;timeout&#39; : float (default = 0)</span>
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
 <span class="sd">                The amount in seconds the optimization is allowed to</span>
-<span class="sd">                run before being terminated. 0 means there is no</span>
+<span class="sd">                run before being terminated. ``0`` means there is no</span>
 <span class="sd">                timeout.</span>
 
-<span class="sd">            &#39;force_field&#39; : int (default = 16)</span>
+<span class="sd">            &#39;force_field&#39; : :class:`int` (default = ``16``)</span>
 <span class="sd">                The number of the force field to be used.</span>
 
-<span class="sd">            &#39;max_iter&#39; : int (default = 2500)</span>
+<span class="sd">            &#39;max_iter&#39; : :class:`int` (default = ``2500``)</span>
 <span class="sd">                The maximum number of iterations done during the</span>
 <span class="sd">                optimization.</span>
 
-<span class="sd">            &#39;gradient&#39; : float (default = 0.05)</span>
+<span class="sd">            &#39;gradient&#39; : :class:`float` (default = ``0.05``)</span>
 <span class="sd">                The gradient at which optimization is stopped.</span>
 
-<span class="sd">            &#39;md&#39; : bool (default=False)</span>
+<span class="sd">            &#39;md&#39; : :class:`bool` (default = ``False``)</span>
 <span class="sd">                Toggles whether a MD conformer search should be</span>
 <span class="sd">                performed.</span>
 
 <span class="sd">        Only values which need to be changed from the default need to</span>
-<span class="sd">        be specified. For exmaple:</span>
+<span class="sd">        be specified. For exmaple,</span>
+
+<span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            macromodel_opt(mol, &#39;path&#39;, {&#39;max_iter&#39; : 10})</span>
 
 
-<span class="sd">    md : dict (default = {})</span>
+<span class="sd">    md : :class:`dict`, optional</span>
 <span class="sd">        A dictionary holding settings for the MD conformer search.</span>
 <span class="sd">        This parameter is used in the same way as `settings` except</span>
 <span class="sd">        the values effect the MD only. See docstring of</span>
-<span class="sd">        macromodel_md_opt() for valid values.</span>
+<span class="sd">        :func:`_macromodel_md_opt` for valid values.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.mol</span>
-<span class="sd">        The rdkit molecule held in this attribute is replaced by an</span>
-<span class="sd">        rdkit molecule with an optimized structure.</span>
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The id of the conformer to be optimized.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">md</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
              <span class="s1">&#39;restricted&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
@@ -432,32 +446,33 @@
         <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="s1">&#39;_file&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
         <span class="c1"># First write a .mol file of the molecule.</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># MacroModel requires a ``.mae`` file as input. This creates a</span>
         <span class="c1"># ``.mae`` file holding the molecule.</span>
-        <span class="n">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">_create_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
         <span class="c1"># generate the ``.com`` file for the MacroModel run.</span>
-        <span class="n">_generate_com</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">_generate_com</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
         <span class="c1"># Run the optimization.</span>
-        <span class="n">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
+        <span class="n">_run_bmin</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
         <span class="c1"># Get the ``.maegz`` file output from the optimization and</span>
         <span class="c1"># convert it to a ``.mae`` file.</span>
-        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span>
-                                                          <span class="s1">&#39;.mae&#39;</span><span class="p">))</span>
+        <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">),</span>
+                            <span class="n">conformer</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">windows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">all_windows</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span> <span class="o">==</span>
-                               <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">windows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">all_windows</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span> <span class="o">==</span>
+                               <span class="n">mol</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;md&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">all_windows</span><span class="p">:</span>
-                    <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                                       <span class="n">logger</span><span class="p">,</span> <span class="n">md</span><span class="p">)</span>
+                    <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                                       <span class="n">macromodel_path</span><span class="p">,</span>
+                                       <span class="n">md</span><span class="p">,</span>
+                                       <span class="n">conformer</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="n">_ForceFieldError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="c1"># If OPLS_2005 has been tried already - record an exception.</span>
@@ -466,11 +481,14 @@
 
         <span class="c1"># If OPLSE_2005 has not been tried - try it.</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Minimization with OPLS3 failed on &quot;</span><span class="si">{}</span><span class="s1">&quot;. &#39;</span>
-                        <span class="s1">&#39;Trying OPLS_2005.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                        <span class="s1">&#39;Trying OPLS_2005.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
         <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;force_field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">14</span>
-        <span class="k">return</span> <span class="n">macromodel_cage_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                                   <span class="n">vals</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">macromodel_cage_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                                   <span class="n">macromodel_path</span><span class="p">,</span>
+                                   <span class="n">vals</span><span class="p">,</span>
+                                   <span class="n">md</span><span class="p">,</span>
+                                   <span class="n">conformer</span><span class="p">)</span>
 
     <span class="c1"># The &#39;lewis_fixed&#39; parameter should not be used by the user.</span>
     <span class="c1"># Sometimes the Lewis structure of `macro_mol` is wrong. If this is</span>
@@ -479,83 +497,83 @@
     <span class="c1"># tried to prevent infinite recursion.</span>
     <span class="k">except</span> <span class="n">_LewisStructureError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Attempting to fix Lewis &#39;</span>
-                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]:</span>
-            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
             <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="n">macromodel_cage_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
-                                       <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">macromodel_cage_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                                       <span class="n">macromodel_path</span><span class="p">,</span>
+                                       <span class="n">vals</span><span class="p">,</span>
+                                       <span class="n">md</span><span class="p">,</span>
+                                       <span class="n">conformer</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ex</span></div>
 
 
-<div class="viewcode-block" id="_macromodel_md_opt"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._macromodel_md_opt">[docs]</a><span class="k">def</span> <span class="nf">_macromodel_md_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span>
-                       <span class="n">logger</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{}):</span>
+<div class="viewcode-block" id="_macromodel_md_opt"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._macromodel_md_opt">[docs]</a><span class="k">def</span> <span class="nf">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                       <span class="n">macromodel_path</span><span class="p">,</span>
+                       <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Runs a MD conformer search on `macro_mol`.</span>
+<span class="sd">    Runs a MD conformer search on `mol`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule who&#39;s structure must be optimized.</span>
+<span class="sd">    mol : `.Molecule`</span>
+<span class="sd">        The molecule who&#39;s structure must be optimized.</span>
 
-<span class="sd">    macromodel_path : str</span>
-<span class="sd">        The full path of the ``Schrodinger`` suite within the user&#39;s</span>
-<span class="sd">        machine. For example, in a default Microsoft installation the</span>
-<span class="sd">        folder will probably be something like</span>
-<span class="sd">        ``C:\Program Files\Schrodinger2016-2``.</span>
+<span class="sd">    macromodel_path : :class:`str`</span>
+<span class="sd">        The full path of the Schrodinger suite within the user&#39;s</span>
+<span class="sd">        machine. For example, on a Linux machine this may be something</span>
+<span class="sd">        like ``&#39;/opt/schrodinger2017-2&#39;``.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    settings : dict (default = {})</span>
+<span class="sd">    settings : :class:`dict`, optional</span>
 <span class="sd">        Each key is a string describing an MD parameter. The value is</span>
 <span class="sd">        the corresponding value. Only values which need to be changed</span>
 <span class="sd">        from the default need to be specified. The allowed parameters</span>
 <span class="sd">        are:</span>
 
-<span class="sd">            &#39;timeout&#39; : float (default = 0)</span>
+<span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
 <span class="sd">                The amount in seconds the MD is allowed to run before</span>
-<span class="sd">                being terminated. 0 means there is no timeout.</span>
+<span class="sd">                being terminated. ``0`` means there is no timeout.</span>
 
-<span class="sd">            &#39;force_field&#39; : int (default = 16)</span>
+<span class="sd">            &#39;force_field&#39; : :class:``int (default = ``16``)</span>
 <span class="sd">                The number of the force field to be used.</span>
 
-<span class="sd">            &#39;temp&#39; : float (default = 300)</span>
+<span class="sd">            &#39;temp&#39; : :class:`float` (default = ``300``)</span>
 <span class="sd">                The temperature in Kelvin at which the MD is run.</span>
 
-<span class="sd">            &#39;confs&#39; : int (default = 50)</span>
+<span class="sd">            &#39;confs&#39; : :class:`int` (default = ``50``)</span>
 <span class="sd">                The number of conformers sampled and optimized from the</span>
 <span class="sd">                MD.</span>
 
-<span class="sd">            &#39;time_step&#39; : float (default = 1.0)</span>
-<span class="sd">                The time step in fs for the MD.</span>
+<span class="sd">            &#39;time_step&#39; : :class:`float` (default = ``1.0``)</span>
+<span class="sd">                The time step in ``fs`` for the MD.</span>
 
-<span class="sd">            &#39;eq_time&#39; : float (default = 10)</span>
-<span class="sd">                The equilibriation time in ps before the MD is run.</span>
+<span class="sd">            &#39;eq_time&#39; : :class:`float` (default = ``10``)</span>
+<span class="sd">                The equilibriation time in ``ps`` before the MD is run.</span>
 
-<span class="sd">            &#39;sim_time&#39; : float (default = 200)</span>
-<span class="sd">                The simulation time in ps of the MD.</span>
+<span class="sd">            &#39;sim_time&#39; : :class:`float` (default = ``200``)</span>
+<span class="sd">                The simulation time in ``ps`` of the MD.</span>
 
-<span class="sd">            &#39;max_iter&#39; : int (default = 2500)</span>
+<span class="sd">            &#39;max_iter&#39; : :class:`int` (default = ``2500``)</span>
 <span class="sd">                The maximum number of iterations done during the</span>
 <span class="sd">                optimization.</span>
 
-<span class="sd">            &#39;gradient&#39; : float (default = 0.05)</span>
+<span class="sd">            &#39;gradient&#39; : float (default = ``0.05``)</span>
 <span class="sd">                The gradient at which optimization is stopped.</span>
 
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.mol</span>
-<span class="sd">        The rdkit molecule held in this attribute is replaced by an</span>
-<span class="sd">        rdkit molecule with an optimized structure.</span>
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The id of the conformer to be optimized.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="n">vals</span> <span class="o">=</span> <span class="p">{</span>
                <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -577,22 +595,21 @@
     <span class="k">if</span> <span class="s1">&#39;lewis_fixed&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
         <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running MD on &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running MD on &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="s1">&#39;_file&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">))</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.mol&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
         <span class="c1"># First write a .mol file of the molecule.</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="c1"># MacroModel requires a ``.mae`` file as input. This creates a</span>
         <span class="c1"># ``.mae`` file holding the molecule.</span>
-        <span class="n">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">_create_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
         <span class="c1"># Generate the ``.com`` file for the MacroModel MD run.</span>
-        <span class="n">_generate_md_com</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="n">_generate_md_com</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
         <span class="c1"># Run the optimization.</span>
-        <span class="n">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
+        <span class="n">_run_bmin</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">])</span>
         <span class="c1"># Extract the lowest energy conformer into its own .mae file.</span>
-        <span class="n">conformer_mae</span> <span class="o">=</span> <span class="n">MAEExtractor</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">conformer_mae</span><span class="p">)</span>
+        <span class="n">conformer_mae</span> <span class="o">=</span> <span class="n">MAEExtractor</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">conformer_mae</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="n">_ForceFieldError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="c1"># If OPLS_2005 has been tried already - record an exception.</span>
@@ -600,11 +617,13 @@
             <span class="k">raise</span> <span class="n">ex</span>
         <span class="c1"># If OPLSE_2005 has not been tried - try it.</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Minimization with OPLS3 failed on &quot;</span><span class="si">{}</span><span class="s1">&quot;. &#39;</span>
-                        <span class="s1">&#39;Trying OPLS_2005.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                        <span class="s1">&#39;Trying OPLS_2005.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
         <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;force_field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">14</span>
-        <span class="k">return</span> <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span>
-                                  <span class="n">vals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                                  <span class="n">macromodel_path</span><span class="p">,</span>
+                                  <span class="n">vals</span><span class="p">,</span>
+                                  <span class="n">conformer</span><span class="p">)</span>
 
     <span class="c1"># The &#39;lewis_fixed&#39; parameter should not be used by the user.</span>
     <span class="c1"># Sometimes the Lewis structure of `macro_mol` is wrong. If this is</span>
@@ -613,17 +632,19 @@
     <span class="c1"># tried to prevent infinite recursion.</span>
     <span class="k">except</span> <span class="n">_LewisStructureError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span><span class="s1">&#39;Attempting to fix Lewis &#39;</span>
-                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+                        <span class="s1">&#39;structure of &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]:</span>
             <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;lewis_fixed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
-                                      <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+            <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+                                      <span class="n">macromodel_path</span><span class="p">,</span>
+                                      <span class="n">vals</span><span class="p">,</span>
+                                      <span class="n">conformer</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ex</span></div>
 
 
-<div class="viewcode-block" id="_run_bmin"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._run_bmin">[docs]</a><span class="k">def</span> <span class="nf">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="_run_bmin"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._run_bmin">[docs]</a><span class="k">def</span> <span class="nf">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running bmin on &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
@@ -687,11 +708,11 @@
     <span class="c1"># If optimization fails because the license is not found, rerun the</span>
     <span class="c1"># function.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">proc_out</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_run_bmin</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
 
     <span class="c1"># Make sure the .maegz file created by the optimization is present.</span>
     <span class="n">maegz</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;-out.maegz&#39;</span>
-    <span class="n">_wait_for_file</span><span class="p">(</span><span class="n">maegz</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="n">_wait_for_file</span><span class="p">(</span><span class="n">maegz</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">maegz</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">_OptimizationError</span><span class="p">((</span><span class="s1">&#39;The .log and/or .maegz &#39;</span>
                                   <span class="s1">&#39;files were not created by &#39;</span>
@@ -724,11 +745,11 @@
             <span class="k">break</span></div>
 
 
-<div class="viewcode-block" id="_run_applyhtreat"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._run_applyhtreat">[docs]</a><span class="k">def</span> <span class="nf">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_run_applyhtreat"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._run_applyhtreat">[docs]</a><span class="k">def</span> <span class="nf">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
     <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="n">mae</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mae&#39;</span>
     <span class="n">mae_out</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_htreated.mae&#39;</span>
-    <span class="n">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="n">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
 
     <span class="n">app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span> <span class="s1">&#39;utilities&#39;</span><span class="p">,</span> <span class="s1">&#39;applyhtreat&#39;</span><span class="p">)</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">mae_out</span><span class="p">]</span>
@@ -737,12 +758,12 @@
 
     <span class="c1"># If no license if found, keep re-running the function until it is.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_run_applyhtreat</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
 
     <span class="n">macro_mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mae_out</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_license_found"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._license_found">[docs]</a><span class="k">def</span> <span class="nf">_license_found</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">macro_mol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_license_found"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._license_found">[docs]</a><span class="k">def</span> <span class="nf">_license_found</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">mol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks to see if minimization failed due to a missing license.</span>
 
@@ -753,17 +774,17 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    output : str</span>
-<span class="sd">        The outout from submitting the minimization of the structure</span>
+<span class="sd">    output : :class:`str`</span>
+<span class="sd">        The output from submitting the minimization of the structure</span>
 <span class="sd">        to the ``bmin`` program.</span>
 
-<span class="sd">    macro_mol : MacroMolecule (default=None)</span>
-<span class="sd">        The macromolecule being optimized. If the .log file is not to</span>
+<span class="sd">    mol : :class:`.Molecule`, optional</span>
+<span class="sd">        The molecule being optimized. If the ``.log`` file is not to</span>
 <span class="sd">        be checked, the default ``None`` should be used.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    bool</span>
+<span class="sd">    :class:`bool`</span>
 <span class="sd">        ``True`` if the license was found. ``False`` if the</span>
 <span class="sd">        minimization did not occur due to a missing license.</span>
 
@@ -771,7 +792,7 @@
 
     <span class="k">if</span> <span class="s1">&#39;Could not check out a license for mmlibs&#39;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">mol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="c1"># To check if the log file mentions a missing license file open the</span>
@@ -779,7 +800,7 @@
 
     <span class="c1"># Check if the file exists first. If not, this is often means the</span>
     <span class="c1"># calculation must be redone so return False anyway.</span>
-    <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;mol&#39;</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">log_file_path</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;mol&#39;</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
         <span class="n">log_file_content</span> <span class="o">=</span> <span class="n">log_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
@@ -795,7 +816,7 @@
                                          <span class="n">arg5</span><span class="p">,</span> <span class="n">arg6</span><span class="p">,</span> <span class="n">arg7</span><span class="p">,</span> <span class="n">arg8</span><span class="p">,</span> <span class="n">arg9</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_generate_com"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._generate_com">[docs]</a><span class="k">def</span> <span class="nf">_generate_com</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_generate_com"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._generate_com">[docs]</a><span class="k">def</span> <span class="nf">_generate_com</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a ``.com`` file for a MacroModel optimization.</span>
 
@@ -805,35 +826,24 @@
 <span class="sd">    a bond added during assembly of the macromolecule.</span>
 
 <span class="sd">    This fixing is implemented by creating a ``.com`` file with various</span>
-<span class="sd">    ``FX`` commands written within its body.</span>
-
-<span class="sd">    This function is called by ``macromodel_opt``. It is private</span>
-<span class="sd">    because it should probably not be used outside of this context.</span>
+<span class="sd">    &quot;FX&quot; commands written within its body.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule which is to be optimized.</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule which is to be optimized.</span>
 
-<span class="sd">    settings : dict</span>
+<span class="sd">    settings : :class:`dict`</span>
 <span class="sd">        A dictionary of settings for the optimization. See</span>
-<span class="sd">        macromodel_opt() documentation.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    This function creates a new ``.com`` file holding the instructions</span>
-<span class="sd">    for optimizing the macromolecule using MacroModel.</span>
+<span class="sd">        :func:`macromodel_opt` documentation.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating .com file for &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating .com file for &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
     <span class="c1"># This is the body of the ``.com`` file. The line that begins and</span>
     <span class="c1"># ends with exclamation lines is replaced with the various commands</span>
@@ -854,14 +864,14 @@
     <span class="c1"># Create a path for the ``.com`` file. It is the same as that of</span>
     <span class="c1"># the structure file but with a ``.com`` extension. Get the path of</span>
     <span class="c1"># the ``.mae`` file and the output file in the same way.</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="n">com_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.com&#39;</span>
     <span class="n">mae</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mae&#39;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-out.maegz&#39;</span>
 
     <span class="c1"># This function adds all the lines which fix bond distances and</span>
     <span class="c1"># angles into ``main_string``.</span>
-    <span class="n">main_string</span> <span class="o">=</span> <span class="n">_fix_params_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">main_string</span><span class="p">,</span>
+    <span class="n">main_string</span> <span class="o">=</span> <span class="n">_fix_params_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">main_string</span><span class="p">,</span>
                                           <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;restricted&#39;</span><span class="p">])</span>
 
     <span class="c1"># Writes the ``.com`` file.</span>
@@ -877,7 +887,7 @@
         <span class="n">com</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">main_string</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_generate_md_com"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._generate_md_com">[docs]</a><span class="k">def</span> <span class="nf">_generate_md_com</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_generate_md_com"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._generate_md_com">[docs]</a><span class="k">def</span> <span class="nf">_generate_md_com</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating .com file for &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
 
     <span class="n">main_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
@@ -920,83 +930,64 @@
         <span class="n">com</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">main_string</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_create_mae"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._create_mae">[docs]</a><span class="k">def</span> <span class="nf">_create_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_create_mae"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._create_mae">[docs]</a><span class="k">def</span> <span class="nf">_create_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the ``.mae`` file holding the molecule to be optimized.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule which is to be optimized. Its molecular</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule which is to be optimized. Its molecular</span>
 <span class="sd">        structure file is converted to a ``.mae`` file. The original</span>
 <span class="sd">        file is also kept.</span>
 
-<span class="sd">    macromodel_path : str</span>
-<span class="sd">        The full path of the installation directory of the Schrodinger</span>
-<span class="sd">        suite. By default on a Windows machine it should be something</span>
-<span class="sd">        like: &quot;C:\Program Files\Schrodinger2016-2&quot;.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    This function creates a new ``.mae`` file from the structure file</span>
-<span class="sd">    in `macro_mol._file`. This new file is placed in the same</span>
-<span class="sd">    folder as the original file and has the same name. Only the</span>
-<span class="sd">    extensions are different.</span>
+<span class="sd">    macromodel_path : :class:`str`</span>
+<span class="sd">        The full path of the Schrodinger suite within the user&#39;s</span>
+<span class="sd">        machine. For example, on a Linux machine this may be something</span>
+<span class="sd">        like ``&#39;/opt/schrodinger2017-2&#39;``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        The full path of the newly created ``.mae`` file.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Converting </span><span class="si">{}</span><span class="s1"> of &quot;</span><span class="si">{}</span><span class="s1">&quot; to .mae.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                                  <span class="n">ext</span><span class="p">,</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Converting </span><span class="si">{ext}</span><span class="s1"> of &quot;</span><span class="si">{mol.name}</span><span class="s1">&quot; to .mae.&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create the name of the new ``.mae`` file. It is the same as the</span>
     <span class="c1"># original structure file, including the same path. Only the</span>
     <span class="c1"># extensions are different.</span>
-    <span class="n">mae_file</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">)</span>
-    <span class="n">_structconvert</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">mae_file</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="n">mae_file</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">)</span>
+    <span class="n">_structconvert</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="n">mae_file</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mae_file</span></div>
 
 
-<div class="viewcode-block" id="_convert_maegz_to_mae"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._convert_maegz_to_mae">[docs]</a><span class="k">def</span> <span class="nf">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_convert_maegz_to_mae"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._convert_maegz_to_mae">[docs]</a><span class="k">def</span> <span class="nf">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a ``.maegz`` file to a ``.mae`` file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule being optimized. The ``.maegz`` file holding</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule being optimized. The ``.maegz`` file holding</span>
 <span class="sd">        its optimized structure is converted to a ``.mae`` file. Both</span>
 <span class="sd">        versions are kept.</span>
 
-<span class="sd">    macromodel_path : str</span>
-<span class="sd">        The full path of the installation directory of the Schrodinger</span>
-<span class="sd">        suite. By default on a Windows machine it should be something</span>
-<span class="sd">        like: &quot;C:\Program Files\Schrodinger2016-2&quot;.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    This function creates a new ``.mae`` file from a ``.maegz`` file.</span>
-<span class="sd">    This new file is placed in the same folder as the ``.maegz`` file.</span>
+<span class="sd">    macromodel_path : :class:`str`</span>
+<span class="sd">        The full path of the Schrodinger suite within the user&#39;s</span>
+<span class="sd">        machine. For example, on a Linux machine this may be something</span>
+<span class="sd">        like ``&#39;/opt/schrodinger2017-2&#39;``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ForceFieldError</span>
+<span class="sd">    :class:`_ForceFieldError`</span>
 <span class="sd">        If the OPLS3 force field failed to optimize the molecule. If</span>
 <span class="sd">        this happens the conversion function is unable to convert the</span>
 <span class="sd">        output of the optimization function and as a result this error</span>
@@ -1004,17 +995,16 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Converting .maegz of &quot;</span><span class="si">{}</span><span class="s1">&quot; to .mae.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                                       <span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Converting .maegz of &quot;</span><span class="si">{mol.name}</span><span class="s1">&quot; to .mae.&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="c1"># ``out`` is the full path of the optimized ``.mae`` file.</span>
     <span class="n">maegz</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-out.maegz&#39;</span>
     <span class="c1"># Replace extensions to get the names of the various files.</span>
     <span class="n">mae</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mae&#39;</span>
-    <span class="k">return</span> <span class="n">_structconvert</span><span class="p">(</span><span class="n">maegz</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_structconvert</span><span class="p">(</span><span class="n">maegz</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_structconvert"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._structconvert">[docs]</a><span class="k">def</span> <span class="nf">_structconvert</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_structconvert"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._structconvert">[docs]</a><span class="k">def</span> <span class="nf">_structconvert</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
 
     <span class="n">convrt_app</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macromodel_path</span><span class="p">,</span> <span class="s1">&#39;utilities&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;structconvert&#39;</span><span class="p">)</span>
@@ -1035,13 +1025,13 @@
 
     <span class="c1"># If no license if found, keep re-running the function until it is.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_license_found</span><span class="p">(</span><span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_structconvert</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_structconvert</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="n">oname</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
 
     <span class="c1"># If force field failed, raise.</span>
     <span class="k">if</span> <span class="s1">&#39;number 1&#39;</span> <span class="ow">in</span> <span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_ForceFieldError</span><span class="p">(</span><span class="n">convrt_return</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
-    <span class="n">_wait_for_file</span><span class="p">(</span><span class="n">oname</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+    <span class="n">_wait_for_file</span><span class="p">(</span><span class="n">oname</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">oname</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">_ConversionError</span><span class="p">(</span>
          <span class="p">(</span><span class="s1">&#39;Conversion output file </span><span class="si">{}</span><span class="s1"> was not found.&#39;</span>
@@ -1051,35 +1041,32 @@
     <span class="k">return</span> <span class="n">convrt_return</span></div>
 
 
-<div class="viewcode-block" id="_fix_params_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_params_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_params_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">main_string</span><span class="p">,</span> <span class="n">restricted</span><span class="p">):</span>
+<div class="viewcode-block" id="_fix_params_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_params_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_params_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">main_string</span><span class="p">,</span> <span class="n">restricted</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds lines to the ``.com`` body fixing bond distances and angles.</span>
 
 <span class="sd">    For each bond distance, bond angle and torisional angle that does</span>
-<span class="sd">    not involve a bond created during assembly a ``FX`` command is</span>
+<span class="sd">    not involve a bond created during assembly a &quot;FX&quot; command is</span>
 <span class="sd">    added to the string holding holding the body of the ``.com`` file.</span>
 
 <span class="sd">    These lines replace the filler line in the main string.</span>
 
-<span class="sd">    This function is called by ``macromodel_opt``. It is private</span>
-<span class="sd">    because it should probably not be used outside of this context.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule which is to be optimized.</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule which is to be optimized.</span>
 
-<span class="sd">    main_string : str</span>
+<span class="sd">    main_string : :class:`str`</span>
 <span class="sd">        The body of the ``.com`` file which is to have fix commands</span>
 <span class="sd">        added.</span>
 
-<span class="sd">    restricted : bool (default = True)</span>
+<span class="sd">    restricted : :class:`bool`</span>
 <span class="sd">        When ``False`` the block containing instructions to fix</span>
-<span class="sd">        molecular parameters is not added to the .com file.</span>
+<span class="sd">        molecular parameters is not added to the ``.com`` file.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        A string holding the body of the ``.com`` file with</span>
 <span class="sd">        instructions to fix the various bond distances and angles as</span>
 <span class="sd">        described in the docstring.</span>
@@ -1094,17 +1081,17 @@
         <span class="k">return</span> <span class="n">main_string</span><span class="o">.</span><span class="n">replace</span><span class="p">((</span><span class="s2">&quot;!!!BLOCK_OF_FIXED_PARAMETERS_&quot;</span>
                                     <span class="s2">&quot;COMES_HERE!!!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">fix_block</span><span class="p">)</span>
     <span class="c1"># Add lines that fix the bond distance.</span>
-    <span class="n">fix_block</span> <span class="o">=</span> <span class="n">_fix_distance_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">)</span>
+    <span class="n">fix_block</span> <span class="o">=</span> <span class="n">_fix_distance_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">)</span>
     <span class="c1"># Add lines that fix the bond angles.</span>
-    <span class="n">fix_block</span> <span class="o">=</span> <span class="n">_fix_bond_angle_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">)</span>
+    <span class="n">fix_block</span> <span class="o">=</span> <span class="n">_fix_bond_angle_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">)</span>
     <span class="c1"># Add lines that fix the torsional angles.</span>
-    <span class="n">fix_block</span> <span class="o">=</span> <span class="n">_fix_torsional_angle_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">)</span>
+    <span class="n">fix_block</span> <span class="o">=</span> <span class="n">_fix_torsional_angle_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">main_string</span><span class="o">.</span><span class="n">replace</span><span class="p">((</span><span class="s2">&quot;!!!BLOCK_OF_FIXED_PARAMETERS_&quot;</span>
                                 <span class="s2">&quot;COMES_HERE!!!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">fix_block</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_fix_distance_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_distance_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_distance_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">):</span>
+<div class="viewcode-block" id="_fix_distance_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_distance_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_distance_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds lines fixing bond distances to ``.com`` body string.</span>
 
@@ -1113,16 +1100,16 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule to be optimized.</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule to be optimized.</span>
 
-<span class="sd">    fix_block : str</span>
+<span class="sd">    fix_block : :class:`str`</span>
 <span class="sd">        The string holding all the lines containing fix commands for</span>
 <span class="sd">        the ``.com`` file.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        A string holding lines containg fix commands for the ``.com``</span>
 <span class="sd">        file. The string has the lines fixing bond distances added to</span>
 <span class="sd">        it by this function.</span>
@@ -1134,12 +1121,12 @@
     <span class="c1"># If the bond does invovle two bonder atoms go to the next bond.</span>
     <span class="c1"># This is because a bond between 2 bonder atoms was added during</span>
     <span class="c1"># assembly and should therefore not be fixed.</span>
-    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
         <span class="n">atom1</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtom</span><span class="p">()</span>
         <span class="n">atom2</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtom</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="ow">and</span>
-           <span class="n">atom2</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="ow">and</span>
+           <span class="n">atom2</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
             <span class="k">continue</span>
 
         <span class="c1"># Make sure that the indices are increased by 1 in the .mae</span>
@@ -1152,7 +1139,7 @@
     <span class="k">return</span> <span class="n">fix_block</span></div>
 
 
-<div class="viewcode-block" id="_fix_bond_angle_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_bond_angle_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_bond_angle_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">):</span>
+<div class="viewcode-block" id="_fix_bond_angle_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_bond_angle_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_bond_angle_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds lines fixing bond angles to ``.com`` body string.</span>
 
@@ -1160,16 +1147,16 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule to be optimized.</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule to be optimized.</span>
 
-<span class="sd">    fix_block : str</span>
+<span class="sd">    fix_block : :class:`str`</span>
 <span class="sd">        The string holding all the lines containing fix commands for</span>
 <span class="sd">        the ``.com`` file.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        A string holding lines containg fix commands for the ``.com``</span>
 <span class="sd">        file. The string has the lines fixing bond angles added to it</span>
 <span class="sd">        by this function.</span>
@@ -1186,7 +1173,7 @@
     <span class="c1"># ``ba_atoms`` is a tuple of tuples of the form ((1,2,3), (4,5,6),</span>
     <span class="c1"># (7,8,9), ...). Each inner tuple holds the indicies of the atoms</span>
     <span class="c1"># which form a bond angle.</span>
-    <span class="n">ba_atoms</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">ba_mol</span><span class="p">)</span>
+    <span class="n">ba_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">ba_mol</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">atom_ids</span> <span class="ow">in</span> <span class="n">ba_atoms</span><span class="p">:</span>
         <span class="n">atom_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atom_ids</span><span class="p">]</span>
@@ -1196,24 +1183,24 @@
     <span class="k">return</span> <span class="n">fix_block</span></div>
 
 
-<div class="viewcode-block" id="_fix_torsional_angle_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_torsional_angle_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_torsional_angle_in_com_file</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">):</span>
+<div class="viewcode-block" id="_fix_torsional_angle_in_com_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._fix_torsional_angle_in_com_file">[docs]</a><span class="k">def</span> <span class="nf">_fix_torsional_angle_in_com_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">fix_block</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds lines fixing torsional bond angles to ``.com`` body string.</span>
 
-<span class="sd">    All torsional angles of the macromolecule are fixed.</span>
+<span class="sd">    All torsional angles of the molecule are fixed.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule to be optimized.</span>
+<span class="sd">    macro_mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule to be optimized.</span>
 
-<span class="sd">    fix_block : str</span>
+<span class="sd">    fix_block : :class:`str`</span>
 <span class="sd">        The string holding all the lines containing fix commands for</span>
 <span class="sd">        the ``.com`` file.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        A string holding lines containg fix commands for the ``.com``</span>
 <span class="sd">        file. The string has the lines fixing bond angles added to it</span>
 <span class="sd">        by this function.</span>
@@ -1230,7 +1217,7 @@
     <span class="c1"># ``ta_atoms`` as a tuple of tuples of the form ((1,2,3,4),</span>
     <span class="c1"># (4,5,6,7), ...). Each inner tuple holds the indicies of the atoms</span>
     <span class="c1"># which have a torsional angle.</span>
-    <span class="n">ta_atoms</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">ta_mol</span><span class="p">)</span>
+    <span class="n">ta_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">ta_mol</span><span class="p">)</span>
 
     <span class="c1"># Apply the fix.</span>
     <span class="k">for</span> <span class="n">atom_ids</span> <span class="ow">in</span> <span class="n">ta_atoms</span><span class="p">:</span>
@@ -1241,25 +1228,22 @@
     <span class="k">return</span> <span class="n">fix_block</span></div>
 
 
-<div class="viewcode-block" id="_wait_for_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._wait_for_file">[docs]</a><span class="k">def</span> <span class="nf">_wait_for_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="_wait_for_file"><a class="viewcode-back" href="../../../mtk.optimization.macromodel.html#mtk.optimization.macromodel._wait_for_file">[docs]</a><span class="k">def</span> <span class="nf">_wait_for_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stalls until a given file exists or `timeout` expires.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    file_name : str</span>
+<span class="sd">    file_name : :class:`str`</span>
 <span class="sd">        The full path of the file which should be waited for.</span>
 
-<span class="sd">    logger : FakeLogger or logging.Logger</span>
-<span class="sd">        Used for logging.</span>
-
-<span class="sd">    timeout : int or float</span>
+<span class="sd">    timeout : :class:`int` or :class:`float`, optional</span>
 <span class="sd">        The number of seconds before the function stops waiting and</span>
 <span class="sd">        returns.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    --------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

@@ -44,10 +44,10 @@ class _LewisStructureError(Exception):
         self.message = message
 
 
-def macromodel_opt(macro_mol,
+def macromodel_opt(mol,
                    macromodel_path,
-                   settings={},
-                   md={},
+                   settings=None,
+                   md=None,
                    conformer=-1):
     """
     Optimizes the molecule using MacroModel.
@@ -58,68 +58,68 @@ def macromodel_opt(macro_mol,
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure must be optimized.
+    mol : `.Molecule`
+        The molecule who's structure must be optimized.
 
-    macromodel_path : str
-        The full path of the ``Schrodinger`` suite within the user's
-        machine. For example, in a default Microsoft installation the
-        folder will probably be something like
-        ``C:\Program Files\Schrodinger2016-2``.
+    macromodel_path : :class:`str`
+        The full path of the Schrodinger suite within the user's
+        machine. For example, on a Linux machine this may be something
+        like ``'/opt/schrodinger2017-2'``.
 
-    settings : dict (default = {})
+    settings : :class:`dict`, optional
         A dictionary which maps the names of optimization parameters to
         their values. Valid values are:
 
-            'restricted' : bool (default = True)
-                If False then all bonds are optimized, not just the
+            'restricted' : :class:`bool` (default = ``True``)
+                If ``False`` then all bonds are optimized, not just the
                 ones created during macromolecular assembly.
 
-            'timeout' : float (default = 0)
+            'timeout' : :class:`float` (default = ``0``)
                 The amount in seconds the optimization is allowed to
-                run before being terminated. 0 means there is no
+                run before being terminated. ``0`` means there is no
                 timeout.
 
-            'force_field' : int (default = 16)
+            'force_field' : :class:`int` (default = ``16``)
                 The number of the force field to be used.
 
-            'max_iter' : int (default = 2500)
+            'max_iter' : :class:`int` (default = ``2500``)
                 The maximum number of iterations done during the
                 optimization.
 
-            'gradient' : float (default = 0.05)
+            'gradient' : :class:`float` (default = ``0.05``)
                 The gradient at which optimization is stopped.
 
-            'md' : bool (default=False)
+            'md' : :class:`bool` (default = ``False``)
                 Toggles whether a MD conformer search should be
                 performed.
 
         Only values which need to be changed from the default need to
-        be specified. For exmaple:
+        be specified. For exmaple,
+
+        .. code-block:: python
 
             macromodel_opt(mol, 'path', {'max_iter' : 10})
 
 
-    md : dict (default = {})
+    md : :class:`dict`, optional
         A dictionary holding settings for the MD conformer search.
         This parameter is used in the same way as `settings` except
         the values effect the MD only. See docstring of
-        macromodel_md_opt() for valid values.
+        :func:`_macromodel_md_opt` for valid values.
 
     conformer : :class:`int`, optional
         The id of the conformer to be optimized.
 
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute is replaced by an
-        rdkit molecule with an optimized structure.
-
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
+
+    if settings is None:
+        settings = {}
+    if md is None:
+        md = {}
 
     vals = {
              'restricted': True,
@@ -138,25 +138,24 @@ def macromodel_opt(macro_mol,
         vals['lewis_fixed'] = False
 
     try:
-        macro_mol._file = '{}.mol'.format(uuid4().int)
+        mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
-        macro_mol.write(macro_mol._file, conformer)
+        mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
-        _create_mae(macro_mol, macromodel_path)
+        _create_mae(mol, macromodel_path)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(macro_mol, vals)
+        _generate_com(mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
+        _run_bmin(mol, macromodel_path, vals['timeout'])
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(macro_mol, macromodel_path)
-        macro_mol.update_from_mae(macro_mol._file.replace('.mol',
-                                                          '.mae'),
-                                  conformer)
+        _convert_maegz_to_mae(mol, macromodel_path)
+        mol.update_from_mae(mol._file.replace('.mol', '.mae'),
+                            conformer)
 
         if vals['md']:
-            _macromodel_md_opt(macro_mol,
+            _macromodel_md_opt(mol,
                                macromodel_path,
                                md,
                                conformer)
@@ -168,10 +167,10 @@ def macromodel_opt(macro_mol,
 
         # If OPLSE_2005 has not been tried - try it.
         logger.warning(('Minimization with OPLS3 failed on "{}". '
-                        'Trying OPLS_2005.').format(macro_mol.name))
+                        'Trying OPLS_2005.').format(mol.name))
 
         vals['force_field'] = 14
-        return macromodel_opt(macro_mol,
+        return macromodel_opt(mol,
                               macromodel_path,
                               vals,
                               md,
@@ -184,11 +183,11 @@ def macromodel_opt(macro_mol,
     # tried to prevent infinite recursion.
     except _LewisStructureError as ex:
         logger.warning(('Attempting to fix Lewis '
-                        'structure of "{}".'.format(macro_mol.name)))
+                        'structure of "{}".'.format(mol.name)))
         if not vals['lewis_fixed']:
-            _run_applyhtreat(macro_mol, macromodel_path)
+            _run_applyhtreat(mol, macromodel_path)
             vals['lewis_fixed'] = True
-            return macromodel_opt(macro_mol,
+            return macromodel_opt(mol,
                                   macromodel_path,
                                   vals,
                                   md,
@@ -197,10 +196,10 @@ def macromodel_opt(macro_mol,
             raise ex
 
 
-def macromodel_cage_opt(macro_mol,
+def macromodel_cage_opt(mol,
                         macromodel_path,
-                        settings={},
-                        md={},
+                        settings=None,
+                        md=None,
                         conformer=-1):
     """
     Optimizes the molecule using MacroModel.
@@ -216,68 +215,68 @@ def macromodel_cage_opt(macro_mol,
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure must be optimized.
+    mol : `.Molecule`
+        The molecule who's structure must be optimized.
 
-    macromodel_path : str
-        The full path of the ``Schrodinger`` suite within the user's
-        machine. For example, in a default Microsoft installation the
-        folder will probably be something like
-        ``C:\Program Files\Schrodinger2016-2``.
+    macromodel_path : :class:`str`
+        The full path of the Schrodinger suite within the user's
+        machine. For example, on a Linux machine this may be something
+        like ``'/opt/schrodinger2017-2'``.
 
-    settings : dict (default = {})
+    settings : :class:`dict`, optional
         A dictionary which maps the names of optimization parameters to
         their values. Valid values are:
 
-            'restricted' : bool (default = True)
-                If False then all bonds are optimized, not just the
+            'restricted' : :class:`bool` (default = ``True``)
+                If ``False`` then all bonds are optimized, not just the
                 ones created during macromolecular assembly.
 
-            'timeout' : float (default = 0)
+            'timeout' : :class:`float` (default = ``0``)
                 The amount in seconds the optimization is allowed to
-                run before being terminated. 0 means there is no
+                run before being terminated. ``0`` means there is no
                 timeout.
 
-            'force_field' : int (default = 16)
+            'force_field' : :class:`int` (default = ``16``)
                 The number of the force field to be used.
 
-            'max_iter' : int (default = 2500)
+            'max_iter' : :class:`int` (default = ``2500``)
                 The maximum number of iterations done during the
                 optimization.
 
-            'gradient' : float (default = 0.05)
+            'gradient' : :class:`float` (default = ``0.05``)
                 The gradient at which optimization is stopped.
 
-            'md' : bool (default=False)
+            'md' : :class:`bool` (default = ``False``)
                 Toggles whether a MD conformer search should be
                 performed.
 
         Only values which need to be changed from the default need to
-        be specified. For exmaple:
+        be specified. For exmaple,
+
+        .. code-block:: python
 
             macromodel_opt(mol, 'path', {'max_iter' : 10})
 
 
-    md : dict (default = {})
+    md : :class:`dict`, optional
         A dictionary holding settings for the MD conformer search.
         This parameter is used in the same way as `settings` except
         the values effect the MD only. See docstring of
-        macromodel_md_opt() for valid values.
+        :func:`_macromodel_md_opt` for valid values.
 
     conformer : :class:`int`, optional
         The id of the conformer to be optimized.
 
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute is replaced by an
-        rdkit molecule with an optimized structure.
-
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
+
+    if settings is None:
+        settings = {}
+    if md is None:
+        md = {}
 
     vals = {
              'restricted': True,
@@ -296,31 +295,30 @@ def macromodel_cage_opt(macro_mol,
         vals['lewis_fixed'] = False
 
     try:
-        macro_mol._file = '{}.mol'.format(uuid4().int)
+        mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
-        macro_mol.write(macro_mol._file, conformer)
+        mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
-        _create_mae(macro_mol, macromodel_path)
+        _create_mae(mol, macromodel_path)
         # generate the ``.com`` file for the MacroModel run.
-        _generate_com(macro_mol, vals)
+        _generate_com(mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
+        _run_bmin(mol, macromodel_path, vals['timeout'])
         # Get the ``.maegz`` file output from the optimization and
         # convert it to a ``.mae`` file.
-        _convert_maegz_to_mae(macro_mol, macromodel_path)
-        macro_mol.update_from_mae(macro_mol._file.replace('.mol',
-                                                          '.mae'),
-                                  conformer)
+        _convert_maegz_to_mae(mol, macromodel_path)
+        mol.update_from_mae(mol._file.replace('.mol', '.mae'),
+                            conformer)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            if macro_mol.windows is not None:
-                all_windows = (len(macro_mol.windows) ==
-                               macro_mol.topology.n_windows)
+            if mol.windows is not None:
+                all_windows = (len(mol.windows) ==
+                               mol.topology.n_windows)
 
                 if vals['md'] and all_windows:
-                    _macromodel_md_opt(macro_mol,
+                    _macromodel_md_opt(mol,
                                        macromodel_path,
                                        md,
                                        conformer)
@@ -332,10 +330,10 @@ def macromodel_cage_opt(macro_mol,
 
         # If OPLSE_2005 has not been tried - try it.
         logger.warning(('Minimization with OPLS3 failed on "{}". '
-                        'Trying OPLS_2005.').format(macro_mol.name))
+                        'Trying OPLS_2005.').format(mol.name))
 
         vals['force_field'] = 14
-        return macromodel_cage_opt(macro_mol,
+        return macromodel_cage_opt(mol,
                                    macromodel_path,
                                    vals,
                                    md,
@@ -348,11 +346,11 @@ def macromodel_cage_opt(macro_mol,
     # tried to prevent infinite recursion.
     except _LewisStructureError as ex:
         logger.warning(('Attempting to fix Lewis '
-                        'structure of "{}".'.format(macro_mol.name)))
+                        'structure of "{}".'.format(mol.name)))
         if not vals['lewis_fixed']:
-            _run_applyhtreat(macro_mol, macromodel_path)
+            _run_applyhtreat(mol, macromodel_path)
             vals['lewis_fixed'] = True
-            return macromodel_cage_opt(macro_mol,
+            return macromodel_cage_opt(mol,
                                        macromodel_path,
                                        vals,
                                        md,
@@ -361,74 +359,70 @@ def macromodel_cage_opt(macro_mol,
             raise ex
 
 
-def _macromodel_md_opt(macro_mol,
+def _macromodel_md_opt(mol,
                        macromodel_path,
-                       settings={},
+                       settings=None,
                        conformer=-1):
     """
-    Runs a MD conformer search on `macro_mol`.
+    Runs a MD conformer search on `mol`.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule who's structure must be optimized.
+    mol : `.Molecule`
+        The molecule who's structure must be optimized.
 
-    macromodel_path : str
-        The full path of the ``Schrodinger`` suite within the user's
-        machine. For example, in a default Microsoft installation the
-        folder will probably be something like
-        ``C:\Program Files\Schrodinger2016-2``.
+    macromodel_path : :class:`str`
+        The full path of the Schrodinger suite within the user's
+        machine. For example, on a Linux machine this may be something
+        like ``'/opt/schrodinger2017-2'``.
 
-    settings : dict (default = {})
+    settings : :class:`dict`, optional
         Each key is a string describing an MD parameter. The value is
         the corresponding value. Only values which need to be changed
         from the default need to be specified. The allowed parameters
         are:
 
-            'timeout' : float (default = 0)
+            'timeout' : :class:`float` (default = ``0``)
                 The amount in seconds the MD is allowed to run before
-                being terminated. 0 means there is no timeout.
+                being terminated. ``0`` means there is no timeout.
 
-            'force_field' : int (default = 16)
+            'force_field' : :class:``int (default = ``16``)
                 The number of the force field to be used.
 
-            'temp' : float (default = 300)
+            'temp' : :class:`float` (default = ``300``)
                 The temperature in Kelvin at which the MD is run.
 
-            'confs' : int (default = 50)
+            'confs' : :class:`int` (default = ``50``)
                 The number of conformers sampled and optimized from the
                 MD.
 
-            'time_step' : float (default = 1.0)
-                The time step in fs for the MD.
+            'time_step' : :class:`float` (default = ``1.0``)
+                The time step in ``fs`` for the MD.
 
-            'eq_time' : float (default = 10)
-                The equilibriation time in ps before the MD is run.
+            'eq_time' : :class:`float` (default = ``10``)
+                The equilibriation time in ``ps`` before the MD is run.
 
-            'sim_time' : float (default = 200)
-                The simulation time in ps of the MD.
+            'sim_time' : :class:`float` (default = ``200``)
+                The simulation time in ``ps`` of the MD.
 
-            'max_iter' : int (default = 2500)
+            'max_iter' : :class:`int` (default = ``2500``)
                 The maximum number of iterations done during the
                 optimization.
 
-            'gradient' : float (default = 0.05)
+            'gradient' : float (default = ``0.05``)
                 The gradient at which optimization is stopped.
 
     conformer : :class:`int`, optional
         The id of the conformer to be optimized.
 
-    Modifies
-    --------
-    macro_mol.mol
-        The rdkit molecule held in this attribute is replaced by an
-        rdkit molecule with an optimized structure.
-
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
+
+    if settings is None:
+        settings = {}
 
     vals = {
                'timeout': 0,
@@ -450,21 +444,21 @@ def _macromodel_md_opt(macro_mol,
     if 'lewis_fixed' not in vals:
         vals['lewis_fixed'] = False
 
-    logger.info('Running MD on "{}".'.format(macro_mol.name))
+    logger.info('Running MD on "{}".'.format(mol.name))
     try:
-        macro_mol._file = '{}.mol'.format(uuid4().int)
+        mol._file = '{}.mol'.format(uuid4().int)
         # First write a .mol file of the molecule.
-        macro_mol.write(macro_mol._file, conformer)
+        mol.write(mol._file, conformer)
         # MacroModel requires a ``.mae`` file as input. This creates a
         # ``.mae`` file holding the molecule.
-        _create_mae(macro_mol, macromodel_path)
+        _create_mae(mol, macromodel_path)
         # Generate the ``.com`` file for the MacroModel MD run.
-        _generate_md_com(macro_mol, vals)
+        _generate_md_com(mol, vals)
         # Run the optimization.
-        _run_bmin(macro_mol, macromodel_path, vals['timeout'])
+        _run_bmin(mol, macromodel_path, vals['timeout'])
         # Extract the lowest energy conformer into its own .mae file.
-        conformer_mae = MAEExtractor(macro_mol._file).path
-        macro_mol.update_from_mae(conformer_mae, conformer)
+        conformer_mae = MAEExtractor(mol._file).path
+        mol.update_from_mae(conformer_mae, conformer)
 
     except _ForceFieldError as ex:
         # If OPLS_2005 has been tried already - record an exception.
@@ -472,10 +466,10 @@ def _macromodel_md_opt(macro_mol,
             raise ex
         # If OPLSE_2005 has not been tried - try it.
         logger.warning(('Minimization with OPLS3 failed on "{}". '
-                        'Trying OPLS_2005.').format(macro_mol.name))
+                        'Trying OPLS_2005.').format(mol.name))
 
         vals['force_field'] = 14
-        return _macromodel_md_opt(macro_mol,
+        return _macromodel_md_opt(mol,
                                   macromodel_path,
                                   vals,
                                   conformer)
@@ -487,11 +481,11 @@ def _macromodel_md_opt(macro_mol,
     # tried to prevent infinite recursion.
     except _LewisStructureError as ex:
         logger.warning(('Attempting to fix Lewis '
-                        'structure of "{}".'.format(macro_mol.name)))
+                        'structure of "{}".'.format(mol.name)))
         if not vals['lewis_fixed']:
             vals['lewis_fixed'] = True
-            _run_applyhtreat(macro_mol, macromodel_path)
-            return _macromodel_md_opt(macro_mol,
+            _run_applyhtreat(mol, macromodel_path)
+            return _macromodel_md_opt(mol,
                                       macromodel_path,
                                       vals,
                                       conformer)
@@ -618,7 +612,7 @@ def _run_applyhtreat(macro_mol, macromodel_path):
     macro_mol.update_from_mae(mae_out)
 
 
-def _license_found(output, macro_mol=None):
+def _license_found(output, mol=None):
     """
     Checks to see if minimization failed due to a missing license.
 
@@ -629,17 +623,17 @@ def _license_found(output, macro_mol=None):
 
     Parameters
     ----------
-    output : str
-        The outout from submitting the minimization of the structure
+    output : :class:`str`
+        The output from submitting the minimization of the structure
         to the ``bmin`` program.
 
-    macro_mol : MacroMolecule (default=None)
-        The macromolecule being optimized. If the .log file is not to
+    mol : :class:`.Molecule`, optional
+        The molecule being optimized. If the ``.log`` file is not to
         be checked, the default ``None`` should be used.
 
     Returns
     -------
-    bool
+    :class:`bool`
         ``True`` if the license was found. ``False`` if the
         minimization did not occur due to a missing license.
 
@@ -647,7 +641,7 @@ def _license_found(output, macro_mol=None):
 
     if 'Could not check out a license for mmlibs' in output:
         return False
-    if macro_mol is None:
+    if mol is None:
         return True
 
     # To check if the log file mentions a missing license file open the
@@ -655,7 +649,7 @@ def _license_found(output, macro_mol=None):
 
     # Check if the file exists first. If not, this is often means the
     # calculation must be redone so return False anyway.
-    log_file_path = macro_mol._file.replace('mol', 'log')
+    log_file_path = mol._file.replace('mol', 'log')
     with open(log_file_path, 'r') as log_file:
         log_file_content = log_file.read()
 
@@ -671,7 +665,7 @@ def _com_line(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9):
                                          arg5, arg6, arg7, arg8, arg9)
 
 
-def _generate_com(macro_mol, settings):
+def _generate_com(mol, settings):
     """
     Create a ``.com`` file for a MacroModel optimization.
 
@@ -681,32 +675,24 @@ def _generate_com(macro_mol, settings):
     a bond added during assembly of the macromolecule.
 
     This fixing is implemented by creating a ``.com`` file with various
-    ``FX`` commands written within its body.
-
-    This function is called by ``macromodel_opt``. It is private
-    because it should probably not be used outside of this context.
+    "FX" commands written within its body.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule which is to be optimized.
+    mol : :class:`.Molecule`
+        The molecule which is to be optimized.
 
-    settings : dict
+    settings : :class:`dict`
         A dictionary of settings for the optimization. See
-        macromodel_opt() documentation.
-
-    Modifies
-    --------
-    This function creates a new ``.com`` file holding the instructions
-    for optimizing the macromolecule using MacroModel.
+        :func:`macromodel_opt` documentation.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
-    logger.debug('Creating .com file for "{}".'.format(macro_mol.name))
+    logger.debug('Creating .com file for "{}".'.format(mol.name))
 
     # This is the body of the ``.com`` file. The line that begins and
     # ends with exclamation lines is replaced with the various commands
@@ -727,14 +713,14 @@ def _generate_com(macro_mol, settings):
     # Create a path for the ``.com`` file. It is the same as that of
     # the structure file but with a ``.com`` extension. Get the path of
     # the ``.mae`` file and the output file in the same way.
-    name, ext = os.path.splitext(macro_mol._file)
+    name, ext = os.path.splitext(mol._file)
     com_file = name + '.com'
     mae = name + '.mae'
     output = name + '-out.maegz'
 
     # This function adds all the lines which fix bond distances and
     # angles into ``main_string``.
-    main_string = _fix_params_in_com_file(macro_mol, main_string,
+    main_string = _fix_params_in_com_file(mol, main_string,
                                           settings['restricted'])
 
     # Writes the ``.com`` file.
@@ -793,77 +779,64 @@ def _generate_md_com(macro_mol, settings):
         com.write(main_string)
 
 
-def _create_mae(macro_mol, macromodel_path):
+def _create_mae(mol, macromodel_path):
     """
     Creates the ``.mae`` file holding the molecule to be optimized.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule which is to be optimized. Its molecular
+    mol : :class:`.Molecule`
+        The molecule which is to be optimized. Its molecular
         structure file is converted to a ``.mae`` file. The original
         file is also kept.
 
-    macromodel_path : str
-        The full path of the installation directory of the Schrodinger
-        suite. By default on a Windows machine it should be something
-        like: "C:\Program Files\Schrodinger2016-2".
-
-    Modifies
-    --------
-    This function creates a new ``.mae`` file from the structure file
-    in `macro_mol._file`. This new file is placed in the same
-    folder as the original file and has the same name. Only the
-    extensions are different.
+    macromodel_path : :class:`str`
+        The full path of the Schrodinger suite within the user's
+        machine. For example, on a Linux machine this may be something
+        like ``'/opt/schrodinger2017-2'``.
 
     Returns
     -------
-    str
+    :class:`str`
         The full path of the newly created ``.mae`` file.
 
     """
 
-    _, ext = os.path.splitext(macro_mol._file)
+    _, ext = os.path.splitext(mol._file)
 
-    logger.debug('Converting {} of "{}" to .mae.'.format(
-                                                  ext, macro_mol.name))
+    logger.debug(f'Converting {ext} of "{mol.name}" to .mae.')
 
     # Create the name of the new ``.mae`` file. It is the same as the
     # original structure file, including the same path. Only the
     # extensions are different.
-    mae_file = macro_mol._file.replace(ext, '.mae')
-    _structconvert(macro_mol._file, mae_file, macromodel_path)
+    mae_file = mol._file.replace(ext, '.mae')
+    _structconvert(mol._file, mae_file, macromodel_path)
     return mae_file
 
 
-def _convert_maegz_to_mae(macro_mol, macromodel_path):
+def _convert_maegz_to_mae(mol, macromodel_path):
     """
     Converts a ``.maegz`` file to a ``.mae`` file.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule being optimized. The ``.maegz`` file holding
+    mol : :class:`.Molecule`
+        The molecule being optimized. The ``.maegz`` file holding
         its optimized structure is converted to a ``.mae`` file. Both
         versions are kept.
 
-    macromodel_path : str
-        The full path of the installation directory of the Schrodinger
-        suite. By default on a Windows machine it should be something
-        like: "C:\Program Files\Schrodinger2016-2".
-
-    Modifies
-    --------
-    This function creates a new ``.mae`` file from a ``.maegz`` file.
-    This new file is placed in the same folder as the ``.maegz`` file.
+    macromodel_path : :class:`str`
+        The full path of the Schrodinger suite within the user's
+        machine. For example, on a Linux machine this may be something
+        like ``'/opt/schrodinger2017-2'``.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     Raises
     ------
-    ForceFieldError
+    :class:`_ForceFieldError`
         If the OPLS3 force field failed to optimize the molecule. If
         this happens the conversion function is unable to convert the
         output of the optimization function and as a result this error
@@ -871,9 +844,8 @@ def _convert_maegz_to_mae(macro_mol, macromodel_path):
 
     """
 
-    logger.debug('Converting .maegz of "{}" to .mae.'.format(
-                                                       macro_mol.name))
-    name, ext = os.path.splitext(macro_mol._file)
+    logger.debug(f'Converting .maegz of "{mol.name}" to .mae.')
+    name, ext = os.path.splitext(mol._file)
     # ``out`` is the full path of the optimized ``.mae`` file.
     maegz = name + '-out.maegz'
     # Replace extensions to get the names of the various files.
@@ -918,35 +890,32 @@ def _structconvert(iname, oname, macromodel_path):
     return convrt_return
 
 
-def _fix_params_in_com_file(macro_mol, main_string, restricted):
+def _fix_params_in_com_file(mol, main_string, restricted):
     """
     Adds lines to the ``.com`` body fixing bond distances and angles.
 
     For each bond distance, bond angle and torisional angle that does
-    not involve a bond created during assembly a ``FX`` command is
+    not involve a bond created during assembly a "FX" command is
     added to the string holding holding the body of the ``.com`` file.
 
     These lines replace the filler line in the main string.
 
-    This function is called by ``macromodel_opt``. It is private
-    because it should probably not be used outside of this context.
-
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule which is to be optimized.
+    mol : :class:`.Molecule`
+        The molecule which is to be optimized.
 
-    main_string : str
+    main_string : :class:`str`
         The body of the ``.com`` file which is to have fix commands
         added.
 
-    restricted : bool (default = True)
+    restricted : :class:`bool`
         When ``False`` the block containing instructions to fix
-        molecular parameters is not added to the .com file.
+        molecular parameters is not added to the ``.com`` file.
 
     Returns
     -------
-    str
+    :class:`str`
         A string holding the body of the ``.com`` file with
         instructions to fix the various bond distances and angles as
         described in the docstring.
@@ -961,17 +930,17 @@ def _fix_params_in_com_file(macro_mol, main_string, restricted):
         return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                     "COMES_HERE!!!\n"), fix_block)
     # Add lines that fix the bond distance.
-    fix_block = _fix_distance_in_com_file(macro_mol, fix_block)
+    fix_block = _fix_distance_in_com_file(mol, fix_block)
     # Add lines that fix the bond angles.
-    fix_block = _fix_bond_angle_in_com_file(macro_mol, fix_block)
+    fix_block = _fix_bond_angle_in_com_file(mol, fix_block)
     # Add lines that fix the torsional angles.
-    fix_block = _fix_torsional_angle_in_com_file(macro_mol, fix_block)
+    fix_block = _fix_torsional_angle_in_com_file(mol, fix_block)
 
     return main_string.replace(("!!!BLOCK_OF_FIXED_PARAMETERS_"
                                 "COMES_HERE!!!\n"), fix_block)
 
 
-def _fix_distance_in_com_file(macro_mol, fix_block):
+def _fix_distance_in_com_file(mol, fix_block):
     """
     Adds lines fixing bond distances to ``.com`` body string.
 
@@ -980,16 +949,16 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule to be optimized.
+    mol : :class:`.Molecule`
+        The molecule to be optimized.
 
-    fix_block : str
+    fix_block : :class:`str`
         The string holding all the lines containing fix commands for
         the ``.com`` file.
 
     Returns
     -------
-    str
+    :class:`str`
         A string holding lines containg fix commands for the ``.com``
         file. The string has the lines fixing bond distances added to
         it by this function.
@@ -1001,12 +970,12 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
     # If the bond does invovle two bonder atoms go to the next bond.
     # This is because a bond between 2 bonder atoms was added during
     # assembly and should therefore not be fixed.
-    for bond in macro_mol.mol.GetBonds():
+    for bond in mol.mol.GetBonds():
         atom1 = bond.GetBeginAtom()
         atom2 = bond.GetEndAtom()
 
-        if (atom1.GetIdx() in macro_mol.bonder_ids and
-           atom2.GetIdx() in macro_mol.bonder_ids):
+        if (atom1.GetIdx() in mol.bonder_ids and
+           atom2.GetIdx() in mol.bonder_ids):
             continue
 
         # Make sure that the indices are increased by 1 in the .mae
@@ -1019,7 +988,7 @@ def _fix_distance_in_com_file(macro_mol, fix_block):
     return fix_block
 
 
-def _fix_bond_angle_in_com_file(macro_mol, fix_block):
+def _fix_bond_angle_in_com_file(mol, fix_block):
     """
     Adds lines fixing bond angles to ``.com`` body string.
 
@@ -1027,16 +996,16 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule to be optimized.
+    mol : :class:`.Molecule`
+        The molecule to be optimized.
 
-    fix_block : str
+    fix_block : :class:`str`
         The string holding all the lines containing fix commands for
         the ``.com`` file.
 
     Returns
     -------
-    str
+    :class:`str`
         A string holding lines containg fix commands for the ``.com``
         file. The string has the lines fixing bond angles added to it
         by this function.
@@ -1053,7 +1022,7 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     # ``ba_atoms`` is a tuple of tuples of the form ((1,2,3), (4,5,6),
     # (7,8,9), ...). Each inner tuple holds the indicies of the atoms
     # which form a bond angle.
-    ba_atoms = macro_mol.mol.GetSubstructMatches(ba_mol)
+    ba_atoms = mol.mol.GetSubstructMatches(ba_mol)
 
     for atom_ids in ba_atoms:
         atom_ids = [i+1 for i in atom_ids]
@@ -1063,24 +1032,24 @@ def _fix_bond_angle_in_com_file(macro_mol, fix_block):
     return fix_block
 
 
-def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
+def _fix_torsional_angle_in_com_file(mol, fix_block):
     """
     Adds lines fixing torsional bond angles to ``.com`` body string.
 
-    All torsional angles of the macromolecule are fixed.
+    All torsional angles of the molecule are fixed.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule to be optimized.
+    macro_mol : :class:`.Molecule`
+        The molecule to be optimized.
 
-    fix_block : str
+    fix_block : :class:`str`
         The string holding all the lines containing fix commands for
         the ``.com`` file.
 
     Returns
     -------
-    str
+    :class:`str`
         A string holding lines containg fix commands for the ``.com``
         file. The string has the lines fixing bond angles added to it
         by this function.
@@ -1097,7 +1066,7 @@ def _fix_torsional_angle_in_com_file(macro_mol, fix_block):
     # ``ta_atoms`` as a tuple of tuples of the form ((1,2,3,4),
     # (4,5,6,7), ...). Each inner tuple holds the indicies of the atoms
     # which have a torsional angle.
-    ta_atoms = macro_mol.mol.GetSubstructMatches(ta_mol)
+    ta_atoms = mol.mol.GetSubstructMatches(ta_mol)
 
     # Apply the fix.
     for atom_ids in ta_atoms:
@@ -1114,16 +1083,16 @@ def _wait_for_file(file_name, timeout=10):
 
     Parameters
     ----------
-    file_name : str
+    file_name : :class:`str`
         The full path of the file which should be waited for.
 
-    timeout : int or float
+    timeout : :class:`int` or :class:`float`, optional
         The number of seconds before the function stops waiting and
         returns.
 
     Returns
     --------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 

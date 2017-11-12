@@ -87,7 +87,7 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">mtk.optimization.optimization module</a><ul>
-<li><a class="reference internal" href="#extending-mmea-adding-optimization-functions">Extending MMEA: Adding optimization functions</a></li>
+<li><a class="reference internal" href="#extending-mtk-adding-optimization-functions">Extending mtk: Adding optimization functions.</a></li>
 </ul>
 </li>
 </ul>
@@ -156,43 +156,31 @@
   <div class="section" id="module-mtk.optimization.optimization">
 <span id="mtk-optimization-optimization-module"></span><h1>mtk.optimization.optimization module<a class="headerlink" href="#module-mtk.optimization.optimization" title="Permalink to this headline">¶</a></h1>
 <p>Defines optimization functions.</p>
-<div class="section" id="extending-mmea-adding-optimization-functions">
-<h2>Extending MMEA: Adding optimization functions<a class="headerlink" href="#extending-mmea-adding-optimization-functions" title="Permalink to this headline">¶</a></h2>
-<p>New optimization functions are added by writing them into this module.
-The only requirement is that the first argument is <code class="docutils literal"><span class="pre">mol</span></code> and
-there is a keyword argument <code class="docutils literal"><span class="pre">logger</span></code>. This allows users to identify
-which arguments are handled automatically by MMEA and which need to be
-defined in the input file. The convention is that if the optimization
-function takes the arguments <code class="docutils literal"><span class="pre">mol</span></code> and <code class="docutils literal"><span class="pre">logger</span></code>, the user
-does not have to specify them argument in the input file.</p>
-<p>When defining optimization functions the <code class="docutils literal"><span class="pre">logger</span></code> argument should be
-used for logging as a normal logger from the <code class="docutils literal"><span class="pre">logging</span></code> library would.
-When running the GA a special logger compatible with multiprocessing
-is automatically placed in this argument. It may be useful to define
-the logger argument as a keyword argument:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">opt_func</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">somearg</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)):</span>
-    <span class="o">...</span>
-</pre></div>
-</div>
-<p>In this way, if the optimization function is used outside of the GA,
-the logger will be provided automatically as well.</p>
-<p>An optimization function should update the rdkit molecule in the <cite>mol</cite>
-attribute. The return values of optimization functions are discarded.</p>
+<div class="section" id="extending-mtk-adding-optimization-functions">
+<h2>Extending mtk: Adding optimization functions.<a class="headerlink" href="#extending-mtk-adding-optimization-functions" title="Permalink to this headline">¶</a></h2>
+<p>New optimization functions are added by writing them in this module.
+The only requirement is that the first argument is <cite>mol</cite>. This allows
+users to identify which arguments are handled automatically by <code class="docutils literal"><span class="pre">mtk</span></code>
+and which need to be defined in the input file. The convention is that
+if the optimization function takes the argument <cite>mol</cite>, the user does
+not have to specify it in the input file.</p>
+<p>An optimization function should update the <code class="docutils literal"><span class="pre">rdkit</span></code> molecule in
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.mol" title="mtk.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.mol</span></code></a>. The return values of optimization functions
+are discarded by the GA.</p>
 <p>Optimizations can be complicated. If the use of helper functions is
-required make sure that they are private, ie that their names begin
+required make sure that they are private, i.e. that their names begin
 with a leading underscore. In the event that the optimization is so
 complex that it requires its own module or file, place it in the same
-folder as this file. Then import the optimization function into this
-file. See <code class="docutils literal"><span class="pre">macromodel.py</span></code> as an example. Make sure that only the
-optimization functions are imported back into this file, not any of the
-helper functions or classes.</p>
+folder as this file. Then import the optimization function here. Make
+sure that only the optimization functions are imported back into this
+file, not any of the helper functions or classes.</p>
 <dl class="class">
 <dt id="mtk.optimization.optimization._OptimizationFunc">
 <em class="property">class </em><code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_OptimizationFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A decorator for optimziation functions.</p>
 <p>This decorator is applied to all optimization functions
-automatically in _optimize_all(). It should not be applied
+automatically in <a class="reference internal" href="#mtk.optimization.optimization._optimize_all" title="mtk.optimization.optimization._optimize_all"><code class="xref py py-func docutils literal"><span class="pre">_optimize_all()</span></code></a>. It should not be applied
 explicitly when defining the functions.</p>
 <p>This decorator prevents optimization functions from raising if
 they fail (necessary for multiprocessing) and prevents them from
@@ -200,11 +188,24 @@ being run twice on the same molecule.</p>
 <dl class="method">
 <dt id="mtk.optimization.optimization._OptimizationFunc.__call__">
 <code class="descname">__call__</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_OptimizationFunc.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__call__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Decorates and calls the optimization function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule to be optimized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The optimized molecule.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="mtk.optimization.optimization._OptimizationFunc.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.optimization.optimization', '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in _optimize_all(). It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__init__': &lt;function _OptimizationFunc.__init__&gt;, '__call__': &lt;function _OptimizationFunc.__call__&gt;, '__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;})</em><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.optimization.optimization', '__doc__': '\n    A decorator for optimziation functions.\n\n    This decorator is applied to all optimization functions\n    automatically in :func:`_optimize_all`. It should not be applied\n    explicitly when defining the functions.\n\n    This decorator prevents optimization functions from raising if\n    they fail (necessary for multiprocessing) and prevents them from\n    being run twice on the same molecule.\n\n    ', '__init__': &lt;function _OptimizationFunc.__init__&gt;, '__call__': &lt;function _OptimizationFunc.__call__&gt;, '__dict__': &lt;attribute '__dict__' of '_OptimizationFunc' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of '_OptimizationFunc' objects&gt;})</em><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -234,11 +235,10 @@ being run twice on the same molecule.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><em>FunctionData</em></a>) – The <code class="docutils literal"><span class="pre">FunctionData</span></code> object which represents the chosen
-optimization function. This function should be defined within
-this module. The <code class="docutils literal"><span class="pre">FunctionData</span></code> object also holds any
-additional parameters the optimization function may need.</li>
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The <code class="docutils literal"><span class="pre">Population</span></code> instance who’s members must be optimized.</li>
+<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which represents the chosen
+optimization function.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance who’s members are to be
+optimized.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of parallel processes to create.</li>
 </ul>
 </td>
@@ -246,7 +246,7 @@ additional parameters the optimization function may need.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -262,18 +262,17 @@ additional parameters the optimization function may need.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><em>FunctionData</em></a>) – The <code class="docutils literal"><span class="pre">FunctionData</span></code> object which represents the chosen
-optimization function. This function should be defined within
-this module. The <code class="docutils literal"><span class="pre">FunctionData</span></code> object also holds any
-additional parameters the optimization function may need.</li>
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – The <code class="docutils literal"><span class="pre">Population</span></code> instance who’s members must be optimized.</li>
+<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which represents the chosen
+optimization function.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance who’s members are to be
+optimized.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -291,11 +290,11 @@ in place of an optimization function when necessary.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – A macromolecule which will not be optimized.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – A molecule which will not be optimized.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -310,16 +309,16 @@ in place of an optimization function when necessary.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being optimized.</li>
-<li><strong>ofunc</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><em>FunctionData</em></a>) – A FunctionData object representing the optimization function
-to be used.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule being optimized.</li>
+<li><strong>ofunc</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the optimization
+function to be used.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -337,18 +336,18 @@ raise errors during multiprocessing, they are handled correctly.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>param1</strong> (<em>object</em>) – Dummy parameter, does nothing.</li>
-<li><strong>param2</strong> (<em>object</em><em> (</em><em>default = 2</em><em>)</em>) – Dummy keyword parameter, does nothing.</li>
+<li><strong>param1</strong> (<code class="xref py py-class docutils literal"><span class="pre">object</span></code>) – Dummy parameter, does nothing.</li>
+<li><strong>param2</strong> (<code class="xref py py-class docutils literal"><span class="pre">object</span></code>, optional) – Dummy keyword parameter, does nothing.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong> – This function does not return. It only raises.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">This function does not return. It only raises.</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> – An exception is always raised.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">Exception</span></code> – An exception is always raised.</p>
 </td>
 </tr>
 </tbody>
@@ -364,7 +363,7 @@ raise errors during multiprocessing, they are handled correctly.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule who’s structure should be optimized.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure should be optimized.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
 </ul>
 </td>
@@ -372,7 +371,7 @@ raise errors during multiprocessing, they are handled correctly.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -389,15 +388,15 @@ raise errors during multiprocessing, they are handled correctly.</p>
 <dl class="function">
 <dt id="mtk.optimization.optimization.rdkit_optimization">
 <code class="descclassname">mtk.optimization.optimization.</code><code class="descname">rdkit_optimization</code><span class="sig-paren">(</span><em>mol</em>, <em>embed=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#rdkit_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.rdkit_optimization" title="Permalink to this definition">¶</a></dt>
-<dd><p>Optimizes the structure of the molecule using rdkit.</p>
-<p>Uses the MMFF forcefield.</p>
+<dd><p>Optimizes the structure of the molecule using <code class="docutils literal"><span class="pre">rdkit</span></code>.</p>
+<p>Uses the <code class="docutils literal"><span class="pre">MMFF</span></code> forcefield.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule who’s structure should be optimized.</li>
-<li><strong>embed</strong> (<em>bool</em><em> (</em><em>default = False</em><em>)</em>) – When <code class="docutils literal"><span class="pre">True</span></code> the structure is guessed before an optimization
+<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule who’s structure should be optimized.</li>
+<li><strong>embed</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – When <code class="docutils literal"><span class="pre">True</span></code> the structure is guessed before an optimization
 is carried out. This guess structure overrides any previous
 structure.</li>
 <li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
@@ -407,7 +406,7 @@ structure.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
