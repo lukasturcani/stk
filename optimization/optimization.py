@@ -1,39 +1,27 @@
 """
 Defines optimization functions.
 
-Extending MMEA: Adding optimization functions
+Extending mtk: Adding optimization functions.
 ---------------------------------------------
-New optimization functions are added by writing them into this module.
-The only requirement is that the first argument is ``mol`` and
-there is a keyword argument ``logger``. This allows users to identify
-which arguments are handled automatically by MMEA and which need to be
-defined in the input file. The convention is that if the optimization
-function takes the arguments ``mol`` and ``logger``, the user
-does not have to specify them argument in the input file.
 
-When defining optimization functions the ``logger`` argument should be
-used for logging as a normal logger from the ``logging`` library would.
-When running the GA a special logger compatible with multiprocessing
-is automatically placed in this argument. It may be useful to define
-the logger argument as a keyword argument::
+New optimization functions are added by writing them in this module.
+The only requirement is that the first argument is `mol`. This allows
+users to identify which arguments are handled automatically by ``mtk``
+and which need to be defined in the input file. The convention is that
+if the optimization function takes the argument `mol`, the user does
+not have to specify it in the input file.
 
-    opt_func(mol, somearg, logger=logging.getLogger(__name__)):
-        ...
-
-In this way, if the optimization function is used outside of the GA,
-the logger will be provided automatically as well.
-
-An optimization function should update the rdkit molecule in the `mol`
-attribute. The return values of optimization functions are discarded.
+An optimization function should update the ``rdkit`` molecule in
+:attr:`.MacroMolecule.mol`. The return values of optimization functions
+are discarded by the GA.
 
 Optimizations can be complicated. If the use of helper functions is
-required make sure that they are private, ie that their names begin
+required make sure that they are private, i.e. that their names begin
 with a leading underscore. In the event that the optimization is so
 complex that it requires its own module or file, place it in the same
-folder as this file. Then import the optimization function into this
-file. See ``macromodel.py`` as an example. Make sure that only the
-optimization functions are imported back into this file, not any of the
-helper functions or classes.
+folder as this file. Then import the optimization function here. Make
+sure that only the optimization functions are imported back into this
+file, not any of the helper functions or classes.
 
 """
 
@@ -45,7 +33,6 @@ import logging
 from threading import Thread
 
 from .macromodel import macromodel_opt, macromodel_cage_opt
-
 from ..convenience_tools import daemon_logger, logged_call
 
 
@@ -58,21 +45,20 @@ def _optimize_all(func_data, population, processes):
 
     Parameters
     ----------
-    func_data : FunctionData
-        The ``FunctionData`` object which represents the chosen
-        optimization function. This function should be defined within
-        this module. The ``FunctionData`` object also holds any
-        additional parameters the optimization function may need.
+    func_data : :class:`.FunctionData`
+        The :class:`.FunctionData` object which represents the chosen
+        optimization function.
 
-    population : Population
-        The ``Population`` instance who's members must be optimized.
+    population : :class:`.Population`
+        The :class:`.Population` instance who's members are to be
+        optimized.
 
     processes : :class:`int`
         The number of parallel processes to create.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
@@ -109,19 +95,17 @@ def _optimize_all_serial(func_data, population):
 
     Parameters
     ----------
-    func_data : FunctionData
-        The ``FunctionData`` object which represents the chosen
-        optimization function. This function should be defined within
-        this module. The ``FunctionData`` object also holds any
-        additional parameters the optimization function may need.
+    func_data : :class:`.FunctionData`
+        The :class:`.FunctionData` object which represents the chosen
+        optimization function.
 
-    population : Population
-        The ``Population`` instance who's members must be optimized.
+    population : :class:`.Population`
+        The :class:`.Population` instance who's members are to be
+        optimized.
 
     Returns
     -------
-    None : NoneType
-
+    None : :class:`NoneType`
 
     """
 
@@ -143,7 +127,7 @@ class _OptimizationFunc:
     A decorator for optimziation functions.
 
     This decorator is applied to all optimization functions
-    automatically in _optimize_all(). It should not be applied
+    automatically in :func:`_optimize_all`. It should not be applied
     explicitly when defining the functions.
 
     This decorator prevents optimization functions from raising if
@@ -156,6 +140,20 @@ class _OptimizationFunc:
         wraps(func)(self)
 
     def __call__(self, mol):
+        """
+        Decorates and calls the optimization function.
+
+        Parameters
+        ----------
+        mol : :class:`.Molecule`
+            The molecule to be optimized.
+
+        Returns
+        -------
+        :class:`.Molecule`
+            The optimized molecule.
+
+        """
 
         if mol.optimized:
             logger.info(f'Skipping {mol.name}.')
@@ -186,12 +184,12 @@ def do_not_optimize(mol):
 
     Parameters
     ----------
-    mol : MacroMolecule
-        A macromolecule which will not be optimized.
+    mol : :class:`.Molecule`
+        A molecule which will not be optimized.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
@@ -204,16 +202,16 @@ def partial_raiser(mol, ofunc):
 
     Parameters
     ----------
-    mol : MacroMolecule
-        The macromolecule being optimized.
+    mol : :class:`.Molecule`
+        The molecule being optimized.
 
-    ofunc : FunctionData
-        A FunctionData object representing the optimization function
-        to be used.
+    ofunc : :class:`.FunctionData`
+        A :class:`.FunctionData` object representing the optimization
+        function to be used.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`.NoneType`
 
     """
 
@@ -232,19 +230,20 @@ def raiser(mol, param1, param2=2):
 
     Parameters
     ---------
-    param1 : object
+    param1 : :class:`object`
         Dummy parameter, does nothing.
 
-    param2 : object (default = 2)
+    param2 : :class:`object`, optional
         Dummy keyword parameter, does nothing.
 
     Returns
     -------
-    This function does not return. It only raises.
+    None : :class:`NoneType`
+        This function does not return. It only raises.
 
     Raises
     ------
-    Exception
+    :class:`Exception`
         An exception is always raised.
 
     """
@@ -254,16 +253,16 @@ def raiser(mol, param1, param2=2):
 
 def rdkit_optimization(mol, embed=False, conformer=-1):
     """
-    Optimizes the structure of the molecule using rdkit.
+    Optimizes the structure of the molecule using ``rdkit``.
 
     Uses the ``MMFF`` forcefield.
 
     Parameters
     ----------
-    mol : MacroMolecule
-        The macromolecule who's structure should be optimized.
+    mol : :class:`.Molecule`
+        The molecule who's structure should be optimized.
 
-    embed : bool (default = False)
+    embed : :class:`bool`, optional
         When ``True`` the structure is guessed before an optimization
         is carried out. This guess structure overrides any previous
         structure.
@@ -273,7 +272,7 @@ def rdkit_optimization(mol, embed=False, conformer=-1):
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
@@ -299,15 +298,15 @@ def rdkit_ETKDG(mol, conformer=-1):
 
     Parameters
     ----------
-    mol : MacroMolecule
-        The macromolecule who's structure should be optimized.
+    mol : :class:`.Molecule`
+        The molecule who's structure should be optimized.
 
     conformer : :class:`int`, optional
         The conformer to use.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     References
     ----------
