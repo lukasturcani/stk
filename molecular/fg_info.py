@@ -1,34 +1,37 @@
 """
-A module for the FGInfo class.
+Defines :class:`FGInfo` which describes functional groups.
 
-Extending MMEA: Adding  more functional groups.
------------------------------------------------
+Extending mtk: Adding  more functional groups.
+----------------------------------------------
 
-If MMEA is to incorporate a new functional group, a new ``FGInfo``
-instance should be added to the `functional_groups` list.
+If ``mtk`` is to incorporate a new functional group, a new
+:class:``FGInfo`` instance should be added to
+:data:`functional_groups`. This is a :class:`list` defined in this
+module.
 
-Adding a new ``FGInfo`` instance to `functional_groups` will allow the
-``Topology.join_mols()`` method to connect this functional group to
-(all) others during assembly. Nothing except adding this instance
+Adding a new ``FGInfo`` instance to :data:`functional_groups` will
+allow :meth:`.Topology.join_mols` to connect the functional group to
+all others during assembly. Nothing except adding this instance
 should be necessary in order to incorporate new functional groups.
 
-Note that when adding SMARTS if you want to make a SMARTS that targets
-an atom in an environment, for example a bromine connected to a carbon
+Note that when adding SMARTS, if you want to make a SMARTS that targets
+an atom in an environment, for example, a bromine connected to a
+carbon::
 
     [$([Br][C])]
 
 The atom you are targeting needs to be written first. The above SMARTS
-works but
+works but::
 
     [$([C][Br])]
 
 does not.
 
-If this new functional group is to connect to another functional group
+If a new functional group is to connect to another functional group
 with a double bond during assembly, the names of the functional groups
-should be added to the `double_bond_combs` list. The order in
+should be added to :data:`double_bond_combs`. The order in
 which they are placed in the tuple does not matter. Again, this is all
-that needs to be done for MMEA to create double bonds between given
+that needs to be done for ``mtk`` to create double bonds between given
 functional groups.
 
 """
@@ -44,17 +47,17 @@ class FGInfo:
 
     Attributes
     ----------
-    name : str
+    name : :class:`str`
         The name of the functional group.
 
-    fg_smarts : str
+    fg_smarts : :class:`str`
         A SMARTS string which matches the functional group.
 
-    bonder_smarts :
+    bonder_smarts : :class:`str`
         A SMARTS string which matches the atom on the functional group
         which forms bonds during reactions.
 
-    del_smarts : str
+    del_smarts : :class:`str`
         A SMARTS string, which matches the atoms removed when the
         functional group reacts.
 
@@ -63,6 +66,27 @@ class FGInfo:
     __slots__ = ['name', 'fg_smarts', 'bonder_smarts', 'del_smarts']
 
     def __init__(self, name, fg_smarts, bonder_smarts, del_smarts):
+        """
+        Initializes a :class:`FGInfo` instnace.
+
+        Parameters
+        ---------
+        name : :class:`str`
+            The name of the functional group.
+
+        fg_smarts : :class:`str`
+            A SMARTS string which matches the functional group.
+
+        bonder_smarts : :class:`str`
+            A SMARTS string which matches the atom on the functional
+            group which forms bonds during reactions.
+
+        del_smarts : :class:`str`
+            A SMARTS string, which matches the atoms removed when the
+            functional group reacts.
+
+        """
+
         self.name = name
         self.fg_smarts = fg_smarts
         self.bonder_smarts = bonder_smarts
