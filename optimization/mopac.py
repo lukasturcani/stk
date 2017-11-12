@@ -70,12 +70,8 @@ def mopac_opt(mol, mopac_path, settings=None):
                 ``80.1`` can be used to model a water environment at
                 room temperature.
 
-            'charge' : :class:`list` of :class:`float` (default = ``0``)
-                When the system being studied is an ion, the charge,
-                ``n``, on the ion must be supplied as an integer. For
-                cations ``n`` can be ``1``, ``2``, ``3``, etc., for
-                anions ``-1``, ``-2``, ``-3``, etc.
-
+            'charge' : :class:`float` (default = ``0``)
+                The charge of the system.
 
             'fileout' : :class:`str` (default = ``'PDBOUT'``)
                 Determines the output file type.
@@ -157,9 +153,8 @@ def _kill_mopac(mol):
     """
     Kills an in-progress MOPAC run.
 
-    To kill a MOPAC run for a specific structure it is enough to
-    generate a non empty file with the molecule's name with the
-    ``.end`` extension.
+    To kill a MOPAC run, a file with the molecule's name and a ``.end``
+    extension is written.
 
     Parameters
     ----------
