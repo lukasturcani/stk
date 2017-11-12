@@ -153,129 +153,144 @@
 <span class="sd">Defines classes which describe molecules.</span>
 
 <span class="sd">There are a couple of major classes defined here. The most important</span>
-<span class="sd">ones are ``StructUnit`` and ``MacroMolecule``. Here is an overview of</span>
-<span class="sd">their role/interaction. This is followed by a step-by-step guide to</span>
-<span class="sd">macromolecular assembly.</span>
+<span class="sd">ones are :class:`StructUnit` and :class:`MacroMolecule`. Here is an</span>
+<span class="sd">overview of their role and interaction. This is followed by a</span>
+<span class="sd">step-by-step guide to macromolecular assembly.</span>
 
-<span class="sd">The StructUnit class represents the monomers that make up</span>
+<span class="sd">:class:`StructUnit` represents the monomers that make up</span>
 <span class="sd">macromolecules. These are commonly refered to as ``building blocks`` in</span>
-<span class="sd">the documentation. The class holds information concerning only a single</span>
-<span class="sd">building block molecule. Such as the number of atoms and bonds it may</span>
-<span class="sd">have. It also has information about the functoinal groups present on</span>
-<span class="sd">the building block molecule (FGInfo class defined in</span>
-<span class="sd">/mmea/classes/fg_info.py). The class also allows manipulation of the</span>
-<span class="sd">lone building block molecule, such as rotations and translations.</span>
+<span class="sd">the documentation. :class:`StructUnit` holds information concerning</span>
+<span class="sd">only a single building block molecule. For example, the number of atoms</span>
+<span class="sd">and bonds a building block may have. It also has information about the</span>
+<span class="sd">functoinal groups present in the building block molecule (see</span>
+<span class="sd">:class:`.FGInfo`). The class also allows manipulation of the lone</span>
+<span class="sd">building block molecule, such as rotations and translations.</span>
 
-<span class="sd">The StructUnit class should be inherited as necessary. For example</span>
-<span class="sd">StructUnit2 adds manipulations relavant to molecules with 2 functional</span>
-<span class="sd">groups. The StructUnit3 class adds manipulations relavant to 3 or more</span>
-<span class="sd">functional groups. If you have a monomer which needs specific</span>
-<span class="sd">information or manipulations, give it its own class.</span>
+<span class="sd">The :class:`StructUnit` should be inherited as necessary. For example,</span>
+<span class="sd">:class:`StructUnit2` adds manipulations relavant to molecules with 2</span>
+<span class="sd">functional groups. :class:`StructUnit3` adds manipulations relavant to</span>
+<span class="sd">molecules with 3 or more functional groups. If you have a monomer which</span>
+<span class="sd">needs specific information or manipulations, give it its own class.</span>
 
-<span class="sd">The MacroMolecule class represents an assembled macromolecule. It</span>
-<span class="sd">requires at least 2 basic pieces of information: which monomers are</span>
-<span class="sd">used to assemble the macromolecule and what is the topology/structure</span>
-<span class="sd">of the macromolecule.</span>
+<span class="sd">The :class:`MacroMolecule` class represents an assembled macromolecule.</span>
+<span class="sd">It requires at least 2 basic pieces of information: which monomers are</span>
+<span class="sd">used to assemble the macromolecule and what the topology/structure</span>
+<span class="sd">of the macromolecule is.</span>
 
-<span class="sd">The MacroMolecule holds in its `building_blocks` attribute a list of</span>
-<span class="sd">StructUnit (or derived classes) instances. These represent the</span>
-<span class="sd">monomers which form the macromolecule. Only one StructUnit instance per</span>
+<span class="sd">:attr:`MacroMolecule.building_blocks` holds a :class:`list` of</span>
+<span class="sd">:class:`StructUnit` instances. These represent the monomers which</span>
+<span class="sd">make up the macromolecule. Only one :class:`StructUnit` instance per</span>
 <span class="sd">monomer type is held. So if 4 of one type of monomer and 2 of another</span>
-<span class="sd">type of monomer form a macromolecule, only 2 StructUnit instances are</span>
-<span class="sd">in `building_blocks`.</span>
+<span class="sd">type of monomer form a macromolecule, only 2 :class:`StructUnit`</span>
+<span class="sd">instances are in :attr:`MacroMolecule.building_blocks`.</span>
 
-<span class="sd">In its `topology` attribute a MacroMolecule holds a ``Topology` child</span>
-<span class="sd">class instance. This instance is responsible for assembling the</span>
-<span class="sd">macromolecule from the building blocks. The building should happen in</span>
-<span class="sd">the ``__init__()`` method of the MacroMolecule via the Topology</span>
-<span class="sd">instance&#39;s ``build()`` method. The ``build()`` method should place the</span>
-<span class="sd">assembled macromoleclue in the `mol` attribute of the MacroMolecule</span>
-<span class="sd">instance.</span>
+<span class="sd">:attr:`MacroMolecule.topology` holds a :class:`Topology` instance. This</span>
+<span class="sd">instance is responsible for assembling the macromolecule from the</span>
+<span class="sd">building blocks. The building should happen in</span>
+<span class="sd">:meth:`MacroMolecule.__init__` via :meth:`.Topology.build`. The</span>
+<span class="sd">:meth:`~.Topology.build` method places the assembled macromoleclue in</span>
+<span class="sd">:attr:`MacroMolecule.mol` as an ``rdkit`` molecule.</span>
 
-<span class="sd">The StructUnit class labels atoms in the functional groups of the</span>
-<span class="sd">building blocks as either ``bonder`` or ``del`` (see its</span>
-<span class="sd">documentation). This tells the Topology intance which atoms form bonds</span>
-<span class="sd">and which are removed during assembly.</span>
+<span class="sd">:class:`StructUnit` labels atoms in the functional groups of the</span>
+<span class="sd">building blocks as either ``&#39;bonder&#39;`` or ``&#39;del&#39;`` (see its</span>
+<span class="sd">documentation). This tells the :class:`.Topology` instance which atoms</span>
+<span class="sd">form bonds and which are removed during assembly.</span>
 
-<span class="sd">No need to worry about the metaclasses.</span>
-
-<span class="sd">-------------------------------------------------------</span>
 <span class="sd">A more detailed description of macromolecular assembly.</span>
 <span class="sd">-------------------------------------------------------</span>
+
 <span class="sd">This is a step-by-step guide of how macromolecular assembly is carried</span>
 <span class="sd">out and what the classes do.</span>
 
-<span class="sd">First you create StructUnit instances of the building blocks which make</span>
-<span class="sd">up the macromolecule:</span>
+<span class="sd">First you create :class:`StructUnit` instances of the building blocks</span>
+<span class="sd">which make up the macromolecule:</span>
 
-<span class="sd">    bb = StructUnit(&#39;/path/to/struct/file.mol2&#39;)</span>
+<span class="sd">.. code-block:: python</span>
 
-<span class="sd">The StructUnit instances are initialized using paths of molecular</span>
-<span class="sd">structure files. (Initializing a StructUnit automatically completes</span>
-<span class="sd">steps 1 to 4.)</span>
+<span class="sd">    bb = StructUnit(&#39;/path/to/struct/file.mol2&#39;, &#39;amine&#39;)</span>
 
-<span class="sd">    1) Place an rdkit instance of the molecule into the `mol` attribute</span>
-<span class="sd">       of the StructUnit.</span>
-<span class="sd">    2) Scan the path of the structure file for the name of a functional</span>
+<span class="sd">The :class:`StructUnit` instances are initialized using paths to</span>
+<span class="sd">molecular structure files. (Initializing a :class:`StructUnit`</span>
+<span class="sd">automatically completes steps 1 to 4.)</span>
+
+<span class="sd">    1. Place an ``rdkit`` instance of the molecule into</span>
+<span class="sd">       :attr:`StructUnit.mol`, i.e.</span>
+
+<span class="sd">       .. code-block:: python</span>
+
+<span class="sd">           bb.mol  # &lt;rdkit.Chem.rdchem.Mol at 0x7f961a8f1f80&gt;</span>
+
+<span class="sd">    2. Scan the path of the structure file for the name of a functional</span>
 <span class="sd">       group. (Alternatively the name of a functional group can be</span>
 <span class="sd">       supplied to the initializer).</span>
 
-<span class="sd">What functional groups are recognized by MMEA?</span>
-<span class="sd">The module ``/mmea/molecular/fg_info.py`` defines a class called</span>
-<span class="sd">FGInfo. Instances of this class are held in the list</span>
-<span class="sd">`functional_groups` (also in that module). If you put an FGInfo</span>
-<span class="sd">instance in that list, the functional group will be recognized.</span>
+<span class="sd">       .. code-block:: python</span>
 
-<span class="sd">    3) Place the FGInfo instance of the functional group in the</span>
-<span class="sd">       `func_grp` attribute of the StructUnit.</span>
+<span class="sd">           bb.func_group.name  # &#39;amine&#39;</span>
 
-<span class="sd">    4) Using the FGInfo instance, tag atoms in the building block as</span>
-<span class="sd">       either &#39;bonder&#39; or &#39;del&#39;. &#39;bonder&#39; signifies that the atoms form</span>
-<span class="sd">       a bond during macromolecular assembly, while &#39;del&#39; means they</span>
-<span class="sd">       are deleted.</span>
+<span class="sd">Which functional groups are recognized by ``mtk``?</span>
 
-<span class="sd">    5) Give the StructUnit instances and the class representing the</span>
-<span class="sd">       topology to the macromolecule&#39;s initializer.</span>
+<span class="sd">The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a</span>
+<span class="sd">:class:`list` of instances of this class called</span>
+<span class="sd">:data:`functional_groups`. If you put an :class:`.FGInfo` instance into</span>
+<span class="sd">:data:`functional_groups`, the functional group will be recognized.</span>
 
-<span class="sd">    6) Make an instance of the topology class in the MacroMolecule</span>
-<span class="sd">      initializer.</span>
+<span class="sd">    3. Place the :class:`.FGInfo` instance of the functional group into</span>
+<span class="sd">       :attr:`StructUnit.func_grp`.</span>
 
-<span class="sd">    7) Run the ``build()`` of the instance generated in 6) during</span>
-<span class="sd">       MacroMolecule initialization.</span>
+<span class="sd">    4. Using :class:`.FGInfo`, tag atoms in the building block as</span>
+<span class="sd">       either ``&#39;bonder&#39;`` or ``&#39;del&#39;``. ``&#39;bonder&#39;`` signifies that</span>
+<span class="sd">       the atoms form a bond during macromolecular assembly, while</span>
+<span class="sd">       ``&#39;del&#39;`` means they are deleted.</span>
 
-<span class="sd">    8) The ``build()`` will vary depending on the Topology class.</span>
-<span class="sd">       However the basic structure is the same (steps 9 - 11).</span>
+<span class="sd">    5. Give the :class:`StructUnit` and :class:`.Topology` instances to</span>
+<span class="sd">       the macromolecule&#39;s initializer.</span>
 
-<span class="sd">    9) Combine the StructUnit rdkit molecules into a single rdkit</span>
-<span class="sd">       molecule. Make sure that the building blocks are arranged in the</span>
-<span class="sd">       shape of the macromolecule. All the manipulations available via</span>
-<span class="sd">       the StructUnit class are useful here to make sure all the</span>
-<span class="sd">       building blocks are oriented correctly when forming the</span>
-<span class="sd">       macromolecule.</span>
+<span class="sd">       .. code-block:: python</span>
 
-<span class="sd">    10) Create bonds between all the disjoined building block</span>
-<span class="sd">        molecules. This is where the tagging done by StructUnit is</span>
-<span class="sd">        needed.</span>
+<span class="sd">           macro_mol = MacroMolecule([bb1, bb2], Topology())</span>
 
-<span class="sd">    11) Delete all the atoms tagged for deletion.</span>
+<span class="sd">       Normally, :class:`MacroMolecule` and :class:`.Topology` will</span>
+<span class="sd">       not be used directly. Instead, classes derived from these</span>
+<span class="sd">       will be used. For example,</span>
 
-<span class="sd">After all this you should have a rdkit instance of the macromolecule</span>
-<span class="sd">which should be placed in the `mol` attribute of the MacroMolecule</span>
-<span class="sd">intance.</span>
+<span class="sd">           .. code-block:: python</span>
 
-<span class="sd">Extending MMEA: Adding new macromolecules.</span>
-<span class="sd">------------------------------------------</span>
+<span class="sd">               macro_mol = Polymer([bb1, bb2], Linear(&quot;AB&quot;, [0, 0], 3))</span>
+
+<span class="sd">    6. Run :meth:`.Topology.build` inside</span>
+<span class="sd">       :meth:`MacroMolecule.__init__`.</span>
+
+<span class="sd">    7. The details of :meth:`.Topology.build` will vary depending on</span>
+<span class="sd">       the :class:`.Topology` class used. However, the basic structure</span>
+<span class="sd">       is the same (steps 8 - 10).</span>
+
+<span class="sd">    8. Combine the ``rdkit`` molecules in :attr:`StructUnit.mol`</span>
+<span class="sd">       into a single ``rdkit`` molecule. Make sure that the building</span>
+<span class="sd">       blocks are arranged in the shape of the macromolecule. All the</span>
+<span class="sd">       manipulations available through :class:`StructUnit` are</span>
+<span class="sd">       useful here to make sure all building blocks are oriented</span>
+<span class="sd">       correctly when forming the macromolecule.</span>
+
+<span class="sd">    9. Create bonds between all the disjoined building block</span>
+<span class="sd">       molecules. This is where the tagging done by :class:`StructUnit`</span>
+<span class="sd">       is needed.</span>
+
+<span class="sd">    10. Delete all atoms tagged for deletion.</span>
+
+<span class="sd">After all this you should have a ``rdkit`` instance of the</span>
+<span class="sd">macromolecule which should be placed into :attr:`MacroMolecule.mol`.</span>
+
+<span class="sd">Extending mtk: Adding new macromolecules.</span>
+<span class="sd">-----------------------------------------</span>
+
 <span class="sd">To add new macromolecules create a new class which inherits</span>
-<span class="sd">``MacroMolecule``. The initializer of ``MacroMolecule`` can be used or</span>
-<span class="sd">a custom one may be used. However, all the same attributes must be</span>
-<span class="sd">defined.</span>
+<span class="sd">:class:`MacroMolecule`.</span>
 
 <span class="sd">If you&#39;re adding a new class of macromolecules, it quite likely you</span>
-<span class="sd">want to add a new ``Topology`` class. See the docstring of the</span>
-<span class="sd">/mmea/molecular_tools/topologies/base.py module for guidance on adding</span>
-<span class="sd">these. The topology class does the assembly of the macromolecule from</span>
-<span class="sd">the building blocks. The assembled macromolecule instance is then held</span>
-<span class="sd">by the macromolecular class.</span>
+<span class="sd">want to add a new :class:`.Topology` class. See the</span>
+<span class="sd">:mod:`.topologies.base` for guidance on adding these. The topology</span>
+<span class="sd">class does the assembly of the macromolecule from the building blocks.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -347,7 +362,7 @@
 
 <div class="viewcode-block" id="CachedStructUnit"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.CachedStructUnit">[docs]</a><span class="k">class</span> <span class="nc">CachedStructUnit</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A metaclass for making StructUnit create cached instances.</span>
+<span class="sd">    A metaclass for making :class:`StructUnit` create cached instances.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -397,34 +412,29 @@
 
 <span class="sd">    This class defines the operations which any class</span>
 <span class="sd">    describing molecules should inherit or may find useful. Examples of</span>
-<span class="sd">    such classes are ``StructUnit`` and ``MacroMolecule``. This calls</span>
-<span class="sd">    is unlikely to be useful as in and of itself. It lacks an</span>
-<span class="sd">    `__init__()` method because it does not need one. Child classes</span>
-<span class="sd">    should define it.</span>
-
-<span class="sd">    It is assumed that child classes will have some basic attributes.</span>
+<span class="sd">    such are :class:`StructUnit` and :class:`MacroMolecule`. This class</span>
+<span class="sd">    should not be used directly.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        A rdkit molecule instance representing the molecule.</span>
+<span class="sd">    mol : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        An ``rdkit`` molecule instance representing the molecule.</span>
 
-<span class="sd">    inchi : str</span>
+<span class="sd">    inchi : :class:`str`</span>
 <span class="sd">        The InChI of the molecule.</span>
 
-<span class="sd">    energy : Energy</span>
-<span class="sd">        An instance of the ``Energy`` class. It handles all things</span>
-<span class="sd">        energy.</span>
+<span class="sd">    energy : :class:`.Energy`</span>
+<span class="sd">        Handles all things energy.</span>
 
-<span class="sd">    optimized : bool</span>
-<span class="sd">        Indicates whether a Molecule has been passed through an</span>
-<span class="sd">        optimization function or not.</span>
+<span class="sd">    optimized : :class:`bool`</span>
+<span class="sd">        Indicates whether a :class:`Molecule` has been passed through</span>
+<span class="sd">        an optimization function or not.</span>
 
-<span class="sd">    name : str (default = &quot;&quot;)</span>
+<span class="sd">    name : :class:`str`</span>
 <span class="sd">        A name which can be optionally given to the molecule for easy</span>
 <span class="sd">        identification.</span>
 
-<span class="sd">    note : str (default = &quot;&quot;)</span>
+<span class="sd">    note : :class:`str`</span>
 <span class="sd">        A note or comment about the molecule. Purely optional but can</span>
 <span class="sd">        be useful for labelling and debugging.</span>
 
@@ -439,7 +449,7 @@
 
 <div class="viewcode-block" id="Molecule.all_atom_coords"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.all_atom_coords">[docs]</a>    <span class="k">def</span> <span class="nf">all_atom_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Yields the coordinates of atoms in `mol`.</span>
+<span class="sd">        Yields the coordinates of atoms in :attr:`mol`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -448,11 +458,15 @@
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
-<span class="sd">        tuple of (int, numpy.array)</span>
-<span class="sd">            The ``int`` represents the atom id of the atom whose</span>
-<span class="sd">            coordinates are being yielded.</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">            The yielded :class:`tuple` has the form</span>
 
-<span class="sd">            The array represents the position.</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                (32, numpy.array([12, 34, 3]))</span>
+
+<span class="sd">            Where the first element is the atom id and the second</span>
+<span class="sd">            element is an array holding the coordinates of the atom.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -473,7 +487,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atom_id : int</span>
+<span class="sd">        atom_id : :class:`int`</span>
 <span class="sd">            The id of the atom whose coordinates are desired.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -481,7 +495,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            An array holding the x, y and z coordinates of the atom.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -496,10 +510,10 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atom1_id : int</span>
+<span class="sd">        atom1_id : :class:`int`</span>
 <span class="sd">            The id of the first atom.</span>
 
-<span class="sd">        atom2_id : int</span>
+<span class="sd">        atom2_id : :class:`int`</span>
 <span class="sd">            The id of the second atom.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -507,7 +521,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        scipy.double</span>
+<span class="sd">        :class:`scipy.double`</span>
 <span class="sd">            The distance between the first and second atoms.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -524,12 +538,12 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atom_id : int</span>
+<span class="sd">        atom_id : :class:`int`</span>
 <span class="sd">            The id number of the atom.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        str</span>
+<span class="sd">        :class:`str`</span>
 <span class="sd">            The atomic symbol of the atom.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -538,18 +552,19 @@
 
 <div class="viewcode-block" id="Molecule._cavity_size"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates diameter of the molecule&#39;s from `origin`.</span>
+<span class="sd">        Calculates diameter of the molecule from `origin`.</span>
 
 <span class="sd">        The cavity is measured by finding the atom nearest to</span>
 <span class="sd">        `origin`, correcting for van der Waals diameter and multiplying</span>
 <span class="sd">        by -2.</span>
 
-<span class="sd">        This function should not be used. Use cavity_size() instead.</span>
-<span class="sd">        cavity_size() finds the optimal value of `origin` to use.</span>
+<span class="sd">        This function should not be used directly. Use</span>
+<span class="sd">        :meth:`cavity_size` instead, which finds the optimal value of</span>
+<span class="sd">        `origin` to use.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        origin : numpy.array</span>
+<span class="sd">        origin : :class:`numpy.array`</span>
 <span class="sd">            Holds the x, y and z coordinate of the position from which</span>
 <span class="sd">            the cavity is measured.</span>
 
@@ -558,7 +573,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        float</span>
+<span class="sd">        :class:`float`</span>
 <span class="sd">            The (negative) diameter of the molecules cavity.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -582,7 +597,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        The diameter of the molecule&#39;s cavity in Angstroms.</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The diameter of the molecule&#39;s cavity in Angstroms.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -606,14 +622,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the centre of mass of the molecule.</span>
 
-<span class="sd">        Paramters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            An array holding the coordinates of the center of mass.</span>
 
 <span class="sd">        References</span>
@@ -634,14 +650,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the centroid of the molecule.</span>
 
-<span class="sd">        Paramters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            A numpy array holding the position of the centroid.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -654,8 +670,9 @@
                         <span class="n">target</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
                         <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the relative % difference between all the average dihedral</span>
-<span class="sd">        angle values within the molecule and the target value.</span>
+<span class="sd">        Returns the difference between the average dihedral and target.</span>
+
+<span class="sd">        The differences is a returned as a percent.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -670,9 +687,10 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        diff : :class:`float`</span>
-<span class="sd">            Float representing the % relative difference between the average</span>
-<span class="sd">            dihedral value in the molecule and the target value.</span>
+<span class="sd">        :class:`float`</span>
+<span class="sd">            The percent difference between the average dihedral in the</span>
+<span class="sd">            molecule and the target value.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">match</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">dihedral_SMARTS</span><span class="p">)</span>
@@ -702,17 +720,17 @@
 
 <div class="viewcode-block" id="Molecule.dump"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes a JSON dict of the molecule to a file.</span>
+<span class="sd">        Writes a JSON :class:`dict` of the molecule to a file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
-<span class="sd">            The full path of the file to which the JSON dict of the</span>
-<span class="sd">            molecule can be written.</span>
+<span class="sd">        path : :class:`str`</span>
+<span class="sd">            The full path to the file to which the JSON dict should be</span>
+<span class="sd">            written.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -722,27 +740,27 @@
 <div class="viewcode-block" id="Molecule.fromdict"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.fromdict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromdict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">,</span> <span class="n">optimized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a Molecule from a JSON dict.</span>
+<span class="sd">        Creates a :class:`Molecule` from a JSON :class:`dict`.</span>
 
-<span class="sd">        The Molecule returned has the class specified in the JSON</span>
-<span class="sd">        dictionary, not ``Molecule``.</span>
+<span class="sd">        The :class:`Molecule` returned has the class specified in</span>
+<span class="sd">        `json_dict`, not :class:`Molecule`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        json_dict : dict</span>
-<span class="sd">            A dict holding the JSON representation of a molecule.</span>
+<span class="sd">        json_dict : :class:`dict`</span>
+<span class="sd">            A :class:`dict` holding the JSON representation of a</span>
+<span class="sd">            molecule.</span>
 
-<span class="sd">        optimized : bool</span>
-<span class="sd">            The value passed to the loaded molecules `optimized`</span>
-<span class="sd">            attribute.</span>
+<span class="sd">        optimized : :class:`bool`, optional</span>
+<span class="sd">            The value passed to :attr:`Molecule.optimized`</span>
 
-<span class="sd">        load_names : bool (default = True)</span>
-<span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
-<span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
+<span class="sd">        load_names : :class:`bool`, optional</span>
+<span class="sd">            If ``True`` then the ``name`` key stored in `json_dict`</span>
+<span class="sd">            is loaded.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Molecule</span>
+<span class="sd">        :class:`Molecule`</span>
 <span class="sd">            The molecule represented by `json_dict`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -758,9 +776,9 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        networkx.Graph</span>
-<span class="sd">            A graph where the nodes are the ids of the atoms in the</span>
-<span class="sd">            rdkit molecule and the edges are the bonds.</span>
+<span class="sd">        :class:`networkx.Graph`</span>
+<span class="sd">            A graph where the nodes are the ids of the atoms and the</span>
+<span class="sd">            edges are the bonds.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -782,7 +800,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inchi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the InChi of the molecule.</span>
+<span class="sd">        Returns the InChI of the molecule.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`str`</span>
+<span class="sd">            The InChI of the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -792,27 +815,26 @@
 <div class="viewcode-block" id="Molecule.load"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.load">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">optimized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a Molecule from a JSON file.</span>
+<span class="sd">        Creates a :class:`Molecule` from a JSON file.</span>
 
-<span class="sd">        The Molecule returned has the class specified in the JSON</span>
-<span class="sd">        dictionary, not ``Molecule``.</span>
+<span class="sd">        The returned :class:`Molecule` has the class specified in the</span>
+<span class="sd">        JSON file, not :class:`Molecule`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
+<span class="sd">        path : :class:`str`</span>
 <span class="sd">            The full path holding a JSON representation to a molecule.</span>
 
-<span class="sd">        optimized : bool (default = True)</span>
-<span class="sd">            The value passed to the loaded molecules `optimized`</span>
-<span class="sd">            attribute.</span>
+<span class="sd">        optimized : :class:`bool`, optional</span>
+<span class="sd">            The value passed to :attr:`Molecule.optimized`.</span>
 
-<span class="sd">        load_names : bool (default = True)</span>
-<span class="sd">            If ``True`` then the `name` attribute stored in the JSON</span>
-<span class="sd">            objects is loaded. If ``False`` then it&#39;s not.</span>
+<span class="sd">        load_names : :class:`bool`, optional</span>
+<span class="sd">            If ``True`` then the ``name`` key stored in the JSON file</span>
+<span class="sd">            is loaded.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Molecule</span>
+<span class="sd">        :class:`Molecule`</span>
 <span class="sd">            The molecule held in `path`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -833,9 +855,16 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tuple of form (float, int, int)</span>
-<span class="sd">            The float represents the largest inter-atomic distance on</span>
-<span class="sd">            the molecule. The ints are the ids of the atoms.</span>
+<span class="sd">        :class:`tuple` of form (float, int, int)</span>
+<span class="sd">            A :class:`tuple` of the form</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                max_diameter = (312.3, 4, 54)</span>
+
+<span class="sd">            Where the first element is the largest inter-atomic</span>
+<span class="sd">            distance in the molecule. The next 2 elements are the ids</span>
+<span class="sd">            of the involved atoms.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -854,14 +883,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a V3000 mol block of the molecule.</span>
 
-<span class="sd">        Paramters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        str</span>
+<span class="sd">        :class:`str`</span>
 <span class="sd">            The V3000 mol block representing the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -928,19 +957,19 @@
 
 <div class="viewcode-block" id="Molecule.position_matrix"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.position_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">position_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the position of all atoms in the as a matrix.</span>
+<span class="sd">        Returns the position of all atoms as a matrix.</span>
 
-<span class="sd">        Paramters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.matrix</span>
-<span class="sd">            The matrix is 3 x n. Each column holds the x, y and z</span>
-<span class="sd">            coordinates of an atom. The index of the column corresponds</span>
-<span class="sd">            to the id of the atom in the molecule.</span>
+<span class="sd">        :class:`numpy.matrix`</span>
+<span class="sd">            The matrix has a shape ``[3, n]``. Each column holds the x,</span>
+<span class="sd">            y and z coordinates of an atom. The index of the column</span>
+<span class="sd">            corresponds to the id of the atom in the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -958,15 +987,14 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        other : MacroMolecule</span>
-<span class="sd">            The ``MacroMolecule`` instance you are checking has</span>
+<span class="sd">        other : :class:`Molecule`</span>
+<span class="sd">            The :class:`Molecule` instance you are checking has</span>
 <span class="sd">            the same structure.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool</span>
-<span class="sd">            Returns ``True`` if the building blocks and topology</span>
-<span class="sd">            of the macromolecules are the same.</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            Returns ``True`` if the structures match.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -980,10 +1008,10 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        theta : float</span>
+<span class="sd">        theta : :class:`float`</span>
 <span class="sd">            The size of the rotation in radians.</span>
 
-<span class="sd">        axis : numpy.array</span>
+<span class="sd">        axis : :class:`numpy.array`</span>
 <span class="sd">            The axis about which the rotation happens.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -991,7 +1019,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1030,11 +1058,6 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule by a rotation from `start` to `end`.</span>
 
-<span class="sd">        Note: The difference between this method and</span>
-<span class="sd">        :meth:`StructUnit._set_orientation2()` is about which point the</span>
-<span class="sd">        rotation occurs: centroid of entire molecule versus centroid of</span>
-<span class="sd">        bonder atoms, respectively.</span>
-
 <span class="sd">        Given two direction vectors, `start` and `end`, this method</span>
 <span class="sd">        applies the rotation required transform `start` to `end` on</span>
 <span class="sd">        the molecule. The rotation occurs about the centroid of the</span>
@@ -1046,19 +1069,26 @@
 <span class="sd">        direction.</span>
 
 <span class="sd">        The great thing about this method is that you as long as you</span>
-<span class="sd">        can associate a gemotric feature of the molecule with a vector,</span>
-<span class="sd">        then the molecule can be roatated so that this vector is</span>
+<span class="sd">        can associate a geometric feature of the molecule with a</span>
+<span class="sd">        vector, then the molecule can be rotated so that this vector is</span>
 <span class="sd">        aligned with `end`. The defined vector can be virtually</span>
-<span class="sd">        anything. This means that any geomteric feature of the molecule</span>
+<span class="sd">        anything. This means that any geometric feature of the molecule</span>
 <span class="sd">        can be easily aligned with any arbitrary axis.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The difference between this method and</span>
+<span class="sd">        :meth:`StructUnit._set_orientation2` is about which point the</span>
+<span class="sd">        rotation occurs: centroid of the entire molecule versus</span>
+<span class="sd">        centroid of the bonder atoms, respectively.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        start : numpy.array</span>
+<span class="sd">        start : :class:`numpy.array`</span>
 <span class="sd">            A vector which is to be rotated so that it transforms to</span>
 <span class="sd">            the `end` vector.</span>
 
-<span class="sd">        end : numpy.array</span>
+<span class="sd">        end : :class:`numpy.array`</span>
 <span class="sd">            This array holds the vector, onto which `start` is rotated.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -1066,8 +1096,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule in `mol`.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` molecule in :attr:`~Molecule.mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1100,7 +1130,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        position : numpy.array</span>
+<span class="sd">        position : :class:`numpy.array`</span>
 <span class="sd">            This array holds the position on which the centroid of the</span>
 <span class="sd">            molecule should be placed.</span>
 
@@ -1109,9 +1139,10 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule with the centroid placed at `position`.</span>
-<span class="sd">            This is the same instance as that in `mol`.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` molecule with the centroid placed at</span>
+<span class="sd">            `position`. This is the same instance as that in</span>
+<span class="sd">            :attr:`Molecule.mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1138,22 +1169,22 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        pos_mat : numpy.array</span>
+<span class="sd">        pos_mat : :class:`numpy.array`</span>
 <span class="sd">            The matrix holds the coordinates on which the atoms of the</span>
 <span class="sd">            molecule should be placed.</span>
 
-<span class="sd">            The dimensions are 3 x n. Each column of `pos_mat`</span>
-<span class="sd">            represents the coordinates of a single atom. The 1st column</span>
-<span class="sd">            sets the coordinate of the atom with id of 0. The next</span>
-<span class="sd">            column sets the coordinate of the atom with id 1, and so</span>
-<span class="sd">            on.</span>
+<span class="sd">            The shape of the matrix is ``[3, n]``. Each column of</span>
+<span class="sd">            `pos_mat` represents the coordinates of a single atom. The</span>
+<span class="sd">            1st column sets the coordinates of the atom with id of 0.</span>
+<span class="sd">            The next column sets the coordinates of the atom with id 1,</span>
+<span class="sd">            and so on.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1172,7 +1203,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        shift : numpy.array</span>
+<span class="sd">        shift : :class:`numpy.array`</span>
 <span class="sd">            A numpy array holding the value of the shift along each</span>
 <span class="sd">            axis.</span>
 
@@ -1291,7 +1322,7 @@
 
 <div class="viewcode-block" id="Molecule.update_stereochemistry"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.update_stereochemistry">[docs]</a>    <span class="k">def</span> <span class="nf">update_stereochemistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates stereochemistry tags on `mol` attribute.</span>
+<span class="sd">        Updates stereochemistry tags in :attr:`Molecule.mol`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1300,7 +1331,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1313,13 +1344,13 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a molecular structure file of the molecule.</span>
 
-<span class="sd">        This bypasses the need to use rdkit&#39;s writing functions, which</span>
-<span class="sd">        have issues with macromolecules due to poor ring finding and</span>
-<span class="sd">        sanitization issues.</span>
+<span class="sd">        This bypasses the need to the writining functions in ``rdkit``.</span>
+<span class="sd">        These have issues with macromolecules due to poor ring finding</span>
+<span class="sd">        and sanitization issues.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
+<span class="sd">        path : :class:`str`</span>
 <span class="sd">            The `path` to which the molecule should be written.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -1327,7 +1358,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1340,22 +1371,22 @@
 
 <div class="viewcode-block" id="Molecule._write_mdl_mol_file"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._write_mdl_mol_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes a V3000 .mol file of the molecule</span>
+<span class="sd">        Writes a V3000 ``.mol`` file of the molecule</span>
 
-<span class="sd">        This function should not be used directly, only via the</span>
-<span class="sd">        ``write()`` method.</span>
+<span class="sd">        This function should not be used directly, only via</span>
+<span class="sd">        :meth:`write`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
-<span class="sd">            The full path to which to the file should be written.</span>
+<span class="sd">        path : :class:`str`</span>
+<span class="sd">            The full path to the file being written.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1364,22 +1395,22 @@
 
 <div class="viewcode-block" id="Molecule._write_pdb_file"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule._write_pdb_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Writes a .pdb file of the molecule</span>
+<span class="sd">        Writes a ``.pdb`` file of the molecule</span>
 
-<span class="sd">        This function should not be used directly, only via the</span>
-<span class="sd">        ``write()`` method.</span>
+<span class="sd">        This function should not be used directly, only via</span>
+<span class="sd">        :meth:`write`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        path : str</span>
-<span class="sd">            The full path to which to the file should be written.</span>
+<span class="sd">        path : :class:`str`</span>
+<span class="sd">            The full path to the file being written.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1405,71 +1436,34 @@
 
 <div class="viewcode-block" id="StructUnit"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit">[docs]</a><span class="k">class</span> <span class="nc">StructUnit</span><span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">CachedStructUnit</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents the building blocks of macromolecules examined by MMEA.</span>
-
-<span class="sd">    ``Building blocks`` in this case refers to the smallest molecular</span>
-<span class="sd">    units of the assembled molecules examined by MMEA.</span>
+<span class="sd">    Represents the building blocks of macromolecules.</span>
 
 <span class="sd">    The goal of this class is to conveniently store information about,</span>
 <span class="sd">    and perform operations on, single instances of macromolecular</span>
 <span class="sd">    building blocks.</span>
 
-<span class="sd">    An important part of this class is labelling atoms in functional</span>
-<span class="sd">    groups.</span>
-
-<span class="sd">    This class should only deal with issues that concern a single</span>
-<span class="sd">    building block in and of itself.</span>
-
-<span class="sd">    Class attributes</span>
-<span class="sd">    ----------------</span>
-<span class="sd">    init_funcs : dict of {str : function}</span>
-<span class="sd">        This dictionary holds the various functions which can be used</span>
-<span class="sd">        to initialize rdkit molecules and pairs them with the</span>
-<span class="sd">        appropriate file extension.</span>
-
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    file : str</span>
-<span class="sd">        The full path of the molecular structure file holding the</span>
-<span class="sd">        molecule. The supported file formats are the keys in the</span>
-<span class="sd">        `init_funcs` dictionary. As long as a file of one of these</span>
-<span class="sd">        types is provided, MMEA will automatically use the correct</span>
-<span class="sd">        initialization function.</span>
+<span class="sd">    init_funcs : :class:`dict`</span>
+<span class="sd">        This dictionary holds the various functions which can be used</span>
+<span class="sd">        to initialize ``rdkit`` molecules and pairs them with the</span>
+<span class="sd">        appropriate file extension.</span>
 
-<span class="sd">    mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        The rdkit instance of the molecule held in `file`.</span>
+<span class="sd">    file : :class:`str`</span>
+<span class="sd">        The full path to the molecular structure file holding the</span>
+<span class="sd">        molecule. The supported file formats are the keys in</span>
+<span class="sd">        :attr:`init_funcs`. As long as a file with one of these</span>
+<span class="sd">        extensions is provided, the correct initialization function</span>
+<span class="sd">        will be used.</span>
 
-<span class="sd">    inchi : str</span>
-<span class="sd">        The InChI of the molecule.</span>
-
-<span class="sd">    func_grp : FGInfo</span>
-<span class="sd">        The ``FGInfo`` instance holding information about the</span>
+<span class="sd">    func_grp : :class:`.FGInfo`</span>
+<span class="sd">        The :class:`.FGInfo` instance holding information about the</span>
 <span class="sd">        functional group which will react when the building block</span>
 <span class="sd">        assembles to form macromolecules.</span>
 
-<span class="sd">    bonder_ids : list of ints</span>
-<span class="sd">        A list holding the atom ids of the atoms which form bonds</span>
-<span class="sd">        during macromolecular assembly.</span>
-
-<span class="sd">    energy : Energy</span>
-<span class="sd">        This attribute handles information about the energy of the</span>
-<span class="sd">        instance. See the documentation of ``Energy`` to see what is</span>
-<span class="sd">        available.</span>
-
-<span class="sd">    optimized : bool (default = False)</span>
-<span class="sd">        A flag to monitor whether an optimization has been performed on</span>
-<span class="sd">        the molecule.</span>
-
-<span class="sd">    key : MacroMolKey</span>
-<span class="sd">        The key used for caching the molecule.</span>
-
-<span class="sd">    name : str (default = &quot;&quot;)</span>
-<span class="sd">        A name which can be optionally given to the molcule for easy</span>
-<span class="sd">        identification.</span>
-
-<span class="sd">    note : str (default = &quot;&quot;)</span>
-<span class="sd">        A note or comment about the molecule. Purely optional but can</span>
-<span class="sd">        be useful for labelling and debugging.</span>
+<span class="sd">    bonder_ids : :class:`list` of :class:`int`</span>
+<span class="sd">        A :class:`list` holding the atom ids of the atoms which form</span>
+<span class="sd">        bonds during macromolecular assembly.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1489,27 +1483,27 @@
 
 <div class="viewcode-block" id="StructUnit.__init__"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">functional_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes a ``StructUnit`` instance.</span>
+<span class="sd">        Initializes a :class:`StructUnit` instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        file : str</span>
+<span class="sd">        file : :class:`str`</span>
 <span class="sd">            The full path of the molecular structure file holding the</span>
 <span class="sd">            building block.</span>
 
-<span class="sd">        functional_group : str (default = None)</span>
+<span class="sd">        functional_group : :class:`str`, optional</span>
 <span class="sd">            The name of the functional group which is to have atoms</span>
 <span class="sd">            tagged. If ``None``, a functional group name found in the</span>
 <span class="sd">            path `file`  is used. If no functional group is provided</span>
 <span class="sd">            to this parameter and the name of one is not present in</span>
 <span class="sd">            `file`, no tagging is done.</span>
 
-<span class="sd">        note : str (default = &quot;&quot;)</span>
-<span class="sd">            A note or comment about the molecule.</span>
-
-<span class="sd">        name : str (default = &quot;&quot;)</span>
+<span class="sd">        name : :class:`str`, optional</span>
 <span class="sd">            A name which can be optionally given to the molcule for</span>
 <span class="sd">            easy identification.</span>
+
+<span class="sd">        note : :class:`str`, optional</span>
+<span class="sd">            A note or comment about the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1565,26 +1559,26 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        db : str</span>
+<span class="sd">        db : :class:`str`</span>
 <span class="sd">            A path to a database of molecular files.</span>
 
-<span class="sd">        fg : str, optional</span>
+<span class="sd">        fg : :class:`str`, optional</span>
 <span class="sd">            The name of a functional group which the molecules in `db`</span>
 <span class="sd">            have. By default it is assumed the name is present in the</span>
 <span class="sd">            path of the files.</span>
 
-<span class="sd">        name : str, optional</span>
+<span class="sd">        name : :class:`str`, optional</span>
 <span class="sd">            The name to be given to the created molecule.</span>
 
-<span class="sd">        note : str, optional</span>
+<span class="sd">        note : :class:`str`, optional</span>
 <span class="sd">            A note to be given to the created molecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        StructUnit</span>
+<span class="sd">        :class:`StructUnit`</span>
 <span class="sd">            A random molecule from `db`.</span>
 
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 <span class="sd">            If no files in `db` could be initialized from.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1617,9 +1611,15 @@
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
-<span class="sd">        tuple of form (int, int, scipy.double)</span>
-<span class="sd">            The ints represnt the atoms ids and the double is their</span>
-<span class="sd">            distance.</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">           A :class:`tuple` of the form</span>
+
+<span class="sd">           .. code-block:: python</span>
+
+<span class="sd">               (3, 54, 12.54)</span>
+
+<span class="sd">            The first two elements are the ids of the involved atoms</span>
+<span class="sd">            and the third element is the distance between them.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1641,8 +1641,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
-<span class="sd">            A numpy array holding the midpoint of the bonder atoms.</span>
+<span class="sd">        :class:`numpy.array`</span>
+<span class="sd">            An array holding the midpoint of the bonder atoms.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1654,8 +1654,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Yields the direction vectors between all pairs of bonder atoms.</span>
 
-<span class="sd">        The yielded vector is normalized. If a pair (1,2) is yielded,</span>
-<span class="sd">        the pair (2,1) will not be.</span>
+<span class="sd">        The yielded vector is normalized. If the pair ``(1, 2)`` is</span>
+<span class="sd">        yielded, the pair ``(2, 1)`` will not be.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1664,10 +1664,17 @@
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
-<span class="sd">        tuple of (int, int, numpy.array)</span>
-<span class="sd">            The ints in the tuple represent the ids of the start and</span>
-<span class="sd">            end atoms, respectively. The array is the direciont vector</span>
-<span class="sd">            running between the atomic positions.</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">            They yielded tuple has the form</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                (3, 54, np.array([12.2, 43.3, 9.78]))</span>
+
+<span class="sd">            The first two elements of the tuple represent the ids of</span>
+<span class="sd">            the start and end atoms of the vector, respectively. The</span>
+<span class="sd">            array is the direction vector running between the atomic</span>
+<span class="sd">            positions.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1688,10 +1695,11 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.matrix</span>
-<span class="sd">            The matrix is 3 x n. Each column holds the x, y and z</span>
-<span class="sd">            coordinates of a bonder atom. The index of the column</span>
-<span class="sd">            corresponds to the index of the atom id in `bonder_ids`.</span>
+<span class="sd">        :class:`numpy.matrix`</span>
+<span class="sd">            The matrix has the shape ``[3, n``. Each column holds the</span>
+<span class="sd">            x, y and z coordinates of a bonder atom. The index of the</span>
+<span class="sd">            column corresponds to the index of the atom id in</span>
+<span class="sd">            :attr:`bonder_ids`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1707,18 +1715,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the direction vector between the 2 molecular centroids.</span>
 
-<span class="sd">        The first molecule centroid is the centroid of the entire</span>
+<span class="sd">        The first molecular centroid is the centroid of the entire</span>
 <span class="sd">        molecule. The second molecular centroid is the centroid of the</span>
 <span class="sd">        bonder atoms.</span>
 
-<span class="sd">        Paramters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            The normalized direction vector running from the centroid</span>
 <span class="sd">            of the bonder atoms to the molecular centroid.</span>
 
@@ -1749,7 +1757,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
 <span class="sd">            The &quot;core&quot; of the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1768,12 +1776,17 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tuple of tuples of ints</span>
+<span class="sd">        :class:`tuple`</span>
 <span class="sd">            The form of the returned tuple is:</span>
-<span class="sd">            ((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with</span>
-<span class="sd">            ids 1 to 9 are in a functional group and that the atoms 1,</span>
-<span class="sd">            2 and 3 all form one functional group together. So do 4, 5</span>
-<span class="sd">            and 5 and so on.</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                ((1, 2, 3), (4, 5, 6), (7, 8, 9))</span>
+
+<span class="sd">            This means that all atoms with ids ``1`` to ``9`` are in a</span>
+<span class="sd">            functional group and that the atoms ``1``, ``2`` and ``3``</span>
+<span class="sd">            all form one functional group together. So do ``4``, ``5``</span>
+<span class="sd">            and ``6`` and so on.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1792,12 +1805,12 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atomid : int</span>
+<span class="sd">        atomid : :class:`int`</span>
 <span class="sd">            The id of the atom being queried.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool</span>
+<span class="sd">        :class:`bool`</span>
 <span class="sd">            Indicates whether the atom with `atomid` is part of the</span>
 <span class="sd">            core.</span>
 
@@ -1813,22 +1826,24 @@
 
 <div class="viewcode-block" id="StructUnit.json"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.json">[docs]</a>    <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a JSON representation of the object.</span>
+<span class="sd">        Returns a JSON representation of the molecule.</span>
 
 <span class="sd">        The representation has the following form:</span>
 
+<span class="sd">        .. code-block:: python</span>
+
 <span class="sd">            {</span>
 <span class="sd">                &#39;class&#39; : &#39;StructUnit&#39;,</span>
-<span class="sd">                &#39;mol_block&#39; : &#39;A string holding the V3000 mol</span>
-<span class="sd">                               block of the molecule.&#39;,</span>
+<span class="sd">                &#39;mol_block&#39; : &#39;&#39;&#39;A string holding the V3000 mol</span>
+<span class="sd">                                 block of the molecule.&#39;&#39;&#39;,</span>
 <span class="sd">                &#39;note&#39; : &#39;This molecule is nice.&#39;,</span>
 <span class="sd">                &#39;name&#39; : &#39;benzene&#39;</span>
 <span class="sd">            }</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict</span>
-<span class="sd">            A dict which represents the molecule.</span>
+<span class="sd">        :class:`dict`</span>
+<span class="sd">            A :class:`dict` which represents the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1849,18 +1864,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Completes a JSON initialization.</span>
 
-<span class="sd">        This function is not to be used. Use ``Molecule.load()``</span>
+<span class="sd">        This function is not to be used. Use :meth:`Molecule.load`</span>
 <span class="sd">        for loading instances from a JSON string. That function will</span>
 <span class="sd">        automatically call this one.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        json_dict : dict</span>
+<span class="sd">        json_dict : :class:`dict`</span>
 <span class="sd">            A dictionary holding the attribute data of the molecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1877,21 +1892,25 @@
 <div class="viewcode-block" id="StructUnit.gen_key"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.gen_key">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gen_key</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">,</span> <span class="n">functional_group</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generates the key for caching the molecule.</span>
+<span class="sd">        Generates the key used when caching the molecule.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        rdkit_mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            An rdkit instance of the molecule.</span>
+<span class="sd">        rdkit_mol : :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            An ``rdkit`` instance of the molecule.</span>
 
-<span class="sd">        functional_group : str</span>
+<span class="sd">        functional_group : :class:`str`</span>
 <span class="sd">            The name of the functional group being used to make</span>
 <span class="sd">            macromolecules.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tuple</span>
-<span class="sd">            The key used for caching the molecule.</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">            The key used for caching the molecule. Has the form</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                (&#39;amine&#39;, &#39;InChIString&#39;)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -1899,22 +1918,22 @@
 
 <div class="viewcode-block" id="StructUnit.minimize_theta"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.minimize_theta">[docs]</a>    <span class="k">def</span> <span class="nf">minimize_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">centroid</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Rotate mol to minimize angle between `v1` and `v2`.</span>
+<span class="sd">        Rotates the molecule to minimize angle between `v1` and `v2`.</span>
 
 <span class="sd">        The rotation is done about the vector `axis`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        v1 : numpy.array</span>
+<span class="sd">        v1 : :class:`numpy.array`</span>
 <span class="sd">            The vector which is rotated.</span>
 
-<span class="sd">        v2 : numpy.array</span>
+<span class="sd">        v2 : :class:`numpy.array`</span>
 <span class="sd">            The vector which is stationary.</span>
 
-<span class="sd">        axis : numpy.array</span>
+<span class="sd">        axis : :class:`numpy.array`</span>
 <span class="sd">            The vector about which the rotation happens.</span>
 
-<span class="sd">        centroid : numpy.array</span>
+<span class="sd">        centroid : :class:`numpy.array`</span>
 <span class="sd">            The position vector at the center of the rotation.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -1922,7 +1941,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2003,10 +2022,10 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        theta : float</span>
+<span class="sd">        theta : :class:`float`</span>
 <span class="sd">            The size of the rotation in radians.</span>
 
-<span class="sd">        axis : numpy.array</span>
+<span class="sd">        axis : :class:`numpy.array`</span>
 <span class="sd">            The axis about which rotation happens.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -2014,7 +2033,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2039,8 +2058,8 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        position : numpy.array</span>
-<span class="sd">            A numpy array holding the desired the position. It holds</span>
+<span class="sd">        position : :class:`numpy.array`</span>
+<span class="sd">            An array holding the desired the position. It holds</span>
 <span class="sd">            the x, y and z coordinates, respectively.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -2048,9 +2067,9 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule after it has been shifted. The same</span>
-<span class="sd">            instance as held in `mol`.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` molecule after it has been shifted. The same</span>
+<span class="sd">            instance as in :attr:`~Molecule.mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2069,10 +2088,7 @@
 
 <div class="viewcode-block" id="StructUnit._set_orientation2"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit._set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Note: The difference between this method and</span>
-<span class="sd">        ``set_orientation()`` is about which point the rotation</span>
-<span class="sd">        occurs: centroid of bonder atoms versus centroid of entire</span>
-<span class="sd">        molecule, respectively.</span>
+<span class="sd">        Rotates the molecule by a rotation from `start` to `end`.</span>
 
 <span class="sd">        Given two direction vectors, `start` and `end`, this method</span>
 <span class="sd">        applies the rotation required transform `start` to `end` on</span>
@@ -2088,16 +2104,23 @@
 <span class="sd">        can associate a gemotric feature of the molecule with a vector,</span>
 <span class="sd">        then the molecule can be roatated so that this vector is</span>
 <span class="sd">        aligned with `end`. The defined vector can be virtually</span>
-<span class="sd">        anything. This means that any geomteric feature of the molecule</span>
+<span class="sd">        anything. This means that any geometric feature of the molecule</span>
 <span class="sd">        can be easily aligned with any arbitrary axis.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The difference between this method and</span>
+<span class="sd">        :meth:`~Molecule.set_orientation` is about which point the rotation</span>
+<span class="sd">        occurs: centroid of bonder atoms versus centroid of entire</span>
+<span class="sd">        molecule, respectively.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        start : numpy.array</span>
+<span class="sd">        start : :class:`numpy.array`</span>
 <span class="sd">            A vector which is to be rotated so that it transforms to</span>
 <span class="sd">            the `end` vector.</span>
 
-<span class="sd">        end : numpy.array</span>
+<span class="sd">        end : :class:`numpy.array`</span>
 <span class="sd">            This array holds the vector, onto which `start` is rotated.</span>
 
 <span class="sd">        conformer : :class:`int`</span>
@@ -2105,8 +2128,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule in `mol`.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` molecule in :attr:`~Molecule.mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2190,26 +2213,25 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        smiles : str</span>
+<span class="sd">        smiles : :class:`str`</span>
 <span class="sd">            A SMARTS string of the molecule.</span>
 
-<span class="sd">        functional_group : str (default = None)</span>
+<span class="sd">        functional_group : :class:`str`, optional</span>
 <span class="sd">            The name of the functional group which is to have atoms</span>
 <span class="sd">            tagged. If no functional group is provided to this</span>
 <span class="sd">            parameter, no tagging is done.</span>
 
-<span class="sd">        note : str (default = &quot;&quot;)</span>
+<span class="sd">        note : :class:`str`, optional</span>
 <span class="sd">            A note or comment about the molecule.</span>
 
-<span class="sd">        name : str (default = &quot;&quot;)</span>
+<span class="sd">        name : :class:`str`, optional</span>
 <span class="sd">            A name which can be optionally given to the molcule for</span>
 <span class="sd">            easy identification.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        StructUnit</span>
-<span class="sd">            The StructUnit instance of the molecule represented by</span>
-<span class="sd">            `smarts`.</span>
+<span class="sd">        :class:`StructUnit`</span>
+<span class="sd">            A :class:`StructUnit` instance of the molecule in `smarts`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2239,25 +2261,17 @@
 <span class="sd">        Adds bonding and deletion tags to atoms.</span>
 
 <span class="sd">        All atoms which form the functional group of the molecule have</span>
-<span class="sd">        the property &#39;fg&#39; added. Its value is set to the name of the</span>
-<span class="sd">        functional group.</span>
+<span class="sd">        the property ``&#39;fg&#39;`` added. Its value is set to the name of</span>
+<span class="sd">        the functional group.</span>
 
 <span class="sd">        The atoms which form bonds during assembly have the property</span>
-<span class="sd">        called &#39;bonder&#39; added and set to &#39;1&#39;. Atoms which are deleted</span>
-<span class="sd">        during reactions have the property &#39;del&#39; set to &#39;1&#39;.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The atoms in this rdkit molecule have the properties &#39;fg&#39;,</span>
-<span class="sd">            &#39;bonder&#39; and &#39;del&#39; added, in accordance with the docstring.</span>
-
-<span class="sd">        bonder_ids : set of ints</span>
-<span class="sd">            Adds the ids of bonder atoms to this list.</span>
+<span class="sd">        called ``&#39;bonder&#39;`` added and set to ``&#39;1&#39;``. Atoms which are</span>
+<span class="sd">        deleted during reactions have the property ``&#39;del&#39;`` set to</span>
+<span class="sd">        ``&#39;1&#39;``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2290,20 +2304,11 @@
 
 <div class="viewcode-block" id="StructUnit.untag_atoms"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit.untag_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">untag_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes the tags added by ``tag_atoms()``.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The atoms in this rdkit molecule have the properties</span>
-<span class="sd">            &#39;fg&#39;, &#39;bonder&#39; and &#39;del&#39; removed.</span>
-
-<span class="sd">        bonder_ids : list of ints</span>
-<span class="sd">            This list is set to [].</span>
+<span class="sd">        Removes the tags added by :meth:`tag_atoms`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2337,7 +2342,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        end : numpy.array</span>
+<span class="sd">        end : :class:`numpy.array`</span>
 <span class="sd">            The vector with which the molecule&#39;s bonder atoms should be</span>
 <span class="sd">            aligned.</span>
 
@@ -2346,8 +2351,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule in `mol`.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` molecule in :attr:`~Molecule.mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2364,17 +2369,18 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        vector : numpy.array</span>
+<span class="sd">        vector : :class:`numpy.array`</span>
 <span class="sd">            The vector to which the distance should be minimized.</span>
 
-<span class="sd">        axis : numpy.array</span>
+<span class="sd">        axis : :class:`numpy.array`</span>
 <span class="sd">            The direction vector along which the rotation happens.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
+<span class="sd">            The id of the conformer to be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2395,17 +2401,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the coefficients of the plane formed by bonder atoms.</span>
 
-<span class="sd">        A plane is defined by the scalar plane equation,</span>
+<span class="sd">        A plane is defined by the scalar plane equation::</span>
 
 <span class="sd">            ax + by + cz = d.</span>
 
-<span class="sd">        This method returns the a, b, c and d coefficients of this</span>
-<span class="sd">        equation for the plane formed by the bonder atoms. The</span>
-<span class="sd">        coefficents a, b and c decribe the normal vector to the plane.</span>
-<span class="sd">        The coefficent d is found by substituting these coefficients</span>
-<span class="sd">        along with the x, y and z variables in the scalar equation and</span>
-<span class="sd">        solving for d. The variables x, y and z are substituted by the</span>
-<span class="sd">        coordinate of some point on the plane. For example, the</span>
+<span class="sd">        This method returns the ``a``, ``b``, ``c`` and ``d``</span>
+<span class="sd">        coefficients of this equation for the plane formed by the</span>
+<span class="sd">        bonder atoms. The coefficents ``a``, ``b`` and ``c`` decribe</span>
+<span class="sd">        the normal vector to the plane. The coefficent ``d`` is found</span>
+<span class="sd">        by substituting these coefficients along with the ``x``, ``y``</span>
+<span class="sd">        and ``z`` variables in the scalar equation and solving for</span>
+<span class="sd">        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by</span>
+<span class="sd">        the coordinates of some point on the plane. For example, the</span>
 <span class="sd">        position of one of the bonder atoms.</span>
 
 <span class="sd">        Parameters</span>
@@ -2415,8 +2422,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
-<span class="sd">            This array has the form [a, b, c, d] and represents the</span>
+<span class="sd">        :class:`numpy.array`</span>
+<span class="sd">            This array has the form ``[a, b, c, d]`` and represents the</span>
 <span class="sd">            scalar equation of the plane formed by the bonder atoms.</span>
 
 <span class="sd">        References</span>
@@ -2443,7 +2450,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.array</span>
+<span class="sd">        :class:`numpy.array`</span>
 <span class="sd">            A unit vector which describes the normal to the plane of</span>
 <span class="sd">            the bonder atoms.</span>
 
@@ -2475,13 +2482,13 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atom : int</span>
+<span class="sd">        atom : :class:`int`</span>
 <span class="sd">            The id of atom which is to have angle minimized.</span>
 
-<span class="sd">        vector : numpy.array</span>
+<span class="sd">        vector : :class:`numpy.array`</span>
 <span class="sd">            A vector with which the angle is minimized.</span>
 
-<span class="sd">        axis : numpy.array</span>
+<span class="sd">        axis : :class:`numpy.array`</span>
 <span class="sd">            The vector about which the rotation happens.</span>
 
 <span class="sd">        conformer : :class:`int`, optional</span>
@@ -2489,7 +2496,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2505,14 +2512,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule so the plane normal is aligned with `end`.</span>
 
-<span class="sd">        Here ``plane normal`` referes to the normal of the plane formed</span>
-<span class="sd">        by the bonder atoms in the substituted molecule. The molecule</span>
-<span class="sd">        is rotated about the centroid of the bonder atoms. The rotation</span>
-<span class="sd">        results in the normal of their plane being aligned with `end`.</span>
+<span class="sd">        Here &quot;plane normal&quot; referes to the normal of the plane formed</span>
+<span class="sd">        by the bonder atoms. The molecule is rotated about the centroid</span>
+<span class="sd">        of the bonder atoms. The rotation results in the normal of</span>
+<span class="sd">        their plane being aligned with `end`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        end : numpy.array</span>
+<span class="sd">        end : :class:`numpy.array`</span>
 <span class="sd">            The vector with which the normal of plane of bonder atoms</span>
 <span class="sd">            shoould be aligned.</span>
 
@@ -2521,8 +2528,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            The rdkit molecule in `mol`.</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">            The ``rdkit`` molecule in :attr:`~Molecule.mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2533,145 +2540,98 @@
 <div class="viewcode-block" id="MacroMolecule"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule">[docs]</a><span class="nd">@total_ordering</span>
 <span class="k">class</span> <span class="nc">MacroMolecule</span><span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">Cached</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class for assembled macromolecules.</span>
+<span class="sd">    A representing assembled macromolecules.</span>
 
-<span class="sd">    The goal of this class is to represent an individual used by the</span>
-<span class="sd">    GA. As such, it holds attributes that are to be expected for this</span>
-<span class="sd">    purpose. Mainly, it has a fitness value stored in its `fitness`</span>
-<span class="sd">    attribute and a genetic code - as defined by its `building_blocks`</span>
-<span class="sd">    and  `topology` attributes. If a change is made to either of these</span>
-<span class="sd">    attributes, they should describe a different macromolecule. On the</span>
-<span class="sd">    other hand, the same attributes should always describe the same</span>
-<span class="sd">    macromolecule.</span>
-
-<span class="sd">    Because of this, as well as the computational cost associated with</span>
-<span class="sd">    macromolecule initialization, instances of this class are cached.</span>
-<span class="sd">    This means that providing the same arguments to the initializer</span>
-<span class="sd">    will not build a different instance with the same attribute values.</span>
-<span class="sd">    It will yield the original instance, retrieved from memory.</span>
-
-<span class="sd">    To prevent bloating this class, any information that can be</span>
-<span class="sd">    categorized is. For example, storing information that concerns</span>
-<span class="sd">    building blocks ``in a vacuum`` is stored in ``StructUnit``</span>
-<span class="sd">    instances. Equally, manipulations of such data is also performed by</span>
-<span class="sd">    those instances. Similarly, anything to do with topolgy should be</span>
-<span class="sd">    held by a ``Topology`` instance in the topology attribute. There is</span>
-<span class="sd">    a notable exception to this however. This happens when retrieving</span>
-<span class="sd">    topological information directly from rdkit molecule instances</span>
-<span class="sd">    of the macromolecule. Examples include the information about atomic</span>
-<span class="sd">    coordinates, which can be access with the ``atom_coords()`` method.</span>
-
-<span class="sd">    It should also be noted that only a single copy of each</span>
-<span class="sd">    ``StructUnit`` instance representing a specific building block</span>
-<span class="sd">    needs to be held. How many of such building blocks are need to</span>
-<span class="sd">    assemble the molecule is the handled by the ``Topology`` class.</span>
+<span class="sd">    Because of the computational cost associated with macromolecule</span>
+<span class="sd">    assembly, instances of this class are cached. This means that</span>
+<span class="sd">    providing the same arguments to the initializer will not build a</span>
+<span class="sd">    different instance with the same attribute values. It will yield</span>
+<span class="sd">    the original instance, retrieved from memory.</span>
 
 <span class="sd">    This class is not intended to be used directly but should be</span>
 <span class="sd">    inherited by subclasses representing specific macromolecules. The</span>
-<span class="sd">    ``Cage`` and ``Polymer`` classes are examples of this. Any</span>
-<span class="sd">    information or methods that apply generally to all macromolecules</span>
-<span class="sd">    should be defined within this class while specific non-general data</span>
-<span class="sd">    should be included in derived classes.</span>
+<span class="sd">    :class:`Cage` and :class:`Polymer` classes are examples of this.</span>
+<span class="sd">    Any information or methods that apply generally to all</span>
+<span class="sd">    macromolecule should be defined within this class while specific</span>
+<span class="sd">    non-general data should be included in the derived classes.</span>
 
-<span class="sd">    This class also supports comparison operations, these act on the</span>
-<span class="sd">    fitness value assiciated with a macromolecule. Comparison</span>
-<span class="sd">    operations not explicitly defined are included via the</span>
-<span class="sd">    ``total_ordering`` decorator. For other operations and methods</span>
-<span class="sd">    supported by this class examine the rest of the class definition.</span>
-
-<span class="sd">    Finally, a word of caution. The equality operator ``==`` compares</span>
-<span class="sd">    fitness values. This means two macromolecules, made from different</span>
-<span class="sd">    building blocks, can compare equal if they happen to have the same</span>
-<span class="sd">    fitness. The operator is not to be used to check if one</span>
-<span class="sd">    macromolecule is the same structurally as another. To do this check</span>
-<span class="sd">    use the ``same()`` method. This method may be overwritten in</span>
-<span class="sd">    derived classes, as necessary. In addition the ``is`` operator is</span>
-<span class="sd">    implemented as is default in Python. It compares whether two</span>
-<span class="sd">    objects are in the same location in memory. Because the</span>
-<span class="sd">    ``MacroMolecule`` class is cached the ``is`` operator could in</span>
-<span class="sd">    principle be used instead of the `same` method (including in</span>
-<span class="sd">    derived classes). However, this is not intended use and is not</span>
-<span class="sd">    guaranteed to work in future implementations. If caching stops</span>
-<span class="sd">    being implemented such code would break.</span>
+<span class="sd">    Note the equality operator ``==`` compares :attr:`fitness`. This</span>
+<span class="sd">    means two different macromolecules compare equal if they happen to</span>
+<span class="sd">    have the same fitness. The operator is not to be used to check if</span>
+<span class="sd">    one macromolecule is the same structurally as another. To do this,</span>
+<span class="sd">    use :meth:`~Molecule.same`.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    building_blocks : list of ``StructUnit`` instances</span>
-<span class="sd">        This attribute holds ``StructUnit`` instances which represent</span>
-<span class="sd">        the monomers forming the macromolecule. Only one ``StructUnit``</span>
-<span class="sd">        instance is needed per building block, even if multiples of a</span>
-<span class="sd">        building block join up to form the macromolecule</span>
+<span class="sd">    building_blocks : :class:`list` of :class:`StructUnit`</span>
+<span class="sd">        This attribute holds :class:`StructUnit` instances which</span>
+<span class="sd">        represent the monomers forming the macromolecule. Only one</span>
+<span class="sd">        :class:`StructUnit` instance is needed per building block, even</span>
+<span class="sd">        if multiples of that molecule join up to form the</span>
+<span class="sd">        macromolecule.</span>
 
-<span class="sd">    bb_counter : Counter</span>
+<span class="sd">    bb_counter : :class:`collections.Counter`</span>
 <span class="sd">        A counter keeping track of how much of each building block is</span>
 <span class="sd">        used to form the macromolecule.</span>
 
-<span class="sd">    topology : Topology</span>
-<span class="sd">        An object of a class derived from ``Topology``. It</span>
-<span class="sd">        assembles the marcormolecule from the building_blocks.</span>
+<span class="sd">    topology : :class:`.Topology`</span>
+<span class="sd">        Defines the shape of macromolecule and assembles it.</span>
 
-<span class="sd">    mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        An rdkit instance representing the macromolecule.</span>
+<span class="sd">    fitness : :class:`float`</span>
+<span class="sd">        The fitness value of the macromolecule, used by the GA.</span>
 
-<span class="sd">    inchi : str</span>
-<span class="sd">        The InChI of the molecule.</span>
-
-<span class="sd">    optimized : bool (default = False)</span>
-<span class="sd">        This is a flag to indicate if a molecule has been previously</span>
-<span class="sd">        optimized. Optimization functions set this flag to ``True``</span>
-<span class="sd">        after an optimization.</span>
-
-<span class="sd">    energy : Energy</span>
-<span class="sd">        This attribute handles information about the energy of the</span>
-<span class="sd">        instance. See the documentation of ``Energy`` to see what is</span>
-<span class="sd">        available.</span>
-
-<span class="sd">    fitness : float (default = None)</span>
-<span class="sd">        The fitness value of the macromolecule, as determined by the</span>
-<span class="sd">        chosen fitness functions together with any normalization</span>
-<span class="sd">        functions. Fitness functions do not place values into this</span>
-<span class="sd">        attribute directly.</span>
-
-<span class="sd">    unscaled_fitness : dict</span>
-<span class="sd">        The dictionary hold the name of a fitness function as the</span>
+<span class="sd">    unscaled_fitness : :class:`dict`</span>
+<span class="sd">        The dictionary holds the name of a fitness function as the</span>
 <span class="sd">        key and the value it calculated for unscaled_fitness as the</span>
-<span class="sd">        value.</span>
+<span class="sd">        value. For example,</span>
 
-<span class="sd">    progress_params : dict (default = {})</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            unscaled_fitness = {&#39;fitness_func1&#39;: 12.3,</span>
+<span class="sd">                                &#39;fitness_func2&#39;: 49.2}</span>
+
+<span class="sd">        where ``&#39;fitness_func1&#39;`` and ``&#39;fitness_func2&#39;`` are the</span>
+<span class="sd">        names of the fintess functions applied on the molecule.</span>
+
+<span class="sd">    progress_params : :class:`dict`</span>
 <span class="sd">        Holds the fitness parameters which the GA should track to make</span>
-<span class="sd">        progress plots. The key is the name of a fitness function.</span>
+<span class="sd">        progress plots. The key is the name of a fitness function. Has</span>
+<span class="sd">        the form</span>
 
-<span class="sd">    bonds_made : int</span>
-<span class="sd">        The number of bonds created during assembly.</span>
+<span class="sd">        .. code-block:: python</span>
 
-<span class="sd">    bonder_ids : list of ints</span>
-<span class="sd">        The ids of atoms which have bonds added during assembly. This</span>
-<span class="sd">        list is sorted from lowest to highest id.</span>
+<span class="sd">            unscaled_fitness = {&#39;fitness_func1&#39;: [8, 49]</span>
+<span class="sd">                                &#39;fitness_func2&#39;: [78, 4.2, 32.3]}</span>
 
-<span class="sd">    fg_ids : set of ints</span>
-<span class="sd">        The ids of atoms which were parth of the functional group of</span>
+
+<span class="sd">    bonds_made : :class:`int`</span>
+<span class="sd">        The number of bonds made during assembly.</span>
+
+<span class="sd">    bonder_ids : :class:`list` of :class:`int`</span>
+<span class="sd">        The ids of atoms which have bonds added during assembly. Sorted</span>
+<span class="sd">        from lowest to highest id.</span>
+
+<span class="sd">    fg_ids : :class:`set` of :class:`int`</span>
+<span class="sd">        The ids of atoms which were part of the functional group of</span>
 <span class="sd">        the building blocks.</span>
 
-<span class="sd">    key : MacroMolKey</span>
-<span class="sd">        The key used for caching the molecule. Necessary for</span>
-<span class="sd">        `update_cache` to work. This attribute is assigned by the</span>
-<span class="sd">        `__call__()` method of the ``Cached`` metaclass.</span>
+<span class="sd">    fragments : :class:`dict`</span>
+<span class="sd">        The :class:`dict` has the form</span>
 
-<span class="sd">    name : str (default = &quot;&quot;)</span>
-<span class="sd">        A name which can be optionally given to the molcule for easy</span>
-<span class="sd">        identification.</span>
+<span class="sd">        .. code-block:: python</span>
 
-<span class="sd">    note : str (default = &quot;&quot;)</span>
-<span class="sd">        A note or comment about the molecule. Purely optional but can</span>
-<span class="sd">        be useful for labelling and debugging.</span>
+<span class="sd">            fragments = {(0, 0): {1, 2, 3, 4},</span>
+<span class="sd">                         (0, 1): {5, 6, 7, 8},</span>
+<span class="sd">                         (1, 0): {9, 10, 11},</span>
+<span class="sd">                         (1, 1): {12, 13, 14},</span>
+<span class="sd">                         (1, 2): {15, 16, 17}}</span>
 
-<span class="sd">    fragments : dict</span>
-<span class="sd">        The key in this dictionary is a tuple of form (int, int). The</span>
-<span class="sd">        first int is the index of a building block within</span>
-<span class="sd">        `building_blocks`. The second int indentifies a molecule of</span>
-<span class="sd">        that building block. For example, (1, 3) identifies the 4th</span>
-<span class="sd">        molecule of type building_blocks[1] to be added to the</span>
-<span class="sd">        macromolecule during assembly.</span>
+<span class="sd">        The key in this dictionary is a tuple of form ``(5, 2)``. The</span>
+<span class="sd">        first element is the index of a building block within</span>
+<span class="sd">        :attr:`building_blocks`. The second element indentifies a</span>
+<span class="sd">        molecule of that building block. For example, ``(1, 3)``</span>
+<span class="sd">        identifies the 4th molecule of  ``building_blocks[1]`` to be</span>
+<span class="sd">        added to the macromolecule during assembly.</span>
 
 <span class="sd">        The value in the dictionary is a set of ints. These hold the</span>
 <span class="sd">        atom ids belonging to a particular molecule before assembly.</span>
@@ -2685,30 +2645,25 @@
                  <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                  <span class="n">bb_conformers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a ``MacroMolecule`` instance.</span>
-
-<span class="sd">        When an exception occurs during initialization, all parameters</span>
-<span class="sd">        which were provided to the initializer are saved to a file</span>
-<span class="sd">        ``failures.txt`` which is in the ``output`` folder.</span>
+<span class="sd">        Initialize a :class:`MacroMolecule` instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
-<span class="sd">        building_blocks : iterable of ``StructUnit`` instances</span>
-<span class="sd">            A set of ``StructUnit`` instances which represent the</span>
-<span class="sd">            monomers forming the macromolecule.</span>
+<span class="sd">        building_blocks : :class:`list` of :class:`StructUnit`</span>
+<span class="sd">            The :class:`StructUnit` instances of building blocks</span>
+<span class="sd">            forming the macromolecule.</span>
 
-<span class="sd">        topology : Topology</span>
-<span class="sd">            An instance of a class derived from ``Topology``. It</span>
-<span class="sd">            assembles the marcormolecule from the building_blocks.</span>
+<span class="sd">        topology : :class:`.Topology`</span>
+<span class="sd">            Defines the shape of macromolecule and assembles it.</span>
 
-<span class="sd">        note : str (default = &quot;&quot;)</span>
+<span class="sd">        name : :class:`str`, optional</span>
+<span class="sd">            A name which can be given to the molcule for easy</span>
+<span class="sd">            identification.</span>
+
+<span class="sd">        note : :class:`str`, optional</span>
 <span class="sd">            A note or comment about the molecule.</span>
 
-<span class="sd">        name : str (default = &quot;&quot;)</span>
-<span class="sd">            A name which can be optionally given to the molcule for</span>
-<span class="sd">            easy identification.</span>
-
-<span class="sd">        bb_conformers : :class:`list` of :class:`int`</span>
+<span class="sd">        bb_conformers : :class:`list` of :class:`int`, optional</span>
 <span class="sd">            The ids of the building block conformers to be used. Must</span>
 <span class="sd">            be equal in length to `building_blocks` and orders must</span>
 <span class="sd">            correspond. If ``None``, then ``-1`` is used for all</span>
@@ -2817,20 +2772,21 @@
 
 <div class="viewcode-block" id="MacroMolecule.building_block_cores"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.building_block_cores">[docs]</a>    <span class="k">def</span> <span class="nf">building_block_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Yields the &quot;cores&quot; of a building block molecule.</span>
+<span class="sd">        Yields the &quot;cores&quot; of the building block molecules.</span>
 
-<span class="sd">        The structure of the cores are representative of how they are</span>
-<span class="sd">        found in the macromolecule.</span>
+<span class="sd">        The structure of the yielded cores has the geometry found in</span>
+<span class="sd">        the macromolecule.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        bb : int</span>
+<span class="sd">        bb : :class:`int`</span>
 <span class="sd">            The index of a building block molecule within</span>
-<span class="sd">            `building_blocks`. The cores of this molecule are yielded.</span>
+<span class="sd">            :attr:`building_blocks`. The cores of this molecule are</span>
+<span class="sd">            yielded.</span>
 
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
-<span class="sd">        rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
 <span class="sd">            The core of a building block molecule, as found in the</span>
 <span class="sd">            macromolecule.</span>
 
@@ -2858,16 +2814,18 @@
 
 <div class="viewcode-block" id="MacroMolecule.json"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.json">[docs]</a>    <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a JSON representation of the object.</span>
+<span class="sd">        Returns a JSON representation of the molecule.</span>
 
-<span class="sd">        The representation has the following form:</span>
+<span class="sd">        The representation has the form</span>
+
+<span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            {</span>
 <span class="sd">                &#39;class&#39; : &#39;Polymer&#39;,</span>
-<span class="sd">                &#39;mol_block&#39; : &#39;A string holding the V3000 mol</span>
-<span class="sd">                               block of the molecule.&#39;</span>
+<span class="sd">                &#39;mol_block&#39; : &#39;&#39;&#39;A string holding the V3000 mol</span>
+<span class="sd">                                 block of the molecule.&#39;&#39;&#39;</span>
 <span class="sd">                &#39;building_blocks&#39; : {bb1.json(), bb2.json()}</span>
-<span class="sd">                &#39;topology&#39; : &#39;Copolymer(repeating_unit=&#39;AB&#39;)&#39;</span>
+<span class="sd">                &#39;topology&#39; : &#39;Copolymer(repeating_unit=&quot;AB&quot;)&#39;</span>
 <span class="sd">                &#39;unscaled_fitness&#39; : {&#39;fitness_func1&#39; : fitness1,</span>
 <span class="sd">                                      &#39;fitness_func2&#39; : fitness2},</span>
 <span class="sd">                &#39;note&#39; : &#39;A nice molecule.&#39;,</span>
@@ -2876,8 +2834,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict</span>
-<span class="sd">            A dict which represents the molecule.</span>
+<span class="sd">        :class:`dict`</span>
+<span class="sd">            A :class:`dict` which represents the molecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2907,18 +2865,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Completes a JSON initialization.</span>
 
-<span class="sd">        This function is not to be used. Use ``Molecule.load()``</span>
+<span class="sd">        This function is not to be used. Use :meth:`Molecule.load`</span>
 <span class="sd">        for loading instances from a JSON string. That function will</span>
 <span class="sd">        automatically call this one.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        json_dict : dict</span>
+<span class="sd">        json_dict : :class:`dict`</span>
 <span class="sd">            A dictionary holding the attribute data of the molecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -2966,19 +2924,19 @@
 <div class="viewcode-block" id="MacroMolecule.gen_key"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.gen_key">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gen_key</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generates the key for caching the molecule.</span>
+<span class="sd">        Generates the key used for caching the molecule.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        building_blocks : iterable of StructUnit instances</span>
+<span class="sd">        building_blocks : :class:`list` of :class:`StructUnit`</span>
 <span class="sd">            The building blocks used to make the macromolecule.</span>
 
-<span class="sd">        topology : Topology</span>
+<span class="sd">        topology : :class:`.Topology`</span>
 <span class="sd">            The topology used to make the macromolecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tuple</span>
+<span class="sd">        :class:`tuple`</span>
 <span class="sd">            The key used for caching the macromolecule.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3011,7 +2969,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        float</span>
+<span class="sd">        :class:`float`</span>
 <span class="sd">            The mean rmsd of the macromole&#39;s building blocks to their</span>
 <span class="sd">            &quot;free&quot; counterparts.</span>
 
@@ -3042,19 +3000,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates `bonder_ids` and `fg_ids` attributes.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        bonder_ids : list of ints</span>
-<span class="sd">            All molecules tagged &#39;bonder&#39; have their ids added to this</span>
-<span class="sd">            list.</span>
-
-<span class="sd">        fg_ids : set of ints</span>
-<span class="sd">            All molecules tagged &#39;fg&#39; have their ids add to</span>
-<span class="sd">            this set.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3069,18 +3017,18 @@
 
 <div class="viewcode-block" id="MacroMolecule.update_cache"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.update_cache">[docs]</a>    <span class="k">def</span> <span class="nf">update_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set cached molecule with same &#39;key&#39; to have equal attributes.</span>
+<span class="sd">        Update attributes of cached molecule.</span>
 
-<span class="sd">        When an instance of ``MacroMolecule`` is first created it</span>
-<span class="sd">        is cached. Using multiprocessing to perform optimizations or</span>
-<span class="sd">        calculate fitness returns modified copies of the cached</span>
+<span class="sd">        When an instance of :class:`MacroMolecule` is first created it</span>
+<span class="sd">        is cached. Using ``multiprocessing`` to perform optimizations</span>
+<span class="sd">        or calculate fitness returns modified copies of the cached</span>
 <span class="sd">        molecules. In order to ensure that the cached molecules have</span>
 <span class="sd">        their attributes updated to the values of the copies, this</span>
 <span class="sd">        method must be run on the copies.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3088,21 +3036,16 @@
 
 <div class="viewcode-block" id="MacroMolecule.update_fragments"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.update_fragments">[docs]</a>    <span class="k">def</span> <span class="nf">update_fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Saves rdkit atom properties in `fragments`.</span>
+<span class="sd">        Saves ``rdkit`` atom properties in :attr:`fragments`.</span>
 
-<span class="sd">        The properties saved are &#39;bb_index&#39; and &#39;mol_index&#39;. These</span>
-<span class="sd">        should be added to the atoms by the ``place_mols()`` function</span>
-<span class="sd">        during ``build()``.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        fragments : dict</span>
-<span class="sd">            The dictionary is updated with the data from the &#39;bb_index&#39;</span>
-<span class="sd">            and &#39;mol_index&#39; properties.</span>
+<span class="sd">        The properties saved are ``&#39;bb_index&#39;`` and ``&#39;mol_index&#39;``.</span>
+<span class="sd">        These should be added to the atoms by</span>
+<span class="sd">        :meth:`.Topology.place_mols` when running</span>
+<span class="sd">        :meth:`.Topology.build`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3175,27 +3118,19 @@
 <span class="sd">        only want to compare the triangulars with other</span>
 <span class="sd">        triangular windows and squares only with other squares.</span>
 
-<span class="sd">        Paramters</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        conformer : :class:`int`, optional</span>
 <span class="sd">            The id of the conformer to use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        float</span>
+<span class="sd">        :class:`float`</span>
 <span class="sd">            The total difference of window size when considering</span>
 <span class="sd">            every combination of windows of the same type.</span>
 
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 <span class="sd">            If not all windows were found.</span>
-
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        WindowError</span>
-<span class="sd">            When the number of found windows is less than the</span>
-<span class="sd">            number of expected windows. Likely due to a collapsed</span>
-<span class="sd">            cage.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3247,7 +3182,7 @@
 
 <div class="viewcode-block" id="Cage.windows"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Cage.windows">[docs]</a>    <span class="k">def</span> <span class="nf">windows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns window sizes found by pyWindow.</span>
+<span class="sd">        Returns window sizes found by ``pyWindow``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3256,17 +3191,17 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 <span class="sd">            If the function for finding windows and their sizes</span>
 <span class="sd">            found fewer than the required number of windows or</span>
 <span class="sd">            if it failed for some other reason.</span>
 
-<span class="sd">        list of floats</span>
-<span class="sd">            Each float in the list represents the size of a</span>
+<span class="sd">        :class:`list` of :class:`float`</span>
+<span class="sd">            Each :class:`float` represents the size of a</span>
 <span class="sd">            window in the cage. If the window finding function</span>
 <span class="sd">            found more than the expected number of windows, only</span>
-<span class="sd">            the largest n windows are returned. Where n is the</span>
-<span class="sd">            number of expected windows.</span>
+<span class="sd">            the largest ``n`` windows are returned. Where ``n`` is the</span>
+<span class="sd">            number of expected windows for that cage topology.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3329,7 +3264,7 @@
 
 <span class="sd">    periodic_bonds : :class:`list` of :class:`.PeriodicBond`</span>
 <span class="sd">        When periodic topologies are assembled, periodic bonds</span>
-<span class="sd">        do not get added to the rdkit molecule in the</span>
+<span class="sd">        do not get added to the ``rdkit`` molecule in the</span>
 <span class="sd">        :attr:`~.MacroMolecule.mol` attribute. Instead,</span>
 <span class="sd">        :meth:`~.PeriodicLattice.join_mols` adds</span>
 <span class="sd">        :class:`.PeriodicBond` instances representing the bonds into</span>
@@ -3421,7 +3356,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
-<span class="sd">            An rdkit molecule of the island.</span>
+<span class="sd">            An ``rdkit`` molecule of the island.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3453,7 +3388,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`tuple`</span>
-<span class="sd">            The first member of the tuple an rdkit molecule of the</span>
+<span class="sd">            The first member of the tuple an ``rdkit`` molecule of the</span>
 <span class="sd">            island with all bonds between the unit cells added. The</span>
 <span class="sd">            second member of the tuple is a :class:`set` of</span>
 <span class="sd">            :class:`int`, where each :class:`int` is id of a bonder</span>
@@ -3527,7 +3462,7 @@
 
 <span class="sd">        bonded : :class:`set` of :class:`int`</span>
 <span class="sd">            Contains all the ids of all bonder atoms in `island` which</span>
-<span class="sd">            have already had a bonded added by :methd:`_join_island`.</span>
+<span class="sd">            have already had a bonded added by :meth:`_join_island`.</span>
 
 <span class="sd">        bonder_map : :class:`dict`</span>
 <span class="sd">            This is a mapping of the ids of bonder atoms in the island</span>
@@ -3546,7 +3481,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
-<span class="sd">            The rdkit molecule of the final, assembled island.</span>
+<span class="sd">            The ``rdkit`` molecule of the final, assembled island.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -3615,9 +3550,9 @@
 <span class="sd">            3rd unit cell along the x axis, the second along the y axis</span>
 <span class="sd">            and the fourth along the z axis.</span>
 
-<span class="sd">            The second member is an rdkit molecule of the island being</span>
-<span class="sd">            built. The third member is a :class:`dict` mapping the</span>
-<span class="sd">            ids of bonder atoms in the island back to the id of the</span>
+<span class="sd">            The second member is an ``rdkit`` molecule of the island</span>
+<span class="sd">            being built. The third member is a :class:`dict` mapping</span>
+<span class="sd">            the ids of bonder atoms in the island back to the id of the</span>
 <span class="sd">            equivalent atom in the original unit cell.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3706,7 +3641,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keywords</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;name </span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-            <span class="c1"># Write the cell paramters.</span>
+            <span class="c1"># Write the cell parameters.</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;cell</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="c1"># The sizes of cell vectors a, b and c are written first.</span>
             <span class="k">for</span> <span class="n">vector</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">cell_dimensions</span><span class="p">:</span>
