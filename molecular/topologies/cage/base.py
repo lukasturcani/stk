@@ -10,54 +10,85 @@ from ....convenience_tools import (centroid, vector_theta,
                                    normalize_vector)
 
 
-class WindowError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
 class Vertex:
     """
-    Used to represent the vertices of Cage polyhedra.
+    Used to represent the vertices of cage polyhedra.
 
     This class stores information about the vertices which make up a
-    Cage's structure.
+    cage's structure.
 
     Attributes
     ----------
-    coord : numpy.array of floats
-        A numpy array which holds the x, y and z coordinates of the
+    coord : :class:`numpy.array`
+        An array which holds the x, y and z coordinates of the
         vertex, in that order.
 
-    connected : list of Edge or Vertex instances
-        This list holds the Edge or Vertex instances which represent
-        the edges or vertices connected to the `self` vertex.
+    connected : :class:`list` of :class:`Edge` or :class:`Vertex`
+        This :class:`list` holds the :class:`Edge` or :class:`Vertex`
+        instances which represent the edges or vertices connected to
+        this one.
 
-    bonder_ids : list of ints
-        This list holds the ids of atoms which belong to the building
-        block placed on the vertex and will form bonds. The ids reflect
-        those in the macromolecule not in the building block itself.
+    bonder_ids : :class:`list` of :class:`int`
+        This :class:`list` holds the ids of atoms which belong to the
+        building block placed on the vertex and will form bonds. The
+        ids reflect those in the macromolecule not in the building block
+        itself.
 
-    atom_position_pairs : list of tuples of form (int, Vertex)
+    atom_position_pairs : :class:`list`
+        A :class:`list` of the form
+
+        .. code-block:: python
+
+            atom_position_pairs = [(4, v1), (8, v2)]
+
+        Where ``v1`` and ``v2`` are :class:`Vertex` instances.
+
         Each atom which  is paired to a neighboring vertex or
-        edge first. Only after this is the atom - atom pairing
-        performed. The atom - edge/vertex pairing is stored here. The
+        edge first. Only after this is the atom-atom pairing
+        performed. The atom-edge/vertex pairing is stored here. The
         int represents the id of the atom.
 
-    distances : list of tuples of form (float, int, int)
+    distances : :class:`list`
+        A :class:`list` of the form
+
+        .. code-block:: python
+
+            distances = [(15.2, 5, 10), (18.4, 3, 8), ...]
+
         After bonder atoms have been associated with vertices to which
         they join, the idividual atoms are paired up. To do this the
         distance between every bonder atom on the paired vertex and the
         bonder atom which is paired to the vertex is found. This
-        information is stored here where float is the distance, the
-        first int is the bonder atom and the second int is the bonder
-        atom on the vertex paired to the first atom.
+        information is stored here the first element of each
+        :class:`tuple` the distance, and the second and third elements
+        represent the bonder atoms.
 
-    id : object, optional
-        An id to identify the vertex. Used by `place_mols()`
+    id : :class:`object`, optional
+        An id to identify the vertex. Used by
+        :meth:`CageTopology.place_mols`.
 
     """
 
     def __init__(self, x, y, z, id_=None):
+        """
+        Initializes a :class:`Vertex`.
+
+        Parameters
+        ----------
+        x : :class:`int` or :class:`float`
+            The x coordinate.
+
+        y : :class:`int` or :class:`float`
+            The y coordiante
+
+        z : :class:`int` or :class:`float`
+            The z coordiante
+
+        id : :class:`object`, optional
+            An id to identify the vertex.
+
+        """
+
         self.coord = np.array([x, y, z])
         self.connected = []
         self.bonder_ids = []
@@ -68,24 +99,24 @@ class Vertex:
     @classmethod
     def vertex_init(cls, *vertices):
         """
-        Intializes the Vertex from  a list of other vertices.
+        Intializes the :class:`Vertex` from other vertices.
 
         This initalizer automatically calculates the position of the
         vertex from the positions of the vertices provided to the
         initializer. Its position is set to the centroid of the
         provided vertices.
 
-        The `connected` attributes of all the involved vertices are
-        also updated.
+        The :attr:`connected` attributes of all the involved vertices
+        are also updated.
 
         Parameters
         ----------
-        vertices : tuple
-            A tuple of Vertex objects.
+        vertices : :class:`tuple` pf :class:`Vertex`
+            Holds :class:`Vertex` objects used for initialization.
 
         Returns
         -------
-        Vertex
+        :class:`Vertex`
             The initialized vertex.
 
         """
@@ -101,7 +132,7 @@ class Vertex:
 
     def place_mol(self, building_block, aligner=0, aligner_edge=0):
         """
-        Place a StructUnit3 building block on the coords of the vertex.
+        Place a :class:`.StructUnit3` building block on the vertex.
 
         The orientation of the building block is aligned with 2
         parameters. Firstly, the normal of the plane of bonder atoms of
@@ -119,29 +150,24 @@ class Vertex:
 
         Parameters
         ----------
-        building_block : StructUnit3
+        building_block : :class:`.StructUnit3`
             The building block molecule to be placed on a vertex.
 
-        aligner : int, optional
-            The index of the atom within `bonder_ids` which is to be
-            aligned with an edge.
+        aligner : :class:`int`, optional
+            The index of the atom within
+            :attr`.StructUnit.bonder_ids` which is to be aligned
+            with an edge.
 
-        aligner_edge : int, optional
-            The index of an edge in `connected`. It is the edge with
-            which `aligner` is aligned.
-
-        Modifies
-        --------
-        building_block.mol : rdkit.Chem.rdchem.Mol
-            The conformer of the rdkit instance in this attribute is
-            modified as per the description in the docstring.
+        aligner_edge : :class:`int`, optional
+            The index of an edge in :attr:`connected`. It is the edge
+            with which `aligner` is aligned.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit instance holding the building block molecule with
-            the coordinates placed on the vertex and orientation set as
-            described in the docstring.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` instance holding the building block molecule
+            with the coordinates placed on the vertex and orientation
+            set as described in the docstring.
 
         """
 
@@ -178,7 +204,7 @@ class Vertex:
 
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             A normalized vector which defines the normal pointed away
             from the origin.
 
@@ -211,23 +237,24 @@ class Vertex:
         """
         Return coefficients of plane of edges connected to the vertex.
 
-        A plane is defined by the scalar plane equation,
+        A plane is defined by the scalar plane equation::
 
             ax + by + cz = d.
 
-        This method returns the a, b, c and d coefficients of this
-        equation for the plane formed by the connected edges. The
-        coefficents a, b and c decribe the normal vector to the plane.
-        The coefficent d is found by substituting these coefficients
-        along with the x, y and z variables in the scalar equation and
-        solving for d. The variables x, y and z are substituted by the
-        coordinate of some point on the plane. For example, the
+        This method returns the ``a``, ``b``, ``c`` and ``d``
+        coefficients of this equation for the plane formed by the
+        connected edges. The coefficents ``a``, ``b`` and ``c`` decribe
+        the normal vector to the plane. The coefficent ``d`` is found
+        by substituting these coefficients along with the ``x``, ``y``
+        and ``z`` variables in the scalar equation and solving for
+        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by
+        the coordinate of some point on the plane. For example, the
         position of one of the connected edges.
 
         Returns
         -------
-        numpy.array
-            This array has the form [a, b, c, d] and represents the
+        :class:`numpy.array`
+            This array has the form ``[a, b, c, d]`` and represents the
             scalar equation of the plane formed by the connected edges.
 
         References
@@ -246,7 +273,7 @@ class Vertex:
 
         Yields
         ------
-        numpy.array
+        :class:`numpy.array`
             A normalized direction vector running from one edge
             connected to the vertex to another.
 
@@ -261,10 +288,10 @@ class Vertex:
 
         Returns
         -------
-        numpy.matrix
-            The matrix is n x 3, where n is the number of edges
-            connected to the vertex. The row holds the x, y and z
-            coordinates, respectively.
+        :class:`numpy.matrix`
+            The matrix of shape ``[n, 3]``, where ``n`` is the number
+            of edges connected to the vertex. The row holds the x, y
+            and z coordinates, respectively.
 
         """
 
@@ -279,7 +306,7 @@ class Vertex:
 
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             An array which holds the x, y and z positions of the
             centroid of the edges connected to the vertex.
 
@@ -301,13 +328,30 @@ class Edge(Vertex):
 
     Attributes
     ----------
-    direction : numpy.array
+    direction : :class:`numpy.array`
         This vector represents the orientation of the edge. It is a
-        normalized direction vector which runs from `v2` to `v1`.
+        normalized direction vector which runs from `v2` to `v1`,
+        provided in the initalizer.
 
     """
 
     def __init__(self, v1, v2, id_=None):
+        """
+        Initializes an :class:`Edge` instance.
+
+        Parameters
+        ----------
+        v1 : :class:`Vertex`
+            A vertex joined to the edge.
+
+        v2 : :class:`Vertex`
+            Another vertex joined to the edge.
+
+        id_ : :class`str`, optional
+            An id for the edge.
+
+        """
+
         Vertex.__init__(self, *centroid(v1.coord, v2.coord), id_)
         self.direction = normalize_vector(v1.coord - v2.coord)
         self.connected.extend([v1, v2])
@@ -324,25 +368,18 @@ class Edge(Vertex):
 
         Parameters
         ----------
-        linker : StructUnit2
+        linker : :class:`.StructUnit2`
             The linker which is to be placed and orientated as
             described in the docstring.
 
-        alignment : int
-            1 for parallel alignment with `self.direction` and -1 for
-            anti-parallel alignment with `self.direction`.
-
-
-        Modifies
-        --------
-        linker.mol : rdkit.Chem.rdchem.Mol
-            The conformer of the rdkit instance in this attribute is
-            modified as per the description in the docstring.
+        alignment : :class:`int`
+            ``1`` for parallel alignment with :attr:`direction` and
+            ``-1`` for anti-parallel alignment with :attr:`direction`.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit instance holding the linker molecule with the
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` instance holding the linker molecule with the
             coordinates placed on the edge and orientation set as
             described in the docstring.
 
@@ -370,9 +407,6 @@ class _CageTopology(Topology):
 
     Attributes
     ----------
-    In addition to all the attributes defined within ``Topology`` this
-    class has the following attributes:
-
     A_alignments : list of ints (default = None)
         The length of this list must be equal to the number of
         building blocks in the cage. When cages are built one of the
