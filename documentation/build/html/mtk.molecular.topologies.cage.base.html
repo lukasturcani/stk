@@ -158,7 +158,7 @@
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.cage.base.Vertex</span></code></a></p>
 <p>Used to represent the edges of Cage polyhedra.</p>
 <p>This class stores information about the edges which make up a
-Cage’s structure.</p>
+cage’s structure.</p>
 <dl class="attribute">
 <dt id="mtk.molecular.topologies.cage.base.Edge.direction">
 <code class="descname">direction</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Edge.direction" title="Permalink to this definition">¶</a></dt>
@@ -166,30 +166,6 @@ Cage’s structure.</p>
 normalized direction vector which runs from <cite>v2</cite> to <cite>v1</cite>,
 provided in the initalizer.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base.Edge.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>id_=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#Edge.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Edge.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes an <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Edge" title="mtk.molecular.topologies.cage.base.Edge"><code class="xref py py-class docutils literal"><span class="pre">Edge</span></code></a> instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>v1</strong> (<a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a>) – A vertex joined to the edge.</li>
-<li><strong>v2</strong> (<a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a>) – Another vertex joined to the edge.</li>
-<li><strong>id</strong> (<em>:class`str`</em><em>, </em><em>optional</em>) – An id for the edge.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base.Edge.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Edge.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="mtk.molecular.topologies.cage.base.Edge.place_mol">
@@ -286,46 +262,10 @@ represent the bonder atoms.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base.Vertex.id">
-<code class="descname">id</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.id" title="Permalink to this definition">¶</a></dt>
+<dt id="mtk.molecular.topologies.cage.base.Vertex.id_">
+<code class="descname">id_</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.id_" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">object</span></code>, optional – An id to identify the vertex. Used by
 <code class="xref py py-meth docutils literal"><span class="pre">CageTopology.place_mols()</span></code>.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base.Vertex.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.topologies.cage.base', '__doc__': &quot;\n    Used to represent the vertices of cage polyhedra.\n\n    This class stores information about the vertices which make up a\n    cage's structure.\n\n    Attributes\n    ----------\n    coord : :class:`numpy.array`\n        An array which holds the x, y and z coordinates of the\n        vertex, in that order.\n\n    connected : :class:`list` of :class:`Edge` or :class:`Vertex`\n        This :class:`list` holds the :class:`Edge` or :class:`Vertex`\n        instances which represent the edges or vertices connected to\n        this one.\n\n    bonder_ids : :class:`list` of :class:`int`\n        This :class:`list` holds the ids of atoms which belong to the\n        building block placed on the vertex and will form bonds. The\n        ids reflect those in the macromolecule not in the building block\n        itself.\n\n    atom_position_pairs : :class:`list`\n        A :class:`list` of the form\n\n        .. code-block:: python\n\n            atom_position_pairs = [(4, v1), (8, v2)]\n\n        Where ``v1`` and ``v2`` are :class:`Vertex` instances.\n\n        Each atom which  is paired to a neighboring vertex or\n        edge first. Only after this is the atom-atom pairing\n        performed. The atom-edge/vertex pairing is stored here. The\n        int represents the id of the atom.\n\n    distances : :class:`list`\n        A :class:`list` of the form\n\n        .. code-block:: python\n\n            distances = [(15.2, 5, 10), (18.4, 3, 8), ...]\n\n        After bonder atoms have been associated with vertices to which\n        they join, the idividual atoms are paired up. To do this the\n        distance between every bonder atom on the paired vertex and the\n        bonder atom which is paired to the vertex is found. This\n        information is stored here the first element of each\n        :class:`tuple` the distance, and the second and third elements\n        represent the bonder atoms.\n\n    id : :class:`object`, optional\n        An id to identify the vertex. Used by\n        :meth:`CageTopology.place_mols`.\n\n    &quot;, '__init__': &lt;function Vertex.__init__&gt;, 'vertex_init': &lt;classmethod object&gt;, 'place_mol': &lt;function Vertex.place_mol&gt;, 'edge_plane_normal': &lt;function Vertex.edge_plane_normal&gt;, 'edge_plane': &lt;function Vertex.edge_plane&gt;, 'edge_direction_vectors': &lt;function Vertex.edge_direction_vectors&gt;, 'edge_coord_matrix': &lt;function Vertex.edge_coord_matrix&gt;, 'edge_centroid': &lt;function Vertex.edge_centroid&gt;, '__dict__': &lt;attribute '__dict__' of 'Vertex' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Vertex' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base.Vertex.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em>, <em>id_=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#Vertex.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The x coordinate.</li>
-<li><strong>y</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The y coordiante</li>
-<li><strong>z</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code> or <code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The z coordiante</li>
-<li><strong>id</strong> (<code class="xref py py-class docutils literal"><span class="pre">object</span></code>, optional) – An id to identify the vertex.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base.Vertex.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base.Vertex.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">
@@ -485,7 +425,7 @@ are also updated.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertices</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> pf <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a>) – Holds <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> objects used for initialization.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertices</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a>) – Holds <a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><code class="xref py py-class docutils literal"><span class="pre">Vertex</span></code></a> objects used for initialization.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The initialized vertex.</td>
 </tr>
@@ -494,248 +434,6 @@ are also updated.</p>
 </tbody>
 </table>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology">
-<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_CageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.base.Topology</span></code></a></p>
-<p>A topology class which cage topologies should inherit.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology.A_alignments">
-<code class="descname">A_alignments</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.A_alignments" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of ints (default = None)</em> – The length of this list must be equal to the number of
-building blocks in the cage. When cages are built one of the
-bonder atoms of each building block is aligned with an edge
-during placement. The int indicates which bonder atom is
-aligned. The int corresponds to an index in <cite>bonder_ids</cite>.</p>
-<p>If <code class="docutils literal"><span class="pre">None</span></code> the first atom in <cite>bonder_ids</cite> is always aligned.</p>
-<p>For example,</p>
-<blockquote>
-<div>A_alignments = [0,2,1,2]</div></blockquote>
-<p>In this case there must be 4 building blocks in the cage. The
-the first building block has its first (index 0) bonder atom
-aligned. The 2nd building block has the 3rd (index 2) atom
-aligned. The 3rd building block has the 2nd (index 1) atom
-aligned. The 4th building block has the 3rd (index 2) atom
-aligned.</p>
-</dd></dl>
-
-<dl class="docutils">
-<dt>B_alignments <span class="classifier-delimiter">:</span> <span class="classifier">list of ints (default = None)</span></dt>
-<dd><p class="first">The length of this list should be euqal to the number of
-linkers in the cage. The linkers of a cage can have either 2
-functional groups or 3 or more, depending on the topology.</p>
-<p>When the linkers have 2 functional groups the list should hold
-either 1 or -1. The value indicates that the linker is aligned
-parallel or antiparallel with the edge its placed on. For
-example in a tetrahedral topology,</p>
-<blockquote>
-<div>B_alignments = [-1, 1, 1, -1, 1, -1]</div></blockquote>
-<p>It indicates that the first linker is aligned anti parallel and
-the second is aligned in parallel, and so on.</p>
-<p class="last">If the linkers have 3 or more functional groups, the values
-in B_alignments have the same role as <cite>A_alignments</cite>. The only
-difference is that by default the second atom is aligned,
-rather than the first.</p>
-</dd>
-<dt>edge_alignments <span class="classifier-delimiter">:</span> <span class="classifier">list of ints, optional</span></dt>
-<dd><p class="first">The length of the list is equal to the number of building
-blocks in the cage. Each element is an int which holds the id
-of an edge. For example,</p>
-<blockquote>
-<div>edge_alignments = [1, 2, 3, 4]</div></blockquote>
-<p class="last">then the first building block is aligned with the edge with
-<cite>id</cite> of 1, the second building block is aligned with the edge
-with <cite>id</cite> 2 and so on. For this to work the edge defined by
-the class must have their <cite>id</cite> attributes defined.</p>
-</dd>
-</dl>
-<p>bb_assignments : <code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional</p>
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology._bb_maps">
-<code class="descname">_bb_maps</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology._bb_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology._bb_maps" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology.join_mols">
-<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.join_mols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Joins up the separate building blocks which form the molecule.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being assembled.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.mol</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – Joins up the separate building blocks in this
-macromolecule.</li>
-<li><strong>macro_mol.bonds_made</strong> (<em>int</em>) – Places the number of bonds made during assembly into this
-attribute.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions">
-<code class="descname">pair_bonders_with_positions</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology.pair_bonders_with_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Matches atoms with the closest building block position.</p>
-<p>After a building block is placed on a position, each atom
-which forms a bond must be paired with the location of the
-building block to which it bonds. This function matches atoms
-and positions so that each is only present in one pairing and
-so that the total distance of the pairings is minimized.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being buit.</li>
-<li><strong>vertex</strong> (<a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><em>Vertex</em></a>) – The position at which all the atoms being paired are
-located.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>vertex.atom_position_pairs</strong> (<em>list of tuples of</em><em> (</em><em>int</em><em>, </em><a class="reference internal" href="#mtk.molecular.topologies.cage.base.Vertex" title="mtk.molecular.topologies.cage.base.Vertex"><em>Vertex</em></a><em>)</em>) – Adds a tuples to this list represnting the id of the atom
-and position which were paired.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._CageTopology.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_CageTopology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._CageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Places all building block molecules on correct coordinates.</p>
-<p>The building block molecules are placed in their appropriate
-positions based on the topology. It does not join them.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><em>MacroMolecule</em></a>) – The macromolecule being built.</li>
-<li><strong>Modifies</strong> – </li>
-<li><strong>--------</strong> – </li>
-<li><strong>macro_mol.mol</strong> – An rdkit instance of the macromolecule with disconnected
-building blocks is placed in this attribute.</li>
-<li><strong>macro_mol.bb_counter</strong> (<em>Counter</em>) – The counter is updated with the number of building blocks
-of each type used to form the macromolecule.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology">
-<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_NoLinkerCageTopology</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>placement='random'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_NoLinkerCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.topologies.cage.base._CageTopology" title="mtk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.cage.base._CageTopology</span></code></a></p>
-<p>Cage topologies where all building units have equal number of fgs.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.alignments">
-<code class="descname">alignments</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.alignments" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list of ints</em> – Same meaning as <cite>A_alignments</cite> in _CageTopology.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.placement">
-<code class="descname">placement</code><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.placement" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> –</p>
-<p>The name of the placement type to be used. Valid options are</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>‘random’ - For each vertex, a building block is picked</dt>
-<dd>randomly from <cite>macro_mol.building_blocks</cite> and placed on
-the vertex.</dd>
-</dl>
-</div></blockquote>
-</dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>alignments=None</em>, <em>placement='random'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_NoLinkerCageTopology.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.connect">
-<em class="property">classmethod </em><code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_NoLinkerCageTopology.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates each Vertex with a list of its neighbors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols">
-<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_NoLinkerCageTopology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols_random">
-<code class="descname">place_mols_random</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_NoLinkerCageTopology.place_mols_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols_random" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="mtk.molecular.topologies.cage.base._VertexOnlyCageTopology">
-<em class="property">class </em><code class="descclassname">mtk.molecular.topologies.cage.base.</code><code class="descname">_VertexOnlyCageTopology</code><span class="sig-paren">(</span><em>A_alignments=None</em>, <em>B_alignments=None</em>, <em>edge_alignments=None</em>, <em>bb_assignments=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#_VertexOnlyCageTopology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#mtk.molecular.topologies.cage.base._CageTopology" title="mtk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.cage.base._CageTopology</span></code></a></p>
-<p>Cage topolgies where all building block/linker mols have 3+ fgs.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.cage.base'</em><a class="headerlink" href="#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

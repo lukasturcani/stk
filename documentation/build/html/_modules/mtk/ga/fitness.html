@@ -387,7 +387,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_calc_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._calc_fitness">[docs]</a><span class="k">def</span> <span class="nf">_calc_fitness</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">processes</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_calc_fitness</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">processes</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness values of all members of a population.</span>
 
@@ -432,10 +432,10 @@
         <span class="n">member</span><span class="o">.</span><span class="n">update_cache</span><span class="p">()</span>
 
     <span class="n">logq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">log_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+    <span class="n">log_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="_calc_fitness_serial"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._calc_fitness_serial">[docs]</a><span class="k">def</span> <span class="nf">_calc_fitness_serial</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_calc_fitness_serial</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness values of all members of a population.</span>
 
@@ -460,10 +460,10 @@
     <span class="n">p_func</span> <span class="o">=</span> <span class="n">_FitnessFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
     <span class="c1"># Apply the function to every member of the population.</span>
     <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">population</span><span class="p">:</span>
-        <span class="n">p_func</span><span class="p">(</span><span class="n">member</span><span class="p">)</span></div>
+        <span class="n">p_func</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_param_labels"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._param_labels">[docs]</a><span class="k">def</span> <span class="nf">_param_labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_param_labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds the :attr:`param_labels` attribute to a fitness function.</span>
 
@@ -502,10 +502,10 @@
         <span class="n">func</span><span class="o">.</span><span class="n">param_labels</span> <span class="o">=</span> <span class="n">labels</span>
         <span class="k">return</span> <span class="n">func</span>
 
-    <span class="k">return</span> <span class="n">add_labels</span></div>
+    <span class="k">return</span> <span class="n">add_labels</span>
 
 
-<div class="viewcode-block" id="_FitnessFunc"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc">[docs]</a><span class="k">class</span> <span class="nc">_FitnessFunc</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">_FitnessFunc</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A decorator for fitness functions.</span>
 
@@ -521,7 +521,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_FitnessFunc.__init__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`_FitnessFunc` instance.</span>
 
@@ -532,9 +532,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
 
-<div class="viewcode-block" id="_FitnessFunc.__call__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decorates and calls the fitness function.</span>
 
@@ -570,7 +570,7 @@
 
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">macro_mol</span><span class="o">.</span><span class="n">unscaled_fitness</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-            <span class="k">return</span> <span class="n">macro_mol</span></div></div>
+            <span class="k">return</span> <span class="n">macro_mol</span>
 
 
 <div class="viewcode-block" id="random_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness">[docs]</a><span class="k">def</span> <span class="nf">random_fitness</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
@@ -961,7 +961,7 @@
                         <span class="n">target_dihedral</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._cage_target">[docs]</a><span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span>
                  <span class="n">macro_mol</span><span class="p">,</span>
                  <span class="n">target_mol_file</span><span class="p">,</span>
                  <span class="n">efunc</span><span class="p">,</span>
@@ -1162,10 +1162,10 @@
                      <span class="n">cavity</span><span class="p">,</span>
                      <span class="n">asymmetry</span><span class="p">,</span>
                      <span class="n">prec_strain</span><span class="p">,</span>
-                     <span class="n">dihedral_strain</span><span class="p">])</span></div>
+                     <span class="n">dihedral_strain</span><span class="p">])</span>
 
 
-<div class="viewcode-block" id="_make_cage_target_folder"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._make_cage_target_folder">[docs]</a><span class="k">def</span> <span class="nf">_make_cage_target_folder</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">_make_cage_target_folder</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a folder to store molecules made by :func:`_cage_target`.</span>
 
@@ -1194,10 +1194,10 @@
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">pass</span>
 
-    <span class="k">return</span> <span class="n">dir_path</span></div>
+    <span class="k">return</span> <span class="n">dir_path</span>
 
 
-<div class="viewcode-block" id="_generate_complexes"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._generate_complexes">[docs]</a><span class="k">def</span> <span class="nf">_generate_complexes</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_generate_complexes</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Yields ``rdkit`` molecules of cage / target complexes.</span>
 
@@ -1247,10 +1247,10 @@
 
         <span class="n">rot_target</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">)</span>
 
-        <span class="k">yield</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rot_target</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span></div>
+        <span class="k">yield</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rot_target</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_c60_rotations"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._c60_rotations">[docs]</a><span class="k">def</span> <span class="nf">_c60_rotations</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">c60</span><span class="p">,</span> <span class="n">n5fold</span><span class="p">,</span> <span class="n">n2fold</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_c60_rotations</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">c60</span><span class="p">,</span> <span class="n">n5fold</span><span class="p">,</span> <span class="n">n2fold</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rotates C60 about its axes of symmetry while placed in `macro_mol`.</span>
 
@@ -1305,7 +1305,7 @@
             <span class="n">buckyball</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">aligned_c60</span><span class="p">)</span>
             <span class="n">buckyball</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">angle5</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
             <span class="n">buckyball</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">angle2</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-            <span class="k">yield</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">buckyball</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span></div>
+            <span class="k">yield</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">CombineMols</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">buckyball</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
 </pre></div>
 
            </div>

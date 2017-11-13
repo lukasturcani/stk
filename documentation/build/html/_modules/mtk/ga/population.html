@@ -236,7 +236,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Population.__init__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Intializes a population.</span>
 
@@ -269,7 +269,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">arg</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.init_all"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_all">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">init_all</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
@@ -1335,7 +1335,7 @@
 
             <span class="n">member</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.__iter__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allows populations to be iterated through,</span>
 
@@ -1350,9 +1350,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Population.__getitem__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allows indexing to select members of the population.</span>
 
@@ -1411,9 +1411,9 @@
 
         <span class="c1"># If `key` is not ``int`` or ``slice`` raise ``TypeError``.</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Index must be an integer or slice, not&quot;</span>
-                        <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+                        <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Population.__len__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the total number of members in the population.</span>
 
@@ -1425,9 +1425,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()))</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()))</span>
 
-<div class="viewcode-block" id="Population.__sub__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__sub__">[docs]</a>    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes members of `other` from the population.</span>
 
@@ -1462,9 +1462,9 @@
 
         <span class="n">new_pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
         <span class="n">new_pop</span><span class="o">.</span><span class="n">add_members</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">new_pop</span></div>
+        <span class="k">return</span> <span class="n">new_pop</span>
 
-<div class="viewcode-block" id="Population.__add__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__add__">[docs]</a>    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Joins two populations.</span>
 
@@ -1483,12 +1483,12 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Population.__contains__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">())</span></div>
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">())</span>
 
-<div class="viewcode-block" id="Population.__str__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">output_string</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; Population &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                          <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                          <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Members</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;   ---------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1513,10 +1513,10 @@
         <span class="k">for</span> <span class="n">pop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
             <span class="n">output_string</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">output_string</span></div>
+        <span class="k">return</span> <span class="n">output_string</span>
 
-<div class="viewcode-block" id="Population.__repr__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

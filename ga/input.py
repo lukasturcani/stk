@@ -115,7 +115,7 @@ class GAInput:
 
     opt_func : :class:`dict`
         This must define the parameters of a function defined in
-        :mod:`.optimization`. This will be the function used to
+        :mod:`~mtk.optimization`. This will be the function used to
         optimize the structures of the molecules.
 
     fitness_func : :class:`dict`

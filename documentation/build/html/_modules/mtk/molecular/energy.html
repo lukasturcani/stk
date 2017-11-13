@@ -376,7 +376,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EMethod.__init__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMethod.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`EMethod` instance.</span>
 
@@ -387,9 +387,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
-<div class="viewcode-block" id="EMethod.__get__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMethod.__get__">[docs]</a>    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a modified :attr:`func`.</span>
 
@@ -425,7 +425,7 @@
         <span class="c1"># method is modified so that after the method returns a value,</span>
         <span class="c1"># it is stored in the `values` dictionary of the Energy</span>
         <span class="c1"># instance.</span>
-        <span class="k">return</span> <span class="n">e_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">e_logger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EMeta"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMeta">[docs]</a><span class="k">class</span> <span class="nc">EMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
@@ -446,7 +446,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EMeta.__new__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.EMeta.__new__">[docs]</a>    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Turns all the public methods in `cls` into descriptors.</span>
 
@@ -463,7 +463,7 @@
             <span class="c1"># Replace method with descriptor.</span>
             <span class="n">cls_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EMethod</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cls_name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">cls_dict</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="e_logger"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.e_logger">[docs]</a><span class="k">def</span> <span class="nf">e_logger</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
@@ -617,7 +617,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Energy.__init__"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">molecule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">molecule</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`Energy` instance.</span>
 
@@ -630,7 +630,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="n">molecule</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="Energy.formation"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy.Energy.formation">[docs]</a>    <span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;force_e_calc&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">formation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -1472,7 +1472,7 @@
 <span class="n">Energy</span><span class="o">.</span><span class="n">pseudoformation</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">pseudoformation_key</span>
 
 
-<div class="viewcode-block" id="_run_mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._run_mopac">[docs]</a><span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">):</span>
 
     <span class="n">mop_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
 
@@ -1495,10 +1495,10 @@
     <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s1">&#39;Minimization took too long and was terminated &#39;</span>
                      <span class="s1">&#39;by force - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_root</span><span class="p">))</span>
-        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span></div>
+        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_kill_mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._kill_mopac">[docs]</a><span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stops an in-progress MOPAC run.</span>
 
@@ -1518,10 +1518,10 @@
     <span class="n">end_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.end&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">end_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">end</span><span class="p">:</span>
-        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span></div>
+        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_mop_line"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._mop_line">[docs]</a><span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Formats `settings` into a MOPAC input string.</span>
 
@@ -1553,10 +1553,10 @@
     <span class="n">charge_info</span> <span class="o">=</span> <span class="s1">&#39; CHARGE=</span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">])</span>
     <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="n">charge_info</span>
 
-    <span class="k">return</span> <span class="n">mopac_run_str</span></div>
+    <span class="k">return</span> <span class="n">mopac_run_str</span>
 
 
-<div class="viewcode-block" id="_create_mop"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._create_mop">[docs]</a><span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the ``.mop`` file holding the molecule to be optimized.</span>
 
@@ -1599,10 +1599,10 @@
                                                                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
             <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom_info</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">mop_file</span></div>
+    <span class="k">return</span> <span class="n">mop_file</span>
 
 
-<div class="viewcode-block" id="_extract_MOPAC_en"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_en">[docs]</a><span class="k">def</span> <span class="nf">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
     <span class="n">mopac_out</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.arc&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mopac_out</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
@@ -1610,10 +1610,10 @@
         <span class="n">energy_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outfile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">energy_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">energy_val</span></div>
+    <span class="k">return</span> <span class="n">energy_val</span>
 
 
-<div class="viewcode-block" id="_extract_MOPAC_dipole"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_dipole">[docs]</a><span class="k">def</span> <span class="nf">_extract_MOPAC_dipole</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_extract_MOPAC_dipole</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
     <span class="n">mopac_out</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.arc&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mopac_out</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
@@ -1621,7 +1621,7 @@
         <span class="n">energy_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outfile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">energy_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">energy_val</span></div>
+    <span class="k">return</span> <span class="n">energy_val</span>
 </pre></div>
 
            </div>

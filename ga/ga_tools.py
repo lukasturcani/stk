@@ -28,7 +28,7 @@ class GATools:
 
     optimization : :class:`.FunctionData`
         Holds the name and arguments of an optimization function
-        defined in :mod:`.optimization`. The function is used to
+        defined in :mod:`~mtk.optimization`. The function is used to
         optimize the molecules in the population.
 
     fitness : :class:`.FunctionData`
@@ -81,7 +81,7 @@ class GATools:
 
         optimization : :class:`.FuncionData`
             Holds the name and arguments of an optimization function
-            defined in :mod:`.optimization`. The function is used to
+            defined in :mod:`~mtk.optimization`. The function is used to
             optimize the molecules in the population.
 
         fitness : :class:`.FunctionData`
