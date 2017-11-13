@@ -205,56 +205,6 @@ generation, in the order in which they are to be applied.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="mtk.ga.normalization.Normalization.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies the normalization functions on <cite>population</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose members need to have their fitness
-values normalized.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.ga.normalization.Normalization.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.normalization', '__doc__': '\n    A class for carrying out normalization of fitness values.\n\n    Attributes\n    ----------\n    funcs : :class:`list` of :class:`.FunctionData`\n        Holds all the normalization functions to be applied each\n        generation, in the order in which they are to be applied.\n\n    ', '__init__': &lt;function Normalization.__init__&gt;, '__call__': &lt;function Normalization.__call__&gt;, 'cage': &lt;function Normalization.cage&gt;, 'combine': &lt;function Normalization.combine&gt;, 'divide': &lt;function Normalization.divide&gt;, 'magnitudes': &lt;function Normalization.magnitudes&gt;, 'shift_elements': &lt;function Normalization.shift_elements&gt;, 'invert': &lt;function Normalization.invert&gt;, '__dict__': &lt;attribute '__dict__' of 'Normalization' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Normalization' objects&gt;})</em><a class="headerlink" href="#mtk.ga.normalization.Normalization.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.ga.normalization.Normalization.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>funcs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a <a class="reference internal" href="#mtk.ga.normalization.Normalization" title="mtk.ga.normalization.Normalization"><code class="xref py py-class docutils literal"><span class="pre">Normalization</span></code></a> instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>funcs</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds all the normalization functions to be applied each
-generation, in the order in which they are to be applied.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.ga.normalization.Normalization.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.ga.normalization'</em><a class="headerlink" href="#mtk.ga.normalization.Normalization.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.ga.normalization.Normalization.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.ga.normalization.Normalization.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="mtk.ga.normalization.Normalization.cage">
 <code class="descname">cage</code><span class="sig-paren">(</span><em>population</em>, <em>cavity</em>, <em>window</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/normalization.html#Normalization.cage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.normalization.Normalization.cage" title="Permalink to this definition">¶</a></dt>
 <dd><p>A normalization function for use with <a class="reference internal" href="mtk.ga.fitness.html#mtk.ga.fitness.cage" title="mtk.ga.fitness.cage"><code class="xref py py-func docutils literal"><span class="pre">cage()</span></code></a></p>

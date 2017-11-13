@@ -270,7 +270,7 @@
     <span class="n">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_run_mopac"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._run_mopac">[docs]</a><span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">7200</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">7200</span><span class="p">):</span>
 
     <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
     <span class="n">mop_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
@@ -297,10 +297,10 @@
                        <span class="s1">&#39;by force - </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
         <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 
-    <span class="k">return</span></div>
+    <span class="k">return</span>
 
 
-<div class="viewcode-block" id="_kill_mopac"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._kill_mopac">[docs]</a><span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kills an in-progress MOPAC run.</span>
 
@@ -321,10 +321,10 @@
     <span class="n">end_file</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.end&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">end_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">end</span><span class="p">:</span>
-        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span></div>
+        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_mop_line"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._mop_line">[docs]</a><span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Formats `settings` into a MOPAC input string.</span>
 
@@ -365,10 +365,10 @@
     <span class="c1"># Add the let keyword avoiding the crash of MOPAC</span>
     <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="s2">&quot; LET &quot;</span>
 
-    <span class="k">return</span> <span class="n">mopac_run_str</span></div>
+    <span class="k">return</span> <span class="n">mopac_run_str</span>
 
 
-<div class="viewcode-block" id="_create_mop"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._create_mop">[docs]</a><span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the ``.mop`` file holding the molecule to be optimized.</span>
 
@@ -410,10 +410,10 @@
             <span class="n">atom_info</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{atom_symbol}</span><span class="s2">   </span><span class="si">{x}</span><span class="s2">   +1  </span><span class="si">{y}</span><span class="s2">   +1  </span><span class="si">{z}</span><span class="s2">   +1 </span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom_info</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">mop_file</span></div>
+    <span class="k">return</span> <span class="n">mop_file</span>
 
 
-<div class="viewcode-block" id="_convert_mopout_to_mol"><a class="viewcode-back" href="../../../mtk.optimization.mopac.html#mtk.optimization.mopac._convert_mopout_to_mol">[docs]</a><span class="k">def</span> <span class="nf">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_convert_mopout_to_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Updates the molecular structure if the optimization is successful.</span>
 
@@ -442,7 +442,7 @@
                                    <span class="n">sanitize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                    <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="c1"># Updating the macro_mol.mol infos with the new mol</span>
-    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">new_mol</span></div>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">new_mol</span>
 </pre></div>
 
            </div>
