@@ -164,10 +164,10 @@
 <div class="section" id="cages">
 <h3>Cages<a class="headerlink" href="#cages" title="Permalink to this headline">¶</a></h3>
 <p>To add a new cage topology a new class should be created, named
-after the topology. This class should inherit <a class="reference internal" href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology" title="mtk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code></a>.
+after the topology. This class should inherit <code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code>.
 This will give access to various methods which are necessary
 for dealing with any cage molecule. See the documenation of
-<a class="reference internal" href="mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology" title="mtk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code></a> for more details.</p>
+<code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code> for more details.</p>
 <p>The new class will only need to have five class attributes added:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -234,43 +234,6 @@ treated. If <code class="docutils literal"><span class="pre">'h'</span></code> t
 polymer are converted into hydrogem atoms. If <code class="docutils literal"><span class="pre">'fg'</span></code> they are
 kept as the original functional group.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.base.Linear.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>repeating_unit</em>, <em>orientation</em>, <em>n</em>, <em>ends='h'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a <a class="reference internal" href="#mtk.molecular.topologies.base.Linear" title="mtk.molecular.topologies.base.Linear"><code class="xref py py-class docutils literal"><span class="pre">Linear</span></code></a> instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>repeating_unit</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – A string showing the repeating unit of the
-<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a>. For example, <code class="docutils literal"><span class="pre">&quot;AB&quot;</span></code> or <code class="docutils literal"><span class="pre">&quot;ABB&quot;</span></code>. The
-building block with index <code class="docutils literal"><span class="pre">0</span></code> in
-<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.building_blocks" title="mtk.molecular.molecules.MacroMolecule.building_blocks"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.building_blocks</span></code></a> is labelled as
-<code class="docutils literal"><span class="pre">&quot;A&quot;</span></code> while index <code class="docutils literal"><span class="pre">1</span></code> as <code class="docutils literal"><span class="pre">&quot;B&quot;</span></code> and so on.</li>
-<li><strong>orientation</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – For each character in the repeating unit, a value of
-<code class="docutils literal"><span class="pre">-1</span></code>, <code class="docutils literal"><span class="pre">0</span></code> or <code class="docutils literal"><span class="pre">1</span></code> must be given in a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>. It
-indicates the direction at which each monomer of the
-repeating unit is placed along the chain. <code class="docutils literal"><span class="pre">0</span></code> means that
-the direction is random.</li>
-<li><strong>n</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of repeating units which are used to make the
-polymer.</li>
-<li><strong>ends</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The string represents how the end groups of the polymer are
-treated. If <code class="docutils literal"><span class="pre">'h'</span></code> the functional groups at the end of the
-polymer are converted into hydrogem atoms. If <code class="docutils literal"><span class="pre">'fg'</span></code> they
-are kept as the original functional group.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.base.Linear.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="mtk.molecular.topologies.base.Linear.del_atoms">
@@ -406,42 +369,6 @@ between the building blocks of a macromolecule. The way in which
 this is done will depend on what kind of macromolecules are being
 built. In addition, each child class must define methods which
 place the building blocks in approriate positions.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.base.Topology.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.topologies.base', '__doc__': '\n    Builds macromolecules.\n\n    More accurately, child classes of :class:`Topology` take care of\n    building macromolecules.\n\n    This class directly defines any operations and attributes that are\n    needed by any topology during assembly. However, this class is not\n    used directly. It is intended to be inherited from. All\n    :attr:`.MacroMolecule.topology` attributes hold an instance of a\n    :class:`Topology` child class. Child classes of :class:`Topology`\n    define operations specific to that one topology. For example, each\n    child class must define a :meth:`join_mols`, which creates bonds\n    between the building blocks of a macromolecule. The way in which\n    this is done will depend on what kind of macromolecules are being\n    built. In addition, each child class must define methods which\n    place the building blocks in approriate positions.\n\n    ', 'build': &lt;function Topology.build&gt;, 'del_atoms': &lt;function Topology.del_atoms&gt;, 'determine_bond_type': &lt;staticmethod object&gt;, '__str__': &lt;function Topology.__str__&gt;, '__repr__': &lt;function Topology.__repr__&gt;, '__eq__': &lt;function Topology.__eq__&gt;, '__hash__': &lt;function Topology.__hash__&gt;, '__dict__': &lt;attribute '__dict__' of 'Topology' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Topology' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.base.Topology.__eq__">
-<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.base.Topology.__hash__">
-<code class="descname">__hash__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__hash__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__hash__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.base.Topology.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.base.Topology.__repr__">
-<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__repr__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.topologies.base.Topology.__str__">
-<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__str__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.base.Topology.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="mtk.molecular.topologies.base.Topology.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
@@ -535,16 +462,6 @@ double bond.</li>
 <em class="property">class </em><code class="descclassname">mtk.molecular.topologies.base.</code><code class="descname">TopologyMeta</code><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#TopologyMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
 <p>Makes a repr of an instance, based initialization arguments used.</p>
-<dl class="method">
-<dt id="mtk.molecular.topologies.base.TopologyMeta.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#TopologyMeta.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta.__call__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.base.TopologyMeta.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.base'</em><a class="headerlink" href="#mtk.molecular.topologies.base.TopologyMeta.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="function">

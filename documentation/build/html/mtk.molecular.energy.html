@@ -325,17 +325,6 @@ a decorated version of the original method defined in
 <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>. The method is decorated with <a class="reference internal" href="#mtk.molecular.energy.e_logger" title="mtk.molecular.energy.e_logger"><code class="xref py py-func docutils literal"><span class="pre">e_logger()</span></code></a>
 decorator. Calling this decorated method makes it automatically
 update <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a>.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EMeta.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.EMeta.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="mtk.molecular.energy.EMeta.__new__">
-<em class="property">static </em><code class="descname">__new__</code><span class="sig-paren">(</span><em>cls_name</em>, <em>bases</em>, <em>cls_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMeta.__new__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMeta.__new__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Turns all the public methods in <cite>cls</cite> into descriptors.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -347,71 +336,6 @@ update <a class="reference internal" href="#mtk.molecular.energy.Energy.values" 
 <dt id="mtk.molecular.energy.EMethod.func">
 <code class="descname">func</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.func" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">function</span></code> – The method which the descriptor acts as a getter for.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EMethod.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.energy', '__doc__': '\n    A descriptor for methods of :class:`Energy`.\n\n    Attributes\n    ----------\n    func : :class:`function`\n        The method which the descriptor acts as a getter for.\n\n    ', '__init__': &lt;function EMethod.__init__&gt;, '__get__': &lt;function EMethod.__get__&gt;, '__dict__': &lt;attribute '__dict__' of 'EMethod' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'EMethod' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.EMethod.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.energy.EMethod.__get__">
-<code class="descname">__get__</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMethod.__get__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMethod.__get__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a modified <a class="reference internal" href="#mtk.molecular.energy.EMethod.func" title="mtk.molecular.energy.EMethod.func"><code class="xref py py-attr docutils literal"><span class="pre">func</span></code></a>.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EMethod.obj">
-<code class="descname">obj</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.obj" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">object</span></code> – The object to which the method in <a class="reference internal" href="#mtk.molecular.energy.EMethod.func" title="mtk.molecular.energy.EMethod.func"><code class="xref py py-attr docutils literal"><span class="pre">func</span></code></a> should be
-bound.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EMethod.cls">
-<code class="descname">cls</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.cls" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">object</span></code> – The class of <cite>obj</cite>.</p>
-</dd></dl>
-
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
-<li><code class="xref py py-class docutils literal"><span class="pre">BoundMethod</span></code> – A decorated version of the method held in <cite>self.func</cite>. The
-difference is that when calling the method  now, it will
-automatically update the <cite>values</cite> attribute of <cite>obj</cite>.</li>
-<li><code class="xref py py-class docutils literal"><span class="pre">function</span></code> – If the method in <a class="reference internal" href="#mtk.molecular.energy.EMethod.func" title="mtk.molecular.energy.EMethod.func"><code class="xref py py-attr docutils literal"><span class="pre">func</span></code></a> is called as a class
-attribute rather than an instance attribute, return it
-instead of the descriptor.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.energy.EMethod.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMethod.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMethod.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a <a class="reference internal" href="#mtk.molecular.energy.EMethod" title="mtk.molecular.energy.EMethod"><code class="xref py py-class docutils literal"><span class="pre">EMethod</span></code></a> instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – The method which the descriptor acts as a getter for.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EMethod.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.EMethod.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EMethod.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 </dd></dl>
@@ -439,37 +363,6 @@ instead of the descriptor.</li>
 <p>Where the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instance identifies an
 <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> method which was run and the parameters which
 were used, while the key holds the result of the calculation.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.Energy.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.molecular.energy', '__doc__': &quot;\n    Handles all things related to a molecule's energy.\n\n    An instance of this class will be placed in\n    :attr:`.Molecule.energy` of each :class:`.Molecule` instance.\n\n    Attributes\n    ----------\n    molecule : :class:`.Molecule`\n        The molecule on which all the energy calculation are performed.\n\n    values : :class:`dict`\n        A :class:`dict` of the form\n\n        .. code-block:: python\n\n            values = {FunctionData('method1', param='a'): 34}\n\n        Where the :class:`.FunctionData` instance identifies an\n        :class:`Energy` method which was run and the parameters which\n        were used, while the key holds the result of the calculation.\n\n    &quot;, '__init__': &lt;function Energy.__init__&gt;, 'formation': &lt;mtk.molecular.energy.EMethod object&gt;, 'pseudoformation': &lt;mtk.molecular.energy.EMethod object&gt;, 'rdkit': &lt;mtk.molecular.energy.EMethod object&gt;, 'macromodel': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac_dipole': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac_ea': &lt;mtk.molecular.energy.EMethod object&gt;, 'mopac_ip': &lt;mtk.molecular.energy.EMethod object&gt;, '__dict__': &lt;attribute '__dict__' of 'Energy' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Energy' objects&gt;})</em><a class="headerlink" href="#mtk.molecular.energy.Energy.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.molecular.energy.Energy.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes a <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>molecules</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule on which all the energy calculation are
-performed.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.Energy.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.Energy.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.Energy.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy.Energy.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">
@@ -899,100 +792,7 @@ value has not already been found.</li>
 <em class="property">exception </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EnergyError</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EnergyError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 <p>A class for errors in <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> methods.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EnergyError.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.energy'</em><a class="headerlink" href="#mtk.molecular.energy.EnergyError.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.molecular.energy.EnergyError.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.molecular.energy.EnergyError.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="mtk.molecular.energy._create_mop">
-<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>file_root</em>, <em>molecule</em>, <em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._create_mop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
-structure file is converted to a <code class="docutils literal"><span class="pre">.mop</span></code> file. The original
-file is also kept.</li>
-<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Dictionary defined by the MOPAC methods, where all the run
-details are defined.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full path of the newly created <code class="docutils literal"><span class="pre">.mop</span></code> file.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="mtk.molecular.energy._extract_MOPAC_dipole">
-<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_dipole</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_dipole" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="mtk.molecular.energy._extract_MOPAC_en">
-<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_en</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_en"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_en" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="mtk.molecular.energy._kill_mopac">
-<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._kill_mopac" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stops an in-progress MOPAC run.</p>
-<p>To kill a MOPAC run, a file with the molecule’s name and a <code class="docutils literal"><span class="pre">.end</span></code>
-extension is written.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_root</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The molecule’s name.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="mtk.molecular.energy._mop_line">
-<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._mop_line" title="Permalink to this definition">¶</a></dt>
-<dd><p>Formats <cite>settings</cite> into a MOPAC input string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Dictionary defined in <code class="xref py py-func docutils literal"><span class="pre">mopac_opt()</span></code>, where all the run
-details are defined.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String containing all the MOPAC keywords correctly formatted
-for the input file.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="mtk.molecular.energy._run_mopac">
-<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>file_root</em>, <em>mopac_path</em>, <em>timeout=3600</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._run_mopac" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="function">
 <dt id="mtk.molecular.energy.e_logger">

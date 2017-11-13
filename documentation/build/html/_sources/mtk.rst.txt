@@ -10,7 +10,6 @@ Subpackages
     mtk.ga
     mtk.molecular
     mtk.optimization
-    mtk.tests
 
 Module contents
 ---------------

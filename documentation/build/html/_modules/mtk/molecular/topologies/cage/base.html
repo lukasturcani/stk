@@ -214,13 +214,13 @@
 <span class="sd">        :class:`tuple` the distance, and the second and third elements</span>
 <span class="sd">        represent the bonder atoms.</span>
 
-<span class="sd">    id : :class:`object`, optional</span>
+<span class="sd">    id_ : :class:`object`, optional</span>
 <span class="sd">        An id to identify the vertex. Used by</span>
 <span class="sd">        :meth:`CageTopology.place_mols`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Vertex.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`Vertex`.</span>
 
@@ -245,7 +245,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_position_pairs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">id_</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">id_</span>
 
 <div class="viewcode-block" id="Vertex.vertex_init"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Vertex.vertex_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">vertex_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">vertices</span><span class="p">):</span>
@@ -262,7 +262,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        vertices : :class:`tuple` pf :class:`Vertex`</span>
+<span class="sd">        vertices : :class:`tuple` of :class:`Vertex`</span>
 <span class="sd">            Holds :class:`Vertex` objects used for initialization.</span>
 
 <span class="sd">        Returns</span>
@@ -475,7 +475,7 @@
 <span class="sd">    Used to represent the edges of Cage polyhedra.</span>
 
 <span class="sd">    This class stores information about the edges which make up a</span>
-<span class="sd">    Cage&#39;s structure.</span>
+<span class="sd">    cage&#39;s structure.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -486,7 +486,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Edge.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Edge.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">id_</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes an :class:`Edge` instance.</span>
 
@@ -507,7 +507,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">])</span>
         <span class="n">v1</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Edge.place_mol"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base.Edge.place_mol">[docs]</a>    <span class="k">def</span> <span class="nf">place_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linker</span><span class="p">,</span> <span class="n">alignment</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -552,42 +552,47 @@
         <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div></div>
 
 
-<div class="viewcode-block" id="_CageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology">[docs]</a><span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A topology class which cage topologies should inherit.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    A_alignments : list of ints (default = None)</span>
-<span class="sd">        The length of this list must be equal to the number of</span>
+<span class="sd">    A_alignments : :class:`list` of :class:`int`</span>
+<span class="sd">        The length of this :class:`list` must be equal to the number of</span>
 <span class="sd">        building blocks in the cage. When cages are built one of the</span>
 <span class="sd">        bonder atoms of each building block is aligned with an edge</span>
-<span class="sd">        during placement. The int indicates which bonder atom is</span>
-<span class="sd">        aligned. The int corresponds to an index in `bonder_ids`.</span>
+<span class="sd">        during placement. The :class:`int` indicates which bonder atom</span>
+<span class="sd">        is aligned. The :class:`int` corresponds to an index in</span>
+<span class="sd">        :attr:`.MacroMolecule.bonder_ids`.</span>
 
 <span class="sd">        If ``None`` the first atom in `bonder_ids` is always aligned.</span>
 
 <span class="sd">        For example,</span>
 
-<span class="sd">            A_alignments = [0,2,1,2]</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            A_alignments = [0, 2, 1, 2]</span>
 
 <span class="sd">        In this case there must be 4 building blocks in the cage. The</span>
-<span class="sd">        the first building block has its first (index 0) bonder atom</span>
-<span class="sd">        aligned. The 2nd building block has the 3rd (index 2) atom</span>
-<span class="sd">        aligned. The 3rd building block has the 2nd (index 1) atom</span>
-<span class="sd">        aligned. The 4th building block has the 3rd (index 2) atom</span>
-<span class="sd">        aligned.</span>
+<span class="sd">        the first building block has its first (index ``0``) bonder</span>
+<span class="sd">        atom aligned. The 2nd building block has the 3rd (index ``2``)</span>
+<span class="sd">        atom aligned. The 3rd building block has the 2nd (index ``1``)</span>
+<span class="sd">        atom aligned. The 4th building block has the 3rd (index ``2``)</span>
+<span class="sd">        atom aligned.</span>
 
 
-<span class="sd">    B_alignments : list of ints (default = None)</span>
-<span class="sd">        The length of this list should be euqal to the number of</span>
-<span class="sd">        linkers in the cage. The linkers of a cage can have either 2</span>
+<span class="sd">    B_alignments : :class:`list` of :class:`int`</span>
+<span class="sd">        The length of this :class:`list` should be euqal to the number</span>
+<span class="sd">        of linkers in the cage. The linkers of a cage can have either 2</span>
 <span class="sd">        functional groups or 3 or more, depending on the topology.</span>
 
-<span class="sd">        When the linkers have 2 functional groups the list should hold</span>
-<span class="sd">        either 1 or -1. The value indicates that the linker is aligned</span>
-<span class="sd">        parallel or antiparallel with the edge its placed on. For</span>
-<span class="sd">        example in a tetrahedral topology,</span>
+<span class="sd">        When the linkers have 2 functional groups, the :class:`list`</span>
+<span class="sd">        should hold either ``1`` or ``-1``. The value indicates that</span>
+<span class="sd">        the linker is aligned parallel or antiparallel with the edge</span>
+<span class="sd">        its placed on. For example, in a tetrahedral topology,</span>
+
+<span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            B_alignments = [-1, 1, 1, -1, 1, -1]</span>
 
@@ -595,27 +600,57 @@
 <span class="sd">        the second is aligned in parallel, and so on.</span>
 
 <span class="sd">        If the linkers have 3 or more functional groups, the values</span>
-<span class="sd">        in B_alignments have the same role as `A_alignments`. The only</span>
-<span class="sd">        difference is that by default the second atom is aligned,</span>
-<span class="sd">        rather than the first.</span>
+<span class="sd">        in :attr:`B_alignments` have the same role as</span>
+<span class="sd">        :attr:`A_alignments`. The only difference is that by default</span>
+<span class="sd">        the second atom is aligned, rather than the first.</span>
 
-<span class="sd">    edge_alignments : list of ints, optional</span>
-<span class="sd">        The length of the list is equal to the number of building</span>
-<span class="sd">        blocks in the cage. Each element is an int which holds the id</span>
-<span class="sd">        of an edge. For example,</span>
+<span class="sd">    edge_alignments : :class:`list` of :class:`int`</span>
+<span class="sd">        The length of the :class:`list` is equal to the number of</span>
+<span class="sd">        building blocks in the cage. Each element is an :class:`int`</span>
+<span class="sd">        which holds the id of an edge. For example,</span>
+
+<span class="sd">        .. code-block:: python</span>
 
 <span class="sd">            edge_alignments = [1, 2, 3, 4]</span>
 
 <span class="sd">        then the first building block is aligned with the edge with</span>
-<span class="sd">        `id` of 1, the second building block is aligned with the edge</span>
-<span class="sd">        with `id` 2 and so on. For this to work the edge defined by</span>
-<span class="sd">        the class must have their `id` attributes defined.</span>
+<span class="sd">        :attr:`Vertex.id_` of ``1``, the second building block is</span>
+<span class="sd">        aligned with the edge with :attr:`Vertex.id_` ``2`` and so on.</span>
+<span class="sd">        For this to work, the edges must have their :attr:`Vertex.id_`</span>
+<span class="sd">        attributes defined.</span>
 
-<span class="sd">    bb_assignments : :class:`dict`, optional</span>
+<span class="sd">    bb_assignments : :class:`dict`</span>
+<span class="sd">        A :class:`dict` of the form</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            bb_assignments = {</span>
+<span class="sd">                0: [0, 1, 3],</span>
+<span class="sd">                1: [2]</span>
+<span class="sd">                2: [0, 4, 5],</span>
+<span class="sd">                3: [1, 2, 3]</span>
+<span class="sd">            }</span>
+
+<span class="sd">        This means the building block at index ``0`` of</span>
+<span class="sd">        :attr:`.MacroMolecule.building_blocks` sits on the vertices</span>
+<span class="sd">        of indices ``0``, ``1``, and ``3``. The building block at</span>
+<span class="sd">        index ``1`` of :attr:`.MacroMolecule.building_blocks` sits on</span>
+<span class="sd">        verticex of index ``2``.</span>
+
+<span class="sd">        The building block at index ``2`` in</span>
+<span class="sd">        :attr:`.MacroMolecule.building_blocks` also sits on the vertex</span>
+<span class="sd">        of index ``0``. However each cage is composed of two sets of</span>
+<span class="sd">        building blocks, called building blocks and linkers. This means</span>
+<span class="sd">        that the building block at index ``0`` is builing block while</span>
+<span class="sd">        the one at index ``2`` is a linker, or vice versa. Which one</span>
+<span class="sd">        is which is automatically deduced by looking at the number of</span>
+<span class="sd">        functional groups.</span>
+
+<span class="sd">        If ``None`` then building blocks are assigned at random.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_CageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">A_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">B_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">edge_alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -633,9 +668,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">A_alignments</span> <span class="o">=</span> <span class="n">A_alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">B_alignments</span> <span class="o">=</span> <span class="n">B_alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span> <span class="o">=</span> <span class="n">bb_assignments</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span> <span class="o">=</span> <span class="n">bb_assignments</span>
 
-<div class="viewcode-block" id="_CageTopology._bb_maps"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology._bb_maps">[docs]</a>    <span class="k">def</span> <span class="nf">_bb_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_bb_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -664,30 +699,20 @@
                 <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
                     <span class="n">map_</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">bb</span>
 
-        <span class="k">return</span> <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span></div>
+        <span class="k">return</span> <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span>
 
-<div class="viewcode-block" id="_CageTopology.join_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Joins up the separate building blocks which form the molecule.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">            The macromolecule being assembled.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        macro_mol.mol : rdkit.Chem.rdchem.Mol</span>
-<span class="sd">            Joins up the separate building blocks in this</span>
-<span class="sd">            macromolecule.</span>
-
-<span class="sd">        macro_mol.bonds_made : int</span>
-<span class="sd">            Places the number of bonds made during assembly into this</span>
-<span class="sd">            attribute.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -725,9 +750,9 @@
                 <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
                 <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
 
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
 
-<div class="viewcode-block" id="_CageTopology.pair_bonders_with_positions"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions">[docs]</a>    <span class="k">def</span> <span class="nf">pair_bonders_with_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">pair_bonders_with_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matches atoms with the closest building block position.</span>
 
@@ -737,24 +762,21 @@
 <span class="sd">        and positions so that each is only present in one pairing and</span>
 <span class="sd">        so that the total distance of the pairings is minimized.</span>
 
+<span class="sd">        This updates of :attr:`Vertex.atom_position_pairs` attribute of</span>
+<span class="sd">        `vertex`.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">            The macromolecule being buit.</span>
 
-<span class="sd">        vertex : Vertex</span>
+<span class="sd">        vertex : :class:`Vertex`</span>
 <span class="sd">            The position at which all the atoms being paired are</span>
 <span class="sd">            located.</span>
 
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        vertex.atom_position_pairs : list of tuples of (int, Vertex)</span>
-<span class="sd">            Adds a tuples to this list represnting the id of the atom</span>
-<span class="sd">            and position which were paired.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -786,33 +808,25 @@
                 <span class="k">continue</span>
             <span class="n">vertex</span><span class="o">.</span><span class="n">atom_position_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bonder_id</span><span class="p">,</span> <span class="n">pos</span><span class="p">))</span>
             <span class="n">paired_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder_id</span><span class="p">)</span>
-            <span class="n">paired_pos</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></div>
+            <span class="n">paired_pos</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
 
-<div class="viewcode-block" id="_CageTopology.place_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._CageTopology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Places all building block molecules on correct coordinates.</span>
 
 <span class="sd">        The building block molecules are placed in their appropriate</span>
 <span class="sd">        positions based on the topology. It does not join them.</span>
 
+<span class="sd">        Also updates :attr:`.MacroMolecule.bb_counter`.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">            The macromolecule being built.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        macro_mol.mol</span>
-<span class="sd">            An rdkit instance of the macromolecule with disconnected</span>
-<span class="sd">            building blocks is placed in this attribute.</span>
-
-<span class="sd">        macro_mol.bb_counter : Counter</span>
-<span class="sd">            The counter is updated with the number of building blocks</span>
-<span class="sd">            of each type used to form the macromolecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -888,52 +902,53 @@
                     <span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
 
             <span class="c1"># Save the ids of atoms which form new bonds.</span>
-            <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span></div></div>
+            <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_VertexOnlyCageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._VertexOnlyCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_VertexOnlyCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">_VertexOnlyCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cage topolgies where all building block/linker mols have 3+ fgs.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="o">...</span></div>
+    <span class="o">...</span>
 
 
-<div class="viewcode-block" id="_NoLinkerCageTopology"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cage topologies where all building units have equal number of fgs.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    alignments : list of ints</span>
-<span class="sd">        Same meaning as `A_alignments` in _CageTopology.</span>
+<span class="sd">    alignments : :class:`list` of :class:`int`</span>
+<span class="sd">        See :attr:`_CageTopology.A_alignments`</span>
 
-<span class="sd">    placement : str</span>
+<span class="sd">    placement : :class`str`</span>
 <span class="sd">        The name of the placement type to be used. Valid options are</span>
 
-<span class="sd">            &#39;random&#39; - For each vertex, a building block is picked</span>
-<span class="sd">             randomly from `macro_mol.building_blocks` and placed on</span>
-<span class="sd">             the vertex.</span>
+<span class="sd">            1. ``&#39;random&#39;`` - For each vertex, a building block is</span>
+<span class="sd">                picked randomly from</span>
+<span class="sd">                :attr:`.MacroMolecule.building_blocks` and placed on</span>
+<span class="sd">                the vertex.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_NoLinkerCageTopology.__init__"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="s1">&#39;random&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">alignments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">alignments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">alignments</span> <span class="o">=</span> <span class="n">alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">=</span> <span class="n">placement</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-<div class="viewcode-block" id="_NoLinkerCageTopology.place_mols"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
 
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">place_mols_random</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">place_mols_random</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
-<div class="viewcode-block" id="_NoLinkerCageTopology.place_mols_random"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols_random">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols_random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">place_mols_random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">alignments</span><span class="p">):</span>
             <span class="n">bb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">))</span>
@@ -952,16 +967,16 @@
 
             <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair_bonders_with_positions</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-            <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">ipos</span><span class="p">)</span></div>
+            <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">ipos</span><span class="p">)</span>
 
-<div class="viewcode-block" id="_NoLinkerCageTopology.connect"><a class="viewcode-back" href="../../../../../mtk.molecular.topologies.cage.base.html#mtk.molecular.topologies.cage.base._NoLinkerCageTopology.connect">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates each Vertex with a list of its neighbors.</span>
+<span class="sd">        Updates each :attr:`Vertex.connected`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None : NoneType</span>
+<span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -971,7 +986,7 @@
         <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
             <span class="n">v1</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
             <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
 </pre></div>
 
            </div>

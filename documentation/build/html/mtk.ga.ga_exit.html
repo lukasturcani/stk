@@ -189,64 +189,6 @@ require.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="mtk.ga.ga_exit.Exit.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>pop</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls the chosen exit function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population holding the current generation of molecules.</li>
-<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population where every previous generation is a
-subpopulation.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value returned by giving <cite>pop</cite> and <cite>progress</cite> to the
-exit function defined in <a class="reference internal" href="#mtk.ga.ga_exit.Exit.func_data" title="mtk.ga.ga_exit.Exit.func_data"><code class="xref py py-attr docutils literal"><span class="pre">func_data</span></code></a></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.ga.ga_exit.Exit.__dict__">
-<code class="descname">__dict__</code><em class="property"> = mappingproxy({'__module__': 'mtk.ga.ga_exit', '__doc__': '\n    Checks if the exit criterion for the GA has been satisfied.\n\n    Attributes\n    ----------\n    func_data : :class:`.FunctionData`\n        A :class:`.FunctionData` object which holds the name of the\n        exit function to use and any additional parameters it may\n        require.\n\n    ', '__init__': &lt;function Exit.__init__&gt;, '__call__': &lt;function Exit.__call__&gt;, 'mol_present': &lt;function Exit.mol_present&gt;, 'mol_name_present': &lt;function Exit.mol_name_present&gt;, 'fitness_plateau': &lt;function Exit.fitness_plateau&gt;, 'no_exit': &lt;function Exit.no_exit&gt;, '__dict__': &lt;attribute '__dict__' of 'Exit' objects&gt;, '__weakref__': &lt;attribute '__weakref__' of 'Exit' objects&gt;})</em><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__dict__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mtk.ga.ga_exit.Exit.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>func_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes an <a class="reference internal" href="#mtk.ga.ga_exit.Exit" title="mtk.ga.ga_exit.Exit"><code class="xref py py-class docutils literal"><span class="pre">Exit</span></code></a> instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which holds the name of the
-exit function to use and any additional parameters it may
-require.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.ga.ga_exit.Exit.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.ga.ga_exit'</em><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="mtk.ga.ga_exit.Exit.__weakref__">
-<code class="descname">__weakref__</code><a class="headerlink" href="#mtk.ga.ga_exit.Exit.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="mtk.ga.ga_exit.Exit.fitness_plateau">
 <code class="descname">fitness_plateau</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em>, <em>num_gens</em>, <em>top_members=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.fitness_plateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.fitness_plateau" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if the most fit molecules remain the same.</p>
@@ -292,7 +234,7 @@ subpopulation.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if a molecule with <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.name" title="mtk.molecular.molecules.MacroMolecule.name"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.name</span></code></a> of
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if a molecule with <code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.name</span></code> of
 <cite>mol_name</cite> is found in <cite>population</cite>. Else, <code class="docutils literal"><span class="pre">False</span></code>.</p>
 </td>
 </tr>

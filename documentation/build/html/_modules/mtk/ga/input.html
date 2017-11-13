@@ -266,7 +266,7 @@
 
 <span class="sd">    opt_func : :class:`dict`</span>
 <span class="sd">        This must define the parameters of a function defined in</span>
-<span class="sd">        :mod:`.optimization`. This will be the function used to</span>
+<span class="sd">        :mod:`~mtk.optimization`. This will be the function used to</span>
 <span class="sd">        optimize the structures of the molecules.</span>
 
 <span class="sd">    fitness_func : :class:`dict`</span>
@@ -339,7 +339,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GAInput.__init__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`GAInput` instance.</span>
 
@@ -402,7 +402,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">pop_dumps</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;tar_output&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tar_output</span> <span class="o">=</span> <span class="kc">True</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tar_output</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="GAInput.crosser"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.crosser">[docs]</a>    <span class="k">def</span> <span class="nf">crosser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -581,12 +581,12 @@
 
         <span class="k">return</span> <span class="n">Selection</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="n">crossover</span><span class="p">,</span> <span class="n">mutation</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GAInput.__repr__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span>
-                           <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+                           <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-<div class="viewcode-block" id="GAInput.__str__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

@@ -63,7 +63,7 @@ class Vertex:
         :class:`tuple` the distance, and the second and third elements
         represent the bonder atoms.
 
-    id : :class:`object`, optional
+    id_ : :class:`object`, optional
         An id to identify the vertex. Used by
         :meth:`CageTopology.place_mols`.
 
@@ -111,7 +111,7 @@ class Vertex:
 
         Parameters
         ----------
-        vertices : :class:`tuple` pf :class:`Vertex`
+        vertices : :class:`tuple` of :class:`Vertex`
             Holds :class:`Vertex` objects used for initialization.
 
         Returns
@@ -324,7 +324,7 @@ class Edge(Vertex):
     Used to represent the edges of Cage polyhedra.
 
     This class stores information about the edges which make up a
-    Cage's structure.
+    cage's structure.
 
     Attributes
     ----------
@@ -407,36 +407,41 @@ class _CageTopology(Topology):
 
     Attributes
     ----------
-    A_alignments : list of ints (default = None)
-        The length of this list must be equal to the number of
+    A_alignments : :class:`list` of :class:`int`
+        The length of this :class:`list` must be equal to the number of
         building blocks in the cage. When cages are built one of the
         bonder atoms of each building block is aligned with an edge
-        during placement. The int indicates which bonder atom is
-        aligned. The int corresponds to an index in `bonder_ids`.
+        during placement. The :class:`int` indicates which bonder atom
+        is aligned. The :class:`int` corresponds to an index in
+        :attr:`.MacroMolecule.bonder_ids`.
 
         If ``None`` the first atom in `bonder_ids` is always aligned.
 
         For example,
 
-            A_alignments = [0,2,1,2]
+        .. code-block:: python
+
+            A_alignments = [0, 2, 1, 2]
 
         In this case there must be 4 building blocks in the cage. The
-        the first building block has its first (index 0) bonder atom
-        aligned. The 2nd building block has the 3rd (index 2) atom
-        aligned. The 3rd building block has the 2nd (index 1) atom
-        aligned. The 4th building block has the 3rd (index 2) atom
-        aligned.
+        the first building block has its first (index ``0``) bonder
+        atom aligned. The 2nd building block has the 3rd (index ``2``)
+        atom aligned. The 3rd building block has the 2nd (index ``1``)
+        atom aligned. The 4th building block has the 3rd (index ``2``)
+        atom aligned.
 
 
-    B_alignments : list of ints (default = None)
-        The length of this list should be euqal to the number of
-        linkers in the cage. The linkers of a cage can have either 2
+    B_alignments : :class:`list` of :class:`int`
+        The length of this :class:`list` should be euqal to the number
+        of linkers in the cage. The linkers of a cage can have either 2
         functional groups or 3 or more, depending on the topology.
 
-        When the linkers have 2 functional groups the list should hold
-        either 1 or -1. The value indicates that the linker is aligned
-        parallel or antiparallel with the edge its placed on. For
-        example in a tetrahedral topology,
+        When the linkers have 2 functional groups, the :class:`list`
+        should hold either ``1`` or ``-1``. The value indicates that
+        the linker is aligned parallel or antiparallel with the edge
+        its placed on. For example, in a tetrahedral topology,
+
+        .. code-block:: python
 
             B_alignments = [-1, 1, 1, -1, 1, -1]
 
@@ -444,23 +449,53 @@ class _CageTopology(Topology):
         the second is aligned in parallel, and so on.
 
         If the linkers have 3 or more functional groups, the values
-        in B_alignments have the same role as `A_alignments`. The only
-        difference is that by default the second atom is aligned,
-        rather than the first.
+        in :attr:`B_alignments` have the same role as
+        :attr:`A_alignments`. The only difference is that by default
+        the second atom is aligned, rather than the first.
 
-    edge_alignments : list of ints, optional
-        The length of the list is equal to the number of building
-        blocks in the cage. Each element is an int which holds the id
-        of an edge. For example,
+    edge_alignments : :class:`list` of :class:`int`
+        The length of the :class:`list` is equal to the number of
+        building blocks in the cage. Each element is an :class:`int`
+        which holds the id of an edge. For example,
+
+        .. code-block:: python
 
             edge_alignments = [1, 2, 3, 4]
 
         then the first building block is aligned with the edge with
-        `id` of 1, the second building block is aligned with the edge
-        with `id` 2 and so on. For this to work the edge defined by
-        the class must have their `id` attributes defined.
+        :attr:`Vertex.id_` of ``1``, the second building block is
+        aligned with the edge with :attr:`Vertex.id_` ``2`` and so on.
+        For this to work, the edges must have their :attr:`Vertex.id_`
+        attributes defined.
 
-    bb_assignments : :class:`dict`, optional
+    bb_assignments : :class:`dict`
+        A :class:`dict` of the form
+
+        .. code-block:: python
+
+            bb_assignments = {
+                0: [0, 1, 3],
+                1: [2]
+                2: [0, 4, 5],
+                3: [1, 2, 3]
+            }
+
+        This means the building block at index ``0`` of
+        :attr:`.MacroMolecule.building_blocks` sits on the vertices
+        of indices ``0``, ``1``, and ``3``. The building block at
+        index ``1`` of :attr:`.MacroMolecule.building_blocks` sits on
+        verticex of index ``2``.
+
+        The building block at index ``2`` in
+        :attr:`.MacroMolecule.building_blocks` also sits on the vertex
+        of index ``0``. However each cage is composed of two sets of
+        building blocks, called building blocks and linkers. This means
+        that the building block at index ``0`` is builing block while
+        the one at index ``2`` is a linker, or vice versa. Which one
+        is which is automatically deduced by looking at the number of
+        functional groups.
+
+        If ``None`` then building blocks are assigned at random.
 
     """
 
@@ -521,22 +556,12 @@ class _CageTopology(Topology):
 
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
-
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            Joins up the separate building blocks in this
-            macromolecule.
-
-        macro_mol.bonds_made : int
-            Places the number of bonds made during assembly into this
-            attribute.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -586,24 +611,21 @@ class _CageTopology(Topology):
         and positions so that each is only present in one pairing and
         so that the total distance of the pairings is minimized.
 
+        This updates of :attr:`Vertex.atom_position_pairs` attribute of
+        `vertex`.
+
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being buit.
 
-        vertex : Vertex
+        vertex : :class:`Vertex`
             The position at which all the atoms being paired are
             located.
 
-        Modifies
-        --------
-        vertex.atom_position_pairs : list of tuples of (int, Vertex)
-            Adds a tuples to this list represnting the id of the atom
-            and position which were paired.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -644,24 +666,16 @@ class _CageTopology(Topology):
         The building block molecules are placed in their appropriate
         positions based on the topology. It does not join them.
 
+        Also updates :attr:`.MacroMolecule.bb_counter`.
+
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being built.
-
-        Modifies
-        --------
-        macro_mol.mol
-            An rdkit instance of the macromolecule with disconnected
-            building blocks is placed in this attribute.
-
-        macro_mol.bb_counter : Counter
-            The counter is updated with the number of building blocks
-            of each type used to form the macromolecule.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -755,15 +769,16 @@ class _NoLinkerCageTopology(_CageTopology):
 
     Attributes
     ----------
-    alignments : list of ints
-        Same meaning as `A_alignments` in _CageTopology.
+    alignments : :class:`list` of :class:`int`
+        See :attr:`_CageTopology.A_alignments`
 
-    placement : str
+    placement : :class`str`
         The name of the placement type to be used. Valid options are
 
-            'random' - For each vertex, a building block is picked
-             randomly from `macro_mol.building_blocks` and placed on
-             the vertex.
+            1. ``'random'`` - For each vertex, a building block is
+                picked randomly from
+                :attr:`.MacroMolecule.building_blocks` and placed on
+                the vertex.
 
     """
 
@@ -806,11 +821,11 @@ class _NoLinkerCageTopology(_CageTopology):
     @classmethod
     def connect(cls):
         """
-        Updates each Vertex with a list of its neighbors.
+        Updates each :attr:`Vertex.connected`.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
