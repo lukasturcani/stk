@@ -164,12 +164,12 @@ def parameter_epp(pop,
             max_params.append([None for x in range(nparams)])
             continue
 
-        p_mat = np.array([x.progress_params[func_name] for x in sp])
-
+        p_mat = [x.progress_params[func_name] for x in sp]
         # Each element of this list holds an array of all the valid
         # values of a particular progress_param.
-        p_arrays = [p_mat[:, x] for x in range(nparams)]
-        p_arrays = [[x for x in a if x is not None] for a in p_arrays]
+        p_arrays = [[pparams[x] for
+                     pparams in p_mat if pparams[x] is not None] for
+                    x in range(nparams)]
 
         min_params.append([min(x) if len(x) > 0 else None
                            for x in p_arrays])
