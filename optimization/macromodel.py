@@ -313,8 +313,9 @@ def macromodel_cage_opt(mol,
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            if mol.windows is not None:
-                all_windows = (len(mol.windows) ==
+            windows = mol.windows(conformer)
+            if windows is not None:
+                all_windows = (len(windows) ==
                                mol.topology.n_windows)
 
                 if vals['md'] and all_windows:
