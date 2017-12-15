@@ -1472,7 +1472,7 @@
 <span class="n">Energy</span><span class="o">.</span><span class="n">pseudoformation</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">pseudoformation_key</span>
 
 
-<span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">):</span>
+<div class="viewcode-block" id="_run_mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._run_mopac">[docs]</a><span class="k">def</span> <span class="nf">_run_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">mopac_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">):</span>
 
     <span class="n">mop_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.mop&#39;</span>
 
@@ -1495,10 +1495,10 @@
     <span class="k">except</span> <span class="n">sp</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s1">&#39;Minimization took too long and was terminated &#39;</span>
                      <span class="s1">&#39;by force - </span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_root</span><span class="p">))</span>
-        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span>
+        <span class="n">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+<div class="viewcode-block" id="_kill_mopac"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._kill_mopac">[docs]</a><span class="k">def</span> <span class="nf">_kill_mopac</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stops an in-progress MOPAC run.</span>
 
@@ -1518,10 +1518,10 @@
     <span class="n">end_file</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.end&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">end_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">end</span><span class="p">:</span>
-        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span>
+        <span class="n">end</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SHUT&#39;</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+<div class="viewcode-block" id="_mop_line"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._mop_line">[docs]</a><span class="k">def</span> <span class="nf">_mop_line</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Formats `settings` into a MOPAC input string.</span>
 
@@ -1553,10 +1553,10 @@
     <span class="n">charge_info</span> <span class="o">=</span> <span class="s1">&#39; CHARGE=</span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">])</span>
     <span class="n">mopac_run_str</span> <span class="o">=</span> <span class="n">mopac_run_str</span> <span class="o">+</span> <span class="n">charge_info</span>
 
-    <span class="k">return</span> <span class="n">mopac_run_str</span>
+    <span class="k">return</span> <span class="n">mopac_run_str</span></div>
 
 
-<span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<div class="viewcode-block" id="_create_mop"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._create_mop">[docs]</a><span class="k">def</span> <span class="nf">_create_mop</span><span class="p">(</span><span class="n">file_root</span><span class="p">,</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates the ``.mop`` file holding the molecule to be optimized.</span>
 
@@ -1599,10 +1599,10 @@
                                                                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
             <span class="n">mop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atom_info</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">mop_file</span>
+    <span class="k">return</span> <span class="n">mop_file</span></div>
 
 
-<span class="k">def</span> <span class="nf">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+<div class="viewcode-block" id="_extract_MOPAC_en"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_en">[docs]</a><span class="k">def</span> <span class="nf">_extract_MOPAC_en</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
     <span class="n">mopac_out</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.arc&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mopac_out</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
@@ -1610,10 +1610,10 @@
         <span class="n">energy_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outfile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">energy_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">energy_val</span>
+    <span class="k">return</span> <span class="n">energy_val</span></div>
 
 
-<span class="k">def</span> <span class="nf">_extract_MOPAC_dipole</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
+<div class="viewcode-block" id="_extract_MOPAC_dipole"><a class="viewcode-back" href="../../../mtk.molecular.energy.html#mtk.molecular.energy._extract_MOPAC_dipole">[docs]</a><span class="k">def</span> <span class="nf">_extract_MOPAC_dipole</span><span class="p">(</span><span class="n">file_root</span><span class="p">):</span>
     <span class="n">mopac_out</span> <span class="o">=</span> <span class="n">file_root</span> <span class="o">+</span> <span class="s1">&#39;.arc&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mopac_out</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
@@ -1621,7 +1621,7 @@
         <span class="n">energy_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outfile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">x</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">energy_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">energy_str</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">energy_val</span>
+    <span class="k">return</span> <span class="n">energy_val</span></div>
 </pre></div>
 
            </div>

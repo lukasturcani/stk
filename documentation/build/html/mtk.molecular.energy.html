@@ -795,6 +795,88 @@ value has not already been found.</li>
 </dd></dl>
 
 <dl class="function">
+<dt id="mtk.molecular.energy._create_mop">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>file_root</em>, <em>molecule</em>, <em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._create_mop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+structure file is converted to a <code class="docutils literal"><span class="pre">.mop</span></code> file. The original
+file is also kept.</li>
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Dictionary defined by the MOPAC methods, where all the run
+details are defined.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full path of the newly created <code class="docutils literal"><span class="pre">.mop</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._extract_MOPAC_dipole">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_dipole</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_dipole" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._extract_MOPAC_en">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_en</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_en"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_en" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._kill_mopac">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._kill_mopac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an in-progress MOPAC run.</p>
+<p>To kill a MOPAC run, a file with the molecule’s name and a <code class="docutils literal"><span class="pre">.end</span></code>
+extension is written.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_root</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The molecule’s name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._mop_line">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._mop_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats <cite>settings</cite> into a MOPAC input string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Dictionary defined in <code class="xref py py-func docutils literal"><span class="pre">mopac_opt()</span></code>, where all the run
+details are defined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String containing all the MOPAC keywords correctly formatted
+for the input file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._run_mopac">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>file_root</em>, <em>mopac_path</em>, <em>timeout=3600</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._run_mopac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="mtk.molecular.energy.e_logger">
 <code class="descclassname">mtk.molecular.energy.</code><code class="descname">e_logger</code><span class="sig-paren">(</span><em>func</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#e_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.e_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turns <cite>func</cite> into a version which updates :attr`Energy.values`.</p>
