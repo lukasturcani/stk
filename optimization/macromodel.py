@@ -387,7 +387,7 @@ def _macromodel_md_opt(mol,
                 The amount in seconds the MD is allowed to run before
                 being terminated. ``0`` means there is no timeout.
 
-            'force_field' : :class:``int (default = ``16``)
+            'force_field' : :class:`int` (default = ``16``)
                 The number of the force field to be used.
 
             'temp' : :class:`float` (default = ``300``)
