@@ -37,6 +37,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon']
 
+autodoc_default_flags = ['private-members']
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -156,6 +158,3 @@ texinfo_documents = [
      author, 'mtk', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-

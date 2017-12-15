@@ -174,6 +174,72 @@ complex that it requires its own module or file, place it in the same
 folder as this file. Then import the optimization function here. Make
 sure that only the optimization functions are imported back into this
 file, not any of the helper functions or classes.</p>
+<dl class="class">
+<dt id="mtk.optimization.optimization._OptimizationFunc">
+<em class="property">class </em><code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_OptimizationFunc</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_OptimizationFunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._OptimizationFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A decorator for optimziation functions.</p>
+<p>This decorator is applied to all optimization functions
+automatically in <a class="reference internal" href="#mtk.optimization.optimization._optimize_all" title="mtk.optimization.optimization._optimize_all"><code class="xref py py-func docutils literal"><span class="pre">_optimize_all()</span></code></a>. It should not be applied
+explicitly when defining the functions.</p>
+<p>This decorator prevents optimization functions from raising if
+they fail (necessary for multiprocessing) and prevents them from
+being run twice on the same molecule.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.optimization._optimize_all">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_optimize_all</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em>, <em>processes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_optimize_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._optimize_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run opt function on all population members in parallel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which represents the chosen
+optimization function.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance who’s members are to be
+optimized.</li>
+<li><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of parallel processes to create.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.optimization.optimization._optimize_all_serial">
+<code class="descclassname">mtk.optimization.optimization.</code><code class="descname">_optimize_all_serial</code><span class="sig-paren">(</span><em>func_data</em>, <em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#_optimize_all_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization._optimize_all_serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run opt function on all population members sequentially.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which represents the chosen
+optimization function.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance who’s members are to be
+optimized.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="mtk.optimization.optimization.do_not_optimize">
 <code class="descclassname">mtk.optimization.optimization.</code><code class="descname">do_not_optimize</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/optimization/optimization.html#do_not_optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.optimization.optimization.do_not_optimize" title="Permalink to this definition">¶</a></dt>
