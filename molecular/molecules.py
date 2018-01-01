@@ -2983,10 +2983,12 @@ class Cage(MacroMolecule):
 
         """
 
-        windows = np.array(self.windows(conformer))
+        windows = self.windows(conformer)
 
-        if (windows is None or len(windows) < self.topology.n_windows):
+        if windows is None or len(windows) < self.topology.n_windows:
             return None
+
+        windows = np.array(windows)
 
         # Cluster the windows into groups so that only size
         # differences between windows of the same type are taken
