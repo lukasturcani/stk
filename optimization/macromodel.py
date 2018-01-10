@@ -72,7 +72,10 @@ def macromodel_opt(mol,
 
             'restricted' : :class:`bool` (default = ``True``)
                 If ``False`` then all bonds are optimized, not just the
-                ones created during macromolecular assembly.
+                ones created during macromolecular assembly. If
+                ``True`` then a regular optimization is performed. If
+                ``'both'`` then a restricted optimization is performed
+                first, followed by a regular optimization.
 
             'timeout' : :class:`float` (default = ``0``)
                 The amount in seconds the optimization is allowed to
@@ -154,6 +157,15 @@ def macromodel_opt(mol,
         mol.update_from_mae(mol._file.replace('.mol', '.mae'),
                             conformer)
 
+        if vals['restricted'] == 'both':
+            new_vals = dict(vals)
+            new_vals['md'] = False
+            new_vals['restricted'] = False
+            macromodel_opt(mol=mol,
+                           macromodel_path=macromodel_path,
+                           settings=new_vals,
+                           md={})
+
         if vals['md']:
             _macromodel_md_opt(mol,
                                macromodel_path,
@@ -229,7 +241,10 @@ def macromodel_cage_opt(mol,
 
             'restricted' : :class:`bool` (default = ``True``)
                 If ``False`` then all bonds are optimized, not just the
-                ones created during macromolecular assembly.
+                ones created during macromolecular assembly. If
+                ``True`` then a regular optimization is performed. If
+                ``'both'`` then a restricted optimization is performed
+                first, followed by a regular optimization.
 
             'timeout' : :class:`float` (default = ``0``)
                 The amount in seconds the optimization is allowed to
@@ -310,6 +325,15 @@ def macromodel_cage_opt(mol,
         _convert_maegz_to_mae(mol, macromodel_path)
         mol.update_from_mae(mol._file.replace('.mol', '.mae'),
                             conformer)
+
+        if vals['restricted'] == 'both':
+            new_vals = dict(vals)
+            new_vals['md'] = False
+            new_vals['restricted'] = False
+            macromodel_opt(mol=mol,
+                           macromodel_path=macromodel_path,
+                           settings=new_vals,
+                           md={})
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
