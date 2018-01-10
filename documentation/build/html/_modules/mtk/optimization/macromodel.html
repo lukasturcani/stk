@@ -223,7 +223,10 @@
 
 <span class="sd">            &#39;restricted&#39; : :class:`bool` (default = ``True``)</span>
 <span class="sd">                If ``False`` then all bonds are optimized, not just the</span>
-<span class="sd">                ones created during macromolecular assembly.</span>
+<span class="sd">                ones created during macromolecular assembly. If</span>
+<span class="sd">                ``True`` then a regular optimization is performed. If</span>
+<span class="sd">                ``&#39;both&#39;`` then a restricted optimization is performed</span>
+<span class="sd">                first, followed by a regular optimization.</span>
 
 <span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
 <span class="sd">                The amount in seconds the optimization is allowed to</span>
@@ -305,6 +308,15 @@
         <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">),</span>
                             <span class="n">conformer</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;restricted&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;both&#39;</span><span class="p">:</span>
+            <span class="n">new_vals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+            <span class="n">new_vals</span><span class="p">[</span><span class="s1">&#39;md&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">new_vals</span><span class="p">[</span><span class="s1">&#39;restricted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                           <span class="n">macromodel_path</span><span class="o">=</span><span class="n">macromodel_path</span><span class="p">,</span>
+                           <span class="n">settings</span><span class="o">=</span><span class="n">new_vals</span><span class="p">,</span>
+                           <span class="n">md</span><span class="o">=</span><span class="p">{})</span>
+
         <span class="k">if</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;md&#39;</span><span class="p">]:</span>
             <span class="n">_macromodel_md_opt</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
                                <span class="n">macromodel_path</span><span class="p">,</span>
@@ -380,7 +392,10 @@
 
 <span class="sd">            &#39;restricted&#39; : :class:`bool` (default = ``True``)</span>
 <span class="sd">                If ``False`` then all bonds are optimized, not just the</span>
-<span class="sd">                ones created during macromolecular assembly.</span>
+<span class="sd">                ones created during macromolecular assembly. If</span>
+<span class="sd">                ``True`` then a regular optimization is performed. If</span>
+<span class="sd">                ``&#39;both&#39;`` then a restricted optimization is performed</span>
+<span class="sd">                first, followed by a regular optimization.</span>
 
 <span class="sd">            &#39;timeout&#39; : :class:`float` (default = ``0``)</span>
 <span class="sd">                The amount in seconds the optimization is allowed to</span>
@@ -461,6 +476,15 @@
         <span class="n">_convert_maegz_to_mae</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">)</span>
         <span class="n">mol</span><span class="o">.</span><span class="n">update_from_mae</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;.mae&#39;</span><span class="p">),</span>
                             <span class="n">conformer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">vals</span><span class="p">[</span><span class="s1">&#39;restricted&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;both&#39;</span><span class="p">:</span>
+            <span class="n">new_vals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+            <span class="n">new_vals</span><span class="p">[</span><span class="s1">&#39;md&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">new_vals</span><span class="p">[</span><span class="s1">&#39;restricted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+                           <span class="n">macromodel_path</span><span class="o">=</span><span class="n">macromodel_path</span><span class="p">,</span>
+                           <span class="n">settings</span><span class="o">=</span><span class="n">new_vals</span><span class="p">,</span>
+                           <span class="n">md</span><span class="o">=</span><span class="p">{})</span>
 
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
