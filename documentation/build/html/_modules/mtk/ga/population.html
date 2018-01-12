@@ -273,62 +273,45 @@
 
 <div class="viewcode-block" id="Population.init_all"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_all">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">init_all</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                 <span class="n">databases</span><span class="p">,</span>
-                 <span class="n">bb_classes</span><span class="p">,</span>
-                 <span class="n">topologies</span><span class="p">,</span>
                  <span class="n">macromol_class</span><span class="p">,</span>
+                 <span class="n">building_blocks</span><span class="p">,</span>
+                 <span class="n">topologies</span><span class="p">,</span>
                  <span class="n">processes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span>
                  <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates all possible molecules from a given set of databases.</span>
-
-<span class="sd">        All possible combinations of building blocks from `databases`</span>
-<span class="sd">        and topologies from `topologies` are built. The initialization</span>
-<span class="sd">        of a macromolecule in the population has the form</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            mol = macromol_class([bb1, bb2, ...], topology)</span>
-
-<span class="sd">        where ``bb1`` is initialized from a  molecule in</span>
-<span class="sd">        ``databases[0]``, ``bb2`` from a molecule in ``databases[1]``</span>
-<span class="sd">        and so on.</span>
+<span class="sd">        Creates all possible molecules from provided building blocks.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        databases : :class:`list` of :class:`str`</span>
-<span class="sd">            List of paths to directories, which hold molecular</span>
-<span class="sd">            structure files of the building blocks.</span>
-
-<span class="sd">        bb_classes : :class:`list` of :class:`type`</span>
-<span class="sd">            This list must be equal in length to `databases`. For each</span>
-<span class="sd">            database provided in `databases`, a class used to</span>
-<span class="sd">            initialize building blocks from that database is provided</span>
-<span class="sd">            here. For example, if</span>
-
-<span class="sd">            .. code-block:: python</span>
-
-<span class="sd">                databases = [&#39;/path/to/amines2f&#39;,</span>
-<span class="sd">                             &#39;/path/to/aldehydes3f&#39;]</span>
-
-<span class="sd">            then a valid `bb_classes` list would be</span>
-
-<span class="sd">            .. code-block:: python</span>
-
-<span class="sd">                bb_classes = [StructUnit2, StructUnit3]</span>
-
-<span class="sd">            This means all molecules in the ``amines2f`` database are</span>
-<span class="sd">            initialized as :class:`.StructUnit2` objects, while all</span>
-<span class="sd">            molecules in ``aldehydes3f`` are initialized as</span>
-<span class="sd">            :class:`.StructUnit3` objects.</span>
-
-<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
-<span class="sd">            The topologies of macromolecules being made.</span>
-
 <span class="sd">        macromol_class : :class:`type`</span>
 <span class="sd">            The class of the :class:`.MacroMolecule` objects being</span>
 <span class="sd">            built.</span>
+
+<span class="sd">        building_blocks : :class:`list`</span>
+<span class="sd">            A :class:`list` of the form</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                building_blocks = [[StructUnit2(), StructUnit2(), ...],</span>
+<span class="sd">                                   [StructUnit3(), StructUnit3(), ...],</span>
+<span class="sd">                                   [StructUnit2(), StructUnit2(), ...]]</span>
+
+<span class="sd">            To assemble a new :class:`.MacroMolecule`, a</span>
+<span class="sd">            :class:`.StructUnit` is picked from each of the sublists</span>
+<span class="sd">            in `building_blocks`. The picked :class:`.StructUnit`</span>
+<span class="sd">            instances are then supplied to the macromolecule:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                macro_mol = MacroMolecule([pick1, pick2, pick3],</span>
+<span class="sd">                                          Topology())</span>
+
+<span class="sd">            The order of picked :class:`.StructUnit` instances</span>
+<span class="sd">            corresponds to the order of the sublists.</span>
+
+<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
+<span class="sd">            The topologies of macromolecules being made.</span>
 
 <span class="sd">        processes : :class:`int`, optional</span>
 <span class="sd">            The number of parallel processes to create when building</span>
@@ -339,7 +322,7 @@
 <span class="sd">            be used on the population.</span>
 
 <span class="sd">        duplicates : :class:`bool`, optional</span>
-<span class="sd">            If ``True``, duplicate structures are not removed from</span>
+<span class="sd">            If ``False``, duplicate structures are removed from</span>
 <span class="sd">            the population.</span>
 
 <span class="sd">        Returns</span>
@@ -348,25 +331,10 @@
 <span class="sd">            A population holding all possible macromolecules from</span>
 <span class="sd">            assembled from `databases`.</span>
 
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        If the name of the functional group needs to be provided to the</span>
-<span class="sd">        building blocks, a lambda function can be used.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            dbs = [&#39;/path/to/db1&#39;, &#39;path/to/db2&#39;]</span>
-<span class="sd">            bb_classes = [lambda x: StructUnit2(x, &#39;aldehyde&#39;),</span>
-<span class="sd">                          lambda x: StructUnit3(x, &#39;amine&#39;)]</span>
-<span class="sd">            tops = [Linear(&quot;AB&quot;, [0, 0], 6)]</span>
-<span class="sd">            pop = Population.init_all(dbs, bb_classes, tops, Polymer)</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">databases</span><span class="p">]</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="o">*</span><span class="n">bb_files</span><span class="p">,</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">databases</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
-            <span class="n">bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">su</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">su</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bb_classes</span><span class="p">,</span> <span class="n">bb_files</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="o">*</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span><span class="p">))</span>
 
         <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
