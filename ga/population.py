@@ -9,7 +9,7 @@ from os.path import join
 import numpy as np
 from collections import Counter
 import json
-from glob import iglob, glob
+from glob import iglob
 import multiprocessing as mp
 import psutil
 
