@@ -537,49 +537,38 @@ is held by the population.</td>
 
 <dl class="classmethod">
 <dt id="mtk.ga.population.Population.init_all">
-<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>databases</em>, <em>bb_classes</em>, <em>topologies</em>, <em>macromol_class</em>, <em>processes=None</em>, <em>ga_tools=&lt;mtk.ga.ga_tools.GATools object&gt;</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates all possible molecules from a given set of databases.</p>
-<p>All possible combinations of building blocks from <cite>databases</cite>
-and topologies from <cite>topologies</cite> are built. The initialization
-of a macromolecule in the population has the form</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol</span> <span class="o">=</span> <span class="n">macromol_class</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">topology</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>where <code class="docutils literal"><span class="pre">bb1</span></code> is initialized from a  molecule in
-<code class="docutils literal"><span class="pre">databases[0]</span></code>, <code class="docutils literal"><span class="pre">bb2</span></code> from a molecule in <code class="docutils literal"><span class="pre">databases[1]</span></code>
-and so on.</p>
+<em class="property">classmethod </em><code class="descname">init_all</code><span class="sig-paren">(</span><em>macromol_class</em>, <em>building_blocks</em>, <em>topologies</em>, <em>processes=None</em>, <em>ga_tools=&lt;mtk.ga.ga_tools.GATools object&gt;</em>, <em>duplicates=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/population.html#Population.init_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.population.Population.init_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates all possible molecules from provided building blocks.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>databases</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – List of paths to directories, which hold molecular
-structure files of the building blocks.</li>
-<li><strong>bb_classes</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">type</span></code>) – <p>This list must be equal in length to <cite>databases</cite>. For each
-database provided in <cite>databases</cite>, a class used to
-initialize building blocks from that database is provided
-here. For example, if</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/path/to/amines2f&#39;</span><span class="p">,</span>
-             <span class="s1">&#39;/path/to/aldehydes3f&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>then a valid <cite>bb_classes</cite> list would be</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">StructUnit2</span><span class="p">,</span> <span class="n">StructUnit3</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>This means all molecules in the <code class="docutils literal"><span class="pre">amines2f</span></code> database are
-initialized as <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2" title="mtk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal"><span class="pre">StructUnit2</span></code></a> objects, while all
-molecules in <code class="docutils literal"><span class="pre">aldehydes3f</span></code> are initialized as
-<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3" title="mtk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a> objects.</p>
-</li>
-<li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>macromol_class</strong> (<code class="xref py py-class docutils literal"><span class="pre">type</span></code>) – The class of the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> objects being
 built.</li>
+<li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(),</span> <span class="n">StructUnit3</span><span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(),</span> <span class="n">StructUnit2</span><span class="p">(),</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>To assemble a new <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>, a
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> is picked from each of the sublists
+in <cite>building_blocks</cite>. The picked <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>
+instances are then supplied to the macromolecule:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">macro_mol</span> <span class="o">=</span> <span class="n">MacroMolecule</span><span class="p">([</span><span class="n">pick1</span><span class="p">,</span> <span class="n">pick2</span><span class="p">,</span> <span class="n">pick3</span><span class="p">],</span>
+                          <span class="n">Topology</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The order of picked <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> instances
+corresponds to the order of the sublists.</p>
+</li>
+<li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – The topologies of macromolecules being made.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of parallel processes to create when building
 the molecules.</li>
 <li><strong>ga_tools</strong> (<a class="reference internal" href="mtk.ga.ga_tools.html#mtk.ga.ga_tools.GATools" title="mtk.ga.ga_tools.GATools"><code class="xref py py-class docutils literal"><span class="pre">GATools</span></code></a>, optional) – Stores the selection, mutation and crossover functions to
 be used on the population.</li>
-<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">True</span></code>, duplicate structures are not removed from
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If <code class="docutils literal"><span class="pre">False</span></code>, duplicate structures are removed from
 the population.</li>
 </ul>
 </td>
@@ -593,16 +582,6 @@ assembled from <cite>databases</cite>.</p>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Examples</p>
-<p>If the name of the functional group needs to be provided to the
-building blocks, a lambda function can be used.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">dbs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/path/to/db1&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/db2&#39;</span><span class="p">]</span>
-<span class="n">bb_classes</span> <span class="o">=</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">),</span>
-              <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)]</span>
-<span class="n">tops</span> <span class="o">=</span> <span class="p">[</span><span class="n">Linear</span><span class="p">(</span><span class="s2">&quot;AB&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">)]</span>
-<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_all</span><span class="p">(</span><span class="n">dbs</span><span class="p">,</span> <span class="n">bb_classes</span><span class="p">,</span> <span class="n">tops</span><span class="p">,</span> <span class="n">Polymer</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="classmethod">

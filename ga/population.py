@@ -122,62 +122,45 @@ class Population:
 
     @classmethod
     def init_all(cls,
-                 databases,
-                 bb_classes,
-                 topologies,
                  macromol_class,
+                 building_blocks,
+                 topologies,
                  processes=None,
                  ga_tools=GATools.init_empty(),
                  duplicates=False):
         """
-        Creates all possible molecules from a given set of databases.
-
-        All possible combinations of building blocks from `databases`
-        and topologies from `topologies` are built. The initialization
-        of a macromolecule in the population has the form
-
-        .. code-block:: python
-
-            mol = macromol_class([bb1, bb2, ...], topology)
-
-        where ``bb1`` is initialized from a  molecule in
-        ``databases[0]``, ``bb2`` from a molecule in ``databases[1]``
-        and so on.
+        Creates all possible molecules from provided building blocks.
 
         Parameters
         ----------
-        databases : :class:`list` of :class:`str`
-            List of paths to directories, which hold molecular
-            structure files of the building blocks.
-
-        bb_classes : :class:`list` of :class:`type`
-            This list must be equal in length to `databases`. For each
-            database provided in `databases`, a class used to
-            initialize building blocks from that database is provided
-            here. For example, if
-
-            .. code-block:: python
-
-                databases = ['/path/to/amines2f',
-                             '/path/to/aldehydes3f']
-
-            then a valid `bb_classes` list would be
-
-            .. code-block:: python
-
-                bb_classes = [StructUnit2, StructUnit3]
-
-            This means all molecules in the ``amines2f`` database are
-            initialized as :class:`.StructUnit2` objects, while all
-            molecules in ``aldehydes3f`` are initialized as
-            :class:`.StructUnit3` objects.
-
-        topologies : :class:`list` of :class:`.Topology`
-            The topologies of macromolecules being made.
-
         macromol_class : :class:`type`
             The class of the :class:`.MacroMolecule` objects being
             built.
+
+        building_blocks : :class:`list`
+            A :class:`list` of the form
+
+            .. code-block:: python
+
+                building_blocks = [[StructUnit2(), StructUnit2(), ...],
+                                   [StructUnit3(), StructUnit3(), ...],
+                                   [StructUnit2(), StructUnit2(), ...]]
+
+            To assemble a new :class:`.MacroMolecule`, a
+            :class:`.StructUnit` is picked from each of the sublists
+            in `building_blocks`. The picked :class:`.StructUnit`
+            instances are then supplied to the macromolecule:
+
+            .. code-block:: python
+
+                macro_mol = MacroMolecule([pick1, pick2, pick3],
+                                          Topology())
+
+            The order of picked :class:`.StructUnit` instances
+            corresponds to the order of the sublists.
+
+        topologies : :class:`list` of :class:`.Topology`
+            The topologies of macromolecules being made.
 
         processes : :class:`int`, optional
             The number of parallel processes to create when building
@@ -188,7 +171,7 @@ class Population:
             be used on the population.
 
         duplicates : :class:`bool`, optional
-            If ``True``, duplicate structures are not removed from
+            If ``False``, duplicate structures are removed from
             the population.
 
         Returns
@@ -197,25 +180,10 @@ class Population:
             A population holding all possible macromolecules from
             assembled from `databases`.
 
-        Examples
-        --------
-        If the name of the functional group needs to be provided to the
-        building blocks, a lambda function can be used.
-
-        .. code-block:: python
-
-            dbs = ['/path/to/db1', 'path/to/db2']
-            bb_classes = [lambda x: StructUnit2(x, 'aldehyde'),
-                          lambda x: StructUnit3(x, 'amine')]
-            tops = [Linear("AB", [0, 0], 6)]
-            pop = Population.init_all(dbs, bb_classes, tops, Polymer)
-
         """
 
-        databases = [glob(join(db, '*')) for db in databases]
         args = []
-        for *bb_files, topology in it.product(*databases, topologies):
-            bbs = [su(f) for su, f in zip(bb_classes, bb_files)]
+        for *bbs, topology in it.product(*building_blocks, topologies):
             args.append((bbs, topology))
 
         with mp.Pool(processes) as pool:
