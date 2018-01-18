@@ -4,7 +4,8 @@ from ..molecular import (MacroMolecule, Molecule, FourPlusSix,
                          StructUnit, StructUnit2, StructUnit3)
 from ..ga import Population
 
-pop = Population.load(join('data', 'macromolecule', 'mm.json'))
+pop = Population.load(join('data', 'macromolecule', 'mm.json'),
+                      Molecule.fromdict)
 
 
 def test_building_block_cores():
