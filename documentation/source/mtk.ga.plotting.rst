@@ -1,5 +1,5 @@
-mtk.ga.plotting module
-======================
+mtk\.ga\.plotting module
+========================
 
 .. automodule:: mtk.ga.plotting
     :members:

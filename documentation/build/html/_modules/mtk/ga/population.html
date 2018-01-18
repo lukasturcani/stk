@@ -158,19 +158,18 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">iglob</span><span class="p">,</span> <span class="n">glob</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
 
 <span class="kn">from</span> <span class="nn">.fitness</span> <span class="k">import</span> <span class="n">_calc_fitness</span><span class="p">,</span> <span class="n">_calc_fitness_serial</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
 <span class="kn">from</span> <span class="nn">.ga_tools</span> <span class="k">import</span> <span class="n">GATools</span>
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">dedupe</span>
-<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">Cage</span><span class="p">,</span>
-                         <span class="n">StructUnit</span><span class="p">,</span> <span class="n">StructUnit2</span><span class="p">,</span> <span class="n">StructUnit3</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..molecular.optimization.optimization</span> <span class="k">import</span> <span class="p">(</span>
-                                   <span class="n">_optimize_all_serial</span><span class="p">,</span> <span class="n">_optimize_all</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..optimization.optimization</span> <span class="k">import</span> <span class="p">(</span><span class="n">_optimize_all_serial</span><span class="p">,</span>
+                                         <span class="n">_optimize_all</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population">[docs]</a><span class="k">class</span> <span class="nc">Population</span><span class="p">:</span>
@@ -230,13 +229,14 @@
 <span class="sd">        used.</span>
 
 <span class="sd">    ga_tools : :class:`.GATools`</span>
-<span class="sd">        An instance of the :class:`.GATools` class. Calls to preform EA</span>
-<span class="sd">        operations on the :class:`.Population` instance are delegated</span>
-<span class="sd">        to this attribute.</span>
+<span class="sd">        An instance of the :class:`.GATools` class. It stores</span>
+<span class="sd">        instances of classes such as :class:`.Selection`,</span>
+<span class="sd">        :class:`.Mutation` and :class:`.Crossover`, which carry out GA</span>
+<span class="sd">        operations on the population.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Population.__init__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Intializes a population.</span>
 
@@ -244,16 +244,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`</span>
 <span class="sd">            A population is initialized with the :class:`.Molecule` and</span>
-<span class="sd">            :class:`Population` instances it should hold. These are placed</span>
-<span class="sd">            into the :attr:`members` or :attr:`populations` attributes,</span>
-<span class="sd">            respectively. A :class:`.GATools` instance may be included</span>
-<span class="sd">            and will be placed into the :attr:`ga_tools` attribute.</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        TypeError</span>
-<span class="sd">            If initialized with something other than :class:`.Molecule`,</span>
-<span class="sd">            :class:`Population` or :class:`.GATools` instances.</span>
+<span class="sd">            :class:`Population` instances it should hold. These are</span>
+<span class="sd">            placed into the :attr:`members` or :attr:`populations`</span>
+<span class="sd">            attributes, respectively. A :class:`.GATools` instance may</span>
+<span class="sd">            be included and will be placed into the :attr:`ga_tools`</span>
+<span class="sd">            attribute.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -264,84 +259,70 @@
 
         <span class="c1"># Determine type of supplied arguments and place in the</span>
         <span class="c1"># appropriate attribute.  ``Population`` types added to</span>
-        <span class="c1"># `populations` attribute, ``Molecule`` into `members` and</span>
-        <span class="c1"># if ``GATools`` is supplied it is placed into `ga_tools`.</span>
-        <span class="c1"># Raise a ``TypeError``  if an argument was not ``GATools``,</span>
-        <span class="c1"># ``Molecule`` or ``Population`` type.</span>
+        <span class="c1"># `populations` attribute, if ``GATools`` is supplied it is</span>
+        <span class="c1"># placed into `ga_tools`. Everything else goes into `members`.</span>
         <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Population</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-                <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Molecule</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
-                <span class="k">continue</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">GATools</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">GATools</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">arg</span>
-                <span class="k">continue</span>
 
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="p">(</span><span class="s2">&quot;Population can only be&quot;</span>
-                     <span class="s2">&quot; initialized with ``Population``,&quot;</span>
-                     <span class="s2">&quot; ``Molecule`` and ``GATools`` types.&quot;</span><span class="p">),</span> <span class="n">arg</span><span class="p">)</span></div>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.init_all"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_all">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_all</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">databases</span><span class="p">,</span> <span class="n">bb_classes</span><span class="p">,</span>
-                 <span class="n">topologies</span><span class="p">,</span> <span class="n">macromol_class</span><span class="p">,</span>
-                 <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span> <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">init_all</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                 <span class="n">macromol_class</span><span class="p">,</span>
+                 <span class="n">building_blocks</span><span class="p">,</span>
+                 <span class="n">topologies</span><span class="p">,</span>
+                 <span class="n">processes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">ga_tools</span><span class="o">=</span><span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">(),</span>
+                 <span class="n">duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates all possible molecules from a given set of databases.</span>
-
-<span class="sd">        All possible combinations of building blocks from `databases`</span>
-<span class="sd">        and topologies from `topologies` are built. The initialization</span>
-<span class="sd">        of a macromolecule in the population has the form</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            mol = macromol_class([bb1, bb2, ...], topology)</span>
-
-<span class="sd">        where ``bb1`` is initialized from a  molecule in</span>
-<span class="sd">        ``databases[0]``, ``bb2`` from a molecule in ``databases[1]``</span>
-<span class="sd">        and so on.</span>
+<span class="sd">        Creates all possible molecules from provided building blocks.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        databases : :class:`list` of :class:`str`</span>
-<span class="sd">            List of paths to directories, which hold molecular</span>
-<span class="sd">            structure files of the building blocks.</span>
-
-<span class="sd">        bb_classes : :class:`list` of :class:`type`</span>
-<span class="sd">            This list must be equal in length to `databases`. For each</span>
-<span class="sd">            database provided in `databases`, a class used to</span>
-<span class="sd">            initialize building blocks from that database is provided</span>
-<span class="sd">            here. For example, if</span>
-
-<span class="sd">            .. code-block:: python</span>
-
-<span class="sd">                databases = [&#39;/path/to/amines2f&#39;,</span>
-<span class="sd">                             &#39;/path/to/aldehydes3f&#39;]</span>
-
-<span class="sd">            then a valid `bb_classes` list would be</span>
-
-<span class="sd">            .. code-block:: python</span>
-
-<span class="sd">                bb_classes = [StructUnit2, StructUnit3]</span>
-
-<span class="sd">            This means all molecules in the ``amines2f`` database are</span>
-<span class="sd">            initialized as :class:`.StructUnit2` objects, while all</span>
-<span class="sd">            molecules in ``aldehydes3f`` are initialized as</span>
-<span class="sd">            :class:`.StructUnit3` objects.</span>
-
-<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
-<span class="sd">            The topologies of macromolecules being made.</span>
-
 <span class="sd">        macromol_class : :class:`type`</span>
 <span class="sd">            The class of the :class:`.MacroMolecule` objects being</span>
 <span class="sd">            built.</span>
 
+<span class="sd">        building_blocks : :class:`list`</span>
+<span class="sd">            A :class:`list` of the form</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                building_blocks = [[StructUnit2(), StructUnit2(), ...],</span>
+<span class="sd">                                   [StructUnit3(), StructUnit3(), ...],</span>
+<span class="sd">                                   [StructUnit2(), StructUnit2(), ...]]</span>
+
+<span class="sd">            To assemble a new :class:`.MacroMolecule`, a</span>
+<span class="sd">            :class:`.StructUnit` is picked from each of the sublists</span>
+<span class="sd">            in `building_blocks`. The picked :class:`.StructUnit`</span>
+<span class="sd">            instances are then supplied to the macromolecule:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                macro_mol = MacroMolecule([pick1, pick2, pick3],</span>
+<span class="sd">                                          Topology())</span>
+
+<span class="sd">            The order of picked :class:`.StructUnit` instances</span>
+<span class="sd">            corresponds to the order of the sublists.</span>
+
+<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
+<span class="sd">            The topologies of macromolecules being made.</span>
+
+<span class="sd">        processes : :class:`int`, optional</span>
+<span class="sd">            The number of parallel processes to create when building</span>
+<span class="sd">            the molecules.</span>
+
+<span class="sd">        ga_tools : :class:`.GATools`, optional</span>
+<span class="sd">            Stores the selection, mutation and crossover functions to</span>
+<span class="sd">            be used on the population.</span>
+
 <span class="sd">        duplicates : :class:`bool`, optional</span>
-<span class="sd">            If ``True``, duplicate structures are not removed from</span>
+<span class="sd">            If ``False``, duplicate structures are removed from</span>
 <span class="sd">            the population.</span>
 
 <span class="sd">        Returns</span>
@@ -350,28 +331,13 @@
 <span class="sd">            A population holding all possible macromolecules from</span>
 <span class="sd">            assembled from `databases`.</span>
 
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        If the name of the functional group needs to be provided to the</span>
-<span class="sd">        building blocks, a lambda function can be used.</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            dbs = [&#39;/path/to/db1&#39;, &#39;path/to/db2&#39;]</span>
-<span class="sd">            bb_classes = [lambda x: StructUnit2(x, &#39;aldehyde&#39;),</span>
-<span class="sd">                          lambda x: StructUnit3(x, &#39;amine&#39;)]</span>
-<span class="sd">            tops = [Linear(&quot;AB&quot;, [0, 0], 6)]</span>
-<span class="sd">            pop = Population.init_all(dbs, bb_classes, tops, Polymer)</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">databases</span> <span class="o">=</span> <span class="p">[</span><span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">databases</span><span class="p">]</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="o">*</span><span class="n">bb_files</span><span class="p">,</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">databases</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
-            <span class="n">bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">su</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">su</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bb_classes</span><span class="p">,</span> <span class="n">bb_files</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="o">*</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bbs</span><span class="p">,</span> <span class="n">topology</span><span class="p">))</span>
 
-        <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
             <span class="n">mols</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">macromol_class</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
         <span class="c1"># Update the cache.</span>
@@ -390,114 +356,110 @@
             <span class="n">p</span><span class="o">.</span><span class="n">remove_duplicates</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">p</span></div>
 
-<div class="viewcode-block" id="Population.init_diverse_cages"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_diverse_cages">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_diverse_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
-                           <span class="n">topologies</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">,</span>
-                           <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.init_diverse"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_diverse">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">init_diverse</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                     <span class="n">macromol_class</span><span class="p">,</span>
+                     <span class="n">building_blocks</span><span class="p">,</span>
+                     <span class="n">topologies</span><span class="p">,</span>
+                     <span class="n">size</span><span class="p">,</span>
+                     <span class="n">ga_tools</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a population of cages built from provided databases.</span>
+<span class="sd">        Assembles a population of :class:`.MacroMolecule`.</span>
 
-<span class="sd">        All cages are held in the population&#39;s `members` attribute.</span>
+<span class="sd">        All molecules are held in the :attr:`members`.</span>
 
-<span class="sd">        From the supplied databases a random linker and building block</span>
-<span class="sd">        molecule is selected to form a cage. The next linker and</span>
-<span class="sd">        building block selected are those which have the most different</span>
-<span class="sd">        Morgan fingerprints to the first pair. The next pair random</span>
-<span class="sd">        again and so on. This is done until `size` cages have been</span>
+<span class="sd">        From the supplied sublists of building blocks, a random</span>
+<span class="sd">        molecule is selected to initialize a :class:`.MacroMolecule`</span>
+<span class="sd">        per sublist. The next molecule selected from the same sublist</span>
+<span class="sd">        is the one most with the most different Morgan fingerprint. The</span>
+<span class="sd">        next molecule is picked at random again and so on. This is done</span>
+<span class="sd">        until `size` :class:`.MacroMolecule` instances have been</span>
 <span class="sd">        formed.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        bb_db : str</span>
-<span class="sd">            The full path of the database of building-block* molecules.</span>
+<span class="sd">        macromol_class : :class:`type`</span>
+<span class="sd">            The class of :class:`.MacroMolecule` to be assembled.</span>
 
-<span class="sd">        lk_db : str</span>
-<span class="sd">            The full path of the database of linker molecules.</span>
+<span class="sd">        building_blocks : :class:`list`</span>
+<span class="sd">            A :class:`list` of the form</span>
 
-<span class="sd">        topolgies : iterable of Topology objects</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                building_blocks = [[StructUnit2(), StructUnit2(), ...],</span>
+<span class="sd">                                   [StructUnit3(), StructUnit3(), ...],</span>
+<span class="sd">                                   [StructUnit2(), StructUnit2(), ...]]</span>
+
+<span class="sd">            To assemble a new :class:`.MacroMolecule`, a</span>
+<span class="sd">            :class:`.StructUnit` is picked from each of the sublists</span>
+<span class="sd">            in `building_blocks`. The picked :class:`.StructUnit`</span>
+<span class="sd">            instances are then supplied to the macromolecule:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                macro_mol = MacroMolecule([pick1, pick2, pick3],</span>
+<span class="sd">                                          Topology())</span>
+
+<span class="sd">            The order of picked :class:`.StructUnit` instances</span>
+<span class="sd">            corresponds to the order of the sublists.</span>
+
+<span class="sd">        topolgies : :class:`iterable` of :class:`.Topology`</span>
 <span class="sd">            An iterable holding topologies which should be randomly</span>
-<span class="sd">            selected for cage initialization.</span>
+<span class="sd">            selected during initialization of :class:`.MacroMolecule`.</span>
 
-<span class="sd">        size : int</span>
+<span class="sd">        size : :class:`int`</span>
 <span class="sd">            The size of the population to be initialized.</span>
 
-<span class="sd">        ga_tools : GATools</span>
-<span class="sd">            The GATools instance to be used by created population.</span>
-
-<span class="sd">        bb_fg : str (default = None)</span>
-<span class="sd">            The name of the functional group present in molecules in</span>
-<span class="sd">            `bb_db`. It is the name of the functional group used to</span>
-<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
-<span class="sd">            the name is present in `bb_db`.</span>
-
-<span class="sd">        lk_fg : str (default = None)</span>
-<span class="sd">            The name of the functional group present in molecules in</span>
-<span class="sd">            `lk_db`. It is the name of the functional group used to</span>
-<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
-<span class="sd">            the name is present in `lk_db`.</span>
+<span class="sd">        ga_tools : :class:`.GATools`</span>
+<span class="sd">            The :class:`.GATools` instance to be used by created</span>
+<span class="sd">            population.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
-<span class="sd">            A population filled with random cages.</span>
+<span class="sd">        :class:`.Population`</span>
+<span class="sd">            A population filled with generated molecules.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
-        <span class="n">bb_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">bb_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
-        <span class="c1"># Remove any files which are not valid structure files.</span>
-        <span class="n">bb_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bb_files</span> <span class="k">if</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
-        <span class="n">lk_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">lk_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
-        <span class="n">lk_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lk_files</span> <span class="k">if</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
 
-        <span class="n">pairs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-        <span class="n">bbindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bb_files</span><span class="p">)))</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">while</span> <span class="n">bbindices</span><span class="p">:</span>
-            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Shuffle the sublists.</span>
+        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 
-            <span class="n">topology</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">topologies</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="c1"># First pick the index of a building block file.</span>
-                <span class="n">bbi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bbindices</span><span class="p">)</span>
-                <span class="c1"># Next get the indices of all linker files which are</span>
-                <span class="c1"># not already used together with `bbi`.</span>
-                <span class="n">lkindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lk_files</span><span class="p">)))</span>
-                <span class="k">for</span> <span class="n">pairedi</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]:</span>
-                    <span class="n">lkindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pairedi</span><span class="p">)</span>
-                <span class="c1"># If `bbi` has been paired with all linkers already,</span>
-                <span class="c1"># remove it from the list of possible indices and try</span>
-                <span class="c1"># again.</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">lkindices</span><span class="p">:</span>
-                    <span class="n">bbindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bbi</span><span class="p">)</span>
-                    <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
-                    <span class="k">continue</span>
-                <span class="c1"># Pick a linker index and note the pairing.</span>
-                <span class="n">lki</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lkindices</span><span class="p">)</span>
-                <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lki</span><span class="p">)</span>
+        <span class="c1"># Go through every possible macromolecule.</span>
+        <span class="k">for</span> <span class="o">*</span><span class="n">bbs</span><span class="p">,</span> <span class="n">top</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
 
-                <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_files</span><span class="p">[</span><span class="n">bbi</span><span class="p">],</span> <span class="n">bb_fg</span><span class="p">)</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_files</span><span class="p">[</span><span class="n">lki</span><span class="p">],</span> <span class="n">lk_fg</span><span class="p">)</span>
+            <span class="c1"># Generate the random macromolecule.</span>
+            <span class="n">macro_mol</span> <span class="o">=</span> <span class="n">macromol_class</span><span class="p">(</span><span class="n">bbs</span><span class="p">,</span> <span class="n">top</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">bb_file</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">bb_db</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_file</span><span class="p">,</span> <span class="n">bb_fg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span><span class="p">:</span>
+                <span class="k">break</span>
 
-                <span class="n">lk_file</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">lk_db</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+            <span class="c1"># Make an iterators which goes through all rdkit molecules</span>
+            <span class="c1"># in the sublists.</span>
+            <span class="n">mol_iters</span> <span class="o">=</span> <span class="p">[(</span><span class="n">struct_unit</span><span class="o">.</span><span class="n">mol</span> <span class="k">for</span> <span class="n">struct_unit</span> <span class="ow">in</span> <span class="n">db</span><span class="p">)</span> <span class="k">for</span>
+                         <span class="n">db</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">]</span>
+            <span class="c1"># Make a dictionary which maps every rdkit molecule to its</span>
+            <span class="c1"># StructUnit, for every sublist in building_blocks.</span>
+            <span class="n">mol_maps</span> <span class="o">=</span> <span class="p">[{</span><span class="n">struct_unit</span><span class="o">.</span><span class="n">mol</span><span class="p">:</span> <span class="n">struct_unit</span> <span class="k">for</span> <span class="n">struct_unit</span> <span class="ow">in</span> <span class="n">db</span><span class="p">}</span>
+                        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+            <span class="c1"># Get the most different StructUnit to the previously</span>
+            <span class="c1"># selected one, per sublist. Take index of 1 because the</span>
+            <span class="c1"># index of 0 will the molecule itself.</span>
+            <span class="n">diff_mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">mols</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span>
+                         <span class="n">bb</span><span class="p">,</span> <span class="n">mols</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bbs</span><span class="p">,</span> <span class="n">mol_iters</span><span class="p">)]</span>
+            <span class="n">diff_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol_map</span><span class="p">[</span><span class="n">mol</span><span class="p">]</span> <span class="k">for</span>
+                        <span class="n">mol_map</span><span class="p">,</span> <span class="n">mol</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mol_maps</span><span class="p">,</span> <span class="n">diff_mols</span><span class="p">)]</span>
 
-            <span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">topology</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cage</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
-                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cage</span><span class="p">)</span>
+            <span class="n">macro_mol</span> <span class="o">=</span> <span class="n">macromol_class</span><span class="p">(</span><span class="n">diff_bbs</span><span class="p">,</span> <span class="n">top</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span><span class="p">:</span>
                 <span class="k">break</span>
 
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span>
@@ -535,99 +497,82 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">moltype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
                      <span class="n">iglob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">glob_pattern</span><span class="p">))))</span></div>
 
-<div class="viewcode-block" id="Population.init_random_cages"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_random_cages">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">init_random_cages</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bb_db</span><span class="p">,</span> <span class="n">lk_db</span><span class="p">,</span>
-                          <span class="n">topologies</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ga_tools</span><span class="p">,</span>
-                          <span class="n">bb_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lk_fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.init_random"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.init_random">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">init_random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                    <span class="n">macromol_class</span><span class="p">,</span>
+                    <span class="n">building_blocks</span><span class="p">,</span>
+                    <span class="n">topologies</span><span class="p">,</span>
+                    <span class="n">size</span><span class="p">,</span>
+                    <span class="n">ga_tools</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a population of cages built from provided databases.</span>
+<span class="sd">        Assembles a population of :class:`.MacroMolecule`.</span>
 
-<span class="sd">        All cages are held in the population&#39;s `members` attribute.</span>
+<span class="sd">        All molecules are held in :attr:`members`.</span>
 
-<span class="sd">        From the supplied databases a random linker and building-block*</span>
-<span class="sd">        molecule is selected to form a cage. This is done until `size`</span>
-<span class="sd">        cages have been formed. After this, all of them are returned</span>
-<span class="sd">        together in a ``Population`` instance.</span>
+<span class="sd">        From the supplied building blocks a random molecule is selected</span>
+<span class="sd">        per sublist to for a :class:`.MacroMolecule`. This is done</span>
+<span class="sd">        until `size` :class:`.MacroMolecule` have been formed.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        bb_db : str</span>
-<span class="sd">            The full path of the database of building-block* molecules.</span>
+<span class="sd">        macromol_class : :class:`type`</span>
+<span class="sd">            The class of :class:`.MacroMolecule` to be assembled.</span>
 
-<span class="sd">        lk_db : str</span>
-<span class="sd">            The full path of the database of linker molecules.</span>
+<span class="sd">        building_blocks : :class:`list`</span>
+<span class="sd">            A :class:`list` of the form</span>
 
-<span class="sd">        topolgies : iterable of Topology objects</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                building_blocks = [[StructUnit2(), StructUnit2(), ...],</span>
+<span class="sd">                                   [StructUnit3(), StructUnit3(), ...],</span>
+<span class="sd">                                   [StructUnit2(), StructUnit2(), ...]]</span>
+
+<span class="sd">            To assemble a new :class:`.MacroMolecule`, a</span>
+<span class="sd">            :class:`.StructUnit` is picked from each of the sublists</span>
+<span class="sd">            in `building_blocks`. The picked :class:`.StructUnit`</span>
+<span class="sd">            instances are then supplied to the macromolecule:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                macro_mol = MacroMolecule([pick1, pick2, pick3],</span>
+<span class="sd">                                          Topology())</span>
+
+<span class="sd">            The order of picked :class:`.StructUnit` instances</span>
+<span class="sd">            corresponds to the order of the sublists.</span>
+
+<span class="sd">        topolgies : :class:`iterable` of :class:`.Topology`</span>
 <span class="sd">            An iterable holding topologies which should be randomly</span>
-<span class="sd">            selected for cage initialization.</span>
+<span class="sd">            selected during initialization of :class:`.MacroMolecule`.</span>
 
-<span class="sd">        size : int</span>
+<span class="sd">        size : :class:`int`</span>
 <span class="sd">            The size of the population to be initialized.</span>
 
-<span class="sd">        ga_tools : GATools</span>
-<span class="sd">            The GATools instance to be used by created population.</span>
-
-<span class="sd">        bb_fg : str (default = None)</span>
-<span class="sd">            The name of the functional group present in molecules in</span>
-<span class="sd">            `bb_db`. It is the name of the functional group used to</span>
-<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
-<span class="sd">            the name is present in `bb_db`.</span>
-
-<span class="sd">        lk_fg : str (default = None)</span>
-<span class="sd">            The name of the functional group present in molecules in</span>
-<span class="sd">            `lk_db`. It is the name of the functional group used to</span>
-<span class="sd">            build the macromolecules. If ``None`` it is assumed that</span>
-<span class="sd">            the name is present in `lk_db`.</span>
+<span class="sd">        ga_tools : :class:`.GATools`</span>
+<span class="sd">            The :class:`.GATools` instance to be used by created</span>
+<span class="sd">            population.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Population</span>
+<span class="sd">        :class:`.Population`</span>
 <span class="sd">            A population filled with random cages.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">ga_tools</span><span class="p">)</span>
-        <span class="n">bb_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">bb_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
-        <span class="c1"># Remove any files which are not valid structure files.</span>
-        <span class="n">bb_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bb_files</span> <span class="k">if</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
-        <span class="n">lk_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">lk_db</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
-        <span class="n">lk_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lk_files</span> <span class="k">if</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">StructUnit</span><span class="o">.</span><span class="n">init_funcs</span><span class="p">]</span>
 
-        <span class="n">pairs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-        <span class="n">bbindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bb_files</span><span class="p">)))</span>
-        <span class="k">while</span> <span class="n">bbindices</span><span class="p">:</span>
-            <span class="c1"># First pick the index of a building block file.</span>
-            <span class="n">bbi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bbindices</span><span class="p">)</span>
-            <span class="c1"># Next get the indices of all linker files which are not</span>
-            <span class="c1"># already used together with `bbi`.</span>
-            <span class="n">lkindices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lk_files</span><span class="p">)))</span>
-            <span class="k">for</span> <span class="n">pairedi</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]:</span>
-                <span class="n">lkindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pairedi</span><span class="p">)</span>
-            <span class="c1"># If `bbi` has been paired with all linkers already, remove</span>
-            <span class="c1"># it from the list of possible indices and try again.</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">lkindices</span><span class="p">:</span>
-                <span class="n">bbindices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bbi</span><span class="p">)</span>
-                <span class="k">continue</span>
-            <span class="c1"># Pick a linker index and note the pairing.</span>
-            <span class="n">lki</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">lkindices</span><span class="p">)</span>
-            <span class="n">pairs</span><span class="p">[</span><span class="n">bbi</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lki</span><span class="p">)</span>
+        <span class="c1"># Shuffle the sublists.</span>
+        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 
-            <span class="n">topology</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">topologies</span><span class="p">)</span>
-            <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_files</span><span class="p">[</span><span class="n">bbi</span><span class="p">],</span> <span class="n">bb_fg</span><span class="p">)</span>
-            <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="n">lk_files</span><span class="p">[</span><span class="n">lki</span><span class="p">],</span> <span class="n">lk_fg</span><span class="p">)</span>
+        <span class="c1"># Go through every possible macromolecule.</span>
+        <span class="k">for</span> <span class="o">*</span><span class="n">bbs</span><span class="p">,</span> <span class="n">top</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
 
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">lk_fg</span><span class="p">)</span>
+            <span class="c1"># Generate the random macromolecule.</span>
+            <span class="n">macro_mol</span> <span class="o">=</span> <span class="n">macromol_class</span><span class="p">(</span><span class="n">bbs</span><span class="p">,</span> <span class="n">top</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
-            <span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">topology</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cage</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pop</span><span class="p">:</span>
-                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cage</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span><span class="p">:</span>
                 <span class="k">break</span>
 
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span>
@@ -750,7 +695,7 @@
 
         <span class="k">return</span> <span class="n">n</span></div>
 
-<div class="viewcode-block" id="Population.calculate_member_fitness"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.calculate_member_fitness">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_member_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.calculate_member_fitness"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.calculate_member_fitness">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_member_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies the fitness function to all members.</span>
 
@@ -771,16 +716,21 @@
 <span class="sd">        :attr:`.MacroMolecule.unscaled_fitness` attribute of molecules</span>
 <span class="sd">        held by the population.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        processes : :class:`int`</span>
+<span class="sd">            The number of parallel processes to create.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
-            <span class="n">_calc_fitness</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">processes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_calc_fitness_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_calc_fitness_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+            <span class="n">_calc_fitness</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.dump"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -812,9 +762,14 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.exit"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.exit">[docs]</a>    <span class="k">def</span> <span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.exit"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.exit">[docs]</a>    <span class="k">def</span> <span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks the if the EA exit criterion has been satisfied.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        progress : :class:`Population`</span>
+<span class="sd">            population where each subpopulation is a previous generation.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -824,23 +779,31 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.fromlist"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.fromlist">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromlist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pop_list</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromlist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pop_list</span><span class="p">,</span> <span class="n">member_init</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes a population from a list representation of one.</span>
+<span class="sd">        Initializes a population from a :class:`list` representation.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        pop_list : :class:`list` of :class:`str` and :class:`list`</span>
-<span class="sd">            A list which represents a population. Like the ones created</span>
-<span class="sd">            by :meth:`tolist()`.</span>
+<span class="sd">        pop_list : :class:`list`</span>
+<span class="sd">            A :class:`list` which represents a population. Like the</span>
+<span class="sd">            ones created by :meth:`tolist`. For example in,</span>
 
-<span class="sd">        load_names : :class:`bool`, optional</span>
-<span class="sd">            If ``True``, then the :meth:`.Molecule.name` attribute</span>
-<span class="sd">            stored in the JSON objects is loaded. If ``False``, then</span>
-<span class="sd">            it&#39;s not.</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                pop_list = [{...}, [{...}], [{...}, {...}], {...}]</span>
+
+<span class="sd">            ``pop_list`` represents the population, sublists represent</span>
+<span class="sd">            its subpopulations and the :class:`dict` ``{...}``</span>
+<span class="sd">            represents the members.</span>
+
+<span class="sd">        member_init : :class:`function`</span>
+<span class="sd">            The initialization function for the population&#39;s members.</span>
+<span class="sd">            It converts the member represenations in `pop_list` into</span>
+<span class="sd">            desired objects.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -852,11 +815,9 @@
         <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pop_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">Molecule</span><span class="o">.</span><span class="n">fromdict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="n">load_names</span><span class="p">))</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">member_init</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="n">load_names</span><span class="p">))</span>
+                <span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span><span class="s1">&#39;Population list must consist only&#39;</span>
@@ -987,7 +948,7 @@
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">same</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.load"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.load">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">load_names</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">member_init</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`Population` from one dumped to a file.</span>
 
@@ -996,9 +957,12 @@
 <span class="sd">        path : :class:`str`</span>
 <span class="sd">            The full path of the file holding the dumped population.</span>
 
-<span class="sd">        load_names : :class:`bool`, optional</span>
-<span class="sd">            If ``True``, then the `name` attribute stored in the JSON</span>
-<span class="sd">            objects is loaded. If ``False``, then it&#39;s not.</span>
+<span class="sd">        member_init : :class:`function`</span>
+<span class="sd">            The initialization function for the population&#39;s members.</span>
+<span class="sd">            It converts the member representations in the file to</span>
+<span class="sd">            :class:`.Molecule` objects. For example</span>
+<span class="sd">            :meth:`.Molecule.fromdict` when loading ``.json`` files</span>
+<span class="sd">            generated by :meth:`dump`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1010,7 +974,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pop_list</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">pop_list</span><span class="p">,</span> <span class="n">load_names</span><span class="p">)</span>
+        <span class="n">pop</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fromlist</span><span class="p">(</span><span class="n">pop_list</span><span class="p">,</span> <span class="n">member_init</span><span class="p">)</span>
         <span class="n">pop</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="n">GATools</span><span class="o">.</span><span class="n">init_empty</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">pop</span></div>
 
@@ -1129,7 +1093,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">normalization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.optimize_population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.optimize_population">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.optimize_population"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.optimize_population">[docs]</a>    <span class="k">def</span> <span class="nf">optimize_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="o">=</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Optimizes the structures of molecules in the population.</span>
 
@@ -1147,19 +1111,26 @@
 <span class="sd">        population. This means their :attr:`.Molecule.mol` attributes</span>
 <span class="sd">        are modified.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        processes : :class:`int`</span>
+<span class="sd">            The number of parallel processes to create.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None : :class:`NoneType`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">parallel</span><span class="p">:</span>
-            <span class="n">_optimize_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">processes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_optimize_all_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_optimize_all_serial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+            <span class="n">_optimize_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="o">.</span><span class="n">optimization</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">processes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.remove_duplicates"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">between_subpops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">id</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">top_seen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.remove_duplicates"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.remove_duplicates">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">between_subpops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">key</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+                          <span class="n">top_seen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes duplicates from the population and preserves structure.</span>
 
@@ -1334,7 +1305,7 @@
 
             <span class="n">member</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.__iter__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allows populations to be iterated through,</span>
 
@@ -1349,9 +1320,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Population.__getitem__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allows indexing to select members of the population.</span>
 
@@ -1410,9 +1381,9 @@
 
         <span class="c1"># If `key` is not ``int`` or ``slice`` raise ``TypeError``.</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Index must be an integer or slice, not&quot;</span>
-                        <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+                        <span class="s2">&quot; </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Population.__len__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the total number of members in the population.</span>
 
@@ -1424,9 +1395,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()))</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">()))</span>
 
-<div class="viewcode-block" id="Population.__sub__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__sub__">[docs]</a>    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes members of `other` from the population.</span>
 
@@ -1461,9 +1432,9 @@
 
         <span class="n">new_pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
         <span class="n">new_pop</span><span class="o">.</span><span class="n">add_members</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">new_pop</span></div>
+        <span class="k">return</span> <span class="n">new_pop</span>
 
-<div class="viewcode-block" id="Population.__add__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__add__">[docs]</a>    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Joins two populations.</span>
 
@@ -1482,12 +1453,12 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Population.__contains__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">())</span></div>
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_members</span><span class="p">())</span>
 
-<div class="viewcode-block" id="Population.__str__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">output_string</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; Population &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                          <span class="s2">&quot;--------------------------</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                          <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Members</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;   ---------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1512,10 +1483,10 @@
         <span class="k">for</span> <span class="n">pop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
             <span class="n">output_string</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">output_string</span></div>
+        <span class="k">return</span> <span class="n">output_string</span>
 
-<div class="viewcode-block" id="Population.__repr__"><a class="viewcode-back" href="../../../mtk.ga.population.html#mtk.ga.population.Population.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

@@ -158,30 +158,35 @@
 <code class="descclassname">mtk.ga.plotting.</code><code class="descname">fitness_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/plotting.html#fitness_epp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.plotting.fitness_epp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the min, max and avg fitness values of each subpopulation.</p>
 <p>Also saves the plot data. The min, mean and max values for each
-generation are placed in an array:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dmp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">)</span>
+subpopulation of <cite>pop</cite> are placed in an array:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dmp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>which is then dumped to the file <cite>dump_name</cite>.</p>
+<p>The members with a fitness of <code class="docutils literal"><span class="pre">0.0001</span></code> (indicating a failed
+fitness calculation) are excluded from this analysis.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – A population containing any number of subpopulations and no
-direct members.</li>
-<li><strong>plot_name</strong> (<em>str</em><em> (</em><em>default = False</em><em>)</em>) – The full path of where the plot should be saved. If <code class="docutils literal"><span class="pre">False</span></code>
-then no plot is made. Useful if you only want the dump file.</li>
-<li><strong>dump_name</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – If <code class="docutils literal"><span class="pre">None</span></code> then <cite>plot_name</cite> is used only with the extension
-<code class="docutils literal"><span class="pre">.dmp</span></code>.</li>
-<li><strong>xlabel</strong> (<em>str</em><em> (</em><em>default = 'Generation'</em><em>)</em>) – The label on the x-axis.</li>
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population containing any number of subpopulations and no
+direct members. Each subpopulation represents a generation of
+the GA.</li>
+<li><strong>plot_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – The full path to where the plot should be saved. If <code class="docutils literal"><span class="pre">False</span></code>
+then no plot is made. Useful if you only want the dump file and
+not graph.</li>
+<li><strong>dump_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
+dumped. If <code class="docutils literal"><span class="pre">None</span></code> then <cite>plot_name</cite> is used but with a
+<code class="docutils literal"><span class="pre">.dmp</span></code> extension.</li>
+<li><strong>xlabel</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The label on the x-axis.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -191,13 +196,14 @@ then no plot is made. Useful if you only want the dump file.</li>
 <dl class="function">
 <dt id="mtk.ga.plotting.parameter_epp">
 <code class="descclassname">mtk.ga.plotting.</code><code class="descname">parameter_epp</code><span class="sig-paren">(</span><em>pop</em>, <em>plot_name=False</em>, <em>dump_name=None</em>, <em>xlabel='Generation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/plotting.html#parameter_epp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.plotting.parameter_epp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the progress_params values across subpopulations.</p>
-<p>For each progress_param a plot will be produced. Each will show
-subpopulations on the x-axis and the min, max and avg values
-of that progress param on the y axis.</p>
+<dd><p>Plots the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.progress_params</span></code></a> values.</p>
+<p>For each element in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a> a
+separate graph will be produced. Each will show subpopulations on
+the x-axis and the min, max and avg values of that
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.progress_params" title="mtk.molecular.molecules.MacroMolecule.progress_params"><code class="xref py py-attr docutils literal"><span class="pre">progress_params</span></code></a> element on the y-axis.</p>
 <p>Also saves the plot data. The min, mean and max values for each
-generation are placed in an array:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dmp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">)</span>
+subpopulation are placed in an array:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dmp_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mins</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>which is then dumped to the file <cite>dump_name</cite>.</p>
@@ -206,20 +212,23 @@ generation are placed in an array:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><em>Population</em></a>) – A population holding any number of subpopulations and no
-direct members.</li>
-<li><strong>plot_name</strong> (<em>str</em><em> (</em><em>default = False</em><em>)</em>) – The full path of where the plot should be saved. If <code class="docutils literal"><span class="pre">False</span></code>
-then no plot is made. Useful if you only want the dump file.</li>
-<li><strong>dump_name</strong> (<em>str</em><em> (</em><em>default = None</em><em>)</em>) – If <code class="docutils literal"><span class="pre">None</span></code> then <cite>plot_name</cite> is used only with the extension
-<code class="docutils literal"><span class="pre">.dmp</span></code>.</li>
-<li><strong>xlabel</strong> (<em>str</em><em> (</em><em>default = 'Generation'</em><em>)</em>) – The label on the x-axis.</li>
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population containing any number of subpopulations and no
+direct members. Each subpopulation represents a generation of
+the GA.</li>
+<li><strong>plot_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – The full path to where the plot should be saved. If <code class="docutils literal"><span class="pre">False</span></code>
+then no plot is made. Useful if you only want the dump file and
+not graph.</li>
+<li><strong>dump_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The path to the file where the data to make the graph is
+dumped. If <code class="docutils literal"><span class="pre">None</span></code> then <cite>plot_name</cite> is used but with a
+<code class="docutils literal"><span class="pre">.dmp</span></code> extension.</li>
+<li><strong>xlabel</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>, optional) – The label on the x-axis.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -229,7 +238,7 @@ then no plot is made. Useful if you only want the dump file.</li>
 <dl class="function">
 <dt id="mtk.ga.plotting.plot_counter">
 <code class="descclassname">mtk.ga.plotting.</code><code class="descname">plot_counter</code><span class="sig-paren">(</span><em>counter</em>, <em>plot_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/plotting.html#plot_counter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.plotting.plot_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves a .png file holding a plot of <cite>counter</cite>.</p>
+<dd><p>Saves a <code class="docutils literal"><span class="pre">.png</span></code> file holding a plot of <cite>counter</cite>.</p>
 <p>The counter should hold the number of times a certain population
 member was selected.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -237,15 +246,15 @@ member was selected.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>counter</strong> (<em>Counter</em>) – A counter of which members of a population were picked.</li>
-<li><strong>plot_name</strong> (<em>str</em>) – The full path of the .png where the plot is to be saved.</li>
+<li><strong>counter</strong> (<code class="xref py py-class docutils literal"><span class="pre">collections.Counter</span></code>) – A counter of which members of a population were selected.</li>
+<li><strong>plot_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path of the <code class="docutils literal"><span class="pre">.png</span></code> where the plot is to be saved.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">NoneType</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
 </td>
 </tr>
 </tbody>

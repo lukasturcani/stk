@@ -1,12 +1,11 @@
-mtk.molecular package
-=====================
+mtk\.molecular package
+======================
 
 Subpackages
 -----------
 
 .. toctree::
 
-    mtk.molecular.optimization
     mtk.molecular.topologies
 
 Submodules
