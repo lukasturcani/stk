@@ -154,198 +154,204 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">types</span> <span class="k">import</span> <span class="n">ModuleType</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">isclass</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">fitness</span>
-<span class="kn">from</span> <span class="nn">.crossover</span> <span class="k">import</span> <span class="n">Crossover</span>
 <span class="kn">from</span> <span class="nn">.ga_tools</span> <span class="k">import</span> <span class="n">GATools</span>
 <span class="kn">from</span> <span class="nn">.selection</span> <span class="k">import</span> <span class="n">Selection</span>
 <span class="kn">from</span> <span class="nn">.mutation</span> <span class="k">import</span> <span class="n">Mutation</span>
-<span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
+<span class="kn">from</span> <span class="nn">.crossover</span> <span class="k">import</span> <span class="n">Crossover</span>
 <span class="kn">from</span> <span class="nn">.normalization</span> <span class="k">import</span> <span class="n">Normalization</span>
 <span class="kn">from</span> <span class="nn">.ga_exit</span> <span class="k">import</span> <span class="n">Exit</span>
 
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">ga</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">molecular</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">convenience_tools</span>
-
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">FunctionData</span>
-<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">Energy</span><span class="p">,</span> <span class="n">topologies</span>
-<span class="kn">from</span> <span class="nn">..molecular.optimization</span> <span class="k">import</span> <span class="n">optimization</span>
 
 
 <div class="viewcode-block" id="GAInput"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput">[docs]</a><span class="k">class</span> <span class="nc">GAInput</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class for concisely holding information from MMEA&#39;s input file.</span>
+<span class="sd">    A class for reading a GA&#39;s input file.</span>
 
-<span class="sd">    An MMEA input file is a Python script. The script must define a set</span>
-<span class="sd">    of variables. Each variable defines a parameter or a function used</span>
-<span class="sd">    by MMEA. If the variable defines a function used by MMEA it must</span>
-<span class="sd">    also define any parameters necessary to use the function. It does</span>
+<span class="sd">    An ``mtk`` input file is a Python script. The script must define a</span>
+<span class="sd">    set of variables. Each variable defines a parameter or a function</span>
+<span class="sd">    used by the GA. If the variable defines a function, it must also</span>
+<span class="sd">    define any parameters necessary to use the function. It does</span>
 <span class="sd">    not have to define any default initialized parameters, though it</span>
 <span class="sd">    may if desired.</span>
 
-<span class="sd">    Each variable name must corresond to an attribute of this class.</span>
+<span class="sd">    Each variable name defined in the input file must corresond to an</span>
+<span class="sd">    attribute of this class.</span>
 
 <span class="sd">    Variables which define a function or method are supplied as</span>
 <span class="sd">    dictionaries, for example:</span>
+
+<span class="sd">    .. code-block:: python</span>
 
 <span class="sd">        fitness_func = {&#39;NAME&#39; : &#39;func_name&#39;,</span>
 <span class="sd">                        &#39;param1_name&#39; : param1_val,</span>
 <span class="sd">                        &#39;param2_name&#39; : param2_val}</span>
 
 <span class="sd">    Key points from the line example are:</span>
-<span class="sd">        &gt; The variable name specifies the GA operation and is equal to</span>
-<span class="sd">          the name of an attribute of this class.</span>
-<span class="sd">        &gt; The key &#39;NAME&#39; holds the name of the function which carries</span>
-<span class="sd">          out the GA operation.</span>
-<span class="sd">        &gt; Any parameters which the function needs are provided as key</span>
-<span class="sd">          value pairs where the keys are strings holding the parameter</span>
-<span class="sd">          name.</span>
 
-<span class="sd">    Valid function names for a given variable can be found by using</span>
-<span class="sd">    the -h option.</span>
+<span class="sd">        1. The variable name (e.g. ``fitness_func``) specifies the GA</span>
+<span class="sd">           operation and matches the name of an attribute of</span>
+<span class="sd">           :class:`GAInput`.</span>
+<span class="sd">        2. The key ``&#39;NAME&#39;`` holds the name of the function which</span>
+<span class="sd">           carries out the GA operation. Note the difference between</span>
+<span class="sd">           the variable name specifying the generic role, i.e. a</span>
+<span class="sd">           fitness function, versus the value for ``&#39;NAME&#39;`` holding</span>
+<span class="sd">           the name of the function which carries out that role.</span>
+<span class="sd">        3. Any parameters which the function needs are provided as key</span>
+<span class="sd">           value pairs where the keys are strings holding the parameter</span>
+<span class="sd">           name.</span>
 
-<span class="sd">        python -m mmea -h fitness_func</span>
+<span class="sd">    Valid functions for a given role are described in the corresponding</span>
+<span class="sd">    attribute of :class:`GAInput`.</span>
 
-<span class="sd">    See also the User&#39;s guide.</span>
+<span class="sd">    Some variables will need to define other parameters used by the GA</span>
+<span class="sd">    such as constants or lists of constants,</span>
 
-<span class="sd">    Some variables will need to define other parameters used by MMEA,</span>
-<span class="sd">    such as constants,</span>
+<span class="sd">    .. code-block:: python</span>
 
 <span class="sd">        num_generations = 5</span>
-
-<span class="sd">    or lists of constants</span>
-
 <span class="sd">        databases = [&#39;first/path&#39;, &#39;second/path&#39;]</span>
-
-<span class="sd">    See the ``Attributes`` section to see what data each variable must</span>
-<span class="sd">    hold.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    pop_size : int</span>
+<span class="sd">    processes : :class:`int`</span>
+<span class="sd">        The number of parallel processes to create when running</span>
+<span class="sd">        parallel operations. This does not have to be specified in the</span>
+<span class="sd">        input file. If not specified, the number will default to the</span>
+<span class="sd">        value returned by :func:`psutil.cpu_count`</span>
+
+<span class="sd">    pop_size : :class:`int`</span>
 <span class="sd">        The size of the population.</span>
 
-<span class="sd">    num_generations : int</span>
-<span class="sd">        The number of generations formed by MMEA.</span>
+<span class="sd">    num_generations : :class:`int`</span>
+<span class="sd">        The number of generations the GA runs for.</span>
 
-<span class="sd">    num_mutations: int</span>
-<span class="sd">        The number of successful mutations per generation.</span>
+<span class="sd">    num_mutations: :class:`int`</span>
+<span class="sd">        The number of mutation operations carried out per generation.</span>
 
-<span class="sd">    num_crossovers: int</span>
-<span class="sd">        The number of successful crossovers per generation.</span>
+<span class="sd">    num_crossovers: :class:`int`</span>
+<span class="sd">        The number of crossover operations carried out per generation.</span>
 
-<span class="sd">    init_func : dict</span>
-<span class="sd">        The key &#39;NAME&#39; must hold the name of a ``Population`` method</span>
-<span class="sd">        initializer method.</span>
+<span class="sd">    init_func : :class:`dict`</span>
+<span class="sd">        This must define the parameters of a :class:`.Population`</span>
+<span class="sd">        initializer.</span>
 
-<span class="sd">    generational_select_func : dict</span>
-<span class="sd">        The key &#39;NAME&#39; must hold the name of the ``Selection`` class</span>
-<span class="sd">        method used to select members of the next generation.</span>
+<span class="sd">    generational_select_func : :class:`dict`</span>
+<span class="sd">        This must define the parameters of a :class:`.Selection`</span>
+<span class="sd">        method. This will be the function used to select members of the</span>
+<span class="sd">        next generation.</span>
 
-<span class="sd">    crossover_select_func : dict</span>
-<span class="sd">        The key &#39;NAME&#39; must hold the name of the ``Selection`` class</span>
-<span class="sd">        method used to select parents from the current generation&#39;s</span>
-<span class="sd">        population for crossover.</span>
+<span class="sd">    crossover_select_func : :class:`dict`</span>
+<span class="sd">        This must define the parameters of a :class:`.Selection`</span>
+<span class="sd">        method. This will be the function used to select molecules for</span>
+<span class="sd">        crossover.</span>
 
-<span class="sd">    mutation_select_func : dict</span>
-<span class="sd">        The key &#39;NAME&#39; must hold the name of the ``Selection`` class</span>
-<span class="sd">        method used to select ``MacroMolecule`` instances for mutation</span>
-<span class="sd">        from the current generation&#39;s population.</span>
+<span class="sd">    mutation_select_func : :class:`dict`</span>
+<span class="sd">        This must define the parameters of a :class:`.Selection`</span>
+<span class="sd">        method. This will be the function used to select molecules for</span>
+<span class="sd">        mutation.</span>
 
-<span class="sd">    crossover_funcs : list of dicts</span>
-<span class="sd">        This list holds a dict for each crossover function which is to</span>
-<span class="sd">        be used by the GA. The key &#39;NAME&#39; in each dict must hold the</span>
-<span class="sd">        name of a method of the ``Crossover`` class.</span>
+<span class="sd">    crossover_funcs : :class:`list` of :class:`dict`</span>
+<span class="sd">        This :class:`list` holds a :class:`dict` for each crossover</span>
+<span class="sd">        function which is to be used by the GA. The functions are</span>
+<span class="sd">        defined as methods in :class:`.Crossover`</span>
 
-<span class="sd">    mutation_funcs : list of dicts</span>
-<span class="sd">        This list holds a dict for each mutation function which is to</span>
-<span class="sd">        be used by the GA. The key &#39;NAME&#39; in each dict must hold the</span>
-<span class="sd">        name of a method of the ``Mutation`` class.</span>
+<span class="sd">    mutation_funcs : :class:`list` of :class:`dict`</span>
+<span class="sd">        This :class:`list` holds a :class:`dict` for each mutation</span>
+<span class="sd">        function which is to be used by the GA. The functions are</span>
+<span class="sd">        defined as methods in :class:`.Mutation`</span>
 
-<span class="sd">    opt_func : dict</span>
-<span class="sd">        The key &#39;NAME&#39; of the dict must hold the name of a fucntion</span>
-<span class="sd">        defined in the ``optimization.py`` module. It is used for</span>
-<span class="sd">        optimizing the structure of generated molecules.</span>
+<span class="sd">    opt_func : :class:`dict`</span>
+<span class="sd">        This must define the parameters of a function defined in</span>
+<span class="sd">        :mod:`~mtk.optimization`. This will be the function used to</span>
+<span class="sd">        optimize the structures of the molecules.</span>
 
-<span class="sd">    fitness_func : dict</span>
-<span class="sd">        The key &#39;NAME&#39; must hold the name of a function defined in</span>
-<span class="sd">        ``fitness.py``. The function is used to calculate the fitness</span>
-<span class="sd">        of generated molecules.</span>
+<span class="sd">    fitness_func : :class:`dict`</span>
+<span class="sd">        This must define the parameters of a function defined in</span>
+<span class="sd">        :mod:`.fitness`. This will be the function used to</span>
+<span class="sd">        calculate the fitness of the molecules.</span>
 
-<span class="sd">    mutation_weights : list of ints</span>
-<span class="sd">        The probability that each function in `mutation_funcs` will be</span>
-<span class="sd">        selected each time a mutation operation is carried out. The</span>
-<span class="sd">        order of the probabilities corresponds to the order of the</span>
-<span class="sd">        mutation functions in `mutation_funcs`.</span>
+<span class="sd">    mutation_weights : :class:`list` of :class:`int`</span>
+<span class="sd">        The probability that each function in :attr:`mutation_funcs`</span>
+<span class="sd">        will be selected each time a mutation operation is carried out.</span>
+<span class="sd">        The order of the probabilities corresponds to the order of the</span>
+<span class="sd">        mutation functions in :attr:`mutation_funcs`.</span>
 
-<span class="sd">    normalization_funcs : list of dicts</span>
-<span class="sd">        A list of functions which rescale or normalize the population&#39;s</span>
-<span class="sd">        fitness values. The order reflects the order in which they are</span>
-<span class="sd">        applied each generation.</span>
+<span class="sd">    normalization_funcs : :class:`list` of :class:`dict`</span>
+<span class="sd">        This :class:`list` holds a :class:`dict` for each normalization</span>
+<span class="sd">        function used to rescale or normalize the population&#39;s fitness</span>
+<span class="sd">        values. The order reflects the order in which they are applied</span>
+<span class="sd">        each generation. The functions are defined as methods in</span>
+<span class="sd">        :class:`.Normalization`. This can be ommited from the input</span>
+<span class="sd">        file which means that no normalization functions will be used.</span>
 
-<span class="sd">    databases : list of strings</span>
-<span class="sd">        A list which holds the paths to any number JSON files. These</span>
-<span class="sd">        files must hold the JSON representations of Population</span>
-<span class="sd">        instances. All the molecules in the populations are loaded</span>
-<span class="sd">        into memory for the duration of the GA run. This means not all</span>
-<span class="sd">        molecules have to be remade and optimized or have their</span>
-<span class="sd">        fitness value recalculated.</span>
+<span class="sd">    databases : :class:`list` of :class:`str`</span>
+<span class="sd">        A :class:`list` which holds the paths to any number ``JSON``</span>
+<span class="sd">        files. These files must hold the ``JSON`` representations of</span>
+<span class="sd">        dumped :class:`.Population` instances. All the molecules in the</span>
+<span class="sd">        populations are loaded into memory for the duration of the GA</span>
+<span class="sd">        run. Molecules loaded in this way do not have to be built,</span>
+<span class="sd">        re-optimized or have fitness values recalculated when</span>
+<span class="sd">        encountered by the GA.</span>
 
-<span class="sd">    parallel : bool (default = True)</span>
-<span class="sd">        If ``True`` MMEA does optimization and fitness calculation of</span>
-<span class="sd">        each molecule in parallel.</span>
+<span class="sd">    progress_dump : :class:`bool`</span>
+<span class="sd">        If ``True`` a ``.json`` :class:`.Population` dump is made at</span>
+<span class="sd">        the end of the GA run called ``progress.json``. The population</span>
+<span class="sd">        holds each generation made by the GA as a subpopulation. This</span>
+<span class="sd">        can be ommitted from the input file, in which case it</span>
+<span class="sd">        defaults to ``True``.</span>
 
-<span class="sd">    progress_dump : bool (default = True)</span>
-<span class="sd">        If ``True`` a .json Population dump is made at the end of the</span>
-<span class="sd">        GA run called ``progress`.json`. The population holds each</span>
-<span class="sd">        generation as a subpopulation.</span>
+<span class="sd">    database_dump : :class:`bool`</span>
+<span class="sd">        If ``True`` a ``.json`` :class:`.Population` dump is made at</span>
+<span class="sd">        the end of the GA run called ``database.json``. The population</span>
+<span class="sd">        holds every molecule made by the GA during its run. This can</span>
+<span class="sd">        be omitted from the input file, in which case it defaults to</span>
+<span class="sd">        ``True``.</span>
 
-<span class="sd">    database_dump : bool (default = True)</span>
-<span class="sd">        If ``True`` a .json Population dump is made at the end of the</span>
-<span class="sd">        GA run called ``database.json``. The population holds every</span>
-<span class="sd">        molecule made by the GA as a member.</span>
+<span class="sd">    plot_epp : :class:`bool` or :class:`str`</span>
+<span class="sd">        If a string is provided, it should hold the base name for the</span>
+<span class="sd">        EPP plots made by the GA. If ``False`` then no EPP plots are</span>
+<span class="sd">        made. This can be omitted from the input file, in which case</span>
+<span class="sd">        it defaults to ``&#39;epp.png&#39;``.</span>
 
-<span class="sd">    plot_epp : False or str (default = &#39;epp.png&#39;)</span>
-<span class="sd">        If a string, then it should hold the name of the EPP plots.</span>
-<span class="sd">        If ``False`` then no EPP plots are made.</span>
+<span class="sd">    logging_level : :class:`int`</span>
+<span class="sd">        The logging level for logging messages to the screen. This can</span>
+<span class="sd">        be omitted from the input file in which case it defulats to</span>
+<span class="sd">        ``logging.DEBUG``.</span>
 
-<span class="sd">    logging_level : int (default = logging.DEBUG)</span>
-<span class="sd">        The logging level for logging messages to the screen.</span>
+<span class="sd">    counters : :class:`bool`</span>
+<span class="sd">        If ``True`` plots of which molecules get chosen by selection</span>
+<span class="sd">        functions are made. This can be omitted from the input file,</span>
+<span class="sd">        in which case it defaults to ``True``.</span>
 
-<span class="sd">    counters : bool (default = True)</span>
-<span class="sd">        If ``True`` plots the which molecules get chosen by selection</span>
-<span class="sd">        functions get made.</span>
+<span class="sd">    pop_dumps : :class:`bool`</span>
+<span class="sd">        If ``True`` each generation makes a ``.json`` dump file. This</span>
+<span class="sd">        can be omitted from the input file, in which case it defaults</span>
+<span class="sd">        to ``True``.</span>
 
-<span class="sd">    pop_dumps : bool (default = True)</span>
-<span class="sd">        If ``True`` each generation makes a .json dump file.</span>
-
-<span class="sd">    tar_output : bool (default = True)</span>
+<span class="sd">    tar_output : :class:`bool`</span>
 <span class="sd">        If ``True`` a copy of the output folder is compressed, tarred</span>
-<span class="sd">        and placed in the output folder.</span>
+<span class="sd">        and placed in the output folder. This can be omitted from the</span>
+<span class="sd">        input file, in which case it defaults to ``True``.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GAInput.__init__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes a ``GAInput`` instance.</span>
+<span class="sd">        Initializes a :class:`GAInput` instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        input_file : str</span>
-<span class="sd">            The full path of the MMEA input file.</span>
+<span class="sd">        input_file : :class:`str`</span>
+<span class="sd">            The path to the GA input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inp</span><span class="p">:</span>
-            <span class="n">mmea_namespace</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">mmea_namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">convenience_tools</span><span class="p">))</span>
-            <span class="n">mmea_namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">molecular</span><span class="p">))</span>
-            <span class="n">mmea_namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">ga</span><span class="p">))</span>
-            <span class="n">exec</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">mmea_namespace</span><span class="p">,</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="n">exec</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;plot_epp&#39;</span><span class="p">)</span> <span class="ow">and</span>
            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;plot_epp&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
@@ -353,6 +359,9 @@
 
         <span class="c1"># If the input file did not specify some values, default</span>
         <span class="c1"># initialize them.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;processes&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processes</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;num_crossovers&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_crossovers</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -360,10 +369,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mutation_weights&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mutation_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mutation_weights</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;crossover_weights&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">crossover_weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crossover_weights</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;normalization_funcs&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">normalization_funcs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -373,9 +382,6 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;databases&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;parallel&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;progress_dump&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">progress_dump</span> <span class="o">=</span> <span class="kc">True</span>
@@ -396,23 +402,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">pop_dumps</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;tar_output&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tar_output</span> <span class="o">=</span> <span class="kc">True</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tar_output</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="GAInput.crosser"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.crosser">[docs]</a>    <span class="k">def</span> <span class="nf">crosser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a Crossover instance loaded with data from input file.</span>
+<span class="sd">        Use input file data to build :class:`.Crossover` instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Crossover</span>
-<span class="sd">            A Crossover instance which has all of the crossover</span>
-<span class="sd">            related data held in the GAInput instance.</span>
+<span class="sd">        :class:`.Crossover`</span>
+<span class="sd">            A :class:`.Crossover` instance which has all of the</span>
+<span class="sd">            crossover related data held by the :class:`.GAInput`</span>
+<span class="sd">            instance.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">funcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionData</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                               <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                              <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
+                                 <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
                  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossover_funcs</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">Crossover</span><span class="p">(</span><span class="n">funcs</span><span class="p">,</span>
@@ -421,83 +428,86 @@
 
 <div class="viewcode-block" id="GAInput.exiter"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.exiter">[docs]</a>    <span class="k">def</span> <span class="nf">exiter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a Exit instance loaded with data from the input file.</span>
+<span class="sd">        Use input file data to build :class:`.Exit` instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Exit</span>
-<span class="sd">            An Exit instance loaded with the exit function defined in</span>
-<span class="sd">            the input file. If none was defined an exit function which</span>
-<span class="sd">            always returns ``False`` is used.</span>
+<span class="sd">        :class:`.Exit`</span>
+<span class="sd">            An :class:`.Exit` instance loaded with the exit function</span>
+<span class="sd">            defined in the input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">func_data</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exit_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                                  <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">exit_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">exit_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                                    <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">Exit</span><span class="p">(</span><span class="n">func_data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GAInput.fitnessor"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.fitnessor">[docs]</a>    <span class="k">def</span> <span class="nf">fitnessor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a FunctionData of fitness func in input file.</span>
+<span class="sd">        Use input file data to  extract fitness function information.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        FunctionData</span>
-<span class="sd">            A FunctionData object which represents the fitness</span>
-<span class="sd">            function.</span>
+<span class="sd">        :class:`.FunctionData`</span>
+<span class="sd">            A :class:`.FunctionData` object which represents the</span>
+<span class="sd">            fitness function.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                             <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">fitness_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                            <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span></div>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">fitness_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                               <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="GAInput.ga_tools"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.ga_tools">[docs]</a>    <span class="k">def</span> <span class="nf">ga_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a GATools instance loaded with data from the input file.</span>
+<span class="sd">        Use input file data to build a :class:`.GATools` instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        GATools</span>
-<span class="sd">            A GATools instance which has all of the input data held in</span>
-<span class="sd">            the GAInput instance.</span>
+<span class="sd">        :class:`.GATools`</span>
+<span class="sd">            A :class:`.GATools` instance built from the information</span>
+<span class="sd">            defined in the input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">GATools</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">crosser</span><span class="p">(),</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">mutator</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="p">(),</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">opter</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitnessor</span><span class="p">(),</span>
-                       <span class="bp">self</span><span class="o">.</span><span class="n">exiter</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">GATools</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">crosser</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">mutator</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">opter</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fitnessor</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">exiter</span><span class="p">(),</span>
+                       <span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GAInput.initer"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.initer">[docs]</a>    <span class="k">def</span> <span class="nf">initer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a FunctionData object of init function in input file.</span>
+<span class="sd">        Use input file to  extract initialization function information.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        FunctionData</span>
-<span class="sd">            A FunctionData object which represents the initialization</span>
-<span class="sd">            function.</span>
+<span class="sd">        :class:`.FunctionData`</span>
+<span class="sd">            A :class:`.FunctionData` object which represents the</span>
+<span class="sd">            initialization function.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                             <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">init_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                            <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span></div>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">init_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                               <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="GAInput.mutator"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.mutator">[docs]</a>    <span class="k">def</span> <span class="nf">mutator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a Mutation instance loaded with data from input file.</span>
+<span class="sd">        Use input file data to build :class:`.Mutation` instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Mutation</span>
-<span class="sd">            A Mutation instance which has all of the mutation related</span>
-<span class="sd">            data held in the GAInput instance.</span>
+<span class="sd">        :class:`.Mutation`</span>
+<span class="sd">            A :class:`.Mutation` instance which has all of the</span>
+<span class="sd">            mutation related data held in the input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -511,13 +521,13 @@
 
 <div class="viewcode-block" id="GAInput.normalizer"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.normalizer">[docs]</a>    <span class="k">def</span> <span class="nf">normalizer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns Normalization instance holding data from input file.</span>
+<span class="sd">        Use input file data to build :class:`.Normalization` instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Normalization</span>
-<span class="sd">            A Normalization instance which has all of the normalization</span>
-<span class="sd">            related data held in the GAInput instance.</span>
+<span class="sd">        :class:`.Normalization`</span>
+<span class="sd">            A :class:`.Normalization` instance which has all of the</span>
+<span class="sd">            normalization related data held in the input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -528,147 +538,55 @@
 
 <div class="viewcode-block" id="GAInput.opter"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.opter">[docs]</a>    <span class="k">def</span> <span class="nf">opter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a FunctionData of optimization func in input file.</span>
+<span class="sd">        Use the input file to extract optimization function data.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        FunctionData</span>
-<span class="sd">            A FunctionData object which represents the optimization</span>
-<span class="sd">            function.</span>
+<span class="sd">        :class:`.FunctionData`</span>
+<span class="sd">            A :class:`.FunctionData` object which represents the</span>
+<span class="sd">            optimization function defined in the input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                             <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">opt_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                            <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span></div>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">opt_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="GAInput.selector"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.selector">[docs]</a>    <span class="k">def</span> <span class="nf">selector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a Selection instance loaded with data from input file.</span>
+<span class="sd">        Use input file data to build :class:`.Selection` instance.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Selection</span>
-<span class="sd">            A Selection instance which has all of the selection</span>
-<span class="sd">            related data held in the GAInput instance.</span>
+<span class="sd">        :class:`.Selection`</span>
+<span class="sd">            A :class:`.Selection` instance which has all of the</span>
+<span class="sd">            selection related data held in the input file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">gen</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generational_select_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                            <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">generational_select_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                           <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">generational_select_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                              <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
 
         <span class="n">crossover</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crossover_select_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                                  <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">crossover_select_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">crossover_select_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
 
         <span class="n">mutation</span> <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation_select_func</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">],</span>
                                 <span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">mutation_select_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">mutation_select_func</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
+                                   <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;NAME&#39;</span><span class="p">})</span>
 
         <span class="k">return</span> <span class="n">Selection</span><span class="p">(</span><span class="n">gen</span><span class="p">,</span> <span class="n">crossover</span><span class="p">,</span> <span class="n">mutation</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GAInput.__repr__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span>
-                           <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+                           <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-<div class="viewcode-block" id="GAInput.__str__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.GAInput.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
-
-
-<div class="viewcode-block" id="InputHelp"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.InputHelp">[docs]</a><span class="k">class</span> <span class="nc">InputHelp</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class which creates output when ``-h`` option is used as input.</span>
-
-<span class="sd">    The ``-h`` option is used in the following way:</span>
-
-<span class="sd">        python -m MMEA -h keyword</span>
-
-<span class="sd">    Here ``keyword`` corresponds to one of the attributes of the</span>
-<span class="sd">    ``GAInput`` class. The output when this command is used will be</span>
-<span class="sd">    a list of all functions which can be used with that keyword and</span>
-<span class="sd">    the corresponding documentation.</span>
-
-<span class="sd">    Class attributes</span>
-<span class="sd">    ----------------</span>
-<span class="sd">    modules : dict</span>
-<span class="sd">        Maps the name of the keyword to the object which holds the</span>
-<span class="sd">        functions or methods that are to be used with that keyword.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">modules</span> <span class="o">=</span> <span class="p">{</span>
-               <span class="s1">&#39;init_func&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                             <span class="n">Population</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                             <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;init&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;generational_select_func&#39;</span><span class="p">:</span> <span class="p">(</span>
-                                 <span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                 <span class="n">Selection</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                 <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;generational&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;crossover_select_func&#39;</span><span class="p">:</span> <span class="p">(</span>
-                                 <span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                 <span class="n">Selection</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                 <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;crossover&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;mutation_select_func&#39;</span><span class="p">:</span> <span class="p">(</span>
-                                 <span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                 <span class="n">Selection</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                 <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;mutation&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;crossover_funcs&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                   <span class="n">Crossover</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                   <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;mutation_funcs&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                  <span class="n">Mutation</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                  <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;opt_func&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                            <span class="n">optimization</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                            <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ModuleType</span><span class="p">)</span> <span class="ow">and</span>
-                            <span class="s1">&#39;optimization&#39;</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="vm">__module__</span><span class="p">),</span>
-
-               <span class="s1">&#39;fitness_func&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                <span class="n">fitness</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                                <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                                <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ModuleType</span><span class="p">)</span> <span class="ow">and</span>
-                                <span class="s1">&#39;fitness&#39;</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="vm">__module__</span><span class="p">),</span>
-
-               <span class="s1">&#39;normalization_funcs&#39;</span><span class="p">:</span>  <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                                        <span class="n">Normalization</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                                        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;energy&#39;</span><span class="p">:</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Energy</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                          <span class="n">Energy</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span>
-                          <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)),</span>
-
-               <span class="s1">&#39;topologies&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">cls</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span>
-                              <span class="n">topologies</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span>
-                              <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                              <span class="n">isclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="ow">and</span>
-                              <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">topologies</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Topology</span><span class="p">)),</span>
-
-               <span class="s1">&#39;exit_func&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">func</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span>
-                             <span class="n">Exit</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span>
-                             <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))</span>
-               <span class="p">}</span>
-
-<div class="viewcode-block" id="InputHelp.__init__"><a class="viewcode-back" href="../../../mtk.ga.input.html#mtk.ga.input.InputHelp.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">keyword</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__func__&#39;</span><span class="p">):</span>
-                <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__func__</span>
-
-            <span class="nb">print</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

@@ -3,7 +3,6 @@ Tests for normalization functions.
 
 """
 
-from os.path import join
 from ..ga import Normalization
 from .test_population import generate_population
 
@@ -12,12 +11,13 @@ population = generate_population()
 
 def test_cage():
     for i, mem in enumerate(population):
-        mem.fitness = [i,i,i,i]
+        mem.fitness = [i, i, i, i]
 
     Normalization.cage(None, population, 2, 3)
 
     for i, mem in enumerate(population):
-        assert mem.fitness == [abs(i-2), abs(i-3), i, i] 
+        assert mem.fitness == [abs(i-2), abs(i-3), i, i]
+
 
 def test_combine():
 
@@ -28,7 +28,7 @@ def test_combine():
     for i, mem in enumerate(population, 1):
         mem.fitness = [i for _ in range(4)]
 
-    Normalization.combine(None, population, [1,1,1,1], [1,1,1,1])
+    Normalization.combine(None, population, [1, 1, 1, 1], [1, 1, 1, 1])
 
     for i, mem in enumerate(population, 1):
         assert mem.fitness == i*4

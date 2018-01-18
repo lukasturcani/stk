@@ -1,134 +1,212 @@
 """
 Module for defining fitness functions.
 
-A note on how fitness values are calculated.
---------------------------------------------
-Calculation of fitness values can be a multi-step process. The goal is
-to place a numerical value between 0 (exclusive) and infinity in the
-`fitness` attribute of a MacroMolecule instance. A thing to keep in
-mind is that once a value is placed into the `unscaled_fitness`
-attribute it never changes (for a given fitness function and molecule).
-However, values placed into the `fitness` attribute are subject to
-change. This is because the outcome of a normalization procedure can
-depend on other members of the population, not just the one being
-evaulated. As a result this can be different each generation.
+How fitness values are calculated.
+----------------------------------
 
-There are 2 ways in which calculation of a `fitness` value can be
-achieved. First, using only a fitness function. Second, using a fitness
-function and normalization functions.
+The basic outline of the fitness calculation procedure for a single
+molecule is as follows,
 
-The case when only a fitness function is used is simple. All fitness
-functions take a MacroMoleule instance as an argument and return the
-value of its fitness. MMEA then automatically puts this returned value
-into the `unscaled_fitness` attribute. Next, MMEA copies this value
-into the `fitness` attribute at the start of each generation.
+.. code-block:: python
 
-So what happens if normalization functions are used?
+    # 1. Start with a MacroMolecule instance.
+    mol = Polymer([monomer1, monomer2], SomeTopology())
 
-The first thing to note is that multiple normalization functions can
-be applied sequentially. Each normalization function replaces the
-previous value in the `fitness` attribute. Normalization functions do
-not manipulate or interact with the `unscaled_fitness` attribute in any
-way. Before the first normalization function is applied, MMEA
-automatically copies the value in `unscaled_fitness` into `fitness`.
+    # This new instance has had no fitness functions applied to it
+    # and therefore its "fitness" and "unscaled_fitness" attributes
+    # are empty.
+    mol.fitness  # None
+    mol.unscaled_fitness  # {}
 
-The normalization functions then place various values into the
-`fitness` attribute. Only the last normalization function needs to
-place a value between 0 (exclusive) and infinity in the `fitness`
-attribute. This is useful if the fitness function calculates the values
-a number of fitness parameters (such as energy, molecular weight, etc.)
-and then the normalization functions combine them into a single number.
+    # 2. Apply a fitness function to the MacroMolecule.
+    mol.unscaled_fitness['random_fitness'] = random_fitness(mol)
 
-Each generation, before all the normalization functions are reapplied,
-MMEA automatically copies the value in `unscaled_fitness` into
-`fitness`. Then the sequence of normalization functions is applied
-again.
+    # This adds the unscaled fitness value into the "unscaled_fitness"
+    # attribute, but does not change the "fitness" attribute.
+    mol.fitness  # None
+    mol.unscaled_fitness  # {'random_fitness': 34}
 
-While fitness functions are only applied once per molecule,
-normalization functions are reapplied each generation.
+    # 3.Copy the value from "unscaled_fitness" into "fitness".
+    mol.fitness = deepcopy(mol.unscaled_fitness['random_fitness'])
 
-Extending MMEA: Adding fitness functions.
------------------------------------------
+    mol.fitness  # 34
+    mol.unscaled_fitness  # {'random_fitness': 34}
 
-Example: random_fitness()
+    # 4. Apply any number of normalization functions to the fitness
+    #    value. Normalization functions can be skipped altogether.
+
+    # Normalization functions act on a population of MacroMolecules,
+    # i.e. they normalize the fitness values across the population. So
+    # first step is to put the molecule into a population.
+    pop = Population(mol)
+
+    # Apply the normalization function.
+    norm_func(pop)
+
+    mol.fitness  # 12
+    mol.unscaled_fitness  # {'random_fitness': 34}
+
+    # Multiple normalization functions may be applied.
+    norm_func2(pop)
+
+    mol.fitness  # 200
+    mol.unscaled_fitness  # {'random_fitness': 34}
+
+When running the GA, this process is much simplified,
+
+.. code-block:: python
+
+    # Start with a population of molecules, representing a GA
+    # generation.
+    pop = Population(mol1, mol2, mol3)
+
+    mol1.fitness  # None
+    mol1.unscaled_fitness  # {}
+
+    mol2.fitness  # None
+    mol2.unscaled_fitness  # {}
+
+    mol3.fitness  # None
+    mol3.unscaled_fitness  # {}
+
+    # Calculate the unscaled fitness values of all molecules.
+    pop.calculate_member_fitness()
+
+    mol1.fitness  # None
+    mol1.unscaled_fitness  # {'random_fitness': 12}
+
+    mol2.fitness  # None
+    mol2.unscaled_fitness  # {'random_fitness': 34}
+
+    mol3.fitness  # None
+    mol3.unscaled_fitness  # {'random_fitness': 22}
+
+    # Apply the normalization functions.
+    pop.normalize_fitness_values()
+
+    mol1.fitness  # 3
+    mol1.unscaled_fitness  # {'random_fitness': 12}
+
+    mol2.fitness  # 1
+    mol2.unscaled_fitness  # {'random_fitness': 34}
+
+    mol3.fitness  # 2
+    mol3.unscaled_fitness  # {'random_fitness': 22}
+
+The method :meth:`.Population.normalize_fitness_values` automatically
+copies the fitness value from :attr:`.MacroMolecule.unscaled_fitness`
+into :attr:`.MacroMolecule.fitness` before applying any normalization
+functions. A fitness function is only applied once per molecule,
+because the result depends only on the molecule. However, normalization
+functions are re-applied every generation. This is because for some
+normalization functions, the returned value for a molecule may also
+depend on the other molecules in the population. At each generation,
+a fresh copy of the value from :attr:`.MacroMolecule.unscaled_fitness`
+is made into :attr:`.MacroMolecule.fitness`. This means that the
+normalization functions always start from the unscaled fitness value.
+
+Extending mtk: Adding fitness functions.
+----------------------------------------
 
 To add a new fitness function simply write it as a function in this
-module. It will need to take the ``MacroMolecule`` instance as its
-first argument and this argument should be called ``macro_mol``. It
-should also hold a keyword argument called ``logger``. The purpose of
-this is to help users identify which arguments are handled
-automatically by MMEA and which they need to define in the input file.
-The convention is that if the fitness function takes an argument called
-``macro_mol`` or ``logger`` they do not have to specify that argument
-in the input file.
-
-When defining fitness functions the ``logger`` argument should be
-used for logging as a normal logger from the ``logging`` library would.
-When running the GA a special logger compatible with multiprocessing
-is automatically placed in this argument. It may be useful to define
-the logger argument as a keyword argument::
-
-    fit_func(macro_mol, somearg, logger=logging.getLogger(__name__)):
-        ...
-
-In this way, if the fitness function is used outside of the GA,
-the logger will be provided automatically as well.
+module. It will need to take the :class:`.MacroMolecule` instance as
+its first argument and this argument should be called `macro_mol`. The
+purpose of this is to help users identify which arguments are handled
+automatically by ``mtk`` and which they need to define in the input
+file. The convention is that if the fitness function takes an argument
+called `macro_mol`, they do not have to specify that argument in the
+input file.
 
 A fitness function must return the value which represents the fitness
-of the molecule received as an argument. If a fitness function is meant
-to be paired with a normalization funtion it can return any value or
+of the molecule `macro_mol`. If a fitness function is meant to be
+paired with a normalization function it can return any value or
 object it likes. Just as long as the normalization functions know how
 to deal with it and convert it to a number.
 
+.. code-block:: python
+
+    def random_fitness(macro_mol):
+        return abs(np.random.normal(50, 20))
+
+Obviously, this is a just toy example but all the key components of
+fitness functions are there. More complex fitness functions can take
+an arbitrary number arguments, and will likely use molecular properties
+to calculate a fitness value. Here is a fitness function which rewards
+molecules for having a desired size.
+
+.. code-block:: python
+
+    def size(macro_mol, desired_size):
+        return abs(macro_mol.max_diameter() - desired_size)
+
 A fitness function may be complex and may not fit neatly into a single
-function. For example, the ``cage_target()`` fitness function needs to
-call ``_generate_complexes()`` in order to sample various conformations
+function. For example, the :func:`cage_target` needs to call
+:func:`_generate_complexes` in order to sample various conformations
 before outputting a fitness value. This is fine. Define helper
-functions such as ``_generate_complexes()`` within this module but make
-sure they are private. This means that names of helper functions begin
-with a leading underscore.
+functions such as :func:`_generate_complexes` within this module but
+make sure they are private. This means that names of helper functions
+begin with a leading underscore.
+
+.. _plotting-note:
 
 A note on plotting.
 -------------------
-As mentioned before some fitness functions may be complex and as a
+
+As mentioned before, some fitness functions may be complex and as a
 result manipulate all sorts of data. Typically, in order to measure the
 progress of a GA, the fitness values in the population are tracked
 across generations. However, let's say that some hypothetical fitness
 function also calculates the energies of molecules. It may be quite
-interesting plot the evolution of energies across generations too. If
-this is the case the fitness function may assign to the
-`progress_params` attribute of `macro_mol`:
+interesting plot the evolution of energies across generations too, even
+if the energy is not directly reflect in the final fitness value. If
+this is the case, the fitness function may assign to the
+:attr:`.MacroMolecule.progress_params` attribute of `macro_mol`,
 
-    macro_mol.progress_params['example_func'] = [mol_energy]
+.. code-block:: python
 
-Now a plot showing the change in `mol_energy` across generations will
-be made too, along with the plot showing the changes in fitness. In
-this case the name of the fitness function was ``example_func``.
+    def example_func(macro_mol):
+        mol_energy = macro_mol.energy.some_energy_func()
+        macro_mol.progress_params['example_func'] = [mol_energy]
+        ...
 
-What if two things are needed to be kept track of?
+Now a plot showing the change in ``mol_energy`` across generations will
+be made too, along with the plot showing the changes in fitness.
 
-    macro_mol.progress_params['example_func'] = [mol_energy, mol_radius]
+What if two things are needed to be kept track of? Simple,
 
-Great, now a progress plot for each of the variables will be made.
+.. code-block:: python
 
-How will the y axes be labelled in each plot?
-The decorator `_param_labels()` exists for this.
+    def example_func(macro_mol):
+        mol_energy = macro_mol.energy.some_energy_func()
+        mol_radius = macro_mol.max_diamater() / 2
+        macro_mol.progress_params['example_func'] = [mol_energy,
+                                                     mol_radius]
+        ...
+
+Great, now a separate progress plot ``mol_energy`` and ``mol_radius``
+will be made.
+
+How will the y-axes be labelled in each plot? The decorator
+:func:`_param_labels` exists for this.
 
 Let's create a basic outline of a some fitness function:
 
+.. code-block:: python
+
     @_param_labels('Molecule Energy / J mol-1', 'Mol Radius / m-9')
-    def this_is_the_fitness_function(macro_mol, some_param):
+    def some_fitness_fn(macro_mol, some_param):
         ...
         calculate_stuff()
         ...
-        macro_mol.progress_params['this_is_the_fitness_function'] = [
-                                                mol_energy, mol_radius]
+        macro_mol.progress_params['some_fitness_fn'] = [mol_energy,
+                                                        mol_radius]
         ...
         return fitness_value
 
 If this function is used in the GA, a progress plot will be made for
-each of the `progress_params` and they will have their y-axes labelled
-'Molecule Energy / J mol-1' and 'Molecule Radius / m-9', respectively.
+each variable placed in :attr:`.MacroMolecule.progress_params` and
+they will have their y-axes labelled ``'Molecule Energy / J mol-1'``
+and ``'Molecule Radius / m-9'``, respectively.
 
 """
 
@@ -145,66 +223,64 @@ from os.path import join
 from uuid import uuid4
 import logging
 from threading import Thread
-from traceback import format_exc
-import psutil
 
 from ..convenience_tools import (matrix_centroid,
                                  FunctionData,
                                  rotation_matrix_arbitrary_axis,
-                                 StopLogging, mplogger, FakeLogger)
+                                 daemon_logger,
+                                 logged_call)
 
-from ..molecular import (Cage, StructUnit,
-                         Energy, optimization, func_key)
-
+from ..molecular import Cage, StructUnit, Energy, func_key
+from .. import optimization
 
 logger = logging.getLogger(__name__)
 
 
-def _calc_fitness(func_data, population):
+def _calc_fitness(func_data, population, processes):
     """
     Calculates the fitness values of all members of a population.
 
     Parameters
     ----------
-    func_data : FunctionData
-        A ``FunctionData`` instance representing the chosen fitness
-        function and any additional parameters it may require.
+    func_data : :class:`.FunctionData`
+        A :class:`.FunctionData` instance representing the chosen
+        fitness function and any additional parameters it may require.
 
-    population : Population
+    population : :class:`.Population`
         The population whose members must have their fitness
         calculated.
 
+    processes : :class:`int`
+        The number of parallel processes to create.
+
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
-    # In order for logging to work with multiprocessing properly, each
-    # subprocess will log into the que. A thread in the main process
-    # will then log.
-    m = mp.Manager()
-    logq = m.Queue()
-    exit_ = StopLogging()
-    log_thread = Thread(target=mplogger, args=(logq, logger))
-    log_thread.daemon = True
+    manager = mp.Manager()
+    logq = manager.Queue()
+    log_thread = Thread(target=daemon_logger, args=(logq, ))
     log_thread.start()
 
     # Get the fitness function object.
     func = globals()[func_data.name]
     # Make sure it won't raise errors while using multiprocessing.
-    p_func = _FitnessFunc(partial(func, **func_data.params), logq)
+    p_func = _FitnessFunc(partial(func, **func_data.params))
 
     # Apply the function to every member of the population, in
     # parallel.
-    with mp.get_context('spawn').Pool(psutil.cpu_count(False)) as pool:
-        evaluated = pool.map(p_func, population)
+    with mp.get_context('spawn').Pool(processes) as pool:
+        evaluated = pool.starmap(logged_call,
+                                 ((logq, p_func, mem) for
+                                  mem in population))
 
     # Make sure the cache is updated with the evaluated versions.
     for member in evaluated:
         member.update_cache()
 
-    logq.put((exit_, exit_))
+    logq.put(None)
     log_thread.join()
 
 
@@ -214,17 +290,17 @@ def _calc_fitness_serial(func_data, population):
 
     Parameters
     ----------
-    func_data : FunctionData
-        A ``FunctionData`` instance representing the chosen fitness
-        function and any additional parameters it may require.
+    func_data : :class:`.FunctionData`
+        A :class:`.FunctionData` instance representing the chosen
+        fitness function and any additional parameters it may require.
 
-    population : Population
+    population : :class:`.Population`
         The population whose members must have their fitness
         calculated.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
@@ -238,24 +314,36 @@ def _calc_fitness_serial(func_data, population):
 
 def _param_labels(*labels):
     """
-    Adds the `param_labels` attribute to a fitness function.
+    Adds the :attr:`param_labels` attribute to a fitness function.
 
-    The point of this decorator is described in the module level
-    docstring.
+    The point of this decorator is described in :ref:`plotting-note`.
 
     Parameters
     ----------
-    labels : tuple
-        List of strings about the fitness labels used for plotting
-        EPPs. The order of the strings should represent the order of
-        the fitness ``vars`` in the fitness funciton. In practice it
-        should correspond to the order of the ``coeffs`` or
-        ``exponents`` parameters given to the fitness function.
+    *labels : :class:`str`
+        This function takes an arbitrary number of strings. The strings
+        are the y-axis labels for each graph made per variable in
+        :attr:`.MacroMolecule.progress_params`. The order of strings
+        must correspond to the order of variables placed into
+        :attr:`.MacroMolecule.progress_params`.
 
     Returns
     -------
-    func
-        Decorated function.
+    :class:`function`
+        The decorated function, with the attribute :attr:`param_labels`
+        added. :attr:`param_labels` holds the strings provided in
+        `*labels`.
+
+    Examples
+    --------
+
+    .. code-block:: python
+
+        @_param_labels('ONE', 'TWO', 'THREE')
+        def some_func(...):
+            return 1
+
+        some_func.param_labels  # ['ONE', 'TWO', 'THREE']
 
     """
 
@@ -271,66 +359,81 @@ class _FitnessFunc:
     A decorator for fitness functions.
 
     This decorator is applied to all fitness functions automatically in
-    _calc_fitness(). It should not be applied explicitly when defining
-    the functions.
+    :func:`_calc_fitness`. It should not be applied explicitly when
+    defining the functions.
 
     The decorator prevents fitness functions from raising if
-    they fail (necessary for multiprocessing), prevents them from
-    being run twice on the same molecule and stores the value returned
-    by them in the `unscaled_fitness` dictionary.
+    they fail (necessary for ``multiprocessing`` compatibility),
+    prevents them from being run twice on the same molecule and stores
+    the value returned by them in
+    :attr:`.MacroMolecule.unscaled_fitness`.
 
     """
 
-    def __init__(self, func, logq=None):
-        wraps(func)(self)
-        self.logq = logq
+    def __init__(self, func):
+        """
+        Initializes a :class:`_FitnessFunc` instance.
 
-    def __call__(self, macro_mol, *args,  **kwargs):
-        logger = logging.getLogger(__name__)
-        if self.logq is not None:
-            logger = FakeLogger(self.logq)
+        Parameters
+        ----------
+        func : :class:`function`
+            The fitness function to be decorated.
+
+        """
+
+        wraps(func)(self)
+
+    def __call__(self, macro_mol):
+        """
+        Decorates and calls the fitness function.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The molecule to have its fitness calculated.
+
+        Returns
+        -------
+        :class:`.MacroMolecule`
+            `macro_mol` with its fitness calculated.
+
+        """
 
         func_name = self.__wrapped__.func.__name__
 
         # If the fitness function has already been applied to this
         # molecule, return.
         if func_name in macro_mol.unscaled_fitness:
-            logger.info('Skipping {}.'.format(macro_mol.name))
+            logger.info(f'Skipping {macro_mol.name}.')
             return macro_mol
 
         try:
-            logger.info('Calculating fitness of {}.'.format(
-                                                       macro_mol.name))
-            val = self.__wrapped__(macro_mol, *args,
-                                   **kwargs, logger=logger)
+            logger.info(f'Calculating fitness of {macro_mol.name}.')
+            val = self.__wrapped__(macro_mol)
 
         except Exception as ex:
             val = None
-            errormsg = ('Fitness function "{}()" '
-                        'failed on molecule "{}".').format(
-                        func_name, macro_mol.name)
-            logger.error((errormsg+'\n'+format_exc()).strip())
+            errormsg = (f'Fitness function "{func_name}()" '
+                        f'failed on molecule "{macro_mol.name}".')
+            logger.error(errormsg, exc_info=True)
 
         finally:
             macro_mol.unscaled_fitness[func_name] = val
             return macro_mol
 
 
-def random_fitness(macro_mol, logger=logger):
+def random_fitness(macro_mol):
     """
     Returns a random fitness value.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule to which a fitness value is to be assigned.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
+    macro_mol : :class:`.MacroMolecule`
+        The molecule for which a fitness value is to be calculated.
 
     Returns
     -------
-    float
+    :class:`float`
         A random postive number.
 
     """
@@ -339,27 +442,24 @@ def random_fitness(macro_mol, logger=logger):
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
-def random_fitness_vector(macro_mol, logger=logger):
+def random_fitness_vector(macro_mol):
     """
-    Returns a size 4 array of random numbers.
+    Returns a 4 element array of random numbers.
+
+    Notes
+    -----
+    This function places the array into
+    :attr:`~.MacroMolecule.progress_params` of `macro_mol`.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The macromolecule which is to have its fitness calculated.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
-
-    Modifies
-    --------
-    macro_mol.progress_params : dict
-        The random numbers are also placed into this attribute.
+    macro_mol : :class:`.MacroMolecule`
+        The molecule for which a fitness value is to be calculated.
 
     Returns
     -------
-    numpy.array
-        An array holding random numbers.
+    :class:`numpy.ndarray`
+        An array holding the 4 random numbers.
 
     """
 
@@ -373,31 +473,29 @@ def random_fitness_vector(macro_mol, logger=logger):
     return f
 
 
-def raiser(macro_mol, param1, param2=2, logger=logger):
+def raiser(macro_mol, param1, param2=2):
     """
     Doens't calculate a fitness value, raises an error instead.
 
-    This function is used to test that when fitness functions raise
-    errors during multiprocessing, they are handled correctly.
+    This function is used for tests to ensure that when fitness
+    functions raise errors, they are handeled correctly.
 
     Parameters
     ---------
-    param1 : object
+    param1 : :class:`object`
         Dummy parameter, does nothing.
 
-    param2 : object (default = 2)
+    param2 : :class:`object`, optional
         Dummy keyword parameter, does nothing.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
 
     Returns
     -------
-    This function does not return. It only raises.
+    None : :class:`NoneType`
+        This function does not return. It only raises.
 
     Raises
     ------
-    Exception
+    :class:`Exception`
         An exception is always raised.
 
     """
@@ -406,31 +504,29 @@ def raiser(macro_mol, param1, param2=2, logger=logger):
 
 
 @_param_labels('var1', 'var2', 'var3', 'var4')
-def partial_raiser(macro_mol, logger=logger):
+def partial_raiser(macro_mol):
     """
     Calculates fitness or raises at random.
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
-        The molecule having its fitness calculated, maybe.
-
-    logger : FakeLogger or logging.Logger, optional
-        Used for logging. Not used by this function.
+    macro_mol : :class:`.MacroMolecule`
+        The molecule having its fitness calculated.
 
     Returns
     -------
-    numpy.array
-        The value of applying random_fitness_vector() to `macro_mol`.
+    :class:`numpy.ndarray`
+        The result of applying :func:`random_fitness_vector` to
+        `macro_mol`.
 
     Raises
     ------
-    Exception
+    :class:`Exception`
         Raised at random.
 
     """
 
-    if not np.random.choice([0, 1]):
+    if np.random.choice([0, 1]):
         raise Exception('Partial raiser.')
 
     r = random_fitness_vector(macro_mol)
@@ -441,34 +537,35 @@ def partial_raiser(macro_mol, logger=logger):
 
 
 # Provides labels for the progress plotter.
-@_param_labels('Cavity Difference ', 'Window Difference ',
-               'Asymmetry ', 'Energy per Bond ', 'Precursors Strain',
+@_param_labels('Cavity Difference',
+               'Window Difference',
+               'Asymmetry',
+               'Energy per Bond',
+               'Precursors Strain',
                'Dihedral Strain')
-def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
-                                                    forcefield='mmff')},
-         dihedral_SMARTS="", target_value=180, logger=logger):
+def cage(macro_mol,
+         pseudoformation_params={'func': FunctionData('rdkit',
+                                                      forcefield='mmff')},
+         dihedral_SMARTS='',
+         target_dihedral=180):
     """
     Returns the fitness vector of a cage.
 
     The fitness vector consists of the following properties in the
     listed order
 
-        1) `cavity` - the diameter of the cage pore.
-        2) `window` - the diameter of the largest cage window.
-        3) `asymmetry` - the sum of the size differences of all the
+        1. `cavity` - the diameter of the cage pore.
+        2. `window` - the diameter of the largest cage window.
+        3. `asymmetry` - the sum of the size differences of all the
            windows in `macro_mol`.
-        4) `eng_per_bond` - The formation energy of `macro_mol` per
+        4. `eng_per_bond` - The formation energy of `macro_mol` per
            bond made.
-        5) `prec_strain` - The mean rmsd between the free building blocks
-           and those in the macromolecule.
-        6) `dihedral_strain` - The % relative difference between the average
-            dihedral angle within the molecule and a target value. The user
-            must provide the SMARTS for the dihedral and the target value.
-
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:``~.MacroMolecule.progress_params``.
+        5. `prec_strain` - The mean rmsd between the free building
+           block and those in the macromolecule.
+        6. `dihedral_strain` - The % relative difference between the
+           average dihedral angle within the molecule and a target
+           value. The user must provide the SMARTS for the dihedral and
+           the target value.
 
     Parameters
     ----------
@@ -478,35 +575,20 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
+    target_dihedral : :class:`float`, optional
+        The target value for the dihedral angle.
 
     pseudoformation_params : dict, optional
-        This fitness function calculates the formation energy using the
-        ``Energy.pseudoformation()`` method. This parameter defines the
+        This fitness function calculates the formation energy using
+        :meth:`.Energy.pseudoformation`. This parameter defines the
         arguments passed to this method via a dictionary. The name of
         the argument is the key and the value of the argument is the
         value.
 
-        Default initialized arguments of :meth:`.Energy.pseudoformation()` only
-        need to be specified in ``energy_params`` if the user wishes to
-        change the default value.
-
-        To see what arguments :meth:`.Energy.pseudoformation()` requires, try
-        using the  ``-h`` option::
-
-            $ python -m mtk -h energy
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging. Not used by this function.
-
-
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -520,7 +602,7 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
     warnings.filterwarnings('ignore')
 
     cavity = macro_mol.cavity_size()
-    window = max(macro_mol.windows)
+    window = max(macro_mol.windows())
     asymmetry = macro_mol.window_difference()
 
     logger.debug('Calculating cage energy.')
@@ -531,26 +613,42 @@ def cage(macro_mol, pseudoformation_params={'func': FunctionData('rdkit',
     prec_strain = macro_mol.bb_distortion()
 
     dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
-                                                target_value)
+                                                target_dihedral)
 
-    macro_mol.progress_params['cage'] = [cavity, window, asymmetry,
-                                         e_per_bond, prec_strain,
+    macro_mol.progress_params['cage'] = [cavity,
+                                         window,
+                                         asymmetry,
+                                         e_per_bond,
+                                         prec_strain,
                                          dihedral_strain]
 
     if None in macro_mol.progress_params['cage']:
         raise ValueError(('At least one'
                          ' fitness parameter not calculated.'))
 
-    return np.array([cavity, window, asymmetry, e_per_bond, prec_strain,
+    return np.array([cavity,
+                     window,
+                     asymmetry,
+                     e_per_bond,
+                     prec_strain,
                      dihedral_strain])
 
 
-@_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
-               'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
+@_param_labels('Binding Energy',
+               'Complex Cavity',
+               'Complex Asymmetry',
+               'Complex Strain',
+               'Cavity',
+               'Asymmetry',
+               'Precursors Strain',
                'Dihedral Strain')
-def cage_target(macro_mol, target_mol_file, efunc, ofunc,
-                dihedral_SMARTS="", target_value=180,
-                rotations=0, logger=logger):
+def cage_target(macro_mol,
+                target_mol_file,
+                efunc,
+                ofunc,
+                dihedral_SMARTS="",
+                target_value=180,
+                rotations=0):
     """
     Returns the fitness vector of a cage / target complex.
 
@@ -571,7 +669,7 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
     Notes
     -----
     This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:``~.MacroMolecule.progress_params``.
+    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -590,25 +688,21 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
         A :class:`.FunctionData` object representing the optimization
         function to be run on the generated complexes.
 
+    dihedral_SMARTS : :class:`str`, optional
+        The SMARTS code for the dihedral of interest.
+
+    target_value : :class:`float`, optional
+        A number representing the target value for the dihedral angle.
+
     rotations : :class:`int`, optional
         The number of times the target should be randomly rotated
         within the cage cavity in order to find the most stable
         conformation.
 
-    dihedral_SMARTS : :class:`str`, optional
-        The SMARTS code for the dihedral of interest.
-
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging. Not used by this function.
-
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -617,27 +711,40 @@ def cage_target(macro_mol, target_mol_file, efunc, ofunc,
 
     """
 
-    return _cage_target('cage_target', macro_mol,
-                        target_mol_file, efunc, ofunc,
+    return _cage_target('cage_target',
+                        macro_mol,
+                        target_mol_file,
+                        efunc,
+                        ofunc,
                         FunctionData('_generate_complexes',
                                      number=rotations+1),
                         dihedral_SMARTS,
-                        target_value,
-                        logger)
+                        target_value)
 
 
-@_param_labels('Binding Energy', 'Complex Cavity', 'Complex Asymmetry',
-               'Complex Strain', 'Cavity', 'Asymmetry', 'Precursors Strain',
+@_param_labels('Binding Energy',
+               'Complex Cavity',
+               'Complex Asymmetry',
+               'Complex Strain',
+               'Cavity',
+               'Asymmetry',
+               'Precursors Strain',
                'Dihedral Strain')
-def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
-             dihedral_SMARTS="", target_value=180, logger=logger):
+def cage_c60(macro_mol,
+             target_mol_file,
+             efunc,
+             ofunc,
+             n5fold,
+             n2fold,
+             dihedral_SMARTS='',
+             target_dihedral=180):
     """
     Calculates the fitness vector of a cage / C60 complex.
 
     The difference between this function and :func:`cage_target` is
     that the rotations are specifically aimed at sampling C60 entirely
-    and systematically. Rather than the random sampling of the other
-    function.
+    and systematically. Rather than the random sampling used by the
+    other function.
 
     The function returns a fitness vector consisting of:
 
@@ -649,11 +756,6 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
         6. asymmetry of cage by itself
         7. strain of cage by itself
         8. strain in select dihedral angles of the cage by itself
-
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -682,17 +784,13 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional
-        Used for logging. Not used by this function.
+    target_dihedral : :class:`float`, optional
+        The target value for the dihedral angle.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -700,22 +798,30 @@ def cage_c60(macro_mol, target_mol_file, efunc, ofunc, n5fold, n2fold,
         If the calculation of a fitness parameter fails.
 
     """
-    return _cage_target('cage_c60', macro_mol,
-                        target_mol_file, efunc, ofunc,
+    return _cage_target('cage_c60',
+                        macro_mol,
+                        target_mol_file,
+                        efunc,
+                        ofunc,
                         FunctionData('_c60_rotations',
                                      n5fold=n5fold,
                                      n2fold=n2fold),
                         dihedral_SMARTS,
-                        target_value,
-                        logger)
+                        target_dihedral)
 
 
-def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
-                 rotation_func,  dihedral_SMARTS, target_value, logger):
+def _cage_target(func_name,
+                 macro_mol,
+                 target_mol_file,
+                 efunc,
+                 ofunc,
+                 rotation_func,
+                 dihedral_SMARTS,
+                 target_dihedral):
     """
     A general fitness function for calculating fitness of complexes.
 
-    This function should be inherited by other fitness functions which
+    This function should be wrapped by other fitness functions which
     define their own rotation function. For example :func:`cage_c60`
     and :func:`cage_target`.
 
@@ -729,11 +835,6 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
         6. asymmetry of cage by itself
         7. strain of cage by itself
         8. strain in select dihedral angles of the cage by itself
-
-    Notes
-    -----
-    This function modifies `macro_mol`. It places the calculated
-    fitness parameters into :attr:`~.MacroMolecule.progress_params`.
 
     Parameters
     ----------
@@ -763,18 +864,13 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
     dihedral_SMARTS : :class:`str`, optional
         The SMARTS code for the dihedral of interest.
 
-
-    target_value : :class:`float`, optional
-        Float representing the target value for the dihedral angle.
-
-    logger : :class:`.FakeLogger` or :class:`logging.Logger`
-        Used for logging. Not used by this function.
+    target_dihedral : :class:`float`, optional
+        The target value for the dihedral angle.
 
     Returns
     -------
     :class:`numpy.ndarray`
-        The numpy array holds the fitness vector described in this
-        docstring.
+        The numpy array holding the fitness vector.
 
     Raises
     ------
@@ -893,7 +989,7 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
     asymmetry = macro_mol.window_difference()
     prec_strain = macro_mol.bb_distortion()
     dihedral_strain = macro_mol.dihedral_strain(dihedral_SMARTS,
-                                                target_value)
+                                                target_dihedral)
     macro_mol.progress_params[func_name] = [binding_energy,
                                             cmplx_cavity,
                                             cmplx_asymmetry,
@@ -909,16 +1005,21 @@ def _cage_target(func_name, macro_mol, target_mol_file, efunc, ofunc,
                          macro_mol.progress_params[func_name])
 
     return np.array([binding_energy,
-                     cmplx_cavity, cmplx_asymmetry, cmplx_strain,
-                     cavity, asymmetry, prec_strain, dihedral_strain])
+                     cmplx_cavity,
+                     cmplx_asymmetry,
+                     cmplx_strain,
+                     cavity,
+                     asymmetry,
+                     prec_strain,
+                     dihedral_strain])
 
 
 def _make_cage_target_folder():
     """
-    Creates a folder to store molecules made by _cage_target().
+    Creates a folder to store molecules made by :func:`_cage_target`.
 
-    The function creates a folder called `cage_target`.
-    Inside will be any complexes formed by the function _cage_target().
+    The function creates a folder called ``cage_target``.
+    Inside will be any complexes formed by the :func:`_cage_target`.
     The folder will be placed in the current working directory, or
     if the GA is running, 1 above the current working dirctory. This
     prevents the generated molecules from being cleaned up by the GA
@@ -926,7 +1027,7 @@ def _make_cage_target_folder():
 
     Returns
     -------
-    str
+    :class:`str`
         The path of the ``cage_target`` folder.
 
     """
@@ -939,7 +1040,7 @@ def _make_cage_target_folder():
 
     try:
         os.mkdir(dir_path)
-    except:
+    except Exception:
         pass
 
     return dir_path
@@ -947,26 +1048,26 @@ def _make_cage_target_folder():
 
 def _generate_complexes(macro_mol, target, number=1):
     """
-    Yields rdkit instances of cage / target complexes.
+    Yields ``rdkit`` molecules of cage / target complexes.
 
     If multiple complexes are returned, they will be different via a
     random rotation accross the x, y and z axes.
 
     Parameters
     ----------
-    macro_mol : Cage
+    macro_mol : :class:`.Cage`
         The cage used to form the complex.
 
-    target : StructUnit
+    target : :class:`.StructUnit`
         The target used to form the complex.
 
-    number : int (default = 1)
+    number : :class:`int`, optional
         The number of complexes to be returned.
 
     Yields
     ------
-    rdkit.Chem.rdchem.Mol
-        An rdkit instance holding the cage / target complex.
+    :class:`rdkit.Chem.rdchem.Mol`
+        An ``rdkit`` instance holding the cage / target complex.
 
     """
 
@@ -1004,23 +1105,23 @@ def _c60_rotations(macro_mol, c60, n5fold, n2fold):
 
     Parameters
     ----------
-    macro_mol : MacroMolecule
+    macro_mol : :class:`.MacroMolecule`
         The cage which should have C60 placed inside it.
 
-    c60 : StructUnit
+    c60 : :class:`.StructUnit`
         A StructUnit instance of C60.
 
-    n5fold : int
+    n5fold : :class:`int`
         The number of rotations along the 5-fold axis of symmetry.
 
-    n2fold : int
-        The number of rotations along the 2 fold axis of symmetry per
+    n2fold : :class:`int`
+        The number of rotations along the 2-fold axis of symmetry per
         rotation along the 5-fold axis.
 
     Yields
     ------
-    rdkit.Chem.rdchem.Mol
-        An rdkit instance holding the cage / C60 complex.
+    :class:`rdkit.Chem.rdchem.Mol`
+        An ``rdkit`` instance holding the cage / C60 complex.
 
     """
 

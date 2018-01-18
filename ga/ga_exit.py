@@ -1,49 +1,105 @@
 """
-Defines functions which cut short the GA if a criterion is reached.
+Defines functions which cut short the GA if a condition is satisfied.
 
 These functions are useful when debugging and testing the convergence
 of the GA. For example they can tell the GA to stop when a certain
 molecule has been found.
 
-The functions are defined as methods in the Exit() class.
+The functions are defined as methods in the :class:`Exit`.
 
-Extending MMEA: Adding Exit methods.
---------------------------------------
+Extending mtk: Adding exit functions.
+-------------------------------------
+
 The only requirement is that the methods take `population` as their
-first parameter (barring `self`, `cls` etc.) and return ``True`` if the
-exit criterion has been satisfied and ``False``` otherwise.
+first argument (barring `self`, `cls` etc.) and `progress` as their
+second. They must return ``True`` if the exit criterion has been
+satisfied and ``False`` otherwise. The naming requirement of the first
+two arguments exists to help users identify which arguments they need
+to define in the input file and which are handeled automatically by
+``mtk``. The arguments `population` and `progress` are automatically
+provided when the GA is run. They hold a :class:`.Population` instance
+holding the current generation and a :class:`.Population` instance
+holding every previous generation in a subpopulation, respectively.
 
 As usual, if you need to define multiple functions, make sure any
-helper functions are private, ie their names start with a leading
+helper functions are private, i.e. their names start with a leading
 underscore.
 
 """
 
 
 class Exit:
+    """
+    Checks if the exit criterion for the GA has been satisfied.
+
+    Attributes
+    ----------
+    func_data : :class:`.FunctionData`
+        A :class:`.FunctionData` object which holds the name of the
+        exit function to use and any additional parameters it may
+        require.
+
+    """
+
     def __init__(self, func_data):
+        """
+        Initializes an :class:`Exit` instance.
+
+        Parameters
+        ----------
+        func_data : :class:`.FunctionData`
+            A :class:`.FunctionData` object which holds the name of the
+            exit function to use and any additional parameters it may
+            require.
+
+        """
+
         self.func_data = func_data
 
     def __call__(self, pop, progress):
+        """
+        Calls the chosen exit function.
+
+        Parameters
+        ----------
+        pop : :class:`.Population`
+            The population holding the current generation of molecules.
+
+        progress : :class:`.Population`
+            A population where every previous generation is a
+            subpopulation.
+
+        Returns
+        -------
+        :class:`bool`
+            The value returned by giving `pop` and `progress` to the
+            exit function defined in :attr:`func_data`
+
+        """
+
         func = getattr(self, self.func_data.name)
         return func(pop, progress, **self.func_data.params)
 
-    def mol_present(self, population, mol):
+    def mol_present(self, population, progress, mol):
         """
         ``True`` if `mol` is in `population`.
 
         Parameters
         ----------
-        population : Population
-            The GA population.
+        pop : :class:`.Population`
+            The population holding the current generation of molecules.
 
-        mol : MacroMolecule
-            A molecule which if present in `population` causes the GA to
-            stop.
+        progress : :class:`.Population`
+            A population where every previous generation is a
+            subpopulation.
+
+        mol : :class:`.MacroMolecule`
+            A molecule which if present in `population` causes the GA
+            to stop.
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if `mol` in `population`, ``False`` otherwise.
 
         """
@@ -54,15 +110,16 @@ class Exit:
 
     def mol_name_present(self, population, progress, mol_name):
         """
-        Returns ``True`` if molecule with `name` in `population`.
+        Looks for a molecule called `mol_name`.
 
         Parameters
         ----------
-        population : :class:`.Population`
-            The GA population.
+        pop : :class:`.Population`
+            The population holding the current generation of molecules.
 
         progress : :class:`.Population`
-            Population where each subpopulation is a previous generation.
+            A population where every previous generation is a
+            subpopulation.
 
         mol_name : :class:`str`
             The name of a molecule.
@@ -70,45 +127,51 @@ class Exit:
         Returns
         -------
         :class:`bool`
-            ``True`` if a molecule with `name` of  `mol_name` is found
-            in `population`.
+            ``True`` if a molecule with :attr:`.MacroMolecule.name` of
+            `mol_name` is found in `population`. Else, ``False``.
 
         """
 
         return any(x.name == mol_name for x in population)
 
-    def fitness_plateau(self, population, progress, num, top_members=1):
+    def fitness_plateau(self,
+                        population,
+                        progress,
+                        num_gens,
+                        top_members=1):
         """
-        Returns ``True`` if fitness function of the top x candidates do not
-        change for n generations.
+        Checks if the most fit molecules remain the same.
 
         Parameters
         ----------
-        population : :class:`Population`
-            The GA population.
+        pop : :class:`.Population`
+            The population holding the current generation of molecules.
 
-        progress : :class:`Population`
-            Population where each subpopulation is a previous generation.
+        progress : :class:`.Population`
+            A population where every previous generation is a
+            subpopulation.
 
-        num : :class:`int`
-            Number of generations for which no the x top members did not
-            change. This number is defined by the user.
+        num_gens : :class:`int`
+            Number of generations in which the fittest molecules did
+            not change.
 
-        top_members : :class:`int`
-            Number of members that are going to be considered for the plateau
-            analysis. This number needs to be smaller than the total
-            population. The user can define this number, which defaults to 1.
+        top_members : :class:`int`, optional
+            The number of fittest molecules which are checked. This
+            number needs to be smaller than the population size.
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if the fitness function shows no improvement for n
             generations.
 
         """
-        # Check that the GA has run for more than num generations
-        if len(progress.populations) > num:
-            gens = {frozenset(sorted(progress.populations[-x],reverse=True)[:top_members]) for x in range(1, num)}
+
+        # Check that the GA has run for more than num_gens generations.
+        if len(progress.populations) > num_gens:
+            gens = {frozenset(sorted(progress.populations[-x],
+                                     reverse=True)[:top_members])
+                    for x in range(1, num_gens)}
             unique_gens = len(gens)
             if unique_gens == 1:
                 return True
@@ -121,16 +184,20 @@ class Exit:
         """
         Returns ``False``.
 
-        Useful when you never want the GA to exit prematurely. This is
-        used by default when no exit function is defined in the input
-        file.
+        Useful when you never want the GA to exit prematurely.
 
-        progress : :class:`Population`
-            population where each subpopulation is a previous generation.
+        Parameters
+        ----------
+        pop : :class:`.Population`
+            The population holding the current generation of molecules.
+
+        progress : :class:`.Population`
+            A population where every previous generation is a
+            subpopulation.
 
         Returns
         -------
-        False : bool
+        False : :class:`bool`
 
         """
 

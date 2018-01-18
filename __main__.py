@@ -6,11 +6,13 @@ import argparse
 from rdkit import RDLogger
 from os.path import join, basename, abspath
 
-from .ga import (Population,
-                 GAInput, InputHelp)
-from .convenience_tools import (tar_output, errorhandler,
+from .molecular import Molecule
+from .ga import Population, GAInput
+from .convenience_tools import (tar_output,
+                                errorhandler,
                                 streamhandler,
-                                archive_output, kill_macromodel)
+                                archive_output,
+                                kill_macromodel)
 from .ga import plotting as plot
 
 warnings.filterwarnings("ignore")
@@ -140,8 +142,9 @@ class GAProgress:
             u = '-'*100
 
         s += u
-        s += '{:<10}\t{:<40}\t{}\n'.format('molecule', 'fitness',
-                                           'unscaled_fitness')
+        s += '\n{:<10}\t{:<40}\t{}\n'.format('molecule',
+                                             'fitness',
+                                             'unscaled_fitness')
         s += u
         for mem in sorted(pop, reverse=True):
             uf = {n: str(v) for n, v in mem.unscaled_fitness.items()}
@@ -233,9 +236,9 @@ def ga_run(ga_input):
 
     progress.debug_dump(pop, 'init_pop.json')
     logger.info('Optimizing the population.')
-    pop.optimize_population()
+    pop.optimize_population(ga_input.processes)
     logger.info('Calculating the fitness of population members.')
-    pop.calculate_member_fitness()
+    pop.calculate_member_fitness(ga_input.processes)
     logger.info('Normalizing fitness values.')
     pop.normalize_fitness_values()
     progress.log_pop(logger, pop)
@@ -264,9 +267,9 @@ def ga_run(ga_input):
         id_ = pop.assign_names_from(id_)
         progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
         logger.info('Optimizing the population.')
-        pop.optimize_population()
+        pop.optimize_population(ga_input.processes)
         logger.info('Calculating the fitness of population members.')
-        pop.calculate_member_fitness()
+        pop.calculate_member_fitness(ga_input.processes)
         logger.info('Normalizing fitness values.')
         pop.normalize_fitness_values()
         progress.log_pop(logger, pop)
@@ -302,43 +305,21 @@ def ga_run(ga_input):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-     prog='python -m mmea',
-     description=('MMEA in can be run in a number of ways.'
-                  ' Each type of run can be invoked by one'
-                  ' of the listed commands.'
-                  ' For details on a command use: command -h.'))
-    commands = parser.add_subparsers(help='commands')
+    parser = argparse.ArgumentParser(prog='python -m mtk')
 
-    run = commands.add_parser('run', description='Runs the GA.')
-    run.add_argument('INPUT_FILE', type=str)
-    run.add_argument('-l', '--loops', type=int, default=1,
-                     help='The number times the GA should be run.')
-
-    helper = commands.add_parser(
-             'helper',
-             description=('Provides a description variables which'
-                          ' need to be defined in an input file.'))
-    helper.add_argument(
-            'KEYWORD', type=str,
-            choices=list(InputHelp.modules.keys()),
-            help=('The name of a variable which needs to be defined'
-                  ' in an input file.'))
+    parser.add_argument('INPUT_FILE', type=str)
+    parser.add_argument('-l', '--loops', type=int, default=1,
+                        help='The number times the GA should be run.')
 
     args = parser.parse_args()
 
-    if 'INPUT_FILE' in dir(args):
+    ifile = abspath(args.INPUT_FILE)
+    ga_input = GAInput(ifile)
+    rootlogger.setLevel(ga_input.logging_level)
+    logger.info('Loading molecules from any provided databases.')
+    dbs = []
+    for db in ga_input.databases:
+        dbs.append(Population.load(db, Molecule.fromdict))
 
-        ifile = abspath(args.INPUT_FILE)
-        ga_input = GAInput(ifile)
-        rootlogger.setLevel(ga_input.logging_level)
-        logger.info('Loading molecules from any provided databases.')
-        dbs = []
-        for db in ga_input.databases:
-            dbs.append(Population.load(db))
-
-        for x in range(args.loops):
-            ga_run(ga_input)
-
-    elif 'KEYWORD' in dir(args):
-        InputHelp(args.KEYWORD)
+    for x in range(args.loops):
+        ga_run(ga_input)
