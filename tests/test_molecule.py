@@ -250,6 +250,5 @@ def test_shift():
 def test_update_from_mae():
     mol = make_mol()
 
-    mol.update_from_mae(join('data', 'molecule', 'molecule.mae'))
-    assert mol.mol.GetNumAtoms() == 272
-    assert mol.mol.GetNumBonds() == 288
+    mol.update_from_mae(join('data', 'molecule', 'molecule.mae'), 1)
+    assert mol.max_diameter(0) != mol.max_diameter(1)

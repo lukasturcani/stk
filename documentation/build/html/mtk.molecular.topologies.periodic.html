@@ -158,11 +158,6 @@
 <dd><p>Bases: <a class="reference internal" href="#mtk.molecular.topologies.periodic.PeriodicLattice" title="mtk.molecular.topologies.periodic.PeriodicLattice"><code class="xref py py-class docutils literal"><span class="pre">mtk.molecular.topologies.periodic.PeriodicLattice</span></code></a></p>
 <p>Represents a hexagonal lattice.</p>
 <dl class="attribute">
-<dt id="mtk.molecular.topologies.periodic.Hexagonal.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.periodic'</em><a class="headerlink" href="#mtk.molecular.topologies.periodic.Hexagonal.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="mtk.molecular.topologies.periodic.Hexagonal.a">
 <code class="descname">a</code><em class="property"> = array([1, 0, 0])</em><a class="headerlink" href="#mtk.molecular.topologies.periodic.Hexagonal.a" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -200,18 +195,13 @@ representation of periodic lattices. The <a class="reference internal" href="#mt
 is extended to collect the coordinates of any deleted atoms. This
 is necessary for positioning terminating atoms on islands generated
 from the periodic structure by <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic.island" title="mtk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">Periodic.island()</span></code></a>.</p>
-<dl class="attribute">
-<dt id="mtk.molecular.topologies.periodic.PeriodicLattice.__module__">
-<code class="descname">__module__</code><em class="property"> = 'mtk.molecular.topologies.periodic'</em><a class="headerlink" href="#mtk.molecular.topologies.periodic.PeriodicLattice.__module__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="method">
 <dt id="mtk.molecular.topologies.periodic.PeriodicLattice.del_atoms">
 <code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/periodic.html#PeriodicLattice.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.periodic.PeriodicLattice.del_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes the atoms which are lost during assembly.</p>
 <p class="rubric">Notes</p>
 <p>The parameter <cite>macro_mol</cite> has two attributes changed.
-<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.mol" title="mtk.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> has deleter atoms removed, while
+<code class="xref py py-attr docutils literal"><span class="pre">mol</span></code> has deleter atoms removed, while
 <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic.terminator_coords" title="mtk.molecular.molecules.Periodic.terminator_coords"><code class="xref py py-attr docutils literal"><span class="pre">terminator_coords</span></code></a> is updated with the
 coordinates of every removed atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -233,7 +223,7 @@ coordinates of every removed atom.</p>
 <code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/periodic.html#PeriodicLattice.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.periodic.PeriodicLattice.join_mols" title="Permalink to this definition">¶</a></dt>
 <dd><p>Joins the building blocks in the unit cell.</p>
 <p class="rubric">Notes</p>
-<p>The rdkit instance in the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.mol" title="mtk.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute
+<p>The rdkit instance in the <code class="xref py py-attr docutils literal"><span class="pre">mol</span></code> attribute
 has bonds added to it. The
 <code class="xref py py-attr docutils literal"><span class="pre">periodic_bonds</span></code> attribute is also filled
 with <code class="xref py py-class docutils literal"><span class="pre">PeriodicBond</span></code> instances.</p>
@@ -258,7 +248,7 @@ with <code class="xref py py-class docutils literal"><span class="pre">PeriodicB
 <p class="rubric">Notes</p>
 <p>This method modifies <cite>macro_mol</cite>. An rdkit molecule of the
 unit cell with the building blocks not joined up is placed in
-the <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.mol" title="mtk.molecular.molecules.MacroMolecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute.</p>
+the <code class="xref py py-attr docutils literal"><span class="pre">mol</span></code> attribute.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
