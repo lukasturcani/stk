@@ -179,8 +179,8 @@ class GAInput:
     pop_dumps : :class:`bool`
         If ``True`` each generation makes a ``.json`` dump file. This
         can be omitted from the input file, in which case it defaults
-        to ``True``. It means that a progress dump is made at each
-        generation as well.
+        to ``True``. It means that a progress and database dump is made
+        at each generation as well.
 
     tar_output : :class:`bool`
         If ``True`` a copy of the output folder is compressed, tarred
