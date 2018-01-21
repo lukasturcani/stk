@@ -39,6 +39,14 @@ class GAProgress:
         restart GA run can be performed. If an empty string an empty
         string is provided, a new run is assumed.
 
+    first_mol_name : :class:`int`
+        The name the first unnamed molecule produced by the GA should
+        be assigned.
+
+    start_gen : :class:`int`
+        The starting generation number, will be non ``1`` if a run is
+        restarted.
+
     progress_dump : :class:`bool`
         If ``True`` a population dump file ```progress.json`` is made
         in the output directory. Each subpopulation of this population
@@ -60,6 +68,13 @@ class GAProgress:
             self.progress.ga_tools = ga_tools
         else:
             self.progress = Population(ga_tools)
+
+        self.first_mol_name = max((mol for mol in self.progress if
+                                   mol.name.isnumeric()),
+                                  key=lambda mol: int(mol.name),
+                                  default=0)
+
+        self.start_gen = len(self.progress.populations) + 1
 
         self.progress_dump = progress_dump
         self.db_pop = Population() if db_dump else None
@@ -235,7 +250,7 @@ def ga_run(ga_input):
     pop = init_func(**ga_input.initer().params,
                     size=ga_input.pop_size,
                     ga_tools=ga_input.ga_tools())
-    id_ = pop.assign_names_from(0)
+    id_ = pop.assign_names_from(progress.first_mol_name)
 
     progress.debug_dump(pop, 'init_pop.json')
 
@@ -256,7 +271,8 @@ def ga_run(ga_input):
 
     # 3. Run the GA.
 
-    for x in range(1, ga_input.num_generations+1):
+    stop_gen = progress.start_gen+ga_input.num_generations+1
+    for x in range(progress.start_gen, stop_gen):
         # Check that the population has the correct size.
         assert len(pop) == ga_input.pop_size
         logger.info('Generation {} of {}.'.format(
