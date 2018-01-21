@@ -6,7 +6,7 @@ import argparse
 from rdkit import RDLogger
 from os.path import join, basename, abspath
 
-from .molecular import Molecule
+from .molecular import Molecule, CACHE_SETTINGS
 from .ga import Population, GAInput
 from .convenience_tools import (tar_output,
                                 errorhandler,
@@ -253,7 +253,16 @@ def ga_run(ga_input):
                         size=ga_input.pop_size,
                         ga_tools=ga_input.ga_tools())
     else:
+        # The version of the molecule loaded from databases may not
+        # have the properties calculated that the loaded from the
+        # previous GA run may have. As a result, first turn the cache
+        # of to load the GA produced version and then update the cache.
+        CACHE_SETTINGS['ON'] = False
         pop = init_func(**ga_input.initer().params)
+        CACHE_SETTINGS['ON'] = True
+        for m in pop:
+            m.update_cache()
+
         pop.ga_tools = ga_input.ga_tools()
 
     id_ = pop.assign_names_from(progress.first_mol_name)
