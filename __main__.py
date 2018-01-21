@@ -274,8 +274,8 @@ def ga_run(ga_input):
     for x in range(progress.start_gen, ga_input.num_generations+1):
         # Check that the population has the correct size.
         assert len(pop) == ga_input.pop_size
-        logger.info('Generation {} of {}.'.format(
-                                x, ga_input.num_generations))
+
+        logger.info(f'Generation {x} of {ga_input.num_generations}.')
 
         logger.info('Starting crossovers.')
         offspring = pop.gen_offspring(ccounter.format(x))
@@ -296,7 +296,7 @@ def ga_run(ga_input):
         logger.debug('Population size is {}.'.format(len(pop)))
 
         id_ = pop.assign_names_from(id_)
-        progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
+        progress.debug_dump(pop, f'gen_{x}_unselected.json')
 
         logger.info('Optimizing the population.')
         pop.optimize_population(ga_input.processes)
@@ -315,11 +315,9 @@ def ga_run(ga_input):
 
         logger.info('Recording progress.')
         progress.progress.add_subpopulation(pop)
-        if ga_input.pop_dumps:
-            dump_name = join('..', 'pop_dumps', 'progress.json')
-            progress.progress.dump(dump_name)
-
-        progress.debug_dump(pop, 'gen_{}_selected.json'.format(x))
+        progress.debug_dump(progress.progress, 'progress.json')
+        progress.debug_dump(progress.db_pop, 'database.json')
+        progress.debug_dump(pop, f'gen_{x}_selected.json')
 
         # Check if any user-defined exit criterion has been fulfilled.
         if pop.exit(progress.progress):
