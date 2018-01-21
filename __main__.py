@@ -74,10 +74,11 @@ class GAProgress:
                                   key=lambda mol: int(mol.name),
                                   default=0)
 
-        self.start_gen = len(self.progress.populations) + 1
+        self.start_gen = (1 if len(self.progress.populations) == 0
+                          else len(self.progress.populations))
 
         self.progress_dump = progress_dump
-        self.db_pop = Population() if db_dump else None
+        self.db_pop = Population(ga_tools) if db_dump else None
 
     def db(self, mols):
         """
@@ -247,9 +248,14 @@ def ga_run(ga_input):
 
     logger.info('Generating initial population.')
     init_func = getattr(Population, ga_input.initer().name)
-    pop = init_func(**ga_input.initer().params,
-                    size=ga_input.pop_size,
-                    ga_tools=ga_input.ga_tools())
+    if init_func.__name__ != 'load':
+        pop = init_func(**ga_input.initer().params,
+                        size=ga_input.pop_size,
+                        ga_tools=ga_input.ga_tools())
+    else:
+        pop = init_func(**ga_input.initer().params)
+        pop.ga_tools = ga_input.ga_tools()
+
     id_ = pop.assign_names_from(progress.first_mol_name)
 
     progress.debug_dump(pop, 'init_pop.json')
