@@ -271,8 +271,7 @@ def ga_run(ga_input):
 
     # 3. Run the GA.
 
-    stop_gen = progress.start_gen+ga_input.num_generations+1
-    for x in range(progress.start_gen, stop_gen):
+    for x in range(progress.start_gen, ga_input.num_generations+1):
         # Check that the population has the correct size.
         assert len(pop) == ga_input.pop_size
         logger.info('Generation {} of {}.'.format(
