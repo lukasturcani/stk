@@ -243,32 +243,48 @@ def ga_run(ga_input):
         assert len(pop) == ga_input.pop_size
         logger.info('Generation {} of {}.'.format(
                                 x, ga_input.num_generations))
+
         logger.info('Starting crossovers.')
         offspring = pop.gen_offspring(ccounter.format(x))
+
         logger.info('Starting mutations.')
         mutants = pop.gen_mutants(mcounter.format(x))
+
         logger.debug('Population size is {}.'.format(len(pop)))
+
         logger.info('Adding offsping and mutants to population.')
         pop += offspring + mutants
+
         logger.debug('Population size is {}.'.format(len(pop)))
+
         logger.info('Removing duplicates, if any.')
         pop.remove_duplicates()
+
         logger.debug('Population size is {}.'.format(len(pop)))
+
         id_ = pop.assign_names_from(id_)
         progress.debug_dump(pop, 'gen_{}_unselected.json'.format(x))
+
         logger.info('Optimizing the population.')
         pop.optimize_population(ga_input.processes)
+
         logger.info('Calculating the fitness of population members.')
         pop.calculate_member_fitness(ga_input.processes)
+
         logger.info('Normalizing fitness values.')
         pop.normalize_fitness_values()
+
         progress.log_pop(logger, pop)
         progress.db(pop)
+
         logger.info('Selecting members of the next generation.')
         pop = pop.gen_next_gen(ga_input.pop_size, gcounter.format(x))
+
         logger.info('Recording progress.')
         progress.progress.add_subpopulation(pop)
+
         progress.debug_dump(pop, 'gen_{}_selected.json'.format(x))
+
         # Check if any user-defined exit criterion has been fulfilled.
         if pop.exit(progress.progress):
             break
