@@ -213,14 +213,16 @@
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">subpop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">populations</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
         <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subpop</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Ignore failed molecules from EPP.</span>
+        <span class="n">clean_pop</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="o">!=</span> <span class="mf">0.0001</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">clean_pop</span><span class="p">:</span>
+            <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">clean_pop</span><span class="p">))</span>
+            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">clean_pop</span><span class="p">))</span>
+            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">clean_pop</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span><span class="p">))</span>
-            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span><span class="p">]))</span>
-            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subpop</span><span class="p">))</span>
+            <span class="n">maxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
+            <span class="n">means</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
+            <span class="n">mins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span>
 
     <span class="c1"># Save the plot data.</span>
     <span class="k">if</span> <span class="n">plot_name</span> <span class="ow">and</span> <span class="n">dump_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

@@ -33,16 +33,16 @@ class GAProgress:
 
     Attributes
     ----------
-    progress_dump : bool
-        If ``True`` a population dump file `progress.json` is made in
-        the output directory. Each subpopulation of this population
+    progress_dump : :class:`bool`
+        If ``True`` a population dump file ```progress.json`` is made
+        in the output directory. Each subpopulation of this population
         represents a generation of the GA.
 
-    progress : Population
+    progress : :class:`.Population`
         A population where each subpopulation is a generation of the
         GA.
 
-    db_pop : Population or None
+    db_pop : :class:`.Population` or :class:`NoneType`
         A population which holds every molecule made by the GA.
 
     """
@@ -54,23 +54,18 @@ class GAProgress:
 
     def db(self, mols):
         """
-        Adds `mols` to `db_pop`.
+        Adds `mols` to :attr:`db_pop`.
 
         Only molecules not already present are added.
 
         Parameters
         ----------
-        mols : Population
+        mols : :class:`.Population`
             A group of molecules made by the GA.
-
-        Modifies
-        --------
-        db_pop : Population
-            `mols` are added to this population.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -81,20 +76,20 @@ class GAProgress:
         """
         Creates output files for the GA run.
 
-        Modifies
-        --------
-        progress.log
-            This file holds the progress of the GA in text form. Each
-            generation is reprented by the names of the molecules and
-            their key and fitness.
+        The following files are created:
 
-        progress.json
-            A population dump file holding `progress`. Only made if
-            `progress_dump` is ``True``.
+            progress.log
+                This file holds the progress of the GA in text form.
+                Each generation is reprented by the names of the
+                molecules and their key and fitness.
 
-        database.json
-            A population dump file holding every molecule made by the
-            GA. Only made if `db` is not ``None``.
+            progress.json
+                A population dump file holding `progress`. Only made if
+                :attr:`progress_dump` is ``True``.
+
+            database.json
+                A population dump file holding every molecule made by
+                the GA. Only made if :attr:`db_pop` is not ``None``.
 
         """
 
@@ -113,19 +108,19 @@ class GAProgress:
 
     def log_pop(self, logger, pop):
         """
-        Writes `pop` to `logger` at level INFO.
+        Writes `pop` to `logger` at level ``INFO``.
 
         Parameters
         ----------
-        logger : Logger
+        logger : :class:`Logger`
             The logger object recording the GA.
 
-        pop : Population
+        pop : :class:`.Population`
             A population which is to be added to the log.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -157,25 +152,20 @@ class GAProgress:
         """
         Creates a population dump file.
 
-        The dump file is made only if logging level is DEBUG or below.
+        Dumping only occurs `pop.ga_tools.input.pop_dumps` is ``True``.
 
         Parameters
         ----------
-        pop : Population
+        pop : :class:`.Population`
             The population to be dumped.
 
-        dump_name : str
+        dump_name : :class:`str`
             The name of the file to which the population should be
             dumped.
 
-        Modifies
-        --------
-        dump_path
-            A population dump file is made at this location.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
