@@ -63,8 +63,18 @@ class GAProgress:
 
     def __init__(self, progress_load, progress_dump, db_dump, ga_tools):
         if progress_load:
+            # The version of the molecule loaded from databases may not
+            # have the properties calculated that the version loaded
+            # from the previous GA run may have. As a result, first
+            # turn the cache of to load the GA produced version and
+            # then update the cache.
+            CACHE_SETTINGS['ON'] = False
+            for m in Population.load(progress_load, Molecule.fromdict):
+                m.update_cache()
+            CACHE_SETTINGS['ON'] = True
             self.progress = Population.load(progress_load,
                                             Molecule.fromdict)
+
             self.progress.ga_tools = ga_tools
         else:
             self.progress = Population(ga_tools)
@@ -254,15 +264,15 @@ def ga_run(ga_input):
                         ga_tools=ga_input.ga_tools())
     else:
         # The version of the molecule loaded from databases may not
-        # have the properties calculated that the loaded from the
-        # previous GA run may have. As a result, first turn the cache
-        # of to load the GA produced version and then update the cache.
+        # have the properties calculated that the version loaded from
+        # the previous GA run may have. As a result, first turn the
+        # cache off to load the GA produced version and then update the
+        # cache.
         CACHE_SETTINGS['ON'] = False
-        pop = init_func(**ga_input.initer().params)
-        CACHE_SETTINGS['ON'] = True
-        for m in pop:
+        for m in init_func(**ga_input.initer().params):
             m.update_cache()
-
+        CACHE_SETTINGS['ON'] = True
+        pop = init_func(**ga_input.initer().params)
         pop.ga_tools = ga_input.ga_tools()
 
     id_ = pop.assign_names_from(progress.first_mol_name)
