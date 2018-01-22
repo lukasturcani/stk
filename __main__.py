@@ -74,14 +74,15 @@ class GAProgress:
             CACHE_SETTINGS['ON'] = True
             self.progress = Population.load(progress_load,
                                             Molecule.fromdict)
-
             self.progress.ga_tools = ga_tools
         else:
             self.progress = Population(ga_tools)
 
-        self.first_mol_name = max((mol for mol in self.progress if
+        # The +1 is added so that the first mol's name is 1 more than
+        # the max in the previous GA.
+        self.first_mol_name = max((int(mol.name)+1 for mol
+                                   in self.progress if
                                    mol.name.isnumeric()),
-                                  key=lambda mol: int(mol.name),
                                   default=0)
 
         self.start_gen = (1 if len(self.progress.populations) == 0
