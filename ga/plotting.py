@@ -62,19 +62,16 @@ def fitness_epp(pop,
 
     for i, subpop in enumerate(pop.populations, 1):
         xvals.append(i)
-        if len(subpop) == 0:
-            maxs.append(0)
-            means.append(0)
-            mins.append(0)
+        # Ignore failed molecules from EPP.
+        clean_pop = [x.fitness for x in subpop if x.fitness != 0.0001]
+        if clean_pop:
+            maxs.append(max(clean_pop))
+            means.append(np.mean(clean_pop))
+            mins.append(min(clean_pop))
         else:
-            maxs.append(max(x.fitness for x in subpop))
-            clean_pop = [x.fitness for x in subpop if x.fitness != 0.0001]
-            if clean_pop:
-                means.append(np.mean(clean_pop))
-                mins.append(min(clean_pop))
-            else:
-                means.append(0.0001)
-                mins.append(0.0001)
+            maxs.append(0.0001)
+            means.append(0.0001)
+            mins.append(0.0001)
 
     # Save the plot data.
     if plot_name and dump_name is None:

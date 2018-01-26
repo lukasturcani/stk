@@ -666,7 +666,7 @@ class Population:
             if isinstance(item, dict):
                 pop.members.append(member_init(item))
             elif isinstance(item, list):
-                pop.populations.append(cls.fromlist(item))
+                pop.populations.append(cls.fromlist(item, member_init))
 
             else:
                 raise TypeError(('Population list must consist only'
