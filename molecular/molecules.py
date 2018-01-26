@@ -2881,7 +2881,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        self.__class__.cache[self.key].__dict__ = dict(vars(self))
+        if self.key in self.__class__.cache:
+            self.__class__.cache[self.key].__dict__ = dict(vars(self))
 
     def update_fragments(self):
         """
