@@ -784,7 +784,7 @@ class Molecule:
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
             charge = atom.GetFormalCharge()
-            charge = '' if charge == 0 else f'CHG={charge}'
+            charge = '' if charge == 0 else f' CHG={charge}'
             x, y, z = self.atom_coords(atom_id, conformer)
             atom_block += atom_line.format(atom_id+1,
                                            atom_sym,
