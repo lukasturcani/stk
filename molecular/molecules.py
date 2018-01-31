@@ -762,11 +762,11 @@ class Molecule:
                        "$$$$\n")
 
         # id atomic_symbol x y z
-        atom_line = "M  V30 {0} {1} {2:.4f} {3:.4f} {4:.4f} 0\n"
+        atom_line = "M  V30 {} {} {:.4f} {:.4f} {:.4f} 0{}\n"
         atom_block = ""
 
         # id bond_order atom1 atom2
-        bond_line = "M  V30 {0} {1} {2} {3}\n"
+        bond_line = "M  V30 {} {} {} {}\n"
         bond_block = ""
 
         main_string = main_string.format(self.mol.GetNumAtoms(),
@@ -783,9 +783,13 @@ class Molecule:
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
+            charge = atom.GetFormalCharge()
+            charge = '' if charge == 0 else f' CHG={charge}'
             x, y, z = self.atom_coords(atom_id, conformer)
             atom_block += atom_line.format(atom_id+1,
-                                           atom_sym, x, y, z)
+                                           atom_sym,
+                                           x, y, z,
+                                           charge)
 
         for bond in self.mol.GetBonds():
             bond_id = bond.GetIdx()
