@@ -1,67 +1,41 @@
 from ..ga import Mutation, Population
-from ..molecular import (EightPlusTwelve, FourPlusSix, StructUnit,
-StructUnit2, StructUnit3)
+from ..molecular import (EightPlusTwelve,
+                         FourPlusSix,
+                         Molecule,
+                         StructUnit3)
 from os.path import join
-from glob import glob
+from glob import iglob
 
 path = join('data', 'mutation', 'mutants.json')
-pop = Population.load(path)
+pop = Population.load(path, Molecule.fromdict)
 mol = pop[0]
 
 
-def test_cage_random_bb():
-    mutant = Mutation(None, None).cage_random_bb(mol,
-                join('data', 'mutation', 'cage', 'bb'),
-                'aldehyde')
+def test_random_bb():
+    mols = [StructUnit3(path, 'aldehyde') for path in
+            iglob(join('data', 'mutation', 'cage', 'bb', '*.mol'))]
+    mutant = Mutation(None, None).random_bb(
+                                mol,
+                                mols,
+                                lambda x: x.__class__ is StructUnit3)
 
     assert mutant.topology.__class__ == mol.topology.__class__
 
 
-def test_cage_random_lk():
-    mutant = Mutation(None, None).cage_random_lk(mol,
-                join('data', 'mutation', 'cage', 'lk'),
-                     'amine')
-
-    assert mutant.topology.__class__ == mol.topology.__class__
-
-
-def test_cage_similar_bb():
+def test_similar_bb():
     db = join('data', 'mutation', 'cage', 'bb')
-    mutant = Mutation(None, None).cage_similar_bb(mol, db, 'aldehyde')
+    mols = [StructUnit3(path, 'aldehyde') for
+            path in iglob(join(db, '*.mol'))]
 
+    mutant = Mutation(None, None).similar_bb(
+                                mol,
+                                mols,
+                                lambda x: x.__class__ is StructUnit3)
 
-    _, bb1 = min(zip(mol.bb_counter.values(),
-                     mol.bb_counter.keys()))
-    _, lk1 = max(zip(mol.bb_counter.values(),
-                     mol.bb_counter.keys()))
-
-    _, mbb1 = min(zip(mutant.bb_counter.values(),
-                     mutant.bb_counter.keys()))
-    _, mlk1 = max(zip(mutant.bb_counter.values(),
-                     mutant.bb_counter.keys()))
-
-    most_sim = bb1.similar_molecules(db)[0][1]
-    assert StructUnit3(most_sim, 'aldehyde') is mbb1
-    assert mutant.topology.__class__ == mol.topology.__class__
-
-
-def test_cage_similar_lk():
-    db = join('data', 'mutation', 'cage', 'lk')
-    mutant = Mutation(None, None).cage_similar_lk(mol, db, 'amine')
-
-
-    _, bb1 = min(zip(mol.bb_counter.values(),
-                     mol.bb_counter.keys()))
-    _, lk1 = max(zip(mol.bb_counter.values(),
-                     mol.bb_counter.keys()))
-
-    _, mbb1 = min(zip(mutant.bb_counter.values(),
-                     mutant.bb_counter.keys()))
-    _, mlk1 = max(zip(mutant.bb_counter.values(),
-                     mutant.bb_counter.keys()))
-
-    most_sim = bb1.similar_molecules(db)[0][1]
-    assert StructUnit2(most_sim, 'amine') is mlk1
+    rdkit_mols = (m.mol for m in mols)
+    most_sim = mol.building_blocks[0].similar_molecules(rdkit_mols)[1][1]
+    mol_map = {m.mol: m for m in mols}
+    assert mol_map[most_sim] is mutant.building_blocks[1]
     assert mutant.topology.__class__ == mol.topology.__class__
 
 

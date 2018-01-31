@@ -1,5 +1,5 @@
-mtk.molecular.topologies.periodic module
-========================================
+mtk\.molecular\.topologies\.periodic module
+===========================================
 
 .. automodule:: mtk.molecular.topologies.periodic
     :members:

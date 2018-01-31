@@ -1,5 +1,5 @@
-mtk.ga.input module
-===================
+mtk\.ga\.input module
+=====================
 
 .. automodule:: mtk.ga.input
     :members:

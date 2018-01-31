@@ -155,24 +155,23 @@
 <span class="sd">Extending mtk: Adding mutation functions.</span>
 <span class="sd">-----------------------------------------</span>
 
-<span class="sd">If a new mutation operation is to be added to mtk it should be added</span>
-<span class="sd">as a method in the :class:`Mutation` class defined in this module. The</span>
-<span class="sd">only requirement is that the first argument is `macro_mol`, excluding</span>
-<span class="sd">any `self` or `cls` arguments.</span>
+<span class="sd">If a new mutation operation is to be added to ``mtk`` it should be</span>
+<span class="sd">added as a method in the :class:`Mutation` class defined in this</span>
+<span class="sd">module. The only requirement is that the first argument is `macro_mol`,</span>
+<span class="sd">excluding any `self` or `cls` arguments.</span>
 
 <span class="sd">The naming requirement of `macro_mol` exists to help users identify</span>
-<span class="sd">which arguments are handled automatically by mtk and which they need</span>
-<span class="sd">to define in the input file. The convention is that if the mutation</span>
-<span class="sd">function takes an argument called  `macro_mol` it does not have to be</span>
-<span class="sd">specified in the input file.</span>
+<span class="sd">which arguments are handled automatically by ``mtk`` and which they</span>
+<span class="sd">need to define in the input file. The convention is that if the</span>
+<span class="sd">mutation function takes an argument called  `macro_mol` it does not</span>
+<span class="sd">have to be specified in the input file.</span>
 
-<span class="sd">If the mutation function does not fit neatly into a single function</span>
-<span class="sd">make sure that any helper functions are private, ie that their names</span>
+<span class="sd">If the mutation function does not fit neatly into a single function,</span>
+<span class="sd">make sure that any helper functions are private, i.e. that their names</span>
 <span class="sd">start with a leading underscore.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
@@ -180,12 +179,16 @@
 
 <span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="k">import</span> <span class="n">plot_counter</span>
-<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">StructUnit3</span><span class="p">,</span> <span class="n">Cage</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="MutationError"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.MutationError">[docs]</a><span class="k">class</span> <span class="nc">MutationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Used for errors which occuring during mutation operations.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="o">...</span></div>
 
 
@@ -215,16 +218,16 @@
 <span class="sd">        The number of mutations that needs to be performed each</span>
 <span class="sd">        generation.</span>
 
-<span class="sd">    weights : :class:`list` of :class:`floats`</span>
-<span class="sd">        If `weights` is a :class:`list`, each :class:`float`</span>
+<span class="sd">    weights : :class:`list` of :class:`float`</span>
+<span class="sd">        If :attr:`weights` is a :class:`list`, each :class:`float`</span>
 <span class="sd">        corresponds to the probability of selecting the mutation</span>
-<span class="sd">        function at the corresponding index. If `weights` is</span>
-<span class="sd">        ``None`` each mutation function has equal likelihood of</span>
+<span class="sd">        function at the corresponding index. If :attr:`weights` is</span>
+<span class="sd">        ``None``, each mutation function has equal likelihood of</span>
 <span class="sd">        being picked.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Mutation.__init__"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcs</span><span class="p">,</span> <span class="n">num_mutations</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcs</span><span class="p">,</span> <span class="n">num_mutations</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a :class:`Mutation` object.</span>
 
@@ -240,7 +243,7 @@
 <span class="sd">            The number of mutations that needs to be performed each</span>
 <span class="sd">            generation.</span>
 
-<span class="sd">        weights : :class:`list` of :class:`floats`, optional</span>
+<span class="sd">        weights : :class:`list` of :class:`float`, optional</span>
 <span class="sd">            If `weights` is a :class:`list`, each :class:`float`</span>
 <span class="sd">            corresponds to the probability of selecting the mutation</span>
 <span class="sd">            function at the corresponding index. If `weights` is</span>
@@ -251,9 +254,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">funcs</span> <span class="o">=</span> <span class="n">funcs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span> <span class="o">=</span> <span class="n">num_mutations</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_mutations</span> <span class="o">=</span> <span class="n">num_mutations</span>
 
-<div class="viewcode-block" id="Mutation.__call__"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">counter_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Carries out mutation operations on `population`.</span>
 
@@ -263,7 +266,7 @@
 <span class="sd">        mutation operations have been performed.</span>
 
 <span class="sd">        The mutants generated are returned together in a</span>
-<span class="sd">        :class:`.Population` object. Any mutants created present in</span>
+<span class="sd">        :class:`.Population` object. Any mutants already present in</span>
 <span class="sd">        `population` are removed.</span>
 
 <span class="sd">        Parameters</span>
@@ -323,292 +326,147 @@
                     <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">member</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
             <span class="n">plot_counter</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">counter_path</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">mutant_pop</span></div>
+        <span class="k">return</span> <span class="n">mutant_pop</span>
 
-<div class="viewcode-block" id="Mutation.cage_random_bb"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.cage_random_bb">[docs]</a>    <span class="k">def</span> <span class="nf">cage_random_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Mutation.random_bb"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.random_bb">[docs]</a>    <span class="k">def</span> <span class="nf">random_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">mols</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Substitutes a building block with a random one from a database.</span>
+<span class="sd">        Substitute a building block at random.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        macro_mol : Cage</span>
-<span class="sd">            The cage who&#39;s building block will be exchanged. Note that</span>
-<span class="sd">            the cage is not destroyed. It is used a template for a new</span>
-<span class="sd">            cage.</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">            The cage which is to have its building block substituted.</span>
 
-<span class="sd">        database : str</span>
-<span class="sd">            The full path of the database from which a new</span>
-<span class="sd">            building block is to be found.</span>
+<span class="sd">        mols : :class:`list` of :class:`.StructUnit`</span>
+<span class="sd">            A group of molecules from which one is used for</span>
+<span class="sd">            substitution.</span>
 
-<span class="sd">        fg : str (default = None)</span>
-<span class="sd">            The name of a functional group. All molecules in</span>
-<span class="sd">            `database` must have this functional group. This is the</span>
-<span class="sd">            functional group which is used to assemble the</span>
-<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
-<span class="sd">            path `database` holds the name of the functional group.</span>
+<span class="sd">        key : :class:`function`</span>
+<span class="sd">            A function which takes a building block of `macro_mol` and</span>
+<span class="sd">            returns ``True`` or ``False``. For all building blocks</span>
+<span class="sd">            which return ``True``, one is chosen at random to undergo</span>
+<span class="sd">            mutation.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Cage</span>
-<span class="sd">            A cage instance generated by taking all attributes of</span>
-<span class="sd">            `macro_mol` except its building-block* which is replaced by</span>
-<span class="sd">            a random building-block* from `database`.</span>
+<span class="sd">        :class:`.MacroMolecule`</span>
+<span class="sd">            The mutated `macro_mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">_</span><span class="p">,</span> <span class="n">lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="c1"># Choose the building block which undergoes mutation.</span>
+        <span class="n">valid_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">bb</span><span class="p">)]</span>
+        <span class="n">chosen_bb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_bbs</span><span class="p">)</span>
 
-        <span class="n">_</span><span class="p">,</span> <span class="n">og_bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="c1"># Make sure that the building block itself will not be picked.</span>
+        <span class="n">mols</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">mols</span> <span class="k">if</span> <span class="n">mol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">chosen_bb</span><span class="p">]</span>
 
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">bb_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
-                <span class="n">bb_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">bb_file</span><span class="p">)</span>
-                <span class="n">bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">bb_file</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
-                <span class="k">break</span>
+        <span class="c1"># Choose a replacement building block.</span>
+        <span class="n">replacement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">mols</span><span class="p">)</span>
 
-            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">continue</span>
+        <span class="c1"># Build the new MacroMolecule.</span>
+        <span class="n">new_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span>
+                   <span class="n">bb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">chosen_bb</span><span class="p">]</span>
+        <span class="n">new_bbs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">replacement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">new_bbs</span><span class="p">,</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
-                <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement building block does&#39;</span>
-                   <span class="s1">&#39; not have the same number of functional groups as &#39;</span>
-                   <span class="s1">&#39;the original building block.</span><span class="se">\n\n</span><span class="s1">Original building &#39;</span>
-                  <span class="s1">&#39;block:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">Replacement building block:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                  <span class="s1">&#39;</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_bb</span><span class="p">,</span> <span class="n">bb</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Mutation.cage_random_lk"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.cage_random_lk">[docs]</a>    <span class="k">def</span> <span class="nf">cage_random_lk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Mutation.similar_bb"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.similar_bb">[docs]</a>    <span class="k">def</span> <span class="nf">similar_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">mols</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Substitutes a linker with a random one from a database.</span>
+<span class="sd">        Substitute a building block with a similar one.</span>
+
+<span class="sd">        This function first selects a building block of `macro_mol` for</span>
+<span class="sd">        mutation. One is chosen at random from the building blocks</span>
+<span class="sd">        where ``key(building_block) == True``.</span>
+
+<span class="sd">        All  molecules in `mols` are then checked for similarity to the</span>
+<span class="sd">        building block. The first time this mutation function is run on</span>
+<span class="sd">        a `macro_mol`, the most similar molecule in `mols` to the</span>
+<span class="sd">        chosen building block is used to substitute it. The next time</span>
+<span class="sd">        this mutation function is run on the same `macro_mol` and the</span>
+<span class="sd">        same building block is chosen, the second most similar molecule</span>
+<span class="sd">        from `mols` is used for substitution and so on.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        macro_mol : Cage</span>
-<span class="sd">            The cage who&#39;s linker will be exchanged. Note that</span>
-<span class="sd">            the cage is not destroyed. It is used a template for a new</span>
-<span class="sd">            cage.</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">            The cage which is to have its building block substituted.</span>
 
-<span class="sd">        database : str</span>
-<span class="sd">            The full path of the database from which a new linker is to</span>
-<span class="sd">            be found.</span>
+<span class="sd">        mols : :class:`list` of :class:`.StructUnit`</span>
+<span class="sd">            A group of molecules from which one is used for</span>
+<span class="sd">            substitution.</span>
 
-<span class="sd">        fg : str (default = None)</span>
-<span class="sd">            The name of a functional group. All molecules in</span>
-<span class="sd">            `database` must have this functional group. This is the</span>
-<span class="sd">            functional group which is used to assemble the</span>
-<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
-<span class="sd">            path `database` holds the name of the functional group.</span>
+<span class="sd">        key : :class:`function`</span>
+<span class="sd">            A function which takes a building block of `macro_mol` and</span>
+<span class="sd">            returns ``True`` or ``False``. For all building blocks</span>
+<span class="sd">            which return ``True``, one is chosen at random to undergo</span>
+<span class="sd">            mutation.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Cage</span>
-<span class="sd">            A cage instance generated by taking all attributes of</span>
-<span class="sd">            `macro_mol` except its linker which is replaced by a random</span>
-<span class="sd">            linker from `database`.</span>
+<span class="sd">        :class:`.MacroMolecule`</span>
+<span class="sd">            The mutated `macro_mol`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">_</span><span class="p">,</span> <span class="n">og_lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-        <span class="n">lk_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">og_lk</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_similar_bb&#39;</span><span class="p">):</span>
+            <span class="c1"># This will map every macro_mol to a set of iterators which</span>
+            <span class="c1"># yield the most similar building blocks. 1 iterator for</span>
+            <span class="c1"># each previously chosen building block.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">:</span>
+            <span class="c1"># Maps the building blocks to iterators which yield the</span>
+            <span class="c1"># next most similar molecule in `mols` to the building</span>
+            <span class="c1"># block.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">_</span><span class="p">,</span> <span class="n">bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="c1"># Choose the building block which undergoes mutation.</span>
+        <span class="n">valid_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">bb</span><span class="p">)]</span>
+        <span class="n">chosen_bb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">valid_bbs</span><span class="p">)</span>
 
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">lk_file</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
-                <span class="n">lk_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">database</span><span class="p">,</span> <span class="n">lk_file</span><span class="p">)</span>
-                <span class="n">lk</span> <span class="o">=</span> <span class="n">lk_type</span><span class="p">(</span><span class="n">lk_file</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
-                <span class="k">break</span>
+        <span class="c1"># Create a mapping from rdkit molecules to the StructUnits.</span>
+        <span class="n">mol_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">struct_unit</span><span class="o">.</span><span class="n">mol</span><span class="p">:</span> <span class="n">struct_unit</span> <span class="k">for</span> <span class="n">struct_unit</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">}</span>
 
-            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="k">continue</span>
+        <span class="c1"># If the building block has not been chosen before, create an</span>
+        <span class="c1"># iterator yielding similar molecules from `mols` for it.</span>
+        <span class="k">if</span> <span class="n">chosen_bb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">][</span><span class="n">chosen_bb</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
+                           <span class="n">chosen_bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">mol_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
-                 <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement linker does not&#39;</span>
-                  <span class="s1">&#39; have the same number of functional groups as the&#39;</span>
-                  <span class="s1">&#39; original linker.</span><span class="se">\n\n</span><span class="s1">Original linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                  <span class="s1">&#39;Replacement linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_lk</span><span class="p">,</span> <span class="n">lk</span><span class="p">))</span>
+        <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">][</span><span class="n">chosen_bb</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sim_struct_unit</span> <span class="o">=</span> <span class="n">mol_map</span><span class="p">[</span><span class="n">sim_mol</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
+        <span class="c1"># If the most similar molecule in `mols` is itself, then take</span>
+        <span class="c1"># the next most similar one.</span>
+        <span class="k">if</span> <span class="n">sim_struct_unit</span> <span class="ow">is</span> <span class="n">chosen_bb</span><span class="p">:</span>
+            <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">][</span><span class="n">chosen_bb</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">sim_struct_unit</span> <span class="o">=</span> <span class="n">mol_map</span><span class="p">[</span><span class="n">sim_mol</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Mutation.cage_similar_bb"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.cage_similar_bb">[docs]</a>    <span class="k">def</span> <span class="nf">cage_similar_bb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Substitute the building block with similar one from `database`.</span>
-
-<span class="sd">        All of the molecules in `database` are checked for similarity</span>
-<span class="sd">        to the building block of `macro_mol`. The first time this</span>
-<span class="sd">        mutation function is run on a cage, the most similar molecule</span>
-<span class="sd">        in `database` is used to substitute the building block. The</span>
-<span class="sd">        next time this mutation function is run on the same cage, the</span>
-<span class="sd">        second most similar molecule from `database` is used and so on.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        macro_mol : Cage</span>
-<span class="sd">            The cage which is to have its building-block* substituted.</span>
-
-<span class="sd">        database : str</span>
-<span class="sd">            The full path of the database from which molecules are used</span>
-<span class="sd">            to substitute the building-block* of `macro_mol`.</span>
-
-<span class="sd">        fg : str (default = None)</span>
-<span class="sd">            The name of a functional group. All molecules in</span>
-<span class="sd">            `database` must have this functional group. This is the</span>
-<span class="sd">            functional group which is used to assemble the</span>
-<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
-<span class="sd">            path `database` holds the name of the functional group.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        macro_mol._similar_bb_mols : generator</span>
-<span class="sd">            Creates this attribute on the `macro_mol` instance. This</span>
-<span class="sd">            allows the function to keep track of which molecule from</span>
-<span class="sd">            `database` should be used in the substitution.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        Cage</span>
-<span class="sd">            A new cage with the same linker as `macro_mol` but a</span>
-<span class="sd">            different building-block*. The building-block* is selected</span>
-<span class="sd">            according to the description in this docstring.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_similar_bb_mols&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span> <span class="o">=</span> <span class="p">{}</span>
-
-        <span class="c1"># The idea here is to create a list of molecules from</span>
-        <span class="c1"># `database` ordered by similarity to the building block of</span>
-        <span class="c1"># `macro_mol`. Each time this function is called on `macro_mol`</span>
-        <span class="c1"># the next molecule from this list is used to substitute the</span>
-        <span class="c1"># building block of the cage and create a new mutant.</span>
-
-        <span class="n">_</span><span class="p">,</span> <span class="n">lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-
-        <span class="n">_</span><span class="p">,</span> <span class="n">og_bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-
-        <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
-                                    <span class="n">og_bb</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
-
-        <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_bb_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">new_bb</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="n">sim_mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_bb</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
-              <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement building block does&#39;</span>
-               <span class="s1">&#39; not have the same number of functional groups as &#39;</span>
-               <span class="s1">&#39;the original building block.</span><span class="se">\n\n</span><span class="s1">Original building &#39;</span>
-              <span class="s1">&#39;block:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">Replacement building block:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-              <span class="s1">&#39;</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_bb</span><span class="p">,</span> <span class="n">new_bb</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">new_bb</span><span class="p">,</span> <span class="n">lk</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Mutation.cage_similar_lk"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.cage_similar_lk">[docs]</a>    <span class="k">def</span> <span class="nf">cage_similar_lk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Substitute the linker with a similar one from `database`.</span>
-
-<span class="sd">        All of the molecules in `database` are checked for similarity</span>
-<span class="sd">        to the linker of `macro_mol`. The first time this mutation</span>
-<span class="sd">        function is run on a cage, the most similar molecule in</span>
-<span class="sd">        `database` is used to substitute the linker. The next time this</span>
-<span class="sd">        mutation function is run on the same cage, the second most</span>
-<span class="sd">        similar molecule from `database` is used and so on.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        macro_mol : Cage</span>
-<span class="sd">            The cage which is to have its linker substituted.</span>
-
-<span class="sd">        database : str</span>
-<span class="sd">            The full path of the database from which molecules are used</span>
-<span class="sd">            to substitute the linker of `macro_mol`.</span>
-
-<span class="sd">        fg : str (default = None)</span>
-<span class="sd">            The name of a functional group. All molecules in</span>
-<span class="sd">            `database` must have this functional group. This is the</span>
-<span class="sd">            functional group which is used to assemble the</span>
-<span class="sd">            macromolecules. If ``None`` it is assumed that the</span>
-<span class="sd">            path `database` holds the name of the functional group.</span>
-
-<span class="sd">        Modifies</span>
-<span class="sd">        --------</span>
-<span class="sd">        macro_mol._similar_lk_mols : generator</span>
-<span class="sd">            Creates this attribute on the `macro_mol` instance. This</span>
-<span class="sd">            allows the function to keep track of which molecule from</span>
-<span class="sd">            `database` should be used in the substitution.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        Cage</span>
-<span class="sd">            A new cage with the same building-block* as `macro_mol` but</span>
-<span class="sd">            a different linker. The linker is selected according to the</span>
-<span class="sd">            description in this docstring.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_similar_lk_mols&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span> <span class="o">=</span> <span class="p">{}</span>
-
-        <span class="c1"># The idea here is to create a list of molecules from</span>
-        <span class="c1"># `database` ordered by similarity to the linker of</span>
-        <span class="c1"># `macro_mol`. Each time this function is called on `macro_mol`</span>
-        <span class="c1"># the next molecule from this list is used to substitute the</span>
-        <span class="c1"># linker of the cage and create a new mutant.</span>
-
-        <span class="n">_</span><span class="p">,</span> <span class="n">og_lk</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-        <span class="n">lk_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">og_lk</span><span class="p">)</span>
-
-        <span class="n">_</span><span class="p">,</span> <span class="n">bb</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
-                        <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_counter</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-
-        <span class="k">if</span> <span class="n">macro_mol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
-                                    <span class="n">og_lk</span><span class="o">.</span><span class="n">similar_molecules</span><span class="p">(</span><span class="n">database</span><span class="p">))</span>
-
-        <span class="n">sim_mol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_similar_lk_mols</span><span class="p">[</span><span class="n">macro_mol</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">new_lk</span> <span class="o">=</span> <span class="n">lk_type</span><span class="p">(</span><span class="n">sim_mol</span><span class="p">,</span> <span class="n">fg</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">og_lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_lk</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">MutationError</span><span class="p">(</span>
-             <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">MUTATION ERROR: Replacement linker does not&#39;</span>
-              <span class="s1">&#39; have the same number of functional groups as the&#39;</span>
-              <span class="s1">&#39; original linker.</span><span class="se">\n\n</span><span class="s1">Original linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-              <span class="s1">&#39;Replacement linker:</span><span class="se">\n\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">og_lk</span><span class="p">,</span> <span class="n">new_lk</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">Cage</span><span class="p">([</span><span class="n">new_lk</span><span class="p">,</span> <span class="n">bb</span><span class="p">],</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
+        <span class="c1"># Build the new MacroMolecule.</span>
+        <span class="n">new_bbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">bb</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span> <span class="k">if</span>
+                   <span class="n">bb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">chosen_bb</span><span class="p">]</span>
+        <span class="n">new_bbs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_struct_unit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">new_bbs</span><span class="p">,</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Mutation.random_topology"><a class="viewcode-back" href="../../../mtk.ga.mutation.html#mtk.ga.mutation.Mutation.random_topology">[docs]</a>    <span class="k">def</span> <span class="nf">random_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">topologies</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Changes `macro_mol` topology to a random one from `topologies`.</span>
 
-<span class="sd">        A new instance of the same type as `macro_mol` is created. Ie</span>
-<span class="sd">        if `macro_mol` was a Polymer instance then a Polymer instance</span>
-<span class="sd">        will be returned.</span>
+<span class="sd">        A new instance of the same type as `macro_mol` is created. I.e.</span>
+<span class="sd">        if `macro_mol` was a :class:`.Polymer` instance then a</span>
+<span class="sd">        :class:`.Polymer` instance will be returned.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        macro_mol : MacroMolecule</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">            The macromolecule which is to be mutated.</span>
 
-<span class="sd">        topologies : list of Topology instances</span>
+<span class="sd">        topologies : :class:`list` of :class:`.Topology`</span>
 <span class="sd">            This lists holds the topology instances from which one is</span>
 <span class="sd">            selected at random to form a new molecule.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        MacroMolecule</span>
+<span class="sd">        :class:`.MacroMolecule`</span>
 <span class="sd">            A molecule generated by initializing a new instance</span>
 <span class="sd">            with all the same parameters as `macro_mol` except for the</span>
 <span class="sd">            topology.</span>
@@ -616,7 +474,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">tops</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">topologies</span> <span class="k">if</span>
-                                <span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)]</span>
+                <span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">topology</span><span class="p">)]</span>
         <span class="n">topology</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">tops</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">macro_mol</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">)</span></div></div>
 </pre></div>
