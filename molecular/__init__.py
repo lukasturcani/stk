@@ -1,4 +1,3 @@
-from .optimization import *
 from .topologies import *
 from .energy import *
 from .fg_info import *

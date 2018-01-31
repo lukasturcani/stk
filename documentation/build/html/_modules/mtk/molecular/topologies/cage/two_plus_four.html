@@ -166,22 +166,22 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)]</span>
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
     <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">positions_A</span>
     <span class="n">beta</span><span class="o">.</span><span class="n">edge_plane_normal</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
                                         <span class="n">alpha</span><span class="o">.</span><span class="n">edge_plane_normal</span><span class="p">(),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)]</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">)]</span>
 
-    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">positions_B</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">positions_B</span>
 
-    <span class="n">a</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">b</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">c</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">d</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">1</span></div>
@@ -193,25 +193,25 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">0</span><span class="p">)]</span>
 
-    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="n">positions_A</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">positions_A</span>
 
-    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">c</span><span class="p">)]</span>
+    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">)]</span>
 
-    <span class="n">e1</span><span class="p">,</span><span class="n">e2</span><span class="p">,</span><span class="n">e3</span><span class="p">,</span><span class="n">e4</span><span class="p">,</span><span class="n">e5</span><span class="p">,</span><span class="n">e6</span> <span class="o">=</span> <span class="n">positions_B</span>
-    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e1</span><span class="p">,</span><span class="n">e3</span><span class="p">,</span><span class="n">e5</span><span class="p">]:</span>
-        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+    <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">e3</span><span class="p">,</span> <span class="n">e4</span><span class="p">,</span> <span class="n">e5</span><span class="p">,</span> <span class="n">e6</span> <span class="o">=</span> <span class="n">positions_B</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e1</span><span class="p">,</span> <span class="n">e3</span><span class="p">,</span> <span class="n">e5</span><span class="p">]:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 
-    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e2</span><span class="p">,</span><span class="n">e4</span><span class="p">,</span><span class="n">e6</span><span class="p">]:</span>
-        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e2</span><span class="p">,</span> <span class="n">e4</span><span class="p">,</span> <span class="n">e6</span><span class="p">]:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">])</span>
 
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">2</span></div>
@@ -223,28 +223,28 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 
-    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="n">positions_A</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">positions_A</span>
 
-    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">d</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">d</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">)]</span>
+    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)]</span>
 
-    <span class="n">e1</span><span class="p">,</span><span class="n">e2</span><span class="p">,</span><span class="n">e3</span><span class="p">,</span><span class="n">e4</span><span class="p">,</span><span class="n">e5</span><span class="p">,</span><span class="n">e6</span><span class="p">,</span><span class="n">e7</span><span class="p">,</span><span class="n">e8</span> <span class="o">=</span> <span class="n">positions_B</span>
-    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e1</span><span class="p">,</span><span class="n">e3</span><span class="p">,</span><span class="n">e5</span><span class="p">,</span><span class="n">e7</span><span class="p">]:</span>
-        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+    <span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">,</span> <span class="n">e3</span><span class="p">,</span> <span class="n">e4</span><span class="p">,</span> <span class="n">e5</span><span class="p">,</span> <span class="n">e6</span><span class="p">,</span> <span class="n">e7</span><span class="p">,</span> <span class="n">e8</span> <span class="o">=</span> <span class="n">positions_B</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e1</span><span class="p">,</span> <span class="n">e3</span><span class="p">,</span> <span class="n">e5</span><span class="p">,</span> <span class="n">e7</span><span class="p">]:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 
-    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e2</span><span class="p">,</span><span class="n">e4</span><span class="p">,</span><span class="n">e6</span><span class="p">,</span><span class="n">e8</span><span class="p">]:</span>
-        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="n">e2</span><span class="p">,</span> <span class="n">e4</span><span class="p">,</span> <span class="n">e6</span><span class="p">,</span> <span class="n">e8</span><span class="p">]:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">])</span>
 
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">2</span></div>
@@ -256,27 +256,27 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">50</span><span class="p">)]</span>
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">)]</span>
 
-    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">f</span> <span class="o">=</span> <span class="n">positions_A</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">positions_A</span>
 
-    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">d</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">a</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">d</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">a</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">d</span><span class="p">)]</span>
+    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">d</span><span class="p">)]</span>
 
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">8</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">1</span></div>
@@ -289,45 +289,45 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">),</span>
 
-                <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
 
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">75</span><span class="p">),</span>
-                <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">75</span><span class="p">)]</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">75</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">75</span><span class="p">)]</span>
 
-    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">h</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">positions_A</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">positions_A</span>
 
     <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
 
-             <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
 
 
-             <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
-             <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
 
-            <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
 
-            <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
-            <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">d</span><span class="p">)]</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">d</span><span class="p">)]</span>
 
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">12</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">2</span></div>
