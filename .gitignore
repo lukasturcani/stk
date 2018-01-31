@@ -7,6 +7,10 @@
 # in test_macromodel.py. Ignore it.
 tests/macromodel_tests_output
 
+# This folder gets created by running tests for mopac functions
+# in test_mopac.py. Ignore it.
+tests/mopac_tests_output
+
 # This folder gets created by running tests for fitness functions.
 tests/cage_target
 

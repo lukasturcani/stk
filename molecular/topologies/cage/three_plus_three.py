@@ -15,16 +15,16 @@ class OnePlusOne(_NoLinkerCageTopology):
 
     """
 
-    positions_A = [Vertex(25,0,0),
-                   Vertex(-25,0,0)]
-    a,b = positions_A
-    connections = [(a,b)]
+    positions_A = [Vertex(25, 0, 0),
+                   Vertex(-25, 0, 0)]
+    a, b = positions_A
+    connections = [(a, b)]
 
-    a.edge_plane_normal = lambda : np.array([1,0,0])
-    b.edge_plane_normal = lambda : np.array([-1,0,0])
+    a.edge_plane_normal = lambda: np.array([1, 0, 0])
+    b.edge_plane_normal = lambda: np.array([-1, 0, 0])
 
-    a.edge_centroid = lambda : np.array([0,0,0])
-    b.edge_centroid = lambda : np.array([0,0,0])
+    a.edge_centroid = lambda: np.array([0, 0, 0])
+    b.edge_centroid = lambda: np.array([0, 0, 0])
 
     n_windows = 3
     n_window_types = 1
@@ -35,11 +35,10 @@ class OnePlusOne(_NoLinkerCageTopology):
 
         for position in self.positions_A:
             other_position = next(x for x in self.positions_A if
-                                x is not position)
+                                  x is not position)
 
             position.atom_position_pairs = [(atom, other_position) for
-                                    atom in position.bonder_ids]
-
+                                            atom in position.bonder_ids]
 
             for atom_id, vertex in position.atom_position_pairs:
                 # Get all the distances between the atom and the bonder
@@ -49,8 +48,7 @@ class OnePlusOne(_NoLinkerCageTopology):
                     distance = macro_mol.atom_distance(atom_id,
                                                        atom2_id)
                     position.distances.append((distance,
-                                             atom_id, atom2_id))
-
+                                              atom_id, atom2_id))
 
         paired = set()
         for position in self.positions_A:
@@ -76,21 +74,20 @@ class TwoPlusTwo(_NoLinkerCageTopology):
 
     """
 
-    positions_A = [Vertex(50,0,-50/np.sqrt(2)),
-                Vertex(-50,0,-50/np.sqrt(2)),
-                Vertex(0,50,50/np.sqrt(2)),
-                Vertex(0,-50,50/np.sqrt(2))]
+    positions_A = [Vertex(50, 0, -50/np.sqrt(2)),
+                   Vertex(-50, 0, -50/np.sqrt(2)),
+                   Vertex(0, 50, 50/np.sqrt(2)),
+                   Vertex(0, -50, 50/np.sqrt(2))]
 
-    a,b,c,d = positions_A
+    a, b, c, d = positions_A
 
     for x in positions_A:
         old_normal = x.edge_plane_normal
         x.edge_plane_normal = lambda a=old_normal: np.multiply(a(), -1)
 
-
-    connections = [(a,b), (a,c), (a,d),
-                   (b,c), (b,d),
-                   (c,d)]
+    connections = [(a, b), (a, c), (a, d),
+                   (b, c), (b, d),
+                   (c, d)]
 
     n_windows = 4
     n_window_types = 1
@@ -103,19 +100,19 @@ class FourPlusFour(_NoLinkerCageTopology):
     """
 
     positions_A = [Vertex(-50, 50, -50),
-                Vertex(-50, -50, -50),
-                Vertex(50, 50, -50),
-                Vertex(50, -50, -50),
+                   Vertex(-50, -50, -50),
+                   Vertex(50, 50, -50),
+                   Vertex(50, -50, -50),
 
-                Vertex(-50, 50, 50),
-                Vertex(-50, -50, 50),
-                Vertex(50, 50, 50),
-                Vertex(50, -50, 50)]
+                   Vertex(-50, 50, 50),
+                   Vertex(-50, -50, 50),
+                   Vertex(50, 50, 50),
+                   Vertex(50, -50, 50)]
 
-    a,b,c,d, e,f,g,h = positions_A
+    a, b, c, d, e, f, g, h = positions_A
 
-    connections = [(a,b), (a,c), (a,e), (b,d), (b,f), (c,g), (c,d),
-                   (d,h), (e,g), (e,f), (f,h), (g,h)]
+    connections = [(a, b), (a, c), (a, e), (b, d), (b, f), (c, g),
+                   (c, d), (d, h), (e, g), (e, f), (f, h), (g, h)]
 
     n_windows = 6
     n_window_types = 1
