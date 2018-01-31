@@ -1,5 +1,5 @@
-mtk.ga.population module
-========================
+mtk\.ga\.population module
+==========================
 
 .. automodule:: mtk.ga.population
     :members:

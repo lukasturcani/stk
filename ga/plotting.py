@@ -12,41 +12,46 @@ from . import fitness
 plt.switch_backend('agg')
 
 
-def fitness_epp(pop, plot_name=False,
-                dump_name=None, xlabel='Generation'):
+def fitness_epp(pop,
+                plot_name=False,
+                dump_name=None,
+                xlabel='Generation'):
     """
     Plots the min, max and avg fitness values of each subpopulation.
 
     Also saves the plot data. The min, mean and max values for each
-    generation are placed in an array:
+    subpopulation of `pop` are placed in an array:
 
-        >>> dmp_array = np.array(mins, means, maxs)
+        >>> dmp_array = np.array([mins, means, maxs])
 
     which is then dumped to the file `dump_name`.
 
-    The members with a standard fitness of 0.0001 are excluded from
-    this analysis.
+    The members with a fitness of ``0.0001`` (indicating a failed
+    fitness calculation) are excluded from this analysis.
 
     Parameters
     ----------
-    pop : Population
+    pop : :class:`.Population`
         A population containing any number of subpopulations and no
-        direct members.
+        direct members. Each subpopulation represents a generation of
+        the GA.
 
-    plot_name : str (default = False)
-        The full path of where the plot should be saved. If ``False``
-        then no plot is made. Useful if you only want the dump file.
+    plot_name : :class:`str` or :class:`bool`, optional
+        The full path to where the plot should be saved. If ``False``
+        then no plot is made. Useful if you only want the dump file and
+        not graph.
 
-    dump_name : str (default = None)
-        If ``None`` then `plot_name` is used only with the extension
-        ``.dmp``.
+    dump_name : :class:`str`, optional
+        The path to the file where the data to make the graph is
+        dumped. If ``None`` then `plot_name` is used but with a
+        ``.dmp`` extension.
 
-    xlabel : str (default = 'Generation')
+    xlabel : :class:`str`, optional
         The label on the x-axis.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
@@ -57,19 +62,16 @@ def fitness_epp(pop, plot_name=False,
 
     for i, subpop in enumerate(pop.populations, 1):
         xvals.append(i)
-        if len(subpop) == 0:
-            maxs.append(0)
-            means.append(0)
-            mins.append(0)
+        # Ignore failed molecules from EPP.
+        clean_pop = [x.fitness for x in subpop if x.fitness != 0.0001]
+        if clean_pop:
+            maxs.append(max(clean_pop))
+            means.append(np.mean(clean_pop))
+            mins.append(min(clean_pop))
         else:
-            maxs.append(max(x.fitness for x in subpop))
-            clean_pop = [x.fitness for x in subpop if x.fitness != 0.0001]
-            if clean_pop:
-                means.append(np.mean(clean_pop))
-                mins.append(min(clean_pop))
-            else:
-                means.append(0.0001)
-                mins.append(0.0001)
+            maxs.append(0.0001)
+            means.append(0.0001)
+            mins.append(0.0001)
 
     # Save the plot data.
     if plot_name and dump_name is None:
@@ -85,8 +87,8 @@ def fitness_epp(pop, plot_name=False,
         plt.ylabel('Fitness')
         plt.scatter(xvals, maxs, color='red', marker='o', label='max',
                     alpha=0.5)
-        plt.scatter(xvals, means, color='green', marker='o', label='mean',
-                    alpha=0.5)
+        plt.scatter(xvals, means, color='green', marker='o',
+                    label='mean', alpha=0.5)
         plt.scatter(xvals, mins, color='blue', marker='o', label='min',
                     alpha=0.5)
         frame = (min(mins) + max(maxs))/50
@@ -99,42 +101,48 @@ def fitness_epp(pop, plot_name=False,
         plt.close('all')
 
 
-def parameter_epp(pop, plot_name=False,
-                  dump_name=None, xlabel='Generation'):
+def parameter_epp(pop,
+                  plot_name=False,
+                  dump_name=None,
+                  xlabel='Generation'):
     """
-    Plots the progress_params values across subpopulations.
+    Plots the :attr:`.MacroMolecule.progress_params` values.
 
-    For each progress_param a plot will be produced. Each will show
-    subpopulations on the x-axis and the min, max and avg values
-    of that progress param on the y axis.
+    For each element in :attr:`~.MacroMolecule.progress_params` a
+    separate graph will be produced. Each will show subpopulations on
+    the x-axis and the min, max and avg values of that
+    :attr:`~.MacroMolecule.progress_params` element on the y-axis.
 
     Also saves the plot data. The min, mean and max values for each
-    generation are placed in an array:
+    subpopulation are placed in an array:
 
-        >>> dmp_array = np.array(mins, means, maxs)
+        >>> dmp_array = np.array([mins, means, maxs])
 
     which is then dumped to the file `dump_name`.
 
     Parameters
     ----------
-    pop : Population
-        A population holding any number of subpopulations and no
-        direct members.
+    pop : :class:`.Population`
+        A population containing any number of subpopulations and no
+        direct members. Each subpopulation represents a generation of
+        the GA.
 
-    plot_name : str (default = False)
-        The full path of where the plot should be saved. If ``False``
-        then no plot is made. Useful if you only want the dump file.
+    plot_name : :class:`str` or :class:`bool`, optional
+        The full path to where the plot should be saved. If ``False``
+        then no plot is made. Useful if you only want the dump file and
+        not graph.
 
-    dump_name : str (default = None)
-        If ``None`` then `plot_name` is used only with the extension
-        ``.dmp``.
+    dump_name : :class:`str`, optional
+        The path to the file where the data to make the graph is
+        dumped. If ``None`` then `plot_name` is used but with a
+        ``.dmp`` extension.
 
-    xlabel : str (default = 'Generation')
+    xlabel : :class:`str`, optional
         The label on the x-axis.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 
@@ -158,12 +166,12 @@ def parameter_epp(pop, plot_name=False,
             max_params.append([None for x in range(nparams)])
             continue
 
-        p_mat = np.array([x.progress_params[func_name] for x in sp])
-
+        p_mat = [x.progress_params[func_name] for x in sp]
         # Each element of this list holds an array of all the valid
         # values of a particular progress_param.
-        p_arrays = [p_mat[:, x] for x in range(nparams)]
-        p_arrays = [[x for x in a if x is not None] for a in p_arrays]
+        p_arrays = [[pparams[x] for
+                     pparams in p_mat if pparams[x] is not None] for
+                    x in range(nparams)]
 
         min_params.append([min(x) if len(x) > 0 else None
                            for x in p_arrays])
@@ -224,22 +232,22 @@ def parameter_epp(pop, plot_name=False,
 
 def plot_counter(counter, plot_name):
     """
-    Saves a .png file holding a plot of `counter`.
+    Saves a ``.png`` file holding a plot of `counter`.
 
     The counter should hold the number of times a certain population
     member was selected.
 
     Parameters
     ----------
-    counter : Counter
-        A counter of which members of a population were picked.
+    counter : :class:`collections.Counter`
+        A counter of which members of a population were selected.
 
-    plot_name : str
-        The full path of the .png where the plot is to be saved.
+    plot_name : :class:`str`
+        The full path of the ``.png`` where the plot is to be saved.
 
     Returns
     -------
-    None : NoneType
+    None : :class:`NoneType`
 
     """
 

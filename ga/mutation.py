@@ -4,24 +4,23 @@ Defines mutation operations via the :class:`Mutation` class.
 Extending mtk: Adding mutation functions.
 -----------------------------------------
 
-If a new mutation operation is to be added to mtk it should be added
-as a method in the :class:`Mutation` class defined in this module. The
-only requirement is that the first argument is `macro_mol`, excluding
-any `self` or `cls` arguments.
+If a new mutation operation is to be added to ``mtk`` it should be
+added as a method in the :class:`Mutation` class defined in this
+module. The only requirement is that the first argument is `macro_mol`,
+excluding any `self` or `cls` arguments.
 
 The naming requirement of `macro_mol` exists to help users identify
-which arguments are handled automatically by mtk and which they need
-to define in the input file. The convention is that if the mutation
-function takes an argument called  `macro_mol` it does not have to be
-specified in the input file.
+which arguments are handled automatically by ``mtk`` and which they
+need to define in the input file. The convention is that if the
+mutation function takes an argument called  `macro_mol` it does not
+have to be specified in the input file.
 
-If the mutation function does not fit neatly into a single function
-make sure that any helper functions are private, ie that their names
+If the mutation function does not fit neatly into a single function,
+make sure that any helper functions are private, i.e. that their names
 start with a leading underscore.
 
 """
 
-import os
 import logging
 import numpy as np
 from collections import Counter
@@ -29,12 +28,16 @@ from itertools import islice
 
 from .population import Population
 from .plotting import plot_counter
-from ..molecular import StructUnit3, Cage
 
 logger = logging.getLogger(__name__)
 
 
 class MutationError(Exception):
+    """
+    Used for errors which occuring during mutation operations.
+
+    """
+
     ...
 
 
@@ -64,11 +67,11 @@ class Mutation:
         The number of mutations that needs to be performed each
         generation.
 
-    weights : :class:`list` of :class:`floats`
-        If `weights` is a :class:`list`, each :class:`float`
+    weights : :class:`list` of :class:`float`
+        If :attr:`weights` is a :class:`list`, each :class:`float`
         corresponds to the probability of selecting the mutation
-        function at the corresponding index. If `weights` is
-        ``None`` each mutation function has equal likelihood of
+        function at the corresponding index. If :attr:`weights` is
+        ``None``, each mutation function has equal likelihood of
         being picked.
 
     """
@@ -89,7 +92,7 @@ class Mutation:
             The number of mutations that needs to be performed each
             generation.
 
-        weights : :class:`list` of :class:`floats`, optional
+        weights : :class:`list` of :class:`float`, optional
             If `weights` is a :class:`list`, each :class:`float`
             corresponds to the probability of selecting the mutation
             function at the corresponding index. If `weights` is
@@ -112,7 +115,7 @@ class Mutation:
         mutation operations have been performed.
 
         The mutants generated are returned together in a
-        :class:`.Population` object. Any mutants created present in
+        :class:`.Population` object. Any mutants already present in
         `population` are removed.
 
         Parameters
@@ -174,290 +177,145 @@ class Mutation:
 
         return mutant_pop
 
-    def cage_random_bb(self, macro_mol, database, fg=None):
+    def random_bb(self, macro_mol, mols, key):
         """
-        Substitutes a building block with a random one from a database.
+        Substitute a building block at random.
 
         Parameters
         ----------
-        macro_mol : Cage
-            The cage who's building block will be exchanged. Note that
-            the cage is not destroyed. It is used a template for a new
-            cage.
+        macro_mol : :class:`.MacroMolecule`
+            The cage which is to have its building block substituted.
 
-        database : str
-            The full path of the database from which a new
-            building block is to be found.
+        mols : :class:`list` of :class:`.StructUnit`
+            A group of molecules from which one is used for
+            substitution.
 
-        fg : str (default = None)
-            The name of a functional group. All molecules in
-            `database` must have this functional group. This is the
-            functional group which is used to assemble the
-            macromolecules. If ``None`` it is assumed that the
-            path `database` holds the name of the functional group.
+        key : :class:`function`
+            A function which takes a building block of `macro_mol` and
+            returns ``True`` or ``False``. For all building blocks
+            which return ``True``, one is chosen at random to undergo
+            mutation.
 
         Returns
         -------
-        Cage
-            A cage instance generated by taking all attributes of
-            `macro_mol` except its building-block* which is replaced by
-            a random building-block* from `database`.
+        :class:`.MacroMolecule`
+            The mutated `macro_mol`.
 
         """
 
-        _, lk = max(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
+        # Choose the building block which undergoes mutation.
+        valid_bbs = [bb for bb in macro_mol.building_blocks if key(bb)]
+        chosen_bb = np.random.choice(valid_bbs)
 
-        _, og_bb = min(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
+        # Make sure that the building block itself will not be picked.
+        mols = [mol for mol in mols if mol is not chosen_bb]
 
-        while True:
-            try:
-                bb_file = np.random.choice(os.listdir(database))
-                bb_file = os.path.join(database, bb_file)
-                bb = StructUnit3(bb_file, fg)
-                break
+        # Choose a replacement building block.
+        replacement = np.random.choice(mols)
 
-            except TypeError:
-                continue
+        # Build the new MacroMolecule.
+        new_bbs = [bb for bb in macro_mol.building_blocks if
+                   bb is not chosen_bb]
+        new_bbs.append(replacement)
+        return macro_mol.__class__(new_bbs, macro_mol.topology)
 
-        if len(og_bb.bonder_ids) != len(bb.bonder_ids):
-            raise MutationError(
-                ('\n\nMUTATION ERROR: Replacement building block does'
-                   ' not have the same number of functional groups as '
-                   'the original building block.\n\nOriginal building '
-                  'block:\n\n{}\n\nReplacement building block:\n\n'
-                  '{}\n\n').format(og_bb, bb))
-
-        return Cage([bb, lk], macro_mol.topology)
-
-    def cage_random_lk(self, macro_mol, database, fg=None):
+    def similar_bb(self, macro_mol, mols, key):
         """
-        Substitutes a linker with a random one from a database.
+        Substitute a building block with a similar one.
+
+        This function first selects a building block of `macro_mol` for
+        mutation. One is chosen at random from the building blocks
+        where ``key(building_block) == True``.
+
+        All  molecules in `mols` are then checked for similarity to the
+        building block. The first time this mutation function is run on
+        a `macro_mol`, the most similar molecule in `mols` to the
+        chosen building block is used to substitute it. The next time
+        this mutation function is run on the same `macro_mol` and the
+        same building block is chosen, the second most similar molecule
+        from `mols` is used for substitution and so on.
 
         Parameters
         ----------
-        macro_mol : Cage
-            The cage who's linker will be exchanged. Note that
-            the cage is not destroyed. It is used a template for a new
-            cage.
+        macro_mol : :class:`.MacroMolecule`
+            The cage which is to have its building block substituted.
 
-        database : str
-            The full path of the database from which a new linker is to
-            be found.
+        mols : :class:`list` of :class:`.StructUnit`
+            A group of molecules from which one is used for
+            substitution.
 
-        fg : str (default = None)
-            The name of a functional group. All molecules in
-            `database` must have this functional group. This is the
-            functional group which is used to assemble the
-            macromolecules. If ``None`` it is assumed that the
-            path `database` holds the name of the functional group.
+        key : :class:`function`
+            A function which takes a building block of `macro_mol` and
+            returns ``True`` or ``False``. For all building blocks
+            which return ``True``, one is chosen at random to undergo
+            mutation.
 
         Returns
         -------
-        Cage
-            A cage instance generated by taking all attributes of
-            `macro_mol` except its linker which is replaced by a random
-            linker from `database`.
+        :class:`.MacroMolecule`
+            The mutated `macro_mol`.
 
         """
 
-        _, og_lk = max(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
-        lk_type = type(og_lk)
+        if not hasattr(self, '_similar_bb'):
+            # This will map every macro_mol to a set of iterators which
+            # yield the most similar building blocks. 1 iterator for
+            # each previously chosen building block.
+            self._similar_bb = {}
+        if macro_mol not in self._similar_bb:
+            # Maps the building blocks to iterators which yield the
+            # next most similar molecule in `mols` to the building
+            # block.
+            self._similar_bb[macro_mol] = {}
 
-        _, bb = min(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
+        # Choose the building block which undergoes mutation.
+        valid_bbs = [bb for bb in macro_mol.building_blocks if key(bb)]
+        chosen_bb = np.random.choice(valid_bbs)
 
-        while True:
-            try:
-                lk_file = np.random.choice(os.listdir(database))
-                lk_file = os.path.join(database, lk_file)
-                lk = lk_type(lk_file, fg)
-                break
+        # Create a mapping from rdkit molecules to the StructUnits.
+        mol_map = {struct_unit.mol: struct_unit for struct_unit in mols}
 
-            except TypeError:
-                continue
+        # If the building block has not been chosen before, create an
+        # iterator yielding similar molecules from `mols` for it.
+        if chosen_bb not in self._similar_bb[macro_mol]:
+            self._similar_bb[macro_mol][chosen_bb] = iter(
+                           chosen_bb.similar_molecules(mol_map.keys()))
 
-        if len(og_lk.bonder_ids) != len(lk.bonder_ids):
-            raise MutationError(
-                 ('\n\nMUTATION ERROR: Replacement linker does not'
-                  ' have the same number of functional groups as the'
-                  ' original linker.\n\nOriginal linker:\n\n{}\n\n'
-                  'Replacement linker:\n\n{}\n\n').format(og_lk, lk))
+        sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
+        sim_struct_unit = mol_map[sim_mol]
 
-        return Cage([bb, lk], macro_mol.topology)
+        # If the most similar molecule in `mols` is itself, then take
+        # the next most similar one.
+        if sim_struct_unit is chosen_bb:
+            sim_mol = next(self._similar_bb[macro_mol][chosen_bb])[-1]
+            sim_struct_unit = mol_map[sim_mol]
 
-    def cage_similar_bb(self, macro_mol, database, fg=None):
-        """
-        Substitute the building block with similar one from `database`.
-
-        All of the molecules in `database` are checked for similarity
-        to the building block of `macro_mol`. The first time this
-        mutation function is run on a cage, the most similar molecule
-        in `database` is used to substitute the building block. The
-        next time this mutation function is run on the same cage, the
-        second most similar molecule from `database` is used and so on.
-
-        Parameters
-        ----------
-        macro_mol : Cage
-            The cage which is to have its building-block* substituted.
-
-        database : str
-            The full path of the database from which molecules are used
-            to substitute the building-block* of `macro_mol`.
-
-        fg : str (default = None)
-            The name of a functional group. All molecules in
-            `database` must have this functional group. This is the
-            functional group which is used to assemble the
-            macromolecules. If ``None`` it is assumed that the
-            path `database` holds the name of the functional group.
-
-        Modifies
-        --------
-        macro_mol._similar_bb_mols : generator
-            Creates this attribute on the `macro_mol` instance. This
-            allows the function to keep track of which molecule from
-            `database` should be used in the substitution.
-
-        Returns
-        -------
-        Cage
-            A new cage with the same linker as `macro_mol` but a
-            different building-block*. The building-block* is selected
-            according to the description in this docstring.
-
-        """
-
-        if not hasattr(self, '_similar_bb_mols'):
-            self._similar_bb_mols = {}
-
-        # The idea here is to create a list of molecules from
-        # `database` ordered by similarity to the building block of
-        # `macro_mol`. Each time this function is called on `macro_mol`
-        # the next molecule from this list is used to substitute the
-        # building block of the cage and create a new mutant.
-
-        _, lk = max(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
-
-        _, og_bb = min(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
-
-        if macro_mol not in self._similar_bb_mols:
-            self._similar_bb_mols[macro_mol] = iter(
-                                    og_bb.similar_molecules(database))
-
-        sim_mol = next(self._similar_bb_mols[macro_mol])[-1]
-        new_bb = StructUnit3(sim_mol, fg)
-
-        if len(og_bb.bonder_ids) != len(new_bb.bonder_ids):
-            raise MutationError(
-              ('\n\nMUTATION ERROR: Replacement building block does'
-               ' not have the same number of functional groups as '
-               'the original building block.\n\nOriginal building '
-              'block:\n\n{}\n\nReplacement building block:\n\n'
-              '{}\n\n').format(og_bb, new_bb))
-
-        return Cage([new_bb, lk], macro_mol.topology)
-
-    def cage_similar_lk(self, macro_mol, database, fg=None):
-        """
-        Substitute the linker with a similar one from `database`.
-
-        All of the molecules in `database` are checked for similarity
-        to the linker of `macro_mol`. The first time this mutation
-        function is run on a cage, the most similar molecule in
-        `database` is used to substitute the linker. The next time this
-        mutation function is run on the same cage, the second most
-        similar molecule from `database` is used and so on.
-
-        Parameters
-        ----------
-        macro_mol : Cage
-            The cage which is to have its linker substituted.
-
-        database : str
-            The full path of the database from which molecules are used
-            to substitute the linker of `macro_mol`.
-
-        fg : str (default = None)
-            The name of a functional group. All molecules in
-            `database` must have this functional group. This is the
-            functional group which is used to assemble the
-            macromolecules. If ``None`` it is assumed that the
-            path `database` holds the name of the functional group.
-
-        Modifies
-        --------
-        macro_mol._similar_lk_mols : generator
-            Creates this attribute on the `macro_mol` instance. This
-            allows the function to keep track of which molecule from
-            `database` should be used in the substitution.
-
-        Returns
-        -------
-        Cage
-            A new cage with the same building-block* as `macro_mol` but
-            a different linker. The linker is selected according to the
-            description in this docstring.
-
-        """
-
-        if not hasattr(self, '_similar_lk_mols'):
-            self._similar_lk_mols = {}
-
-        # The idea here is to create a list of molecules from
-        # `database` ordered by similarity to the linker of
-        # `macro_mol`. Each time this function is called on `macro_mol`
-        # the next molecule from this list is used to substitute the
-        # linker of the cage and create a new mutant.
-
-        _, og_lk = max(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
-        lk_type = type(og_lk)
-
-        _, bb = min(zip(macro_mol.bb_counter.values(),
-                        macro_mol.bb_counter.keys()))
-
-        if macro_mol not in self._similar_lk_mols:
-            self._similar_lk_mols[macro_mol] = iter(
-                                    og_lk.similar_molecules(database))
-
-        sim_mol = next(self._similar_lk_mols[macro_mol])[-1]
-        new_lk = lk_type(sim_mol, fg)
-
-        if len(og_lk.bonder_ids) != len(new_lk.bonder_ids):
-            raise MutationError(
-             ('\n\nMUTATION ERROR: Replacement linker does not'
-              ' have the same number of functional groups as the'
-              ' original linker.\n\nOriginal linker:\n\n{}\n\n'
-              'Replacement linker:\n\n{}\n\n').format(og_lk, new_lk))
-
-        return Cage([new_lk, bb], macro_mol.topology)
+        # Build the new MacroMolecule.
+        new_bbs = [bb for bb in macro_mol.building_blocks if
+                   bb is not chosen_bb]
+        new_bbs.append(sim_struct_unit)
+        return macro_mol.__class__(new_bbs, macro_mol.topology)
 
     def random_topology(self, macro_mol, topologies):
         """
         Changes `macro_mol` topology to a random one from `topologies`.
 
-        A new instance of the same type as `macro_mol` is created. Ie
-        if `macro_mol` was a Polymer instance then a Polymer instance
-        will be returned.
+        A new instance of the same type as `macro_mol` is created. I.e.
+        if `macro_mol` was a :class:`.Polymer` instance then a
+        :class:`.Polymer` instance will be returned.
 
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule which is to be mutated.
 
-        topologies : list of Topology instances
+        topologies : :class:`list` of :class:`.Topology`
             This lists holds the topology instances from which one is
             selected at random to form a new molecule.
 
         Returns
         -------
-        MacroMolecule
+        :class:`.MacroMolecule`
             A molecule generated by initializing a new instance
             with all the same parameters as `macro_mol` except for the
             topology.
@@ -465,6 +323,6 @@ class Mutation:
         """
 
         tops = [x for x in topologies if
-                                repr(x) != repr(macro_mol.topology)]
+                repr(x) != repr(macro_mol.topology)]
         topology = np.random.choice(tops)
         return macro_mol.__class__(macro_mol.building_blocks, topology)

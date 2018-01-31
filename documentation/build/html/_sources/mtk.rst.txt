@@ -6,16 +6,10 @@ Subpackages
 
 .. toctree::
 
+    mtk.convenience_tools
     mtk.ga
     mtk.molecular
-
-Submodules
-----------
-
-.. toctree::
-
-   mtk.convenience_tools
-   mtk.export_tools
+    mtk.optimization
 
 Module contents
 ---------------

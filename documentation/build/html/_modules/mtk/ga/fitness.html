@@ -152,134 +152,212 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module for defining fitness functions.</span>
 
-<span class="sd">A note on how fitness values are calculated.</span>
-<span class="sd">--------------------------------------------</span>
-<span class="sd">Calculation of fitness values can be a multi-step process. The goal is</span>
-<span class="sd">to place a numerical value between 0 (exclusive) and infinity in the</span>
-<span class="sd">`fitness` attribute of a MacroMolecule instance. A thing to keep in</span>
-<span class="sd">mind is that once a value is placed into the `unscaled_fitness`</span>
-<span class="sd">attribute it never changes (for a given fitness function and molecule).</span>
-<span class="sd">However, values placed into the `fitness` attribute are subject to</span>
-<span class="sd">change. This is because the outcome of a normalization procedure can</span>
-<span class="sd">depend on other members of the population, not just the one being</span>
-<span class="sd">evaulated. As a result this can be different each generation.</span>
+<span class="sd">How fitness values are calculated.</span>
+<span class="sd">----------------------------------</span>
 
-<span class="sd">There are 2 ways in which calculation of a `fitness` value can be</span>
-<span class="sd">achieved. First, using only a fitness function. Second, using a fitness</span>
-<span class="sd">function and normalization functions.</span>
+<span class="sd">The basic outline of the fitness calculation procedure for a single</span>
+<span class="sd">molecule is as follows,</span>
 
-<span class="sd">The case when only a fitness function is used is simple. All fitness</span>
-<span class="sd">functions take a MacroMoleule instance as an argument and return the</span>
-<span class="sd">value of its fitness. MMEA then automatically puts this returned value</span>
-<span class="sd">into the `unscaled_fitness` attribute. Next, MMEA copies this value</span>
-<span class="sd">into the `fitness` attribute at the start of each generation.</span>
+<span class="sd">.. code-block:: python</span>
 
-<span class="sd">So what happens if normalization functions are used?</span>
+<span class="sd">    # 1. Start with a MacroMolecule instance.</span>
+<span class="sd">    mol = Polymer([monomer1, monomer2], SomeTopology())</span>
 
-<span class="sd">The first thing to note is that multiple normalization functions can</span>
-<span class="sd">be applied sequentially. Each normalization function replaces the</span>
-<span class="sd">previous value in the `fitness` attribute. Normalization functions do</span>
-<span class="sd">not manipulate or interact with the `unscaled_fitness` attribute in any</span>
-<span class="sd">way. Before the first normalization function is applied, MMEA</span>
-<span class="sd">automatically copies the value in `unscaled_fitness` into `fitness`.</span>
+<span class="sd">    # This new instance has had no fitness functions applied to it</span>
+<span class="sd">    # and therefore its &quot;fitness&quot; and &quot;unscaled_fitness&quot; attributes</span>
+<span class="sd">    # are empty.</span>
+<span class="sd">    mol.fitness  # None</span>
+<span class="sd">    mol.unscaled_fitness  # {}</span>
 
-<span class="sd">The normalization functions then place various values into the</span>
-<span class="sd">`fitness` attribute. Only the last normalization function needs to</span>
-<span class="sd">place a value between 0 (exclusive) and infinity in the `fitness`</span>
-<span class="sd">attribute. This is useful if the fitness function calculates the values</span>
-<span class="sd">a number of fitness parameters (such as energy, molecular weight, etc.)</span>
-<span class="sd">and then the normalization functions combine them into a single number.</span>
+<span class="sd">    # 2. Apply a fitness function to the MacroMolecule.</span>
+<span class="sd">    mol.unscaled_fitness[&#39;random_fitness&#39;] = random_fitness(mol)</span>
 
-<span class="sd">Each generation, before all the normalization functions are reapplied,</span>
-<span class="sd">MMEA automatically copies the value in `unscaled_fitness` into</span>
-<span class="sd">`fitness`. Then the sequence of normalization functions is applied</span>
-<span class="sd">again.</span>
+<span class="sd">    # This adds the unscaled fitness value into the &quot;unscaled_fitness&quot;</span>
+<span class="sd">    # attribute, but does not change the &quot;fitness&quot; attribute.</span>
+<span class="sd">    mol.fitness  # None</span>
+<span class="sd">    mol.unscaled_fitness  # {&#39;random_fitness&#39;: 34}</span>
 
-<span class="sd">While fitness functions are only applied once per molecule,</span>
-<span class="sd">normalization functions are reapplied each generation.</span>
+<span class="sd">    # 3.Copy the value from &quot;unscaled_fitness&quot; into &quot;fitness&quot;.</span>
+<span class="sd">    mol.fitness = deepcopy(mol.unscaled_fitness[&#39;random_fitness&#39;])</span>
 
-<span class="sd">Extending MMEA: Adding fitness functions.</span>
-<span class="sd">-----------------------------------------</span>
+<span class="sd">    mol.fitness  # 34</span>
+<span class="sd">    mol.unscaled_fitness  # {&#39;random_fitness&#39;: 34}</span>
 
-<span class="sd">Example: random_fitness()</span>
+<span class="sd">    # 4. Apply any number of normalization functions to the fitness</span>
+<span class="sd">    #    value. Normalization functions can be skipped altogether.</span>
+
+<span class="sd">    # Normalization functions act on a population of MacroMolecules,</span>
+<span class="sd">    # i.e. they normalize the fitness values across the population. So</span>
+<span class="sd">    # first step is to put the molecule into a population.</span>
+<span class="sd">    pop = Population(mol)</span>
+
+<span class="sd">    # Apply the normalization function.</span>
+<span class="sd">    norm_func(pop)</span>
+
+<span class="sd">    mol.fitness  # 12</span>
+<span class="sd">    mol.unscaled_fitness  # {&#39;random_fitness&#39;: 34}</span>
+
+<span class="sd">    # Multiple normalization functions may be applied.</span>
+<span class="sd">    norm_func2(pop)</span>
+
+<span class="sd">    mol.fitness  # 200</span>
+<span class="sd">    mol.unscaled_fitness  # {&#39;random_fitness&#39;: 34}</span>
+
+<span class="sd">When running the GA, this process is much simplified,</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    # Start with a population of molecules, representing a GA</span>
+<span class="sd">    # generation.</span>
+<span class="sd">    pop = Population(mol1, mol2, mol3)</span>
+
+<span class="sd">    mol1.fitness  # None</span>
+<span class="sd">    mol1.unscaled_fitness  # {}</span>
+
+<span class="sd">    mol2.fitness  # None</span>
+<span class="sd">    mol2.unscaled_fitness  # {}</span>
+
+<span class="sd">    mol3.fitness  # None</span>
+<span class="sd">    mol3.unscaled_fitness  # {}</span>
+
+<span class="sd">    # Calculate the unscaled fitness values of all molecules.</span>
+<span class="sd">    pop.calculate_member_fitness()</span>
+
+<span class="sd">    mol1.fitness  # None</span>
+<span class="sd">    mol1.unscaled_fitness  # {&#39;random_fitness&#39;: 12}</span>
+
+<span class="sd">    mol2.fitness  # None</span>
+<span class="sd">    mol2.unscaled_fitness  # {&#39;random_fitness&#39;: 34}</span>
+
+<span class="sd">    mol3.fitness  # None</span>
+<span class="sd">    mol3.unscaled_fitness  # {&#39;random_fitness&#39;: 22}</span>
+
+<span class="sd">    # Apply the normalization functions.</span>
+<span class="sd">    pop.normalize_fitness_values()</span>
+
+<span class="sd">    mol1.fitness  # 3</span>
+<span class="sd">    mol1.unscaled_fitness  # {&#39;random_fitness&#39;: 12}</span>
+
+<span class="sd">    mol2.fitness  # 1</span>
+<span class="sd">    mol2.unscaled_fitness  # {&#39;random_fitness&#39;: 34}</span>
+
+<span class="sd">    mol3.fitness  # 2</span>
+<span class="sd">    mol3.unscaled_fitness  # {&#39;random_fitness&#39;: 22}</span>
+
+<span class="sd">The method :meth:`.Population.normalize_fitness_values` automatically</span>
+<span class="sd">copies the fitness value from :attr:`.MacroMolecule.unscaled_fitness`</span>
+<span class="sd">into :attr:`.MacroMolecule.fitness` before applying any normalization</span>
+<span class="sd">functions. A fitness function is only applied once per molecule,</span>
+<span class="sd">because the result depends only on the molecule. However, normalization</span>
+<span class="sd">functions are re-applied every generation. This is because for some</span>
+<span class="sd">normalization functions, the returned value for a molecule may also</span>
+<span class="sd">depend on the other molecules in the population. At each generation,</span>
+<span class="sd">a fresh copy of the value from :attr:`.MacroMolecule.unscaled_fitness`</span>
+<span class="sd">is made into :attr:`.MacroMolecule.fitness`. This means that the</span>
+<span class="sd">normalization functions always start from the unscaled fitness value.</span>
+
+<span class="sd">Extending mtk: Adding fitness functions.</span>
+<span class="sd">----------------------------------------</span>
 
 <span class="sd">To add a new fitness function simply write it as a function in this</span>
-<span class="sd">module. It will need to take the ``MacroMolecule`` instance as its</span>
-<span class="sd">first argument and this argument should be called ``macro_mol``. It</span>
-<span class="sd">should also hold a keyword argument called ``logger``. The purpose of</span>
-<span class="sd">this is to help users identify which arguments are handled</span>
-<span class="sd">automatically by MMEA and which they need to define in the input file.</span>
-<span class="sd">The convention is that if the fitness function takes an argument called</span>
-<span class="sd">``macro_mol`` or ``logger`` they do not have to specify that argument</span>
-<span class="sd">in the input file.</span>
-
-<span class="sd">When defining fitness functions the ``logger`` argument should be</span>
-<span class="sd">used for logging as a normal logger from the ``logging`` library would.</span>
-<span class="sd">When running the GA a special logger compatible with multiprocessing</span>
-<span class="sd">is automatically placed in this argument. It may be useful to define</span>
-<span class="sd">the logger argument as a keyword argument::</span>
-
-<span class="sd">    fit_func(macro_mol, somearg, logger=logging.getLogger(__name__)):</span>
-<span class="sd">        ...</span>
-
-<span class="sd">In this way, if the fitness function is used outside of the GA,</span>
-<span class="sd">the logger will be provided automatically as well.</span>
+<span class="sd">module. It will need to take the :class:`.MacroMolecule` instance as</span>
+<span class="sd">its first argument and this argument should be called `macro_mol`. The</span>
+<span class="sd">purpose of this is to help users identify which arguments are handled</span>
+<span class="sd">automatically by ``mtk`` and which they need to define in the input</span>
+<span class="sd">file. The convention is that if the fitness function takes an argument</span>
+<span class="sd">called `macro_mol`, they do not have to specify that argument in the</span>
+<span class="sd">input file.</span>
 
 <span class="sd">A fitness function must return the value which represents the fitness</span>
-<span class="sd">of the molecule received as an argument. If a fitness function is meant</span>
-<span class="sd">to be paired with a normalization funtion it can return any value or</span>
+<span class="sd">of the molecule `macro_mol`. If a fitness function is meant to be</span>
+<span class="sd">paired with a normalization function it can return any value or</span>
 <span class="sd">object it likes. Just as long as the normalization functions know how</span>
 <span class="sd">to deal with it and convert it to a number.</span>
 
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    def random_fitness(macro_mol):</span>
+<span class="sd">        return abs(np.random.normal(50, 20))</span>
+
+<span class="sd">Obviously, this is a just toy example but all the key components of</span>
+<span class="sd">fitness functions are there. More complex fitness functions can take</span>
+<span class="sd">an arbitrary number arguments, and will likely use molecular properties</span>
+<span class="sd">to calculate a fitness value. Here is a fitness function which rewards</span>
+<span class="sd">molecules for having a desired size.</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    def size(macro_mol, desired_size):</span>
+<span class="sd">        return abs(macro_mol.max_diameter() - desired_size)</span>
+
 <span class="sd">A fitness function may be complex and may not fit neatly into a single</span>
-<span class="sd">function. For example, the ``cage_target()`` fitness function needs to</span>
-<span class="sd">call ``_generate_complexes()`` in order to sample various conformations</span>
+<span class="sd">function. For example, the :func:`cage_target` needs to call</span>
+<span class="sd">:func:`_generate_complexes` in order to sample various conformations</span>
 <span class="sd">before outputting a fitness value. This is fine. Define helper</span>
-<span class="sd">functions such as ``_generate_complexes()`` within this module but make</span>
-<span class="sd">sure they are private. This means that names of helper functions begin</span>
-<span class="sd">with a leading underscore.</span>
+<span class="sd">functions such as :func:`_generate_complexes` within this module but</span>
+<span class="sd">make sure they are private. This means that names of helper functions</span>
+<span class="sd">begin with a leading underscore.</span>
+
+<span class="sd">.. _plotting-note:</span>
 
 <span class="sd">A note on plotting.</span>
 <span class="sd">-------------------</span>
-<span class="sd">As mentioned before some fitness functions may be complex and as a</span>
+
+<span class="sd">As mentioned before, some fitness functions may be complex and as a</span>
 <span class="sd">result manipulate all sorts of data. Typically, in order to measure the</span>
 <span class="sd">progress of a GA, the fitness values in the population are tracked</span>
 <span class="sd">across generations. However, let&#39;s say that some hypothetical fitness</span>
 <span class="sd">function also calculates the energies of molecules. It may be quite</span>
-<span class="sd">interesting plot the evolution of energies across generations too. If</span>
-<span class="sd">this is the case the fitness function may assign to the</span>
-<span class="sd">`progress_params` attribute of `macro_mol`:</span>
+<span class="sd">interesting plot the evolution of energies across generations too, even</span>
+<span class="sd">if the energy is not directly reflect in the final fitness value. If</span>
+<span class="sd">this is the case, the fitness function may assign to the</span>
+<span class="sd">:attr:`.MacroMolecule.progress_params` attribute of `macro_mol`,</span>
 
-<span class="sd">    macro_mol.progress_params[&#39;example_func&#39;] = [mol_energy]</span>
+<span class="sd">.. code-block:: python</span>
 
-<span class="sd">Now a plot showing the change in `mol_energy` across generations will</span>
-<span class="sd">be made too, along with the plot showing the changes in fitness. In</span>
-<span class="sd">this case the name of the fitness function was ``example_func``.</span>
+<span class="sd">    def example_func(macro_mol):</span>
+<span class="sd">        mol_energy = macro_mol.energy.some_energy_func()</span>
+<span class="sd">        macro_mol.progress_params[&#39;example_func&#39;] = [mol_energy]</span>
+<span class="sd">        ...</span>
 
-<span class="sd">What if two things are needed to be kept track of?</span>
+<span class="sd">Now a plot showing the change in ``mol_energy`` across generations will</span>
+<span class="sd">be made too, along with the plot showing the changes in fitness.</span>
 
-<span class="sd">    macro_mol.progress_params[&#39;example_func&#39;] = [mol_energy, mol_radius]</span>
+<span class="sd">What if two things are needed to be kept track of? Simple,</span>
 
-<span class="sd">Great, now a progress plot for each of the variables will be made.</span>
+<span class="sd">.. code-block:: python</span>
 
-<span class="sd">How will the y axes be labelled in each plot?</span>
-<span class="sd">The decorator `_param_labels()` exists for this.</span>
+<span class="sd">    def example_func(macro_mol):</span>
+<span class="sd">        mol_energy = macro_mol.energy.some_energy_func()</span>
+<span class="sd">        mol_radius = macro_mol.max_diamater() / 2</span>
+<span class="sd">        macro_mol.progress_params[&#39;example_func&#39;] = [mol_energy,</span>
+<span class="sd">                                                     mol_radius]</span>
+<span class="sd">        ...</span>
+
+<span class="sd">Great, now a separate progress plot ``mol_energy`` and ``mol_radius``</span>
+<span class="sd">will be made.</span>
+
+<span class="sd">How will the y-axes be labelled in each plot? The decorator</span>
+<span class="sd">:func:`_param_labels` exists for this.</span>
 
 <span class="sd">Let&#39;s create a basic outline of a some fitness function:</span>
 
+<span class="sd">.. code-block:: python</span>
+
 <span class="sd">    @_param_labels(&#39;Molecule Energy / J mol-1&#39;, &#39;Mol Radius / m-9&#39;)</span>
-<span class="sd">    def this_is_the_fitness_function(macro_mol, some_param):</span>
+<span class="sd">    def some_fitness_fn(macro_mol, some_param):</span>
 <span class="sd">        ...</span>
 <span class="sd">        calculate_stuff()</span>
 <span class="sd">        ...</span>
-<span class="sd">        macro_mol.progress_params[&#39;this_is_the_fitness_function&#39;] = [</span>
-<span class="sd">                                                mol_energy, mol_radius]</span>
+<span class="sd">        macro_mol.progress_params[&#39;some_fitness_fn&#39;] = [mol_energy,</span>
+<span class="sd">                                                        mol_radius]</span>
 <span class="sd">        ...</span>
 <span class="sd">        return fitness_value</span>
 
 <span class="sd">If this function is used in the GA, a progress plot will be made for</span>
-<span class="sd">each of the `progress_params` and they will have their y-axes labelled</span>
-<span class="sd">&#39;Molecule Energy / J mol-1&#39; and &#39;Molecule Radius / m-9&#39;, respectively.</span>
+<span class="sd">each variable placed in :attr:`.MacroMolecule.progress_params` and</span>
+<span class="sd">they will have their y-axes labelled ``&#39;Molecule Energy / J mol-1&#39;``</span>
+<span class="sd">and ``&#39;Molecule Radius / m-9&#39;``, respectively.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -296,66 +374,64 @@
 <span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
-<span class="kn">from</span> <span class="nn">traceback</span> <span class="k">import</span> <span class="n">format_exc</span>
-<span class="kn">import</span> <span class="nn">psutil</span>
 
 <span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">matrix_centroid</span><span class="p">,</span>
                                  <span class="n">FunctionData</span><span class="p">,</span>
                                  <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
-                                 <span class="n">StopLogging</span><span class="p">,</span> <span class="n">mplogger</span><span class="p">,</span> <span class="n">FakeLogger</span><span class="p">)</span>
+                                 <span class="n">daemon_logger</span><span class="p">,</span>
+                                 <span class="n">logged_call</span><span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="p">(</span><span class="n">Cage</span><span class="p">,</span> <span class="n">StructUnit</span><span class="p">,</span>
-                         <span class="n">Energy</span><span class="p">,</span> <span class="n">optimization</span><span class="p">,</span> <span class="n">func_key</span><span class="p">)</span>
-
+<span class="kn">from</span> <span class="nn">..molecular</span> <span class="k">import</span> <span class="n">Cage</span><span class="p">,</span> <span class="n">StructUnit</span><span class="p">,</span> <span class="n">Energy</span><span class="p">,</span> <span class="n">func_key</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">optimization</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="_calc_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._calc_fitness">[docs]</a><span class="k">def</span> <span class="nf">_calc_fitness</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+<div class="viewcode-block" id="_calc_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._calc_fitness">[docs]</a><span class="k">def</span> <span class="nf">_calc_fitness</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">processes</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness values of all members of a population.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    func_data : FunctionData</span>
-<span class="sd">        A ``FunctionData`` instance representing the chosen fitness</span>
-<span class="sd">        function and any additional parameters it may require.</span>
+<span class="sd">    func_data : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` instance representing the chosen</span>
+<span class="sd">        fitness function and any additional parameters it may require.</span>
 
-<span class="sd">    population : Population</span>
+<span class="sd">    population : :class:`.Population`</span>
 <span class="sd">        The population whose members must have their fitness</span>
 <span class="sd">        calculated.</span>
 
+<span class="sd">    processes : :class:`int`</span>
+<span class="sd">        The number of parallel processes to create.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># In order for logging to work with multiprocessing properly, each</span>
-    <span class="c1"># subprocess will log into the que. A thread in the main process</span>
-    <span class="c1"># will then log.</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
-    <span class="n">logq</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
-    <span class="n">exit_</span> <span class="o">=</span> <span class="n">StopLogging</span><span class="p">()</span>
-    <span class="n">log_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">mplogger</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">logq</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
-    <span class="n">log_thread</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+    <span class="n">logq</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="n">log_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">daemon_logger</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">logq</span><span class="p">,</span> <span class="p">))</span>
     <span class="n">log_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="c1"># Get the fitness function object.</span>
     <span class="n">func</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="c1"># Make sure it won&#39;t raise errors while using multiprocessing.</span>
-    <span class="n">p_func</span> <span class="o">=</span> <span class="n">_FitnessFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">),</span> <span class="n">logq</span><span class="p">)</span>
+    <span class="n">p_func</span> <span class="o">=</span> <span class="n">_FitnessFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
 
     <span class="c1"># Apply the function to every member of the population, in</span>
     <span class="c1"># parallel.</span>
-    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
-        <span class="n">evaluated</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">p_func</span><span class="p">,</span> <span class="n">population</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">evaluated</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">logged_call</span><span class="p">,</span>
+                                 <span class="p">((</span><span class="n">logq</span><span class="p">,</span> <span class="n">p_func</span><span class="p">,</span> <span class="n">mem</span><span class="p">)</span> <span class="k">for</span>
+                                  <span class="n">mem</span> <span class="ow">in</span> <span class="n">population</span><span class="p">))</span>
 
     <span class="c1"># Make sure the cache is updated with the evaluated versions.</span>
     <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">evaluated</span><span class="p">:</span>
         <span class="n">member</span><span class="o">.</span><span class="n">update_cache</span><span class="p">()</span>
 
-    <span class="n">logq</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">exit_</span><span class="p">,</span> <span class="n">exit_</span><span class="p">))</span>
+    <span class="n">logq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">log_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 
 
@@ -365,17 +441,17 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    func_data : FunctionData</span>
-<span class="sd">        A ``FunctionData`` instance representing the chosen fitness</span>
-<span class="sd">        function and any additional parameters it may require.</span>
+<span class="sd">    func_data : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` instance representing the chosen</span>
+<span class="sd">        fitness function and any additional parameters it may require.</span>
 
-<span class="sd">    population : Population</span>
+<span class="sd">    population : :class:`.Population`</span>
 <span class="sd">        The population whose members must have their fitness</span>
 <span class="sd">        calculated.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None : NoneType</span>
+<span class="sd">    None : :class:`NoneType`</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -389,24 +465,36 @@
 
 <div class="viewcode-block" id="_param_labels"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._param_labels">[docs]</a><span class="k">def</span> <span class="nf">_param_labels</span><span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Adds the `param_labels` attribute to a fitness function.</span>
+<span class="sd">    Adds the :attr:`param_labels` attribute to a fitness function.</span>
 
-<span class="sd">    The point of this decorator is described in the module level</span>
-<span class="sd">    docstring.</span>
+<span class="sd">    The point of this decorator is described in :ref:`plotting-note`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    labels : tuple</span>
-<span class="sd">        List of strings about the fitness labels used for plotting</span>
-<span class="sd">        EPPs. The order of the strings should represent the order of</span>
-<span class="sd">        the fitness ``vars`` in the fitness funciton. In practice it</span>
-<span class="sd">        should correspond to the order of the ``coeffs`` or</span>
-<span class="sd">        ``exponents`` parameters given to the fitness function.</span>
+<span class="sd">    *labels : :class:`str`</span>
+<span class="sd">        This function takes an arbitrary number of strings. The strings</span>
+<span class="sd">        are the y-axis labels for each graph made per variable in</span>
+<span class="sd">        :attr:`.MacroMolecule.progress_params`. The order of strings</span>
+<span class="sd">        must correspond to the order of variables placed into</span>
+<span class="sd">        :attr:`.MacroMolecule.progress_params`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    func</span>
-<span class="sd">        Decorated function.</span>
+<span class="sd">    :class:`function`</span>
+<span class="sd">        The decorated function, with the attribute :attr:`param_labels`</span>
+<span class="sd">        added. :attr:`param_labels` holds the strings provided in</span>
+<span class="sd">        `*labels`.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        @_param_labels(&#39;ONE&#39;, &#39;TWO&#39;, &#39;THREE&#39;)</span>
+<span class="sd">        def some_func(...):</span>
+<span class="sd">            return 1</span>
+
+<span class="sd">        some_func.param_labels  # [&#39;ONE&#39;, &#39;TWO&#39;, &#39;THREE&#39;]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -422,66 +510,81 @@
 <span class="sd">    A decorator for fitness functions.</span>
 
 <span class="sd">    This decorator is applied to all fitness functions automatically in</span>
-<span class="sd">    _calc_fitness(). It should not be applied explicitly when defining</span>
-<span class="sd">    the functions.</span>
+<span class="sd">    :func:`_calc_fitness`. It should not be applied explicitly when</span>
+<span class="sd">    defining the functions.</span>
 
 <span class="sd">    The decorator prevents fitness functions from raising if</span>
-<span class="sd">    they fail (necessary for multiprocessing), prevents them from</span>
-<span class="sd">    being run twice on the same molecule and stores the value returned</span>
-<span class="sd">    by them in the `unscaled_fitness` dictionary.</span>
+<span class="sd">    they fail (necessary for ``multiprocessing`` compatibility),</span>
+<span class="sd">    prevents them from being run twice on the same molecule and stores</span>
+<span class="sd">    the value returned by them in</span>
+<span class="sd">    :attr:`.MacroMolecule.unscaled_fitness`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="_FitnessFunc.__init__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">logq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="o">=</span> <span class="n">logq</span></div>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a :class:`_FitnessFunc` instance.</span>
 
-<div class="viewcode-block" id="_FitnessFunc.__call__"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._FitnessFunc.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">FakeLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logq</span><span class="p">)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        func : :class:`function`</span>
+<span class="sd">            The fitness function to be decorated.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decorates and calls the fitness function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">            The molecule to have its fitness calculated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.MacroMolecule`</span>
+<span class="sd">            `macro_mol` with its fitness calculated.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">func_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
 
         <span class="c1"># If the fitness function has already been applied to this</span>
         <span class="c1"># molecule, return.</span>
         <span class="k">if</span> <span class="n">func_name</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">unscaled_fitness</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Skipping </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Skipping </span><span class="si">{macro_mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">macro_mol</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calculating fitness of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                                       <span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Calculating fitness of </span><span class="si">{macro_mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Fitness function &quot;</span><span class="si">{}</span><span class="s1">()&quot; &#39;</span>
-                        <span class="s1">&#39;failed on molecule &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">func_name</span><span class="p">,</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">((</span><span class="n">errormsg</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">format_exc</span><span class="p">())</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;Fitness function &quot;</span><span class="si">{func_name}</span><span class="s1">()&quot; &#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;failed on molecule &quot;</span><span class="si">{macro_mol.name}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">macro_mol</span><span class="o">.</span><span class="n">unscaled_fitness</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-            <span class="k">return</span> <span class="n">macro_mol</span></div></div>
+            <span class="k">return</span> <span class="n">macro_mol</span></div>
 
 
-<div class="viewcode-block" id="random_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness">[docs]</a><span class="k">def</span> <span class="nf">random_fitness</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="random_fitness"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness">[docs]</a><span class="k">def</span> <span class="nf">random_fitness</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a random fitness value.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule to which a fitness value is to be assigned.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
+<span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">        The molecule for which a fitness value is to be calculated.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    float</span>
+<span class="sd">    :class:`float`</span>
 <span class="sd">        A random postive number.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -490,27 +593,24 @@
 
 
 <div class="viewcode-block" id="random_fitness_vector"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.random_fitness_vector">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;var1&#39;</span><span class="p">,</span> <span class="s1">&#39;var2&#39;</span><span class="p">,</span> <span class="s1">&#39;var3&#39;</span><span class="p">,</span> <span class="s1">&#39;var4&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">random_fitness_vector</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">random_fitness_vector</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a size 4 array of random numbers.</span>
+<span class="sd">    Returns a 4 element array of random numbers.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function places the array into</span>
+<span class="sd">    :attr:`~.MacroMolecule.progress_params` of `macro_mol`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The macromolecule which is to have its fitness calculated.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.progress_params : dict</span>
-<span class="sd">        The random numbers are also placed into this attribute.</span>
+<span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">        The molecule for which a fitness value is to be calculated.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
-<span class="sd">        An array holding random numbers.</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
+<span class="sd">        An array holding the 4 random numbers.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -524,31 +624,29 @@
     <span class="k">return</span> <span class="n">f</span></div>
 
 
-<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Doens&#39;t calculate a fitness value, raises an error instead.</span>
 
-<span class="sd">    This function is used to test that when fitness functions raise</span>
-<span class="sd">    errors during multiprocessing, they are handled correctly.</span>
+<span class="sd">    This function is used for tests to ensure that when fitness</span>
+<span class="sd">    functions raise errors, they are handeled correctly.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ---------</span>
-<span class="sd">    param1 : object</span>
+<span class="sd">    param1 : :class:`object`</span>
 <span class="sd">        Dummy parameter, does nothing.</span>
 
-<span class="sd">    param2 : object (default = 2)</span>
+<span class="sd">    param2 : :class:`object`, optional</span>
 <span class="sd">        Dummy keyword parameter, does nothing.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    This function does not return. It only raises.</span>
+<span class="sd">    None : :class:`NoneType`</span>
+<span class="sd">        This function does not return. It only raises.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    Exception</span>
+<span class="sd">    :class:`Exception`</span>
 <span class="sd">        An exception is always raised.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -557,31 +655,29 @@
 
 
 <div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.partial_raiser">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;var1&#39;</span><span class="p">,</span> <span class="s1">&#39;var2&#39;</span><span class="p">,</span> <span class="s1">&#39;var3&#39;</span><span class="p">,</span> <span class="s1">&#39;var4&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates fitness or raises at random.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
-<span class="sd">        The molecule having its fitness calculated, maybe.</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
+<span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
+<span class="sd">        The molecule having its fitness calculated.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
-<span class="sd">        The value of applying random_fitness_vector() to `macro_mol`.</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
+<span class="sd">        The result of applying :func:`random_fitness_vector` to</span>
+<span class="sd">        `macro_mol`.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    Exception</span>
+<span class="sd">    :class:`Exception`</span>
 <span class="sd">        Raised at random.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Partial raiser.&#39;</span><span class="p">)</span>
 
     <span class="n">r</span> <span class="o">=</span> <span class="n">random_fitness_vector</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">)</span>
@@ -592,68 +688,62 @@
 
 
 <span class="c1"># Provides labels for the progress plotter.</span>
-<div class="viewcode-block" id="cage"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Cavity Difference &#39;</span><span class="p">,</span> <span class="s1">&#39;Window Difference &#39;</span><span class="p">,</span>
-               <span class="s1">&#39;Asymmetry &#39;</span><span class="p">,</span> <span class="s1">&#39;Energy per Bond &#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cage</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">pseudoformation_params</span><span class="o">=</span><span class="p">{</span>
-                     <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;mmff&#39;</span><span class="p">)},</span>
-         <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="cage"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Cavity Difference&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Window Difference&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Energy per Bond&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Precursors Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Dihedral Strain&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cage</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
+         <span class="n">pseudoformation_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span>
+                                                      <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;mmff&#39;</span><span class="p">)},</span>
+         <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+         <span class="n">target_dihedral</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the fitness vector of a cage.</span>
 
 <span class="sd">    The fitness vector consists of the following properties in the</span>
 <span class="sd">    listed order</span>
 
-<span class="sd">        1) `cavity` - the diameter of the cage pore.</span>
-<span class="sd">        2) `window` - the diameter of the largest cage window.</span>
-<span class="sd">        3) `asymmetry` - the sum of the size differences of all the</span>
+<span class="sd">        1. `cavity` - the diameter of the cage pore.</span>
+<span class="sd">        2. `window` - the diameter of the largest cage window.</span>
+<span class="sd">        3. `asymmetry` - the sum of the size differences of all the</span>
 <span class="sd">           windows in `macro_mol`.</span>
-<span class="sd">        4) `eng_per_bond` - The formation energy of `macro_mol` per</span>
+<span class="sd">        4. `eng_per_bond` - The formation energy of `macro_mol` per</span>
 <span class="sd">           bond made.</span>
-<span class="sd">        5) `strain` - The mean rmsd between the free building blocks</span>
-<span class="sd">           and those in the macromolecule.</span>
+<span class="sd">        5. `prec_strain` - The mean rmsd between the free building</span>
+<span class="sd">           block and those in the macromolecule.</span>
+<span class="sd">        6. `dihedral_strain` - The % relative difference between the</span>
+<span class="sd">           average dihedral angle within the molecule and a target</span>
+<span class="sd">           value. The user must provide the SMARTS for the dihedral and</span>
+<span class="sd">           the target value.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : Cage</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
 <span class="sd">        The cage whose fitness is to be calculated.</span>
 
-<span class="sd">    pseudoformation_params : dict (default =</span>
-<span class="sd">          { &#39;func&#39; : FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;) })</span>
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
 
-<span class="sd">        This fitness function calculates the formation energy using the</span>
-<span class="sd">        ``Energy.pseudoformation()`` method. This parameter defines the</span>
+<span class="sd">    target_dihedral : :class:`float`, optional</span>
+<span class="sd">        The target value for the dihedral angle.</span>
+
+<span class="sd">    pseudoformation_params : dict, optional</span>
+<span class="sd">        This fitness function calculates the formation energy using</span>
+<span class="sd">        :meth:`.Energy.pseudoformation`. This parameter defines the</span>
 <span class="sd">        arguments passed to this method via a dictionary. The name of</span>
 <span class="sd">        the argument is the key and the value of the argument is the</span>
 <span class="sd">        value.</span>
 
-<span class="sd">        Default initialized arguments of Energy.pseudoformation() only</span>
-<span class="sd">        need to be specified in `energy_params` if the user wishes to</span>
-<span class="sd">        change the default value.</span>
-
-<span class="sd">        To see what arguments the `Energy.pseudoformation()` method</span>
-<span class="sd">        requires, try using the  `-h` option:</span>
-
-<span class="sd">            python -m mmea -h energy</span>
-
-<span class="sd">    logger : FakeLogger or logging.Logger, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
-
-<span class="sd">    Modifies</span>
-<span class="sd">    --------</span>
-<span class="sd">    macro_mol.progress_params : dict</span>
-<span class="sd">        Places the calculated parameters in the dict. The order</span>
-<span class="sd">        corresponds to the arguments in the ``_param_labels()``</span>
-<span class="sd">        decorator applied to this function.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.array</span>
-<span class="sd">        The numpy array holds the fitness vector described in this</span>
-<span class="sd">        docstring.</span>
+<span class="sd">    :class:`numpy.ndarray`</span>
+<span class="sd">        The numpy array holding the fitness vector.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
+<span class="sd">    :class:`ValueError`</span>
 <span class="sd">        If the calculation of a fitness parameter fails.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -663,7 +753,7 @@
     <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 
     <span class="n">cavity</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
-    <span class="n">window</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">windows</span><span class="p">)</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">windows</span><span class="p">())</span>
     <span class="n">asymmetry</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">window_difference</span><span class="p">()</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Calculating cage energy.&#39;</span><span class="p">)</span>
@@ -671,22 +761,45 @@
                                            <span class="o">**</span><span class="n">pseudoformation_params</span><span class="p">)</span>
     <span class="n">e_per_bond</span> <span class="o">/=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonds_made</span>
 
-    <span class="n">strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+    <span class="n">prec_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
 
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;cage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cavity</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span>
-                                         <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">strain</span><span class="p">]</span>
+    <span class="n">dihedral_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">dihedral_strain</span><span class="p">(</span><span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                                                <span class="n">target_dihedral</span><span class="p">)</span>
+
+    <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;cage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cavity</span><span class="p">,</span>
+                                         <span class="n">window</span><span class="p">,</span>
+                                         <span class="n">asymmetry</span><span class="p">,</span>
+                                         <span class="n">e_per_bond</span><span class="p">,</span>
+                                         <span class="n">prec_strain</span><span class="p">,</span>
+                                         <span class="n">dihedral_strain</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;cage&#39;</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;At least one&#39;</span>
                          <span class="s1">&#39; fitness parameter not calculated.&#39;</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cavity</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">e_per_bond</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cavity</span><span class="p">,</span>
+                     <span class="n">window</span><span class="p">,</span>
+                     <span class="n">asymmetry</span><span class="p">,</span>
+                     <span class="n">e_per_bond</span><span class="p">,</span>
+                     <span class="n">prec_strain</span><span class="p">,</span>
+                     <span class="n">dihedral_strain</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_target">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cage_target</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
-                <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_target">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Precursors Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Dihedral Strain&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cage_target</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
+                <span class="n">target_mol_file</span><span class="p">,</span>
+                <span class="n">efunc</span><span class="p">,</span>
+                <span class="n">ofunc</span><span class="p">,</span>
+                <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">target_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+                <span class="n">rotations</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the fitness vector of a cage / target complex.</span>
 
@@ -702,6 +815,7 @@
 <span class="sd">        5. cavity of cage by itself</span>
 <span class="sd">        6. asymmetry of cage by itself</span>
 <span class="sd">        7. strain of cage by itself</span>
+<span class="sd">        8. strain in select dihedral angles of the cage by itself</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -725,19 +839,21 @@
 <span class="sd">        A :class:`.FunctionData` object representing the optimization</span>
 <span class="sd">        function to be run on the generated complexes.</span>
 
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
+
+<span class="sd">    target_value : :class:`float`, optional</span>
+<span class="sd">        A number representing the target value for the dihedral angle.</span>
+
 <span class="sd">    rotations : :class:`int`, optional</span>
 <span class="sd">        The number of times the target should be randomly rotated</span>
 <span class="sd">        within the cage cavity in order to find the most stable</span>
 <span class="sd">        conformation.</span>
 
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :class:`numpy.ndarray`</span>
-<span class="sd">        The numpy array holds the fitness vector described in this</span>
-<span class="sd">        docstring.</span>
+<span class="sd">        The numpy array holding the fitness vector.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -746,24 +862,40 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">_cage_target</span><span class="p">(</span><span class="s1">&#39;cage_target&#39;</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span>
-                        <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">_cage_target</span><span class="p">(</span><span class="s1">&#39;cage_target&#39;</span><span class="p">,</span>
+                        <span class="n">macro_mol</span><span class="p">,</span>
+                        <span class="n">target_mol_file</span><span class="p">,</span>
+                        <span class="n">efunc</span><span class="p">,</span>
+                        <span class="n">ofunc</span><span class="p">,</span>
                         <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;_generate_complexes&#39;</span><span class="p">,</span>
                                      <span class="n">number</span><span class="o">=</span><span class="n">rotations</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
-                        <span class="n">logger</span><span class="p">)</span></div>
+                        <span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                        <span class="n">target_value</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cage_c60"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_c60">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span> <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span> <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span> <span class="s1">&#39;Strain&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">cage_c60</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
-             <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">n5fold</span><span class="p">,</span> <span class="n">n2fold</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="cage_c60"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness.cage_c60">[docs]</a><span class="nd">@_param_labels</span><span class="p">(</span><span class="s1">&#39;Binding Energy&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Cavity&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Complex Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Cavity&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Asymmetry&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Precursors Strain&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Dihedral Strain&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cage_c60</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
+             <span class="n">target_mol_file</span><span class="p">,</span>
+             <span class="n">efunc</span><span class="p">,</span>
+             <span class="n">ofunc</span><span class="p">,</span>
+             <span class="n">n5fold</span><span class="p">,</span>
+             <span class="n">n2fold</span><span class="p">,</span>
+             <span class="n">dihedral_SMARTS</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+             <span class="n">target_dihedral</span><span class="o">=</span><span class="mi">180</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the fitness vector of a cage / C60 complex.</span>
 
 <span class="sd">    The difference between this function and :func:`cage_target` is</span>
 <span class="sd">    that the rotations are specifically aimed at sampling C60 entirely</span>
-<span class="sd">    and systematically. Rather than the random sampling of the other</span>
-<span class="sd">    function.</span>
+<span class="sd">    and systematically. Rather than the random sampling used by the</span>
+<span class="sd">    other function.</span>
 
 <span class="sd">    The function returns a fitness vector consisting of:</span>
 
@@ -774,11 +906,7 @@
 <span class="sd">        5. cavity of cage by itself</span>
 <span class="sd">        6. asymmetry of cage by itself</span>
 <span class="sd">        7. strain of cage by itself</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
-<span class="sd">    fitness parameters into :attr:`~.MacroMolecule.progress_params`.</span>
+<span class="sd">        8. strain in select dihedral angles of the cage by itself</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -804,14 +932,16 @@
 <span class="sd">        The number of rotations along the 2 fold axis of symmetry per</span>
 <span class="sd">        rotation along the 5-fold axis.</span>
 
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`, optional</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
+
+<span class="sd">    target_dihedral : :class:`float`, optional</span>
+<span class="sd">        The target value for the dihedral angle.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :class:`numpy.ndarray`</span>
-<span class="sd">        The numpy array holds the fitness vector described in this</span>
-<span class="sd">        docstring.</span>
+<span class="sd">        The numpy array holding the fitness vector.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -819,20 +949,30 @@
 <span class="sd">        If the calculation of a fitness parameter fails.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_cage_target</span><span class="p">(</span><span class="s1">&#39;cage_c60&#39;</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span>
-                        <span class="n">target_mol_file</span><span class="p">,</span> <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">_cage_target</span><span class="p">(</span><span class="s1">&#39;cage_c60&#39;</span><span class="p">,</span>
+                        <span class="n">macro_mol</span><span class="p">,</span>
+                        <span class="n">target_mol_file</span><span class="p">,</span>
+                        <span class="n">efunc</span><span class="p">,</span>
+                        <span class="n">ofunc</span><span class="p">,</span>
                         <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;_c60_rotations&#39;</span><span class="p">,</span>
                                      <span class="n">n5fold</span><span class="o">=</span><span class="n">n5fold</span><span class="p">,</span>
                                      <span class="n">n2fold</span><span class="o">=</span><span class="n">n2fold</span><span class="p">),</span>
-                        <span class="n">logger</span><span class="p">)</span></div>
+                        <span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                        <span class="n">target_dihedral</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="_cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._cage_target">[docs]</a><span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">target_mol_file</span><span class="p">,</span>
-                 <span class="n">efunc</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">,</span> <span class="n">rotation_func</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+<div class="viewcode-block" id="_cage_target"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._cage_target">[docs]</a><span class="k">def</span> <span class="nf">_cage_target</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span>
+                 <span class="n">macro_mol</span><span class="p">,</span>
+                 <span class="n">target_mol_file</span><span class="p">,</span>
+                 <span class="n">efunc</span><span class="p">,</span>
+                 <span class="n">ofunc</span><span class="p">,</span>
+                 <span class="n">rotation_func</span><span class="p">,</span>
+                 <span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                 <span class="n">target_dihedral</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A general fitness function for calculating fitness of complexes.</span>
 
-<span class="sd">    This function should be inherited by other fitness functions which</span>
+<span class="sd">    This function should be wrapped by other fitness functions which</span>
 <span class="sd">    define their own rotation function. For example :func:`cage_c60`</span>
 <span class="sd">    and :func:`cage_target`.</span>
 
@@ -845,11 +985,7 @@
 <span class="sd">        5. cavity of cage by itself</span>
 <span class="sd">        6. asymmetry of cage by itself</span>
 <span class="sd">        7. strain of cage by itself</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This function modifies `macro_mol`. It places the calculated</span>
-<span class="sd">    fitness parameters into :attr:`~.MacroMolecule.progress_params`.</span>
+<span class="sd">        8. strain in select dihedral angles of the cage by itself</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -876,14 +1012,16 @@
 <span class="sd">        A :class:`.FunctionData` object representing the rotation</span>
 <span class="sd">        function to be used.</span>
 
-<span class="sd">    logger : :class:`.FakeLogger` or :class:`logging.Logger`</span>
-<span class="sd">        Used for logging. Not used by this function.</span>
+<span class="sd">    dihedral_SMARTS : :class:`str`, optional</span>
+<span class="sd">        The SMARTS code for the dihedral of interest.</span>
+
+<span class="sd">    target_dihedral : :class:`float`, optional</span>
+<span class="sd">        The target value for the dihedral angle.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :class:`numpy.ndarray`</span>
-<span class="sd">        The numpy array holds the fitness vector described in this</span>
-<span class="sd">        docstring.</span>
+<span class="sd">        The numpy array holding the fitness vector.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1000,14 +1138,17 @@
     <span class="c1"># Calculate fitness parameters of cage by itself.</span>
     <span class="n">cavity</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
     <span class="n">asymmetry</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">window_difference</span><span class="p">()</span>
-    <span class="n">strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+    <span class="n">prec_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+    <span class="n">dihedral_strain</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">dihedral_strain</span><span class="p">(</span><span class="n">dihedral_SMARTS</span><span class="p">,</span>
+                                                <span class="n">target_dihedral</span><span class="p">)</span>
     <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">binding_energy</span><span class="p">,</span>
                                             <span class="n">cmplx_cavity</span><span class="p">,</span>
                                             <span class="n">cmplx_asymmetry</span><span class="p">,</span>
                                             <span class="n">cmplx_strain</span><span class="p">,</span>
                                             <span class="n">cavity</span><span class="p">,</span>
                                             <span class="n">asymmetry</span><span class="p">,</span>
-                                            <span class="n">strain</span><span class="p">]</span>
+                                            <span class="n">prec_strain</span><span class="p">,</span>
+                                            <span class="n">dihedral_strain</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;At least one&#39;</span>
@@ -1015,16 +1156,21 @@
                          <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="n">func_name</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">binding_energy</span><span class="p">,</span>
-                     <span class="n">cmplx_cavity</span><span class="p">,</span> <span class="n">cmplx_asymmetry</span><span class="p">,</span> <span class="n">cmplx_strain</span><span class="p">,</span>
-                     <span class="n">cavity</span><span class="p">,</span> <span class="n">asymmetry</span><span class="p">,</span> <span class="n">strain</span><span class="p">])</span></div>
+                     <span class="n">cmplx_cavity</span><span class="p">,</span>
+                     <span class="n">cmplx_asymmetry</span><span class="p">,</span>
+                     <span class="n">cmplx_strain</span><span class="p">,</span>
+                     <span class="n">cavity</span><span class="p">,</span>
+                     <span class="n">asymmetry</span><span class="p">,</span>
+                     <span class="n">prec_strain</span><span class="p">,</span>
+                     <span class="n">dihedral_strain</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="_make_cage_target_folder"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._make_cage_target_folder">[docs]</a><span class="k">def</span> <span class="nf">_make_cage_target_folder</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a folder to store molecules made by _cage_target().</span>
+<span class="sd">    Creates a folder to store molecules made by :func:`_cage_target`.</span>
 
-<span class="sd">    The function creates a folder called `cage_target`.</span>
-<span class="sd">    Inside will be any complexes formed by the function _cage_target().</span>
+<span class="sd">    The function creates a folder called ``cage_target``.</span>
+<span class="sd">    Inside will be any complexes formed by the :func:`_cage_target`.</span>
 <span class="sd">    The folder will be placed in the current working directory, or</span>
 <span class="sd">    if the GA is running, 1 above the current working dirctory. This</span>
 <span class="sd">    prevents the generated molecules from being cleaned up by the GA</span>
@@ -1032,7 +1178,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    str</span>
+<span class="sd">    :class:`str`</span>
 <span class="sd">        The path of the ``cage_target`` folder.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1045,7 +1191,7 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">pass</span>
 
     <span class="k">return</span> <span class="n">dir_path</span></div>
@@ -1053,26 +1199,26 @@
 
 <div class="viewcode-block" id="_generate_complexes"><a class="viewcode-back" href="../../../mtk.ga.fitness.html#mtk.ga.fitness._generate_complexes">[docs]</a><span class="k">def</span> <span class="nf">_generate_complexes</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Yields rdkit instances of cage / target complexes.</span>
+<span class="sd">    Yields ``rdkit`` molecules of cage / target complexes.</span>
 
 <span class="sd">    If multiple complexes are returned, they will be different via a</span>
 <span class="sd">    random rotation accross the x, y and z axes.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : Cage</span>
+<span class="sd">    macro_mol : :class:`.Cage`</span>
 <span class="sd">        The cage used to form the complex.</span>
 
-<span class="sd">    target : StructUnit</span>
+<span class="sd">    target : :class:`.StructUnit`</span>
 <span class="sd">        The target used to form the complex.</span>
 
-<span class="sd">    number : int (default = 1)</span>
+<span class="sd">    number : :class:`int`, optional</span>
 <span class="sd">        The number of complexes to be returned.</span>
 
 <span class="sd">    Yields</span>
 <span class="sd">    ------</span>
-<span class="sd">    rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        An rdkit instance holding the cage / target complex.</span>
+<span class="sd">    :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        An ``rdkit`` instance holding the cage / target complex.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1110,23 +1256,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    macro_mol : MacroMolecule</span>
+<span class="sd">    macro_mol : :class:`.MacroMolecule`</span>
 <span class="sd">        The cage which should have C60 placed inside it.</span>
 
-<span class="sd">    c60 : StructUnit</span>
+<span class="sd">    c60 : :class:`.StructUnit`</span>
 <span class="sd">        A StructUnit instance of C60.</span>
 
-<span class="sd">    n5fold : int</span>
+<span class="sd">    n5fold : :class:`int`</span>
 <span class="sd">        The number of rotations along the 5-fold axis of symmetry.</span>
 
-<span class="sd">    n2fold : int</span>
-<span class="sd">        The number of rotations along the 2 fold axis of symmetry per</span>
+<span class="sd">    n2fold : :class:`int`</span>
+<span class="sd">        The number of rotations along the 2-fold axis of symmetry per</span>
 <span class="sd">        rotation along the 5-fold axis.</span>
 
 <span class="sd">    Yields</span>
 <span class="sd">    ------</span>
-<span class="sd">    rdkit.Chem.rdchem.Mol</span>
-<span class="sd">        An rdkit instance holding the cage / C60 complex.</span>
+<span class="sd">    :class:`rdkit.Chem.rdchem.Mol`</span>
+<span class="sd">        An ``rdkit`` instance holding the cage / C60 complex.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

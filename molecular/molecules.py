@@ -2,129 +2,144 @@
 Defines classes which describe molecules.
 
 There are a couple of major classes defined here. The most important
-ones are ``StructUnit`` and ``MacroMolecule``. Here is an overview of
-their role/interaction. This is followed by a step-by-step guide to
-macromolecular assembly.
+ones are :class:`StructUnit` and :class:`MacroMolecule`. Here is an
+overview of their role and interaction. This is followed by a
+step-by-step guide to macromolecular assembly.
 
-The StructUnit class represents the monomers that make up
+:class:`StructUnit` represents the monomers that make up
 macromolecules. These are commonly refered to as ``building blocks`` in
-the documentation. The class holds information concerning only a single
-building block molecule. Such as the number of atoms and bonds it may
-have. It also has information about the functoinal groups present on
-the building block molecule (FGInfo class defined in
-/mmea/classes/fg_info.py). The class also allows manipulation of the
-lone building block molecule, such as rotations and translations.
+the documentation. :class:`StructUnit` holds information concerning
+only a single building block molecule. For example, the number of atoms
+and bonds a building block may have. It also has information about the
+functoinal groups present in the building block molecule (see
+:class:`.FGInfo`). The class also allows manipulation of the lone
+building block molecule, such as rotations and translations.
 
-The StructUnit class should be inherited as necessary. For example
-StructUnit2 adds manipulations relavant to molecules with 2 functional
-groups. The StructUnit3 class adds manipulations relavant to 3 or more
-functional groups. If you have a monomer which needs specific
-information or manipulations, give it its own class.
+The :class:`StructUnit` should be inherited as necessary. For example,
+:class:`StructUnit2` adds manipulations relavant to molecules with 2
+functional groups. :class:`StructUnit3` adds manipulations relavant to
+molecules with 3 or more functional groups. If you have a monomer which
+needs specific information or manipulations, give it its own class.
 
-The MacroMolecule class represents an assembled macromolecule. It
-requires at least 2 basic pieces of information: which monomers are
-used to assemble the macromolecule and what is the topology/structure
-of the macromolecule.
+The :class:`MacroMolecule` class represents an assembled macromolecule.
+It requires at least 2 basic pieces of information: which monomers are
+used to assemble the macromolecule and what the topology/structure
+of the macromolecule is.
 
-The MacroMolecule holds in its `building_blocks` attribute a list of
-StructUnit (or derived classes) instances. These represent the
-monomers which form the macromolecule. Only one StructUnit instance per
+:attr:`MacroMolecule.building_blocks` holds a :class:`list` of
+:class:`StructUnit` instances. These represent the monomers which
+make up the macromolecule. Only one :class:`StructUnit` instance per
 monomer type is held. So if 4 of one type of monomer and 2 of another
-type of monomer form a macromolecule, only 2 StructUnit instances are
-in `building_blocks`.
+type of monomer form a macromolecule, only 2 :class:`StructUnit`
+instances are in :attr:`MacroMolecule.building_blocks`.
 
-In its `topology` attribute a MacroMolecule holds a ``Topology` child
-class instance. This instance is responsible for assembling the
-macromolecule from the building blocks. The building should happen in
-the ``__init__()`` method of the MacroMolecule via the Topology
-instance's ``build()`` method. The ``build()`` method should place the
-assembled macromoleclue in the `mol` attribute of the MacroMolecule
-instance.
+:attr:`MacroMolecule.topology` holds a :class:`Topology` instance. This
+instance is responsible for assembling the macromolecule from the
+building blocks. The building should happen in
+:meth:`MacroMolecule.__init__` via :meth:`.Topology.build`. The
+:meth:`~.Topology.build` method places the assembled macromoleclue in
+:attr:`MacroMolecule.mol` as an ``rdkit`` molecule.
 
-The StructUnit class labels atoms in the functional groups of the
-building blocks as either ``bonder`` or ``del`` (see its
-documentation). This tells the Topology intance which atoms form bonds
-and which are removed during assembly.
+:class:`StructUnit` labels atoms in the functional groups of the
+building blocks as either ``'bonder'`` or ``'del'`` (see its
+documentation). This tells the :class:`.Topology` instance which atoms
+form bonds and which are removed during assembly.
 
-No need to worry about the metaclasses.
-
--------------------------------------------------------
 A more detailed description of macromolecular assembly.
 -------------------------------------------------------
+
 This is a step-by-step guide of how macromolecular assembly is carried
 out and what the classes do.
 
-First you create StructUnit instances of the building blocks which make
-up the macromolecule:
+First you create :class:`StructUnit` instances of the building blocks
+which make up the macromolecule:
 
-    bb = StructUnit('/path/to/struct/file.mol2')
+.. code-block:: python
 
-The StructUnit instances are initialized using paths of molecular
-structure files. (Initializing a StructUnit automatically completes
-steps 1 to 4.)
+    bb = StructUnit('/path/to/struct/file.mol2', 'amine')
 
-    1) Place an rdkit instance of the molecule into the `mol` attribute
-       of the StructUnit.
-    2) Scan the path of the structure file for the name of a functional
+The :class:`StructUnit` instances are initialized using paths to
+molecular structure files. (Initializing a :class:`StructUnit`
+automatically completes steps 1 to 4.)
+
+    1. Place an ``rdkit`` instance of the molecule into
+       :attr:`StructUnit.mol`, i.e.
+
+       .. code-block:: python
+
+           bb.mol  # <rdkit.Chem.rdchem.Mol at 0x7f961a8f1f80>
+
+    2. Scan the path of the structure file for the name of a functional
        group. (Alternatively the name of a functional group can be
        supplied to the initializer).
 
-What functional groups are recognized by MMEA?
-The module ``/mmea/molecular/fg_info.py`` defines a class called
-FGInfo. Instances of this class are held in the list
-`functional_groups` (also in that module). If you put an FGInfo
-instance in that list, the functional group will be recognized.
+       .. code-block:: python
 
-    3) Place the FGInfo instance of the functional group in the
-       `func_grp` attribute of the StructUnit.
+           bb.func_group.name  # 'amine'
 
-    4) Using the FGInfo instance, tag atoms in the building block as
-       either 'bonder' or 'del'. 'bonder' signifies that the atoms form
-       a bond during macromolecular assembly, while 'del' means they
-       are deleted.
+Which functional groups are recognized by ``mtk``?
 
-    5) Give the StructUnit instances and the class representing the
-       topology to the macromolecule's initializer.
+The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a
+:class:`list` of instances of this class called
+:data:`functional_groups`. If you put an :class:`.FGInfo` instance into
+:data:`functional_groups`, the functional group will be recognized.
 
-    6) Make an instance of the topology class in the MacroMolecule
-      initializer.
+    3. Place the :class:`.FGInfo` instance of the functional group into
+       :attr:`StructUnit.func_grp`.
 
-    7) Run the ``build()`` of the instance generated in 6) during
-       MacroMolecule initialization.
+    4. Using :class:`.FGInfo`, tag atoms in the building block as
+       either ``'bonder'`` or ``'del'``. ``'bonder'`` signifies that
+       the atoms form a bond during macromolecular assembly, while
+       ``'del'`` means they are deleted.
 
-    8) The ``build()`` will vary depending on the Topology class.
-       However the basic structure is the same (steps 9 - 11).
+    5. Give the :class:`StructUnit` and :class:`.Topology` instances to
+       the macromolecule's initializer.
 
-    9) Combine the StructUnit rdkit molecules into a single rdkit
-       molecule. Make sure that the building blocks are arranged in the
-       shape of the macromolecule. All the manipulations available via
-       the StructUnit class are useful here to make sure all the
-       building blocks are oriented correctly when forming the
-       macromolecule.
+       .. code-block:: python
 
-    10) Create bonds between all the disjoined building block
-        molecules. This is where the tagging done by StructUnit is
-        needed.
+           macro_mol = MacroMolecule([bb1, bb2], Topology())
 
-    11) Delete all the atoms tagged for deletion.
+       Normally, :class:`MacroMolecule` and :class:`.Topology` will
+       not be used directly. Instead, classes derived from these
+       will be used. For example,
 
-After all this you should have a rdkit instance of the macromolecule
-which should be placed in the `mol` attribute of the MacroMolecule
-intance.
+           .. code-block:: python
 
-Extending MMEA: Adding new macromolecules.
-------------------------------------------
+               macro_mol = Polymer([bb1, bb2], Linear("AB", [0, 0], 3))
+
+    6. Run :meth:`.Topology.build` inside
+       :meth:`MacroMolecule.__init__`.
+
+    7. The details of :meth:`.Topology.build` will vary depending on
+       the :class:`.Topology` class used. However, the basic structure
+       is the same (steps 8 - 10).
+
+    8. Combine the ``rdkit`` molecules in :attr:`StructUnit.mol`
+       into a single ``rdkit`` molecule. Make sure that the building
+       blocks are arranged in the shape of the macromolecule. All the
+       manipulations available through :class:`StructUnit` are
+       useful here to make sure all building blocks are oriented
+       correctly when forming the macromolecule.
+
+    9. Create bonds between all the disjoined building block
+       molecules. This is where the tagging done by :class:`StructUnit`
+       is needed.
+
+    10. Delete all atoms tagged for deletion.
+
+After all this you should have a ``rdkit`` instance of the
+macromolecule which should be placed into :attr:`MacroMolecule.mol`.
+
+Extending mtk: Adding new macromolecules.
+-----------------------------------------
+
 To add new macromolecules create a new class which inherits
-``MacroMolecule``. The initializer of ``MacroMolecule`` can be used or
-a custom one may be used. However, all the same attributes must be
-defined.
+:class:`MacroMolecule`.
 
 If you're adding a new class of macromolecules, it quite likely you
-want to add a new ``Topology`` class. See the docstring of the
-/mmea/molecular_tools/topologies/base.py module for guidance on adding
-these. The topology class does the assembly of the macromolecule from
-the building blocks. The assembled macromolecule instance is then held
-by the macromolecular class.
+want to add a new :class:`.Topology` class. See the
+:mod:`.topologies.base` for guidance on adding these. The topology
+class does the assembly of the macromolecule from the building blocks.
 
 """
 
@@ -154,7 +169,7 @@ from inspect import signature
 from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
-from ..addons.pyWINDOW import pywindow as pywindow
+import pywindow
 from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
@@ -163,6 +178,8 @@ from ..convenience_tools import (flatten, periodic_table,
 
 
 logger = logging.getLogger(__name__)
+# Toggles caching when making molecules.
+CACHE_SETTINGS = {'ON': True}
 
 
 class Cached(type):
@@ -182,18 +199,19 @@ class Cached(type):
         sig = sig.arguments
         key = self.gen_key(sig['building_blocks'], sig['topology'])
 
-        if key in self.cache:
+        if key in self.cache and CACHE_SETTINGS['ON']:
             return self.cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            self.cache[key] = obj
+            if CACHE_SETTINGS['ON']:
+                self.cache[key] = obj
             return obj
 
 
 class CachedStructUnit(type):
     """
-    A metaclass for making StructUnit create cached instances.
+    A metaclass for making :class:`StructUnit` create cached instances.
 
     """
 
@@ -227,12 +245,13 @@ class CachedStructUnit(type):
                        x.name in sig['file']), None)
 
         key = self.gen_key(mol, fg)
-        if key in self.cache:
+        if key in self.cache and CACHE_SETTINGS['ON']:
             return self.cache[key]
         else:
             obj = super().__call__(*args, **kwargs)
             obj.key = key
-            self.cache[key] = obj
+            if CACHE_SETTINGS['ON']:
+                self.cache[key] = obj
             return obj
 
 
@@ -242,34 +261,29 @@ class Molecule:
 
     This class defines the operations which any class
     describing molecules should inherit or may find useful. Examples of
-    such classes are ``StructUnit`` and ``MacroMolecule``. This calls
-    is unlikely to be useful as in and of itself. It lacks an
-    `__init__()` method because it does not need one. Child classes
-    should define it.
-
-    It is assumed that child classes will have some basic attributes.
+    such are :class:`StructUnit` and :class:`MacroMolecule`. This class
+    should not be used directly.
 
     Attributes
     ----------
-    mol : rdkit.Chem.rdchem.Mol
-        A rdkit molecule instance representing the molecule.
+    mol : :class:`rdkit.Chem.rdchem.Mol`
+        An ``rdkit`` molecule instance representing the molecule.
 
-    inchi : str
+    inchi : :class:`str`
         The InChI of the molecule.
 
-    energy : Energy
-        An instance of the ``Energy`` class. It handles all things
-        energy.
+    energy : :class:`.Energy`
+        Handles all things energy.
 
-    optimized : bool
-        Indicates whether a Molecule has been passed through an
-        optimization function or not.
+    optimized : :class:`bool`
+        Indicates whether a :class:`Molecule` has been passed through
+        an optimization function or not.
 
-    name : str (default = "")
+    name : :class:`str`
         A name which can be optionally given to the molecule for easy
         identification.
 
-    note : str (default = "")
+    note : :class:`str`
         A note or comment about the molecule. Purely optional but can
         be useful for labelling and debugging.
 
@@ -282,74 +296,89 @@ class Molecule:
         self.name = name
         self.note = note
 
-    def all_atom_coords(self):
+    def all_atom_coords(self, conformer=-1):
         """
-        Yields the coordinates of atoms in `mol`.
+        Yields the coordinates of atoms in :attr:`mol`.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
 
         Yields
         ------
-        tuple of (int, numpy.array)
-            The ``int`` represents the atom id of the atom whose
-            coordinates are being yielded.
+        :class:`tuple`
+            The yielded :class:`tuple` has the form
 
-            The array represents the position.
+            .. code-block:: python
+
+                (32, numpy.array([12, 34, 3]))
+
+            Where the first element is the atom id and the second
+            element is an array holding the coordinates of the atom.
 
         """
 
         # Get the conformer from the rdkit instance.
-        conformer = self.mol.GetConformer()
+        conf = self.mol.GetConformer(conformer)
 
         # Go through all the atoms and ask the conformer to return
         # the position of each atom. This is done by supplying the
         # conformers `GetAtomPosition` method with the atom's id.
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
-            atom_position = conformer.GetAtomPosition(atom_id)
+            atom_position = conf.GetAtomPosition(atom_id)
             yield atom_id, np.array([*atom_position])
 
-    def atom_coords(self, atom_id):
+    def atom_coords(self, atom_id, conformer=-1):
         """
         Return coordinates of an atom.
 
         Parameters
         ----------
-        atom_id : int
+        atom_id : :class:`int`
             The id of the atom whose coordinates are desired.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
 
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             An array holding the x, y and z coordinates of the atom.
 
         """
 
-        conf = self.mol.GetConformer()
+        conf = self.mol.GetConformer(conformer)
         atom_position = conf.GetAtomPosition(atom_id)
         return np.array([*atom_position])
 
-    def atom_distance(self, atom1_id, atom2_id):
+    def atom_distance(self, atom1_id, atom2_id, conformer=-1):
         """
         Return the distance between 2 atoms.
 
         Parameters
         ----------
-        atom1_id : int
+        atom1_id : :class:`int`
             The id of the first atom.
 
-        atom2_id : int
+        atom2_id : :class:`int`
             The id of the second atom.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
 
         Returns
         -------
-        scipy.double
+        :class:`scipy.double`
             The distance between the first and second atoms.
 
         """
 
         # Get the atomic positions of each atom and use the scipy
         # function to calculate their distance in Euclidean space.
-        atom1_coords = self.atom_coords(atom1_id)
-        atom2_coords = self.atom_coords(atom2_id)
+        atom1_coords = self.atom_coords(atom1_id, conformer)
+        atom2_coords = self.atom_coords(atom2_id, conformer)
         return euclidean(atom1_coords, atom2_coords)
 
     def atom_symbol(self, atom_id):
@@ -358,38 +387,42 @@ class Molecule:
 
         Parameters
         ----------
-        atom_id : int
+        atom_id : :class:`int`
             The id number of the atom.
 
         Returns
         -------
-        str
+        :class:`str`
             The atomic symbol of the atom.
 
         """
 
         return self.mol.GetAtomWithIdx(atom_id).GetSymbol()
 
-    def _cavity_size(self, origin):
+    def _cavity_size(self, origin, conformer):
         """
-        Calculates diameter of the molecule's from `origin`.
+        Calculates diameter of the molecule from `origin`.
 
         The cavity is measured by finding the atom nearest to
         `origin`, correcting for van der Waals diameter and multiplying
         by -2.
 
-        This function should not be used. Use cavity_size() instead.
-        cavity_size() finds the optimal value of `origin` to use.
+        This function should not be used directly. Use
+        :meth:`cavity_size` instead, which finds the optimal value of
+        `origin` to use.
 
         Parameters
         ----------
-        origin : numpy.array
+        origin : :class:`numpy.array`
             Holds the x, y and z coordinate of the position from which
             the cavity is measured.
 
+        conformer : :class:`int`
+            The id of the conformer to be used.
+
         Returns
         -------
-        float
+        :class:`float`
             The (negative) diameter of the molecules cavity.
 
         """
@@ -397,18 +430,24 @@ class Molecule:
         atom_vdw = np.array([atom_vdw_radii[x.GetSymbol()] for x
                             in self.mol.GetAtoms()])
 
-        distances = euclidean_distances(self.position_matrix().T,
+        distances = euclidean_distances(self.position_matrix(conformer).T,
                                         np.matrix(origin))
         distances = distances.flatten() - atom_vdw
         return -2*min(distances)
 
-    def cavity_size(self):
+    def cavity_size(self, conformer=-1):
         """
         Calculates the diameter of the molecule's cavity.
 
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
         Returns
         -------
-        The diameter of the molecule's cavity in Angstroms.
+        :class:`float`
+            The diameter of the molecule's cavity in Angstroms.
 
         """
 
@@ -419,22 +458,27 @@ class Molecule:
         # What this function does is finds the value of `origin` which
         # causes _cavity_size() to calculate the largest possible
         # cavity.
-        ref = self.center_of_mass()
-        icavity = 0.5*self._cavity_size(ref)
+        ref = self.center_of_mass(conformer)
+        icavity = 0.5*self._cavity_size(ref, conformer)
         bounds = [(coord+icavity, coord-icavity) for coord in ref]
-        cavity_origin = minimize(self._cavity_size,
+        cavity_origin = minimize(lambda x: self._cavity_size(x, conformer),
                                  x0=ref,
                                  bounds=bounds).x
-        cavity = -self._cavity_size(cavity_origin)
+        cavity = -self._cavity_size(cavity_origin, conformer)
         return 0 if cavity < 0 else cavity
 
-    def center_of_mass(self):
+    def center_of_mass(self, conformer=-1):
         """
         Returns the centre of mass of the molecule.
 
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             An array holding the coordinates of the center of mass.
 
         References
@@ -445,31 +489,39 @@ class Molecule:
 
         center = np.array([0., 0., 0.])
         total_mass = 0.
-        for atom_id, coord in self.all_atom_coords():
+        for atom_id, coord in self.all_atom_coords(conformer):
             mass = self.mol.GetAtomWithIdx(atom_id).GetMass()
             total_mass += mass
             center += mass*coord
         return np.divide(center, total_mass)
 
-    def centroid(self):
+    def centroid(self, conformer=-1):
         """
         Returns the centroid of the molecule.
 
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             A numpy array holding the position of the centroid.
 
         """
 
-        centroid = sum(x for _, x in self.all_atom_coords())
+        centroid = sum(x for _, x in self.all_atom_coords(conformer))
         return np.divide(centroid, self.mol.GetNumAtoms())
 
-    # @classmethod
-    def dihedral_strain(self, dihedral_SMARTS="", target=180):
+    def dihedral_strain(self,
+                        dihedral_SMARTS='',
+                        target=180,
+                        conformer=-1):
         """
-        Calculates the relative % difference between all the average dihedral
-        angle values within the molecule and the target value.
+        Returns the difference between the average dihedral and target.
+
+        The differences is a returned as a percent.
 
         Parameters
         ----------
@@ -479,18 +531,18 @@ class Molecule:
         target : :class:`float`
             Float representing the target value for the dihedral angle.
 
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
+
         Returns
         -------
-        diff : :class:`float`
-            Float representing the % relative difference between the average
-            dihedral value in the molecule and the target value.
+        :class:`float`
+            The percent difference between the average dihedral in the
+            molecule and the target value.
+
         """
 
-        # Sanitize the molecule
-        rdkit.SanitizeMol(self.mol)
-
         match = rdkit.MolFromSmarts(dihedral_SMARTS)
-
         atoms_dihedral = self.mol.GetSubstructMatches(match)
 
         dihedral_info = []
@@ -498,8 +550,10 @@ class Molecule:
             for atoms_group in atoms_dihedral:
                 # Calculate the dihedral angle
                 dihedral_value = rdMolTransforms.GetDihedralDeg(
-                                    self.mol.GetConformer(), atoms_group[0],
-                                    atoms_group[1], atoms_group[2],
+                                    self.mol.GetConformer(conformer),
+                                    atoms_group[0],
+                                    atoms_group[1],
+                                    atoms_group[2],
                                     atoms_group[3])
                 # check that the dihedral is calculated in the right direction
                 if abs(dihedral_value) > 90:
@@ -521,17 +575,17 @@ class Molecule:
 
     def dump(self, path):
         """
-        Writes a JSON dict of the molecule to a file.
+        Writes a JSON :class:`dict` of the molecule to a file.
 
         Parameters
         ----------
-        path : str
-            The full path of the file to which the JSON dict of the
-            molecule can be written.
+        path : :class:`str`
+            The full path to the file to which the JSON dict should be
+            written.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -541,27 +595,27 @@ class Molecule:
     @classmethod
     def fromdict(self, json_dict, optimized=True, load_names=True):
         """
-        Creates a Molecule from a JSON dict.
+        Creates a :class:`Molecule` from a JSON :class:`dict`.
 
-        The Molecule returned has the class specified in the JSON
-        dictionary, not ``Molecule``.
+        The :class:`Molecule` returned has the class specified in
+        `json_dict`, not :class:`Molecule`.
 
         Parameters
         ----------
-        json_dict : dict
-            A dict holding the JSON representation of a molecule.
+        json_dict : :class:`dict`
+            A :class:`dict` holding the JSON representation of a
+            molecule.
 
-        optimized : bool
-            The value passed to the loaded molecules `optimized`
-            attribute.
+        optimized : :class:`bool`, optional
+            The value passed to :attr:`Molecule.optimized`
 
-        load_names : bool (default = True)
-            If ``True`` then the `name` attribute stored in the JSON
-            objects is loaded. If ``False`` then it's not.
+        load_names : :class:`bool`, optional
+            If ``True`` then the ``name`` key stored in `json_dict`
+            is loaded.
 
         Returns
         -------
-        Molecule
+        :class:`Molecule`
             The molecule represented by `json_dict`.
 
         """
@@ -577,9 +631,9 @@ class Molecule:
 
         Returns
         -------
-        networkx.Graph
-            A graph where the nodes are the ids of the atoms in the
-            rdkit molecule and the edges are the bonds.
+        :class:`networkx.Graph`
+            A graph where the nodes are the ids of the atoms and the
+            edges are the bonds.
 
         """
 
@@ -601,7 +655,12 @@ class Molecule:
     @property
     def inchi(self):
         """
-        Returns the InChi of the molecule.
+        Returns the InChI of the molecule.
+
+        Returns
+        -------
+        :class:`str`
+            The InChI of the molecule.
 
         """
 
@@ -611,27 +670,26 @@ class Molecule:
     @classmethod
     def load(cls, path, optimized=True, load_names=True):
         """
-        Creates a Molecule from a JSON file.
+        Creates a :class:`Molecule` from a JSON file.
 
-        The Molecule returned has the class specified in the JSON
-        dictionary, not ``Molecule``.
+        The returned :class:`Molecule` has the class specified in the
+        JSON file, not :class:`Molecule`.
 
         Parameters
         ----------
-        path : str
+        path : :class:`str`
             The full path holding a JSON representation to a molecule.
 
-        optimized : bool (default = True)
-            The value passed to the loaded molecules `optimized`
-            attribute.
+        optimized : :class:`bool`, optional
+            The value passed to :attr:`Molecule.optimized`.
 
-        load_names : bool (default = True)
-            If ``True`` then the `name` attribute stored in the JSON
-            objects is loaded. If ``False`` then it's not.
+        load_names : :class:`bool`, optional
+            If ``True`` then the ``name`` key stored in the JSON file
+            is loaded.
 
         Returns
         -------
-        Molecule
+        :class:`Molecule`
             The molecule held in `path`.
 
         """
@@ -641,36 +699,53 @@ class Molecule:
 
         return cls.fromdict(json_dict, optimized, load_names)
 
-    def max_diameter(self):
+    def max_diameter(self, conformer=-1):
         """
         Returns the largest distance between 2 atoms in the molecule.
 
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
         Returns
         -------
-        tuple of form (float, int, int)
-            The float represents the largest inter-atomic distance on
-            the molecule. The ints are the ids of the atoms.
+        :class:`tuple` of form (float, int, int)
+            A :class:`tuple` of the form
+
+            .. code-block:: python
+
+                max_diameter = (312.3, 4, 54)
+
+            Where the first element is the largest inter-atomic
+            distance in the molecule. The next 2 elements are the ids
+            of the involved atoms.
 
         """
 
-        maxid1, maxid2 = max((x for x in
-                              it.combinations(
-                                range(self.mol.GetNumAtoms()), 2)),
-                             key=lambda x: self.atom_distance(*x))
+        maxid1, maxid2 = max(
+            (x for x in it.combinations(range(self.mol.GetNumAtoms()),
+                                        2)),
+            key=lambda x: self.atom_distance(*x, conformer))
 
-        maxd = self.atom_distance(maxid1, maxid2)
+        maxd = self.atom_distance(maxid1, maxid2, conformer)
         maxd += (atom_vdw_radii[self.atom_symbol(maxid1)] +
                  atom_vdw_radii[self.atom_symbol(maxid2)])
 
         return maxd, maxid1, maxid2
 
-    def mdl_mol_block(self):
+    def mdl_mol_block(self, conformer=-1):
         """
         Returns a V3000 mol block of the molecule.
 
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
         Returns
         -------
-        str
+        :class:`str`
             The V3000 mol block representing the molecule.
 
         """
@@ -704,12 +779,17 @@ class Molecule:
                                          self.mol.GetNumBonds())
         # Kekulize the mol, which means that each aromatic bond is
         # converted to a single or double. This is necessary because
-        # .mol V3000 only supports integer bonds.
-        rdkit.Kekulize(self.mol)
+        # .mol V3000 only supports integer bonds. However, this fails
+        # sometimes on big molecules.
+        try:
+            rdkit.Kekulize(self.mol)
+        except ValueError:
+            pass
+
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
             atom_sym = periodic_table[atom.GetAtomicNum()]
-            x, y, z = self.atom_coords(atom_id)
+            x, y, z = self.atom_coords(atom_id, conformer)
             atom_block += atom_line.format(atom_id+1,
                                            atom_sym, x, y, z)
 
@@ -718,6 +798,9 @@ class Molecule:
             atom1_id = bond.GetBeginAtomIdx() + 1
             atom2_id = bond.GetEndAtomIdx() + 1
             bond_order = int(bond.GetBondTypeAsDouble())
+            # Ensure that no information was lost when converting
+            # double to int.
+            assert bond_order == bond.GetBondTypeAsDouble()
             bond_block += bond_line.format(bond_id, bond_order,
                                            atom1_id, atom2_id)
 
@@ -727,23 +810,28 @@ class Molecule:
         return main_string.replace(
                             "!!!BOND!!!BLOCK!!!HERE!!!\n", bond_block)
 
-    def position_matrix(self):
+    def position_matrix(self, conformer=-1):
         """
-        Returns the position of all atoms in the as a matrix.
+        Returns the position of all atoms as a matrix.
+
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
-        numpy.matrix
-            The matrix is 3 x n. Each column holds the x, y and z
-            coordinates of an atom. The index of the column corresponds
-            to the id of the atom in the molecule.
+        :class:`numpy.matrix`
+            The matrix has a shape ``[3, n]``. Each column holds the x,
+            y and z coordinates of an atom. The index of the column
+            corresponds to the id of the atom in the molecule.
 
         """
 
         pos_array = np.array([])
         for atom in self.mol.GetAtoms():
             atom_id = atom.GetIdx()
-            pos_vect = np.array([*self.atom_coords(atom_id)])
+            pos_vect = np.array([*self.atom_coords(atom_id, conformer)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1, 3).T)
@@ -754,21 +842,20 @@ class Molecule:
 
         Parameters
         ----------
-        other : MacroMolecule
-            The ``MacroMolecule`` instance you are checking has
+        other : :class:`Molecule`
+            The :class:`Molecule` instance you are checking has
             the same structure.
 
         Returns
         -------
-        bool
-            Returns ``True`` if the building blocks and topology
-            of the macromolecules are the same.
+        :class:`bool`
+            Returns ``True`` if the structures match.
 
         """
 
         return self.inchi == other.inchi
 
-    def rotate(self, theta, axis):
+    def rotate(self, theta, axis, conformer=-1):
         """
         Rotates the molecule by `theta` about `axis`.
 
@@ -776,51 +863,43 @@ class Molecule:
 
         Parameters
         ----------
-        theta : float
+        theta : :class:`float`
             The size of the rotation in radians.
 
-        axis : numpy.array
+        axis : :class:`numpy.array`
             The axis about which the rotation happens.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The positions of all the atoms are changed due to the
-            rotation.
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
         # Save the original position.
-        og_position = self.centroid()
+        og_position = self.centroid(conformer)
         # Move the centroid of the molecule to the origin, so that the
         # rotation occurs about this point.
-        self.set_position([0, 0, 0])
+        self.set_position([0, 0, 0], conformer)
         # Get the rotation matrix.
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation matrix on the position matrix, to get the
         # new position matrix.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix())
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
         # Apply the rotation.
-        self.set_position_from_matrix(new_pos_mat)
+        self.set_position_from_matrix(new_pos_mat, conformer)
         # Return the centroid of the molecule to the origin position.
-        self.set_position(og_position)
+        self.set_position(og_position, conformer)
 
     def save_bonders(self):
         """
         Adds atoms tagged with 'bonder' to `bonder_ids`.
 
-        Modifies
-        --------
-        bonder_ids : list of ints
-            Updates this set with the ids of atoms tagged 'bonder'.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -830,14 +909,9 @@ class Molecule:
             if atom.HasProp('bonder'):
                 self.bonder_ids.append(atom.GetIdx())
 
-    def set_orientation(self, start, end):
+    def set_orientation(self, start, end, conformer=-1):
         """
         Rotates the molecule by a rotation from `start` to `end`.
-
-        Note: The difference between this method and
-        :meth:`StructUnit._set_orientation2()` is about which point the
-        rotation occurs: centroid of entire molecule versus centroid of
-        bonder atoms, respectively.
 
         Given two direction vectors, `start` and `end`, this method
         applies the rotation required transform `start` to `end` on
@@ -850,31 +924,35 @@ class Molecule:
         direction.
 
         The great thing about this method is that you as long as you
-        can associate a gemotric feature of the molecule with a vector,
-        then the molecule can be roatated so that this vector is
+        can associate a geometric feature of the molecule with a
+        vector, then the molecule can be rotated so that this vector is
         aligned with `end`. The defined vector can be virtually
-        anything. This means that any geomteric feature of the molecule
+        anything. This means that any geometric feature of the molecule
         can be easily aligned with any arbitrary axis.
+
+        Notes
+        -----
+        The difference between this method and
+        :meth:`StructUnit._set_orientation2` is about which point the
+        rotation occurs: centroid of the entire molecule versus
+        centroid of the bonder atoms, respectively.
 
         Parameters
         ----------
-        start : numpy.array
+        start : :class:`numpy.array`
             A vector which is to be rotated so that it transforms to
             the `end` vector.
 
-        end : numpy.array
+        end : :class:`numpy.array`
             This array holds the vector, onto which `start` is rotated.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed due to
-            rotation of the molecule about its centroid.
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit molecule in `mol`.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
 
@@ -885,96 +963,94 @@ class Molecule:
         # Record the position of the molecule then translate the
         # centroid to the origin. This is so that the rotation occurs
         # about this point.
-        og_center = self.centroid()
-        self.set_position([0, 0, 0])
+        og_center = self.centroid(conformer)
+        self.set_position([0, 0, 0], conformer)
 
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix())
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
 
         # Set the positions of the molecule.
-        self.set_position_from_matrix(new_pos_mat)
-        self.set_position(og_center)
+        self.set_position_from_matrix(new_pos_mat, conformer)
+        self.set_position(og_center, conformer)
 
         return self.mol
 
-    def set_position(self, position):
+    def set_position(self, position, conformer=-1):
         """
         Sets the centroid of the molecule to `position`.
 
         Parameters
         ----------
-        position : numpy.array
+        position : :class:`numpy.array`
             This array holds the position on which the centroid of the
             molecule should be placed.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed so that its
-            centroid falls on `position`.
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit molecule with the centroid placed at `position`.
-            This is the same instance as that in `mol`.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule with the centroid placed at
+            `position`. This is the same instance as that in
+            :attr:`Molecule.mol`.
 
         """
 
+        conf_id = self.mol.GetConformer(conformer).GetId()
+
         # Get the original centroid.
-        centroid = self.centroid()
+        centroid = self.centroid(conf_id)
         # Find out how much it needs to shift to reach `position`.
         shift = position - centroid
         # Apply the shift and get the resulting rdkit conformer object.
-        new_conf = self.shift(shift).GetConformer()
+        new_conf = self.shift(shift, conf_id).GetConformer()
+        new_conf.SetId(conf_id)
 
         # Replace the old rkdit conformer with one where the centroid
         # is at `position`.
-        self.mol.RemoveAllConformers()
+        self.mol.RemoveConformer(conf_id)
         self.mol.AddConformer(new_conf)
 
         return self.mol
 
-    def set_position_from_matrix(self, pos_mat):
+    def set_position_from_matrix(self, pos_mat, conformer=-1):
         """
         Set atomic positions of the molecule to those in `pos_mat`.
 
         Parameters
         ----------
-        pos_mat : numpy.array
+        pos_mat : :class:`numpy.array`
             The matrix holds the coordinates on which the atoms of the
             molecule should be placed.
 
-            The dimensions are 3 x n. Each column of `pos_mat`
-            represents the coordinates of a single atom. The 1st column
-            sets the coordinate of the atom with id of 0. The next
-            column sets the coordinate of the atom with id 1, and so
-            on.
+            The shape of the matrix is ``[3, n]``. Each column of
+            `pos_mat` represents the coordinates of a single atom. The
+            1st column sets the coordinates of the atom with id of 0.
+            The next column sets the coordinates of the atom with id 1,
+            and so on.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The coordinates of atoms in this molecule are set to the
-            coordinates in `pos_mat`.
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
-        conf = self.mol.GetConformer()
+        conf = self.mol.GetConformer(conformer)
         for i, coord_mat in enumerate(pos_mat.T):
             coord = rdkit_geo.Point3D(coord_mat.item(0),
                                       coord_mat.item(1),
                                       coord_mat.item(2))
             conf.SetAtomPosition(i, coord)
 
-    def shift(self, shift):
+    def shift(self, shift, conformer=-1):
         """
         Shifts the coordinates of all atoms.
 
@@ -982,9 +1058,12 @@ class Molecule:
 
         Parameters
         ----------
-        shift : numpy.array
+        shift : :class:`numpy.array`
             A numpy array holding the value of the shift along each
             axis.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
@@ -996,7 +1075,7 @@ class Molecule:
 
         # The function does not modify the existing conformer, as a
         # result a new instance is created and used for modification.
-        conformer = rdkit.Conformer(self.mol.GetConformer())
+        conf = rdkit.Conformer(self.mol.GetConformer(conformer))
 
         # For each atom, get the atomic positions from the conformer
         # and shift them. Create a new geometry instance from these new
@@ -1014,8 +1093,7 @@ class Molecule:
             # `atom_position` in an instance holding in the x, y and z
             # coordinates of an atom in its 'x', 'y' and 'z'
             # attributes.
-            atom_position = np.array(
-                                    conformer.GetAtomPosition(atom_id))
+            atom_position = np.array(conf.GetAtomPosition(atom_id))
 
             # Inducing the shift.
             new_atom_position = atom_position + shift
@@ -1025,7 +1103,7 @@ class Molecule:
 
             # Changes the position of the atom in the conformer to the
             # values stored in the new geometry instance.
-            conformer.SetAtomPosition(atom_id, new_coords)
+            conf.SetAtomPosition(atom_id, new_coords)
 
         # Create a new copy of the rdkit molecule instance representing
         # the molecule - the original instance is not to be modified.
@@ -1038,71 +1116,104 @@ class Molecule:
         # conformer is then given to the rdkit molecule, which is
         # returned.
         new_mol.RemoveAllConformers()
-        new_mol.AddConformer(conformer)
+        new_mol.AddConformer(conf)
         return new_mol
 
-    def update_from_mae(self, mae_path):
+    def update_from_mae(self, path, conformer=-1):
         """
-        Updates molecular structure to match an .mae file.
+        Updates molecular structure to match an ``.mae`` file.
 
         Parameters
         ----------
-        mae_path : str
-            The full path of the .mae file from which the structure
+        path : :class:`str`
+            The full path of the ``.mae`` file from which the structure
             should be updated.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The rdkit molecule held in this attribute is changed so
-            that it matches the moleclue held in the .mae file.
+        conformer : :class:`int`, optional
+            The conformer to be updated.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
-        self.mol = mol_from_mae_file(mae_path)
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
 
-    def update_stereochemistry(self):
+        mol = mol_from_mae_file(path)
+        conf = rdkit.Conformer(mol.GetConformer())
+        conf.SetId(conformer)
+        self.mol.RemoveConformer(conformer)
+        self.mol.AddConformer(conf)
+
+    def update_from_mol(self, path, conformer=-1):
         """
-        Updates stereochemistry tags on `mol` attribute.
+        Updates molecular structure to match an ``.mol`` file.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The '_CIPCode' property on each atom of the rkdit molecule
-            is updated to reflect the R or S configuration of the atom
-            in the current geometry.
+        Parameters
+        ----------
+        path : :class:`str`
+            The full path of the ``.mol`` file from which the structure
+            should be updated.
+
+        conformer : :class:`int`, optional
+            The conformer to be updated.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
+
+        """
+
+        if conformer == -1:
+            conformer = self.mol.GetConformer(conformer).GetId()
+
+        mol = rdkit.MolFromMolFile(path, sanitize=False, removeHs=False)
+        conf = rdkit.Conformer(mol.GetConformer())
+        conf.SetId(conformer)
+        self.mol.RemoveConformer(conformer)
+        self.mol.AddConformer(conf)
+
+    def update_stereochemistry(self, conformer=-1):
+        """
+        Updates stereochemistry tags in :attr:`Molecule.mol`.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        None : :class:`NoneType`
 
         """
 
         for atom in self.mol.GetAtoms():
             atom.UpdatePropertyCache()
-        rdkit.AssignAtomChiralTagsFromStructure(self.mol)
+        rdkit.AssignAtomChiralTagsFromStructure(self.mol, conformer)
         rdkit.AssignStereochemistry(self.mol, True, True, True)
 
-    def write(self, path):
+    def write(self, path, conformer=-1):
         """
         Writes a molecular structure file of the molecule.
 
-        This bypasses the need to use rdkit's writing functions, which
-        have issues with macromolecules due to poor ring finding and
-        sanitization issues.
+        This bypasses the need to the writining functions in ``rdkit``.
+        These have issues with macromolecules due to poor ring finding
+        and sanitization issues.
 
         Parameters
         ----------
-        path : str
+        path : :class:`str`
             The `path` to which the molecule should be written.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1111,57 +1222,55 @@ class Molecule:
 
         _, ext = os.path.splitext(path)
         write_func = write_funcs[ext]
-        write_func(path)
+        write_func(path, conformer)
 
-    def _write_mdl_mol_file(self, path):
+    def _write_mdl_mol_file(self, path, conformer=-1):
         """
-        Writes a V3000 .mol file of the molecule
+        Writes a V3000 ``.mol`` file of the molecule
 
-        This function should not be used directly, only via the
-        ``write()`` method.
+        This function should not be used directly, only via
+        :meth:`write`.
 
         Parameters
         ----------
-        path : str
-            The full path to which to the file should be written.
+        path : :class:`str`
+            The full path to the file being written.
 
-        Modifies
-        --------
-        A file is created/ changed at `path`.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
         with open(path, 'w') as f:
-            f.write(self.mdl_mol_block())
+            f.write(self.mdl_mol_block(conformer))
 
-    def _write_pdb_file(self, path):
+    def _write_pdb_file(self, path, conformer=-1):
         """
-        Writes a .pdb file of the molecule
+        Writes a ``.pdb`` file of the molecule
 
-        This function should not be used directly, only via the
-        ``write()`` method.
+        This function should not be used directly, only via
+        :meth:`write`.
 
         Parameters
         ----------
-        path : str
-            The full path to which to the file should be written.
+        path : :class:`str`
+            The full path to the file being written.
 
-        Modifies
-        --------
-        A file is created/ changed at `path`.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
         # First write the file using rdkit.
-        rdkit.MolToPDBFile(self.mol, path)
+        rdkit.MolToPDBFile(self.mol, path, conformer)
 
         # Edit the file because rkdit does poor atom labelling.
         new_content = ''
@@ -1182,71 +1291,34 @@ class Molecule:
 
 class StructUnit(Molecule, metaclass=CachedStructUnit):
     """
-    Represents the building blocks of macromolecules examined by MMEA.
-
-    ``Building blocks`` in this case refers to the smallest molecular
-    units of the assembled molecules examined by MMEA.
+    Represents the building blocks of macromolecules.
 
     The goal of this class is to conveniently store information about,
     and perform operations on, single instances of macromolecular
     building blocks.
 
-    An important part of this class is labelling atoms in functional
-    groups.
-
-    This class should only deal with issues that concern a single
-    building block in and of itself.
-
-    Class attributes
-    ----------------
-    init_funcs : dict of {str : function}
-        This dictionary holds the various functions which can be used
-        to initialize rdkit molecules and pairs them with the
-        appropriate file extension.
-
     Attributes
     ----------
-    file : str
-        The full path of the molecular structure file holding the
-        molecule. The supported file formats are the keys in the
-        `init_funcs` dictionary. As long as a file of one of these
-        types is provided, MMEA will automatically use the correct
-        initialization function.
+    init_funcs : :class:`dict`
+        This dictionary holds the various functions which can be used
+        to initialize ``rdkit`` molecules and pairs them with the
+        appropriate file extension.
 
-    mol : rdkit.Chem.rdchem.Mol
-        The rdkit instance of the molecule held in `file`.
+    file : :class:`str`
+        The full path to the molecular structure file holding the
+        molecule. The supported file formats are the keys in
+        :attr:`init_funcs`. As long as a file with one of these
+        extensions is provided, the correct initialization function
+        will be used.
 
-    inchi : str
-        The InChI of the molecule.
-
-    func_grp : FGInfo
-        The ``FGInfo`` instance holding information about the
+    func_grp : :class:`.FGInfo`
+        The :class:`.FGInfo` instance holding information about the
         functional group which will react when the building block
         assembles to form macromolecules.
 
-    bonder_ids : list of ints
-        A list holding the atom ids of the atoms which form bonds
-        during macromolecular assembly.
-
-    energy : Energy
-        This attribute handles information about the energy of the
-        instance. See the documentation of ``Energy`` to see what is
-        available.
-
-    optimized : bool (default = False)
-        A flag to monitor whether an optimization has been performed on
-        the molecule.
-
-    key : MacroMolKey
-        The key used for caching the molecule.
-
-    name : str (default = "")
-        A name which can be optionally given to the molcule for easy
-        identification.
-
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
+    bonder_ids : :class:`list` of :class:`int`
+        A :class:`list` holding the atom ids of the atoms which form
+        bonds during macromolecular assembly.
 
     """
 
@@ -1266,27 +1338,27 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def __init__(self, file, functional_group=None, name="", note=""):
         """
-        Initializes a ``StructUnit`` instance.
+        Initializes a :class:`StructUnit` instance.
 
         Parameters
         ----------
-        file : str
+        file : :class:`str`
             The full path of the molecular structure file holding the
             building block.
 
-        functional_group : str (default = None)
+        functional_group : :class:`str`, optional
             The name of the functional group which is to have atoms
             tagged. If ``None``, a functional group name found in the
             path `file`  is used. If no functional group is provided
             to this parameter and the name of one is not present in
             `file`, no tagging is done.
 
-        note : str (default = "")
-            A note or comment about the molecule.
-
-        name : str (default = "")
+        name : :class:`str`, optional
             A name which can be optionally given to the molcule for
             easy identification.
+
+        note : :class:`str`, optional
+            A note or comment about the molecule.
 
         """
 
@@ -1342,26 +1414,26 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        db : str
+        db : :class:`str`
             A path to a database of molecular files.
 
-        fg : str, optional
+        fg : :class:`str`, optional
             The name of a functional group which the molecules in `db`
             have. By default it is assumed the name is present in the
             path of the files.
 
-        name : str, optional
+        name : :class:`str`, optional
             The name to be given to the created molecule.
 
-        note : str, optional
+        note : :class:`str`, optional
             A note to be given to the created molecule.
 
         Returns
         -------
-        StructUnit
+        :class:`StructUnit`
             A random molecule from `db`.
 
-        None : NoneType
+        None : :class:`NoneType`
             If no files in `db` could be initialized from.
 
         """
@@ -1378,7 +1450,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                     'Could not initialize {} from {}.'.format(
                                                 cls.__name__, molfile))
 
-    def all_bonder_distances(self):
+    def all_bonder_distances(self, conformer=-1):
         """
         Yield distances between all pairs of bonder atoms.
 
@@ -1387,87 +1459,129 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be
         yielded.
 
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Yields
         ------
-        tuple of form (int, int, scipy.double)
-            The ints represnt the atoms ids and the double is their
-            distance.
+        :class:`tuple`
+           A :class:`tuple` of the form
+
+           .. code-block:: python
+
+               (3, 54, 12.54)
+
+            The first two elements are the ids of the involved atoms
+            and the third element is the distance between them.
 
         """
 
         # Iterate through each pair of atoms - do not allow
         # recombinations.
         for atom1, atom2 in it.combinations(self.bonder_ids, 2):
-                yield (atom1, atom2, self.atom_distance(atom1, atom2))
+                yield (atom1,
+                       atom2,
+                       self.atom_distance(atom1, atom2, conformer))
 
-    def bonder_centroid(self):
+    def bonder_centroid(self, conformer=-1):
         """
         Returns the centroid of the bonder atoms.
 
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
-        numpy.array
-            A numpy array holding the midpoint of the bonder atoms.
+        :class:`numpy.array`
+            An array holding the midpoint of the bonder atoms.
 
         """
 
-        centroid = sum(self.atom_coords(x) for x in self.bonder_ids)
+        centroid = sum(self.atom_coords(x, conformer) for
+                       x in self.bonder_ids)
         return np.divide(centroid, len(self.bonder_ids))
 
-    def bonder_direction_vectors(self):
+    def bonder_direction_vectors(self, conformer=-1):
         """
         Yields the direction vectors between all pairs of bonder atoms.
 
-        The yielded vector is normalized. If a pair (1,2) is yielded,
-        the pair (2,1) will not be.
+        The yielded vector is normalized. If the pair ``(1, 2)`` is
+        yielded, the pair ``(2, 1)`` will not be.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Yields
         ------
-        tuple of (int, int, numpy.array)
-            The ints in the tuple represent the ids of the start and
-            end atoms, respectively. The array is the direciont vector
-            running between the atomic positions.
+        :class:`tuple`
+            They yielded tuple has the form
+
+            .. code-block:: python
+
+                (3, 54, np.array([12.2, 43.3, 9.78]))
+
+            The first two elements of the tuple represent the ids of
+            the start and end atoms of the vector, respectively. The
+            array is the direction vector running between the atomic
+            positions.
 
         """
 
         for atom1_id, atom2_id in it.combinations(self.bonder_ids, 2):
-            p1 = self.atom_coords(atom1_id)
-            p2 = self.atom_coords(atom2_id)
+            p1 = self.atom_coords(atom1_id, conformer)
+            p2 = self.atom_coords(atom2_id, conformer)
 
             yield atom2_id, atom1_id, normalize_vector(p1-p2)
 
-    def bonder_position_matrix(self):
+    def bonder_position_matrix(self, conformer=-1):
         """
         Returns a matrix holding the positions of bonder atoms.
 
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
-        numpy.matrix
-            The matrix is 3 x n. Each column holds the x, y and z
-            coordinates of a bonder atom. The index of the column
-            corresponds to the index of the atom id in `bonder_ids`.
+        :class:`numpy.matrix`
+            The matrix has the shape ``[3, n``. Each column holds the
+            x, y and z coordinates of a bonder atom. The index of the
+            column corresponds to the index of the atom id in
+            :attr:`bonder_ids`.
 
         """
 
         pos_array = np.array([])
 
         for atom_id in self.bonder_ids:
-            pos_vect = np.array([*self.atom_coords(atom_id)])
+            pos_vect = np.array([*self.atom_coords(atom_id, conformer)])
             pos_array = np.append(pos_array, pos_vect)
 
         return np.matrix(pos_array.reshape(-1, 3).T)
 
-    def centroid_centroid_dir_vector(self):
+    def centroid_centroid_dir_vector(self, conformer=-1):
         """
         Returns the direction vector between the 2 molecular centroids.
 
-        The first molecule centroid is the centroid of the entire
+        The first molecular centroid is the centroid of the entire
         molecule. The second molecular centroid is the centroid of the
         bonder atoms.
 
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             The normalized direction vector running from the centroid
             of the bonder atoms to the molecular centroid.
 
@@ -1476,9 +1590,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # If the bonder centroid and centroid are in the same position,
         # the centroid - centroid vector should be orthogonal to the
         # bonder direction vector.
-        if np.allclose(self.centroid(),
-                       self.bonder_centroid(), atol=1e-5):
-            *_, bvec = next(self.bonder_direction_vectors())
+        if np.allclose(self.centroid(conformer),
+                       self.bonder_centroid(conformer), atol=1e-5):
+            *_, bvec = next(self.bonder_direction_vectors(conformer))
             # Construct a secondary vector by finding the minimum
             # component of bvec and setting it to 0.
             vec2 = list(bvec)
@@ -1489,8 +1603,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             return a
 
         else:
-            return normalize_vector(self.centroid() -
-                                    self.bonder_centroid())
+            return normalize_vector(self.centroid(conformer) -
+                                    self.bonder_centroid(conformer))
 
     def core(self):
         """
@@ -1498,7 +1612,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
+        :class:`rdkit.Chem.rdchem.Mol`
             The "core" of the molecule.
 
         """
@@ -1517,12 +1631,17 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Returns
         -------
-        tuple of tuples of ints
+        :class:`tuple`
             The form of the returned tuple is:
-            ((1,2,3), (4,5,6), (7,8,9)). This means that all atoms with
-            ids 1 to 9 are in a functional group and that the atoms 1,
-            2 and 3 all form one functional group together. So do 4, 5
-            and 5 and so on.
+
+            .. code-block:: python
+
+                ((1, 2, 3), (4, 5, 6), (7, 8, 9))
+
+            This means that all atoms with ids ``1`` to ``9`` are in a
+            functional group and that the atoms ``1``, ``2`` and ``3``
+            all form one functional group together. So do ``4``, ``5``
+            and ``6`` and so on.
 
         """
 
@@ -1541,12 +1660,12 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        atomid : int
+        atomid : :class:`int`
             The id of the atom being queried.
 
         Returns
         -------
-        bool
+        :class:`bool`
             Indicates whether the atom with `atomid` is part of the
             core.
 
@@ -1562,22 +1681,24 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def json(self):
         """
-        Returns a JSON representation of the object.
+        Returns a JSON representation of the molecule.
 
         The representation has the following form:
 
+        .. code-block:: python
+
             {
                 'class' : 'StructUnit',
-                'mol_block' : 'A string holding the V3000 mol
-                               block of the molecule.',
+                'mol_block' : '''A string holding the V3000 mol
+                                 block of the molecule.''',
                 'note' : 'This molecule is nice.',
                 'name' : 'benzene'
             }
 
         Returns
         -------
-        dict
-            A dict which represents the molecule.
+        :class:`dict`
+            A :class:`dict` which represents the molecule.
 
         """
 
@@ -1598,18 +1719,18 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         """
         Completes a JSON initialization.
 
-        This function is not to be used. Use ``Molecule.load()``
+        This function is not to be used. Use :meth:`Molecule.load`
         for loading instances from a JSON string. That function will
         automatically call this one.
 
         Parameters
         ----------
-        json_dict : dict
+        json_dict : :class:`dict`
             A dictionary holding the attribute data of the molecule.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1626,55 +1747,56 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
     @staticmethod
     def gen_key(rdkit_mol, functional_group):
         """
-        Generates the key for caching the molecule.
+        Generates the key used when caching the molecule.
 
         Parameters
         ----------
-        rdkit_mol : rdkit.Chem.rdchem.Mol
-            An rdkit instance of the molecule.
+        rdkit_mol : :class:`rdkit.Chem.rdchem.Mol`
+            An ``rdkit`` instance of the molecule.
 
-        functional_group : str
+        functional_group : :class:`str`
             The name of the functional group being used to make
             macromolecules.
 
         Returns
         -------
-        tuple
-            The key used for caching the molecule.
+        :class:`tuple`
+            The key used for caching the molecule. Has the form
+
+            .. code-block:: python
+
+                ('amine', 'InChIString')
 
         """
 
         return functional_group, rdkit.MolToInchi(rdkit_mol)
 
-    def minimize_theta(self, v1, v2, axis, centroid):
+    def minimize_theta(self, v1, v2, axis, centroid, conformer=-1):
         """
-        Rotate mol to minimize angle between `v1` and `v2`.
+        Rotates the molecule to minimize angle between `v1` and `v2`.
 
         The rotation is done about the vector `axis`.
 
         Parameters
         ----------
-        v1 : numpy.array
+        v1 : :class:`numpy.array`
             The vector which is rotated.
 
-        v2 : numpy.array
+        v2 : :class:`numpy.array`
             The vector which is stationary.
 
-        axis : numpy.array
+        axis : :class:`numpy.array`
             The vector about which the rotation happens.
 
-        centroid : numpy.array
+        centroid : :class:`numpy.array`
             The position vector at the center of the rotation.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed due to the
-            rotation.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -1685,8 +1807,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # Save the initial position and change the origin to
         # `centroid`.
-        iposition = self.centroid()
-        self.mol = self.shift(-centroid)
+        iposition = self.centroid(conformer)
+        self.mol = self.shift(-centroid, conformer)
 
         # 1. First transform the problem.
         # 2. The rotation axis is set equal to the z-axis.
@@ -1702,7 +1824,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # If the `tstart` vector is 0 after these transformations it
         # means that it is parallel to the rotation axis, stop.
         if np.allclose(tstart, [0, 0, 0], atol=1e-8):
-            self.set_position(iposition)
+            self.set_position(iposition, conformer)
             return
 
         tend = np.dot(rotmat, v2)
@@ -1721,9 +1843,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             angle *= -1
 
         rotmat = rotation_matrix_arbitrary_axis(angle, axis)
-        posmat = np.dot(rotmat, self.position_matrix())
-        self.set_position_from_matrix(posmat)
-        self.set_position(iposition)
+        posmat = np.dot(rotmat, self.position_matrix(conformer))
+        self.set_position_from_matrix(posmat, conformer)
+        self.set_position(iposition, conformer)
 
     @classmethod
     def rdkit_init(cls, mol, functional_group=None, name="", note=""):
@@ -1747,7 +1869,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             f.seek(0)
             return cls(f.name, functional_group, name, note)
 
-    def rotate2(self, theta, axis):
+    def rotate2(self, theta, axis, conformer=-1):
         """
         Rotates the molecule by `theta` about `axis`.
 
@@ -1755,78 +1877,73 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Parameters
         ----------
-        theta : float
+        theta : :class:`float`
             The size of the rotation in radians.
 
-        axis : numpy.array
+        axis : :class:`numpy.array`
             The axis about which rotation happens.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The atoms in this molecule are rotated.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
         # Save the origin position of the bonder atom centroid.
-        og_position = self.bonder_centroid()
+        og_position = self.bonder_centroid(conformer)
         # Change the position of the centroid of the bonder atoms to
         # the origin so that the rotation occurs about this point.
-        self.set_bonder_centroid([0, 0, 0])
+        self.set_bonder_centroid([0, 0, 0], conformer)
         # Get the rotation matrix.
         rot_mat = rotation_matrix_arbitrary_axis(theta, axis)
         # Apply the rotation on the original atomic coordinates to get
         # the new ones.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix())
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
         # Set the atomic positions to the new coordinates.
-        self.set_position_from_matrix(new_pos_mat)
+        self.set_position_from_matrix(new_pos_mat, conformer)
         # Return the centroid to its original position.
-        self.set_bonder_centroid(og_position)
+        self.set_bonder_centroid(og_position, conformer)
 
-    def set_bonder_centroid(self, position):
+    def set_bonder_centroid(self, position, conformer=-1):
         """
         Move the molecule so that the bonder centroid is on `position`.
 
         Parameters
         ----------
-        position : numpy.array
-            A numpy array holding the desired the position. It holds
+        position : :class:`numpy.array`
+            An array holding the desired the position. It holds
             the x, y and z coordinates, respectively.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The position of the molecule in this rdkit instance is
-            changed, as described in this docstring.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit molecule after it has been shifted. The same
-            instance as held in `mol`.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule after it has been shifted. The same
+            instance as in :attr:`~Molecule.mol`.
 
         """
 
-        center = self.bonder_centroid()
+        conf_id = self.mol.GetConformer(conformer).GetId()
+
+        center = self.bonder_centroid(conf_id)
         shift = position - center
-        new_conf = self.shift(shift).GetConformer()
+        new_conf = self.shift(shift, conf_id).GetConformer()
+        new_conf.SetId(conf_id)
 
         # Make sure the rkdit molecule has only one conformer.
-        self.mol.RemoveAllConformers()
+        self.mol.RemoveConformer(conf_id)
         self.mol.AddConformer(new_conf)
 
         return self.mol
 
-    def _set_orientation2(self, start, end):
+    def _set_orientation2(self, start, end, conformer):
         """
-        Note: The difference between this method and
-        ``set_orientation()`` is about which point the rotation
-        occurs: centroid of bonder atoms versus centroid of entire
-        molecule, respectively.
+        Rotates the molecule by a rotation from `start` to `end`.
 
         Given two direction vectors, `start` and `end`, this method
         applies the rotation required transform `start` to `end` on
@@ -1842,28 +1959,32 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         can associate a gemotric feature of the molecule with a vector,
         then the molecule can be roatated so that this vector is
         aligned with `end`. The defined vector can be virtually
-        anything. This means that any geomteric feature of the molecule
+        anything. This means that any geometric feature of the molecule
         can be easily aligned with any arbitrary axis.
+
+        Notes
+        -----
+        The difference between this method and
+        :meth:`~Molecule.set_orientation` is about which point the rotation
+        occurs: centroid of bonder atoms versus centroid of entire
+        molecule, respectively.
 
         Parameters
         ----------
-        start : numpy.array
+        start : :class:`numpy.array`
             A vector which is to be rotated so that it transforms to
             the `end` vector.
 
-        end : numpy.array
+        end : :class:`numpy.array`
             This array holds the vector, onto which `start` is rotated.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed due to
-            rotation of the molecule about its centroid.
+        conformer : :class:`int`
+            The conformer to use.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit molecule in `mol`.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
 
@@ -1874,43 +1995,48 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # Record the position of the molecule then translate the bonder
         # atom centroid to the origin. This is so that the rotation
         # occurs about this point.
-        og_center = self.bonder_centroid()
-        self.set_bonder_centroid(np.array([0, 0, 0]))
+        og_center = self.bonder_centroid(conformer)
+        self.set_bonder_centroid(np.array([0, 0, 0]), conformer)
 
         # Get the rotation matrix.
         rot_mat = rotation_matrix(start, end)
 
         # Apply the rotation matrix to the atomic positions to yield
         # the new atomic positions.
-        new_pos_mat = np.dot(rot_mat, self.position_matrix())
+        new_pos_mat = np.dot(rot_mat, self.position_matrix(conformer))
 
         # Set the positions in the rdkit molecule.
-        self.set_position_from_matrix(new_pos_mat)
-        self.set_bonder_centroid(og_center)
+        self.set_position_from_matrix(new_pos_mat, conformer)
+        self.set_bonder_centroid(og_center, conformer)
 
         return self.mol
 
-    def similar_molecules(self, database):
+    def similar_molecules(self, mols):
         """
-        Returns molecules from `database` ordered by similarity.
+        Returns molecules from `mols` ordered by similarity.
 
         The most similar molecule is at index 0.
 
         This method uses the Morgan fingerprints of radius 4 to
-        evaluate how similar the molecules in `database` are.
+        evaluate how similar the molecules in `mols` are.
 
         Parameters
         ----------
-        database : str
-            The full path of the database from which the molecules are
-            checked for similarity.
+        mols : :class:`iterable` of :class:`rdkit.Chem.rdchem.Mol`
+            A group of molecules to which similarity is compared.
 
         Returns
         -------
-        list of tuples of form (float, str)
-            The float is the similarity of a given molecule in the
-            database to `mol` while the str is the full path of the
-            structure file of that molecule.
+        :class:`list`
+            A :class:`list` of the form,
+
+            .. code-block:: python
+
+                returned_list = [(8.9, mol1), (7.3, mol2), (3.4, mol3)]
+
+            where the :class:`float` is the similarity of a given
+            molecule in `mols` while the ```mol`` is corresponding
+            ``rdkit`` molecule. Most similar molecule yielded first.
 
         """
 
@@ -1921,52 +2047,46 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         # For every structure file in the database create a rdkit
         # molecule. Place these in a list.
-        mols = []
-        for file in os.listdir(database):
-            path = os.path.join(database, file)
-            # Ignore files which are not structure files and the
-            # structure file of the molecule itself.
-            _, ext = os.path.splitext(path)
-            if ext not in self.init_funcs:
-                continue
-
-            mol = self.init_funcs[ext](path)
+        similarities = []
+        for mol in mols:
             rdkit.GetSSSR(mol)
             mol.UpdatePropertyCache(strict=False)
             mol_fp = rdkit.GetMorganFingerprint(mol, 4)
             similarity = DataStructs.DiceSimilarity(fp, mol_fp)
-            mols.append((similarity, path))
+            similarities.append((similarity, mol))
 
-        return sorted(mols, reverse=True)
+        return sorted(similarities, reverse=True, key=lambda x: x[0])
 
     @classmethod
-    def smarts_init(cls, smarts,
-                    functional_group=None, note="", name=""):
+    def smarts_init(cls,
+                    smarts,
+                    functional_group=None,
+                    note="",
+                    name=""):
         """
         Initialize from a SMARTS string.
 
         Parameters
         ----------
-        smiles : str
+        smiles : :class:`str`
             A SMARTS string of the molecule.
 
-        functional_group : str (default = None)
+        functional_group : :class:`str`, optional
             The name of the functional group which is to have atoms
             tagged. If no functional group is provided to this
             parameter, no tagging is done.
 
-        note : str (default = "")
+        note : :class:`str`, optional
             A note or comment about the molecule.
 
-        name : str (default = "")
+        name : :class:`str`, optional
             A name which can be optionally given to the molcule for
             easy identification.
 
         Returns
         -------
-        StructUnit
-            The StructUnit instance of the molecule represented by
-            `smarts`.
+        :class:`StructUnit`
+            A :class:`StructUnit` instance of the molecule in `smarts`.
 
         """
 
@@ -1996,25 +2116,17 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Adds bonding and deletion tags to atoms.
 
         All atoms which form the functional group of the molecule have
-        the property 'fg' added. Its value is set to the name of the
-        functional group.
+        the property ``'fg'`` added. Its value is set to the name of
+        the functional group.
 
         The atoms which form bonds during assembly have the property
-        called 'bonder' added and set to '1'. Atoms which are deleted
-        during reactions have the property 'del' set to '1'.
-
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The atoms in this rdkit molecule have the properties 'fg',
-            'bonder' and 'del' added, in accordance with the docstring.
-
-        bonder_ids : set of ints
-            Adds the ids of bonder atoms to this list.
+        called ``'bonder'`` added and set to ``'1'``. Atoms which are
+        deleted during reactions have the property ``'del'`` set to
+        ``'1'``.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -2047,20 +2159,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def untag_atoms(self):
         """
-        Removes the tags added by ``tag_atoms()``.
-
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The atoms in this rdkit molecule have the properties
-            'fg', 'bonder' and 'del' removed.
-
-        bonder_ids : list of ints
-            This list is set to [].
+        Removes the tags added by :meth:`tag_atoms`.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -2084,7 +2187,7 @@ class StructUnit2(StructUnit):
 
     """
 
-    def set_orientation2(self, end):
+    def set_orientation2(self, end, conformer=-1):
         """
         Rotate the molecule so that bonder atoms lie on `end`.
 
@@ -2094,28 +2197,24 @@ class StructUnit2(StructUnit):
 
         Parameters
         ----------
-        end : numpy.array
+        end : :class:`numpy.array`
             The vector with which the molecule's bonder atoms should be
             aligned.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed due to
-            rotation of the molecule about the centroid of the bonder
-            atoms.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit molecule in `mol`.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
 
-        *_, start = next(self.bonder_direction_vectors())
-        return self._set_orientation2(start, end)
+        *_, start = next(self.bonder_direction_vectors(conformer))
+        return self._set_orientation2(start, end, conformer)
 
-    def minimize_theta2(self, vector, axis):
+    def minimize_theta2(self, vector, axis, conformer=-1):
         """
         Rotates molecule about `axis` to minimze theta with `vector`.
 
@@ -2125,27 +2224,26 @@ class StructUnit2(StructUnit):
 
         Parameters
         ----------
-        vector : numpy.array
+        vector : :class:`numpy.array`
             The vector to which the distance should be minimized.
 
-        axis : numpy.array
+        axis : :class:`numpy.array`
             The direction vector along which the rotation happens.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed due to
-            rotation of the molecule about the centroid of the bonder
-            atoms.
+        conformer : :class:`int`, optional
+            The id of the conformer to be used.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
-        self.minimize_theta(self.centroid_centroid_dir_vector(),
-                            vector, axis, self.bonder_centroid())
+        self.minimize_theta(self.centroid_centroid_dir_vector(conformer),
+                            vector,
+                            axis,
+                            self.bonder_centroid(conformer),
+                            conformer)
 
 
 class StructUnit3(StructUnit):
@@ -2154,27 +2252,33 @@ class StructUnit3(StructUnit):
 
     """
 
-    def bonder_plane(self):
+    def bonder_plane(self, conformer=-1):
         """
         Returns the coefficients of the plane formed by bonder atoms.
 
-        A plane is defined by the scalar plane equation,
+        A plane is defined by the scalar plane equation::
 
             ax + by + cz = d.
 
-        This method returns the a, b, c and d coefficients of this
-        equation for the plane formed by the bonder atoms. The
-        coefficents a, b and c decribe the normal vector to the plane.
-        The coefficent d is found by substituting these coefficients
-        along with the x, y and z variables in the scalar equation and
-        solving for d. The variables x, y and z are substituted by the
-        coordinate of some point on the plane. For example, the
+        This method returns the ``a``, ``b``, ``c`` and ``d``
+        coefficients of this equation for the plane formed by the
+        bonder atoms. The coefficents ``a``, ``b`` and ``c`` decribe
+        the normal vector to the plane. The coefficent ``d`` is found
+        by substituting these coefficients along with the ``x``, ``y``
+        and ``z`` variables in the scalar equation and solving for
+        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by
+        the coordinates of some point on the plane. For example, the
         position of one of the bonder atoms.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        numpy.array
-            This array has the form [a, b, c, d] and represents the
+        :class:`numpy.array`
+            This array has the form ``[a, b, c, d]`` and represents the
             scalar equation of the plane formed by the bonder atoms.
 
         References
@@ -2183,43 +2287,48 @@ class StructUnit3(StructUnit):
 
         """
 
-        bonder_coord = self.atom_coords(self.bonder_ids[0])
-        d = -np.sum(self.bonder_plane_normal() * bonder_coord)
-        return np.append(self.bonder_plane_normal(), d)
+        bonder_coord = self.atom_coords(self.bonder_ids[0], conformer)
+        d = -np.sum(self.bonder_plane_normal(conformer) * bonder_coord)
+        return np.append(self.bonder_plane_normal(conformer), d)
 
-    def bonder_plane_normal(self):
+    def bonder_plane_normal(self, conformer=-1):
         """
         Returns the normal vector to the plane formed by bonder atoms.
 
         The normal of the plane is defined such that it goes in the
         direction toward the centroid of the molecule.
 
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             A unit vector which describes the normal to the plane of
             the bonder atoms.
 
         """
 
-        if sum(1 for _ in self.bonder_direction_vectors()) < 2:
+        if sum(1 for _ in self.bonder_direction_vectors(conformer)) < 2:
             raise ValueError(("StructUnit3 molecule "
                              "has fewer than 3 functional groups."))
 
-        vgen = (v for *_, v in self.bonder_direction_vectors())
+        vgen = (v for *_, v in self.bonder_direction_vectors(conformer))
         v1, v2 = it.islice(vgen, 2)
 
         normal_v = normalize_vector(np.cross(v1, v2))
 
         theta = vector_theta(normal_v,
-                             self.centroid_centroid_dir_vector())
+                             self.centroid_centroid_dir_vector(conformer))
 
         if theta > np.pi/2:
             normal_v *= -1
 
         return normal_v
 
-    def minimize_theta2(self, atom, vector, axis):
+    def minimize_theta2(self, atom, vector, axis, conformer=-1):
         """
         Rotates molecule to minimize angle between `atom` and `vector`.
 
@@ -2228,237 +2337,197 @@ class StructUnit3(StructUnit):
 
         Parameters
         ----------
-        atom : int
+        atom : :class:`int`
             The id of atom which is to have angle minimized.
 
-        vector : numpy.array
+        vector : :class:`numpy.array`
             A vector with which the angle is minimized.
 
-        axis : numpy.array
+        axis : :class:`numpy.array`
             The vector about which the rotation happens.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The rdkit molecule is changed to reflect the rotation.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
-        v1 = self.atom_coords(atom) - self.bonder_centroid()
-        self.minimize_theta(v1, vector, axis, self.bonder_centroid())
+        v1 = (self.atom_coords(atom, conformer) -
+              self.bonder_centroid(conformer))
+        self.minimize_theta(v1,
+                            vector,
+                            axis,
+                            self.bonder_centroid(conformer),
+                            conformer)
 
-    def set_orientation2(self, end):
+    def set_orientation2(self, end, conformer=-1):
         """
         Rotates the molecule so the plane normal is aligned with `end`.
 
-        Here ``plane normal`` referes to the normal of the plane formed
-        by the bonder atoms in the substituted molecule. The molecule
-        is rotated about the centroid of the bonder atoms. The rotation
-        results in the normal of their plane being aligned with `end`.
+        Here "plane normal" referes to the normal of the plane formed
+        by the bonder atoms. The molecule is rotated about the centroid
+        of the bonder atoms. The rotation results in the normal of
+        their plane being aligned with `end`.
 
         Parameters
         ----------
-        end : numpy.array
+        end : :class:`numpy.array`
             The vector with which the normal of plane of bonder atoms
             shoould be aligned.
 
-        Modifies
-        --------
-        mol : rdkit.Chem.rdchem.Mol
-            The conformer in this rdkit instance is changed due to
-            rotation of the molecule about the centroid of the bonder
-            atoms.
+        conformer : :class:`int`, optional
+            The conformer to use.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit molecule in `mol`.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` molecule in :attr:`~Molecule.mol`.
 
         """
 
-        start = self.bonder_plane_normal()
-        return self._set_orientation2(start, end)
+        start = self.bonder_plane_normal(conformer)
+        return self._set_orientation2(start, end, conformer)
 
 
 @total_ordering
 class MacroMolecule(Molecule, metaclass=Cached):
     """
-    A class for assembled macromolecules.
+    A representing assembled macromolecules.
 
-    The goal of this class is to represent an individual used by the
-    GA. As such, it holds attributes that are to be expected for this
-    purpose. Mainly, it has a fitness value stored in its `fitness`
-    attribute and a genetic code - as defined by its `building_blocks`
-    and  `topology` attributes. If a change is made to either of these
-    attributes, they should describe a different macromolecule. On the
-    other hand, the same attributes should always describe the same
-    macromolecule.
-
-    Because of this, as well as the computational cost associated with
-    macromolecule initialization, instances of this class are cached.
-    This means that providing the same arguments to the initializer
-    will not build a different instance with the same attribute values.
-    It will yield the original instance, retrieved from memory.
-
-    To prevent bloating this class, any information that can be
-    categorized is. For example, storing information that concerns
-    building blocks ``in a vacuum`` is stored in ``StructUnit``
-    instances. Equally, manipulations of such data is also performed by
-    those instances. Similarly, anything to do with topolgy should be
-    held by a ``Topology`` instance in the topology attribute. There is
-    a notable exception to this however. This happens when retrieving
-    topological information directly from rdkit molecule instances
-    of the macromolecule. Examples include the information about atomic
-    coordinates, which can be access with the ``atom_coords()`` method.
-
-    It should also be noted that only a single copy of each
-    ``StructUnit`` instance representing a specific building block
-    needs to be held. How many of such building blocks are need to
-    assemble the molecule is the handled by the ``Topology`` class.
+    Because of the computational cost associated with macromolecule
+    assembly, instances of this class are cached. This means that
+    providing the same arguments to the initializer will not build a
+    different instance with the same attribute values. It will yield
+    the original instance, retrieved from memory.
 
     This class is not intended to be used directly but should be
     inherited by subclasses representing specific macromolecules. The
-    ``Cage`` and ``Polymer`` classes are examples of this. Any
-    information or methods that apply generally to all macromolecules
-    should be defined within this class while specific non-general data
-    should be included in derived classes.
+    :class:`Cage` and :class:`Polymer` classes are examples of this.
+    Any information or methods that apply generally to all
+    macromolecule should be defined within this class while specific
+    non-general data should be included in the derived classes.
 
-    This class also supports comparison operations, these act on the
-    fitness value assiciated with a macromolecule. Comparison
-    operations not explicitly defined are included via the
-    ``total_ordering`` decorator. For other operations and methods
-    supported by this class examine the rest of the class definition.
-
-    Finally, a word of caution. The equality operator ``==`` compares
-    fitness values. This means two macromolecules, made from different
-    building blocks, can compare equal if they happen to have the same
-    fitness. The operator is not to be used to check if one
-    macromolecule is the same structurally as another. To do this check
-    use the ``same()`` method. This method may be overwritten in
-    derived classes, as necessary. In addition the ``is`` operator is
-    implemented as is default in Python. It compares whether two
-    objects are in the same location in memory. Because the
-    ``MacroMolecule`` class is cached the ``is`` operator could in
-    principle be used instead of the `same` method (including in
-    derived classes). However, this is not intended use and is not
-    guaranteed to work in future implementations. If caching stops
-    being implemented such code would break.
+    Note the equality operator ``==`` compares :attr:`fitness`. This
+    means two different macromolecules compare equal if they happen to
+    have the same fitness. The operator is not to be used to check if
+    one macromolecule is the same structurally as another. To do this,
+    use :meth:`~Molecule.same`.
 
     Attributes
     ----------
-    building_blocks : list of ``StructUnit`` instances
-        This attribute holds ``StructUnit`` instances which represent
-        the monomers forming the macromolecule. Only one ``StructUnit``
-        instance is needed per building block, even if multiples of a
-        building block join up to form the macromolecule
+    building_blocks : :class:`list` of :class:`StructUnit`
+        This attribute holds :class:`StructUnit` instances which
+        represent the monomers forming the macromolecule. Only one
+        :class:`StructUnit` instance is needed per building block, even
+        if multiples of that molecule join up to form the
+        macromolecule.
 
-    bb_counter : Counter
+    bb_counter : :class:`collections.Counter`
         A counter keeping track of how much of each building block is
         used to form the macromolecule.
 
-    topology : Topology
-        An object of a class derived from ``Topology``. It
-        assembles the marcormolecule from the building_blocks.
+    topology : :class:`.Topology`
+        Defines the shape of macromolecule and assembles it.
 
-    mol : rdkit.Chem.rdchem.Mol
-        An rdkit instance representing the macromolecule.
+    fitness : :class:`float`
+        The fitness value of the macromolecule, used by the GA.
 
-    inchi : str
-        The InChI of the molecule.
-
-    optimized : bool (default = False)
-        This is a flag to indicate if a molecule has been previously
-        optimized. Optimization functions set this flag to ``True``
-        after an optimization.
-
-    energy : Energy
-        This attribute handles information about the energy of the
-        instance. See the documentation of ``Energy`` to see what is
-        available.
-
-    fitness : float (default = None)
-        The fitness value of the macromolecule, as determined by the
-        chosen fitness functions together with any normalization
-        functions. Fitness functions do not place values into this
-        attribute directly.
-
-    unscaled_fitness : dict
-        The dictionary hold the name of a fitness function as the
+    unscaled_fitness : :class:`dict`
+        The dictionary holds the name of a fitness function as the
         key and the value it calculated for unscaled_fitness as the
-        value.
+        value. For example,
 
-    progress_params : dict (default = {})
+        .. code-block:: python
+
+            unscaled_fitness = {'fitness_func1': 12.3,
+                                'fitness_func2': 49.2}
+
+        where ``'fitness_func1'`` and ``'fitness_func2'`` are the
+        names of the fintess functions applied on the molecule.
+
+    progress_params : :class:`dict`
         Holds the fitness parameters which the GA should track to make
-        progress plots. The key is the name of a fitness function.
+        progress plots. The key is the name of a fitness function. Has
+        the form
 
-    bonds_made : int
-        The number of bonds created during assembly.
+        .. code-block:: python
 
-    bonder_ids : list of ints
-        The ids of atoms which have bonds added during assembly. This
-        list is sorted from lowest to highest id.
+            unscaled_fitness = {'fitness_func1': [8, 49]
+                                'fitness_func2': [78, 4.2, 32.3]}
 
-    fg_ids : set of ints
-        The ids of atoms which were parth of the functional group of
+
+    bonds_made : :class:`int`
+        The number of bonds made during assembly.
+
+    bonder_ids : :class:`list` of :class:`int`
+        The ids of atoms which have bonds added during assembly. Sorted
+        from lowest to highest id.
+
+    fg_ids : :class:`set` of :class:`int`
+        The ids of atoms which were part of the functional group of
         the building blocks.
 
-    key : MacroMolKey
-        The key used for caching the molecule. Necessary for
-        `update_cache` to work. This attribute is assigned by the
-        `__call__()` method of the ``Cached`` metaclass.
+    fragments : :class:`dict`
+        The :class:`dict` has the form
 
-    name : str (default = "")
-        A name which can be optionally given to the molcule for easy
-        identification.
+        .. code-block:: python
 
-    note : str (default = "")
-        A note or comment about the molecule. Purely optional but can
-        be useful for labelling and debugging.
+            fragments = {(0, 0): {1, 2, 3, 4},
+                         (0, 1): {5, 6, 7, 8},
+                         (1, 0): {9, 10, 11},
+                         (1, 1): {12, 13, 14},
+                         (1, 2): {15, 16, 17}}
 
-    fragments : dict
-        The key in this dictionary is a tuple of form (int, int). The
-        first int is the index of a building block within
-        `building_blocks`. The second int indentifies a molecule of
-        that building block. For example, (1, 3) identifies the 4th
-        molecule of type building_blocks[1] to be added to the
-        macromolecule during assembly.
+        The key in this dictionary is a tuple of form ``(5, 2)``. The
+        first element is the index of a building block within
+        :attr:`building_blocks`. The second element indentifies a
+        molecule of that building block. For example, ``(1, 3)``
+        identifies the 4th molecule of  ``building_blocks[1]`` to be
+        added to the macromolecule during assembly.
 
         The value in the dictionary is a set of ints. These hold the
         atom ids belonging to a particular molecule before assembly.
 
     """
 
-    def __init__(self, building_blocks, topology, name="", note=""):
+    def __init__(self,
+                 building_blocks,
+                 topology,
+                 name="",
+                 note="",
+                 bb_conformers=None):
         """
-        Initialize a ``MacroMolecule`` instance.
-
-        When an exception occurs during initialization, all parameters
-        which were provided to the initializer are saved to a file
-        ``failures.txt`` which is in the ``output`` folder.
+        Initialize a :class:`MacroMolecule` instance.
 
         Parameters
         ---------
-        building_blocks : iterable of ``StructUnit`` instances
-            A set of ``StructUnit`` instances which represent the
-            monomers forming the macromolecule.
+        building_blocks : :class:`list` of :class:`StructUnit`
+            The :class:`StructUnit` instances of building blocks
+            forming the macromolecule.
 
-        topology : Topology
-            An instance of a class derived from ``Topology``. It
-            assembles the marcormolecule from the building_blocks.
+        topology : :class:`.Topology`
+            Defines the shape of macromolecule and assembles it.
 
-        note : str (default = "")
+        name : :class:`str`, optional
+            A name which can be given to the molcule for easy
+            identification.
+
+        note : :class:`str`, optional
             A note or comment about the molecule.
 
-        name : str (default = "")
-            A name which can be optionally given to the molcule for
-            easy identification.
-
+        bb_conformers : :class:`list` of :class:`int`, optional
+            The ids of the building block conformers to be used. Must
+            be equal in length to `building_blocks` and orders must
+            correspond. If ``None``, then ``-1`` is used for all
+            building blocks.
 
         """
+
+        if bb_conformers is None:
+            bb_conformers = [-1 for _ in range(len(building_blocks))]
 
         self.fitness = None
         self.unscaled_fitness = {}
@@ -2473,7 +2542,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         try:
             # Ask the ``Topology`` instance to assemble/build the
             # macromolecule. This creates the `mol` attribute.
-            topology.build(self)
+            topology.build(self, bb_conformers)
 
         except Exception as ex:
             self.mol = rdkit.Mol()
@@ -2487,10 +2556,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
                         '---------------\n').format(topology)
 
             bb_blocks = []
-            for bb in building_blocks:
+            for i, bb in enumerate(building_blocks):
+                bb_conf = bb_conformers[i]
                 bb_blocks.append(
                     ('{0.__class__.__name__} {0.func_grp.name}\n'
-                     '{1}').format(bb, bb.mdl_mol_block()))
+                     '{1}').format(bb, bb.mdl_mol_block(bb_conf)))
 
             errormsg += '\n'.join(bb_blocks)
 
@@ -2499,22 +2569,79 @@ class MacroMolecule(Molecule, metaclass=Cached):
         super().__init__(name, note)
         self.save_ids()
 
-    def building_block_cores(self, bb):
+    def add_conformer(self, bb_conformers):
         """
-        Yields the "cores" of a building block molecule.
-
-        The structure of the cores are representative of how they are
-        found in the macromolecule.
+        Assembles a new conformer.
 
         Parameters
         ----------
-        bb : int
+        bb_conformers : :class:`list` of :class:`int`
+            The ids of the building block conformers to be used. Must
+            be equal in length to :attr:`building_blocks` and orders
+            must correspond. If ``None``, then ``-1`` is used for all
+            building blocks.
+
+        Returns
+        -------
+        :class:`int`
+            The id of the new conformer.
+
+        """
+
+        # Save the original rdkit molecule.
+        original_mol = self.mol
+        # Build a new molecule.
+        try:
+            # Ask the ``Topology`` instance to assemble/build the
+            # macromolecule. This creates the `mol` attribute.
+            self.topology.build(self, bb_conformers)
+
+        except Exception as ex:
+            self.mol = rdkit.Mol()
+            errormsg = ('Build failure.\n'
+                        '\n'
+                        'topology\n'
+                        '--------\n'
+                        '{}\n'
+                        '\n'
+                        'building blocks\n'
+                        '---------------\n').format(self.topology)
+
+            bb_blocks = []
+            for i, bb in enumerate(self.building_blocks):
+                bb_conf = bb_conformers[i]
+                bb_blocks.append(
+                    ('{0.__class__.__name__} {0.func_grp.name}\n'
+                     '{1}').format(bb, bb.mdl_mol_block(bb_conf)))
+
+            errormsg += '\n'.join(bb_blocks)
+
+            logger.error(errormsg, exc_info=True)
+
+        # Get the new conformer.
+        new_conf = rdkit.Conformer(self.mol.GetConformer())
+        # Add it to the original molecule.
+        new_id = original_mol.AddConformer(new_conf, True)
+        self.mol = original_mol
+        return new_id
+
+    def building_block_cores(self, bb):
+        """
+        Yields the "cores" of the building block molecules.
+
+        The structure of the yielded cores has the geometry found in
+        the macromolecule.
+
+        Parameters
+        ----------
+        bb : :class:`int`
             The index of a building block molecule within
-            `building_blocks`. The cores of this molecule are yielded.
+            :attr:`building_blocks`. The cores of this molecule are
+            yielded.
 
         Yields
         ------
-        rdkit.Chem.rdchem.Mol
+        :class:`rdkit.Chem.rdchem.Mol`
             The core of a building block molecule, as found in the
             macromolecule.
 
@@ -2542,16 +2669,18 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def json(self):
         """
-        Returns a JSON representation of the object.
+        Returns a JSON representation of the molecule.
 
-        The representation has the following form:
+        The representation has the form
+
+        .. code-block:: python
 
             {
                 'class' : 'Polymer',
-                'mol_block' : 'A string holding the V3000 mol
-                               block of the molecule.'
+                'mol_block' : '''A string holding the V3000 mol
+                                 block of the molecule.'''
                 'building_blocks' : {bb1.json(), bb2.json()}
-                'topology' : 'Copolymer(repeating_unit='AB')'
+                'topology' : 'Copolymer(repeating_unit="AB")'
                 'unscaled_fitness' : {'fitness_func1' : fitness1,
                                       'fitness_func2' : fitness2},
                 'note' : 'A nice molecule.',
@@ -2560,8 +2689,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         Returns
         -------
-        dict
-            A dict which represents the molecule.
+        :class:`dict`
+            A :class:`dict` which represents the molecule.
 
         """
 
@@ -2591,18 +2720,18 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
         Completes a JSON initialization.
 
-        This function is not to be used. Use ``Molecule.load()``
+        This function is not to be used. Use :meth:`Molecule.load`
         for loading instances from a JSON string. That function will
         automatically call this one.
 
         Parameters
         ----------
-        json_dict : dict
+        json_dict : :class:`dict`
             A dictionary holding the attribute data of the molecule.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -2612,12 +2741,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
         topology = eval(json_dict['topology'],  topologies.__dict__)
 
         key = cls.gen_key(bbs, topology)
-        if key in cls.cache:
+        if key in cls.cache and CACHE_SETTINGS['ON']:
             return cls.cache[key]
 
         obj = cls.__new__(cls)
         obj.mol = rdkit.MolFromMolBlock(json_dict['mol_block'],
-                                        sanitize=False, removeHs=False)
+                                        sanitize=False,
+                                        removeHs=False)
         obj.topology = topology
         obj.unscaled_fitness = eval(json_dict['unscaled_fitness'],
                                     np.__dict__)
@@ -2640,25 +2770,28 @@ class MacroMolecule(Molecule, metaclass=Cached):
              for x in json_dict['fragments'].keys()),
             (set(x) for x in json_dict['fragments'].values())
         ))
-        cls.cache[key] = obj
+
+        if CACHE_SETTINGS['ON']:
+            cls.cache[key] = obj
+
         return obj
 
     @staticmethod
     def gen_key(building_blocks, topology):
         """
-        Generates the key for caching the molecule.
+        Generates the key used for caching the molecule.
 
         Parameters
         ----------
-        building_blocks : iterable of StructUnit instances
+        building_blocks : :class:`list` of :class:`StructUnit`
             The building blocks used to make the macromolecule.
 
-        topology : Topology
+        topology : :class:`.Topology`
             The topology used to make the macromolecule.
 
         Returns
         -------
-        tuple
+        :class:`tuple`
             The key used for caching the macromolecule.
 
         """
@@ -2666,7 +2799,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
         return (frozenset(x.key for x in building_blocks),
                 repr(topology))
 
-    def bb_distortion(self):
+    def bb_distortion(self, bb_conformers=None, conformer=-1):
         """
         Rmsd difference of building blocks before and after assembly.
 
@@ -2678,13 +2811,27 @@ class MacroMolecule(Molecule, metaclass=Cached):
         Atoms which form the functional group of the building blocks
         and hydrogens are excluded from the calculation.
 
+        Parameters
+        ----------
+        bb_conformers : :class:`list` of :class:`int`
+            The ids of building block conformers to use. 1 id for each
+            building block, in an order corresponding to
+            :attr:`building_blocks`. If ``None``, all conformer ids
+            default to ``-1``.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
         Returns
         -------
-        float
+        :class:`float`
             The mean rmsd of the macromole's building blocks to their
             "free" counterparts.
 
         """
+
+        if bb_conformers is None:
+            bb_conformers = [-1 for _ in range(len(self.building_blocks))]
 
         # Go through each of the building blocks. For each building
         # block get the core. Get the corrospending cores in the
@@ -2696,7 +2843,11 @@ class MacroMolecule(Molecule, metaclass=Cached):
             free = bb.core()
             am = [(x, x) for x in range(free.GetNumAtoms())]
             for frag in self.building_block_cores(i):
-                rmsd += rdkit.AlignMol(free, frag, atomMap=am)
+                rmsd += rdkit.AlignMol(free,
+                                       frag,
+                                       bb_conformers[i],
+                                       conformer,
+                                       atomMap=am)
                 n += 1
         return rmsd / n
 
@@ -2704,19 +2855,9 @@ class MacroMolecule(Molecule, metaclass=Cached):
         """
         Updates `bonder_ids` and `fg_ids` attributes.
 
-        Modifies
-        --------
-        bonder_ids : list of ints
-            All molecules tagged 'bonder' have their ids added to this
-            list.
-
-        fg_ids : set of ints
-            All molecules tagged 'fg' have their ids add to
-            this set.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -2731,40 +2872,36 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     def update_cache(self):
         """
-        Set cached molecule with same 'key' to have equal attributes.
+        Update attributes of cached molecule.
 
-        When an instance of ``MacroMolecule`` is first created it
-        is cached. Using multiprocessing to perform optimizations or
-        calculate fitness returns modified copies of the cached
+        When an instance of :class:`MacroMolecule` is first created it
+        is cached. Using ``multiprocessing`` to perform optimizations
+        or calculate fitness returns modified copies of the cached
         molecules. In order to ensure that the cached molecules have
         their attributes updated to the values of the copies, this
         method must be run on the copies.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
-        self.__class__.cache[self.key].__dict__ = dict(vars(self))
+        if self.key in self.__class__.cache:
+            self.__class__.cache[self.key].__dict__ = dict(vars(self))
 
     def update_fragments(self):
         """
-        Saves rdkit atom properties in `fragments`.
+        Saves ``rdkit`` atom properties in :attr:`fragments`.
 
-        The properties saved are 'bb_index' and 'mol_index'. These
-        should be added to the atoms by the ``place_mols()`` function
-        during ``build()``.
-
-        Modifies
-        --------
-        fragments : dict
-            The dictionary is updated with the data from the 'bb_index'
-            and 'mol_index' properties.
+        The properties saved are ``'bb_index'`` and ``'mol_index'``.
+        These should be added to the atoms by
+        :meth:`.Topology.place_mols` when running
+        :meth:`.Topology.build`.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -2823,7 +2960,7 @@ class Cage(MacroMolecule):
 
     """
 
-    def window_difference(self):
+    def window_difference(self, conformer=-1):
         """
         The total difference in all window sizes.
 
@@ -2837,28 +2974,28 @@ class Cage(MacroMolecule):
         only want to compare the triangulars with other
         triangular windows and squares only with other squares.
 
+        Parameters
+        ---------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
         Returns
         -------
-        float
+        :class:`float`
             The total difference of window size when considering
             every combination of windows of the same type.
 
-        None : NoneType
+        None : :class:`NoneType`
             If not all windows were found.
-
-
-        Raises
-        ------
-        WindowError
-            When the number of found windows is less than the
-            number of expected windows. Likely due to a collapsed
-            cage.
 
         """
 
-        if (self.windows is None or
-           len(self.windows) < self.topology.n_windows):
+        windows = self.windows(conformer)
+
+        if windows is None or len(windows) < self.topology.n_windows:
             return None
+
+        windows = np.array(windows)
 
         # Cluster the windows into groups so that only size
         # differences between windows of the same type are taken
@@ -2868,7 +3005,6 @@ class Cage(MacroMolecule):
         # sizes have the biggest difference. If there are three
         # types split it at the two biggest differences and so
         # on.
-        windows = np.array(self.windows)
 
         diffs = list(abs(np.ediff1d(windows)))
         sorted_diffs = sorted(diffs, reverse=True)
@@ -2902,31 +3038,42 @@ class Cage(MacroMolecule):
 
         return sum(diff_sums)
 
-    @property
-    def windows(self):
+    def windows(self, conformer=-1):
         """
-        Returns window sizes found by pyWindow.
+        Returns window sizes found by ``pyWindow``.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
             If the function for finding windows and their sizes
             found fewer than the required number of windows or
             if it failed for some other reason.
 
-        list of floats
-            Each float in the list represents the size of a
+        :class:`list` of :class:`float`
+            Each :class:`float` represents the size of a
             window in the cage. If the window finding function
             found more than the expected number of windows, only
-            the largest n windows are returned. Where n is the
-            number of expected windows.
+            the largest ``n`` windows are returned. Where ``n`` is the
+            number of expected windows for that cage topology.
 
         """
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             # Load an RDKit molecule object to pyWINDOW.
-            pw_molecule = pywindow.molecular.Molecule.load_rdkit_mol(self.mol)
+
+            # As pyWindow doesnt support multiple conformers, first
+            # make an rdkit molecule holding only the desired conformer.
+            new_mol = rdkit.Mol(self.mol)
+            new_mol.RemoveAllConformers()
+            new_mol.AddConformer(self.mol.GetConformer(conformer))
+
+            pw_molecule = pywindow.molecular.Molecule.load_rdkit_mol(new_mol)
             # Find windows and get a single array with windows' sizes.
             all_windows = pw_molecule.calculate_windows(output='windows')
 
@@ -2975,7 +3122,7 @@ class Periodic(MacroMolecule):
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
         When periodic topologies are assembled, periodic bonds
-        do not get added to the rdkit molecule in the
+        do not get added to the ``rdkit`` molecule in the
         :attr:`~.MacroMolecule.mol` attribute. Instead,
         :meth:`~.PeriodicLattice.join_mols` adds
         :class:`.PeriodicBond` instances representing the bonds into
@@ -3067,14 +3214,17 @@ class Periodic(MacroMolecule):
         Returns
         -------
         :class:`rdkit.Chem.rdchem.Mol`
-            An rdkit molecule of the island.
+            An ``rdkit`` molecule of the island.
 
         """
 
         cells, island, bonder_map = self._place_island(dimensions)
         island, bonded = self._join_island(cells, island)
-        return self._terminate_island(island, bonded, bonder_map,
-                                      terminator, bond_dict[bond_type])
+        return self._terminate_island(island,
+                                      bonded,
+                                      bonder_map,
+                                      terminator,
+                                      bond_dict[bond_type])
 
     def _join_island(self, cells, island):
         """
@@ -3096,7 +3246,7 @@ class Periodic(MacroMolecule):
         Returns
         -------
         :class:`tuple`
-            The first member of the tuple an rdkit molecule of the
+            The first member of the tuple an ``rdkit`` molecule of the
             island with all bonds between the unit cells added. The
             second member of the tuple is a :class:`set` of
             :class:`int`, where each :class:`int` is id of a bonder
@@ -3132,7 +3282,7 @@ class Periodic(MacroMolecule):
                 try:
                     # ccel as in "connected cell".
                     ccell = cells[x][y][z]
-                except:
+                except Exception:
                     continue
 
                 # `bonder1` is the id of a bonder atom, found in `cell`
@@ -3170,7 +3320,7 @@ class Periodic(MacroMolecule):
 
         bonded : :class:`set` of :class:`int`
             Contains all the ids of all bonder atoms in `island` which
-            have already had a bonded added by :methd:`_join_island`.
+            have already had a bonded added by :meth:`_join_island`.
 
         bonder_map : :class:`dict`
             This is a mapping of the ids of bonder atoms in the island
@@ -3189,7 +3339,7 @@ class Periodic(MacroMolecule):
         Returns
         -------
         :class:`rdkit.Chem.rdchem.Mol`
-            The rdkit molecule of the final, assembled island.
+            The ``rdkit`` molecule of the final, assembled island.
 
         """
 
@@ -3258,9 +3408,9 @@ periodic._place_island([4, 4, 4])
             3rd unit cell along the x axis, the second along the y axis
             and the fourth along the z axis.
 
-            The second member is an rdkit molecule of the island being
-            built. The third member is a :class:`dict` mapping the
-            ids of bonder atoms in the island back to the id of the
+            The second member is an ``rdkit`` molecule of the island
+            being built. The third member is a :class:`dict` mapping
+            the ids of bonder atoms in the island back to the id of the
             equivalent atom in the original unit cell.
 
         """
@@ -3349,7 +3499,7 @@ periodic._place_island([4, 4, 4])
         with open(path, 'w') as f:
             f.write(' '.join(keywords) + '\n\n')
             f.write('name {}\n\n'.format(self.name))
-            # Write the cell paramters.
+            # Write the cell parameters.
             f.write('cell\n')
             # The sizes of cell vectors a, b and c are written first.
             for vector in self.topology.cell_dimensions:

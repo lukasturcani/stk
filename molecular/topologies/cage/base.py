@@ -10,54 +10,85 @@ from ....convenience_tools import (centroid, vector_theta,
                                    normalize_vector)
 
 
-class WindowError(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
 class Vertex:
     """
-    Used to represent the vertices of Cage polyhedra.
+    Used to represent the vertices of cage polyhedra.
 
     This class stores information about the vertices which make up a
-    Cage's structure.
+    cage's structure.
 
     Attributes
     ----------
-    coord : numpy.array of floats
-        A numpy array which holds the x, y and z coordinates of the
+    coord : :class:`numpy.array`
+        An array which holds the x, y and z coordinates of the
         vertex, in that order.
 
-    connected : list of Edge or Vertex instances
-        This list holds the Edge or Vertex instances which represent
-        the edges or vertices connected to the `self` vertex.
+    connected : :class:`list` of :class:`Edge` or :class:`Vertex`
+        This :class:`list` holds the :class:`Edge` or :class:`Vertex`
+        instances which represent the edges or vertices connected to
+        this one.
 
-    bonder_ids : list of ints
-        This list holds the ids of atoms which belong to the building
-        block placed on the vertex and will form bonds. The ids reflect
-        those in the macromolecule not in the building block itself.
+    bonder_ids : :class:`list` of :class:`int`
+        This :class:`list` holds the ids of atoms which belong to the
+        building block placed on the vertex and will form bonds. The
+        ids reflect those in the macromolecule not in the building block
+        itself.
 
-    atom_position_pairs : list of tuples of form (int, Vertex)
+    atom_position_pairs : :class:`list`
+        A :class:`list` of the form
+
+        .. code-block:: python
+
+            atom_position_pairs = [(4, v1), (8, v2)]
+
+        Where ``v1`` and ``v2`` are :class:`Vertex` instances.
+
         Each atom which  is paired to a neighboring vertex or
-        edge first. Only after this is the atom - atom pairing
-        performed. The atom - edge/vertex pairing is stored here. The
+        edge first. Only after this is the atom-atom pairing
+        performed. The atom-edge/vertex pairing is stored here. The
         int represents the id of the atom.
 
-    distances : list of tuples of form (float, int, int)
+    distances : :class:`list`
+        A :class:`list` of the form
+
+        .. code-block:: python
+
+            distances = [(15.2, 5, 10), (18.4, 3, 8), ...]
+
         After bonder atoms have been associated with vertices to which
         they join, the idividual atoms are paired up. To do this the
         distance between every bonder atom on the paired vertex and the
         bonder atom which is paired to the vertex is found. This
-        information is stored here where float is the distance, the
-        first int is the bonder atom and the second int is the bonder
-        atom on the vertex paired to the first atom.
+        information is stored here the first element of each
+        :class:`tuple` the distance, and the second and third elements
+        represent the bonder atoms.
 
-    id : object, optional
-        An id to identify the vertex. Used by `place_mols()`
+    id_ : :class:`object`, optional
+        An id to identify the vertex. Used by
+        :meth:`CageTopology.place_mols`.
 
     """
 
     def __init__(self, x, y, z, id_=None):
+        """
+        Initializes a :class:`Vertex`.
+
+        Parameters
+        ----------
+        x : :class:`int` or :class:`float`
+            The x coordinate.
+
+        y : :class:`int` or :class:`float`
+            The y coordiante
+
+        z : :class:`int` or :class:`float`
+            The z coordiante
+
+        id : :class:`object`, optional
+            An id to identify the vertex.
+
+        """
+
         self.coord = np.array([x, y, z])
         self.connected = []
         self.bonder_ids = []
@@ -68,24 +99,24 @@ class Vertex:
     @classmethod
     def vertex_init(cls, *vertices):
         """
-        Intializes the Vertex from  a list of other vertices.
+        Intializes the :class:`Vertex` from other vertices.
 
         This initalizer automatically calculates the position of the
         vertex from the positions of the vertices provided to the
         initializer. Its position is set to the centroid of the
         provided vertices.
 
-        The `connected` attributes of all the involved vertices are
-        also updated.
+        The :attr:`connected` attributes of all the involved vertices
+        are also updated.
 
         Parameters
         ----------
-        vertices : tuple
-            A tuple of Vertex objects.
+        vertices : :class:`tuple` of :class:`Vertex`
+            Holds :class:`Vertex` objects used for initialization.
 
         Returns
         -------
-        Vertex
+        :class:`Vertex`
             The initialized vertex.
 
         """
@@ -101,7 +132,7 @@ class Vertex:
 
     def place_mol(self, building_block, aligner=0, aligner_edge=0):
         """
-        Place a StructUnit3 building block on the coords of the vertex.
+        Place a :class:`.StructUnit3` building block on the vertex.
 
         The orientation of the building block is aligned with 2
         parameters. Firstly, the normal of the plane of bonder atoms of
@@ -119,29 +150,24 @@ class Vertex:
 
         Parameters
         ----------
-        building_block : StructUnit3
+        building_block : :class:`.StructUnit3`
             The building block molecule to be placed on a vertex.
 
-        aligner : int, optional
-            The index of the atom within `bonder_ids` which is to be
-            aligned with an edge.
+        aligner : :class:`int`, optional
+            The index of the atom within
+            :attr`.StructUnit.bonder_ids` which is to be aligned
+            with an edge.
 
-        aligner_edge : int, optional
-            The index of an edge in `connected`. It is the edge with
-            which `aligner` is aligned.
-
-        Modifies
-        --------
-        building_block.mol : rdkit.Chem.rdchem.Mol
-            The conformer of the rdkit instance in this attribute is
-            modified as per the description in the docstring.
+        aligner_edge : :class:`int`, optional
+            The index of an edge in :attr:`connected`. It is the edge
+            with which `aligner` is aligned.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit instance holding the building block molecule with
-            the coordinates placed on the vertex and orientation set as
-            described in the docstring.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` instance holding the building block molecule
+            with the coordinates placed on the vertex and orientation
+            set as described in the docstring.
 
         """
 
@@ -178,7 +204,7 @@ class Vertex:
 
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             A normalized vector which defines the normal pointed away
             from the origin.
 
@@ -211,23 +237,24 @@ class Vertex:
         """
         Return coefficients of plane of edges connected to the vertex.
 
-        A plane is defined by the scalar plane equation,
+        A plane is defined by the scalar plane equation::
 
             ax + by + cz = d.
 
-        This method returns the a, b, c and d coefficients of this
-        equation for the plane formed by the connected edges. The
-        coefficents a, b and c decribe the normal vector to the plane.
-        The coefficent d is found by substituting these coefficients
-        along with the x, y and z variables in the scalar equation and
-        solving for d. The variables x, y and z are substituted by the
-        coordinate of some point on the plane. For example, the
+        This method returns the ``a``, ``b``, ``c`` and ``d``
+        coefficients of this equation for the plane formed by the
+        connected edges. The coefficents ``a``, ``b`` and ``c`` decribe
+        the normal vector to the plane. The coefficent ``d`` is found
+        by substituting these coefficients along with the ``x``, ``y``
+        and ``z`` variables in the scalar equation and solving for
+        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by
+        the coordinate of some point on the plane. For example, the
         position of one of the connected edges.
 
         Returns
         -------
-        numpy.array
-            This array has the form [a, b, c, d] and represents the
+        :class:`numpy.array`
+            This array has the form ``[a, b, c, d]`` and represents the
             scalar equation of the plane formed by the connected edges.
 
         References
@@ -246,7 +273,7 @@ class Vertex:
 
         Yields
         ------
-        numpy.array
+        :class:`numpy.array`
             A normalized direction vector running from one edge
             connected to the vertex to another.
 
@@ -261,10 +288,10 @@ class Vertex:
 
         Returns
         -------
-        numpy.matrix
-            The matrix is n x 3, where n is the number of edges
-            connected to the vertex. The row holds the x, y and z
-            coordinates, respectively.
+        :class:`numpy.matrix`
+            The matrix of shape ``[n, 3]``, where ``n`` is the number
+            of edges connected to the vertex. The row holds the x, y
+            and z coordinates, respectively.
 
         """
 
@@ -279,7 +306,7 @@ class Vertex:
 
         Returns
         -------
-        numpy.array
+        :class:`numpy.array`
             An array which holds the x, y and z positions of the
             centroid of the edges connected to the vertex.
 
@@ -297,17 +324,34 @@ class Edge(Vertex):
     Used to represent the edges of Cage polyhedra.
 
     This class stores information about the edges which make up a
-    Cage's structure.
+    cage's structure.
 
     Attributes
     ----------
-    direction : numpy.array
+    direction : :class:`numpy.array`
         This vector represents the orientation of the edge. It is a
-        normalized direction vector which runs from `v2` to `v1`.
+        normalized direction vector which runs from `v2` to `v1`,
+        provided in the initalizer.
 
     """
 
     def __init__(self, v1, v2, id_=None):
+        """
+        Initializes an :class:`Edge` instance.
+
+        Parameters
+        ----------
+        v1 : :class:`Vertex`
+            A vertex joined to the edge.
+
+        v2 : :class:`Vertex`
+            Another vertex joined to the edge.
+
+        id_ : :class`str`, optional
+            An id for the edge.
+
+        """
+
         Vertex.__init__(self, *centroid(v1.coord, v2.coord), id_)
         self.direction = normalize_vector(v1.coord - v2.coord)
         self.connected.extend([v1, v2])
@@ -324,25 +368,18 @@ class Edge(Vertex):
 
         Parameters
         ----------
-        linker : StructUnit2
+        linker : :class:`.StructUnit2`
             The linker which is to be placed and orientated as
             described in the docstring.
 
-        alignment : int
-            1 for parallel alignment with `self.direction` and -1 for
-            anti-parallel alignment with `self.direction`.
-
-
-        Modifies
-        --------
-        linker.mol : rdkit.Chem.rdchem.Mol
-            The conformer of the rdkit instance in this attribute is
-            modified as per the description in the docstring.
+        alignment : :class:`int`
+            ``1`` for parallel alignment with :attr:`direction` and
+            ``-1`` for anti-parallel alignment with :attr:`direction`.
 
         Returns
         -------
-        rdkit.Chem.rdchem.Mol
-            The rdkit instance holding the linker molecule with the
+        :class:`rdkit.Chem.rdchem.Mol`
+            The ``rdkit`` instance holding the linker molecule with the
             coordinates placed on the edge and orientation set as
             described in the docstring.
 
@@ -370,39 +407,41 @@ class _CageTopology(Topology):
 
     Attributes
     ----------
-    In addition to all the attributes defined within ``Topology`` this
-    class has the following attributes:
-
-    A_alignments : list of ints (default = None)
-        The length of this list must be equal to the number of
+    A_alignments : :class:`list` of :class:`int`
+        The length of this :class:`list` must be equal to the number of
         building blocks in the cage. When cages are built one of the
         bonder atoms of each building block is aligned with an edge
-        during placement. The int indicates which bonder atom is
-        aligned. The int corresponds to an index in `bonder_ids`.
+        during placement. The :class:`int` indicates which bonder atom
+        is aligned. The :class:`int` corresponds to an index in
+        :attr:`.MacroMolecule.bonder_ids`.
 
         If ``None`` the first atom in `bonder_ids` is always aligned.
 
         For example,
 
-            A_alignments = [0,2,1,2]
+        .. code-block:: python
+
+            A_alignments = [0, 2, 1, 2]
 
         In this case there must be 4 building blocks in the cage. The
-        the first building block has its first (index 0) bonder atom
-        aligned. The 2nd building block has the 3rd (index 2) atom
-        aligned. The 3rd building block has the 2nd (index 1) atom
-        aligned. The 4th building block has the 3rd (index 2) atom
-        aligned.
+        the first building block has its first (index ``0``) bonder
+        atom aligned. The 2nd building block has the 3rd (index ``2``)
+        atom aligned. The 3rd building block has the 2nd (index ``1``)
+        atom aligned. The 4th building block has the 3rd (index ``2``)
+        atom aligned.
 
 
-    B_alignments : list of ints (default = None)
-        The length of this list should be euqal to the number of
-        linkers in the cage. The linkers of a cage can have either 2
+    B_alignments : :class:`list` of :class:`int`
+        The length of this :class:`list` should be euqal to the number
+        of linkers in the cage. The linkers of a cage can have either 2
         functional groups or 3 or more, depending on the topology.
 
-        When the linkers have 2 functional groups the list should hold
-        either 1 or -1. The value indicates that the linker is aligned
-        parallel or antiparallel with the edge its placed on. For
-        example in a tetrahedral topology,
+        When the linkers have 2 functional groups, the :class:`list`
+        should hold either ``1`` or ``-1``. The value indicates that
+        the linker is aligned parallel or antiparallel with the edge
+        its placed on. For example, in a tetrahedral topology,
+
+        .. code-block:: python
 
             B_alignments = [-1, 1, 1, -1, 1, -1]
 
@@ -410,26 +449,62 @@ class _CageTopology(Topology):
         the second is aligned in parallel, and so on.
 
         If the linkers have 3 or more functional groups, the values
-        in B_alignments have the same role as `A_alignments`. The only
-        difference is that by default the second atom is aligned,
-        rather than the first.
+        in :attr:`B_alignments` have the same role as
+        :attr:`A_alignments`. The only difference is that by default
+        the second atom is aligned, rather than the first.
 
-    edge_alignments : list of ints, optional
-        The length of the list is equal to the number of building
-        blocks in the cage. Each element is an int which holds the id
-        of an edge. For example,
+    edge_alignments : :class:`list` of :class:`int`
+        The length of the :class:`list` is equal to the number of
+        building blocks in the cage. Each element is an :class:`int`
+        which holds the id of an edge. For example,
+
+        .. code-block:: python
 
             edge_alignments = [1, 2, 3, 4]
 
         then the first building block is aligned with the edge with
-        `id` of 1, the second building block is aligned with the edge
-        with `id` 2 and so on. For this to work the edge defined by
-        the class must have their `id` attributes defined.
+        :attr:`Vertex.id_` of ``1``, the second building block is
+        aligned with the edge with :attr:`Vertex.id_` ``2`` and so on.
+        For this to work, the edges must have their :attr:`Vertex.id_`
+        attributes defined.
+
+    bb_assignments : :class:`dict`
+        A :class:`dict` of the form
+
+        .. code-block:: python
+
+            bb_assignments = {
+                0: [0, 1, 3],
+                1: [2]
+                2: [0, 4, 5],
+                3: [1, 2, 3]
+            }
+
+        This means the building block at index ``0`` of
+        :attr:`.MacroMolecule.building_blocks` sits on the vertices
+        of indices ``0``, ``1``, and ``3``. The building block at
+        index ``1`` of :attr:`.MacroMolecule.building_blocks` sits on
+        verticex of index ``2``.
+
+        The building block at index ``2`` in
+        :attr:`.MacroMolecule.building_blocks` also sits on the vertex
+        of index ``0``. However each cage is composed of two sets of
+        building blocks, called building blocks and linkers. This means
+        that the building block at index ``0`` is builing block while
+        the one at index ``2`` is a linker, or vice versa. Which one
+        is which is automatically deduced by looking at the number of
+        functional groups.
+
+        If ``None`` then building blocks are assigned at random.
 
     """
 
-    def __init__(self, A_alignments=None, B_alignments=None,
-                 edge_alignments=None):
+    def __init__(self,
+                 A_alignments=None,
+                 B_alignments=None,
+                 edge_alignments=None,
+                 bb_assignments=None):
+
         if A_alignments is None:
             A_alignments = np.zeros(len(self.positions_A))
         if B_alignments is None:
@@ -442,6 +517,38 @@ class _CageTopology(Topology):
         self.A_alignments = A_alignments
         self.B_alignments = B_alignments
         self.edge_alignments = edge_alignments
+        self.bb_assignments = bb_assignments
+
+    def _bb_maps(self, macro_mol):
+        """
+
+        """
+
+        bb_fgs = max(len(bb.functional_group_atoms()) for
+                     bb in macro_mol.building_blocks)
+        bb_map, lk_map = {}, {}
+
+        if self.bb_assignments is None:
+            bbs = [bb for bb in macro_mol.building_blocks if
+                   len(bb.functional_group_atoms()) == bb_fgs]
+            lks = [bb for bb in macro_mol.building_blocks if
+                   len(bb.functional_group_atoms()) != bb_fgs]
+
+            for i in range(len(self.positions_A)):
+                bb_map[i] = np.random.choice(bbs)
+            for i in range(len(self.positions_B)):
+                lk_map[i] = np.random.choice(lks)
+
+        else:
+
+            for bb_index, positions in self.bb_assignments.items():
+                bb = macro_mol.building_blocks[bb_index]
+                n_fgs = len(bb.functional_group_atoms())
+                map_ = bb_map if n_fgs == bb_fgs else lk_map
+                for position in positions:
+                    map_[position] = bb
+
+        return bb_map, lk_map
 
     def join_mols(self, macro_mol):
         """
@@ -449,22 +556,12 @@ class _CageTopology(Topology):
 
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
-
-        Modifies
-        --------
-        macro_mol.mol : rdkit.Chem.rdchem.Mol
-            Joins up the separate building blocks in this
-            macromolecule.
-
-        macro_mol.bonds_made : int
-            Places the number of bonds made during assembly into this
-            attribute.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -514,24 +611,21 @@ class _CageTopology(Topology):
         and positions so that each is only present in one pairing and
         so that the total distance of the pairings is minimized.
 
+        This updates of :attr:`Vertex.atom_position_pairs` attribute of
+        `vertex`.
+
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being buit.
 
-        vertex : Vertex
+        vertex : :class:`Vertex`
             The position at which all the atoms being paired are
             located.
 
-        Modifies
-        --------
-        vertex.atom_position_pairs : list of tuples of (int, Vertex)
-            Adds a tuples to this list represnting the id of the atom
-            and position which were paired.
-
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
@@ -572,54 +666,28 @@ class _CageTopology(Topology):
         The building block molecules are placed in their appropriate
         positions based on the topology. It does not join them.
 
+        Also updates :attr:`.MacroMolecule.bb_counter`.
+
         Parameters
         ----------
-        macro_mol : MacroMolecule
+        macro_mol : :class:`.MacroMolecule`
             The macromolecule being built.
-
-        Modifies
-        --------
-        macro_mol.mol
-            An rdkit instance of the macromolecule with disconnected
-            building blocks is placed in this attribute.
-
-        macro_mol.bb_counter : Counter
-            The counter is updated with the number of building blocks
-            of each type used to form the macromolecule.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
         macro_mol.mol = rdkit.Mol()
+        bb_map, lk_map = self._bb_maps(macro_mol)
 
-        # Get the StructUnit instances of the building blocks.
-        bb1, bb2 = macro_mol.building_blocks
-        # Get the number of functional groups in each building block.
-        n_fg1 = len(bb1.functional_group_atoms())
-        n_fg2 = len(bb2.functional_group_atoms())
-
-        # Depending on the number of functional groups, assigned a
-        # building block to be either a linker or a building-block*.
-        if n_fg1 < n_fg2:
-            lk = bb1
-            n_lk = n_fg1
-            bb = bb2
-            n_bb = n_fg2
-        else:
-            lk = bb2
-            n_lk = n_fg2
-            bb = bb1
-            n_bb = n_fg1
-
-        # Save the original orientations of the linker and building
-        # block. This means that when orienation of molecules is done,
+        # Save the original orientationss of building blocks.
+        # This means that when orienation of molecules is done,
         # the starting position is always the same. Ensures
         # consistency.
-        lk_pos = lk.position_matrix()
-        bb_pos = bb.position_matrix()
+        ipositions = {bb: bb.position_matrix() for
+                      bb in macro_mol.building_blocks}
 
         # This loop places all building-blocks* on the points at
         # `positions_A`. It then pairs all atoms which form a new bond
@@ -627,6 +695,9 @@ class _CageTopology(Topology):
         # counts the nubmer of building-blocks* which make up the
         # structure.
         for i, position in enumerate(self.positions_A):
+            bb = bb_map[i]
+            bb_pos = ipositions[bb]
+            n_bb = len(bb.functional_group_atoms())
             # Position the molecule on the vertex.
             bb.set_position_from_matrix(bb_pos)
             aligner_edge_id = self.edge_alignments[i]
@@ -659,6 +730,10 @@ class _CageTopology(Topology):
         # they are found at. It also counts the number of linkers which
         # make up the structure.
         for i, position in enumerate(self.positions_B):
+            lk = lk_map[i]
+            lk_pos = ipositions[lk]
+            n_lk = len(lk.functional_group_atoms())
+
             lk.set_position_from_matrix(lk_pos)
             lk_mol = position.place_mol(lk,  int(self.B_alignments[i]))
             add_fragment_props(lk_mol,
@@ -685,20 +760,7 @@ class _VertexOnlyCageTopology(_CageTopology):
 
     """
 
-    def __init__(self, A_alignments=None, B_alignments=None,
-                 edge_alignments=None):
-
-        if A_alignments is None:
-            A_alignments = np.zeros(len(self.positions_A))
-        if B_alignments is None:
-            B_alignments = np.zeros(len(self.positions_B))
-        if edge_alignments is None:
-            edge_alignments = [None for x in
-                               range(len(self.positions_A))]
-
-        self.A_alignments = A_alignments
-        self.B_alignments = B_alignments
-        self.edge_alignments = edge_alignments
+    ...
 
 
 class _NoLinkerCageTopology(_CageTopology):
@@ -707,15 +769,16 @@ class _NoLinkerCageTopology(_CageTopology):
 
     Attributes
     ----------
-    alignments : list of ints
-        Same meaning as `A_alignments` in _CageTopology.
+    alignments : :class:`list` of :class:`int`
+        See :attr:`_CageTopology.A_alignments`
 
-    placement : str
+    placement : :class`str`
         The name of the placement type to be used. Valid options are
 
-            'random' - For each vertex, a building block is picked
-             randomly from `macro_mol.building_blocks` and placed on
-             the vertex.
+            1. ``'random'`` - For each vertex, a building block is
+                picked randomly from
+                :attr:`.MacroMolecule.building_blocks` and placed on
+                the vertex.
 
     """
 
@@ -758,11 +821,11 @@ class _NoLinkerCageTopology(_CageTopology):
     @classmethod
     def connect(cls):
         """
-        Updates each Vertex with a list of its neighbors.
+        Updates each :attr:`Vertex.connected`.
 
         Returns
         -------
-        None : NoneType
+        None : :class:`NoneType`
 
         """
 
