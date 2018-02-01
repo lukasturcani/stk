@@ -134,6 +134,11 @@ functional_groups = [
                                  "[$(*[I])]",
                                  "[$([I]*)]"),
 
+                FGInfo("nitrile", "[C][C]#[N]",
+                                 "[$([C]([H])([H])[C]#[N])]",
+                                 "[$([H][C][H])].[$([H][C][H])]"),
+
+
                 # This amine functional group only deletes one of the
                 # hydrogen atoms when a bond is formed.
                 FGInfo("amine2",
@@ -151,4 +156,5 @@ functional_groups = [
 
 double_bond_combs = [('amine', 'aldehyde'),
                      ('amide', 'aldehyde'),
+                     ('nitrile','aldehyde'),
                      ('amide', 'amine')]
