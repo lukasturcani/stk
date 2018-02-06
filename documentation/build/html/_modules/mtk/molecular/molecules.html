@@ -706,6 +706,12 @@
                                     <span class="n">atoms_group</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                     <span class="n">atoms_group</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
                                     <span class="n">atoms_group</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="c1"># check that the dihedral is calculated in the right direction</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dihedral_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">:</span>
+                    <span class="n">dihedral_value</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dihedral_value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dihedral_value</span> <span class="o">=</span> <span class="mi">180</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dihedral_value</span><span class="p">)</span>
+
                 <span class="n">dihedral_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dihedral_value</span><span class="p">)</span>
 
             <span class="c1"># Calculate the average dihedral value</span>
@@ -913,11 +919,11 @@
                        <span class="s2">&quot;$$$$</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># id atomic_symbol x y z</span>
-        <span class="n">atom_line</span> <span class="o">=</span> <span class="s2">&quot;M  V30 </span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2:.4f}</span><span class="s2"> </span><span class="si">{3:.4f}</span><span class="s2"> </span><span class="si">{4:.4f}</span><span class="s2"> 0</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">atom_line</span> <span class="o">=</span> <span class="s2">&quot;M  V30 </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{:.4f}</span><span class="s2"> </span><span class="si">{:.4f}</span><span class="s2"> </span><span class="si">{:.4f}</span><span class="s2"> 0</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">atom_block</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="c1"># id bond_order atom1 atom2</span>
-        <span class="n">bond_line</span> <span class="o">=</span> <span class="s2">&quot;M  V30 </span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2"> </span><span class="si">{3}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">bond_line</span> <span class="o">=</span> <span class="s2">&quot;M  V30 </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">bond_block</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="n">main_string</span> <span class="o">=</span> <span class="n">main_string</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">(),</span>
@@ -934,9 +940,13 @@
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
             <span class="n">atom_id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
             <span class="n">atom_sym</span> <span class="o">=</span> <span class="n">periodic_table</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()]</span>
+            <span class="n">charge</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetFormalCharge</span><span class="p">()</span>
+            <span class="n">charge</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">charge</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">f</span><span class="s1">&#39; CHG=</span><span class="si">{charge}</span><span class="s1">&#39;</span>
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
             <span class="n">atom_block</span> <span class="o">+=</span> <span class="n">atom_line</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atom_id</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
-                                           <span class="n">atom_sym</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+                                           <span class="n">atom_sym</span><span class="p">,</span>
+                                           <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
+                                           <span class="n">charge</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
             <span class="n">bond_id</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
@@ -3032,7 +3042,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="MacroMolecule.update_fragments"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.update_fragments">[docs]</a>    <span class="k">def</span> <span class="nf">update_fragments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
