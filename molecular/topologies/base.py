@@ -508,7 +508,11 @@ class Linear(Topology):
 
             mdir = np.random.choice([-1, 1]) if not mdir else mdir
             mapping[label].set_orientation2([mdir, 0, 0])
-            monomer_mol = mapping[label].set_position([i*50, 0, 0])
+            
+            # The first building block should be placed at 0, the others
+            # have positions calculated based on bb size.
+            x_coord = self._x_position(macro_mol, mapping[label]) if i else 0
+            monomer_mol = mapping[label].set_position([x_coord, 0, 0])
 
             bb_index = macro_mol.building_blocks.index(mapping[label])
             add_fragment_props(monomer_mol, bb_index, i)
@@ -566,3 +570,34 @@ class Linear(Topology):
         """
 
         return
+
+    def _x_position(self, macro_mol, bb):
+        """
+        Calculates the x coordinate on which to place `bb`.
+
+        Does this by checking the most how for down the x axis
+        `macro_mol` stretches and checking the distance between
+        the minimum x position of `bb` and its centroid.
+        It then tries to place `bb` about 3 A away from `macro_mol`.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        bb : :class:`.StructUnit`
+            The building block to be added to `macro_mol`.
+
+        Returns
+        -------
+        :class:`float`
+            The x coordinate on which to place `bb`.
+
+        """
+
+        mm_max_x = max(macro_mol.all_atom_coords(),
+                       key=lambda x: x[1][0])[1][0]
+        bb_min_x = min(bb.all_atom_coords(),
+                       key=lambda x: x[1][0])[1][0]
+        bb_len = bb.centroid()[0] - bb_min_x
+        return mm_max_x + bb_len + 3
