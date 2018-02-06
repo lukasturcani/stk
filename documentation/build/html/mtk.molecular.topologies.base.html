@@ -236,6 +236,34 @@ kept as the original functional group.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.molecular.topologies.base.Linear._x_position">
+<code class="descname">_x_position</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear._x_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear._x_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the x coordinate on which to place <cite>bb</cite>.</p>
+<p>Does this by checking the most how for down the x axis
+<cite>macro_mol</cite> stretches and checking the distance between
+the minimum x position of <cite>bb</cite> and its centroid.
+It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
+<li><strong>bb</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – The building block to be added to <cite>macro_mol</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The x coordinate on which to place <cite>bb</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="mtk.molecular.topologies.base.Linear.del_atoms">
 <code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/base.html#Linear.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.base.Linear.del_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes the atoms which are lost during assembly.</p>
