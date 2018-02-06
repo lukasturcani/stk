@@ -508,7 +508,7 @@ class Linear(Topology):
 
             mdir = np.random.choice([-1, 1]) if not mdir else mdir
             mapping[label].set_orientation2([mdir, 0, 0])
-            
+
             # The first building block should be placed at 0, the others
             # have positions calculated based on bb size.
             x_coord = self._x_position(macro_mol, mapping[label]) if i else 0
