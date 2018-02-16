@@ -7,7 +7,7 @@ from os.path import join
 from glob import iglob
 
 path = join('data', 'mutation', 'mutants.json')
-pop = Population.load(path, Molecule.fromdict)
+pop = Population.load(path, Molecule.from_dict)
 mol = pop[0]
 
 

@@ -3,7 +3,7 @@ from ..molecular import Molecule
 from os.path import join
 
 pop = Population.load(join('data', 'crossover', 'molecules.json'),
-                      Molecule.fromdict)
+                      Molecule.from_dict)
 p1 = pop[0]
 p2 = pop[1]
 

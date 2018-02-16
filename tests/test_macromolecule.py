@@ -5,7 +5,7 @@ from ..molecular import (MacroMolecule, Molecule, FourPlusSix,
 from ..ga import Population
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'),
-                      Molecule.fromdict)
+                      Molecule.from_dict)
 
 
 def test_building_block_cores():
@@ -63,7 +63,7 @@ def test_caching():
     assert mol1 is not mol2
 
     # Remake the MacroMolecules.
-    mol3 = Molecule.fromdict(mol1.json())
+    mol3 = Molecule.from_dict(mol1.json())
     mol4 = MacroMolecule(mol2.building_blocks,
                          mol2.topology.__class__())
 

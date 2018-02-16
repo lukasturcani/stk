@@ -6,7 +6,7 @@ import numpy as np
 
 
 pop = Population.load(join('data', 'macromolecule', 'mm.json'),
-                      Molecule.fromdict)
+                      Molecule.from_dict)
 mol, mol2 = pop[:2]
 
 

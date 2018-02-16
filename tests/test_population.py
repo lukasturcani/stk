@@ -9,9 +9,9 @@ from ..molecular import Cage, MacroMolecule, Molecule
 from ..ga import Population, GATools
 
 pop = Population.load(join('data', 'population', 'population.json'),
-                      Molecule.fromdict)
+                      Molecule.from_dict)
 pop2 = Population.load('data/population/init_cage_isomers.json',
-                       Molecule.fromdict)
+                       Molecule.from_dict)
 
 
 def generate_population(offset=False):
@@ -184,13 +184,13 @@ def test_load():
 
     pname = join('data', 'population', 'pop2.json')
     p = Population.load(pname,
-                        lambda x: Molecule.fromdict(x, load_names=False))
+                        lambda x: Molecule.from_dict(x, load_names=False))
     for mem in p:
         assert not mem.name
 
     Cage.cache = og_cache
 
-    p = Population.load(pname, Molecule.fromdict)
+    p = Population.load(pname, Molecule.from_dict)
     for mem in p:
         assert mem.name
 
