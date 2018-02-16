@@ -26,11 +26,6 @@ class GATools:
         A :class:`.Normalization` instance which rescales or normalizes
         the fitness values in the population.
 
-    optimization : :class:`.FunctionData`
-        Holds the name and arguments of an optimization function
-        defined in :mod:`~mtk.optimization`. The function is used to
-        optimize the molecules in the population.
-
     fitness : :class:`.FunctionData`
         Holds the name and arguments of the function in :mod:`.fitness`
         to be used for calculating the fitness of
@@ -46,15 +41,14 @@ class GATools:
 
     """
 
-    __slots__ = ['selection', 'crossover', 'mutation', 'normalization',
-                 'optimization', 'fitness', 'exit', 'input']
+    __slots__ = ['selection', 'crossover', 'mutation',
+                 'normalization', 'fitness', 'exit', 'input']
 
     def __init__(self,
                  selection,
                  crossover,
                  mutation,
                  normalization,
-                 optimization,
                  fitness,
                  exit_,
                  ga_input):
@@ -79,11 +73,6 @@ class GATools:
             A :class:`.Normalization` instance which rescales or
             normalizes the fitness values in the population.
 
-        optimization : :class:`.FuncionData`
-            Holds the name and arguments of an optimization function
-            defined in :mod:`~mtk.optimization`. The function is used to
-            optimize the molecules in the population.
-
         fitness : :class:`.FunctionData`
             Holds the name and arguments of the function in
             :mod:`.fitness` to be used for calculating the fitness of
@@ -104,7 +93,6 @@ class GATools:
         self.crossover = crossover
         self.mutation = mutation
         self.normalization = normalization
-        self.optimization = optimization
         self.fitness = fitness
         self.input = ga_input
         self.exit = exit_
@@ -116,4 +104,4 @@ class GATools:
 
         """
 
-        return cls(None, None, None, None, None, None, None, None)
+        return cls(None, None, None, None, None, None, None)

@@ -51,7 +51,7 @@ import numpy as np
 import copy
 import logging
 
-from .population import Population
+from .ga_population import GAPopulation
 
 
 logger = logging.getLogger(__name__)
@@ -89,7 +89,7 @@ class Normalization:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population whose members need to have their fitness
             values normalized.
 
@@ -118,7 +118,7 @@ class Normalization:
         # normalization functions you can assume all fitness values
         # have the same type.
 
-        valid_pop = Population(*(mol for mol in population if
+        valid_pop = GAPopulation(*(mol for mol in population if
                                  mol.unscaled_fitness[fitness_func]
                                  is not None))
 
@@ -141,7 +141,7 @@ class Normalization:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population whose members need to have their fitness
             values normalized.
 
@@ -175,7 +175,7 @@ class Normalization:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population whose members need to have their fitness
             values normalized.
 
@@ -206,7 +206,7 @@ class Normalization:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population being normalized.
 
         val : :class:`int` or :class:`float` or :class:`numpy.ndarray`
@@ -261,7 +261,7 @@ class Normalization:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population whose fitness values are normalized.
 
         Returns
@@ -371,7 +371,7 @@ class Normalization:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population to be normalized.
 
         Returns

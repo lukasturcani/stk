@@ -189,7 +189,7 @@
 <span class="sd">    # Normalization functions act on a population of MacroMolecules,</span>
 <span class="sd">    # i.e. they normalize the fitness values across the population. So</span>
 <span class="sd">    # first step is to put the molecule into a population.</span>
-<span class="sd">    pop = Population(mol)</span>
+<span class="sd">    pop = GAPopulation(mol)</span>
 
 <span class="sd">    # Apply the normalization function.</span>
 <span class="sd">    norm_func(pop)</span>
@@ -209,7 +209,7 @@
 
 <span class="sd">    # Start with a population of molecules, representing a GA</span>
 <span class="sd">    # generation.</span>
-<span class="sd">    pop = Population(mol1, mol2, mol3)</span>
+<span class="sd">    pop = GAPopulation(mol1, mol2, mol3)</span>
 
 <span class="sd">    mol1.fitness  # None</span>
 <span class="sd">    mol1.unscaled_fitness  # {}</span>
@@ -244,7 +244,7 @@
 <span class="sd">    mol3.fitness  # 2</span>
 <span class="sd">    mol3.unscaled_fitness  # {&#39;random_fitness&#39;: 22}</span>
 
-<span class="sd">The method :meth:`.Population.normalize_fitness_values` automatically</span>
+<span class="sd">The method :meth:`.GAPopulation.normalize_fitness_values` automatically</span>
 <span class="sd">copies the fitness value from :attr:`.MacroMolecule.unscaled_fitness`</span>
 <span class="sd">into :attr:`.MacroMolecule.fitness` before applying any normalization</span>
 <span class="sd">functions. A fitness function is only applied once per molecule,</span>
@@ -397,7 +397,7 @@
 <span class="sd">        A :class:`.FunctionData` instance representing the chosen</span>
 <span class="sd">        fitness function and any additional parameters it may require.</span>
 
-<span class="sd">    population : :class:`.Population`</span>
+<span class="sd">    population : :class:`.GAPopulation`</span>
 <span class="sd">        The population whose members must have their fitness</span>
 <span class="sd">        calculated.</span>
 
@@ -445,7 +445,7 @@
 <span class="sd">        A :class:`.FunctionData` instance representing the chosen</span>
 <span class="sd">        fitness function and any additional parameters it may require.</span>
 
-<span class="sd">    population : :class:`.Population`</span>
+<span class="sd">    population : :class:`.GAPopulation`</span>
 <span class="sd">        The population whose members must have their fitness</span>
 <span class="sd">        calculated.</span>
 
@@ -620,7 +620,7 @@
     <span class="c1"># vector all have different oraders of magnitude and that some</span>
     <span class="c1"># are negative.</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">]))</span>
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;random_fitness_vector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;random_fitness_vector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">f</span></div>
 
 

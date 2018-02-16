@@ -3420,7 +3420,7 @@ periodic._place_island([4, 4, 4])
         """
 
         a, b, c = self.topology.cell_dimensions
-        cells = np.full(dimensions, None, object).tolist()
+        cells = np.full(dimensions, None, object).to_list()
         island = rdkit.Mol()
         bonder_map = ChainMap()
         i = 0

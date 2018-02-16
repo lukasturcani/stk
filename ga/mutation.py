@@ -26,7 +26,7 @@ import numpy as np
 from collections import Counter
 from itertools import islice
 
-from .population import Population
+from .ga_population import GAPopulation
 from .plotting import plot_counter
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class Mutation:
     """
     Carries out mutations operations on a population.
 
-    Instances of :class:`.Population` delegate mutation operations
+    Instances of :class:`.GAPopulation` delegate mutation operations
     to instances of this class. They do this by calling
 
     >>> mutant_pop = pop.gen_mutants()
@@ -115,12 +115,12 @@ class Mutation:
         mutation operations have been performed.
 
         The mutants generated are returned together in a
-        :class:`.Population` object. Any mutants already present in
+        :class:`.GAPopulation` object. Any mutants already present in
         `population` are removed.
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population who's members are to be mutated.
 
         counter_path : :class:`str`, optional
@@ -129,7 +129,7 @@ class Mutation:
 
         Returns
         -------
-        :class:`.Population`
+        :class:`.GAPopulation`
             A population with all the mutants generated held in
             :attr:`~.Population.members`. This does not include mutants
             which correspond to molecules already present in
@@ -137,7 +137,7 @@ class Mutation:
 
         """
 
-        mutant_pop = Population(population.ga_tools)
+        mutant_pop = GAPopulation(ga_tools=population.ga_tools)
         counter = Counter()
 
         parent_pool = islice(population.select('mutation'),

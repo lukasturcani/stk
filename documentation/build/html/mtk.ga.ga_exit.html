@@ -169,8 +169,8 @@ satisfied and <code class="docutils literal"><span class="pre">False</span></cod
 two arguments exists to help users identify which arguments they need
 to define in the input file and which are handeled automatically by
 <code class="docutils literal"><span class="pre">mtk</span></code>. The arguments <cite>population</cite> and <cite>progress</cite> are automatically
-provided when the GA is run. They hold a <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance
-holding the current generation and a <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instance
+provided when the GA is run. They hold a <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> instance
+holding the current generation and a <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> instance
 holding every previous generation in a subpopulation, respectively.</p>
 <p>As usual, if you need to define multiple functions, make sure any
 helper functions are private, i.e. their names start with a leading
@@ -197,8 +197,8 @@ require.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population holding the current generation of molecules.</li>
-<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population where every previous generation is a
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
 subpopulation.</li>
 <li><strong>num_gens</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Number of generations in which the fittest molecules did
 not change.</li>
@@ -227,8 +227,8 @@ generations.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population holding the current generation of molecules.</li>
-<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population where every previous generation is a
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
 subpopulation.</li>
 <li><strong>mol_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of a molecule.</li>
 </ul>
@@ -254,8 +254,8 @@ subpopulation.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population holding the current generation of molecules.</li>
-<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population where every previous generation is a
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
 subpopulation.</li>
 <li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – A molecule which if present in <cite>population</cite> causes the GA
 to stop.</li>
@@ -282,8 +282,8 @@ to stop.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population holding the current generation of molecules.</li>
-<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – A population where every previous generation is a
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
 subpopulation.</li>
 </ul>
 </td>

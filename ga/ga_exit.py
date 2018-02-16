@@ -17,8 +17,8 @@ satisfied and ``False`` otherwise. The naming requirement of the first
 two arguments exists to help users identify which arguments they need
 to define in the input file and which are handeled automatically by
 ``mtk``. The arguments `population` and `progress` are automatically
-provided when the GA is run. They hold a :class:`.Population` instance
-holding the current generation and a :class:`.Population` instance
+provided when the GA is run. They hold a :class:`.GAPopulation` instance
+holding the current generation and a :class:`.GAPopulation` instance
 holding every previous generation in a subpopulation, respectively.
 
 As usual, if you need to define multiple functions, make sure any
@@ -62,10 +62,10 @@ class Exit:
 
         Parameters
         ----------
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             The population holding the current generation of molecules.
 
-        progress : :class:`.Population`
+        progress : :class:`.GAPopulation`
             A population where every previous generation is a
             subpopulation.
 
@@ -86,10 +86,10 @@ class Exit:
 
         Parameters
         ----------
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             The population holding the current generation of molecules.
 
-        progress : :class:`.Population`
+        progress : :class:`.GAPopulation`
             A population where every previous generation is a
             subpopulation.
 
@@ -114,10 +114,10 @@ class Exit:
 
         Parameters
         ----------
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             The population holding the current generation of molecules.
 
-        progress : :class:`.Population`
+        progress : :class:`.GAPopulation`
             A population where every previous generation is a
             subpopulation.
 
@@ -144,10 +144,10 @@ class Exit:
 
         Parameters
         ----------
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             The population holding the current generation of molecules.
 
-        progress : :class:`.Population`
+        progress : :class:`.GAPopulation`
             A population where every previous generation is a
             subpopulation.
 
@@ -188,10 +188,10 @@ class Exit:
 
         Parameters
         ----------
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             The population holding the current generation of molecules.
 
-        progress : :class:`.Population`
+        progress : :class:`.GAPopulation`
             A population where every previous generation is a
             subpopulation.
 

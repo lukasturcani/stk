@@ -37,7 +37,7 @@ class Selection:
     Whenever a population needs to have some of its members selected
     for GA operations such as mutation, selection or generational
     selection, it delegates this task to an instance of this class. The
-    population holds the instance in :attr:`.Population.ga_tools`.
+    population holds the instance in :attr:`.GAPopulation.ga_tools`.
 
     To illustrate how a :class:`Selection` instance works it is best
     to use an example.
@@ -67,7 +67,7 @@ class Selection:
                         mutation_select_fn)
 
         # 3. Create a population from which "sel" will select members.
-        pop = Population(mol1, mol2, mol3, mol4)
+        pop = GAPopulation(mol1, mol2, mol3, mol4)
 
         # 4. Now the selection instance can be used to select members
         #    of "pop".
@@ -157,7 +157,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which members should be selected.
 
         type_ : :class:`str`
@@ -196,7 +196,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population who's members need to be selected.
 
         Yields
@@ -226,7 +226,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which individuals are to be selected.
 
         elites : :class:`int`, optional
@@ -295,7 +295,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which individuals are to be selected.
 
         truncation : :class:`int`, optional
@@ -347,7 +347,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which individuals are to be selected.
 
         elites : :class:`int`, optional
@@ -479,7 +479,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which parents should be selected.
 
         Yields
@@ -503,7 +503,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which parents should be selected.
 
         n : :class:`int`
@@ -536,7 +536,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which parents are selected.
 
         truncation : :class:`int`, optional
@@ -587,7 +587,7 @@ class Selection:
 
         Parameters
         ----------
-        population : :class:`.Population`
+        population : :class:`.GAPopulation`
             The population from which parents are selected.
 
         truncation : :class:`int`, optional

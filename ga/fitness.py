@@ -38,7 +38,7 @@ molecule is as follows,
     # Normalization functions act on a population of MacroMolecules,
     # i.e. they normalize the fitness values across the population. So
     # first step is to put the molecule into a population.
-    pop = Population(mol)
+    pop = GAPopulation(mol)
 
     # Apply the normalization function.
     norm_func(pop)
@@ -58,7 +58,7 @@ When running the GA, this process is much simplified,
 
     # Start with a population of molecules, representing a GA
     # generation.
-    pop = Population(mol1, mol2, mol3)
+    pop = GAPopulation(mol1, mol2, mol3)
 
     mol1.fitness  # None
     mol1.unscaled_fitness  # {}
@@ -93,7 +93,7 @@ When running the GA, this process is much simplified,
     mol3.fitness  # 2
     mol3.unscaled_fitness  # {'random_fitness': 22}
 
-The method :meth:`.Population.normalize_fitness_values` automatically
+The method :meth:`.GAPopulation.normalize_fitness_values` automatically
 copies the fitness value from :attr:`.MacroMolecule.unscaled_fitness`
 into :attr:`.MacroMolecule.fitness` before applying any normalization
 functions. A fitness function is only applied once per molecule,
@@ -246,7 +246,7 @@ def _calc_fitness(func_data, population, processes):
         A :class:`.FunctionData` instance representing the chosen
         fitness function and any additional parameters it may require.
 
-    population : :class:`.Population`
+    population : :class:`.GAPopulation`
         The population whose members must have their fitness
         calculated.
 
@@ -294,7 +294,7 @@ def _calc_fitness_serial(func_data, population):
         A :class:`.FunctionData` instance representing the chosen
         fitness function and any additional parameters it may require.
 
-    population : :class:`.Population`
+    population : :class:`.GAPopulation`
         The population whose members must have their fitness
         calculated.
 
@@ -469,7 +469,7 @@ def random_fitness_vector(macro_mol):
     # vector all have different oraders of magnitude and that some
     # are negative.
     f = np.multiply(f, np.array([0.01, 1, 10, -100]))
-    macro_mol.progress_params['random_fitness_vector'] = f.tolist()
+    macro_mol.progress_params['random_fitness_vector'] = f.to_list()
     return f
 
 

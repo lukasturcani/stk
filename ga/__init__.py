@@ -5,6 +5,6 @@ from .input import *
 from .mutation import *
 from .normalization import *
 from .plotting import *
-from .population import *
+from .ga_population import *
 from .selection import *
 from .ga_exit import *

@@ -85,7 +85,7 @@ class GAInput:
         The number of crossover operations carried out per generation.
 
     init_func : :class:`dict`
-        This must define the parameters of a :class:`.Population`
+        This must define the parameters of a :class:`.GAPopulation`
         initializer.
 
     generational_select_func : :class:`dict`
@@ -337,7 +337,6 @@ class GAInput:
                        self.crosser(),
                        self.mutator(),
                        self.normalizer(),
-                       self.opter(),
                        self.fitnessor(),
                        self.exiter(),
                        self)

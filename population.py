@@ -1,5 +1,5 @@
 """
-Defines the Population class.
+Defines :class:`Population`.
 
 """
 
@@ -7,18 +7,15 @@ import itertools as it
 import os
 from os.path import join
 import numpy as np
-from collections import Counter
 import json
 from glob import iglob
 import multiprocessing as mp
 import psutil
 
-from .fitness import _calc_fitness, _calc_fitness_serial
-from .plotting import plot_counter
-from .ga_tools import GATools
-from ..convenience_tools import dedupe
-from ..optimization.optimization import (_optimize_all_serial,
-                                         _optimize_all)
+from .molecular import Molecule
+from .convenience_tools import dedupe
+from .optimization.optimization import (_optimize_all_serial,
+                                        _optimize_all)
 
 
 class Population:
@@ -33,25 +30,7 @@ class Population:
 
     :class:`.Molecule` instances held by a :class:`Population` can have
     their structures optimized in parallel through the
-    :meth:`optimize_population` method.
-
-    The EA is invoked by calling a number of methods of this class,
-    such as :meth:`gen_offspring`, :meth:`gen_mutants` and
-    :meth:`select`. However, this class only implements container
-    related functionality. It delegates EA operations to the
-    :class:`.Crossover`, :class:`.Mutation` and :class:`.Selection`
-    classes.
-
-    These classes are organised as follows. Each :class:`Population`
-    instance has a :attr:`ga_tools` attribute. This holds a
-    :class:`.GATools` instance. The :class:`.GATools` instance is just
-    a container. It holds a :class:`.Crossover`, :class:`.Mutation`
-    and :class:`.Selection` instance. These instances deal with the
-    :class:`Population` instance they are held by and perform the
-    various crossover, mutation and selection operations on it.
-    Any functionality related to the EA should be delegated to these
-    instances. The :meth:`gen_offspring` and :meth:`gen_mutants`
-    methods can serve as a guide to how this should be done.
+    :meth:`optimize` method.
 
     The only operations directly implemented by this class are those
     relevant to its role as a container. It supports all expected and
@@ -77,12 +56,6 @@ class Population:
         of a population the generator :meth:`all_members` should be
         used.
 
-    ga_tools : :class:`.GATools`
-        An instance of the :class:`.GATools` class. It stores
-        instances of classes such as :class:`.Selection`,
-        :class:`.Mutation` and :class:`.Crossover`, which carry out GA
-        operations on the population.
-
     """
 
     def __init__(self, *args):
@@ -91,33 +64,21 @@ class Population:
 
         Parameters
         ----------
-        *args : :class:`.Molecule`, :class:`Population`, :class:`.GATools`
+        *args : :class:`.Molecule`, :class:`Population`
             A population is initialized with the :class:`.Molecule` and
             :class:`Population` instances it should hold. These are
             placed into the :attr:`members` or :attr:`populations`
-            attributes, respectively. A :class:`.GATools` instance may
-            be included and will be placed into the :attr:`ga_tools`
-            attribute.
+            attributes, respectively.
 
         """
 
-        # Generate `populations`, `members` and `ga_tools` attributes.
         self.populations = []
         self.members = []
-        self.ga_tools = GATools.init_empty()
 
-        # Determine type of supplied arguments and place in the
-        # appropriate attribute.  ``Population`` types added to
-        # `populations` attribute, if ``GATools`` is supplied it is
-        # placed into `ga_tools`. Everything else goes into `members`.
         for arg in args:
             if isinstance(arg, Population):
                 self.populations.append(arg)
-
-            elif isinstance(arg, GATools):
-                self.ga_tools = arg
-
-            else:
+            elif isinstance(arg, Molecule):
                 self.members.append(arg)
 
     @classmethod
@@ -126,7 +87,6 @@ class Population:
                  building_blocks,
                  topologies,
                  processes=None,
-                 ga_tools=GATools.init_empty(),
                  duplicates=False):
         """
         Creates all possible molecules from provided building blocks.
@@ -166,10 +126,6 @@ class Population:
             The number of parallel processes to create when building
             the molecules.
 
-        ga_tools : :class:`.GATools`, optional
-            Stores the selection, mutation and crossover functions to
-            be used on the population.
-
         duplicates : :class:`bool`, optional
             If ``False``, duplicate structures are removed from
             the population.
@@ -200,7 +156,7 @@ class Population:
             else:
                 mols[i] = macromol_class.cache[mol.key]
 
-        p = Population(*mols, ga_tools)
+        p = cls(*mols)
         if not duplicates:
             p.remove_duplicates()
         return p
@@ -210,8 +166,7 @@ class Population:
                      macromol_class,
                      building_blocks,
                      topologies,
-                     size,
-                     ga_tools):
+                     size):
         """
         Assembles a population of :class:`.MacroMolecule`.
 
@@ -259,10 +214,6 @@ class Population:
         size : :class:`int`
             The size of the population to be initialized.
 
-        ga_tools : :class:`.GATools`
-            The :class:`.GATools` instance to be used by created
-            population.
-
         Returns
         -------
         :class:`.Population`
@@ -270,7 +221,7 @@ class Population:
 
         """
 
-        pop = cls(ga_tools)
+        pop = cls()
 
         # Shuffle the sublists.
         for db in building_blocks:
@@ -351,8 +302,7 @@ class Population:
                     macromol_class,
                     building_blocks,
                     topologies,
-                    size,
-                    ga_tools):
+                    size):
         """
         Assembles a population of :class:`.MacroMolecule`.
 
@@ -396,10 +346,6 @@ class Population:
         size : :class:`int`
             The size of the population to be initialized.
 
-        ga_tools : :class:`.GATools`
-            The :class:`.GATools` instance to be used by created
-            population.
-
         Returns
         -------
         :class:`.Population`
@@ -407,7 +353,7 @@ class Population:
 
         """
 
-        pop = cls(ga_tools)
+        pop = cls()
 
         # Shuffle the sublists.
         for db in building_blocks:
@@ -482,7 +428,7 @@ class Population:
 
         """
 
-        pop = Population(*population.members)
+        pop = self.__class__(*population.members)
         for sp in population.populations:
             pop.add_subpopulation(sp)
 
@@ -544,43 +490,6 @@ class Population:
 
         return n
 
-    def calculate_member_fitness(self, processes=psutil.cpu_count()):
-        """
-        Applies the fitness function to all members.
-
-        The fitness function is defined in the attribute
-        :attr:`.GATools.fitness` of the :class:`.GATools` instance
-        held in the :attr:`ga_tools` attribute of the population.
-
-        The calculation will be performed serially or in parallel
-        depending on the flag :attr:`.GATools.parallel`. The serial
-        version may be faster in cases where all molecules have already
-        had their fitness values calcluated. This is because all
-        calculations will be skipped. In this case creating a parallel
-        process pool creates unncessary overhead.
-
-        Notes
-        -----
-        This method will result in the modification of the
-        :attr:`.MacroMolecule.unscaled_fitness` attribute of molecules
-        held by the population.
-
-        Parameters
-        ----------
-        processes : :class:`int`
-            The number of parallel processes to create.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        if processes == 1:
-            _calc_fitness_serial(self.ga_tools.fitness, self)
-        else:
-            _calc_fitness(self.ga_tools.fitness, self, processes)
-
     def dump(self, path):
         """
         Dumps the population to a file.
@@ -609,29 +518,10 @@ class Population:
         """
 
         with open(path, 'w') as f:
-            json.dump(self.tolist(), f, indent=4)
-
-    def exit(self, progress):
-        """
-        Checks the if the EA exit criterion has been satisfied.
-
-        Parameters
-        ----------
-        progress : :class:`Population`
-            population where each subpopulation is a previous generation.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if the exit criterion is satisfied, else
-            ``False``.
-
-        """
-
-        return self.ga_tools.exit(self, progress)
+            json.dump(self.to_list(), f, indent=4)
 
     @classmethod
-    def fromlist(cls, pop_list, member_init):
+    def from_list(cls, pop_list, member_init):
         """
         Initializes a population from a :class:`list` representation.
 
@@ -639,7 +529,7 @@ class Population:
         ----------
         pop_list : :class:`list`
             A :class:`list` which represents a population. Like the
-            ones created by :meth:`tolist`. For example in,
+            ones created by :meth:`to_list`. For example in,
 
             .. code-block:: python
 
@@ -666,115 +556,12 @@ class Population:
             if isinstance(item, dict):
                 pop.members.append(member_init(item))
             elif isinstance(item, list):
-                pop.populations.append(cls.fromlist(item, member_init))
+                pop.populations.append(cls.from_list(item, member_init))
 
             else:
                 raise TypeError(('Population list must consist only'
                                  ' of strings and lists.'))
         return pop
-
-    def gen_mutants(self, counter_name='mutation_counter.png'):
-        """
-        Returns a :class:`Population` of mutants.
-
-        The selection function which decides which molecules are
-        selected for mutation is defined in the
-        :attr:`.Selection.mutation` attribute of the
-        :class:`.Selection` instance held by the population via its
-        :attr:`ga_tools` attribute.
-
-        The mutation function(s) to be used are defined in the
-        :class:`.Mutation` instance held by the population via its
-        :attr:`ga_tools` attribute.
-
-        Parameters
-        ----------
-        counter_name : :class:`str`, optional
-            The name of the ``.png`` file which holds a graph showing
-            which members were selected for mutation.
-
-        Returns
-        -------
-        :class:`Population`
-            A population holding mutants created by mutating the
-            :class:`.MacroMolecule` instances held by the population.
-
-        """
-
-        return self.ga_tools.mutation(self, counter_name)
-
-    def gen_next_gen(self, pop_size, counter_path=''):
-        """
-        Returns a population holding the next generation of structures.
-
-        The selection function to be used for selecting the next
-        generation of molecules is defined in the :class:`.Selection`
-        instance held by the population via its :attr:`ga_tools`
-        attribute.
-
-        Parameters
-        ----------
-        pop_size : :class:`int`
-            The size of the next generation.
-
-        counter_path : :class:`str`, optional
-            The name of the ``.png`` file holding a graph showing which
-            members were selected for the next generation. If ``''``
-            then no file is made.
-
-        Returns
-        -------
-        :class:`Population`
-            A population holding the next generation of molecules.
-
-        """
-
-        new_gen = Population(self.ga_tools)
-        counter = Counter()
-        for member in self.select('generational'):
-            counter.update([member])
-            new_gen.members.append(member)
-            if len(new_gen) == pop_size:
-                break
-
-        if counter_path:
-            for member in self:
-                if member not in counter.keys():
-                    counter.update({member: 0})
-            plot_counter(counter, counter_path)
-
-        return new_gen
-
-    def gen_offspring(self, counter_name='crossover_counter.png'):
-        """
-        Returns a :class:`Population` of offspring molecules.
-
-        The selection function which decides which molecules are
-        selected for crossover is defined in the
-        :attr:`.Selection.crossover` attribute of the
-        :class:`.Selection` instance held by the population via its
-        :attr:`ga_tools` attribute.
-
-        The crossover function(s) to be used are defined in the
-        :class:`.Crossover` instance held by the population via its
-        :attr:`ga_tools` attribute.
-
-        Parameters
-        ----------
-        counter_name : :class:`str`, optional
-            The name of the ``.png`` file showing which members were
-            selected for crossover.
-
-        Returns
-        -------
-        :class:`Population`
-            A population of offspring, created by crossing
-            :class:`.MacroMolecule` instances contained in the
-            population.
-
-        """
-
-        return self.ga_tools.crossover(self, counter_name)
 
     def has_structure(self, mol):
         """
@@ -823,9 +610,7 @@ class Population:
         with open(path, 'r') as f:
             pop_list = json.load(f)
 
-        pop = cls.fromlist(pop_list, member_init)
-        pop.ga_tools = GATools.init_empty()
-        return pop
+        return cls.from_list(pop_list, member_init)
 
     def max(self, key):
         """
@@ -917,38 +702,12 @@ class Population:
 
         return np.min([key(member) for member in self], axis=0)
 
-    def normalize_fitness_values(self):
-        """
-        Applies the normalization functions on the population.
-
-        Normalization functions scale or modify the fitness values of
-        molecules in the population.
-
-        The normalization functions which are applied on the
-        population, along with their order, are defined in the
-        :class:`.Normalization` instance held by the population via the
-        :attr:`ga_tools` attribute.
-
-        Notes
-        -----
-        This method modifies the :attr:`.MacroMolecule.fitness`
-        attribute of molecules held by the population.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        return self.ga_tools.normalization(self)
-
-    def optimize_population(self, processes=psutil.cpu_count()):
+    def optimize(self, func_data, processes=psutil.cpu_count()):
         """
         Optimizes the structures of molecules in the population.
 
         The molecules are optimized serially or in parallel depending
-        on the flag :attr:`.GATools.parallel` of the :class:`.GATools`
-        instance held by the population. The serial version may be
+        if `processes` is ``1`` or more. The serial version may be
         faster in cases where all molecules have already been
         optimized. This is because all optimizations will be skipped.
         In this case creating a parallel process pool creates
@@ -962,8 +721,14 @@ class Population:
 
         Parameters
         ----------
+        func_data : :class:`.FunctionData`
+            Holds the name and arguments of an optimization function
+            defined in :mod:`~mtk.optimization`. The function is used
+            to optimize the molecules in the population.
+
         processes : :class:`int`
-            The number of parallel processes to create.
+            The number of parallel processes to create. Optimization
+            will run serially if ``1``.
 
         Returns
         -------
@@ -972,9 +737,9 @@ class Population:
         """
 
         if processes == 1:
-            _optimize_all_serial(self.ga_tools.optimization, self)
+            _optimize_all_serial(func_data, self)
         else:
-            _optimize_all(self.ga_tools.optimization, self, processes)
+            _optimize_all(func_data, self, processes)
 
     def remove_duplicates(self,
                           between_subpops=True,
@@ -1068,38 +833,7 @@ class Population:
         for subpop in self.populations:
             subpop.remove_members(key)
 
-    def select(self, type='generational'):
-        """
-        Returns a generator for yielding members of the population.
-
-        Members are yielded based on the selection function defined in
-        the :class:`.Selection` instance held by the population via the
-        :attr:`ga_tools` attribute. The instance defines 3 selection
-        functions, 1 for each `type`.
-
-        Parameters
-        ----------
-        type : :class:`str`, optional
-            A string specifying the type of selection to be performed.
-            Valid values will correspond to names of attributes of the
-            :class:`.Selection` class.
-
-            Valid values are:
-
-                * ``'generational'`` - selects the next generation
-                * ``'crossover'`` - selects molecules for crossover
-                * ``'mutation'`` - selects molecules for mutation
-
-        Returns
-        -------
-        :class:`generator`
-           A generator which yields molecules or tuples of them.
-
-        """
-
-        return self.ga_tools.selection(self, type)
-
-    def tolist(self):
+    def to_list(self):
         """
         Converts the population to a list representation.
 
@@ -1116,7 +850,7 @@ class Population:
 
         pop = [x.json() for x in self.members]
         for sp in self.populations:
-            pop.append(sp.tolist())
+            pop.append(sp.to_list())
         return pop
 
     def write(self, dir_path, use_name=False):
@@ -1218,14 +952,11 @@ class Population:
             return list(self.all_members())[key]
 
         # If ``slice`` return a ``Population`` of the corresponding
-        # ``Molecule`` instances. The returned ``Population`` will
-        # have the same `ga_tools` attribute as original ``Population``
-        # instance.
+        # ``Molecule`` instances.
         if isinstance(key, slice):
             mols = it.islice(self.all_members(),
                              key.start, key.stop, key.step)
-            pop = Population(*mols)
-            pop.ga_tools = self.ga_tools
+            pop = self.__class__(*mols)
             return pop
 
         # If `key` is not ``int`` or ``slice`` raise ``TypeError``.
@@ -1262,9 +993,6 @@ class Population:
         within any subpopulations. The returned population is flat.
         This means any nesting in ``pop1`` is not preserved.
 
-        The resulting population, ``pop3``, will hold the same
-        :class:`.GATools` instance as ``pop1``.
-
         Parameters
         ----------
         other : :class:`Population`
@@ -1279,7 +1007,7 @@ class Population:
 
         """
 
-        new_pop = Population(self.ga_tools)
+        new_pop = self.__class__()
         new_pop.add_members(mol for mol in self if mol not in other)
         return new_pop
 
@@ -1302,7 +1030,7 @@ class Population:
 
         """
 
-        return Population(self, other, self.ga_tools)
+        return self.__class__(self, other)
 
     def __contains__(self, item):
         return any(item is mol for mol in self.all_members())

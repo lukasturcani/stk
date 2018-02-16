@@ -31,7 +31,7 @@ def fitness_epp(pop,
 
     Parameters
     ----------
-    pop : :class:`.Population`
+    pop : :class:`.GAPopulation`
         A population containing any number of subpopulations and no
         direct members. Each subpopulation represents a generation of
         the GA.
@@ -122,7 +122,7 @@ def parameter_epp(pop,
 
     Parameters
     ----------
-    pop : :class:`.Population`
+    pop : :class:`.GAPopulation`
         A population containing any number of subpopulations and no
         direct members. Each subpopulation represents a generation of
         the GA.

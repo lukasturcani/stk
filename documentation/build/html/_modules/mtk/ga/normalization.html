@@ -202,7 +202,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">.population</span> <span class="k">import</span> <span class="n">Population</span>
+<span class="kn">from</span> <span class="nn">.ga_population</span> <span class="k">import</span> <span class="n">GAPopulation</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -240,7 +240,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population whose members need to have their fitness</span>
 <span class="sd">            values normalized.</span>
 
@@ -269,7 +269,7 @@
         <span class="c1"># normalization functions you can assume all fitness values</span>
         <span class="c1"># have the same type.</span>
 
-        <span class="n">valid_pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">population</span> <span class="k">if</span>
+        <span class="n">valid_pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">mol</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">population</span> <span class="k">if</span>
                                  <span class="n">mol</span><span class="o">.</span><span class="n">unscaled_fitness</span><span class="p">[</span><span class="n">fitness_func</span><span class="p">]</span>
                                  <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span>
 
@@ -292,7 +292,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population whose members need to have their fitness</span>
 <span class="sd">            values normalized.</span>
 
@@ -326,7 +326,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population whose members need to have their fitness</span>
 <span class="sd">            values normalized.</span>
 
@@ -357,7 +357,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population being normalized.</span>
 
 <span class="sd">        val : :class:`int` or :class:`float` or :class:`numpy.ndarray`</span>
@@ -412,7 +412,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population whose fitness values are normalized.</span>
 
 <span class="sd">        Returns</span>
@@ -522,7 +522,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population to be normalized.</span>
 
 <span class="sd">        Returns</span>
