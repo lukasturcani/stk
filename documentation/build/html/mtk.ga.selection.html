@@ -182,7 +182,7 @@ start with a leading underscore.</p>
 <p>Whenever a population needs to have some of its members selected
 for GA operations such as mutation, selection or generational
 selection, it delegates this task to an instance of this class. The
-population holds the instance in <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population.ga_tools" title="mtk.ga.population.Population.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">Population.ga_tools</span></code></a>.</p>
+population holds the instance in <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation.ga_tools" title="mtk.ga.ga_population.GAPopulation.ga_tools"><code class="xref py py-attr docutils literal"><span class="pre">GAPopulation.ga_tools</span></code></a>.</p>
 <p>To illustrate how a <a class="reference internal" href="#mtk.ga.selection.Selection" title="mtk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance works it is best
 to use an example.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># 1. Create FunctionData objects which describe the selection</span>
@@ -208,7 +208,7 @@ to use an example.</p>
                 <span class="n">mutation_select_fn</span><span class="p">)</span>
 
 <span class="c1"># 3. Create a population from which &quot;sel&quot; will select members.</span>
-<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">,</span> <span class="n">mol3</span><span class="p">,</span> <span class="n">mol4</span><span class="p">)</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">,</span> <span class="n">mol3</span><span class="p">,</span> <span class="n">mol4</span><span class="p">)</span>
 
 <span class="c1"># 4. Now the selection instance can be used to select members</span>
 <span class="c1">#    of &quot;pop&quot;.</span>
@@ -326,7 +326,7 @@ yielded <code class="docutils literal"><span class="pre">(2,1)</span></code> wil
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which parents should be selected.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instances which are to be
 crossed.</td>
@@ -346,7 +346,7 @@ fit pair yielded first.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which parents should be selected.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents should be selected.</li>
 <li><strong>n</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of individuals used for making offspring.</li>
 </ul>
 </td>
@@ -383,7 +383,7 @@ largest decimal values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which parents are selected.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
 <li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
 </ul>
@@ -413,7 +413,7 @@ by:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which parents are selected.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which parents are selected.</li>
 <li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
 </ul>
@@ -456,7 +456,7 @@ yielded again, largest decimal part of <code class="docutils literal"><span clas
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
 <li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
 yielded.</li>
 </ul>
@@ -477,7 +477,7 @@ yielded.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population who’s members need to be selected.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population who’s members need to be selected.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next fittest <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instance held by
 <cite>population</cite>.</td>
@@ -503,7 +503,7 @@ by:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
 <li><strong>elites</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
 be yielded first.</li>
 <li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be
@@ -551,7 +551,7 @@ weights in the roulette method are based on the decimal part of
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population from which individuals are to be selected.</li>
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population from which individuals are to be selected.</li>
 <li><strong>elites</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of the fittest members which are guaranteed to
 be yielded first.</li>
 <li><strong>truncation</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of least fit members which will never be

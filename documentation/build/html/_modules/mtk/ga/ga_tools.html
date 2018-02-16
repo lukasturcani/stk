@@ -177,11 +177,6 @@
 <span class="sd">        A :class:`.Normalization` instance which rescales or normalizes</span>
 <span class="sd">        the fitness values in the population.</span>
 
-<span class="sd">    optimization : :class:`.FunctionData`</span>
-<span class="sd">        Holds the name and arguments of an optimization function</span>
-<span class="sd">        defined in :mod:`~mtk.optimization`. The function is used to</span>
-<span class="sd">        optimize the molecules in the population.</span>
-
 <span class="sd">    fitness : :class:`.FunctionData`</span>
 <span class="sd">        Holds the name and arguments of the function in :mod:`.fitness`</span>
 <span class="sd">        to be used for calculating the fitness of</span>
@@ -197,15 +192,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;selection&#39;</span><span class="p">,</span> <span class="s1">&#39;crossover&#39;</span><span class="p">,</span> <span class="s1">&#39;mutation&#39;</span><span class="p">,</span> <span class="s1">&#39;normalization&#39;</span><span class="p">,</span>
-                 <span class="s1">&#39;optimization&#39;</span><span class="p">,</span> <span class="s1">&#39;fitness&#39;</span><span class="p">,</span> <span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;selection&#39;</span><span class="p">,</span> <span class="s1">&#39;crossover&#39;</span><span class="p">,</span> <span class="s1">&#39;mutation&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;normalization&#39;</span><span class="p">,</span> <span class="s1">&#39;fitness&#39;</span><span class="p">,</span> <span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">selection</span><span class="p">,</span>
                  <span class="n">crossover</span><span class="p">,</span>
                  <span class="n">mutation</span><span class="p">,</span>
                  <span class="n">normalization</span><span class="p">,</span>
-                 <span class="n">optimization</span><span class="p">,</span>
                  <span class="n">fitness</span><span class="p">,</span>
                  <span class="n">exit_</span><span class="p">,</span>
                  <span class="n">ga_input</span><span class="p">):</span>
@@ -230,11 +224,6 @@
 <span class="sd">            A :class:`.Normalization` instance which rescales or</span>
 <span class="sd">            normalizes the fitness values in the population.</span>
 
-<span class="sd">        optimization : :class:`.FuncionData`</span>
-<span class="sd">            Holds the name and arguments of an optimization function</span>
-<span class="sd">            defined in :mod:`~mtk.optimization`. The function is used to</span>
-<span class="sd">            optimize the molecules in the population.</span>
-
 <span class="sd">        fitness : :class:`.FunctionData`</span>
 <span class="sd">            Holds the name and arguments of the function in</span>
 <span class="sd">            :mod:`.fitness` to be used for calculating the fitness of</span>
@@ -255,7 +244,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">crossover</span> <span class="o">=</span> <span class="n">crossover</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mutation</span> <span class="o">=</span> <span class="n">mutation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="n">normalization</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimization</span> <span class="o">=</span> <span class="n">optimization</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fitness</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">ga_input</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exit</span> <span class="o">=</span> <span class="n">exit_</span>
@@ -267,7 +255,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

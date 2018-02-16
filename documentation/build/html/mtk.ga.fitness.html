@@ -191,7 +191,7 @@ molecule is as follows,</p>
 <span class="c1"># Normalization functions act on a population of MacroMolecules,</span>
 <span class="c1"># i.e. they normalize the fitness values across the population. So</span>
 <span class="c1"># first step is to put the molecule into a population.</span>
-<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 
 <span class="c1"># Apply the normalization function.</span>
 <span class="n">norm_func</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
@@ -209,7 +209,7 @@ molecule is as follows,</p>
 <p>When running the GA, this process is much simplified,</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Start with a population of molecules, representing a GA</span>
 <span class="c1"># generation.</span>
-<span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">mol1</span><span class="p">,</span> <span class="n">mol2</span><span class="p">,</span> <span class="n">mol3</span><span class="p">)</span>
 
 <span class="n">mol1</span><span class="o">.</span><span class="n">fitness</span>  <span class="c1"># None</span>
 <span class="n">mol1</span><span class="o">.</span><span class="n">unscaled_fitness</span>  <span class="c1"># {}</span>
@@ -245,7 +245,7 @@ molecule is as follows,</p>
 <span class="n">mol3</span><span class="o">.</span><span class="n">unscaled_fitness</span>  <span class="c1"># {&#39;random_fitness&#39;: 22}</span>
 </pre></div>
 </div>
-<p>The method <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population.normalize_fitness_values" title="mtk.ga.population.Population.normalize_fitness_values"><code class="xref py py-meth docutils literal"><span class="pre">Population.normalize_fitness_values()</span></code></a> automatically
+<p>The method <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation.normalize_fitness_values" title="mtk.ga.ga_population.GAPopulation.normalize_fitness_values"><code class="xref py py-meth docutils literal"><span class="pre">GAPopulation.normalize_fitness_values()</span></code></a> automatically
 copies the fitness value from <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.unscaled_fitness" title="mtk.molecular.molecules.MacroMolecule.unscaled_fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.unscaled_fitness</span></code></a>
 into <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule.fitness" title="mtk.molecular.molecules.MacroMolecule.fitness"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.fitness</span></code></a> before applying any normalization
 functions. A fitness function is only applied once per molecule,
@@ -445,7 +445,7 @@ function to be used.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instance representing the chosen
 fitness function and any additional parameters it may require.</li>
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose members must have their fitness
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population whose members must have their fitness
 calculated.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of parallel processes to create.</li>
 </ul>
@@ -472,7 +472,7 @@ calculated.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>func_data</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instance representing the chosen
 fitness function and any additional parameters it may require.</li>
-<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>) – The population whose members must have their fitness
+<li><strong>population</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population whose members must have their fitness
 calculated.</li>
 </ul>
 </td>
