@@ -147,7 +147,7 @@ class Crossover:
 
         """
 
-        offspring_pop = GAPopulation(population.ga_tools)
+        offspring_pop = GAPopulation(ga_tools=population.ga_tools)
         counter = Counter()
 
         parent_pool = islice(population.select('crossover'),

@@ -205,7 +205,7 @@ class GAPopulation(Population):
 
         Parameters
         ----------
-        progress : :class:`Population`
+        progress : :class:`GAPopulation`
             population where each subpopulation is a previous generation.
 
         Returns
@@ -220,7 +220,7 @@ class GAPopulation(Population):
 
     def gen_mutants(self, counter_name='mutation_counter.png'):
         """
-        Returns a :class:`Population` of mutants.
+        Returns a :class:`GAPopulation` of mutants.
 
         The selection function which decides which molecules are
         selected for mutation is defined in the
@@ -240,7 +240,7 @@ class GAPopulation(Population):
 
         Returns
         -------
-        :class:`Population`
+        :class:`GAPopulation`
             A population holding mutants created by mutating the
             :class:`.MacroMolecule` instances held by the population.
 
@@ -269,12 +269,12 @@ class GAPopulation(Population):
 
         Returns
         -------
-        :class:`Population`
+        :class:`GAPopulation`
             A population holding the next generation of molecules.
 
         """
 
-        new_gen = Population(self.ga_tools)
+        new_gen = GAPopulation(ga_tools=self.ga_tools)
         counter = Counter()
         for member in self.select('generational'):
             counter.update([member])
@@ -292,7 +292,7 @@ class GAPopulation(Population):
 
     def gen_offspring(self, counter_name='crossover_counter.png'):
         """
-        Returns a :class:`Population` of offspring molecules.
+        Returns a :class:`GAPopulation` of offspring molecules.
 
         The selection function which decides which molecules are
         selected for crossover is defined in the
@@ -312,7 +312,7 @@ class GAPopulation(Population):
 
         Returns
         -------
-        :class:`Population`
+        :class:`GAPopulation`
             A population of offspring, created by crossing
             :class:`.MacroMolecule` instances contained in the
             population.
@@ -385,6 +385,7 @@ class GAPopulation(Population):
     def __sub__(self, other):
         p = super().__sub__(other)
         p.ga_tools = self.ga_tools
+        return p
 
     def __add__(self, other):
         p = super().__add__(other)

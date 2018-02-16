@@ -80,6 +80,9 @@ class Population:
                 self.populations.append(arg)
             elif isinstance(arg, Molecule):
                 self.members.append(arg)
+            else:
+                raise TypeError(('Must use Population and Molecule '
+                                 'objects for initialization.'))
 
     @classmethod
     def init_all(cls,

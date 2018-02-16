@@ -469,7 +469,7 @@ def random_fitness_vector(macro_mol):
     # vector all have different oraders of magnitude and that some
     # are negative.
     f = np.multiply(f, np.array([0.01, 1, 10, -100]))
-    macro_mol.progress_params['random_fitness_vector'] = f.to_list()
+    macro_mol.progress_params['random_fitness_vector'] = f.tolist()
     return f
 
 
