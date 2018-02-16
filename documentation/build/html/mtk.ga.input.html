@@ -233,7 +233,7 @@ value returned by <code class="xref py py-func docutils literal"><span class="pr
 <dl class="attribute">
 <dt id="mtk.ga.input.GAInput.init_func">
 <code class="descname">init_func</code><a class="headerlink" href="#mtk.ga.input.GAInput.init_func" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – This must define the parameters of a <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – This must define the parameters of a <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>
 initializer.</p>
 </dd></dl>
 
@@ -318,7 +318,7 @@ file which means that no normalization functions will be used.</p>
 <code class="descname">databases</code><a class="headerlink" href="#mtk.ga.input.GAInput.databases" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">str</span></code> – A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> which holds the paths to any number <code class="docutils literal"><span class="pre">JSON</span></code>
 files. These files must hold the <code class="docutils literal"><span class="pre">JSON</span></code> representations of
-dumped <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instances. All the molecules in the
+dumped <a class="reference internal" href="mtk.population.html#mtk.population.Population" title="mtk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> instances. All the molecules in the
 populations are loaded into memory for the duration of the GA
 run. Molecules loaded in this way do not have to be built,
 re-optimized or have fitness values recalculated when
@@ -328,7 +328,7 @@ encountered by the GA.</p>
 <dl class="attribute">
 <dt id="mtk.ga.input.GAInput.progress_dump">
 <code class="descname">progress_dump</code><a class="headerlink" href="#mtk.ga.input.GAInput.progress_dump" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – If <code class="docutils literal"><span class="pre">True</span></code> a <code class="docutils literal"><span class="pre">.json</span></code> <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> dump is made at
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – If <code class="docutils literal"><span class="pre">True</span></code> a <code class="docutils literal"><span class="pre">.json</span></code> <a class="reference internal" href="mtk.population.html#mtk.population.Population" title="mtk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> dump is made at
 the end of the GA run called <code class="docutils literal"><span class="pre">progress.json</span></code>. The population
 holds each generation made by the GA as a subpopulation. This
 can be ommitted from the input file, in which case it
@@ -338,7 +338,7 @@ defaults to <code class="docutils literal"><span class="pre">True</span></code>.
 <dl class="attribute">
 <dt id="mtk.ga.input.GAInput.database_dump">
 <code class="descname">database_dump</code><a class="headerlink" href="#mtk.ga.input.GAInput.database_dump" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – If <code class="docutils literal"><span class="pre">True</span></code> a <code class="docutils literal"><span class="pre">.json</span></code> <a class="reference internal" href="mtk.ga.population.html#mtk.ga.population.Population" title="mtk.ga.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> dump is made at
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – If <code class="docutils literal"><span class="pre">True</span></code> a <code class="docutils literal"><span class="pre">.json</span></code> <a class="reference internal" href="mtk.population.html#mtk.population.Population" title="mtk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> dump is made at
 the end of the GA run called <code class="docutils literal"><span class="pre">database.json</span></code>. The population
 holds every molecule made by the GA during its run. This can
 be omitted from the input file, in which case it defaults to

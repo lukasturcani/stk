@@ -188,7 +188,7 @@
 <span class="sd">    Whenever a population needs to have some of its members selected</span>
 <span class="sd">    for GA operations such as mutation, selection or generational</span>
 <span class="sd">    selection, it delegates this task to an instance of this class. The</span>
-<span class="sd">    population holds the instance in :attr:`.Population.ga_tools`.</span>
+<span class="sd">    population holds the instance in :attr:`.GAPopulation.ga_tools`.</span>
 
 <span class="sd">    To illustrate how a :class:`Selection` instance works it is best</span>
 <span class="sd">    to use an example.</span>
@@ -218,7 +218,7 @@
 <span class="sd">                        mutation_select_fn)</span>
 
 <span class="sd">        # 3. Create a population from which &quot;sel&quot; will select members.</span>
-<span class="sd">        pop = Population(mol1, mol2, mol3, mol4)</span>
+<span class="sd">        pop = GAPopulation(mol1, mol2, mol3, mol4)</span>
 
 <span class="sd">        # 4. Now the selection instance can be used to select members</span>
 <span class="sd">        #    of &quot;pop&quot;.</span>
@@ -308,7 +308,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which members should be selected.</span>
 
 <span class="sd">        type_ : :class:`str`</span>
@@ -347,7 +347,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population who&#39;s members need to be selected.</span>
 
 <span class="sd">        Yields</span>
@@ -377,7 +377,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which individuals are to be selected.</span>
 
 <span class="sd">        elites : :class:`int`, optional</span>
@@ -446,7 +446,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which individuals are to be selected.</span>
 
 <span class="sd">        truncation : :class:`int`, optional</span>
@@ -498,7 +498,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which individuals are to be selected.</span>
 
 <span class="sd">        elites : :class:`int`, optional</span>
@@ -630,7 +630,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which parents should be selected.</span>
 
 <span class="sd">        Yields</span>
@@ -654,7 +654,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which parents should be selected.</span>
 
 <span class="sd">        n : :class:`int`</span>
@@ -687,7 +687,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which parents are selected.</span>
 
 <span class="sd">        truncation : :class:`int`, optional</span>
@@ -738,7 +738,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        population : :class:`.Population`</span>
+<span class="sd">        population : :class:`.GAPopulation`</span>
 <span class="sd">            The population from which parents are selected.</span>
 
 <span class="sd">        truncation : :class:`int`, optional</span>

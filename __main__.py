@@ -7,7 +7,7 @@ from rdkit import RDLogger
 from os.path import join, basename, abspath
 
 from .molecular import Molecule, CACHE_SETTINGS
-from .ga import Population, GAInput
+from .ga import GAPopulation, GAInput
 from .convenience_tools import (tar_output,
                                 errorhandler,
                                 streamhandler,
@@ -52,11 +52,11 @@ class GAProgress:
         in the output directory. Each subpopulation of this population
         represents a generation of the GA.
 
-    progress : :class:`.Population`
+    progress : :class:`.GAPopulation`
         A population where each subpopulation is a generation of the
         GA.
 
-    db_pop : :class:`.Population` or :class:`NoneType`
+    db_pop : :class:`.GAPopulation` or :class:`NoneType`
         A population which holds every molecule made by the GA.
 
     """
@@ -69,14 +69,14 @@ class GAProgress:
             # turn the cache of to load the GA produced version and
             # then update the cache.
             CACHE_SETTINGS['ON'] = False
-            for m in Population.load(progress_load, Molecule.fromdict):
+            for m in GAPopulation.load(progress_load, Molecule.from_dict):
                 m.update_cache()
             CACHE_SETTINGS['ON'] = True
-            self.progress = Population.load(progress_load,
-                                            Molecule.fromdict)
+            self.progress = GAPopulation.load(progress_load,
+                                              Molecule.from_dict)
             self.progress.ga_tools = ga_tools
         else:
-            self.progress = Population(ga_tools)
+            self.progress = GAPopulation(ga_tools)
 
         # The +1 is added so that the first mol's name is 1 more than
         # the max in the previous GA.
@@ -89,7 +89,7 @@ class GAProgress:
                           else len(self.progress.populations))
 
         self.progress_dump = progress_dump
-        self.db_pop = Population(ga_tools) if db_dump else None
+        self.db_pop = GAPopulation(ga_tools) if db_dump else None
 
     def db(self, mols):
         """
@@ -99,7 +99,7 @@ class GAProgress:
 
         Parameters
         ----------
-        mols : :class:`.Population`
+        mols : :class:`.GAPopulation`
             A group of molecules made by the GA.
 
         Returns
@@ -154,7 +154,7 @@ class GAProgress:
         logger : :class:`Logger`
             The logger object recording the GA.
 
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             A population which is to be added to the log.
 
         Returns
@@ -195,7 +195,7 @@ class GAProgress:
 
         Parameters
         ----------
-        pop : :class:`.Population`
+        pop : :class:`.GAPopulation`
             The population to be dumped.
 
         dump_name : :class:`str`
@@ -258,7 +258,7 @@ def ga_run(ga_input):
                           ga_input.ga_tools())
 
     logger.info('Generating initial population.')
-    init_func = getattr(Population, ga_input.initer().name)
+    init_func = getattr(GAPopulation, ga_input.initer().name)
     if init_func.__name__ != 'load':
         pop = init_func(**ga_input.initer().params,
                         size=ga_input.pop_size,
@@ -281,7 +281,7 @@ def ga_run(ga_input):
     progress.debug_dump(pop, 'init_pop.json')
 
     logger.info('Optimizing the population.')
-    pop.optimize_population(ga_input.processes)
+    pop.optimize(ga_input.opter(), ga_input.processes)
 
     logger.info('Calculating the fitness of population members.')
     pop.calculate_member_fitness(ga_input.processes)
@@ -325,7 +325,7 @@ def ga_run(ga_input):
         progress.debug_dump(pop, f'gen_{x}_unselected.json')
 
         logger.info('Optimizing the population.')
-        pop.optimize_population(ga_input.processes)
+        pop.optimize_population(ga_input.opter(), ga_input.processes)
 
         logger.info('Calculating the fitness of population members.')
         pop.calculate_member_fitness(ga_input.processes)
@@ -385,7 +385,7 @@ if __name__ == '__main__':
     logger.info('Loading molecules from any provided databases.')
     dbs = []
     for db in ga_input.databases:
-        dbs.append(Population.load(db, Molecule.fromdict))
+        dbs.append(GAPopulation.load(db, Molecule.from_dict))
 
     for x in range(args.loops):
         ga_run(ga_input)

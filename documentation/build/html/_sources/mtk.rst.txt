@@ -11,6 +11,13 @@ Subpackages
     mtk.molecular
     mtk.optimization
 
+Submodules
+----------
+
+.. toctree::
+
+   mtk.population
+
 Module contents
 ---------------
 
