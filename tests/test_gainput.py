@@ -104,7 +104,6 @@ def test_ga_tools():
     assert hasattr(gatools, 'crossover')
     assert hasattr(gatools, 'mutation')
     assert hasattr(gatools, 'normalization')
-    assert hasattr(gatools, 'optimization')
     assert hasattr(gatools, 'fitness')
     assert hasattr(gatools, 'input')
     assert hasattr(gatools, 'exit')
