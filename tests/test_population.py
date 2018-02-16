@@ -6,7 +6,7 @@ from os.path import join
 import copy
 
 from ..molecular import Cage, MacroMolecule, Molecule
-from ..ga import Population, GATools
+from ..population import Population
 
 pop = Population.load(join('data', 'population', 'population.json'),
                       Molecule.from_dict)
@@ -54,17 +54,16 @@ def test_init():
     """
 
     # A test where only ``Cage`` and ``Population`` instances are used
-    # for initialization as well as a single ``GATools`` instnace, as
-    # intended. Should pass.
+    # for initialization.
     Population(Cage.__new__(Cage), Cage.__new__(Cage),
-               Population.__new__(Population), Cage.__new__(Cage),
-               Population.__new__(Population), GATools.__new__(GATools))
+               Population(), Cage.__new__(Cage),
+               Population())
 
     # Only ``Cage`` and ``Population`` instances are used for
-    # initialization, no ``GATools`` instance. Valid, should pass.
+    # initialization,
     Population(Cage.__new__(Cage), Cage.__new__(Cage),
-               Population.__new__(Population), Cage.__new__(Cage),
-               Population.__new__(Population))
+               Population(), Cage.__new__(Cage),
+               Population())
 
 
 def test_add_members_duplicates():
