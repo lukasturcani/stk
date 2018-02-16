@@ -593,7 +593,7 @@ class Molecule:
             json.dump(self.json(), f, indent=4)
 
     @classmethod
-    def fromdict(self, json_dict, optimized=True, load_names=True):
+    def from_dict(self, json_dict, optimized=True, load_names=True):
         """
         Creates a :class:`Molecule` from a JSON :class:`dict`.
 
@@ -697,7 +697,7 @@ class Molecule:
         with open(path, 'r') as f:
             json_dict = json.load(f)
 
-        return cls.fromdict(json_dict, optimized, load_names)
+        return cls.from_dict(json_dict, optimized, load_names)
 
     def max_diameter(self, conformer=-1):
         """
@@ -2739,7 +2739,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        bbs = [Molecule.fromdict(x) for x in
+        bbs = [Molecule.from_dict(x) for x in
                json_dict['building_blocks']]
 
         topology = eval(json_dict['topology'],  topologies.__dict__)
@@ -2757,7 +2757,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                     np.__dict__)
         obj.fitness = None
         obj.progress_params = json_dict['progress_params']
-        obj.bb_counter = Counter({Molecule.fromdict(key): val for
+        obj.bb_counter = Counter({Molecule.from_dict(key): val for
                                   key, val in json_dict['bb_counter']})
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)

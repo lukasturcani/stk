@@ -131,9 +131,9 @@ def test_caching():
 
         # Try to remake them and check that caching was fine.
         assert mol2 is not mol
-        assert Molecule.fromdict(mol.json()) is mol
+        assert Molecule.from_dict(mol.json()) is mol
         assert StructUnit(data_dir) is mol
-        assert Molecule.fromdict(mol2.json()) is mol2
+        assert Molecule.from_dict(mol2.json()) is mol2
 
         # Make an alteration and make sure new molecules were
         # generated.
@@ -141,7 +141,7 @@ def test_caching():
         mol2dict = mol2.json()
         mol2dict['func_grp'] = mol2dict['func_grp'].replace('amine',
                                                             'aldehyde')
-        mol4 = Molecule.fromdict(mol2dict)
+        mol4 = Molecule.from_dict(mol2dict)
         assert mol3 is not mol
         assert mol3 is not mol2
         assert mol3 is not mol4
