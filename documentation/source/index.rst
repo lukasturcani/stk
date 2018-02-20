@@ -180,7 +180,7 @@ Other Materials
 of materials out of the box. However, ``mtk`` was designed to be easy
 extend to other classes of molecules.
 For a guide on how this can be done
-see, .
+see, :ref:`extending mtk`.
 
 
 Other Features
@@ -199,6 +199,8 @@ Dealing with Multiple Molecules
 
 Automated Molecular Design with Genetic Algorithms
 ..................................................
+
+.. _`extending mtk`:
 
 Extending ``mtk``
 -----------------
