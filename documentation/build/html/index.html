@@ -291,6 +291,28 @@ The argument <code class="docutils literal"><span class="pre">'/opt/schrodinger2
 </div>
 <div class="section" id="covalent-organic-frameworks">
 <h3>Covalent Organic Frameworks<a class="headerlink" href="#covalent-organic-frameworks" title="Permalink to this headline">¶</a></h3>
+<p>Just like the other molecules, covalent organic frameworks (COFs) are easy to
+construct:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;cof_bb1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;cof_bb2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">))</span>
+<span class="n">cof</span> <span class="o">=</span> <span class="n">Periodic</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Hexagonal</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Where the buliding blocks are:</p>
+<img alt="_images/cof_bbs.png" src="_images/cof_bbs.png" />
+<p>The same pattern is used. First building blocks objects are created using
+<code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code> instances. Then a molecule is assembled by creating
+an instance of its class, in this case <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic" title="mtk.molecular.molecules.Periodic"><code class="xref py py-class docutils literal"><span class="pre">Periodic</span></code></a>. The molecule
+being assembled is provided with the building blocks and the topology,
+in this case <a class="reference internal" href="mtk.molecular.topologies.periodic.html#mtk.molecular.topologies.periodic.Hexagonal" title="mtk.molecular.topologies.periodic.Hexagonal"><code class="xref py py-class docutils literal"><span class="pre">Hexagonal</span></code></a>.</p>
+<p>Because COFs are periodic structures, if we want to make a finite size
+molecule we have to create an “island”:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cof</span><span class="o">.</span><span class="n">island</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Here we created create a 5 by 5 by 1 grid of the periodic unit cell and
+terminated the periodic bonds with hydrogen atoms. This is our structure:</p>
+<img alt="_images/cof.png" src="_images/cof.png" />
 </div>
 <div class="section" id="other-materials">
 <h3>Other Materials<a class="headerlink" href="#other-materials" title="Permalink to this headline">¶</a></h3>
@@ -305,15 +327,90 @@ see, <a class="reference internal" href="#extending-mtk"><span class="std std-re
 <h2>Other Features<a class="headerlink" href="#other-features" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="calculating-molecular-properties">
 <h3>Calculating Molecular Properties<a class="headerlink" href="#calculating-molecular-properties" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">mtk</span></code> provides a variety of methods to calculate molecular properties.
+What methods can be used depends on what kind of molecule object is created.
+All molecules can use methods defined in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>. All
+building blocks can use methods in <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> in addition to this.
+Assembled molecules can use additional methods provided by <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>.</p>
+<p>Here are some examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Calculate the energy of a molecule using rdkit and the UFF force field.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+<span class="c1"># Calculate the energy of a molecule using MacroModel. Using force field</span>
+<span class="c1"># number 16 (OPLS3).</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">marcomodel</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+<span class="c1"># Calculate the maximum diameter of of a molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">max_diameter</span><span class="p">()</span>
+<span class="c1"># Calculate the cavity size of a cage molecule.</span>
+<span class="n">cage</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">()</span>
+<span class="c1"># Calculate the mean RMSD between the building blocks original</span>
+<span class="c1"># structure and their structure inside an assembled macromolecule.</span>
+<span class="n">macro_mol</span><span class="o">.</span><span class="n">bb_distortion</span><span class="p">()</span>
+<span class="c1"># Get the center of mass of a molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">center_of_mass</span><span class="p">()</span>
+<span class="c1"># Get the atomic symbol of atom with id of 13.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="geometric-manipulations">
 <h3>Geometric Manipulations<a class="headerlink" href="#geometric-manipulations" title="Permalink to this headline">¶</a></h3>
+<p>In addition to molecular property calculation, <code class="docutils literal"><span class="pre">mtk</span></code> provides tools to
+rotate and translate molecules. These tools are particularly useful when
+defining the assembly process of a new class of molecules.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Change the position of a molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="c1"># Get a matrix holding the position of every atom in the molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">()</span>
+<span class="c1"># Use a matrix to set the position of every atom in the molecule.</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">some_matrix</span><span class="p">)</span>
+<span class="c1"># Rotate the molecule along by pi radians about the vector (1, 1, 3)</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="dealing-with-multiple-molecules">
 <h3>Dealing with Multiple Molecules<a class="headerlink" href="#dealing-with-multiple-molecules" title="Permalink to this headline">¶</a></h3>
+<p>When batches of molecules are created, it is often desirable to optimize
+them all at once. By placing the molecules in a <a class="reference internal" href="mtk.population.html#mtk.population.Population" title="mtk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a>
+instance, all molecules can be optimized in parallel.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="n">cage2</span><span class="p">,</span> <span class="n">cage3</span><span class="p">)</span>
+<span class="n">pop</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel_opt&#39;</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In addition to this, the <a class="reference internal" href="mtk.population.html#mtk.population.Population" title="mtk.population.Population"><code class="xref py py-class docutils literal"><span class="pre">Population</span></code></a> class provides some handy
+tools to assemble large amounts of molecules at a time. For example if
+we want to create every possible cage from a set of building blocks and
+topologies:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bbs1</span> <span class="o">=</span> <span class="p">[</span><span class="n">StructUnit2</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;3.mol&#39;</span><span class="p">)]</span>
+<span class="n">bbs2</span> <span class="o">=</span> <span class="p">[</span><span class="n">StructUnit3</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;4.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;5.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;6.mol&#39;</span><span class="p">)]</span>
+<span class="c1"># Create 18 Cage molecules.</span>
+<span class="n">pop2</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_all</span><span class="p">(</span><span class="n">Cage</span><span class="p">,</span> <span class="p">[</span><span class="n">bbs1</span><span class="p">,</span> <span class="n">bbs2</span><span class="p">],</span> <span class="p">[</span><span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">EightPlusTwelve</span><span class="p">()])</span>
+</pre></div>
+</div>
+<p>Or if we want to select building blocks at random and create 5 cages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop3</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_random</span><span class="p">(</span><span class="n">Cage</span><span class="p">,</span> <span class="p">[</span><span class="n">bbs1</span><span class="p">,</span> <span class="n">bbs2</span><span class="p">],</span> <span class="p">[</span><span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">EightPlusTwelve</span><span class="p">()],</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, the population can be used to calculate statistics across all
+molecules. For example, if you want to know the average cavity size of
+your cages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">())</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="automated-molecular-design-with-genetic-algorithms">
 <h3>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h3>
+<p>Via the <a class="reference internal" href="mtk.ga.html#module-mtk.ga" title="mtk.ga"><code class="xref py py-mod docutils literal"><span class="pre">ga</span></code></a> module, <code class="docutils literal"><span class="pre">mtk</span></code> includes a genetic algorithm which
+can be used to evolve molecules that fulfil user defined design criteria.
+The genetic algorithm can be run from the command line using:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python -m mtk input_file.py
+</pre></div>
+</div>
+<p>The input file is a simple python script which defines the mutation,
+crossover, selection and other functions the genetic algorithm
+should use. For details on how to build and input file see <a class="reference internal" href="mtk.ga.input.html#mtk.ga.input.GAInput" title="mtk.ga.input.GAInput"><code class="xref py py-class docutils literal"><span class="pre">GAInput</span></code></a>.</p>
+<p>The genetic algorithm automatically works with any molecules that <code class="docutils literal"><span class="pre">mtk</span></code>
+can construct, just make sure you define an appropriate fitness function.</p>
 </div>
 </div>
 <div class="section" id="extending-mtk">
