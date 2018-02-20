@@ -1,6 +1,8 @@
 """
 Defines mutation operations via the :class:`Mutation` class.
 
+.. _`adding mutation functions`:
+
 Extending mtk: Adding mutation functions.
 -----------------------------------------
 

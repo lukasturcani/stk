@@ -1,8 +1,10 @@
 """
 Defines crossover operations via the :class:`Crossover` class.
 
+.. _`adding crossover functions`:
+
 Extending mtk: Adding crossover functions.
--------------------------------------------
+------------------------------------------
 
 If a new crossover operation is to be added to ``mtk`` it should be
 added as a method in the :class:`Crossover` class defined in this

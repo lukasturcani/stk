@@ -1,6 +1,8 @@
 """
 Defines :class:`FGInfo` which describes functional groups.
 
+.. _`adding functional groups`:
+
 Extending mtk: Adding  more functional groups.
 ----------------------------------------------
 

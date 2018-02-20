@@ -7,6 +7,8 @@ molecule has been found.
 
 The functions are defined as methods in the :class:`Exit`.
 
+.. _`adding exit functions`:
+
 Extending mtk: Adding exit functions.
 -------------------------------------
 

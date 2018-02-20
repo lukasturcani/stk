@@ -152,8 +152,10 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Defines crossover operations via the :class:`Crossover` class.</span>
 
+<span class="sd">.. _`adding crossover functions`:</span>
+
 <span class="sd">Extending mtk: Adding crossover functions.</span>
-<span class="sd">-------------------------------------------</span>
+<span class="sd">------------------------------------------</span>
 
 <span class="sd">If a new crossover operation is to be added to ``mtk`` it should be</span>
 <span class="sd">added as a method in the :class:`Crossover` class defined in this</span>
@@ -298,7 +300,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">offspring_pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">population</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">offspring_pop</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">ga_tools</span><span class="o">=</span><span class="n">population</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
         <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
 
         <span class="n">parent_pool</span> <span class="o">=</span> <span class="n">islice</span><span class="p">(</span><span class="n">population</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;crossover&#39;</span><span class="p">),</span>

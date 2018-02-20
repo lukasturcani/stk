@@ -45,6 +45,8 @@ building blocks as either ``'bonder'`` or ``'del'`` (see its
 documentation). This tells the :class:`.Topology` instance which atoms
 form bonds and which are removed during assembly.
 
+.. _`macromolecular assembly`:
+
 A more detailed description of macromolecular assembly.
 -------------------------------------------------------
 
@@ -129,6 +131,8 @@ The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a
 
 After all this you should have a ``rdkit`` instance of the
 macromolecule which should be placed into :attr:`MacroMolecule.mol`.
+
+.. _`adding macromolecules`:
 
 Extending mtk: Adding new macromolecules.
 -----------------------------------------

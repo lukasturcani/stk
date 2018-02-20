@@ -13,6 +13,8 @@ population.
 At each generation, a number of normalization functions can be applied
 in sequence.
 
+.. _`adding normalization functions`:
+
 Extending mtk: Adding normalization functions.
 ----------------------------------------------
 

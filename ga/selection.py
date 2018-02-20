@@ -1,6 +1,8 @@
 """
 Defines selection functions via :class:`Selection`.
 
+.. _`adding selection functions`:
+
 Extending mtk: Adding selection functions.
 ------------------------------------------
 

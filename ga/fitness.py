@@ -105,6 +105,8 @@ a fresh copy of the value from :attr:`.MacroMolecule.unscaled_fitness`
 is made into :attr:`.MacroMolecule.fitness`. This means that the
 normalization functions always start from the unscaled fitness value.
 
+.. _`adding fitness functions`:
+
 Extending mtk: Adding fitness functions.
 ----------------------------------------
 
