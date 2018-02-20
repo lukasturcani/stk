@@ -356,7 +356,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        progress : :class:`Population`</span>
+<span class="sd">        progress : :class:`GAPopulation`</span>
 <span class="sd">            population where each subpopulation is a previous generation.</span>
 
 <span class="sd">        Returns</span>
@@ -371,7 +371,7 @@
 
 <div class="viewcode-block" id="GAPopulation.gen_mutants"><a class="viewcode-back" href="../../../mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation.gen_mutants">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mutants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="o">=</span><span class="s1">&#39;mutation_counter.png&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a :class:`Population` of mutants.</span>
+<span class="sd">        Returns a :class:`GAPopulation` of mutants.</span>
 
 <span class="sd">        The selection function which decides which molecules are</span>
 <span class="sd">        selected for mutation is defined in the</span>
@@ -391,7 +391,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`Population`</span>
+<span class="sd">        :class:`GAPopulation`</span>
 <span class="sd">            A population holding mutants created by mutating the</span>
 <span class="sd">            :class:`.MacroMolecule` instances held by the population.</span>
 
@@ -420,12 +420,12 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`Population`</span>
+<span class="sd">        :class:`GAPopulation`</span>
 <span class="sd">            A population holding the next generation of molecules.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">new_gen</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
+        <span class="n">new_gen</span> <span class="o">=</span> <span class="n">GAPopulation</span><span class="p">(</span><span class="n">ga_tools</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span><span class="p">)</span>
         <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;generational&#39;</span><span class="p">):</span>
             <span class="n">counter</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">member</span><span class="p">])</span>
@@ -443,7 +443,7 @@
 
 <div class="viewcode-block" id="GAPopulation.gen_offspring"><a class="viewcode-back" href="../../../mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation.gen_offspring">[docs]</a>    <span class="k">def</span> <span class="nf">gen_offspring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_name</span><span class="o">=</span><span class="s1">&#39;crossover_counter.png&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a :class:`Population` of offspring molecules.</span>
+<span class="sd">        Returns a :class:`GAPopulation` of offspring molecules.</span>
 
 <span class="sd">        The selection function which decides which molecules are</span>
 <span class="sd">        selected for crossover is defined in the</span>
@@ -463,7 +463,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`Population`</span>
+<span class="sd">        :class:`GAPopulation`</span>
 <span class="sd">            A population of offspring, created by crossing</span>
 <span class="sd">            :class:`.MacroMolecule` instances contained in the</span>
 <span class="sd">            population.</span>
@@ -536,6 +536,7 @@
     <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">ga_tools</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga_tools</span>
+        <span class="k">return</span> <span class="n">p</span>
 
     <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>

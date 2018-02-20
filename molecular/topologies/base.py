@@ -1,6 +1,8 @@
 """
 Defines the base :class:`Topology` type.
 
+.. _`adding topologies`:
+
 Extending mtk: Adding new topologies.
 -------------------------------------
 
