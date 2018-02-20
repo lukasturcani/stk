@@ -86,7 +86,26 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to mtk’s documentation!</a></li>
+<li><a class="reference internal" href="#">Welcome to <code class="docutils literal"><span class="pre">mtk</span></code>’s documentation!</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#basic-examples">Basic Examples</a><ul>
+<li><a class="reference internal" href="#linear-polymer">Linear Polymer</a></li>
+<li><a class="reference internal" href="#molecular-cages">Molecular Cages</a></li>
+<li><a class="reference internal" href="#covalent-organic-frameworks">Covalent Organic Frameworks</a></li>
+<li><a class="reference internal" href="#other-materials">Other Materials</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-features">Other Features</a><ul>
+<li><a class="reference internal" href="#calculating-molecular-properties">Calculating Molecular Properties</a></li>
+<li><a class="reference internal" href="#geometric-manipulations">Geometric Manipulations</a></li>
+<li><a class="reference internal" href="#dealing-with-multiple-molecules">Dealing with Multiple Molecules</a></li>
+<li><a class="reference internal" href="#automated-molecular-design-with-genetic-algorithms">Automated Molecular Design with Genetic Algorithms</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#extending-mtk">Extending <code class="docutils literal"><span class="pre">mtk</span></code></a></li>
+<li><a class="reference internal" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
@@ -132,7 +151,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to mtk’s documentation!</li>
+      <li>Welcome to <code class="docutils literal"><span class="pre">mtk</span></code>’s documentation!</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -152,8 +171,179 @@
            <div itemprop="articleBody">
             
   <div class="section" id="welcome-to-mtk-s-documentation">
-<h1>Welcome to mtk’s documentation!<a class="headerlink" href="#welcome-to-mtk-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to <code class="docutils literal"><span class="pre">mtk</span></code>’s documentation!<a class="headerlink" href="#welcome-to-mtk-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal"><span class="pre">mtk</span></code> is a Python 3 library for building, manipulating, optimizing
+and designing molecules.</p>
+</div>
+<div class="section" id="basic-examples">
+<h2>Basic Examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="linear-polymer">
+<h3>Linear Polymer<a class="headerlink" href="#linear-polymer" title="Permalink to this headline">¶</a></h3>
+<p>The core function of <code class="docutils literal"><span class="pre">mtk</span></code> is to assemble molecules. Here is an example
+of how a simple, linear polymer can be built. Starting with three monomers,
+such as</p>
+<img alt="_images/monomers.png" src="_images/monomers.png" />
+<p>each can be loaded into a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2" title="mtk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal"><span class="pre">StructUnit2</span></code></a> object from a molecular
+structure file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">monomer1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;monomer1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+<span class="n">monomer2</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;monomer2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+<span class="n">monomer3</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;monomer3.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first argument is the path to the structure file and the second
+argument specifies the functional group of the monomer.</p>
+<p>To assemble a polymer only a single line of code is required:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span> <span class="o">=</span> <span class="n">Polymer</span><span class="p">([</span><span class="n">monomer1</span><span class="p">,</span> <span class="n">monomer2</span><span class="p">,</span> <span class="n">monomer3</span><span class="p">],</span> <span class="n">Linear</span><span class="p">(</span><span class="s1">&#39;ABC&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Simply create a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a> object by giving it a list of
+monomers and a topology object, in this
+case <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear" title="mtk.molecular.topologies.base.Linear"><code class="xref py py-class docutils literal"><span class="pre">Linear</span></code></a>. The topology object defines the the structure of
+the polymer being assembled. The repeating unit is <code class="docutils literal"><span class="pre">'ABC'</span></code>, the orientation
+of the each monomer along the chain is parallel, anti-parallel and random, respectively, and
+the number of repeating units is <code class="docutils literal"><span class="pre">3</span></code>.</p>
+<p>The assembled polymer can be written to a file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;polymer.mol&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and will look like this.</p>
+<img alt="_images/polymer.png" src="_images/polymer.png" />
+<p>Notice that the functional group has disappeared and been replaced by
+new bonds between the monomers. The new bonds seem a little stretched,
+so we can optimize the structure using an optimization function defined in
+<a class="reference internal" href="mtk.optimization.optimization.html#module-mtk.optimization.optimization" title="mtk.optimization.optimization"><code class="xref py py-mod docutils literal"><span class="pre">optimization</span></code></a>, in this case <a class="reference internal" href="mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_ETKDG" title="mtk.optimization.optimization.rdkit_ETKDG"><code class="xref py py-func docutils literal"><span class="pre">rdkit_ETKDG()</span></code></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">rdkit_ETKDG</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, the polymer can be written to a file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">polymer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;polymer_opt.mol&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and viewed</p>
+<img alt="_images/polymer_opt.png" src="_images/polymer_opt.png" />
+</div>
+<div class="section" id="molecular-cages">
+<h3>Molecular Cages<a class="headerlink" href="#molecular-cages" title="Permalink to this headline">¶</a></h3>
+<p>Molecular cages are relatively
+exotic molecules that look like, yes, cages. Here is an example:</p>
+<img alt="_images/molecular_cage.png" src="_images/molecular_cage.png" />
+<p>Despite their apparent complexity, assembling a molecular cage is
+extremely straightforward. In fact, it is done in exactly the same way
+as a polymer.</p>
+<p>First we define the building blocks of the cage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;bb1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;bb2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here is what they look like:</p>
+<img alt="_images/cage_building_blocks.png" src="_images/cage_building_blocks.png" />
+<p>Notice a slight difference, while the first building building block still
+uses the class <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit2" title="mtk.molecular.molecules.StructUnit2"><code class="xref py py-class docutils literal"><span class="pre">StructUnit2</span></code></a>, the second uses the class
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3" title="mtk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>. The reason is that the first building block has
+2 functional groups while the second has 3 functional groups. Each class
+defines a slightly different set of operations for manipulating the
+positions of the building blocks when assembling the cage. This is
+important so that the building blocks are placed exactly how we want them
+when constructing a molecule. However, all of this happens behind the scenes
+and a cage can be constructed through a simple one-liner:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Notice that this is exactly the same as the polymer example. To generate
+a cage, we simply create a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Cage" title="mtk.molecular.molecules.Cage"><code class="xref py py-class docutils literal"><span class="pre">Cage</span></code></a> object. We initialize it with
+a list of building blocks and provide a topology instance, in this case
+<a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="mtk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal"><span class="pre">FourPlusSix</span></code></a>. Unlike the <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Linear" title="mtk.molecular.topologies.base.Linear"><code class="xref py py-class docutils literal"><span class="pre">Linear</span></code></a> class, the <a class="reference internal" href="mtk.molecular.topologies.cage.two_plus_three.html#mtk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="mtk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal"><span class="pre">FourPlusSix</span></code></a>
+does not require any additional arguments. Our assembled cage looks like
+this</p>
+<img alt="_images/cage.png" src="_images/cage.png" />
+<p>If we want to create a cage with a different topology but using the same
+building blocks, we provide a different topology instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">EightPlusTwelve</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>The assembled cage looks like a cube:</p>
+<img alt="_images/cage2.png" src="_images/cage2.png" />
+<p>Notice that the building blocks are the same, only the shape has changed.
+This is because a different topology instance was provided during initialization.</p>
+<p>Here is a third example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage3</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Dodecahedron</span><span class="p">())</span>
+</pre></div>
+</div>
+<img alt="_images/cage3.png" src="_images/cage3.png" />
+<p>While we assembled some cages, the constructed structures are not
+particularly realistic. We can optimize the geometry using an optimization
+function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+<span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage2</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+<span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage3</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/cages_opt.jpg" src="_images/cages_opt.jpg" />
+<p>In this case the function <a class="reference internal" href="mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_opt" title="mtk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code></a> was used. We could have
+used <code class="xref py py-func docutils literal"><span class="pre">rdkit_ETKDG()</span></code> again but chances are the structures would
+have been optimized quite poorly. The <code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code> function
+requires a valid <code class="docutils literal"><span class="pre">MacroModel</span></code> installation with a working license.
+The argument <code class="docutils literal"><span class="pre">'/opt/schrodinger2017-4'</span></code> is the path to the installation.</p>
+</div>
+<div class="section" id="covalent-organic-frameworks">
+<h3>Covalent Organic Frameworks<a class="headerlink" href="#covalent-organic-frameworks" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="other-materials">
+<h3>Other Materials<a class="headerlink" href="#other-materials" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">mtk</span></code> is a work in progress and currently supports only the above classes
+of materials out of the box. However, <code class="docutils literal"><span class="pre">mtk</span></code> was designed to be easy
+extend to other classes of molecules.
+For a guide on how this can be done
+see, .</p>
+</div>
+</div>
+<div class="section" id="other-features">
+<h2>Other Features<a class="headerlink" href="#other-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="calculating-molecular-properties">
+<h3>Calculating Molecular Properties<a class="headerlink" href="#calculating-molecular-properties" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="geometric-manipulations">
+<h3>Geometric Manipulations<a class="headerlink" href="#geometric-manipulations" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="dealing-with-multiple-molecules">
+<h3>Dealing with Multiple Molecules<a class="headerlink" href="#dealing-with-multiple-molecules" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="automated-molecular-design-with-genetic-algorithms">
+<h3>Automated Molecular Design with Genetic Algorithms<a class="headerlink" href="#automated-molecular-design-with-genetic-algorithms" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="extending-mtk">
+<h2>Extending <code class="docutils literal"><span class="pre">mtk</span></code><a class="headerlink" href="#extending-mtk" title="Permalink to this headline">¶</a></h2>
+<p>Each module of mtk has its own guidelines for adding new functionality.
+However, in almost all cases adding new features to <code class="docutils literal"><span class="pre">mtk</span></code> only involves
+defining a simple function in the appropriate module or a method in the
+appropriate class.</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="mtk.molecular.molecules.html#adding-macromolecules"><span class="std std-ref">Extending mtk: Adding new macromolecules.</span></a></li>
+<li><a class="reference internal" href="mtk.molecular.topologies.base.html#adding-topologies"><span class="std std-ref">Extending mtk: Adding new topologies.</span></a></li>
+<li><a class="reference internal" href="mtk.molecular.fg_info.html#adding-functional-groups"><span class="std std-ref">Extending mtk: Adding  more functional groups.</span></a></li>
+<li><a class="reference internal" href="mtk.molecular.energy.html#adding-energy-functions"><span class="std std-ref">Extending mtk: Adding more energy functions.</span></a></li>
+<li><a class="reference internal" href="mtk.ga.mutation.html#adding-mutation-functions"><span class="std std-ref">Extending mtk: Adding mutation functions.</span></a></li>
+<li><a class="reference internal" href="mtk.ga.crossover.html#adding-crossover-functions"><span class="std std-ref">Extending mtk: Adding crossover functions.</span></a></li>
+<li><a class="reference internal" href="mtk.ga.fitness.html#adding-fitness-functions"><span class="std std-ref">Extending mtk: Adding fitness functions.</span></a></li>
+<li><a class="reference internal" href="mtk.ga.normalization.html#adding-normalization-functions"><span class="std std-ref">Extending mtk: Adding normalization functions.</span></a></li>
+<li><a class="reference internal" href="mtk.ga.selection.html#adding-selection-functions"><span class="std std-ref">Extending mtk: Adding selection functions.</span></a></li>
+<li><a class="reference internal" href="mtk.ga.ga_exit.html#adding-exit-functions"><span class="std std-ref">Extending mtk: Adding exit functions.</span></a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="mtk.molecular.molecules.html#macromolecular-assembly"><span class="std std-ref">A more detailed description of macromolecular assembly.</span></a></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 <div class="section" id="indices-and-tables">

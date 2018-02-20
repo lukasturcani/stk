@@ -1,6 +1,8 @@
 """
 Defines energy calculations via :class:`Energy`.
 
+.. _`adding energy functions`:
+
 Extending mtk: Adding more energy functions.
 --------------------------------------------
 

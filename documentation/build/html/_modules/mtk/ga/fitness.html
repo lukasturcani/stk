@@ -256,6 +256,8 @@
 <span class="sd">is made into :attr:`.MacroMolecule.fitness`. This means that the</span>
 <span class="sd">normalization functions always start from the unscaled fitness value.</span>
 
+<span class="sd">.. _`adding fitness functions`:</span>
+
 <span class="sd">Extending mtk: Adding fitness functions.</span>
 <span class="sd">----------------------------------------</span>
 
@@ -620,7 +622,7 @@
     <span class="c1"># vector all have different oraders of magnitude and that some</span>
     <span class="c1"># are negative.</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">]))</span>
-    <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;random_fitness_vector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+    <span class="n">macro_mol</span><span class="o">.</span><span class="n">progress_params</span><span class="p">[</span><span class="s1">&#39;random_fitness_vector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">f</span></div>
 
 
