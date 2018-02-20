@@ -172,6 +172,36 @@ The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 Covalent Organic Frameworks
 ...........................
 
+Just like the other molecules, covalent organic frameworks (COFs) are easy to
+construct:
+
+.. code-block:: python
+
+    bb1 = StructUnit3('cof_bb1.mol', 'bromine')
+    bb2 = StructUnit3('cof_bb2.mol', 'bromine'))
+    cof = Periodic([bb1, bb2], Hexagonal())
+
+Where the buliding blocks are:
+
+.. image:: figures/cof_bbs.png
+
+The same pattern is used. First building blocks objects are created using
+:class:`StructUnit3` instances. Then a molecule is assembled by creating
+an instance of its class, in this case :class:`.Periodic`. The molecule
+being assembled is provided with the building blocks and the topology,
+in this case :class:`.Hexagonal`.
+
+Because COFs are periodic structures, if we want to make a finite size
+molecule we have to create an "island":
+
+.. code-block:: python
+
+    cof.island([5, 5, 1])
+
+Here we created create a 5 by 5 by 1 grid of the periodic unit cell and
+terminated the periodic bonds with hydrogen atoms. This is our structure:
+
+.. image:: figures/cof.png
 
 Other Materials
 ...............
@@ -189,16 +219,106 @@ Other Features
 Calculating Molecular Properties
 ................................
 
+``mtk`` provides a variety of methods to calculate molecular properties.
+What methods can be used depends on what kind of molecule object is created.
+All molecules can use methods defined in :class:`.Molecule`. All
+building blocks can use methods in :class:`.StructUnit` in addition to this.
+Assembled molecules can use additional methods provided by :class:`.MacroMolecule`.
+
+Here are some examples:
+
+.. code-block:: python
+
+    # Calculate the energy of a molecule using rdkit and the UFF force field.
+    mol.energy.rdkit('uff')
+    # Calculate the energy of a molecule using MacroModel. Using force field
+    # number 16 (OPLS3).
+    mol.energy.marcomodel(16, '/opt/schrodinger2017-4')
+    # Calculate the maximum diameter of of a molecule.
+    mol.max_diameter()
+    # Calculate the cavity size of a cage molecule.
+    cage.cavity_size()
+    # Calculate the mean RMSD between the building blocks original
+    # structure and their structure inside an assembled macromolecule.
+    macro_mol.bb_distortion()
+    # Get the center of mass of a molecule.
+    mol.center_of_mass()
+    # Get the atomic symbol of atom with id of 13.
+    mol.atom_symbol(13)
+
 Geometric Manipulations
-........................
+.......................
+
+In addition to molecular property calculation, ``mtk`` provides tools to
+rotate and translate molecules. These tools are particularly useful when
+defining the assembly process of a new class of molecules.
+
+.. code-block:: python
+
+    # Change the position of a molecule.
+    mol.set_position([1, 2, 3])
+    # Get a matrix holding the position of every atom in the molecule.
+    mol.position_matrix()
+    # Use a matrix to set the position of every atom in the molecule.
+    mol.set_position_from_matrix(some_matrix)
+    # Rotate the molecule along by pi radians about the vector (1, 1, 3)
+    mol.rotate(np.pi, [1, 1, 2])
 
 Dealing with Multiple Molecules
 ...............................
 
 
+When batches of molecules are created, it is often desirable to optimize
+them all at once. By placing the molecules in a :class:`.Population`
+instance, all molecules can be optimized in parallel.
+
+.. code-block:: python
+
+    pop = Population(cage, cage2, cage3)
+    pop.optimize(FunctionData('macromodel_opt', macromodel_path='/opt/schrodinger2017-4'))
+
+
+In addition to this, the :class:`.Population` class provides some handy
+tools to assemble large amounts of molecules at a time. For example if
+we want to create every possible cage from a set of building blocks and
+topologies:
+
+.. code-block:: python
+
+    bbs1 = [StructUnit2(path, 'aldehyde') for path in ('1.mol', '2.mol', '3.mol')]
+    bbs2 = [StructUnit3(path, 'amine') for path in ('4.mol', '5.mol', '6.mol')]
+    # Create 18 Cage molecules.
+    pop2 = Population.init_all(Cage, [bbs1, bbs2], [FourPlusSix(), EightPlusTwelve()])
+
+Or if we want to select building blocks at random and create 5 cages:
+
+.. code-block:: python
+
+    pop3 = Population.init_random(Cage, [bbs1, bbs2], [FourPlusSix(), EightPlusTwelve()], 5)
+
+Finally, the population can be used to calculate statistics across all
+molecules. For example, if you want to know the average cavity size of
+your cages:
+
+.. code-block:: python
+
+    pop.mean(lambda x: x.cavity_size())
 
 Automated Molecular Design with Genetic Algorithms
 ..................................................
+
+Via the :mod:`.ga` module, ``mtk`` includes a genetic algorithm which
+can be used to evolve molecules that fulfil user defined design criteria.
+The genetic algorithm can be run from the command line using::
+
+    $ python -m mtk input_file.py
+
+The input file is a simple python script which defines the mutation,
+crossover, selection and other functions the genetic algorithm
+should use. For details on how to build and input file see :class:`.GAInput`.
+
+The genetic algorithm automatically works with any molecules that ``mtk``
+can construct, just make sure you define an appropriate fitness function.
 
 .. _`extending mtk`:
 
