@@ -27,16 +27,16 @@ def is_bonder(macro_mol, atom_id):
             else False)
 
 
-class PeriodicLattice(Topology):
+class COFLattice(Topology):
     """
     A base class for periodic topologies.
 
     This class behaves almost exactly like
     :class:`.Topology` with only minor additions to suit the
-    representation of periodic lattices. The :meth:`del_atoms` method
-    is extended to collect the coordinates of any deleted atoms. This
-    is necessary for positioning terminating atoms on islands generated
-    from the periodic structure by :meth:`.Periodic.island`.
+    representation of COF periodic lattices. The :meth:`del_atoms`
+    method is extended to collect the coordinates of any deleted atoms.
+    This is necessary for positioning terminating atoms on islands
+    generated from the periodic structure by :meth:`.Periodic.island`.
 
     """
 
@@ -81,6 +81,28 @@ class PeriodicLattice(Topology):
 
         super().del_atoms(macro_mol)
         macro_mol._ids_updated = False
+
+
+class LinkerCOFLattice(COFLattice):
+    ...
+
+
+class NoLinkerCOFLattice(COFLattice):
+    ...
+
+
+class NoLinkerHoneycomb(NoLinkerCOFLattice):
+    """
+    Represents a hexagonal lattice with 2 tritopic building blocks.
+
+    """
+
+    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
+                                 np.array([0.5, 0.866, 0]),
+                                 np.array([0, 0, 5/1.7321])]
+
+    vertices = [(a/3 + b/3 + c/2),
+                (2*a/3 + 2*b/3 + c/2)]
 
     def join_mols(self, macro_mol):
         """
@@ -220,15 +242,57 @@ class PeriodicLattice(Topology):
         super(macro_mol.__class__, macro_mol).save_ids()
 
 
-class Hexagonal(PeriodicLattice):
-    """
-    Represents a hexagonal lattice.
-
-    """
-
+class Honeycomb(LinkerCOFLattice):
     cell_dimensions = a, b, c = [np.array([1, 0, 0]),
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = [(a/3 + b/3 + c/2),
-                (2*a/3 + 2*b/3 + c/2)]
+    vertices = v1, v2 = [(a/3 + b/3 + c/2),
+                         (2*a/3 + 2*b/3 + c/2)]
+
+    edges = [Edge(v1, v2),
+             Edge(v1, v2, [0, -1, 0]),
+             Edge(v1, v2, [-1, 0, 0])]
+
+
+class Hexagonal(LinkerCOFLattice):
+    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
+                                 np.array([0.5, 0.866, 0]),
+                                 np.array([0, 0, 5/1.7321])]
+
+    vertices = v1, v2 = [(a/3 + b/3 + c/2),
+                         (2*a/3 + 2*b/3 + c/2)]
+
+    edges = [Edge(v1, v2),
+             Edge(v1, v1, [1, 0, 0]),
+             Edge(v2, v2, [1, 0, 0]),
+             Edge(v1, v2, [-1, -1, 0]),
+             Edge(v1, v2, [-1, 0, 0]),
+             Edge(v1, v2, [0, -1, 0])]
+
+
+class Square(LinkerCOFLattice):
+    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
+                                 np.array([0, 1, 0]),
+                                 np.array([0, 0, 1])]
+
+    vertices = v1, = [(a/2 + b/2 + c/2)]
+    edges = [Edge(v1, v1, [1, 0, 0]),
+             Edge(v1, v1, [0, 1, 0])]
+
+
+class Kagome(LinkerCOFLattice):
+    cell_dimensions = a, b, c = [np.array([1, 0, 0]),
+                                 np.array([0.5, 0.866, 0]),
+                                 np.array([0, 0, 5/1.7321])]
+
+    vertices = v1, v2, v3 = [(a/3 + 2*b/3 + c/2),
+                             (2*a/3 + 2*b/3 + c/2),
+                             (2*a/3 + b/3 + c/2)]
+
+    edges = [Edge(v1, v2),
+             Edge(v1, v3),
+             Edge(v2, v3),
+             Edge(v1, v2, [-1, 0, 0]),
+             Edge(v1, v3, [-1, 1, 0]),
+             Edge(v2, v3, [0, 1, 0])]
