@@ -352,12 +352,16 @@ class Linear(Topology):
             :attr:`.MacroMolecule.building_blocks` is labelled as
             ``"A"`` while index ``1`` as ``"B"`` and so on.
 
-        orientation : :class:`tuple` of :class:`int`
-            For each character in the repeating unit, a value of
-            ``-1``, ``0`` or ``1`` must be given in a :class:`list`. It
-            indicates the direction at which each monomer of the
-            repeating unit is placed along the chain. ``0`` means that
-            the direction is random.
+        orientation : :class:`tuple` of :class:`float`
+            For each character in the repeating unit, a value between
+            ``0`` (inclusive) and ``1`` (inclusive) must be given.
+            The values give the probability that each monomer is
+            flipped by 180 degrees when being added to the chain. If
+            ``0`` then the monomer is guaranteed to not flip. If ``1``
+            it is guaranteed to flip. This allows the user to create
+            head-to-head or head-to-tail chains, as well as chain with
+            a preference for head-to-head or head-to-tail if a number
+            between ``0`` and ``1`` is chosen.
 
         n : :class:`int`
             The number of repeating units which are used to make the
@@ -493,12 +497,9 @@ class Linear(Topology):
         # Make string representing the entire polymer, not just the
         # repeating unit.
         polymer = self.repeating_unit*self.n
-        # Make a string holding the orientation of each monomer in the
-        # entire polymer, not just the repeating unit.
-        dirs = ",".join(str(x) for x in self.orientation) + ','
-        dirs *= self.n
-        # Turn the string into a list of numbers.
-        dirs = [int(x) for x in dirs.split(',') if x]
+        # Get the direction for each monomer along the entire chain,
+        # not just the repeating unit.
+        dirs = self.orientation*self.n
 
         # Go through the repeating unit. Place each monomer 50 A apart.
         # Also create a bond.
@@ -508,7 +509,9 @@ class Linear(Topology):
                 macro_mol.mol.GetNumAtoms() + id_ for
                 id_ in mapping[label].bonder_ids])
 
-            mdir = np.random.choice([-1, 1]) if not mdir else mdir
+            # Flip or not flip the monomer as given by the probability
+            # in `mdir`.
+            mdir = np.random.choice([1, -1], p=[mdir, 1-mdir])
             mapping[label].set_orientation2([mdir, 0, 0])
 
             # The first building block should be placed at 0, the others

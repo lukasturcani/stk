@@ -503,12 +503,16 @@
 <span class="sd">            :attr:`.MacroMolecule.building_blocks` is labelled as</span>
 <span class="sd">            ``&quot;A&quot;`` while index ``1`` as ``&quot;B&quot;`` and so on.</span>
 
-<span class="sd">        orientation : :class:`tuple` of :class:`int`</span>
-<span class="sd">            For each character in the repeating unit, a value of</span>
-<span class="sd">            ``-1``, ``0`` or ``1`` must be given in a :class:`list`. It</span>
-<span class="sd">            indicates the direction at which each monomer of the</span>
-<span class="sd">            repeating unit is placed along the chain. ``0`` means that</span>
-<span class="sd">            the direction is random.</span>
+<span class="sd">        orientation : :class:`tuple` of :class:`float`</span>
+<span class="sd">            For each character in the repeating unit, a value between</span>
+<span class="sd">            ``0`` (inclusive) and ``1`` (inclusive) must be given.</span>
+<span class="sd">            The values give the probability that each monomer is</span>
+<span class="sd">            flipped by 180 degrees when being added to the chain. If</span>
+<span class="sd">            ``0`` then the monomer is guaranteed to not flip. If ``1``</span>
+<span class="sd">            it is guaranteed to flip. This allows the user to create</span>
+<span class="sd">            head-to-head or head-to-tail chains, as well as chain with</span>
+<span class="sd">            a preference for head-to-head or head-to-tail if a number</span>
+<span class="sd">            between ``0`` and ``1`` is chosen.</span>
 
 <span class="sd">        n : :class:`int`</span>
 <span class="sd">            The number of repeating units which are used to make the</span>
@@ -644,12 +648,9 @@
         <span class="c1"># Make string representing the entire polymer, not just the</span>
         <span class="c1"># repeating unit.</span>
         <span class="n">polymer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeating_unit</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
-        <span class="c1"># Make a string holding the orientation of each monomer in the</span>
-        <span class="c1"># entire polymer, not just the repeating unit.</span>
-        <span class="n">dirs</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span>
-        <span class="n">dirs</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
-        <span class="c1"># Turn the string into a list of numbers.</span>
-        <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dirs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
+        <span class="c1"># Get the direction for each monomer along the entire chain,</span>
+        <span class="c1"># not just the repeating unit.</span>
+        <span class="n">dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
 
         <span class="c1"># Go through the repeating unit. Place each monomer 50 A apart.</span>
         <span class="c1"># Also create a bond.</span>
@@ -659,7 +660,9 @@
                 <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span> <span class="o">+</span> <span class="n">id_</span> <span class="k">for</span>
                 <span class="n">id_</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">])</span>
 
-            <span class="n">mdir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">mdir</span> <span class="k">else</span> <span class="n">mdir</span>
+            <span class="c1"># Flip or not flip the monomer as given by the probability</span>
+            <span class="c1"># in `mdir`.</span>
+            <span class="n">mdir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">mdir</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="n">mdir</span><span class="p">])</span>
             <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">([</span><span class="n">mdir</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 
             <span class="c1"># The first building block should be placed at 0, the others</span>
