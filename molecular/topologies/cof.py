@@ -1,9 +1,29 @@
 import rdkit.Chem.AllChem as rdkit
 import numpy as np
 from scipy.spatial.distance import euclidean
+from collections import deque
 
 from .base import Topology
 from ...convenience_tools import PeriodicBond, add_fragment_props
+
+
+class Edge:
+    """
+    Represents a bond in a COF unit cell.
+
+    This class is used for positioning ditopic building blocks.
+
+    Attributes
+    ----------
+    v1 : :class:`Vertex`
+
+
+    """
+
+    def __init__(self, v1, v2, bond=[0, 0, 0]):
+        self.v1 = v1
+        self.v2 = v2
+        self.bond = bond
 
 
 def is_bonder(macro_mol, atom_id):
@@ -84,8 +104,58 @@ class COFLattice(Topology):
 
 
 class LinkerCOFLattice(COFLattice):
-    ...
+    def place_mols(self, macro_mol):
 
+        # Create the rdkit molecule of the assembled molecule.
+        macro_mol.mol = rdkit.Mol()
+
+        # Identify which building block is ditopic and which is
+        # tritopic.
+        di = next(bb for bb in macro_mol.building_blocks if
+                  len(bb.functional_group_atoms()) == 2)
+        tri = next(bb for bb in macro_mol.building_blocks if
+                   len(bb.functional_group_atoms() == 3))
+
+        # For each vertex in the topology, place a tritopic building
+        # block on it. The Vertex object takes care of alignment.
+
+        for i, v in enumerate(self.vertices):
+            mol = v.place_mol(tri,
+                              self.tritopic_aligners[i],
+                              self.edge_alignments[i])
+            add_fragment_props(mol,
+                               macro_mol.building_blocks.index(tri),
+                               i)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
+            macro_mol.bb_counter.update([tri])
+
+            # Save the ids of the bonder atoms in the assembled molecule.
+            # This is used when creating bonds later in the assembly
+            # process.
+            bonder_ids = deque(maxlen=3)
+            for atom in macro_mol.GetAtoms():
+                if atom.HasProp('bonder'):
+                    bonder_ids.append(atom.GetIdx())
+            v.bonder_ids = sorted(bonder_ids)
+
+        for i, e in enumerate(self.edges):
+            mol = e.place_mol(di, self.ditopic_directions[i])
+            add_fragment_props(mol,
+                               macro_mol.building_blocks.index(di),
+                               i)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
+            macro_mol.bb_counter.update([di])
+            bonder_ids = deque(maxlen=2)
+            for atom in macro_mol.mol.GetAtoms():
+                if atom.HasProp('bonder'):
+                    bonder_ids.append(atom.GetIdx())
+
+            e.bonder_ids = sorted(bonder_ids)
+
+    def join_mols(self, macro_mol):
+        emol = rdkit.EditableMol(macro_mol.mol)
+        macro_mol.bonds_made = 0
+        
 
 class NoLinkerCOFLattice(COFLattice):
     ...
