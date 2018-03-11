@@ -16,4 +16,5 @@ tests/cage_target
 
 # This folder gets created by running tests for cage topologies.
 tests/cage_topology_tests
+tests/cof_topology_tests
 tests/failures.txt
