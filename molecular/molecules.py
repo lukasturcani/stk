@@ -3284,15 +3284,18 @@ class Periodic(MacroMolecule):
         # `periodic_bond` to see which atom ids are connected.
         for cell in flatten(cells):
             for periodic_bond in self.periodic_bonds:
+
                 # Get the indices of the cell which holds the atom
                 # bonded to the equivalent atom of
                 # `periodic_bond.atom1` in the present `cell`.
                 x, y, z = cell.id + periodic_bond.direction
-                try:
-                    # ccel as in "connected cell".
-                    ccell = cells[x][y][z]
-                except Exception:
+                if (x < 0 or y < 0 or z < 0 or
+                    x >= len(cells) or
+                    y >= len(cells[0]) or
+                   z >= len(cells[0][0])):
                     continue
+                # ccel as in "connected cell".
+                ccell = cells[x][y][z]
 
                 # `bonder1` is the id of a bonder atom, found in `cell`
                 # and equivalent to `periodic_bond.atom1`, having a
@@ -3361,20 +3364,23 @@ class Periodic(MacroMolecule):
             # to the next one.
             if not self._is_subterminal(atom_id, bonder_map, bonded):
                 continue
-            tid = emol.AddAtom(rdkit.Atom(terminator))
-            emol.AddBond(tid, atom_id, bond_type)
+
             # Get the id of bonder atom in the original unit cell
             # which is equivalent to `atom`.
             bi = bonder_map[atom_id]
-            # Using the equivalent bonder atom get the position
-            # of the terminating atom relative to the bonder atom. Add
-            # the relative position of the terminating atom and the
-            # position of `atom` to get the final position of the
-            # terminating atom.
-            tcoords = (np.array(iconf.GetAtomPosition(atom_id)) +
-                       self.terminator_coords[bi])
-            rdkit_coords = rdkit_geo.Point3D(*tcoords)
-            coords[tid] = rdkit_coords
+            for rcoords in self.terminator_coords[bi]:
+                tid = emol.AddAtom(rdkit.Atom(terminator))
+                emol.AddBond(tid, atom_id, bond_type)
+
+                # Using the equivalent bonder atom get the position
+                # of the terminating atom relative to the bonder atom. Add
+                # the relative position of the terminating atom and the
+                # position of `atom` to get the final position of the
+                # terminating atom.
+                tcoords = (np.array(iconf.GetAtomPosition(atom_id)) +
+                           rcoords)
+                rdkit_coords = rdkit_geo.Point3D(*tcoords)
+                coords[tid] = rdkit_coords
 
         mol = emol.GetMol()
         conf = mol.GetConformer()
@@ -3424,8 +3430,8 @@ periodic._place_island([4, 4, 4])
 
         """
 
-        a, b, c = self.topology.cell_dimensions
-        cells = np.full(dimensions, None, object).to_list()
+        a, b, c = self.cell_dimensions
+        cells = np.full(dimensions, None, object).tolist()
         island = rdkit.Mol()
         bonder_map = ChainMap()
         i = 0
@@ -3511,10 +3517,10 @@ periodic._place_island([4, 4, 4])
             # Write the cell parameters.
             f.write('cell\n')
             # The sizes of cell vectors a, b and c are written first.
-            for vector in self.topology.cell_dimensions:
+            for vector in self.cell_dimensions:
                 f.write(str(np.round(np.linalg.norm(vector), 6)) + ' ')
             # Then angles alpha, beta and gamma.
-            a, b, c = self.topology.cell_dimensions
+            a, b, c = self.cell_dimensions
             angle1 = round(math.degrees(vector_theta(a, c)), 6)
             angle2 = round(math.degrees(vector_theta(b, c)), 6)
             angle3 = round(math.degrees(vector_theta(a, b)), 6)

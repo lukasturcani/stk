@@ -1,7 +1,7 @@
 import rdkit.Chem.AllChem as rdkit
 import numpy as np
 from scipy.spatial.distance import euclidean
-from collections import deque
+from collections import deque, defaultdict
 
 from .base import Topology
 from ...convenience_tools import (PeriodicBond,
@@ -209,7 +209,7 @@ class COFLattice(Topology):
         # a neighboring deleter atom. The deleter atom has its
         # coordinates relative to the bonder found and saved in
         # `terminator_coords`.
-        macro_mol.terminator_coords = {}
+        macro_mol.terminator_coords = defaultdict(list)
         for atom in macro_mol.mol.GetAtoms():
             if not atom.HasProp('bonder'):
                 continue
@@ -220,7 +220,7 @@ class COFLattice(Topology):
                 nid = neighbor.GetIdx()
                 tcoords = (macro_mol.atom_coords(nid) -
                            macro_mol.atom_coords(atom.GetIdx()))
-                macro_mol.terminator_coords[bi] = tcoords
+                macro_mol.terminator_coords[bi].append(tcoords)
 
         super().del_atoms(macro_mol)
         macro_mol._ids_updated = False
@@ -258,6 +258,7 @@ class LinkerCOFLattice(COFLattice):
         size = di.max_diameter()[0] + multi.max_diameter()[0]
         size *= len(self.vertices)+1
         cell_params = [size*p for p in self.cell_dimensions]
+        macro_mol.cell_dimensions = cell_params
 
         # For each vertex in the topology, place a multitopic building
         # block on it. The Vertex object takes care of alignment.
@@ -310,10 +311,16 @@ class LinkerCOFLattice(COFLattice):
                                                      bonder3,
                                                      bonder4)
                 emol.AddBond(bonder3, bonder4, bond_type)
+            else:
+                macro_mol.periodic_bonds.append(
+                    PeriodicBond(macro_mol.bonder_ids.index(bonder3),
+                                 macro_mol.bonder_ids.index(bonder4),
+                                 e.bond))
 
             macro_mol.bonds_made += 2
 
         macro_mol.mol = emol.GetMol()
+
 
 class NoLinkerCOFLattice(COFLattice):
     ...
