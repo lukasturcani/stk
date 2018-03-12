@@ -427,7 +427,8 @@ class Hexagonal(LinkerCOFLattice):
              Edge(v1, v2, [0, -1, 0]),
              Edge(v1, v4, [0, -1, 0]),
              Edge(v3, v2, [1, -1, 0]),
-             Edge(v3, v4, [0, -1, 0])]
+             Edge(v3, v4, [0, -1, 0]),
+             Edge(v2, v4, [-1, 0, 0])]
 
 
 class Square(LinkerCOFLattice):
