@@ -1226,6 +1226,7 @@ class Molecule:
         """
 
         write_funcs = {'.mol': self._write_mdl_mol_file,
+                       '.sdf': self._write_mdl_mol_file,
                        '.pdb': self._write_pdb_file}
 
         _, ext = os.path.splitext(path)
