@@ -195,7 +195,7 @@ class LinkerCOFLattice(COFLattice):
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
         size = di.max_diameter()[0] + multi.max_diameter()[0]
-        size *= 10
+        size *= len(self.vertices)+1
         cell_params = [size*p for p in self.cell_dimensions]
 
         # For each vertex in the topology, place a multitopic building
@@ -413,15 +413,21 @@ class Hexagonal(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2 = [Vertex((1/3, 1/3, 1/2), 6),
-                         Vertex((2/3, 2/3, 1/2), 6)]
+    vertices = v1, v2, v3, v4 = [Vertex((1/4, 1/4, 1/2), 6),
+                                 Vertex((1/4, 3/4, 1/2), 6),
+                                 Vertex((3/4, 1/4, 1/2), 6),
+                                 Vertex((3/4, 3/4, 1/2), 6)]
 
     edges = [Edge(v1, v2),
-             Edge(v1, v1, [1, 0, 0]),
-             Edge(v2, v2, [1, 0, 0]),
-             Edge(v1, v2, [-1, -1, 0]),
-             Edge(v1, v2, [-1, 0, 0]),
-             Edge(v1, v2, [0, -1, 0])]
+             Edge(v1, v3),
+             Edge(v2, v3),
+             Edge(v2, v4),
+             Edge(v3, v4),
+             Edge(v1, v3, [-1, 0, 0]),
+             Edge(v1, v2, [0, -1, 0]),
+             Edge(v1, v4, [0, -1, 0]),
+             Edge(v3, v2, [1, -1, 0]),
+             Edge(v3, v4, [0, -1, 0])]
 
 
 class Square(LinkerCOFLattice):
