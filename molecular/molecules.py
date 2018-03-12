@@ -3137,6 +3137,11 @@ class Periodic(MacroMolecule):
         :class:`.PeriodicBond` instances representing the bonds into
         this list.
 
+    cell_dimensions : :class:`list` of :class:`numpy.array`
+        The dimensions of the unit cell. The first array is the vector
+        ``a`` the second is ``b`` and the third is ``c``. This should
+        be added during the build process by the periodic topology.
+
     _ids_updated : :class:`bool`
         Indicates whether periodic bond ids have been updated already
         by :meth:`save_ids`.

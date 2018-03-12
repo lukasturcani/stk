@@ -346,6 +346,7 @@ Further Reading
 ---------------
 
     * :ref:`macromolecular assembly`
+    * :ref:`cof assembly`
 
 Indices and tables
 ==================
