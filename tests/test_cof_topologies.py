@@ -13,7 +13,7 @@ def test_honeycomb():
     bb2 = StructUnit3(
         '/home/lukas/databases/liverpool_refined/aldehydes_3f/0.mol')
     cof = Periodic([bb1, bb2], Honeycomb())
-    cof.write(os.path.join(test_dir, 'honeycomb.mol'))
+    cof.write(os.path.join(test_dir, 'honeycomb.sdf'))
 
 
 def test_hexagonal():
@@ -21,7 +21,7 @@ def test_hexagonal():
         '/home/lukas/databases/liverpool_refined/amines_2f/0.mol')
     bb2 = StructUnit3('/home/lukas/Dropbox/workspace/6_aldehyde.mol')
     cof = Periodic([bb1, bb2], Hexagonal())
-    cof.write(os.path.join(test_dir, 'hexagonal.mol'))
+    cof.write(os.path.join(test_dir, 'hexagonal.sdf'))
 
 
 def test_square():
@@ -30,7 +30,7 @@ def test_square():
     bb2 = StructUnit3(
         '/home/lukas/databases/liverpool_refined/aldehydes_4f/59.mol')
     cof = Periodic([bb1, bb2], Square())
-    cof.write(os.path.join(test_dir, 'square.mol'))
+    cof.write(os.path.join(test_dir, 'square.sdf'))
 
 
 def test_kagome():
@@ -39,4 +39,4 @@ def test_kagome():
     bb2 = StructUnit3(
         '/home/lukas/databases/liverpool_refined/aldehydes_4f/59.mol')
     cof = Periodic([bb1, bb2], Kagome())
-    cof.write(os.path.join(test_dir, 'kagome.mol'))
+    cof.write(os.path.join(test_dir, 'kagome.sdf'))
