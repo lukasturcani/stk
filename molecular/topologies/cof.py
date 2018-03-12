@@ -53,17 +53,13 @@ class Vertex:
             bonder_coords = macro_mol.atom_coords(bonder) - center
             x, y, _ = normalize_vector(bonder_coords)
             angle = np.arccos(start@np.array([x, y]))
-            if x < 0 and y < 0:
-                angle += np.pi
-            elif x < 0 and y >= 0:
+            if x < 0:
                 angle = 2*np.pi - angle
 
             angles.append((angle, bonder))
         angles.sort()
-        print(angles)
         self.bonder_map = {}
         for i, (_, bonder_id) in enumerate(angles):
-            macro_mol.mol.GetAtomWithIdx(bonder_id).SetAtomicNum(i+75)
             self.bonder_map[i] = bonder_id
 
 
