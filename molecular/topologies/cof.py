@@ -10,23 +10,34 @@ from ...convenience_tools import (PeriodicBond,
 
 
 class Vertex:
-    def __init__(self, coord, nbonders):
-        self.coord = coord
+    def __init__(self, frac_coord, nbonders):
+        self.frac_coord = frac_coord
         self.nbonders = nbonders
         self.connected = []
 
-    def place_mol(self, scale, mol, aligner, aligner_edge):
+    def place_mol(self, cell_params, mol, aligner):
+        coord = self.calc_coord(cell_params)
         original_position = mol.position_matrix()
         mol.set_orientation2([0, 0, 1])
-        mol.set_bonder_centroid(self.coord*scale)
-        vector = (self.connected[aligner_edge].coord -
-                  self.coord)
+
+        mol.set_bonder_centroid(coord)
+        aligner_edge = next((e for e in self.connected if
+                             all(b == 0 for b in e.bond)),
+                            self.connected[0])
+        vector = (aligner_edge.calc_coord(cell_params) - coord)
         atom = mol.bonder_ids[aligner]
         mol.minimize_theta2(atom, vector, [0, 0, 1])
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
         return rdkit_mol
+
+    def calc_coord(self, cell_params, cell_position=[0, 0, 0]):
+        coord = np.zeros((3, ))
+        for frac, dim, p in zip(self.frac_coord, cell_params, cell_position):
+            coord += (frac+p) * dim
+
+        return coord
 
 
 class Edge:
@@ -42,31 +53,40 @@ class Edge:
 
     """
 
-    def __init__(self, v1, v2, bond=[], unit_cell=[]):
+    def __init__(self, v1, v2, bond=[0, 0, 0]):
         self.v1 = v1
         self.v2 = v2
         self.bond = bond
         self.connected = [v1, v2]
 
-        v2coord = np.array(v2.coord)
-        for i, dimension in zip(bond, unit_cell):
-            v2coord += i * dimension
-
-        self.coord = (v1.coord + v2coord) / 2
-        self.direction = normalize_vector(v1.coord - v2coord)
+        self.frac_coord = []
+        for f1, f2, b in zip(v1.frac_coord, v2.frac_coord, bond):
+            self.frac_coord.append((f1+f2+b) / 2)
 
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def place_mol(self, scale, mol, alignment):
+    def place_mol(self, cell_params, mol, alignment):
+        coord = self.calc_coord(cell_params)
         original_position = mol.position_matrix()
 
-        mol.set_bonder_centroid(self.coord*scale)
-        mol.set_orientation2(self.direction*alignment)
+        mol.set_bonder_centroid(coord)
+        mol.set_orientation2(self.direction(cell_params)*alignment)
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
         return rdkit_mol
+
+    def direction(self, cell_params):
+        v1coord = self.v1.calc_coord(cell_params)
+        v2coord = self.v2.calc_coord(cell_params, self.bond)
+        return normalize_vector((v1coord-v2coord)/2)
+
+    def calc_coord(self, cell_params):
+        coord = np.zeros((3, ))
+        for frac, dim in zip(self.frac_coord, cell_params):
+            coord += frac * dim
+        return coord
 
 
 def is_bonder(macro_mol, atom_id):
@@ -149,20 +169,16 @@ class COFLattice(Topology):
 class LinkerCOFLattice(COFLattice):
     def __init__(self,
                  ditopic_directions=None,
-                 multitopic_aligners=None,
-                 edge_alignments=None):
+                 multitopic_aligners=None):
         super().__init__()
 
         if ditopic_directions is None:
             ditopic_directions = [1 for i in range(len(self.edges))]
         if multitopic_aligners is None:
             multitopic_aligners = [0 for i in range(len(self.vertices))]
-        if edge_alignments is None:
-            edge_alignments = [0 for i in range(len(self.vertices))]
 
         self.ditopic_directions = ditopic_directions
         self.multitopic_aligners = multitopic_aligners
-        self.edge_alignments = edge_alignments
 
     def place_mols(self, macro_mol):
 
@@ -176,20 +192,19 @@ class LinkerCOFLattice(COFLattice):
         multi = next(bb for bb in macro_mol.building_blocks if
                      len(bb.functional_group_atoms()) >= 3)
 
-        # The unit cell will need to be scaled based on the sizes of
-        # of the building blocks.
-        scale = di.max_diameter()[0] + multi.max_diameter()[0]
-        scale *= 10
-        # scale = 1
+        # Calculate the size of the unit cell by scaling to the size of
+        # building blocks.
+        size = di.max_diameter()[0] + multi.max_diameter()[0]
+        size *= 10
+        cell_params = [size*p for p in self.cell_dimensions]
 
         # For each vertex in the topology, place a multitopic building
         # block on it. The Vertex object takes care of alignment.
 
         for i, v in enumerate(self.vertices):
-            mol = v.place_mol(scale,
+            mol = v.place_mol(cell_params,
                               multi,
-                              self.multitopic_aligners[i],
-                              self.edge_alignments[i])
+                              self.multitopic_aligners[i])
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(multi),
                                i)
@@ -206,7 +221,7 @@ class LinkerCOFLattice(COFLattice):
             v.bonder_ids = sorted(bonder_ids)
 
         for i, e in enumerate(self.edges):
-            mol = e.place_mol(scale, di, self.ditopic_directions[i])
+            mol = e.place_mol(cell_params, di, self.ditopic_directions[i])
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(di),
                                i)
@@ -385,12 +400,12 @@ class Honeycomb(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2 = [Vertex(a/3 + b/3 + c/2, 3),
-                         Vertex(2*a/3 + 2*b/3 + c/2, 3)]
+    vertices = v1, v2 = [Vertex((1/3, 1/3, 1/2), 3),
+                         Vertex((2/3, 2/3, 1/2), 3)]
 
     edges = [Edge(v1, v2),
-             Edge(v1, v2, [0, -1, 0], cell_dimensions),
-             Edge(v1, v2, [-1, 0, 0], cell_dimensions)]
+             Edge(v1, v2, [0, -1, 0]),
+             Edge(v1, v2, [-1, 0, 0])]
 
 
 class Hexagonal(LinkerCOFLattice):
@@ -398,15 +413,15 @@ class Hexagonal(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2 = [Vertex(a/3 + b/3 + c/2, 6),
-                         Vertex(2*a/3 + 2*b/3 + c/2, 6)]
+    vertices = v1, v2 = [Vertex((1/3, 1/3, 1/2), 6),
+                         Vertex((2/3, 2/3, 1/2), 6)]
 
     edges = [Edge(v1, v2),
-             Edge(v1, v1, [1, 0, 0], cell_dimensions),
-             Edge(v2, v2, [1, 0, 0], cell_dimensions),
-             Edge(v1, v2, [-1, -1, 0], cell_dimensions),
-             Edge(v1, v2, [-1, 0, 0], cell_dimensions),
-             Edge(v1, v2, [0, -1, 0], cell_dimensions)]
+             Edge(v1, v1, [1, 0, 0]),
+             Edge(v2, v2, [1, 0, 0]),
+             Edge(v1, v2, [-1, -1, 0]),
+             Edge(v1, v2, [-1, 0, 0]),
+             Edge(v1, v2, [0, -1, 0])]
 
 
 class Square(LinkerCOFLattice):
@@ -414,9 +429,9 @@ class Square(LinkerCOFLattice):
                                  np.array([0, 1, 0]),
                                  np.array([0, 0, 1])]
 
-    vertices = v1, = [Vertex(a/2 + b/2 + c/2, 4)]
-    edges = [Edge(v1, v1, [1, 0, 0], cell_dimensions),
-             Edge(v1, v1, [0, 1, 0], cell_dimensions)]
+    vertices = v1, = [Vertex((0.5, 0.5, 0.5), 4)]
+    edges = [Edge(v1, v1, [1, 0, 0]),
+             Edge(v1, v1, [0, 1, 0])]
 
 
 class Kagome(LinkerCOFLattice):
@@ -424,13 +439,13 @@ class Kagome(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2, v3 = [Vertex(a/3 + 2*b/3 + c/2, 4),
-                             Vertex(2*a/3 + 2*b/3 + c/2, 4),
-                             Vertex(2*a/3 + b/3 + c/2, 4)]
+    vertices = v1, v2, v3 = [Vertex((1/4, 3/4, 0.5), 4),
+                             Vertex((3/4, 3/4, 1/2), 4),
+                             Vertex((3/4, 1/4, 1/2), 4)]
 
     edges = [Edge(v1, v2),
              Edge(v1, v3),
              Edge(v2, v3),
-             Edge(v1, v2, [-1, 0, 0], cell_dimensions),
-             Edge(v1, v3, [-1, 1, 0], cell_dimensions),
-             Edge(v2, v3, [0, 1, 0], cell_dimensions)]
+             Edge(v1, v2, [-1, 0, 0]),
+             Edge(v1, v3, [-1, 1, 0]),
+             Edge(v2, v3, [0, 1, 0])]
