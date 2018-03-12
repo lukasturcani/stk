@@ -10,9 +10,8 @@ from ...convenience_tools import (PeriodicBond,
 
 
 class Vertex:
-    def __init__(self, frac_coord, nbonders):
+    def __init__(self, frac_coord):
         self.frac_coord = frac_coord
-        self.nbonders = nbonders
         self.connected = []
 
     def place_mol(self, cell_params, mol, aligner):
@@ -39,6 +38,32 @@ class Vertex:
 
         return coord
 
+    def create_bonder_map(self, macro_mol, cell_params, nbonders):
+        center = self.calc_coord(cell_params)
+
+        # Get all the bonder ids.
+        bonder_ids = deque(maxlen=nbonders)
+        for atom in macro_mol.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                bonder_ids.append(atom.GetIdx())
+
+        start = np.array([0, 1])
+        angles = []
+        for bonder in bonder_ids:
+            bonder_coords = macro_mol.atom_coords(bonder) - center
+            x, y, _ = normalize_vector(bonder_coords)
+            angle = np.arccos(start@np.array([x, y]))
+            if x < 0 and y < 0:
+                angle += np.pi
+            elif x < 0 and y >= 0:
+                angle = 2*np.pi - angle
+
+            angles.append((angle, bonder))
+        angles.sort()
+        self.bonder_map = {}
+        for i, (_, bonder_id) in enumerate(angles):
+            self.bonder_map[i] = bonder_id
+
 
 class Edge:
     """
@@ -53,9 +78,10 @@ class Edge:
 
     """
 
-    def __init__(self, v1, v2, bond=[0, 0, 0]):
+    def __init__(self, v1, v2, joint_positions, bond=[0, 0, 0]):
         self.v1 = v1
         self.v2 = v2
+        self.joint_positions = joint_positions
         self.bond = bond
         self.connected = [v1, v2]
 
@@ -87,6 +113,21 @@ class Edge:
         for frac, dim in zip(self.frac_coord, cell_params):
             coord += frac * dim
         return coord
+
+    def create_bonder_map(self, macro_mol, cell_params):
+        # Get all the bonder ids.
+        bonder_ids = deque(maxlen=2)
+        for atom in macro_mol.mol.GetAtoms():
+            if atom.HasProp('bonder'):
+                bonder_ids.append(atom.GetIdx())
+
+        v1coord = self.v1.calc_coord(cell_params)
+        bonders = sorted(bonder_ids,
+                         key=lambda x: euclidean(
+                                             v1coord,
+                                             macro_mol.atom_coords(x)))
+        self.bonder_map = {0: bonders[0],
+                           1: bonders[1]}
 
 
 def is_bonder(macro_mol, atom_id):
@@ -191,6 +232,7 @@ class LinkerCOFLattice(COFLattice):
                   len(bb.functional_group_atoms()) == 2)
         multi = next(bb for bb in macro_mol.building_blocks if
                      len(bb.functional_group_atoms()) >= 3)
+        nbonders = len(multi.functional_group_atoms())
 
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
@@ -214,11 +256,7 @@ class LinkerCOFLattice(COFLattice):
             # Save the ids of the bonder atoms in the assembled molecule.
             # This is used when creating bonds later in the assembly
             # process.
-            bonder_ids = deque(maxlen=3)
-            for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('bonder'):
-                    bonder_ids.append(atom.GetIdx())
-            v.bonder_ids = sorted(bonder_ids)
+            v.create_bonder_map(macro_mol, cell_params, nbonders)
 
         for i, e in enumerate(self.edges):
             mol = e.place_mol(cell_params, di, self.ditopic_directions[i])
@@ -232,13 +270,32 @@ class LinkerCOFLattice(COFLattice):
                 if atom.HasProp('bonder'):
                     bonder_ids.append(atom.GetIdx())
 
-            e.bonder_ids = sorted(bonder_ids)
+            e.create_bonder_map(macro_mol, cell_params)
 
         super(macro_mol.__class__, macro_mol).save_ids()
 
     def join_mols(self, macro_mol):
-        ...
+        macro_mol.bonds_made = 0
+        emol = rdkit.EditableMol(macro_mol.mol)
+        for e in self.edges:
+            bonder1 = e.bonder_map[0]
+            bonder2 = e.v1.bonder_map[e.joint_positions[0]]
+            bond_type = self.determine_bond_type(macro_mol,
+                                                 bonder1,
+                                                 bonder2)
+            emol.AddBond(bonder1, bonder2, bond_type)
 
+            bonder3 = e.bonder_map[1]
+            bonder4 = e.v2.bonder_map[e.joint_positions[1]]
+            if all(b == 0 for b in e.bond):
+                bond_type = self.determine_bond_type(macro_mol,
+                                                     bonder3,
+                                                     bonder4)
+                emol.AddBond(bonder3, bonder4, bond_type)
+
+            macro_mol.bonds_made += 2
+
+        macro_mol.mol = emol.GetMol()
 
 class NoLinkerCOFLattice(COFLattice):
     ...
@@ -400,12 +457,12 @@ class Honeycomb(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2 = [Vertex((1/3, 1/3, 1/2), 3),
-                         Vertex((2/3, 2/3, 1/2), 3)]
+    vertices = v1, v2 = [Vertex((1/3, 1/3, 1/2)),
+                         Vertex((2/3, 2/3, 1/2))]
 
-    edges = [Edge(v1, v2),
-             Edge(v1, v2, [0, -1, 0]),
-             Edge(v1, v2, [-1, 0, 0])]
+    edges = [Edge(v1, v2, (0, 2)),
+             Edge(v1, v2, (1, 0), [0, -1, 0]),
+             Edge(v1, v2, (2, 1), [-1, 0, 0])]
 
 
 class Hexagonal(LinkerCOFLattice):
@@ -413,22 +470,22 @@ class Hexagonal(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2, v3, v4 = [Vertex((1/4, 1/4, 1/2), 6),
-                                 Vertex((1/4, 3/4, 1/2), 6),
-                                 Vertex((3/4, 1/4, 1/2), 6),
-                                 Vertex((3/4, 3/4, 1/2), 6)]
+    vertices = v1, v2, v3, v4 = [Vertex((1/4, 1/4, 1/2)),
+                                 Vertex((1/4, 3/4, 1/2)),
+                                 Vertex((3/4, 1/4, 1/2)),
+                                 Vertex((3/4, 3/4, 1/2))]
 
-    edges = [Edge(v1, v2),
-             Edge(v1, v3),
-             Edge(v2, v3),
-             Edge(v2, v4),
-             Edge(v3, v4),
-             Edge(v1, v3, [-1, 0, 0]),
-             Edge(v1, v2, [0, -1, 0]),
-             Edge(v1, v4, [0, -1, 0]),
-             Edge(v3, v2, [1, -1, 0]),
-             Edge(v3, v4, [0, -1, 0]),
-             Edge(v2, v4, [-1, 0, 0])]
+    edges = [Edge(v1, v2, (0, 3)),
+             Edge(v1, v3, (1, 4)),
+             Edge(v2, v3, (2, 5)),
+             Edge(v2, v4, (1, 4)),
+             Edge(v3, v4, (0, 3)),
+             Edge(v1, v3, (4, 1), [-1, 0, 0]),
+             Edge(v1, v2, (3, 0), [0, -1, 0]),
+             Edge(v1, v4, (2, 5), [0, -1, 0]),
+             Edge(v3, v2, (2, 5), [1, -1, 0]),
+             Edge(v3, v4, (3, 0), [0, -1, 0]),
+             Edge(v2, v4, (4, 1), [-1, 0, 0])]
 
 
 class Square(LinkerCOFLattice):
@@ -436,9 +493,9 @@ class Square(LinkerCOFLattice):
                                  np.array([0, 1, 0]),
                                  np.array([0, 0, 1])]
 
-    vertices = v1, = [Vertex((0.5, 0.5, 0.5), 4)]
-    edges = [Edge(v1, v1, [1, 0, 0]),
-             Edge(v1, v1, [0, 1, 0])]
+    vertices = v1, = [Vertex((0.5, 0.5, 0.5))]
+    edges = [Edge(v1, v1, (1, 3), [1, 0, 0]),
+             Edge(v1, v1, (0, 2), [0, 1, 0])]
 
 
 class Kagome(LinkerCOFLattice):
@@ -446,13 +503,13 @@ class Kagome(LinkerCOFLattice):
                                  np.array([0.5, 0.866, 0]),
                                  np.array([0, 0, 5/1.7321])]
 
-    vertices = v1, v2, v3 = [Vertex((1/4, 3/4, 0.5), 4),
-                             Vertex((3/4, 3/4, 1/2), 4),
-                             Vertex((3/4, 1/4, 1/2), 4)]
+    vertices = v1, v2, v3 = [Vertex((1/4, 3/4, 0.5)),
+                             Vertex((3/4, 3/4, 1/2)),
+                             Vertex((3/4, 1/4, 1/2))]
 
-    edges = [Edge(v1, v2),
-             Edge(v1, v3),
-             Edge(v2, v3),
-             Edge(v1, v2, [-1, 0, 0]),
-             Edge(v1, v3, [-1, 1, 0]),
-             Edge(v2, v3, [0, 1, 0])]
+    edges = [Edge(v1, v2, (0, 3)),
+             Edge(v1, v3, (1, 3)),
+             Edge(v2, v3, (2, 0)),
+             Edge(v1, v2, (2, 1), [-1, 0, 0]),
+             Edge(v1, v3, (3, 1), [-1, 1, 0]),
+             Edge(v2, v3, (0, 2), [0, 1, 0])]
