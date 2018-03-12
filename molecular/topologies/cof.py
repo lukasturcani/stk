@@ -38,7 +38,11 @@ class Vertex:
 
         return coord
 
-    def create_bonder_map(self, macro_mol, cell_params, nbonders):
+    def create_bonder_map(self,
+                          macro_mol,
+                          cell_params,
+                          nbonders,
+                          aligned_bonder):
         center = self.calc_coord(cell_params)
 
         # Get all the bonder ids.
@@ -58,9 +62,26 @@ class Vertex:
 
             angles.append((angle, bonder))
         angles.sort()
+
+        bonders = [bonder for angle, bonder in angles]
+        aligned = bonder_ids[aligned_bonder]
+        bonders = (bonders[bonders.index(aligned):] +
+                   bonders[:bonders.index(aligned)])
+
+        aligned_pos = self.aligned_position(aligned_bonder)
+        positions = (list(range(aligned_pos, nbonders)) +
+                     list(range(0, aligned_pos)))
+
         self.bonder_map = {}
-        for i, (_, bonder_id) in enumerate(angles):
-            self.bonder_map[i] = bonder_id
+        for bonder, position in zip(bonders, positions):
+            self.bonder_map[position] = bonder
+
+    def aligned_position(self, aligned_bonder):
+        aligner_edge = next((e for e in self.connected if
+                             all(b == 0 for b in e.bond)),
+                            self.connected[0])
+        vindex = 0 if self is aligner_edge.v1 else 1
+        return aligner_edge.joint_positions[vindex]
 
 
 class Edge:
@@ -242,9 +263,8 @@ class LinkerCOFLattice(COFLattice):
         # block on it. The Vertex object takes care of alignment.
 
         for i, v in enumerate(self.vertices):
-            mol = v.place_mol(cell_params,
-                              multi,
-                              self.multitopic_aligners[i])
+            aligner = self.multitopic_aligners[i]
+            mol = v.place_mol(cell_params, multi, aligner)
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(multi),
                                i)
@@ -254,7 +274,7 @@ class LinkerCOFLattice(COFLattice):
             # Save the ids of the bonder atoms in the assembled molecule.
             # This is used when creating bonds later in the assembly
             # process.
-            v.create_bonder_map(macro_mol, cell_params, nbonders)
+            v.create_bonder_map(macro_mol, cell_params, nbonders, aligner)
 
         for i, e in enumerate(self.edges):
             mol = e.place_mol(cell_params, di, self.ditopic_directions[i])
