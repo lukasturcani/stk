@@ -1,3 +1,15 @@
+"""
+Defines COF topologies.
+
+.. _`adding macromolecules`:
+
+How the assembly process works for 2D COF topologies.
+-----------------------------------------------------
+
+
+
+"""
+
 import rdkit.Chem.AllChem as rdkit
 import numpy as np
 from scipy.spatial.distance import euclidean
