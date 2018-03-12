@@ -60,8 +60,10 @@ class Vertex:
 
             angles.append((angle, bonder))
         angles.sort()
+        print(angles)
         self.bonder_map = {}
         for i, (_, bonder_id) in enumerate(angles):
+            macro_mol.mol.GetAtomWithIdx(bonder_id).SetAtomicNum(i+75)
             self.bonder_map[i] = bonder_id
 
 
