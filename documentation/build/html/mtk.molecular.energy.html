@@ -1,0 +1,1075 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.molecular.energy module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.molecular.energy module</a><ul>
+<li><a class="reference internal" href="#extending-mtk-adding-more-energy-functions">Extending mtk: Adding more energy functions.</a></li>
+<li><a class="reference internal" href="#notes">Notes.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.molecular.energy module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.molecular.energy.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.molecular.energy">
+<span id="mtk-molecular-energy-module"></span><h1>mtk.molecular.energy module<a class="headerlink" href="#module-mtk.molecular.energy" title="Permalink to this headline">¶</a></h1>
+<p>Defines energy calculations via <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>.</p>
+<div class="section" id="extending-mtk-adding-more-energy-functions">
+<span id="adding-energy-functions"></span><h2>Extending mtk: Adding more energy functions.<a class="headerlink" href="#extending-mtk-adding-more-energy-functions" title="Permalink to this headline">¶</a></h2>
+<p>It may well be the case that more ways to calculate the energy of
+molcules will need to be added. For example, if support for using some
+external software to perform the calculations needs to be added.</p>
+<p>In order to add a new function which calculates the energy, just add it
+as a method to <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>. There really aren’t any requirements
+beyond this, just make sure the energy value is what the method
+returns.</p>
+<p>If the energy method does not fit neatly into a single method, feel
+free to split it up. Make sure that any helper methods are
+private, i.e. that their names start with a leading underscore. Only
+the main method which the user will use should be public.</p>
+<p>To calculate the energy of some <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> object the only
+thing that is needed is calling one of the <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> methods:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+<span class="go">OUT: 16.501</span>
+</pre></div>
+</div>
+<p>Here, <a class="reference internal" href="#mtk.molecular.energy.Energy.rdkit" title="mtk.molecular.energy.Energy.rdkit"><code class="xref py py-meth docutils literal"><span class="pre">Energy.rdkit()</span></code></a> was used as an example and <code class="docutils literal"><span class="pre">molecule</span></code>
+is just some <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instance. Each <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>
+object has an <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> instance in its <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.energy" title="mtk.molecular.molecules.Molecule.energy"><code class="xref py py-attr docutils literal"><span class="pre">energy</span></code></a>
+attribute.</p>
+<p>Each <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> instance also has a <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">values</span></code></a>
+attribute, which stores the result of previous calculations. Using the
+molecule from the previous example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span>
+<span class="go">OUT: {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501}</span>
+</pre></div>
+</div>
+<p>I.E. this indicates that <a class="reference internal" href="#mtk.molecular.energy.Energy.rdkit" title="mtk.molecular.energy.Energy.rdkit"><code class="xref py py-meth docutils literal"><span class="pre">Energy.rdkit()</span></code></a> was called with the
+<cite>forcefield</cite> argument set to <code class="docutils literal"><span class="pre">'uff'</span></code> and the result was <code class="docutils literal"><span class="pre">16.501</span></code>.</p>
+<p>Calling any method of <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> updates the dictionary
+automatically. When adding a new method to the class, no mechanism for
+updating the dictionary needs to be provided. Writing the method within
+the class is enough for it to update the <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">values</span></code></a>
+dictionary when called.</p>
+<p>Sometimes a function will require a parameter which does not affect the
+outcome of the energy calculation. For example, to calculate the energy
+using the MacroModel program, <a class="reference internal" href="#mtk.molecular.energy.Energy.macromodel" title="mtk.molecular.energy.Energy.macromodel"><code class="xref py py-meth docutils literal"><span class="pre">Energy.macromodel()</span></code></a> can be used:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">macromodel</span><span class="p">(</span><span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                           <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;path/to/macromodel/dir&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function requires the number of a forcefield (<code class="docutils literal"><span class="pre">16</span></code>) and the
+directory where MacroModel is installed on the users computer
+(<code class="docutils literal"><span class="pre">'path/to/macromodel/dir'</span></code>). However, the directory does not affect
+the value of the calculated energy. When running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+<p>We want the output to be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">OUT</span><span class="p">:</span> <span class="p">{</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="n">uff</span><span class="p">):</span> <span class="mf">16.501</span><span class="p">,</span>
+      <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromolecule&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">):</span> <span class="mi">200</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>(Assuming we are still dealing with the same <code class="docutils literal"><span class="pre">molecule</span></code> instance from
+the <a class="reference internal" href="#mtk.molecular.energy.Energy.rdkit" title="mtk.molecular.energy.Energy.rdkit"><code class="xref py py-meth docutils literal"><span class="pre">rdkit()</span></code></a> example, both calculated energies will be
+kept in the dictionary.)</p>
+<p>However, if we just define <a class="reference internal" href="#mtk.molecular.energy.Energy.macromodel" title="mtk.molecular.energy.Energy.macromodel"><code class="xref py py-meth docutils literal"><span class="pre">Energy.macromodel()</span></code></a> within
+<a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>, and then run it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">macromodel</span><span class="p">(</span><span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                           <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;path/to/macromodel/dir&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The output of</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+<p>will be</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">OUT</span><span class="p">:</span> <span class="p">{</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="n">uff</span><span class="p">)</span> <span class="p">:</span> <span class="mf">16.501</span><span class="p">,</span>
+      <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromolecule&#39;</span><span class="p">,</span>
+                   <span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                   <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;path/to/macromodel/dir&#39;</span><span class="p">):</span> <span class="mi">200</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>In order to make sure that the <cite>macromodel_path</cite> is excluded from the
+key, decorate <a class="reference internal" href="#mtk.molecular.energy.Energy.macromodel" title="mtk.molecular.energy.Energy.macromodel"><code class="xref py py-meth docutils literal"><span class="pre">Energy.macromodel()</span></code></a> with the <a class="reference internal" href="#mtk.molecular.energy.exclude" title="mtk.molecular.energy.exclude"><code class="xref py py-func docutils literal"><span class="pre">exclude()</span></code></a>
+decorator. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;macromodel_path&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">macromodel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forcefield</span><span class="p">,</span> <span class="n">macromodel_path</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>Now the parameter <cite>macromodel_path</cite> will not form part of the key in
+the <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">values</span></code></a> dictionary. If there were 2 parameters you
+wanted to exlude:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;exclude1&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude2&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">energy_func</span><span class="p">(</span><span class="n">include1</span><span class="p">,</span> <span class="n">include2</span><span class="p">,</span> <span class="n">exclude1</span><span class="p">,</span> <span class="n">exclude2</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>and so on.</p>
+<p>Sometimes even this isn’t enough to get the key to look exactly the way
+we want. For exmple:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="nd">@exclude</span><span class="p">(</span><span class="s1">&#39;force_e_calc&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">formation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">func</span><span class="p">,</span>
+              <span class="n">products</span><span class="p">,</span>
+              <span class="n">building_blocks</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">force_e_calc</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>The <cite>func</cite> parameter of this function is a <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>
+instance, which holds the data of one of the other <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>
+methods. This includes all data the method requires to run, even
+software directories if needed. As a result, the key when running this
+function may look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;pseudoformation&#39;</span><span class="p">,</span>
+             <span class="n">building_blocks</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">func</span><span class="o">=</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel&#39;</span><span class="p">,</span>
+                               <span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                               <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;/opt/schrodinger2017-2&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Notice that the path of the MacroModel installation was kept nested in
+the key of <a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a>. This is undesirable. To make this
+work properly, a completely custom mechanism for making the
+key of the <a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a> is necessary. To do this, define a
+function in this module. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">formation_key</span><span class="p">(</span><span class="n">fargs</span><span class="p">,</span> <span class="n">fkwargs</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>And set the <code class="xref py py-attr docutils literal"><span class="pre">key</span></code> attribute of the energy method to the newly
+defined function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">Energy</span><span class="o">.</span><span class="n">formation</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">formation_key</span>
+</pre></div>
+</div>
+<p>The <cite>fargs</cite> and <cite>fkwargs</cite> arguments are the arguments and keyword
+arguments with which <a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a> was called, including
+<cite>self</cite>. The <a class="reference internal" href="#mtk.molecular.energy.formation_key" title="mtk.molecular.energy.formation_key"><code class="xref py py-func docutils literal"><span class="pre">formation_key()</span></code></a> function should return a
+<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instance which will act as the key. In our case
+the function was defined so that the key is:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;formation&#39;</span><span class="p">,</span>
+             <span class="n">products</span><span class="o">=</span><span class="p">[],</span>
+             <span class="n">building_blocks</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">func</span><span class="o">=</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;macromodel&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="notes">
+<h2>Notes.<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Make sure to use the <cite>values</cite> dictionary instead of running the same
+calculation repeatedly.</li>
+<li>The automatic updating of the dictionary is  achieved by the
+<a class="reference internal" href="#mtk.molecular.energy.EMeta" title="mtk.molecular.energy.EMeta"><code class="xref py py-class docutils literal"><span class="pre">EMeta</span></code></a> metaclass, <a class="reference internal" href="#mtk.molecular.energy.EMethod" title="mtk.molecular.energy.EMethod"><code class="xref py py-func docutils literal"><span class="pre">EMethod()</span></code></a> descriptor and
+<a class="reference internal" href="#mtk.molecular.energy.e_logger" title="mtk.molecular.energy.e_logger"><code class="xref py py-func docutils literal"><span class="pre">e_logger()</span></code></a> decorator. You do not need to worry about these,
+but information about how they work is provided in the docstring of
+<a class="reference internal" href="#mtk.molecular.energy.EMeta" title="mtk.molecular.energy.EMeta"><code class="xref py py-class docutils literal"><span class="pre">EMeta</span></code></a>.</li>
+</ol>
+<dl class="class">
+<dt id="mtk.molecular.energy.EMeta">
+<em class="property">class </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EMeta</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">type</span></code></p>
+<p>A metaclass for <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>.</p>
+<p>In conjuction with the <a class="reference internal" href="#mtk.molecular.energy.EMethod" title="mtk.molecular.energy.EMethod"><code class="xref py py-class docutils literal"><span class="pre">EMethod</span></code></a> descriptor and the
+<a class="reference internal" href="#mtk.molecular.energy.e_logger" title="mtk.molecular.energy.e_logger"><code class="xref py py-func docutils literal"><span class="pre">e_logger()</span></code></a> decorator this class allows methods to
+automatically update <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a> without explicitly being
+told to do so.</p>
+<p>Basically, this metaclass turns all methods of <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> into
+descriptors of the <a class="reference internal" href="#mtk.molecular.energy.EMethod" title="mtk.molecular.energy.EMethod"><code class="xref py py-class docutils literal"><span class="pre">EMethod</span></code></a> class. These descriptors return
+a decorated version of the original method defined in
+<a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>. The method is decorated with <a class="reference internal" href="#mtk.molecular.energy.e_logger" title="mtk.molecular.energy.e_logger"><code class="xref py py-func docutils literal"><span class="pre">e_logger()</span></code></a>
+decorator. Calling this decorated method makes it automatically
+update <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.energy.EMethod">
+<em class="property">class </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EMethod</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#EMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EMethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A descriptor for methods of <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy.EMethod.func">
+<code class="descname">func</code><a class="headerlink" href="#mtk.molecular.energy.EMethod.func" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">function</span></code> – The method which the descriptor acts as a getter for.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mtk.molecular.energy.Energy">
+<em class="property">class </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">Energy</code><span class="sig-paren">(</span><em>molecule</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Handles all things related to a molecule’s energy.</p>
+<p>An instance of this class will be placed in
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule.energy" title="mtk.molecular.molecules.Molecule.energy"><code class="xref py py-attr docutils literal"><span class="pre">Molecule.energy</span></code></a> of each <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> instance.</p>
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.molecule">
+<code class="descname">molecule</code><a class="headerlink" href="#mtk.molecular.energy.Energy.molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> – The molecule on which all the energy calculation are performed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.molecular.energy.Energy.values">
+<code class="descname">values</code><a class="headerlink" href="#mtk.molecular.energy.Energy.values" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – A <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> of the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;method1&#39;</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">):</span> <span class="mi">34</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Where the <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> instance identifies an
+<a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> method which was run and the parameters which
+were used, while the key holds the result of the calculation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.formation">
+<code class="descname">formation</code><span class="sig-paren">(</span><em>func</em>, <em>products</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.formation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.formation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the formation energy.</p>
+<p>The formation energy is calculated under the assumption that
+the molecule in <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a> is composed of the molecules
+in <cite>building_blocks</cite> and that during formation molecules in
+<cite>products</cite> are formed in addition to <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – <p>A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which describes the method
+used to calculate the energies. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">func</span>  <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><strong>products</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code>) – <p>A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">products</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">4</span><span class="p">,</span> <span class="n">mol1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mol2</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal"><span class="pre">mol1</span></code> and <code class="docutils literal"><span class="pre">mol2</span></code> are <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> objects
+of molecules produced in addition to <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>
+during its formation reaction. The numbers represent the
+number of each molecule made per <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>.</p>
+</li>
+<li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code>, optional) – <p>A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mol1</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">mol2</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal"><span class="pre">mol1</span></code> and <code class="docutils literal"><span class="pre">mol2</span></code> are <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> objects
+which react to for <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>. The numbers represetnt
+the amount of each building block required to form 1
+<a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>.</p>
+<p>This argument can be omitted when the formation energy of a
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instance is being found, as they
+keep this data stored elsewhere already.</p>
+</li>
+<li><strong>force_e_calc</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If this is <code class="docutils literal"><span class="pre">True</span></code> then all molecules in
+<cite>building_blocks</cite>, <cite>products</cite> and <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a> will
+have their energies recalculated. Even if the energy values
+have already been found with the chosen forcefield and
+method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only calculated if the
+value has not already been found.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The formation energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.macromodel">
+<code class="descname">macromodel</code><span class="sig-paren">(</span><em>forcefield</em>, <em>macromodel_path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.macromodel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the energy using macromodel.</p>
+<p>Note that this requires macromodel to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>forcefield</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id number of the forcefield to be used by macromodel.</li>
+<li><strong>macromodel_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the Schrodinger suite within the
+user’s machine. For example, in a default Linux
+installation the folder will probably be something like
+<code class="docutils literal"><span class="pre">'/opt/schrodinger2017-2'</span></code>.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#mtk.molecular.energy.EnergyError" title="mtk.molecular.energy.EnergyError"><code class="xref py py-class docutils literal"><span class="pre">EnergyError</span></code></a> – This exception is raised if no energy value is found in the
+MacroModel calculation’s <code class="docutils literal"><span class="pre">.log</span></code> file. Likely due to a
+forcefield error.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac">
+<code class="descname">mopac</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the energy using MOPAC.</p>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of the optimization
+parameters to their values. Valid values are:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>’hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code> (default = <code class="docutils literal"><span class="pre">'PM7'</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p class="last">PM7 is the latest version of the reparametrization
+of NDDO theory, where all the atomic and diatomic
+parameters were re-optimized / updated from PM6
+<a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
+</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">80.1</span></code>)</span></dt>
+<dd>Sets the dielectric constant for the solvent.
+Presence of this keyword will cause the COSMO
+(Conductor-like Screening Model) method to be used
+to approximate the effect of a solvent model
+surrounding the molecule. Solvents with a low
+dielectric constant are not likely to work well
+with this model. <code class="docutils literal"><span class="pre">0</span></code> means that the dielectric
+constant is not included in the calculation.
+<code class="docutils literal"><span class="pre">80.1</span></code> can be used to model a water environment
+at room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">0</span></code>)</span></dt>
+<dd>The charge of the system.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">172800</span></code>)</span></dt>
+<dd>The amount in seconds the calculation is allowed to
+run before being terminated. The default value is
+<code class="docutils literal"><span class="pre">2</span></code> days or <code class="docutils literal"><span class="pre">172,800</span></code> seconds.</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><strong>mopac_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the MOPAC installation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac_dipole">
+<code class="descname">mopac_dipole</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac_dipole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the dipole moment using MOPAC.</p>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of the optimization
+parameters to their values. Valid values are:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>’hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code> (default = <code class="docutils literal"><span class="pre">'PM7'</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p class="last">PM7 is the latest version of the reparametrization
+of NDDO theory, where all the atomic and diatomic
+parameters were re-optimized / updated from PM6
+<a class="footnote-reference" href="#id4" id="id3">[2]</a>.</p>
+</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">80.1</span></code>)</span></dt>
+<dd>Sets the dielectric constant for the solvent.
+Presence of this keyword will cause the COSMO
+(Conductor-like Screening Model) method to be used
+to approximate the effect of a solvent model
+surrounding the molecule. Solvents with a low
+dielectric constant are not likely to work well
+with this model. <code class="docutils literal"><span class="pre">0</span></code> means that the dielectric
+constant is not included in the calculation.
+<code class="docutils literal"><span class="pre">80.1</span></code> can be used to model a water environment
+at room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">0</span></code>)</span></dt>
+<dd>The charge of the system.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">172800</span></code>)</span></dt>
+<dd>The amount in seconds the calculation is allowed to
+run before being terminated. The default value is
+<code class="docutils literal"><span class="pre">2</span></code> days or <code class="docutils literal"><span class="pre">172,800</span></code> seconds.</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><strong>mopac_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the MOPAC installation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated dipole.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td><a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac_ea">
+<code class="descname">mopac_ea</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac_ea"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac_ea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the electron affinity using MOPAC.</p>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of the optimization
+parameters to their values. Valid values are:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>’hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code> (default = <code class="docutils literal"><span class="pre">'PM7'</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p class="last">PM7 is the latest version of the reparametrization
+of NDDO theory, where all the atomic and diatomic
+parameters were re-optimized / updated from PM6
+<a class="footnote-reference" href="#id6" id="id5">[3]</a>.</p>
+</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">80.1</span></code>)</span></dt>
+<dd>Sets the dielectric constant for the solvent.
+Presence of this keyword will cause the COSMO
+(Conductor-like Screening Model) method to be used
+to approximate the effect of a solvent model
+surrounding the molecule. Solvents with a low
+dielectric constant are not likely to work well
+with this model. <code class="docutils literal"><span class="pre">0</span></code> means that the dielectric
+constant is not included in the calculation.
+<code class="docutils literal"><span class="pre">80.1</span></code> can be used to model a water environment
+at room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">0</span></code>)</span></dt>
+<dd>The charge of the system.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">172800</span></code>)</span></dt>
+<dd>The amount in seconds the calculation is allowed to
+run before being terminated. The default value is
+<code class="docutils literal"><span class="pre">2</span></code> days or <code class="docutils literal"><span class="pre">172,800</span></code> seconds.</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><strong>mopac_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the MOPAC installation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[3]</a></td><td><a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.mopac_ip">
+<code class="descname">mopac_ip</code><span class="sig-paren">(</span><em>mopac_path</em>, <em>settings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.mopac_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.mopac_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the ionization potential using MOPAC.</p>
+<p>Note that this requires MOPAC to be installed and have a
+valid license.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – <p>A dictionary which maps the names of the optimization
+parameters to their values. Valid values are:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>’hamiltonian’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">str</span></code> (default = <code class="docutils literal"><span class="pre">'PM7'</span></code></span></dt>
+<dd>A series of different methods can be selected:
+PM7, PM6, AM1, CIS (CISD, CISDT), MNDO, RM1, etc..<p class="last">PM7 is the latest version of the reparametrization
+of NDDO theory, where all the atomic and diatomic
+parameters were re-optimized / updated from PM6
+<a class="footnote-reference" href="#id8" id="id7">[4]</a>.</p>
+</dd>
+<dt>’eps’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">80.1</span></code>)</span></dt>
+<dd>Sets the dielectric constant for the solvent.
+Presence of this keyword will cause the COSMO
+(Conductor-like Screening Model) method to be used
+to approximate the effect of a solvent model
+surrounding the molecule. Solvents with a low
+dielectric constant are not likely to work well
+with this model. <code class="docutils literal"><span class="pre">0</span></code> means that the dielectric
+constant is not included in the calculation.
+<code class="docutils literal"><span class="pre">80.1</span></code> can be used to model a water environment
+at room temperature.</dd>
+<dt>’charge’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">0</span></code>)</span></dt>
+<dd>The charge of the system.</dd>
+<dt>’timeout’ <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code> (default = <code class="docutils literal"><span class="pre">172800</span></code>)</span></dt>
+<dd>The amount in seconds the calculation is allowed to
+run before being terminated. The default value is
+<code class="docutils literal"><span class="pre">2</span></code> days or <code class="docutils literal"><span class="pre">172,800</span></code> seconds.</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><strong>mopac_path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the MOPAC installation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils footnote" frame="void" id="id8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[4]</a></td><td><a class="reference external" href="http://openmopac.net/PM7_accuracy/PM7_accuracy.html">http://openmopac.net/PM7_accuracy/PM7_accuracy.html</a></td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.pseudoformation">
+<code class="descname">pseudoformation</code><span class="sig-paren">(</span><em>func</em>, <em>building_blocks=None</em>, <em>force_e_calc=False</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.pseudoformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.pseudoformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the formation energy, sans other products.</p>
+<p>This is the formation energy if the energy of the other
+products of the reaction is not taken into account.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – <p>A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which describes the method
+used to calculate the energies. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">func</span>  <span class="o">=</span> <span class="n">FunctionData</span><span class="p">(</span><span class="s1">&#39;rdkit&#39;</span><span class="p">,</span> <span class="n">forcefield</span><span class="o">=</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><strong>building_blocks</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code>, optional) – <p>A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">building_blocks</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mol1</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">mol2</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal"><span class="pre">mol1</span></code> and <code class="docutils literal"><span class="pre">mol2</span></code> are <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> objects
+which react to for <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>. The numbers represetnt
+the amount of each building block required to form 1
+<a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a>.</p>
+<p>This argument can be omitted when the formation energy of a
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> instance is being found, as they
+keep this data stored elsewhere already.</p>
+</li>
+<li><strong>force_e_calc</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>, optional) – If this is <code class="docutils literal"><span class="pre">True</span></code> then all molecules in
+<cite>building_blocks</cite>, <cite>products</cite> and <a class="reference internal" href="#mtk.molecular.energy.Energy.molecule" title="mtk.molecular.energy.Energy.molecule"><code class="xref py py-attr docutils literal"><span class="pre">molecule</span></code></a> will
+have their energies recalculated. Even if the energy values
+have already been found with the chosen forcefield and
+method. If <code class="docutils literal"><span class="pre">False</span></code> the energy is only calculated if the
+value has not already been found.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>float</strong> – The pseudoformation energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.molecular.energy.Energy.rdkit">
+<code class="descname">rdkit</code><span class="sig-paren">(</span><em>forcefield</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#Energy.rdkit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.Energy.rdkit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses <code class="docutils literal"><span class="pre">rdkit</span></code> to calculate the energy.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>forcefield</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of the forcefield to be used.</li>
+<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The calculated energy.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="mtk.molecular.energy.EnergyError">
+<em class="property">exception </em><code class="descclassname">mtk.molecular.energy.</code><code class="descname">EnergyError</code><a class="reference internal" href="_modules/mtk/molecular/energy.html#EnergyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.EnergyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>A class for errors in <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> methods.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._create_mop">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_create_mop</code><span class="sig-paren">(</span><em>file_root</em>, <em>molecule</em>, <em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_create_mop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._create_mop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <code class="docutils literal"><span class="pre">.mop</span></code> file holding the molecule to be optimized.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Molecule" title="mtk.molecular.molecules.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a>) – The molecule which is to be optimized. Its molecular
+structure file is converted to a <code class="docutils literal"><span class="pre">.mop</span></code> file. The original
+file is also kept.</li>
+<li><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Dictionary defined by the MOPAC methods, where all the run
+details are defined.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The full path of the newly created <code class="docutils literal"><span class="pre">.mop</span></code> file.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._extract_MOPAC_dipole">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_dipole</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_dipole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_dipole" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._extract_MOPAC_en">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_extract_MOPAC_en</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_extract_MOPAC_en"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._extract_MOPAC_en" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._kill_mopac">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_kill_mopac</code><span class="sig-paren">(</span><em>file_root</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_kill_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._kill_mopac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an in-progress MOPAC run.</p>
+<p>To kill a MOPAC run, a file with the molecule’s name and a <code class="docutils literal"><span class="pre">.end</span></code>
+extension is written.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_root</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The molecule’s name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._mop_line">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_mop_line</code><span class="sig-paren">(</span><em>settings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_mop_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._mop_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats <cite>settings</cite> into a MOPAC input string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>settings</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Dictionary defined in <code class="xref py py-func docutils literal"><span class="pre">mopac_opt()</span></code>, where all the run
+details are defined.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String containing all the MOPAC keywords correctly formatted
+for the input file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy._run_mopac">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">_run_mopac</code><span class="sig-paren">(</span><em>file_root</em>, <em>mopac_path</em>, <em>timeout=3600</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#_run_mopac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy._run_mopac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.e_logger">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">e_logger</code><span class="sig-paren">(</span><em>func</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#e_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.e_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns <cite>func</cite> into a version which updates :attr`Energy.values`.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – An <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> method.</li>
+<li><strong>obj</strong> (<a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a>) – The <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> object on which the method <cite>func</cite> was
+called.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The function <cite>func</cite> bound to <cite>obj</cite> and modified so that when
+called the results update <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">types.MethodType</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.exclude">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">exclude</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#exclude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.exclude" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator to add the :attr`exclude` attribute to methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – Holds the names parameters which are not to be used as part of
+the key for the <a class="reference internal" href="#mtk.molecular.energy.Energy" title="mtk.molecular.energy.Energy"><code class="xref py py-class docutils literal"><span class="pre">Energy</span></code></a> method.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The function which has had the <a class="reference internal" href="#mtk.molecular.energy.exclude" title="mtk.molecular.energy.exclude"><code class="xref py py-attr docutils literal"><span class="pre">exclude</span></code></a> attribute added.
+This is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding the names of parameters, which
+are not part of the key.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">function</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.formation_key">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">formation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#formation_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.formation_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates the key of <a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fargs</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code>) – The arguments with which <a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a> was called.</li>
+<li><strong>fkwargs</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – The keyword arguments with which <a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a> was
+called.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the key of
+<a class="reference internal" href="#mtk.molecular.energy.Energy.formation" title="mtk.molecular.energy.Energy.formation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.formation()</span></code></a>, when called with the arguments
+<cite>fargs</cite> and keyword arguments <cite>fkwargs</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.func_key">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">func_key</code><span class="sig-paren">(</span><em>func</em>, <em>fargs=None</em>, <em>fkwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#func_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.func_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the key used in <a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a> for <cite>func</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>func</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – The function whose results are to be stored in
+<a class="reference internal" href="#mtk.molecular.energy.Energy.values" title="mtk.molecular.energy.Energy.values"><code class="xref py py-attr docutils literal"><span class="pre">Energy.values</span></code></a>.</li>
+<li><strong>fargs</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code>, optional) – The arguments passed to <cite>func</cite>.</li>
+<li><strong>fkwargs</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>, optional) – The keyword arguments passed to <cite>func</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the key when
+<cite>func</cite> is called with the arguments <cite>fargs</cite> and keyword
+arguments <cite>fkwargs</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mtk.molecular.energy.pseudoformation_key">
+<code class="descclassname">mtk.molecular.energy.</code><code class="descname">pseudoformation_key</code><span class="sig-paren">(</span><em>fargs</em>, <em>fkwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/energy.html#pseudoformation_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.energy.pseudoformation_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates key of the <a class="reference internal" href="#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fargs</strong> (<code class="xref py py-class docutils literal"><span class="pre">tuple</span></code>) – The arguments with which <a class="reference internal" href="#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a> was
+called.</li>
+<li><strong>fkwargs</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – The keyword arguments with which <a class="reference internal" href="#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a>
+was called.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object representing the key when
+<a class="reference internal" href="#mtk.molecular.energy.Energy.pseudoformation" title="mtk.molecular.energy.Energy.pseudoformation"><code class="xref py py-meth docutils literal"><span class="pre">Energy.pseudoformation()</span></code></a> is called with the arguments
+<cite>fargs</cite> and keyword arguments <cite>fkwargs</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

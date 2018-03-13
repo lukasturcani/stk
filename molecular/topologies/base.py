@@ -27,14 +27,15 @@ The new class will only need to have five class attributes added:
        different expected size. Windows of the same type are expected
        to be of the same size.
 
-:attr:`vertices` holds instances of :class:`.Vertex`. Each
+:attr:`vertices` holds instances of :class:`~.cage.base.Vertex`. Each
 instance represents a vertex of a cage and needs to be initialized
 with the coordinates of that vertex. Vertices of a cage are where
 building blocks of cages are placed.
 
-:attr:`edges` holds instances of the :class:`.Edge`. Each
+:attr:`edges` holds instances of the :class:`~.cage.base.Edge`. Each
 instance represents an edge of a cage and needs to be initialized
-with two instances of :class:`.Vertex`. The :class:`.Vertex` instances
+with two instances of :class:`~.cage.base.Vertex`. The
+:class:`~.cage.base.Vertex` instances
 should be held in :attr:`vertices`, as mentioned above. The two
 vertices are the ones which the edge connects. Linkers of cages are
 placed on edges. The edge instances automatically derive their

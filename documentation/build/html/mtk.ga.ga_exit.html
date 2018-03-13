@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.ga.ga_exit module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.ga.ga_exit module</a><ul>
+<li><a class="reference internal" href="#extending-mtk-adding-exit-functions">Extending mtk: Adding exit functions.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.ga.ga_exit module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.ga.ga_exit.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.ga.ga_exit">
+<span id="mtk-ga-ga-exit-module"></span><h1>mtk.ga.ga_exit module<a class="headerlink" href="#module-mtk.ga.ga_exit" title="Permalink to this headline">¶</a></h1>
+<p>Defines functions which cut short the GA if a condition is satisfied.</p>
+<p>These functions are useful when debugging and testing the convergence
+of the GA. For example they can tell the GA to stop when a certain
+molecule has been found.</p>
+<p>The functions are defined as methods in the <a class="reference internal" href="#mtk.ga.ga_exit.Exit" title="mtk.ga.ga_exit.Exit"><code class="xref py py-class docutils literal"><span class="pre">Exit</span></code></a>.</p>
+<div class="section" id="extending-mtk-adding-exit-functions">
+<span id="adding-exit-functions"></span><h2>Extending mtk: Adding exit functions.<a class="headerlink" href="#extending-mtk-adding-exit-functions" title="Permalink to this headline">¶</a></h2>
+<p>The only requirement is that the methods take <cite>population</cite> as their
+first argument (barring <cite>self</cite>, <cite>cls</cite> etc.) and <cite>progress</cite> as their
+second. They must return <code class="docutils literal"><span class="pre">True</span></code> if the exit criterion has been
+satisfied and <code class="docutils literal"><span class="pre">False</span></code> otherwise. The naming requirement of the first
+two arguments exists to help users identify which arguments they need
+to define in the input file and which are handeled automatically by
+<code class="docutils literal"><span class="pre">mtk</span></code>. The arguments <cite>population</cite> and <cite>progress</cite> are automatically
+provided when the GA is run. They hold a <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> instance
+holding the current generation and a <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> instance
+holding every previous generation in a subpopulation, respectively.</p>
+<p>As usual, if you need to define multiple functions, make sure any
+helper functions are private, i.e. their names start with a leading
+underscore.</p>
+<dl class="class">
+<dt id="mtk.ga.ga_exit.Exit">
+<em class="property">class </em><code class="descclassname">mtk.ga.ga_exit.</code><code class="descname">Exit</code><span class="sig-paren">(</span><em>func_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Checks if the exit criterion for the GA has been satisfied.</p>
+<dl class="attribute">
+<dt id="mtk.ga.ga_exit.Exit.func_data">
+<code class="descname">func_data</code><a class="headerlink" href="#mtk.ga.ga_exit.Exit.func_data" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – A <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> object which holds the name of the
+exit function to use and any additional parameters it may
+require.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.ga_exit.Exit.fitness_plateau">
+<code class="descname">fitness_plateau</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em>, <em>num_gens</em>, <em>top_members=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.fitness_plateau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.fitness_plateau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the most fit molecules remain the same.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
+subpopulation.</li>
+<li><strong>num_gens</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Number of generations in which the fittest molecules did
+not change.</li>
+<li><strong>top_members</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The number of fittest molecules which are checked. This
+number needs to be smaller than the population size.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if the fitness function shows no improvement for n
+generations.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.ga_exit.Exit.mol_name_present">
+<code class="descname">mol_name_present</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em>, <em>mol_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.mol_name_present"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.mol_name_present" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks for a molecule called <cite>mol_name</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
+subpopulation.</li>
+<li><strong>mol_name</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The name of a molecule.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if a molecule with <code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.name</span></code> of
+<cite>mol_name</cite> is found in <cite>population</cite>. Else, <code class="docutils literal"><span class="pre">False</span></code>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.ga_exit.Exit.mol_present">
+<code class="descname">mol_present</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em>, <em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.mol_present"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.mol_present" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal"><span class="pre">True</span></code> if <cite>mol</cite> is in <cite>population</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
+subpopulation.</li>
+<li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – A molecule which if present in <cite>population</cite> causes the GA
+to stop.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if <cite>mol</cite> in <cite>population</cite>, <code class="docutils literal"><span class="pre">False</span></code> otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.ga_exit.Exit.no_exit">
+<code class="descname">no_exit</code><span class="sig-paren">(</span><em>population</em>, <em>progress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/ga_exit.html#Exit.no_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.ga_exit.Exit.no_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <code class="docutils literal"><span class="pre">False</span></code>.</p>
+<p>Useful when you never want the GA to exit prematurely.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – The population holding the current generation of molecules.</li>
+<li><strong>progress</strong> (<a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a>) – A population where every previous generation is a
+subpopulation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>False</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

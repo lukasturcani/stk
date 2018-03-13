@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.ga.ga_exit &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="mtk  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mtk.ga.ga_exit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mtk.ga.ga_exit</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines functions which cut short the GA if a condition is satisfied.</span>
+
+<span class="sd">These functions are useful when debugging and testing the convergence</span>
+<span class="sd">of the GA. For example they can tell the GA to stop when a certain</span>
+<span class="sd">molecule has been found.</span>
+
+<span class="sd">The functions are defined as methods in the :class:`Exit`.</span>
+
+<span class="sd">.. _`adding exit functions`:</span>
+
+<span class="sd">Extending mtk: Adding exit functions.</span>
+<span class="sd">-------------------------------------</span>
+
+<span class="sd">The only requirement is that the methods take `population` as their</span>
+<span class="sd">first argument (barring `self`, `cls` etc.) and `progress` as their</span>
+<span class="sd">second. They must return ``True`` if the exit criterion has been</span>
+<span class="sd">satisfied and ``False`` otherwise. The naming requirement of the first</span>
+<span class="sd">two arguments exists to help users identify which arguments they need</span>
+<span class="sd">to define in the input file and which are handeled automatically by</span>
+<span class="sd">``mtk``. The arguments `population` and `progress` are automatically</span>
+<span class="sd">provided when the GA is run. They hold a :class:`.GAPopulation` instance</span>
+<span class="sd">holding the current generation and a :class:`.GAPopulation` instance</span>
+<span class="sd">holding every previous generation in a subpopulation, respectively.</span>
+
+<span class="sd">As usual, if you need to define multiple functions, make sure any</span>
+<span class="sd">helper functions are private, i.e. their names start with a leading</span>
+<span class="sd">underscore.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Exit"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit">[docs]</a><span class="k">class</span> <span class="nc">Exit</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the exit criterion for the GA has been satisfied.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func_data : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object which holds the name of the</span>
+<span class="sd">        exit function to use and any additional parameters it may</span>
+<span class="sd">        require.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes an :class:`Exit` instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        func_data : :class:`.FunctionData`</span>
+<span class="sd">            A :class:`.FunctionData` object which holds the name of the</span>
+<span class="sd">            exit function to use and any additional parameters it may</span>
+<span class="sd">            require.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span> <span class="o">=</span> <span class="n">func_data</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls the chosen exit function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : :class:`.GAPopulation`</span>
+<span class="sd">            The population holding the current generation of molecules.</span>
+
+<span class="sd">        progress : :class:`.GAPopulation`</span>
+<span class="sd">            A population where every previous generation is a</span>
+<span class="sd">            subpopulation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            The value returned by giving `pop` and `progress` to the</span>
+<span class="sd">            exit function defined in :attr:`func_data`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Exit.mol_present"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.mol_present">[docs]</a>    <span class="k">def</span> <span class="nf">mol_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ``True`` if `mol` is in `population`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : :class:`.GAPopulation`</span>
+<span class="sd">            The population holding the current generation of molecules.</span>
+
+<span class="sd">        progress : :class:`.GAPopulation`</span>
+<span class="sd">            A population where every previous generation is a</span>
+<span class="sd">            subpopulation.</span>
+
+<span class="sd">        mol : :class:`.MacroMolecule`</span>
+<span class="sd">            A molecule which if present in `population` causes the GA</span>
+<span class="sd">            to stop.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            ``True`` if `mol` in `population`, ``False`` otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">population</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Exit.mol_name_present"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.mol_name_present">[docs]</a>    <span class="k">def</span> <span class="nf">mol_name_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mol_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Looks for a molecule called `mol_name`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : :class:`.GAPopulation`</span>
+<span class="sd">            The population holding the current generation of molecules.</span>
+
+<span class="sd">        progress : :class:`.GAPopulation`</span>
+<span class="sd">            A population where every previous generation is a</span>
+<span class="sd">            subpopulation.</span>
+
+<span class="sd">        mol_name : :class:`str`</span>
+<span class="sd">            The name of a molecule.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            ``True`` if a molecule with :attr:`.MacroMolecule.name` of</span>
+<span class="sd">            `mol_name` is found in `population`. Else, ``False``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">mol_name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">population</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Exit.fitness_plateau"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.fitness_plateau">[docs]</a>    <span class="k">def</span> <span class="nf">fitness_plateau</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">population</span><span class="p">,</span>
+                        <span class="n">progress</span><span class="p">,</span>
+                        <span class="n">num_gens</span><span class="p">,</span>
+                        <span class="n">top_members</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the most fit molecules remain the same.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : :class:`.GAPopulation`</span>
+<span class="sd">            The population holding the current generation of molecules.</span>
+
+<span class="sd">        progress : :class:`.GAPopulation`</span>
+<span class="sd">            A population where every previous generation is a</span>
+<span class="sd">            subpopulation.</span>
+
+<span class="sd">        num_gens : :class:`int`</span>
+<span class="sd">            Number of generations in which the fittest molecules did</span>
+<span class="sd">            not change.</span>
+
+<span class="sd">        top_members : :class:`int`, optional</span>
+<span class="sd">            The number of fittest molecules which are checked. This</span>
+<span class="sd">            number needs to be smaller than the population size.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            ``True`` if the fitness function shows no improvement for n</span>
+<span class="sd">            generations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check that the GA has run for more than num_gens generations.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">populations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_gens</span><span class="p">:</span>
+            <span class="n">gens</span> <span class="o">=</span> <span class="p">{</span><span class="nb">frozenset</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">populations</span><span class="p">[</span><span class="o">-</span><span class="n">x</span><span class="p">],</span>
+                                     <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="n">top_members</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_gens</span><span class="p">)}</span>
+            <span class="n">unique_gens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gens</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unique_gens</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Exit.no_exit"><a class="viewcode-back" href="../../../mtk.ga.ga_exit.html#mtk.ga.ga_exit.Exit.no_exit">[docs]</a>    <span class="k">def</span> <span class="nf">no_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns ``False``.</span>
+
+<span class="sd">        Useful when you never want the GA to exit prematurely.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pop : :class:`.GAPopulation`</span>
+<span class="sd">            The population holding the current generation of molecules.</span>
+
+<span class="sd">        progress : :class:`.GAPopulation`</span>
+<span class="sd">            A population where every previous generation is a</span>
+<span class="sd">            subpopulation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        False : :class:`bool`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
