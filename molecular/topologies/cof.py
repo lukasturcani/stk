@@ -1,12 +1,82 @@
 """
 Defines COF topologies.
 
-.. _`adding macromolecules`:
+.. _`cof assembly`:
 
 How the assembly process works for 2D COF topologies.
 -----------------------------------------------------
 
+Linker topologies.
+..................
 
+Linker topologies are those which use a building block with two
+functional groups and a building block with three or more functional
+groups. These are implemented as subclasses to
+:class:`LinkerCOFLattice`.
+
+As for any assembly process, there are 3 stages: placement of
+building blocks, joining of building blocks and deletion of extra
+atoms.
+
+A 2D COF topology can be defined by the vertices and edges which
+connected them. The building block with 3 or more functional groups
+sits on the vertices while the building block with 2 functional groups
+sits on the edges. To assemble a COF topology, first the vertices
+and edges are defined. They are represented by the classes
+:class:`Vertex` and :class:`Edge`. Each of these objects defines their
+positions in term of the fractional coordinates along the
+``a``, ``b`` and ``c`` vectors of a unit cell. In addtion, each
+of these objects defines a set of "atomic positiions".
+
+For edges, there are two atomic positions, 0 and 1. 0 is the position
+of the atom which gets connected to an atom on the first vertex
+connected by the edge, while 1 is the
+position of the atom which gets connected to the second vertex
+connected by the edge. Identification of which bonder atom of a
+di-functinalized building block sits on which atom position is done
+in the following way. Check the distance of each bonder atom to the
+first vertex. The closer one is on position 0 the further one is on
+position 1.
+
+For vertices there are multiple atomic positions. The number of
+atomic positions on a vertex is equal to the number of functional
+groups the building block placed on the vertex has. The atomic
+positions are labelled from ``0`` to ``n`` where ``n`` is one less than
+the number of functional groups in the building block. Going clockwise
+around the vertex, starting at the 12 o clock position, the positions
+are labelled starting at 0. After placing and aligning a building block
+on a vertex, it is necessary to identify which bonder atom sits on
+which atomic position. Alignment is done by rotating the builing block
+around the z axis so that the distance of one of the bonder atoms
+and one of the edges is minimized. Because each edge keeps a record
+of which position it connects, the aligned bonder can be assigned to
+a position. Then the bonder atoms are assigned to the next positions
+in clockwise order.
+
+To join molecules simply go through all the edges in a topology. Each
+edge holds the vertices it is connected to and the positions on those
+vertices it connects. Each edge and vertex defines
+a dictionary which maps the position to the bonder atom which sits on
+it. For each edge take the bonder at position ``0`` and the atomic
+position on the vertex which is connceted to it. Use the atomic
+position on the connected vertex to get the id of the bonder atom which
+is to be connected. The same can be done for the bonder at position
+``1`` on the edge.
+
+Periodic bonds are not added to the rdkit molelecule, instead they
+are registered in :attr:`.Periodic.periodic_bonds`. The method
+:meth:`COFLattice.del_atoms` is slightly modified, so that the
+coordinates of any deleted atoms are saved. This is necessary for
+restoring those atoms when using :meth:`.Periodic.island`.
+
+When creating periodic bonds during :meth:`LinkerCOFLattice.join_mols`
+the ids of the bonder atoms involved are saved as the indices within
+:attr:`.MacroMolecule.bonder_ids`. This is because deleting atoms
+will change the atom ids but not the ordering in
+:attr:`~.MacroMolecule.bonder_ids`. However, these are automatically
+updated to bonder ids after assembly is completed by
+:meth:`.Perdiodic.save_ids`. This is run automatically after assembly
+and does not impact implementation but is noted here for completeness.
 
 """
 
@@ -22,11 +92,52 @@ from ...convenience_tools import (PeriodicBond,
 
 
 class Vertex:
+    """
+    Represents a vertex of a 2D COF topology.
+
+    Attributes
+    ----------
+    frac_coord : :class:`tuple` of :class:`float`
+        The fractional positions along the ``a``, ``b`` and ``c``
+        vectors of the vector.
+
+    connected : :class:`list` of :class:`Edge`
+        The edges connected to this vertex.
+
+    bonder_map : :class:`dict`
+        Maps the id of a bonder position on the vertex to the atom
+        id of the bonder sitting on it.
+
+    """
+
     def __init__(self, frac_coord):
         self.frac_coord = frac_coord
         self.connected = []
 
     def place_mol(self, cell_params, mol, aligner):
+        """
+        Places and aligns a molecule on the vertex.
+
+        Parameters
+        ----------
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        mol : :class:`.StructUnit3`
+            The building block to be placed.
+
+        aligner : :class:`int`
+            The index of a bonder atom in
+            :attr:`.StructUnit.bonder_ids` of `mol`. This is the
+            bonder atom which gets aligned with an edge.
+
+        Returns
+        -------
+        :class:`rdkit.Chem.rdchem.Mol`
+            The rdkit instance of the placed `mol`.
+
+        """
+
         coord = self.calc_coord(cell_params)
         original_position = mol.position_matrix()
         mol.set_orientation2([0, 0, 1])
@@ -44,6 +155,25 @@ class Vertex:
         return rdkit_mol
 
     def calc_coord(self, cell_params, cell_position=[0, 0, 0]):
+        """
+        Calculate the position of the vertex within a unit cell.
+
+        Parameters
+        ----------
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        cell_position : :class:`list` of :class:`int`
+            Indicates if the vertex is in a periodic cell or not.
+            Analogous to the defintion of a periodic bond.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The position.
+
+        """
+
         coord = np.zeros((3, ))
         for frac, dim, p in zip(self.frac_coord, cell_params, cell_position):
             coord += (frac+p) * dim
@@ -55,6 +185,32 @@ class Vertex:
                           cell_params,
                           nbonders,
                           aligned_bonder):
+        """
+        Creates the attribute :attr:`bonder_map`.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being built.
+
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        nbonders : :class:`int`
+            The number of bonder atoms the building block placed on the
+            vertex has.
+
+        aligned_bonder : :class:`int`
+            The index of a bonder atom in
+            :attr:`.StructUnit.bonder_ids` of `mol`. This is the
+            bonder atom which gets aligned with an edge.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         center = self.calc_coord(cell_params)
 
         # Get all the bonder ids.
@@ -80,7 +236,7 @@ class Vertex:
         bonders = (bonders[bonders.index(aligned):] +
                    bonders[:bonders.index(aligned)])
 
-        aligned_pos = self.aligned_position(aligned_bonder)
+        aligned_pos = self.aligned_position()
         positions = (list(range(aligned_pos, nbonders)) +
                      list(range(0, aligned_pos)))
 
@@ -88,7 +244,19 @@ class Vertex:
         for bonder, position in zip(bonders, positions):
             self.bonder_map[position] = bonder
 
-    def aligned_position(self, aligned_bonder):
+    def aligned_position(self):
+        """
+        Returns the position of the atom aligned by :meth:`place_mol`.
+
+        Returns
+        -------
+        :class:`int`
+            The id of a position of on the vertex. The bonder atom
+            which gets aligned during :meth:`place_mol` sits on this
+            position.
+
+        """
+
         aligner_edge = next((e for e in self.connected if
                              all(b == 0 for b in e.bond)),
                             self.connected[0])
@@ -100,12 +268,38 @@ class Edge:
     """
     Represents a bond in a COF unit cell.
 
-    This class is used for positioning ditopic building blocks.
+    This class is used for positioning and aligning ditopic building
+    blocks in 2D COF topologies.
 
     Attributes
     ----------
     v1 : :class:`Vertex`
+        The first vertex connected by the edge.
 
+    v2 : :class:Vertex`
+        The second vertex connected by the edge.
+
+    joint_positions : :class:`tuple` of :class:`int`
+        Holds 2 numbers. The first is the id of the position on
+        :attr:`v1` which gets connected by the edge. The second is the
+        id of the position on :attr:`v2` which gets connected by the
+        edge.
+
+    bond : :class:`list` of :class:`int`:
+        Indicates if the bond is periodic.
+
+    connected : class:`list` of :class:`Vertex`
+        The vertices conncetd by the edge.
+
+    frac_coord : :class:`list` of :class`float`
+        The position of the edge in terms of the fractional positions
+        along the ``a``, ``b`` and ``c`` vectors of a unit cell.
+
+    bonder_map : :class:`dict`
+        Maps the id of a position to the id of the bonder atom which
+        sits on it. The positions are ``0`` and ``1`` where ``0`` is
+        the  position which is closer to :attr:`v1` while ``1``
+        is the position closer to :attr:`v2`.
 
     """
 
@@ -124,6 +318,28 @@ class Edge:
         v2.connected.append(self)
 
     def place_mol(self, cell_params, mol, alignment):
+        """
+        Places and aligned a building block along the edge.
+
+        Parameters
+        ----------
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        mol : :class:`.StructUnit3`
+            The building block to be placed.
+
+        alignment : :class:`int`
+            Can be ``1`` or ``-1`` to align `mol` either parallel or
+            anti-parallel with the edge.
+
+        Returns
+        -------
+        :class:`rdkit.Chem.rdchem.Mol`
+            The rdkit instance of the placed `mol`.
+
+        """
+
         coord = self.calc_coord(cell_params)
         original_position = mol.position_matrix()
 
@@ -135,17 +351,63 @@ class Edge:
         return rdkit_mol
 
     def direction(self, cell_params):
+        """
+        The direction vector of the edge.
+
+        Parameters
+        ----------
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The direction vector.
+
+        """
+
         v1coord = self.v1.calc_coord(cell_params)
         v2coord = self.v2.calc_coord(cell_params, self.bond)
         return normalize_vector((v1coord-v2coord)/2)
 
     def calc_coord(self, cell_params):
+        """
+        Calcualtes the position of the edge in a cell.
+
+        Parameters
+        ----------
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The position.
+        """
+
         coord = np.zeros((3, ))
         for frac, dim in zip(self.frac_coord, cell_params):
             coord += frac * dim
         return coord
 
     def create_bonder_map(self, macro_mol, cell_params):
+        """
+        Creates the attribute :attr:`bonder_map`.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being built.
+
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         # Get all the bonder ids.
         bonder_ids = deque(maxlen=2)
         for atom in macro_mol.mol.GetAtoms():
@@ -239,6 +501,39 @@ class COFLattice(Topology):
 
 
 class LinkerCOFLattice(COFLattice):
+    """
+    For 2D COF topologies which use a linker.
+
+    These are topologies which consist of 2 building blocks. One
+    which has two functional groups and one which has 3 or more
+    functional groups.
+
+    This class will have to be extended by sublcasses which define
+    the vertices and edges which a particular topology consists of.
+
+    Attributes
+    ----------
+    vertices : :class:`list` of :class:`Vertex`
+        Class attribute added when defining a subclass. Holds the
+        vertices which make up the topology.
+
+    edges : :class:`list` of :class:`Edge`
+        Class attribute added when defining a subclass. Holds the
+        edges which make up the topology.
+
+    ditopic_directions : :class:`list` of :class:`int`
+        For each edge in the topology, holds ``1`` or ``-1`` to
+        indicate if the building block is placed parallel or
+        anti-parallel to the edge.
+
+    multitopic_aligners : :class:`list` of :class`int`
+        For each vertex in the topology, holds the index of an
+        atom in :attr:`.StructUnit.bonder_ids`. It specicifes which
+        bonder atom is used for alignment of the building block on the
+        vertex.
+
+    """
+
     def __init__(self,
                  ditopic_directions=None,
                  multitopic_aligners=None):
@@ -253,6 +548,19 @@ class LinkerCOFLattice(COFLattice):
         self.multitopic_aligners = multitopic_aligners
 
     def place_mols(self, macro_mol):
+        """
+        Places the building blocks on the topology.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
 
         # Create the rdkit molecule of the assembled molecule.
         macro_mol.mol = rdkit.Mol()
@@ -306,6 +614,20 @@ class LinkerCOFLattice(COFLattice):
         super(macro_mol.__class__, macro_mol).save_ids()
 
     def join_mols(self, macro_mol):
+        """
+        Creates bonds between the building blocks.
+
+        Parameters
+        ----------
+        macor_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
         macro_mol.bonds_made = 0
         emol = rdkit.EditableMol(macro_mol.mol)
         for e in self.edges:
