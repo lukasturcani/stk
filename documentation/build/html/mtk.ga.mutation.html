@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtk.ga.mutation module &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="mtk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mtk.ga.mutation module</a><ul>
+<li><a class="reference internal" href="#extending-mtk-adding-mutation-functions">Extending mtk: Adding mutation functions.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mtk.ga.mutation module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mtk.ga.mutation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mtk.ga.mutation">
+<span id="mtk-ga-mutation-module"></span><h1>mtk.ga.mutation module<a class="headerlink" href="#module-mtk.ga.mutation" title="Permalink to this headline">¶</a></h1>
+<p>Defines mutation operations via the <a class="reference internal" href="#mtk.ga.mutation.Mutation" title="mtk.ga.mutation.Mutation"><code class="xref py py-class docutils literal"><span class="pre">Mutation</span></code></a> class.</p>
+<div class="section" id="extending-mtk-adding-mutation-functions">
+<span id="adding-mutation-functions"></span><h2>Extending mtk: Adding mutation functions.<a class="headerlink" href="#extending-mtk-adding-mutation-functions" title="Permalink to this headline">¶</a></h2>
+<p>If a new mutation operation is to be added to <code class="docutils literal"><span class="pre">mtk</span></code> it should be
+added as a method in the <a class="reference internal" href="#mtk.ga.mutation.Mutation" title="mtk.ga.mutation.Mutation"><code class="xref py py-class docutils literal"><span class="pre">Mutation</span></code></a> class defined in this
+module. The only requirement is that the first argument is <cite>macro_mol</cite>,
+excluding any <cite>self</cite> or <cite>cls</cite> arguments.</p>
+<p>The naming requirement of <cite>macro_mol</cite> exists to help users identify
+which arguments are handled automatically by <code class="docutils literal"><span class="pre">mtk</span></code> and which they
+need to define in the input file. The convention is that if the
+mutation function takes an argument called  <cite>macro_mol</cite> it does not
+have to be specified in the input file.</p>
+<p>If the mutation function does not fit neatly into a single function,
+make sure that any helper functions are private, i.e. that their names
+start with a leading underscore.</p>
+<dl class="class">
+<dt id="mtk.ga.mutation.Mutation">
+<em class="property">class </em><code class="descclassname">mtk.ga.mutation.</code><code class="descname">Mutation</code><span class="sig-paren">(</span><em>funcs</em>, <em>num_mutations</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Carries out mutations operations on a population.</p>
+<p>Instances of <a class="reference internal" href="mtk.ga.ga_population.html#mtk.ga.ga_population.GAPopulation" title="mtk.ga.ga_population.GAPopulation"><code class="xref py py-class docutils literal"><span class="pre">GAPopulation</span></code></a> delegate mutation operations
+to instances of this class. They do this by calling</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mutant_pop</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">gen_mutants</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>which returns a new population consisting of molecules generated by
+performing mutation operations on members of <code class="docutils literal"><span class="pre">pop</span></code>. This class
+uses the <a class="reference internal" href="mtk.ga.selection.html#mtk.ga.selection.Selection" title="mtk.ga.selection.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance in <code class="docutils literal"><span class="pre">pop.ga_tools.selection</span></code>
+to select molecules for mutation.</p>
+<dl class="attribute">
+<dt id="mtk.ga.mutation.Mutation.funcs">
+<code class="descname">funcs</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.funcs" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.convenience_tools.convenience_tools.html#mtk.convenience_tools.convenience_tools.FunctionData" title="mtk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a> – This lists holds all the mutation functions which are to be
+used by the GA. One will be chosen at random when a mutation
+is desired. The likelihood that each is selected is given by
+<cite>weights</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.mutation.Mutation.num_mutations">
+<code class="descname">num_mutations</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.num_mutations" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The number of mutations that needs to be performed each
+generation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mtk.ga.mutation.Mutation.weights">
+<code class="descname">weights</code><a class="headerlink" href="#mtk.ga.mutation.Mutation.weights" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">float</span></code> – If <a class="reference internal" href="#mtk.ga.mutation.Mutation.weights" title="mtk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal"><span class="pre">weights</span></code></a> is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code>, each <code class="xref py py-class docutils literal"><span class="pre">float</span></code>
+corresponds to the probability of selecting the mutation
+function at the corresponding index. If <a class="reference internal" href="#mtk.ga.mutation.Mutation.weights" title="mtk.ga.mutation.Mutation.weights"><code class="xref py py-attr docutils literal"><span class="pre">weights</span></code></a> is
+<code class="docutils literal"><span class="pre">None</span></code>, each mutation function has equal likelihood of
+being picked.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.random_bb">
+<code class="descname">random_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mols</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.random_bb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.random_bb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitute a building block at random.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The cage which is to have its building block substituted.</li>
+<li><strong>mols</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – A group of molecules from which one is used for
+substitution.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which takes a building block of <cite>macro_mol</cite> and
+returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>. For all building blocks
+which return <code class="docutils literal"><span class="pre">True</span></code>, one is chosen at random to undergo
+mutation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The mutated <cite>macro_mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.random_topology">
+<code class="descname">random_topology</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>topologies</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.random_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.random_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes <cite>macro_mol</cite> topology to a random one from <cite>topologies</cite>.</p>
+<p>A new instance of the same type as <cite>macro_mol</cite> is created. I.e.
+if <cite>macro_mol</cite> was a <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a> instance then a
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Polymer" title="mtk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a> instance will be returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule which is to be mutated.</li>
+<li><strong>topologies</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.topologies.base.html#mtk.molecular.topologies.base.Topology" title="mtk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>) – This lists holds the topology instances from which one is
+selected at random to form a new molecule.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A molecule generated by initializing a new instance
+with all the same parameters as <cite>macro_mol</cite> except for the
+topology.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mtk.ga.mutation.Mutation.similar_bb">
+<code class="descname">similar_bb</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mols</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/ga/mutation.html#Mutation.similar_bb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.Mutation.similar_bb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitute a building block with a similar one.</p>
+<p>This function first selects a building block of <cite>macro_mol</cite> for
+mutation. One is chosen at random from the building blocks
+where <code class="docutils literal"><span class="pre">key(building_block)</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p>
+<p>All  molecules in <cite>mols</cite> are then checked for similarity to the
+building block. The first time this mutation function is run on
+a <cite>macro_mol</cite>, the most similar molecule in <cite>mols</cite> to the
+chosen building block is used to substitute it. The next time
+this mutation function is run on the same <cite>macro_mol</cite> and the
+same building block is chosen, the second most similar molecule
+from <cite>mols</cite> is used for substitution and so on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The cage which is to have its building block substituted.</li>
+<li><strong>mols</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit" title="mtk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – A group of molecules from which one is used for
+substitution.</li>
+<li><strong>key</strong> (<code class="xref py py-class docutils literal"><span class="pre">function</span></code>) – A function which takes a building block of <cite>macro_mol</cite> and
+returns <code class="docutils literal"><span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">False</span></code>. For all building blocks
+which return <code class="docutils literal"><span class="pre">True</span></code>, one is chosen at random to undergo
+mutation.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The mutated <cite>macro_mol</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="mtk.ga.mutation.MutationError">
+<em class="property">exception </em><code class="descclassname">mtk.ga.mutation.</code><code class="descname">MutationError</code><a class="reference internal" href="_modules/mtk/ga/mutation.html#MutationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.ga.mutation.MutationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+<p>Used for errors which occuring during mutation operations.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
