@@ -772,35 +772,35 @@ class _NoLinkerCageTopology(_CageTopology):
     alignments : :class:`list` of :class:`int`
         See :attr:`_CageTopology.A_alignments`
 
-    placement : :class`str`
-        The name of the placement type to be used. Valid options are
-
-            1. ``'random'`` - For each vertex, a building block is
-                picked randomly from
-                :attr:`.MacroMolecule.building_blocks` and placed on
-                the vertex.
+    bb_assignments : :class:`list` of :class:`int`
+        For each vertex, the :class:`int` is the index of a
+        building block in :attr:`.MacroMolecule.building_blocks`.
+        It is the building block to be placed on that vertex. Can be
+        ``None`` if a random building block should be placed.
 
     """
 
-    def __init__(self, alignments=None, placement='random'):
+    def __init__(self, alignments=None, bb_assignments=None):
         if alignments is None:
             alignments = np.zeros(len(self.positions_A))
+        if bb_assignments is None:
+            bb_assignments = [None for i in range(len(self.positions_A))]
 
         self.alignments = alignments
-        self.placement = placement
+        self.bb_assignments = bb_assignments
         self.connect()
 
     def place_mols(self, macro_mol):
 
         macro_mol.mol = rdkit.Mol()
 
-        if self.placement == 'random':
-            return self.place_mols_random(macro_mol)
-
-    def place_mols_random(self, macro_mol):
-        for position, orientation in zip(self.positions_A,
-                                         self.alignments):
-            bb = np.random.choice(list(macro_mol.building_blocks))
+        for position, orientation, bb_index in zip(self.positions_A,
+                                                   self.alignments,
+                                                   self.bb_assignments):
+            if bb_index is None:
+                bb = np.random.choice(macro_mol.building_blocks)
+            else:
+                bb = macro_mol.building_blocks[bb_index]
             ipos = bb.position_matrix()
             n_bb = len(bb.functional_group_atoms())
 
