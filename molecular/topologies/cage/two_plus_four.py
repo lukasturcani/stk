@@ -20,10 +20,10 @@ class TwoPlusFour(_CageTopology):
     beta.edge_plane_normal = lambda alpha=alpha: np.multiply(
                                         alpha.edge_plane_normal(), -1)
 
-    positions_B = [Edge(alpha, beta),
-                   Edge(alpha, beta),
-                   Edge(alpha, beta),
-                   Edge(alpha, beta)]
+    positions_B = [Edge(alpha, beta, custom_position=True),
+                   Edge(alpha, beta, custom_position=True),
+                   Edge(alpha, beta, custom_position=True),
+                   Edge(alpha, beta, custom_position=True)]
 
     a, b, c, d = positions_B
 
@@ -48,12 +48,12 @@ class ThreePlusSix(_CageTopology):
 
     a, b, c = positions_A
 
-    positions_B = [Edge(a, b),
-                   Edge(a, b),
-                   Edge(b, c),
-                   Edge(b, c),
-                   Edge(a, c),
-                   Edge(a, c)]
+    positions_B = [Edge(a, b, custom_position=True),
+                   Edge(a, b, custom_position=True),
+                   Edge(b, c, custom_position=True),
+                   Edge(b, c, custom_position=True),
+                   Edge(a, c, custom_position=True),
+                   Edge(a, c, custom_position=True)]
 
     e1, e2, e3, e4, e5, e6 = positions_B
     for e in [e1, e3, e5]:
@@ -79,14 +79,14 @@ class FourPlusEight(_CageTopology):
 
     a, b, c, d = positions_A
 
-    positions_B = [Edge(a, b),
-                   Edge(a, b),
-                   Edge(b, d),
-                   Edge(b, d),
-                   Edge(a, c),
-                   Edge(a, c),
-                   Edge(c, d),
-                   Edge(c, d)]
+    positions_B = [Edge(a, b, custom_position=True),
+                   Edge(a, b, custom_position=True),
+                   Edge(b, d, custom_position=True),
+                   Edge(b, d, custom_position=True),
+                   Edge(a, c, custom_position=True),
+                   Edge(a, c, custom_position=True),
+                   Edge(c, d, custom_position=True),
+                   Edge(c, d, custom_position=True)]
 
     e1, e2, e3, e4, e5, e6, e7, e8 = positions_B
     for e in [e1, e3, e5, e7]:

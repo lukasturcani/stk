@@ -67,9 +67,16 @@ class Vertex:
         An id to identify the vertex. Used by
         :meth:`CageTopology.place_mols`.
 
+    custom_position : :class:`bool`
+        A flag to inidcate if the position of :attr:`coord` was derived
+        from connected vertices or set manually. If the position is
+        derived from the vertices then the position of the building
+        block being placed is derived from the bonder atoms in the
+        conncected vertices.
+
     """
 
-    def __init__(self, x, y, z, id_=None):
+    def __init__(self, x, y, z, id_=None, custom_position=True):
         """
         Initializes a :class:`Vertex`.
 
@@ -87,9 +94,13 @@ class Vertex:
         id : :class:`object`, optional
             An id to identify the vertex.
 
+        custom_position : :class:`bool`, optional
+            See :attr:`custom_position`.
+
         """
 
         self.coord = np.array([x, y, z])
+        self.custom_position = custom_position
         self.connected = []
         self.bonder_ids = []
         self.atom_position_pairs = []
@@ -123,14 +134,19 @@ class Vertex:
 
         # Get the position of this Vertex, as the centroid of the
         # supplied vertices.
-        obj = cls(*centroid(*(v.coord for v in vertices)))
+        obj = cls(*centroid(*(v.coord for v in vertices)),
+                  custom_position=False)
         # Update the `connected` attributes.
         obj.connected.extend(vertices)
         for v in vertices:
             v.connected.append(obj)
         return obj
 
-    def place_mol(self, building_block, aligner=0, aligner_edge=0):
+    def place_mol(self,
+                  building_block,
+                  aligner=0,
+                  aligner_edge=0,
+                  macro_mol=None):
         """
         Place a :class:`.StructUnit3` building block on the vertex.
 
@@ -162,6 +178,12 @@ class Vertex:
             The index of an edge in :attr:`connected`. It is the edge
             with which `aligner` is aligned.
 
+        macro_mol : :class:`.MacroMolecule`, optional
+            The macromolecule being built. Used for vertex only cage
+            topologies where the position of some of the vertices
+            is derived from the positions of the bonder atoms of
+            connceted vertices.
+
         Returns
         -------
         :class:`rdkit.Chem.rdchem.Mol`
@@ -182,7 +204,8 @@ class Vertex:
 
         # Next, define the direction vector going from the edge
         # centroid to the edge with which the atom is aligned.
-        building_block.set_bonder_centroid(self.coord)
+
+        building_block.set_bonder_centroid(self.bonder_centroid(macro_mol))
         vector = (self.connected[aligner_edge].coord -
                   self.edge_centroid())
         # Get the id of the atom which is being aligned.
@@ -318,6 +341,37 @@ class Vertex:
         return (sum(edge.coord for edge in self.connected) /
                 len(self.connected))
 
+    def bonder_centroid(self, macro_mol):
+        """
+        Calculates the centroid of the bonder atoms on the vertex.
+
+        However if :attr:`custom_position` is ``True`` or
+        `macro_mol` is ``None``, then :attr:`coord` is returned.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being built.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The centroid of the bonder atoms.
+
+        """
+
+        if self.custom_position or macro_mol is None:
+            return self.coord
+
+        centroid = np.zeros((3, ))
+        count = 0
+        for v in self.connected:
+            for bonder, edge in v.atom_position_pairs:
+                if edge is self:
+                    centroid += macro_mol.atom_coords(bonder)
+                    count += 1
+        return centroid / count
+
 
 class Edge(Vertex):
     """
@@ -335,7 +389,7 @@ class Edge(Vertex):
 
     """
 
-    def __init__(self, v1, v2, id_=None):
+    def __init__(self, v1, v2, id_=None, custom_position=False):
         """
         Initializes an :class:`Edge` instance.
 
@@ -350,15 +404,22 @@ class Edge(Vertex):
         id_ : :class`str`, optional
             An id for the edge.
 
+        custom_position : :class:`bool`
+            See :attr:`Vertex.custom_position`
+
+
         """
 
-        Vertex.__init__(self, *centroid(v1.coord, v2.coord), id_)
+        Vertex.__init__(self,
+                        *centroid(v1.coord, v2.coord),
+                        id_,
+                        custom_position)
         self.direction = normalize_vector(v1.coord - v2.coord)
         self.connected.extend([v1, v2])
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def place_mol(self, linker, alignment):
+    def place_mol(self, linker, alignment, macro_mol):
         """
         Places a linker molecule on the coordinates of an edge.
 
@@ -376,6 +437,9 @@ class Edge(Vertex):
             ``1`` for parallel alignment with :attr:`direction` and
             ``-1`` for anti-parallel alignment with :attr:`direction`.
 
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being constructed.
+
         Returns
         -------
         :class:`rdkit.Chem.rdchem.Mol`
@@ -388,15 +452,10 @@ class Edge(Vertex):
         # Flush the lists from data of previous molecules.
         self.distances = []
 
-        # First the centroid of the bonder atoms is placed on the
-        # position of the edge, then the direction of the linker is
-        # aligned with the direction of the edge.
-        linker.set_bonder_centroid(self.coord)
+        # Align then place the linker.
         linker.set_orientation2(self.direction * alignment)
-
-        # Ensure the centroid of the linker is placed on the outside of
-        # the cage.
         linker.minimize_theta2(self.coord, self.direction)
+        linker.set_bonder_centroid(self.bonder_centroid(macro_mol))
 
         return linker.mol
 
@@ -641,7 +700,7 @@ class _CageTopology(Topology):
 
         # Sort the pairings of atoms with potential bonding position,
         # smallest first.
-        distances.sort()
+        distances.sort(key=lambda x: x[0])
 
         # This loop looks at all the potential pairings of atoms to
         # positions. It pairs the shortest combinations of atoms and
@@ -704,7 +763,8 @@ class _CageTopology(Topology):
             aligner_edge = next((position.connected.index(x) for x in
                                  position.connected if
                                  x.id == aligner_edge_id), 0)
-            bb_mol = position.place_mol(bb, int(self.A_alignments[i]),
+            bb_mol = position.place_mol(bb,
+                                        int(self.A_alignments[i]),
                                         aligner_edge)
             add_fragment_props(bb_mol,
                                macro_mol.building_blocks.index(bb),
@@ -735,7 +795,9 @@ class _CageTopology(Topology):
             n_lk = len(lk.functional_group_atoms())
 
             lk.set_position_from_matrix(lk_pos)
-            lk_mol = position.place_mol(lk,  int(self.B_alignments[i]))
+            lk_mol = position.place_mol(lk,
+                                        int(self.B_alignments[i]),
+                                        macro_mol=macro_mol)
             add_fragment_props(lk_mol,
                                macro_mol.building_blocks.index(lk),
                                i)
