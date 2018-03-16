@@ -13,12 +13,11 @@ class TwoPlusThree(_CageTopology):
     A cage topology from 2 and 3 functionalized building blocks.
 
     """
-    positions_A = [Vertex(0, 0, 20), Vertex(0, 0, -20)]
-    a, b = positions_A
+    positions_A = a, b = [Vertex(0, 0, 20), Vertex(0, 0, -20)]
 
-    positions_B = [Edge(a, b), Edge(a, b), Edge(a, b)]
-
-    alpha, beta, gamma = positions_B
+    positions_B = alpha, beta, gamma = [Edge(a, b),
+                                        Edge(a, b),
+                                        Edge(a, b)]
 
     b.edge_plane_normal = lambda a=a: np.multiply(
                                             a.edge_plane_normal(), -1)
@@ -42,7 +41,7 @@ class FourPlusSix(_CageTopology):
 
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    x = 60
+    x = 15
     positions_A = v0, v1, v2, v3 = [
                 Vertex(0, 0, x*np.sqrt(6)/2),
                 Vertex(-x, -x*np.sqrt(3)/3, -x*np.sqrt(6)/6),
@@ -68,10 +67,10 @@ class FourPlusSix2(_CageTopology):
                                 Vertex(100, 0, -100),
                                 Vertex(-100, 0, -100)]
 
-    positions_B = e1, e2, e3, e4, e5, e6 = [Edge(a, b, 'a'),
-                                            Edge(a, b, 'b'),
-                                            Edge(c, d, 'e'),
-                                            Edge(c, d, 'f'),
+    positions_B = e1, e2, e3, e4, e5, e6 = [Edge(a, b, 'a', True),
+                                            Edge(a, b, 'b', True),
+                                            Edge(c, d, 'e', True),
+                                            Edge(c, d, 'f', True),
                                             Edge(a, c, 'd'),
                                             Edge(b, d, 'c')]
 
