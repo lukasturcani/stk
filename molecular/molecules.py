@@ -3123,11 +3123,26 @@ class Periodic(MacroMolecule):
 
     Attributes
     ----------
-    terminator_coords : :class:`dict`
-        The key is an :class:`int` representing the id of a bonder
-        atom. The value is a :class:`numpy.ndarray` which holds the x,
-        y and z coordinates of a deleter atom attached to the bonder.
-        The coordinates are relative to the bonder atom.
+    deleters : :class:`dict`
+        A :class:`dict` of the form
+
+        .. code-block:: python
+
+            {
+                12: [[coord, elem, bond_type],
+                     [coord, elem, bond_type],
+                     [coord, elem, bond_type]],
+
+                45: [[coord, elem, bond_type],
+                     [coord, elem, bond_type],
+                     [coord, elem, bond_type]]
+            }
+
+        The key is an :class:`int` which represents a bonder atom.
+        The value holds the position, element and bond type of
+        every deleter atom removed from that bonder. The position is a
+        :class:`numpy.array`, the element is an :class:`int` and the
+        bond type is an :class:`rdkit.Chem.rdchem.BondType`.
 
     periodic_bonds : :class:`list` of :class:`.PeriodicBond`
         When periodic topologies are assembled, periodic bonds
@@ -3204,7 +3219,7 @@ class Periodic(MacroMolecule):
 
         return True
 
-    def island(self, dimensions, terminator=1, bond_type='1'):
+    def island(self, dimensions):
         """
         Build a terminated supercell.
 
@@ -3234,11 +3249,7 @@ class Periodic(MacroMolecule):
 
         cells, island, bonder_map = self._place_island(dimensions)
         island, bonded = self._join_island(cells, island)
-        return self._terminate_island(island,
-                                      bonded,
-                                      bonder_map,
-                                      terminator,
-                                      bond_dict[bond_type])
+        return self._terminate_island(island, bonded, bonder_map)
 
     def _join_island(self, cells, island):
         """
@@ -3320,8 +3331,7 @@ class Periodic(MacroMolecule):
 
         return emol.GetMol(), bonded
 
-    def _terminate_island(self, island, bonded,
-                          bonder_map, terminator, bond_type):
+    def _terminate_island(self, island, bonded, bonder_map):
         """
         Adds atoms to all bonder atoms at the edges of `island`.
 
@@ -3344,15 +3354,6 @@ class Periodic(MacroMolecule):
             back to the id of the equivalent atom in the original unit
             cell.
 
-        terminator : :class:`int`
-            The atomic number of the terminating atoms added to the
-            supercell.
-
-        bond_type : :class:`str`
-            A string holding the bond type of bonds to the terminating
-            atoms. Valid options include ``'1'``, ``'2'``, ``'3'``
-            and ``'ar'``.
-
         Returns
         -------
         :class:`rdkit.Chem.rdchem.Mol`
@@ -3373,8 +3374,8 @@ class Periodic(MacroMolecule):
             # Get the id of bonder atom in the original unit cell
             # which is equivalent to `atom`.
             bi = bonder_map[atom_id]
-            for rcoords in self.terminator_coords[bi]:
-                tid = emol.AddAtom(rdkit.Atom(terminator))
+            for rcoords, element, bond_type in self.deleters[bi]:
+                tid = emol.AddAtom(rdkit.Atom(element))
                 emol.AddBond(tid, atom_id, bond_type)
 
                 # Using the equivalent bonder atom get the position
@@ -3473,13 +3474,13 @@ periodic._place_island([4, 4, 4])
             pb.atom1 = self.bonder_ids[pb.atom1]
             pb.atom2 = self.bonder_ids[pb.atom2]
 
-        # Update terminator_coords to hold atom ids directly instead
+        # Update deleters to hold atom ids directly instead
         # of indices of the atom ids within `bonder_ids`.
-        terminator_coords = {}
-        for index, coord in self.terminator_coords.items():
+        deleters = {}
+        for index, data in self.deleters.items():
             bonder_id = self.bonder_ids[index]
-            terminator_coords[bonder_id] = coord
-        self.terminator_coords = terminator_coords
+            deleters[bonder_id] = data
+        self.deleters = deleters
 
         self._ids_updated = True
 
