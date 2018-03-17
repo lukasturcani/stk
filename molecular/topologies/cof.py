@@ -498,8 +498,8 @@ class COFLattice(Topology):
         -----
         The parameter `macro_mol` has two attributes changed.
         :attr:`~.MacroMolecule.mol` has deleter atoms removed, while
-        :attr:`~.Periodic.terminator_coords` is updated with the
-        coordinates of every removed atom.
+        :attr:`~.Periodic.deleters` is updated with the
+        coordinates, element type and bond type of every removed atom.
 
         Parameters
         ----------
@@ -516,7 +516,7 @@ class COFLattice(Topology):
         # a neighboring deleter atom. The deleter atom has its
         # coordinates relative to the bonder found and saved in
         # `terminator_coords`.
-        macro_mol.terminator_coords = defaultdict(list)
+        macro_mol.deleters = defaultdict(list)
         for atom in macro_mol.mol.GetAtoms():
             if not atom.HasProp('bonder'):
                 continue
@@ -527,7 +527,11 @@ class COFLattice(Topology):
                 nid = neighbor.GetIdx()
                 tcoords = (macro_mol.atom_coords(nid) -
                            macro_mol.atom_coords(atom.GetIdx()))
-                macro_mol.terminator_coords[bi].append(tcoords)
+
+                bond = macro_mol.mol.GetBondBetweenAtoms(nid, atom.GetIdx())
+                macro_mol.deleters[bi].append([tcoords,
+                                               neighbor.GetAtomicNum(),
+                                               bond.GetBondType()])
 
         super().del_atoms(macro_mol)
         macro_mol._ids_updated = False
