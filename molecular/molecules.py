@@ -3151,7 +3151,7 @@ class Periodic(MacroMolecule):
     def __init__(self, building_blocks, topology, name="", note=""):
         self.periodic_bonds = []
         self._ids_updated = False
-        super().__init__(building_blocks, topology, name="", note="")
+        super().__init__(building_blocks, topology, name, note)
 
     def _is_subterminal(self, atom_id, bonder_map, bonded):
         """
