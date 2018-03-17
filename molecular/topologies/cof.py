@@ -317,12 +317,15 @@ class Edge:
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def place_mol(self, cell_params, mol, alignment):
+    def place_mol(self, macro_mol, cell_params, mol, alignment):
         """
         Places and aligned a building block along the edge.
 
         Parameters
         ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being built.
+
         cell_params : :class:`list` of :class:`numpy.array`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
@@ -340,7 +343,7 @@ class Edge:
 
         """
 
-        coord = self.calc_coord(cell_params)
+        coord = self.bonder_centroid(macro_mol, cell_params)
         original_position = mol.position_matrix()
 
         mol.set_bonder_centroid(coord)
@@ -389,6 +392,36 @@ class Edge:
         for frac, dim in zip(self.frac_coord, cell_params):
             coord += frac * dim
         return coord
+
+    def bonder_centroid(self, macro_mol, cell_params):
+        """
+        The centroid of the bonder molecules connected to the edge.
+
+        So the bonders NOT sitting on the edge itself.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The centroid of the bonder attoms connected to those on the
+            edge.
+
+        """
+
+        coord = np.zeros((3, ))
+        for i, position in enumerate(self.joint_positions):
+            vertex = self.connected[i]
+            bonder = vertex.bonder_map[position]
+            coord += macro_mol.atom_coords(bonder)
+
+        for d, param in zip(self.bond, cell_params):
+            coord += d*param
+
+        return coord / (i+1)
 
     def create_bonder_map(self, macro_mol, cell_params):
         """
@@ -576,7 +609,7 @@ class LinkerCOFLattice(COFLattice):
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
         size = di.max_diameter()[0] + multi.max_diameter()[0]
-        size *= len(self.vertices)+1
+        size *= (len(self.vertices)+1)//1.5
         cell_params = [size*p for p in self.cell_dimensions]
         macro_mol.cell_dimensions = cell_params
 
@@ -598,7 +631,10 @@ class LinkerCOFLattice(COFLattice):
             v.create_bonder_map(macro_mol, cell_params, nbonders, aligner)
 
         for i, e in enumerate(self.edges):
-            mol = e.place_mol(cell_params, di, self.ditopic_directions[i])
+            mol = e.place_mol(macro_mol,
+                              cell_params,
+                              di,
+                              self.ditopic_directions[i])
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(di),
                                i)
