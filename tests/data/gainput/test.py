@@ -1,5 +1,5 @@
 # Import stuff
-from mtk import FunctionData, FourPlusSix
+from stk import FunctionData, FourPlusSix
 
 # #################################################################################
 # Define variables.

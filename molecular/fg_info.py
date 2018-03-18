@@ -3,10 +3,10 @@ Defines :class:`FGInfo` which describes functional groups.
 
 .. _`adding functional groups`:
 
-Extending mtk: Adding  more functional groups.
+Extending stk: Adding  more functional groups.
 ----------------------------------------------
 
-If ``mtk`` is to incorporate a new functional group, a new
+If ``stk`` is to incorporate a new functional group, a new
 :class:``FGInfo`` instance should be added to
 :data:`functional_groups`. This is a :class:`list` defined in this
 module.
@@ -33,7 +33,7 @@ If a new functional group is to connect to another functional group
 with a double bond during assembly, the names of the functional groups
 should be added to :data:`double_bond_combs`. The order in
 which they are placed in the tuple does not matter. Again, this is all
-that needs to be done for ``mtk`` to create double bonds between given
+that needs to be done for ``stk`` to create double bonds between given
 functional groups.
 
 """

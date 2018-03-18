@@ -726,7 +726,7 @@ class Population:
         ----------
         func_data : :class:`.FunctionData`
             Holds the name and arguments of an optimization function
-            defined in :mod:`~mtk.optimization`. The function is used
+            defined in :mod:`.optimization`. The function is used
             to optimize the molecules in the population.
 
         processes : :class:`int`
