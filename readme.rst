@@ -1,4 +1,4 @@
 Documentation
 =============
 
-www.chemthings.com/mtk/index.html
+www.chemthings.com/stk/index.html
