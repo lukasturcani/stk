@@ -15,10 +15,10 @@ in sequence.
 
 .. _`adding normalization functions`:
 
-Extending mtk: Adding normalization functions.
+Extending stk: Adding normalization functions.
 ----------------------------------------------
 
-If a new normalization function is to be added to ``mtk`` it should be
+If a new normalization function is to be added to ``stk`` it should be
 added as a method in :class:`.Normalization`. The only requirements are
 that the first argument is `population` (excluding `self`).
 

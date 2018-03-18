@@ -107,14 +107,14 @@ normalization functions always start from the unscaled fitness value.
 
 .. _`adding fitness functions`:
 
-Extending mtk: Adding fitness functions.
+Extending stk: Adding fitness functions.
 ----------------------------------------
 
 To add a new fitness function simply write it as a function in this
 module. It will need to take the :class:`.MacroMolecule` instance as
 its first argument and this argument should be called `macro_mol`. The
 purpose of this is to help users identify which arguments are handled
-automatically by ``mtk`` and which they need to define in the input
+automatically by ``stk`` and which they need to define in the input
 file. The convention is that if the fitness function takes an argument
 called `macro_mol`, they do not have to specify that argument in the
 input file.

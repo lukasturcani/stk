@@ -1,9 +1,9 @@
-.. mtk documentation master file, created by
+.. stk documentation master file, created by
    sphinx-quickstart on Mon Nov 13 11:15:04 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ``mtk``'s documentation!
+Welcome to ``stk``'s documentation!
 ===================================
 
 .. toctree::
@@ -13,7 +13,7 @@ Welcome to ``mtk``'s documentation!
 Overview
 --------
 
-``mtk`` is a Python 3 library for building, manipulating, optimizing
+``stk`` is a Python 3 library for building, manipulating, optimizing
 and designing molecules.
 
 Basic Examples
@@ -22,7 +22,7 @@ Basic Examples
 Linear Polymer
 ..............
 
-The core function of ``mtk`` is to assemble molecules. Here is an example
+The core function of ``stk`` is to assemble molecules. Here is an example
 of how a simple, linear polymer can be built. Starting with three monomers,
 such as
 
@@ -220,11 +220,11 @@ Other COF topologies are available in :mod:`.topologies.cof`. For example:
 Other Materials
 ...............
 
-``mtk`` is a work in progress and currently supports only the above classes
-of materials out of the box. However, ``mtk`` was designed to be easy
+``stk`` is a work in progress and currently supports only the above classes
+of materials out of the box. However, ``stk`` was designed to be easy
 extend to other classes of molecules.
 For a guide on how this can be done
-see, :ref:`extending mtk`.
+see, :ref:`extending stk`.
 
 
 Other Features
@@ -233,7 +233,7 @@ Other Features
 Calculating Molecular Properties
 ................................
 
-``mtk`` provides a variety of methods to calculate molecular properties.
+``stk`` provides a variety of methods to calculate molecular properties.
 What methods can be used depends on what kind of molecule object is created.
 All molecules can use methods defined in :class:`.Molecule`. All
 building blocks can use methods in :class:`.StructUnit` in addition to this.
@@ -263,7 +263,7 @@ Here are some examples:
 Geometric Manipulations
 .......................
 
-In addition to molecular property calculation, ``mtk`` provides tools to
+In addition to molecular property calculation, ``stk`` provides tools to
 rotate and translate molecules. These tools are particularly useful when
 defining the assembly process of a new class of molecules.
 
@@ -321,32 +321,33 @@ your cages:
 Automated Molecular Design with Genetic Algorithms
 ..................................................
 
-Via the :mod:`.ga` module, ``mtk`` includes a genetic algorithm which
+Via the :mod:`.ga` module, ``stk`` includes a genetic algorithm which
 can be used to evolve molecules that fulfil user defined design criteria.
 The genetic algorithm can be run from the command line using::
 
-    $ python -m mtk input_file.py
+    $ python -m stk input_file.py
 
 The input file is a simple python script which defines the mutation,
 crossover, selection and other functions the genetic algorithm
 should use. For details on how to build and input file see :class:`.GAInput`.
 
-The genetic algorithm automatically works with any molecules that ``mtk``
+The genetic algorithm automatically works with any molecules that ``stk``
 can construct, just make sure you define an appropriate fitness function.
 
-.. _`extending mtk`:
+.. _`extending stk`:
 
-Extending ``mtk``
+Extending ``stk``
 -----------------
 
-Each module of mtk has its own guidelines for adding new functionality.
-However, in almost all cases adding new features to ``mtk`` only involves
+Each module of ``stk`` has its own guidelines for adding new functionality.
+However, in almost all cases adding new features to ``stk`` only involves
 defining a simple function in the appropriate module or a method in the
 appropriate class.
 
     * :ref:`adding macromolecules`
     * :ref:`adding topologies`
     * :ref:`adding functional groups`
+    * :ref:`adding optimization functions`
     * :ref:`adding energy functions`
     * :ref:`adding mutation functions`
     * :ref:`adding crossover functions`

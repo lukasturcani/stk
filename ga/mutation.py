@@ -3,16 +3,16 @@ Defines mutation operations via the :class:`Mutation` class.
 
 .. _`adding mutation functions`:
 
-Extending mtk: Adding mutation functions.
+Extending stk: Adding mutation functions.
 -----------------------------------------
 
-If a new mutation operation is to be added to ``mtk`` it should be
+If a new mutation operation is to be added to ``stk`` it should be
 added as a method in the :class:`Mutation` class defined in this
 module. The only requirement is that the first argument is `macro_mol`,
 excluding any `self` or `cls` arguments.
 
 The naming requirement of `macro_mol` exists to help users identify
-which arguments are handled automatically by ``mtk`` and which they
+which arguments are handled automatically by ``stk`` and which they
 need to define in the input file. The convention is that if the
 mutation function takes an argument called  `macro_mol` it does not
 have to be specified in the input file.

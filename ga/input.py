@@ -20,7 +20,7 @@ class GAInput:
     """
     A class for reading a GA's input file.
 
-    An ``mtk`` input file is a Python script. The script must define a
+    An ``stk`` input file is a Python script. The script must define a
     set of variables. Each variable defines a parameter or a function
     used by the GA. If the variable defines a function, it must also
     define any parameters necessary to use the function. It does
@@ -115,7 +115,7 @@ class GAInput:
 
     opt_func : :class:`dict`
         This must define the parameters of a function defined in
-        :mod:`~mtk.optimization`. This will be the function used to
+        :mod:`.optimization`. This will be the function used to
         optimize the structures of the molecules.
 
     fitness_func : :class:`dict`

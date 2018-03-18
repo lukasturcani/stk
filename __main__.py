@@ -362,7 +362,7 @@ def ga_run(ga_input):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='python -m mtk')
+    parser = argparse.ArgumentParser(prog='python -m stk')
 
     parser.add_argument('input_file', type=str)
     parser.add_argument('-l', '--loops', type=int, default=1,

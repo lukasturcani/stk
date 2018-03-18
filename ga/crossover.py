@@ -3,10 +3,10 @@ Defines crossover operations via the :class:`Crossover` class.
 
 .. _`adding crossover functions`:
 
-Extending mtk: Adding crossover functions.
+Extending stk: Adding crossover functions.
 ------------------------------------------
 
-If a new crossover operation is to be added to ``mtk`` it should be
+If a new crossover operation is to be added to ``stk`` it should be
 added as a method in the :class:`Crossover` class defined in this
 module. The only requirements are that the first two arguments are
 `macro_mol1` and `macro_mol2` (excluding `self` or `cls`) and that any
@@ -14,7 +14,7 @@ offspring are returned in a :class:`.GAPopulation` instance.
 
 The naming requirement of `macro_mol1` and `macro_mol2` exists to
 help users identify which arguments are handled automatically by
-``mtk`` and which they need to define in the input file. The convention
+``stk`` and which they need to define in the input file. The convention
 is that if the crossover function takes arguments called  `macro_mol1`
 and `macro_mol2` they do not have to be specified in the input file.
 

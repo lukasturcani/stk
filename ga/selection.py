@@ -3,10 +3,10 @@ Defines selection functions via :class:`Selection`.
 
 .. _`adding selection functions`:
 
-Extending mtk: Adding selection functions.
+Extending stk: Adding selection functions.
 ------------------------------------------
 
-If a new selection operation is to be added to ``mtk`` it should be
+If a new selection operation is to be added to ``stk`` it should be
 added as a method in :class:`Selection`. The only requirements are
 that the first argument is `population` (excluding any `self` or `cls`
 arguments).

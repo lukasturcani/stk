@@ -9,7 +9,7 @@ The functions are defined as methods in the :class:`Exit`.
 
 .. _`adding exit functions`:
 
-Extending mtk: Adding exit functions.
+Extending stk: Adding exit functions.
 -------------------------------------
 
 The only requirement is that the methods take `population` as their
@@ -18,7 +18,7 @@ second. They must return ``True`` if the exit criterion has been
 satisfied and ``False`` otherwise. The naming requirement of the first
 two arguments exists to help users identify which arguments they need
 to define in the input file and which are handeled automatically by
-``mtk``. The arguments `population` and `progress` are automatically
+``stk``. The arguments `population` and `progress` are automatically
 provided when the GA is run. They hold a :class:`.GAPopulation` instance
 holding the current generation and a :class:`.GAPopulation` instance
 holding every previous generation in a subpopulation, respectively.
