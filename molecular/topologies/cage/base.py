@@ -143,6 +143,7 @@ class Vertex:
         return obj
 
     def place_mol(self,
+                  scale,
                   building_block,
                   aligner=0,
                   aligner_edge=0,
@@ -166,6 +167,9 @@ class Vertex:
 
         Parameters
         ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
+
         building_block : :class:`.StructUnit3`
             The building block molecule to be placed on a vertex.
 
@@ -200,30 +204,36 @@ class Vertex:
         # to the normal of the edge plane. This means the bulk of the
         # building block is always pointed away from the center of the
         # molecule.
-        building_block.set_orientation2(self.edge_plane_normal())
+        building_block.set_orientation2(self.edge_plane_normal(scale))
 
         # Next, define the direction vector going from the edge
         # centroid to the edge with which the atom is aligned.
 
-        building_block.set_bonder_centroid(self.bonder_centroid(macro_mol))
-        vector = (self.connected[aligner_edge].coord -
-                  self.edge_centroid())
+        building_block.set_bonder_centroid(
+                            self.bonder_centroid(macro_mol, scale))
+        vector = (self.connected[aligner_edge].coord*scale -
+                  self.edge_centroid(scale))
         # Get the id of the atom which is being aligned.
         atom = building_block.bonder_ids[aligner]
         # Minimize the angle between these things by rotating about the
         # normal of the edge plane.
         building_block.minimize_theta2(atom,
                                        vector,
-                                       self.edge_plane_normal())
+                                       self.edge_plane_normal(scale))
 
         return building_block.mol
 
-    def edge_plane_normal(self):
+    def edge_plane_normal(self, scale):
         """
         Return the normal of the plane formed by the connected edges.
 
         The normal is set such that it always points away from the
         origin.
+
+        Parameters
+        ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
 
         Returns
         -------
@@ -233,7 +243,7 @@ class Vertex:
 
         """
         # Get two of the direction vectors running between the edges.
-        v1, v2 = itertools.islice(self.edge_direction_vectors(), 2)
+        v1, v2 = itertools.islice(self.edge_direction_vectors(scale), 2)
         # To get the normal to the plane get the cross product of these
         # vectors. Normalize it.
         normal = normalize_vector(np.cross(v1, v2))
@@ -249,14 +259,14 @@ class Vertex:
         # directions. If this is the case make sure to multiply the
         # nomral by -1 in all axes so that it points in the correct
         # direction while still acting as the normal to the plane.
-        theta = vector_theta(normal, self.connected[0].coord)
+        theta = vector_theta(normal, self.connected[0].coord*scale)
 
         if theta > np.pi/2:
             normal *= -1
 
         return normal
 
-    def edge_plane(self):
+    def edge_plane(self, scale):
         """
         Return coefficients of plane of edges connected to the vertex.
 
@@ -274,6 +284,11 @@ class Vertex:
         the coordinate of some point on the plane. For example, the
         position of one of the connected edges.
 
+        Parameters
+        ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
+
         Returns
         -------
         :class:`numpy.array`
@@ -286,13 +301,18 @@ class Vertex:
 
         """
 
-        edge_coord = self.edges[0].coord
-        d = -np.sum(self.edge_plane_normal() * edge_coord)
-        return np.append(self.edge_plane_normal(), d)
+        edge_coord = self.edges[0].coord*scale
+        d = -np.sum(self.edge_plane_normal(scale) * edge_coord)
+        return np.append(self.edge_plane_normal(scale), d)
 
-    def edge_direction_vectors(self):
+    def edge_direction_vectors(self, scale):
         """
         Yields direction vectors between edges connected to the vertex.
+
+        Paramters
+        ---------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
 
         Yields
         ------
@@ -303,11 +323,16 @@ class Vertex:
         """
 
         for edge1, edge2 in itertools.combinations(self.connected, 2):
-            yield normalize_vector(edge1.coord-edge2.coord)
+            yield normalize_vector(scale*(edge1.coord-edge2.coord))
 
-    def edge_coord_matrix(self):
+    def edge_coord_matrix(self, scale):
         """
         Return matrix holding coords of edges joined to the vertex.
+
+        Parameters
+        ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
 
         Returns
         -------
@@ -320,12 +345,17 @@ class Vertex:
 
         coords = []
         for edge in self.connected:
-            coords.append(edge.coord)
+            coords.append(edge.coord*scale)
         return np.matrix(coords)
 
-    def edge_centroid(self):
+    def edge_centroid(self, scale):
         """
         Returns the centroid of the edges connected to the vertex.
+
+        Parameters
+        ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
 
         Returns
         -------
@@ -338,10 +368,10 @@ class Vertex:
         # The connected edges are held in the `edges`. To get the
         # centroid, add up all the x, y and z coordinates (separately)
         # and divide each sum by the number of edges.
-        return (sum(edge.coord for edge in self.connected) /
+        return (sum(edge.coord*scale for edge in self.connected) /
                 len(self.connected))
 
-    def bonder_centroid(self, macro_mol):
+    def bonder_centroid(self, macro_mol, scale):
         """
         Calculates the centroid of the bonder atoms on the vertex.
 
@@ -353,6 +383,9 @@ class Vertex:
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being built.
 
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
+
         Returns
         -------
         :class:`numpy.array`
@@ -361,7 +394,7 @@ class Vertex:
         """
 
         if self.custom_position or macro_mol is None:
-            return self.coord
+            return self.coord*scale
 
         centroid = np.zeros((3, ))
         count = 0
@@ -419,7 +452,7 @@ class Edge(Vertex):
         v1.connected.append(self)
         v2.connected.append(self)
 
-    def place_mol(self, linker, alignment, macro_mol):
+    def place_mol(self, scale, linker, alignment, macro_mol):
         """
         Places a linker molecule on the coordinates of an edge.
 
@@ -429,6 +462,9 @@ class Edge(Vertex):
 
         Parameters
         ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
+
         linker : :class:`.StructUnit2`
             The linker which is to be placed and orientated as
             described in the docstring.
@@ -454,8 +490,8 @@ class Edge(Vertex):
 
         # Align then place the linker.
         linker.set_orientation2(self.direction * alignment)
-        linker.minimize_theta2(self.coord, self.direction)
-        linker.set_bonder_centroid(self.bonder_centroid(macro_mol))
+        linker.minimize_theta2(self.coord*scale, self.direction)
+        linker.set_bonder_centroid(self.bonder_centroid(macro_mol, scale))
 
         return linker.mol
 
@@ -660,7 +696,7 @@ class _CageTopology(Topology):
 
         macro_mol.mol = editable_mol.GetMol()
 
-    def pair_bonders_with_positions(self, macro_mol, vertex):
+    def pair_bonders_with_positions(self, scale, macro_mol, vertex):
         """
         Matches atoms with the closest building block position.
 
@@ -675,6 +711,9 @@ class _CageTopology(Topology):
 
         Parameters
         ----------
+        scale : :class:`float`
+            The amount by which the size of the topology is scaled.
+
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being buit.
 
@@ -695,7 +734,7 @@ class _CageTopology(Topology):
         for bonder_id in vertex.bonder_ids:
             atom_coord = macro_mol.atom_coords(bonder_id)
             for position in vertex.connected:
-                distance = euclidean(atom_coord, position.coord)
+                distance = euclidean(atom_coord, position.coord*scale)
                 distances.append((distance, bonder_id, position))
 
         # Sort the pairings of atoms with potential bonding position,
@@ -740,7 +779,7 @@ class _CageTopology(Topology):
 
         macro_mol.mol = rdkit.Mol()
         bb_map, lk_map = self._bb_maps(macro_mol)
-
+        scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
         # Save the original orientationss of building blocks.
         # This means that when orienation of molecules is done,
         # the starting position is always the same. Ensures
@@ -763,7 +802,8 @@ class _CageTopology(Topology):
             aligner_edge = next((position.connected.index(x) for x in
                                  position.connected if
                                  x.id == aligner_edge_id), 0)
-            bb_mol = position.place_mol(bb,
+            bb_mol = position.place_mol(scale,
+                                        bb,
                                         int(self.A_alignments[i]),
                                         aligner_edge)
             add_fragment_props(bb_mol,
@@ -783,7 +823,7 @@ class _CageTopology(Topology):
             # Save the ids of atoms which form new bonds and pair them
             # up with positions.
             position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(macro_mol, position)
+            self.pair_bonders_with_positions(scale, macro_mol, position)
 
         # This loop places all linkers on the points at `positions_B`.
         # It then saves all atoms which form a new bond to the position
@@ -795,7 +835,8 @@ class _CageTopology(Topology):
             n_lk = len(lk.functional_group_atoms())
 
             lk.set_position_from_matrix(lk_pos)
-            lk_mol = position.place_mol(lk,
+            lk_mol = position.place_mol(scale,
+                                        lk,
                                         int(self.B_alignments[i]),
                                         macro_mol=macro_mol)
             add_fragment_props(lk_mol,
@@ -855,6 +896,7 @@ class _NoLinkerCageTopology(_CageTopology):
     def place_mols(self, macro_mol):
 
         macro_mol.mol = rdkit.Mol()
+        scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
 
         for position, orientation, bb_index in zip(self.positions_A,
                                                    self.alignments,
@@ -868,7 +910,7 @@ class _NoLinkerCageTopology(_CageTopology):
 
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                                               position.place_mol(
-                                                bb, int(orientation)))
+                                                scale, bb, int(orientation)))
             macro_mol.bb_counter.update([bb])
 
             bonder_ids = deque(maxlen=n_bb)
@@ -877,7 +919,7 @@ class _NoLinkerCageTopology(_CageTopology):
                     bonder_ids.append(atom.GetIdx())
 
             position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(macro_mol, position)
+            self.pair_bonders_with_positions(scale, macro_mol, position)
             bb.set_position_from_matrix(ipos)
 
     @classmethod

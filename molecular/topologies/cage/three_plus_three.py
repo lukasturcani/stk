@@ -15,16 +15,17 @@ class OnePlusOne(_NoLinkerCageTopology):
 
     """
 
-    positions_A = [Vertex(25, 0, 0),
-                   Vertex(-25, 0, 0)]
+    x = 1
+    positions_A = [Vertex(x, 0, 0),
+                   Vertex(-x, 0, 0)]
     a, b = positions_A
     connections = [(a, b)]
 
-    a.edge_plane_normal = lambda: np.array([1, 0, 0])
-    b.edge_plane_normal = lambda: np.array([-1, 0, 0])
+    a.edge_plane_normal = lambda scale: scale*np.array([1, 0, 0])
+    b.edge_plane_normal = lambda scale: scale*np.array([-1, 0, 0])
 
-    a.edge_centroid = lambda: np.array([0, 0, 0])
-    b.edge_centroid = lambda: np.array([0, 0, 0])
+    a.edge_centroid = lambda scale: scale*np.array([0, 0, 0])
+    b.edge_centroid = lambda scale: scale*np.array([0, 0, 0])
 
     n_windows = 3
     n_window_types = 1
@@ -74,16 +75,17 @@ class TwoPlusTwo(_NoLinkerCageTopology):
 
     """
 
-    positions_A = [Vertex(50, 0, -50/np.sqrt(2)),
-                   Vertex(-50, 0, -50/np.sqrt(2)),
-                   Vertex(0, 50, 50/np.sqrt(2)),
-                   Vertex(0, -50, 50/np.sqrt(2))]
+    x = 1
+    positions_A = [Vertex(x, 0, -x/np.sqrt(2)),
+                   Vertex(-x, 0, -x/np.sqrt(2)),
+                   Vertex(0, x, x/np.sqrt(2)),
+                   Vertex(0, -x, x/np.sqrt(2))]
 
     a, b, c, d = positions_A
 
     for x in positions_A:
         old_normal = x.edge_plane_normal
-        x.edge_plane_normal = lambda a=old_normal: np.multiply(a(), -1)
+        x.edge_plane_normal = lambda scale, a=old_normal: -1*a(scale)
 
     connections = [(a, b), (a, c), (a, d),
                    (b, c), (b, d),
@@ -99,15 +101,16 @@ class FourPlusFour(_NoLinkerCageTopology):
 
     """
 
-    positions_A = [Vertex(-50, 50, -50),
-                   Vertex(-50, -50, -50),
-                   Vertex(50, 50, -50),
-                   Vertex(50, -50, -50),
+    x = 1
+    positions_A = [Vertex(-x, x, -x),
+                   Vertex(-x, -x, -x),
+                   Vertex(x, x, -x),
+                   Vertex(x, -x, -x),
 
-                   Vertex(-50, 50, 50),
-                   Vertex(-50, -50, 50),
-                   Vertex(50, 50, 50),
-                   Vertex(50, -50, 50)]
+                   Vertex(-x, x, x),
+                   Vertex(-x, -x, x),
+                   Vertex(x, x, x),
+                   Vertex(x, -x, x)]
 
     a, b, c, d, e, f, g, h = positions_A
 
