@@ -349,15 +349,13 @@ and z coordinates, respectively.</td>
 <dt id="mtk.molecular.topologies.cage.base.Vertex.edge_direction_vectors">
 <code class="descname">edge_direction_vectors</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cage/base.html#Vertex.edge_direction_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cage.base.Vertex.edge_direction_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields direction vectors between edges connected to the vertex.</p>
-<dl class="docutils">
-<dt>scale <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></span></dt>
-<dd>The amount by which the size of the topology is scaled.</dd>
-</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code> – A normalized direction vector running from one edge
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> (<code class="xref py py-class docutils literal"><span class="pre">float</span></code>) – The amount by which the size of the topology is scaled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code> – A normalized direction vector running from one edge
 connected to the vertex to another.</td>
 </tr>
 </tbody>
