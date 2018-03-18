@@ -13,18 +13,18 @@ class TwoPlusThree(_CageTopology):
     A cage topology from 2 and 3 functionalized building blocks.
 
     """
-    positions_A = a, b = [Vertex(0, 0, 20), Vertex(0, 0, -20)]
+    positions_A = a, b = [Vertex(0, 0, 1), Vertex(0, 0, -1)]
 
     positions_B = alpha, beta, gamma = [Edge(a, b),
                                         Edge(a, b),
                                         Edge(a, b)]
 
-    b.edge_plane_normal = lambda a=a: np.multiply(
-                                            a.edge_plane_normal(), -1)
+    b.edge_plane_normal = lambda scale, a=a: np.multiply(
+                                            a.edge_plane_normal(scale), -1)
 
-    alpha.coord = np.array([-20, -10*np.sqrt(3), 0])
-    beta.coord = np.array([20, -10*np.sqrt(3), 0])
-    gamma.coord = np.array([0, 10*np.sqrt(3), 0])
+    alpha.coord = np.array([-1, -0.5*np.sqrt(3), 0])
+    beta.coord = np.array([1, -0.5*np.sqrt(3), 0])
+    gamma.coord = np.array([0, 0.5*np.sqrt(3), 0])
 
     n_windows = 3
     n_window_types = 1
@@ -41,12 +41,11 @@ class FourPlusSix(_CageTopology):
 
     # Vertices of a tetrahdron so that origin is at the origin. Source:
     # http://tinyurl.com/lc262h8.
-    x = 15
     positions_A = v0, v1, v2, v3 = [
-                Vertex(0, 0, x*np.sqrt(6)/2),
-                Vertex(-x, -x*np.sqrt(3)/3, -x*np.sqrt(6)/6),
-                Vertex(x, -x*np.sqrt(3)/3, -x*np.sqrt(6)/6),
-                Vertex(0, 2*x*np.sqrt(3)/3, -x*np.sqrt(6)/6)]
+                Vertex(0, 0, np.sqrt(6)/2),
+                Vertex(-1, -np.sqrt(3)/3, -np.sqrt(6)/6),
+                Vertex(1, -np.sqrt(3)/3, -np.sqrt(6)/6),
+                Vertex(0, 2*np.sqrt(3)/3, -np.sqrt(6)/6)]
 
     positions_B = [Edge(v0, v1, (0, 1)), Edge(v0, v2, (0, 2)),
                    Edge(v0, v3, (0, 3)), Edge(v1, v2, (1, 2)),
@@ -62,10 +61,10 @@ class FourPlusSix2(_CageTopology):
 
     """
 
-    positions_A = a, b, c, d = [Vertex(100, 0, 100),
-                                Vertex(-100, 0, 100),
-                                Vertex(100, 0, -100),
-                                Vertex(-100, 0, -100)]
+    positions_A = a, b, c, d = [Vertex(1, 0, 1),
+                                Vertex(-1, 0, 1),
+                                Vertex(1, 0, -1),
+                                Vertex(-1, 0, -1)]
 
     positions_B = e1, e2, e3, e4, e5, e6 = [Edge(a, b, 'a', True),
                                             Edge(a, b, 'b', True),
@@ -74,10 +73,10 @@ class FourPlusSix2(_CageTopology):
                                             Edge(a, c, 'd'),
                                             Edge(b, d, 'c')]
 
-    e1.coord = np.array([0, -100, 100])
-    e2.coord = np.array([0, 100, 100])
-    e3.coord = np.array([0, -100, -100])
-    e4.coord = np.array([0, 100, -100])
+    e1.coord = np.array([0, -1, 1])
+    e2.coord = np.array([0, 1, 1])
+    e3.coord = np.array([0, -1, -1])
+    e4.coord = np.array([0, 1, -1])
 
 
 class SixPlusNine(_CageTopology):
@@ -87,12 +86,12 @@ class SixPlusNine(_CageTopology):
     """
 
     # source: http://eusebeia.dyndns.org/4d/prism3
-    positions_A = [Vertex(-50, -50/np.sqrt(3), -50),
-                   Vertex(-50, -50/np.sqrt(3), 50),
-                   Vertex(50, -50/np.sqrt(3), -50),
-                   Vertex(50, -50/np.sqrt(3), 50),
-                   Vertex(0, 100/np.sqrt(3), -50),
-                   Vertex(0, 100/np.sqrt(3), 50)]
+    positions_A = [Vertex(-1, -1/np.sqrt(3), -1),
+                   Vertex(-1, -1/np.sqrt(3), 1),
+                   Vertex(1, -1/np.sqrt(3), -1),
+                   Vertex(1, -1/np.sqrt(3), 1),
+                   Vertex(0, 2/np.sqrt(3), -1),
+                   Vertex(0, 2/np.sqrt(3), 1)]
 
     a, b, c, d, e, f = positions_A
 
@@ -116,15 +115,15 @@ class EightPlusTwelve(_CageTopology):
 
     """
 
-    positions_A = [Vertex(-50, 50, -50),
-                   Vertex(-50, -50, -50),
-                   Vertex(50, 50, -50),
-                   Vertex(50, -50, -50),
+    positions_A = [Vertex(-1, 1, -1),
+                   Vertex(-1, -1, -1),
+                   Vertex(1, 1, -1),
+                   Vertex(1, -1, -1),
 
-                   Vertex(-50, 50, 50),
-                   Vertex(-50, -50, 50),
-                   Vertex(50, 50, 50),
-                   Vertex(50, -50, 50)]
+                   Vertex(-1, 1, 1),
+                   Vertex(-1, -1, 1),
+                   Vertex(1, 1, 1),
+                   Vertex(1, -1, 1)]
 
     a, b, c, d, e, f, g, h = positions_A
 
@@ -156,7 +155,7 @@ class Dodecahedron(_CageTopology):
 
     # Source: http://tinyurl.com/h2dl949
     phi = (1 + np.sqrt(5))/2
-    x = 50
+    x = 1.5
     positions_A = [Vertex(x*phi, 0.0, x/phi),
                    Vertex(x*-phi, 0.0, x/phi),
                    Vertex(x*-phi, 0.0, x/-phi),

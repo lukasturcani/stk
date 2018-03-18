@@ -11,14 +11,14 @@ class SixPlusEight(_VertexOnlyCageTopology):
     A cage topology of 3 and 4 functional group building blocks.
 
     """
+    x = 1
+    positions_A = [Vertex(-x, x, 0),
+                   Vertex(-x, -x, 0),
+                   Vertex(x, x, 0),
+                   Vertex(x, -x, 0),
 
-    positions_A = [Vertex(-50, 50, 0),
-                   Vertex(-50, -50, 0),
-                   Vertex(50, 50, 0),
-                   Vertex(50, -50, 0),
-
-                   Vertex(0, 0, 50),
-                   Vertex(0, 0, -50)]
+                   Vertex(0, 0, x),
+                   Vertex(0, 0, -x)]
 
     a, b, c, d, e, f = positions_A
 
