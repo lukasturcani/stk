@@ -161,11 +161,11 @@ function:
     macromodel_opt(cage2, '/opt/schrodinger2017-4')
     macromodel_opt(cage3, '/opt/schrodinger2017-4')
 
-.. image:: figures/cages_opt.jpg
+.. image:: figures/cages_opt.png
 
 In this case the function :func:`.macromodel_opt` was used. We could have
-used :func:`rdkit_ETKDG` again but chances are the structures would
-have been optimized quite poorly. The :func:`macromodel_opt` function
+used :func:`.rdkit_ETKDG` again but chances are the structures would
+have been optimized quite poorly. The :func:`.macromodel_opt` function
 requires a valid ``MacroModel`` installation with a working license.
 The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 
@@ -177,9 +177,9 @@ construct:
 
 .. code-block:: python
 
-    bb1 = StructUnit3('cof_bb1.mol', 'bromine')
-    bb2 = StructUnit3('cof_bb2.mol', 'bromine'))
-    cof = Periodic([bb1, bb2], Hexagonal())
+    bb1 = StructUnit2('cof_bb1.mol', 'amine')
+    bb2 = StructUnit3('cof_bb2.mol', 'aldehyde'))
+    cof = Periodic([bb1, bb2], Honeycomb())
 
 Where the buliding blocks are:
 
@@ -189,7 +189,7 @@ The same pattern is used. First building blocks objects are created using
 :class:`StructUnit3` instances. Then a molecule is assembled by creating
 an instance of its class, in this case :class:`.Periodic`. The molecule
 being assembled is provided with the building blocks and the topology,
-in this case :class:`.Hexagonal`.
+in this case :class:`.Honeycomb`.
 
 Because COFs are periodic structures, if we want to make a finite size
 molecule we have to create an "island":
@@ -198,10 +198,24 @@ molecule we have to create an "island":
 
     cof.island([5, 5, 1])
 
-Here we created create a 5 by 5 by 1 grid of the periodic unit cell and
-terminated the periodic bonds with hydrogen atoms. This is our structure:
+Here we created create a 5 by 5 by 1 grid of the periodic unit cell.
+This is a cut-out of our structure:
 
-.. image:: figures/cof.png
+.. image:: figures/honey.png
+
+Other COF topologies are available in :mod:`.topologies.cof`. For example:
+
+:class:`.Hexagonal`
+
+.. image:: figures/hex.png
+
+:class:`.Square`
+
+.. image:: figures/square.png
+
+:class:`.Kagome`
+
+.. image:: figures/kagome.png
 
 Other Materials
 ...............

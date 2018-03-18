@@ -282,10 +282,10 @@ function:</p>
 <span class="n">macromodel_opt</span><span class="p">(</span><span class="n">cage3</span><span class="p">,</span> <span class="s1">&#39;/opt/schrodinger2017-4&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/cages_opt.jpg" src="_images/cages_opt.jpg" />
+<img alt="_images/cages_opt.png" src="_images/cages_opt.png" />
 <p>In this case the function <a class="reference internal" href="mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_opt" title="mtk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code></a> was used. We could have
-used <code class="xref py py-func docutils literal"><span class="pre">rdkit_ETKDG()</span></code> again but chances are the structures would
-have been optimized quite poorly. The <code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code> function
+used <a class="reference internal" href="mtk.optimization.optimization.html#mtk.optimization.optimization.rdkit_ETKDG" title="mtk.optimization.optimization.rdkit_ETKDG"><code class="xref py py-func docutils literal"><span class="pre">rdkit_ETKDG()</span></code></a> again but chances are the structures would
+have been optimized quite poorly. The <a class="reference internal" href="mtk.optimization.macromodel.html#mtk.optimization.macromodel.macromodel_opt" title="mtk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code></a> function
 requires a valid <code class="docutils literal"><span class="pre">MacroModel</span></code> installation with a working license.
 The argument <code class="docutils literal"><span class="pre">'/opt/schrodinger2017-4'</span></code> is the path to the installation.</p>
 </div>
@@ -293,9 +293,9 @@ The argument <code class="docutils literal"><span class="pre">'/opt/schrodinger2
 <h3>Covalent Organic Frameworks<a class="headerlink" href="#covalent-organic-frameworks" title="Permalink to this headline">¶</a></h3>
 <p>Just like the other molecules, covalent organic frameworks (COFs) are easy to
 construct:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;cof_bb1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">)</span>
-<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;cof_bb2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;bromine&#39;</span><span class="p">))</span>
-<span class="n">cof</span> <span class="o">=</span> <span class="n">Periodic</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Hexagonal</span><span class="p">())</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;cof_bb1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;cof_bb2.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">))</span>
+<span class="n">cof</span> <span class="o">=</span> <span class="n">Periodic</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">Honeycomb</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>Where the buliding blocks are:</p>
@@ -304,15 +304,22 @@ construct:</p>
 <code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code> instances. Then a molecule is assembled by creating
 an instance of its class, in this case <a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic" title="mtk.molecular.molecules.Periodic"><code class="xref py py-class docutils literal"><span class="pre">Periodic</span></code></a>. The molecule
 being assembled is provided with the building blocks and the topology,
-in this case <a class="reference internal" href="mtk.molecular.topologies.cof.html#mtk.molecular.topologies.cof.Hexagonal" title="mtk.molecular.topologies.cof.Hexagonal"><code class="xref py py-class docutils literal"><span class="pre">Hexagonal</span></code></a>.</p>
+in this case <a class="reference internal" href="mtk.molecular.topologies.cof.html#mtk.molecular.topologies.cof.Honeycomb" title="mtk.molecular.topologies.cof.Honeycomb"><code class="xref py py-class docutils literal"><span class="pre">Honeycomb</span></code></a>.</p>
 <p>Because COFs are periodic structures, if we want to make a finite size
 molecule we have to create an “island”:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cof</span><span class="o">.</span><span class="n">island</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Here we created create a 5 by 5 by 1 grid of the periodic unit cell and
-terminated the periodic bonds with hydrogen atoms. This is our structure:</p>
-<img alt="_images/cof.png" src="_images/cof.png" />
+<p>Here we created create a 5 by 5 by 1 grid of the periodic unit cell.
+This is a cut-out of our structure:</p>
+<img alt="_images/honey.png" src="_images/honey.png" />
+<p>Other COF topologies are available in <a class="reference internal" href="mtk.molecular.topologies.cof.html#module-mtk.molecular.topologies.cof" title="mtk.molecular.topologies.cof"><code class="xref py py-mod docutils literal"><span class="pre">topologies.cof</span></code></a>. For example:</p>
+<p><a class="reference internal" href="mtk.molecular.topologies.cof.html#mtk.molecular.topologies.cof.Hexagonal" title="mtk.molecular.topologies.cof.Hexagonal"><code class="xref py py-class docutils literal"><span class="pre">Hexagonal</span></code></a></p>
+<img alt="_images/hex.png" src="_images/hex.png" />
+<p><a class="reference internal" href="mtk.molecular.topologies.cof.html#mtk.molecular.topologies.cof.Square" title="mtk.molecular.topologies.cof.Square"><code class="xref py py-class docutils literal"><span class="pre">Square</span></code></a></p>
+<img alt="_images/square.png" src="_images/square.png" />
+<p><a class="reference internal" href="mtk.molecular.topologies.cof.html#mtk.molecular.topologies.cof.Kagome" title="mtk.molecular.topologies.cof.Kagome"><code class="xref py py-class docutils literal"><span class="pre">Kagome</span></code></a></p>
+<img alt="_images/kagome.png" src="_images/kagome.png" />
 </div>
 <div class="section" id="other-materials">
 <h3>Other Materials<a class="headerlink" href="#other-materials" title="Permalink to this headline">¶</a></h3>
