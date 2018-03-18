@@ -242,8 +242,8 @@ generated from the periodic structure by <a class="reference internal" href="mtk
 <p class="rubric">Notes</p>
 <p>The parameter <cite>macro_mol</cite> has two attributes changed.
 <code class="xref py py-attr docutils literal"><span class="pre">mol</span></code> has deleter atoms removed, while
-<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic.terminator_coords" title="mtk.molecular.molecules.Periodic.terminator_coords"><code class="xref py py-attr docutils literal"><span class="pre">terminator_coords</span></code></a> is updated with the
-coordinates of every removed atom.</p>
+<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic.deleters" title="mtk.molecular.molecules.Periodic.deleters"><code class="xref py py-attr docutils literal"><span class="pre">deleters</span></code></a> is updated with the
+coordinates, element type and bond type of every removed atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -317,6 +317,26 @@ is the position closer to <a class="reference internal" href="#mtk.molecular.top
 </dd></dl>
 
 <dl class="method">
+<dt id="mtk.molecular.topologies.cof.Edge.bonder_centroid">
+<code class="descname">bonder_centroid</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>cell_params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cof.html#Edge.bonder_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cof.Edge.bonder_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The centroid of the bonder molecules connected to the edge.</p>
+<p>So the bonders NOT sitting on the edge itself.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The centroid of the bonder attoms connected to those on the
+edge.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="mtk.molecular.topologies.cof.Edge.calc_coord">
 <code class="descname">calc_coord</code><span class="sig-paren">(</span><em>cell_params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cof.html#Edge.calc_coord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cof.Edge.calc_coord" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calcualtes the position of the edge in a cell.</p>
@@ -378,13 +398,14 @@ is the position closer to <a class="reference internal" href="#mtk.molecular.top
 
 <dl class="method">
 <dt id="mtk.molecular.topologies.cof.Edge.place_mol">
-<code class="descname">place_mol</code><span class="sig-paren">(</span><em>cell_params</em>, <em>mol</em>, <em>alignment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cof.html#Edge.place_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cof.Edge.place_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descname">place_mol</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>cell_params</em>, <em>mol</em>, <em>alignment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/topologies/cof.html#Edge.place_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.topologies.cof.Edge.place_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places and aligned a building block along the edge.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.MacroMolecule" title="mtk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being built.</li>
 <li><strong>cell_params</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – The <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> and <code class="docutils literal"><span class="pre">c</span></code> vectors of the unit cell.</li>
 <li><strong>mol</strong> (<a class="reference internal" href="mtk.molecular.molecules.html#mtk.molecular.molecules.StructUnit3" title="mtk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>) – The building block to be placed.</li>
 <li><strong>alignment</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Can be <code class="docutils literal"><span class="pre">1</span></code> or <code class="docutils literal"><span class="pre">-1</span></code> to align <cite>mol</cite> either parallel or
@@ -430,7 +451,7 @@ anti-parallel with the edge.</li>
 
 <dl class="attribute">
 <dt id="mtk.molecular.topologies.cof.Hexagonal.edges">
-<code class="descname">edges</code><em class="property"> = [&lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;]</em><a class="headerlink" href="#mtk.molecular.topologies.cof.Hexagonal.edges" title="Permalink to this definition">¶</a></dt>
+<code class="descname">edges</code><em class="property"> = [&lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;, &lt;mtk.molecular.topologies.cof.Edge object&gt;]</em><a class="headerlink" href="#mtk.molecular.topologies.cof.Hexagonal.edges" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

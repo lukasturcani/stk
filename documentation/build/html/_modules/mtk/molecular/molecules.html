@@ -3274,11 +3274,26 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    terminator_coords : :class:`dict`</span>
-<span class="sd">        The key is an :class:`int` representing the id of a bonder</span>
-<span class="sd">        atom. The value is a :class:`numpy.ndarray` which holds the x,</span>
-<span class="sd">        y and z coordinates of a deleter atom attached to the bonder.</span>
-<span class="sd">        The coordinates are relative to the bonder atom.</span>
+<span class="sd">    deleters : :class:`dict`</span>
+<span class="sd">        A :class:`dict` of the form</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">                12: [[coord, elem, bond_type],</span>
+<span class="sd">                     [coord, elem, bond_type],</span>
+<span class="sd">                     [coord, elem, bond_type]],</span>
+
+<span class="sd">                45: [[coord, elem, bond_type],</span>
+<span class="sd">                     [coord, elem, bond_type],</span>
+<span class="sd">                     [coord, elem, bond_type]]</span>
+<span class="sd">            }</span>
+
+<span class="sd">        The key is an :class:`int` which represents a bonder atom.</span>
+<span class="sd">        The value holds the position, element and bond type of</span>
+<span class="sd">        every deleter atom removed from that bonder. The position is a</span>
+<span class="sd">        :class:`numpy.array`, the element is an :class:`int` and the</span>
+<span class="sd">        bond type is an :class:`rdkit.Chem.rdchem.BondType`.</span>
 
 <span class="sd">    periodic_bonds : :class:`list` of :class:`.PeriodicBond`</span>
 <span class="sd">        When periodic topologies are assembled, periodic bonds</span>
@@ -3302,7 +3317,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_bonds</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Periodic._is_subterminal"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic._is_subterminal">[docs]</a>    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3355,7 +3370,7 @@
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Periodic.island"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic.island">[docs]</a>    <span class="k">def</span> <span class="nf">island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">terminator</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond_type</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic.island"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic.island">[docs]</a>    <span class="k">def</span> <span class="nf">island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build a terminated supercell.</span>
 
@@ -3385,11 +3400,7 @@
 
         <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_place_island</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span>
         <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_island</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span>
-                                      <span class="n">bonded</span><span class="p">,</span>
-                                      <span class="n">bonder_map</span><span class="p">,</span>
-                                      <span class="n">terminator</span><span class="p">,</span>
-                                      <span class="n">bond_dict</span><span class="p">[</span><span class="n">bond_type</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Periodic._join_island"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic._join_island">[docs]</a>    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3471,8 +3482,7 @@
 
         <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="n">bonded</span></div>
 
-<div class="viewcode-block" id="Periodic._terminate_island"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic._terminate_island">[docs]</a>    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span>
-                          <span class="n">bonder_map</span><span class="p">,</span> <span class="n">terminator</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._terminate_island"><a class="viewcode-back" href="../../../mtk.molecular.molecules.html#mtk.molecular.molecules.Periodic._terminate_island">[docs]</a>    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds atoms to all bonder atoms at the edges of `island`.</span>
 
@@ -3495,15 +3505,6 @@
 <span class="sd">            back to the id of the equivalent atom in the original unit</span>
 <span class="sd">            cell.</span>
 
-<span class="sd">        terminator : :class:`int`</span>
-<span class="sd">            The atomic number of the terminating atoms added to the</span>
-<span class="sd">            supercell.</span>
-
-<span class="sd">        bond_type : :class:`str`</span>
-<span class="sd">            A string holding the bond type of bonds to the terminating</span>
-<span class="sd">            atoms. Valid options include ``&#39;1&#39;``, ``&#39;2&#39;``, ``&#39;3&#39;``</span>
-<span class="sd">            and ``&#39;ar&#39;``.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`rdkit.Chem.rdchem.Mol`</span>
@@ -3524,8 +3525,8 @@
             <span class="c1"># Get the id of bonder atom in the original unit cell</span>
             <span class="c1"># which is equivalent to `atom`.</span>
             <span class="n">bi</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="p">[</span><span class="n">atom_id</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">rcoords</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span><span class="p">[</span><span class="n">bi</span><span class="p">]:</span>
-                <span class="n">tid</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">terminator</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">rcoords</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">bond_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleters</span><span class="p">[</span><span class="n">bi</span><span class="p">]:</span>
+                <span class="n">tid</span> <span class="o">=</span> <span class="n">emol</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">rdkit</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">element</span><span class="p">))</span>
                 <span class="n">emol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">tid</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
 
                 <span class="c1"># Using the equivalent bonder atom get the position</span>
@@ -3624,13 +3625,13 @@
             <span class="n">pb</span><span class="o">.</span><span class="n">atom1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">pb</span><span class="o">.</span><span class="n">atom1</span><span class="p">]</span>
             <span class="n">pb</span><span class="o">.</span><span class="n">atom2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">pb</span><span class="o">.</span><span class="n">atom2</span><span class="p">]</span>
 
-        <span class="c1"># Update terminator_coords to hold atom ids directly instead</span>
+        <span class="c1"># Update deleters to hold atom ids directly instead</span>
         <span class="c1"># of indices of the atom ids within `bonder_ids`.</span>
-        <span class="n">terminator_coords</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">deleters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">bonder_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="n">terminator_coords</span><span class="p">[</span><span class="n">bonder_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">coord</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">terminator_coords</span> <span class="o">=</span> <span class="n">terminator_coords</span>
+            <span class="n">deleters</span><span class="p">[</span><span class="n">bonder_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deleters</span> <span class="o">=</span> <span class="n">deleters</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">True</span></div>
 

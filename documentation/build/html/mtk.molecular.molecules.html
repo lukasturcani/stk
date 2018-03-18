@@ -1465,12 +1465,25 @@ materials being added.</p>
 <p>The method <a class="reference internal" href="#mtk.molecular.molecules.MacroMolecule.save_ids" title="mtk.molecular.molecules.MacroMolecule.save_ids"><code class="xref py py-meth docutils literal"><span class="pre">save_ids()</span></code></a> is extended to take
 into account ids of atoms in perdiodic bonds.</p>
 <dl class="attribute">
-<dt id="mtk.molecular.molecules.Periodic.terminator_coords">
-<code class="descname">terminator_coords</code><a class="headerlink" href="#mtk.molecular.molecules.Periodic.terminator_coords" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> representing the id of a bonder
-atom. The value is a <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> which holds the x,
-y and z coordinates of a deleter atom attached to the bonder.
-The coordinates are relative to the bonder atom.</p>
+<dt id="mtk.molecular.molecules.Periodic.deleters">
+<code class="descname">deleters</code><a class="headerlink" href="#mtk.molecular.molecules.Periodic.deleters" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – A <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> of the form</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="mi">12</span><span class="p">:</span> <span class="p">[[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">]],</span>
+
+    <span class="mi">45</span><span class="p">:</span> <span class="p">[[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">],</span>
+         <span class="p">[</span><span class="n">coord</span><span class="p">,</span> <span class="n">elem</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">]]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The key is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> which represents a bonder atom.
+The value holds the position, element and bond type of
+every deleter atom removed from that bonder. The position is a
+<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>, the element is an <code class="xref py py-class docutils literal"><span class="pre">int</span></code> and the
+bond type is an <code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.BondType</span></code>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1600,7 +1613,7 @@ equivalent atom in the original unit cell.</p>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Periodic._terminate_island">
-<code class="descname">_terminate_island</code><span class="sig-paren">(</span><em>island</em>, <em>bonded</em>, <em>bonder_map</em>, <em>terminator</em>, <em>bond_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic._terminate_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic._terminate_island" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_terminate_island</code><span class="sig-paren">(</span><em>island</em>, <em>bonded</em>, <em>bonder_map</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic._terminate_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic._terminate_island" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds atoms to all bonder atoms at the edges of <cite>island</cite>.</p>
 <p class="rubric">Notes</p>
 <p>For internal use by <a class="reference internal" href="#mtk.molecular.molecules.Periodic.island" title="mtk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
@@ -1616,11 +1629,6 @@ have already had a bonded added by <a class="reference internal" href="#mtk.mole
 <li><strong>bonder_map</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – This is a mapping of the ids of bonder atoms in the island
 back to the id of the equivalent atom in the original unit
 cell.</li>
-<li><strong>terminator</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The atomic number of the terminating atoms added to the
-supercell.</li>
-<li><strong>bond_type</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – A string holding the bond type of bonds to the terminating
-atoms. Valid options include <code class="docutils literal"><span class="pre">'1'</span></code>, <code class="docutils literal"><span class="pre">'2'</span></code>, <code class="docutils literal"><span class="pre">'3'</span></code>
-and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -1641,7 +1649,7 @@ and <code class="docutils literal"><span class="pre">'ar'</span></code>.</li>
 
 <dl class="method">
 <dt id="mtk.molecular.molecules.Periodic.island">
-<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em>, <em>terminator=1</em>, <em>bond_type='1'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
+<code class="descname">island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mtk/molecular/molecules.html#Periodic.island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mtk.molecular.molecules.Periodic.island" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build a terminated supercell.</p>
 <p>Terminated means that the periodic bonds are replaced with
 bonds to terminating atoms.</p>
