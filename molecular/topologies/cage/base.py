@@ -309,7 +309,7 @@ class Vertex:
         """
         Yields direction vectors between edges connected to the vertex.
 
-        Paramters
+        Parameters
         ---------
         scale : :class:`float`
             The amount by which the size of the topology is scaled.
