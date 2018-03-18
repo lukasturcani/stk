@@ -1,7 +1,9 @@
 """
 Defines optimization functions.
 
-Extending mtk: Adding optimization functions.
+.. _`adding optimziation functions`:
+
+Extending stk: Adding optimization functions.
 ---------------------------------------------
 
 New optimization functions are added by writing them in this module.
