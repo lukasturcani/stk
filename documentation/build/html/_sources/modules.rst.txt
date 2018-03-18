@@ -1,7 +1,7 @@
-mtk
+stk
 ===
 
 .. toctree::
    :maxdepth: 4
 
-   mtk
+   stk
