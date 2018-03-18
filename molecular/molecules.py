@@ -79,7 +79,7 @@ automatically completes steps 1 to 4.)
 
            bb.func_group.name  # 'amine'
 
-Which functional groups are recognized by ``mtk``?
+Which functional groups are recognized by ``stk``?
 
 The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a
 :class:`list` of instances of this class called
@@ -134,7 +134,7 @@ macromolecule which should be placed into :attr:`MacroMolecule.mol`.
 
 .. _`adding macromolecules`:
 
-Extending mtk: Adding new macromolecules.
+Extending stk: Adding new macromolecules.
 -----------------------------------------
 
 To add new macromolecules create a new class which inherits

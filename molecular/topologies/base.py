@@ -3,7 +3,7 @@ Defines the base :class:`Topology` type.
 
 .. _`adding topologies`:
 
-Extending mtk: Adding new topologies.
+Extending stk: Adding new topologies.
 -------------------------------------
 
 Cages

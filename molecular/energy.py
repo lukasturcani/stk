@@ -3,7 +3,7 @@ Defines energy calculations via :class:`Energy`.
 
 .. _`adding energy functions`:
 
-Extending mtk: Adding more energy functions.
+Extending stk: Adding more energy functions.
 --------------------------------------------
 
 It may well be the case that more ways to calculate the energy of
