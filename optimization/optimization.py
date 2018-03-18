@@ -1,7 +1,7 @@
 """
 Defines optimization functions.
 
-.. _`adding optimziation functions`:
+.. _`adding optimization functions`:
 
 Extending stk: Adding optimization functions.
 ---------------------------------------------
