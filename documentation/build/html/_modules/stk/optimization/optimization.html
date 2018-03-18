@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.optimization.optimization &mdash; mtk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="mtk  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> mtk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">mtk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>stk.optimization.optimization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for stk.optimization.optimization</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines optimization functions.</span>
+
+<span class="sd">.. _`adding optimization functions`:</span>
+
+<span class="sd">Extending stk: Adding optimization functions.</span>
+<span class="sd">---------------------------------------------</span>
+
+<span class="sd">New optimization functions are added by writing them in this module.</span>
+<span class="sd">The only requirement is that the first argument is `mol`. This allows</span>
+<span class="sd">users to identify which arguments are handled automatically by ``mtk``</span>
+<span class="sd">and which need to be defined in the input file. The convention is that</span>
+<span class="sd">if the optimization function takes the argument `mol`, the user does</span>
+<span class="sd">not have to specify it in the input file.</span>
+
+<span class="sd">An optimization function should update the ``rdkit`` molecule in</span>
+<span class="sd">:attr:`.MacroMolecule.mol`. The return values of optimization functions</span>
+<span class="sd">are discarded by the GA.</span>
+
+<span class="sd">Optimizations can be complicated. If the use of helper functions is</span>
+<span class="sd">required make sure that they are private, i.e. that their names begin</span>
+<span class="sd">with a leading underscore. In the event that the optimization is so</span>
+<span class="sd">complex that it requires its own module or file, place it in the same</span>
+<span class="sd">folder as this file. Then import the optimization function here. Make</span>
+<span class="sd">sure that only the optimization functions are imported back into this</span>
+<span class="sd">file, not any of the helper functions or classes.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Thread</span>
+
+<span class="kn">from</span> <span class="nn">.macromodel</span> <span class="k">import</span> <span class="n">macromodel_opt</span><span class="p">,</span> <span class="n">macromodel_cage_opt</span>
+<span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="n">daemon_logger</span><span class="p">,</span> <span class="n">logged_call</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="_optimize_all"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization._optimize_all">[docs]</a><span class="k">def</span> <span class="nf">_optimize_all</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">processes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run opt function on all population members in parallel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func_data : :class:`.FunctionData`</span>
+<span class="sd">        The :class:`.FunctionData` object which represents the chosen</span>
+<span class="sd">        optimization function.</span>
+
+<span class="sd">    population : :class:`.Population`</span>
+<span class="sd">        The :class:`.Population` instance who&#39;s members are to be</span>
+<span class="sd">        optimized.</span>
+
+<span class="sd">    processes : :class:`int`</span>
+<span class="sd">        The number of parallel processes to create.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+    <span class="n">logq</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="n">log_thread</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">daemon_logger</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">logq</span><span class="p">,</span> <span class="p">))</span>
+    <span class="n">log_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="c1"># Using the name of the function stored in `func_data` get the</span>
+    <span class="c1"># function object from one of the functions defined within the</span>
+    <span class="c1"># module.</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="c1"># Provide the function with any additional paramters it may</span>
+    <span class="c1"># require.</span>
+    <span class="n">p_func</span> <span class="o">=</span> <span class="n">_OptimizationFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
+
+    <span class="c1"># Apply the function to every member of the population, in</span>
+    <span class="c1"># parallel.</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">optimized</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">logged_call</span><span class="p">,</span>
+                                 <span class="p">((</span><span class="n">logq</span><span class="p">,</span> <span class="n">p_func</span><span class="p">,</span> <span class="n">mem</span><span class="p">)</span> <span class="k">for</span>
+                                  <span class="n">mem</span> <span class="ow">in</span> <span class="n">population</span><span class="p">))</span>
+    <span class="c1"># Make sure the cache is updated with the optimized versions.</span>
+    <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">optimized</span><span class="p">:</span>
+        <span class="n">member</span><span class="o">.</span><span class="n">update_cache</span><span class="p">()</span>
+
+    <span class="n">logq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">log_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="_optimize_all_serial"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization._optimize_all_serial">[docs]</a><span class="k">def</span> <span class="nf">_optimize_all_serial</span><span class="p">(</span><span class="n">func_data</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run opt function on all population members sequentially.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func_data : :class:`.FunctionData`</span>
+<span class="sd">        The :class:`.FunctionData` object which represents the chosen</span>
+<span class="sd">        optimization function.</span>
+
+<span class="sd">    population : :class:`.Population`</span>
+<span class="sd">        The :class:`.Population` instance who&#39;s members are to be</span>
+<span class="sd">        optimized.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Using the name of the function stored in `func_data` get the</span>
+    <span class="c1"># function object from one of the functions defined within the</span>
+    <span class="c1"># module.</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">func_data</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="c1"># Provide the function with any additional paramters it may</span>
+    <span class="c1"># require.</span>
+    <span class="n">p_func</span> <span class="o">=</span> <span class="n">_OptimizationFunc</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_data</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
+
+    <span class="c1"># Apply the function to every member of the population.</span>
+    <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">population</span><span class="p">:</span>
+        <span class="n">p_func</span><span class="p">(</span><span class="n">member</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_OptimizationFunc"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization._OptimizationFunc">[docs]</a><span class="k">class</span> <span class="nc">_OptimizationFunc</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A decorator for optimziation functions.</span>
+
+<span class="sd">    This decorator is applied to all optimization functions</span>
+<span class="sd">    automatically in :func:`_optimize_all`. It should not be applied</span>
+<span class="sd">    explicitly when defining the functions.</span>
+
+<span class="sd">    This decorator prevents optimization functions from raising if</span>
+<span class="sd">    they fail (necessary for multiprocessing) and prevents them from</span>
+<span class="sd">    being run twice on the same molecule.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decorates and calls the optimization function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mol : :class:`.Molecule`</span>
+<span class="sd">            The molecule to be optimized.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.Molecule`</span>
+<span class="sd">            The optimized molecule.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">optimized</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Skipping </span><span class="si">{mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mol</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Optimizing </span><span class="si">{mol.name}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__wrapped__</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">errormsg</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="s1">&#39;Optimization function &#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;&quot;</span><span class="si">{self.__wrapped__.func.__name__}</span><span class="s1">()&quot; &#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;failed on molecule &quot;</span><span class="si">{mol.name}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errormsg</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">mol</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">mol</span></div>
+
+
+<div class="viewcode-block" id="do_not_optimize"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization.do_not_optimize">[docs]</a><span class="k">def</span> <span class="nf">do_not_optimize</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Skips the optimization step.</span>
+
+<span class="sd">    This is very useful when debugging so you do not waste your time</span>
+<span class="sd">    waiting for molecules to get optimized. Use this in the input file</span>
+<span class="sd">    in place of an optimization function when necessary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        A molecule which will not be optimized.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="partial_raiser"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization.partial_raiser">[docs]</a><span class="k">def</span> <span class="nf">partial_raiser</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">ofunc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raises and optimizes at random.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule being optimized.</span>
+
+<span class="sd">    ofunc : :class:`.FunctionData`</span>
+<span class="sd">        A :class:`.FunctionData` object representing the optimization</span>
+<span class="sd">        function to be used.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`.NoneType`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Partial raiser.&#39;</span><span class="p">)</span>
+
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">ofunc</span><span class="o">.</span><span class="n">name</span><span class="p">](</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">ofunc</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="raiser"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization.raiser">[docs]</a><span class="k">def</span> <span class="nf">raiser</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Doens&#39;t optimize, raises an error instead.</span>
+
+<span class="sd">    This function is used to test that when optimization functions</span>
+<span class="sd">    raise errors during multiprocessing, they are handled correctly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    param1 : :class:`object`</span>
+<span class="sd">        Dummy parameter, does nothing.</span>
+
+<span class="sd">    param2 : :class:`object`, optional</span>
+<span class="sd">        Dummy keyword parameter, does nothing.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+<span class="sd">        This function does not return. It only raises.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    :class:`Exception`</span>
+<span class="sd">        An exception is always raised.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Raiser optimization function used.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rdkit_optimization"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization.rdkit_optimization">[docs]</a><span class="k">def</span> <span class="nf">rdkit_optimization</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">embed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Optimizes the structure of the molecule using ``rdkit``.</span>
+
+<span class="sd">    Uses the ``MMFF`` forcefield.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule who&#39;s structure should be optimized.</span>
+
+<span class="sd">    embed : :class:`bool`, optional</span>
+<span class="sd">        When ``True`` the structure is guessed before an optimization</span>
+<span class="sd">        is carried out. This guess structure overrides any previous</span>
+<span class="sd">        structure.</span>
+
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The conformer to use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">embed</span><span class="p">:</span>
+        <span class="n">conf_id</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">clearConfs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">new_conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">))</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="n">new_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">)</span>
+
+    <span class="c1"># Sanitize then optimize the rdkit molecule.</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">MMFFOptimizeMolecule</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">confId</span><span class="o">=</span><span class="n">conformer</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rdkit_ETKDG"><a class="viewcode-back" href="../../../stk.optimization.optimization.html#stk.optimization.optimization.rdkit_ETKDG">[docs]</a><span class="k">def</span> <span class="nf">rdkit_ETKDG</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Does a conformer search with :func:`rdkit.ETKDG` [#]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : :class:`.Molecule`</span>
+<span class="sd">        The molecule who&#39;s structure should be optimized.</span>
+
+<span class="sd">    conformer : :class:`int`, optional</span>
+<span class="sd">        The conformer to use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None : :class:`NoneType`</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [#] http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.5b00654</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">conformer</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">GetId</span><span class="p">()</span>
+
+    <span class="n">conf_id</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EmbedMolecule</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">ETKDG</span><span class="p">())</span>
+    <span class="n">new_conf</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">))</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conf_id</span><span class="p">)</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">RemoveConformer</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+    <span class="n">new_conf</span><span class="o">.</span><span class="n">SetId</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span>
+    <span class="n">mol</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">new_conf</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
