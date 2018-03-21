@@ -447,10 +447,22 @@ class Edge(Vertex):
                         *centroid(v1.coord, v2.coord),
                         id_,
                         custom_position)
-        self.direction = normalize_vector(v1.coord - v2.coord)
+
         self.connected.extend([v1, v2])
         v1.connected.append(self)
         v2.connected.append(self)
+
+    def direction(self, macro_mol, scale):
+        if self.custom_position or macro_mol is None:
+            v1, v2 = self.connected
+            return normalize_vector(v1.coord - v2.coord)
+
+        bonders = []
+        for v in self.connected:
+            for bonder, edge in v.atom_position_pairs:
+                if edge is self:
+                    bonders.append(macro_mol.atom_coords(bonder))
+        return normalize_vector(bonders[0] - bonders[1])
 
     def place_mol(self, scale, linker, alignment, macro_mol):
         """
@@ -489,8 +501,9 @@ class Edge(Vertex):
         self.distances = []
 
         # Align then place the linker.
-        linker.set_orientation2(self.direction * alignment)
-        linker.minimize_theta2(self.coord*scale, self.direction)
+        linker.set_orientation2(self.direction(macro_mol, scale)*alignment)
+        linker.minimize_theta2(self.coord*scale,
+                               self.direction(macro_mol, scale))
         linker.set_bonder_centroid(self.bonder_centroid(macro_mol, scale))
 
         return linker.mol
