@@ -131,6 +131,43 @@ class SixPlusTwelve(_CageTopology):
     n_window_types = 1
 
 
+class EightPlusSixteen(_CageTopology):
+
+    x = 2
+    positions_A = a, b, c, d, e, f, g, h = [
+                    Vertex(-0.5*x, 0.5*x, -0.5*x),
+                    Vertex(-0.5*x, -0.5*x, -0.5*x),
+                    Vertex(0.5*x, -0.5*x, -0.5*x),
+                    Vertex(0.5*x, 0.5*x, -0.5*x),
+
+                    Vertex(-x*np.sqrt(2)/2, 0, x*0.5),
+                    Vertex(0, -x*np.sqrt(2)/2, x*0.5),
+                    Vertex(x*np.sqrt(2)/2, 0, x*0.5),
+                    Vertex(0, x*np.sqrt(2)/2, x*0.5)]
+
+    positions_B = [Edge(b, f),
+                   Edge(c, f),
+                   Edge(a, e),
+                   Edge(b, e),
+
+                   Edge(c, g),
+                   Edge(d, g),
+                   Edge(a, h),
+                   Edge(d, h),
+
+                   Edge(a, b),
+                   Edge(b, c),
+                   Edge(c, d),
+                   Edge(d, a),
+
+                   Edge(e, f),
+                   Edge(f, g),
+                   Edge(g, h),
+                   Edge(h, e)]
+    n_windows = 10
+    n_window_types = 2
+
+
 class TenPlusTwenty(_CageTopology):
     """
     A cage topology from 2 and 4 functionalized building blocks.
