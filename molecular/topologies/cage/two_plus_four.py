@@ -99,6 +99,42 @@ class FourPlusEight(_CageTopology):
     n_window_types = 2
 
 
+class FivePlusTen(_CageTopology):
+
+    c1 = np.cos(2*np.pi/5)
+    c2 = np.cos(np.pi/5)
+    s1 = np.sin(2*np.pi/5)
+    s2 = np.sin(4*np.pi/5)
+
+    positions_A = [Vertex(0, 1, 0),
+                   Vertex(s1, c1, 0),
+                   Vertex(s2, -c2, 0),
+                   Vertex(-s2, -c2, 0),
+                   Vertex(-s1, c1, 0)]
+
+    a, b, c, d, e = positions_A
+
+    positions_B = [Edge(a, b, custom_position=True),
+                   Edge(a, b, custom_position=True),
+                   Edge(b, c, custom_position=True),
+                   Edge(b, c, custom_position=True),
+                   Edge(c, d, custom_position=True),
+                   Edge(c, d, custom_position=True),
+                   Edge(d, e, custom_position=True),
+                   Edge(d, e, custom_position=True),
+                   Edge(e, a, custom_position=True),
+                   Edge(e, a, custom_position=True)]
+
+    for e in positions_B[::2]:
+        e.coord = np.add(e.coord, [0, 0, 0.5])
+
+    for e in positions_B[1::2]:
+        e.coord = np.add(e.coord, [0, 0, -0.5])
+
+    n_windows = 7
+    n_window_types = 2
+
+
 class SixPlusTwelve(_CageTopology):
     """
     A cage topology from 2 and 4 functionalized building blocks.
