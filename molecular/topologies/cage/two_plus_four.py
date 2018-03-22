@@ -135,15 +135,15 @@ class EightPlusSixteen(_CageTopology):
 
     x = 2
     positions_A = a, b, c, d, e, f, g, h = [
-                    Vertex(-0.5*x, 0.5*x, -0.5*x),
-                    Vertex(-0.5*x, -0.5*x, -0.5*x),
-                    Vertex(0.5*x, -0.5*x, -0.5*x),
-                    Vertex(0.5*x, 0.5*x, -0.5*x),
+                    Vertex(-0.5*x, 0.5*x, -0.35*x),
+                    Vertex(-0.5*x, -0.5*x, -0.35*x),
+                    Vertex(0.5*x, -0.5*x, -0.35*x),
+                    Vertex(0.5*x, 0.5*x, -0.35*x),
 
-                    Vertex(-x*np.sqrt(2)/2, 0, x*0.5),
-                    Vertex(0, -x*np.sqrt(2)/2, x*0.5),
-                    Vertex(x*np.sqrt(2)/2, 0, x*0.5),
-                    Vertex(0, x*np.sqrt(2)/2, x*0.5)]
+                    Vertex(-x*np.sqrt(2)/2, 0, x*0.35),
+                    Vertex(0, -x*np.sqrt(2)/2, x*0.35),
+                    Vertex(x*np.sqrt(2)/2, 0, x*0.35),
+                    Vertex(0, x*np.sqrt(2)/2, x*0.35)]
 
     positions_B = [Edge(b, f),
                    Edge(c, f),
