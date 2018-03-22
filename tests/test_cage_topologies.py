@@ -39,6 +39,13 @@ def test_FourPlusEight():
     c.write(join(test_dir, 'FourPlusEight.pdb'))
 
 
+def test_FivePlusTen():
+    bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
+    bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
+    c = Cage([bb1, bb2], FivePlusTen())
+    c.write(join(test_dir, 'FivePlusTen.pdb'))
+
+
 def test_SixPlusTwelve():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
