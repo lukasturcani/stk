@@ -48,7 +48,7 @@ to install any dependencies you are missing.
 GitHub
 ------
 
-Installation is simple and has 2 parts. First, installing ``stk``, second,
+Installation is simple and has two parts. First, installing ``stk``, second,
 installing any libraries it requires.
 
 installing stk
