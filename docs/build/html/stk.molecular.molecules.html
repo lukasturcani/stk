@@ -470,27 +470,6 @@ added to the macromolecule during assembly.</p>
 atom ids belonging to a particular molecule before assembly.</p>
 </dd>
 </dl>
-<dl class="classmethod">
-<dt id="stk.molecular.molecules.MacroMolecule._json_init">
-<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule._json_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule._json_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Completes a JSON initialization.</p>
-<p>This function is not to be used. Use <a class="reference internal" href="#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.load()</span></code></a>
-for loading instances from a JSON string. That function will
-automatically call this one.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json_dict</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – A dictionary holding the attribute data of the molecule.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="method">
 <dt id="stk.molecular.molecules.MacroMolecule.add_conformer">
 <code class="descname">add_conformer</code><span class="sig-paren">(</span><em>bb_conformers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#MacroMolecule.add_conformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.MacroMolecule.add_conformer" title="Permalink to this definition">¶</a></dt>
@@ -737,89 +716,6 @@ identification.</p>
 <code class="descname">note</code><a class="headerlink" href="#stk.molecular.molecules.Molecule.note" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – A note or comment about the molecule. Purely optional but can
 be useful for labelling and debugging.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.Molecule._cavity_size">
-<code class="descname">_cavity_size</code><span class="sig-paren">(</span><em>origin</em>, <em>conformer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule._cavity_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule._cavity_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates diameter of the molecule from <cite>origin</cite>.</p>
-<p>The cavity is measured by finding the atom nearest to
-<cite>origin</cite>, correcting for van der Waals diameter and multiplying
-by -2.</p>
-<p>This function should not be used directly. Use
-<a class="reference internal" href="#stk.molecular.molecules.Molecule.cavity_size" title="stk.molecular.molecules.Molecule.cavity_size"><code class="xref py py-meth docutils literal"><span class="pre">cavity_size()</span></code></a> instead, which finds the optimal value of
-<cite>origin</cite> to use.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>origin</strong> (<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – Holds the x, y and z coordinate of the position from which
-the cavity is measured.</li>
-<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of the conformer to be used.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The (negative) diameter of the molecules cavity.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.Molecule._write_mdl_mol_file">
-<code class="descname">_write_mdl_mol_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule._write_mdl_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule._write_mdl_mol_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes a V3000 <code class="docutils literal"><span class="pre">.mol</span></code> file of the molecule</p>
-<p>This function should not be used directly, only via
-<a class="reference internal" href="#stk.molecular.molecules.Molecule.write" title="stk.molecular.molecules.Molecule.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the file being written.</li>
-<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.Molecule._write_pdb_file">
-<code class="descname">_write_pdb_file</code><span class="sig-paren">(</span><em>path</em>, <em>conformer=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Molecule._write_pdb_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Molecule._write_pdb_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes a <code class="docutils literal"><span class="pre">.pdb</span></code> file of the molecule</p>
-<p>This function should not be used directly, only via
-<a class="reference internal" href="#stk.molecular.molecules.Molecule.write" title="stk.molecular.molecules.Molecule.write"><code class="xref py py-meth docutils literal"><span class="pre">write()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<code class="xref py py-class docutils literal"><span class="pre">str</span></code>) – The full path to the file being written.</li>
-<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, optional) – The conformer to use.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>None</strong></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -1247,7 +1143,7 @@ anything. This means that any geometric feature of the molecule
 can be easily aligned with any arbitrary axis.</p>
 <p class="rubric">Notes</p>
 <p>The difference between this method and
-<a class="reference internal" href="#stk.molecular.molecules.StructUnit._set_orientation2" title="stk.molecular.molecules.StructUnit._set_orientation2"><code class="xref py py-meth docutils literal"><span class="pre">StructUnit._set_orientation2()</span></code></a> is about which point the
+<code class="xref py py-meth docutils literal"><span class="pre">StructUnit._set_orientation2()</span></code> is about which point the
 rotation occurs: centroid of the entire molecule versus
 centroid of the bonder atoms, respectively.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1512,136 +1408,6 @@ be added during the build process by the periodic topology.</p>
 by <a class="reference internal" href="#stk.molecular.molecules.Periodic.save_ids" title="stk.molecular.molecules.Periodic.save_ids"><code class="xref py py-meth docutils literal"><span class="pre">save_ids()</span></code></a>.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="stk.molecular.molecules.Periodic._is_subterminal">
-<code class="descname">_is_subterminal</code><span class="sig-paren">(</span><em>atom_id</em>, <em>bonder_map</em>, <em>bonded</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic._is_subterminal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic._is_subterminal" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="docutils literal"><span class="pre">True</span></code> if atom is bonded to a terminal one.</p>
-<p class="rubric">Notes</p>
-<p>For internal use by <a class="reference internal" href="#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>atom_id</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of the atom being checked.</li>
-<li><strong>bonder_map</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – A dictionary which maps the atom id in the island to the
-equivalent bonder atom in the unit cell.</li>
-<li><strong>bonded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code>) – A set of atom ids of all bonder atoms which have had a
-bond added by <a class="reference internal" href="#stk.molecular.molecules.Periodic._join_island" title="stk.molecular.molecules.Periodic._join_island"><code class="xref py py-meth docutils literal"><span class="pre">_join_island()</span></code></a>.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">True</span></code> if atom is bonded to a terminal atom, <code class="docutils literal"><span class="pre">False</span></code>
-otherwise.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.Periodic._join_island">
-<code class="descname">_join_island</code><span class="sig-paren">(</span><em>cells</em>, <em>island</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic._join_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic._join_island" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds bonds between unit cells of <cite>island</cite>.</p>
-<p class="rubric">Notes</p>
-<p>For internal use by <a class="reference internal" href="#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cells</strong> (nested <code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">Cell</span></code>) – </li>
-<li><strong>island</strong> (<code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – The island molecule holding unit cells placed side by
-side like in a supercell but with no bonds running between
-them.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The first member of the tuple an <code class="docutils literal"><span class="pre">rdkit</span></code> molecule of the
-island with all bonds between the unit cells added. The
-second member of the tuple is a <code class="xref py py-class docutils literal"><span class="pre">set</span></code> of
-<code class="xref py py-class docutils literal"><span class="pre">int</span></code>, where each <code class="xref py py-class docutils literal"><span class="pre">int</span></code> is id of a bonder
-atom which had a bond added by this function.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.Periodic._place_island">
-<code class="descname">_place_island</code><span class="sig-paren">(</span><em>dimensions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic._place_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic._place_island" title="Permalink to this definition">¶</a></dt>
-<dd><p>Places unit cells side by side to form an island.</p>
-<p class="rubric">Notes</p>
-<p>For internal use by <a class="reference internal" href="#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dimensions</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of unit cells in the x, y and z directions to be
-placed side by side.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The first member of the tuple is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding
-<code class="xref py py-class docutils literal"><span class="pre">Cell</span></code> objects, one for each unit cell placed. The
-<code class="xref py py-class docutils literal"><span class="pre">Cell</span></code> object is placed within nested lists so that
-a cell with the coordinates x, y, z can be accessed from
-the list using <code class="docutils literal"><span class="pre">[x][y][z]</span></code>. For example,<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">periodic</span><span class="o">.</span><span class="n">_place_island</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cells</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
-<span class="go">&lt;Cell at 0x7fa0155d54e0&gt;</span>
-</pre></div>
-</div>
-<p>where the returned <code class="xref py py-class docutils literal"><span class="pre">Cell</span></code> object represents the
-3rd unit cell along the x axis, the second along the y axis
-and the fourth along the z axis.</p>
-<p>The second member is an <code class="docutils literal"><span class="pre">rdkit</span></code> molecule of the island
-being built. The third member is a <code class="xref py py-class docutils literal"><span class="pre">dict</span></code> mapping
-the ids of bonder atoms in the island back to the id of the
-equivalent atom in the original unit cell.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.Periodic._terminate_island">
-<code class="descname">_terminate_island</code><span class="sig-paren">(</span><em>island</em>, <em>bonded</em>, <em>bonder_map</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#Periodic._terminate_island"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.Periodic._terminate_island" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds atoms to all bonder atoms at the edges of <cite>island</cite>.</p>
-<p class="rubric">Notes</p>
-<p>For internal use by <a class="reference internal" href="#stk.molecular.molecules.Periodic.island" title="stk.molecular.molecules.Periodic.island"><code class="xref py py-meth docutils literal"><span class="pre">island()</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>island</strong> (<code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code>) – The island molecule which needs to have terminating atoms
-added.</li>
-<li><strong>bonded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – Contains all the ids of all bonder atoms in <cite>island</cite> which
-have already had a bonded added by <a class="reference internal" href="#stk.molecular.molecules.Periodic._join_island" title="stk.molecular.molecules.Periodic._join_island"><code class="xref py py-meth docutils literal"><span class="pre">_join_island()</span></code></a>.</li>
-<li><strong>bonder_map</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – This is a mapping of the ids of bonder atoms in the island
-back to the id of the equivalent atom in the original unit
-cell.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <code class="docutils literal"><span class="pre">rdkit</span></code> molecule of the final, assembled island.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="stk.molecular.molecules.Periodic.cache">
 <code class="descname">cache</code><em class="property"> = {}</em><a class="headerlink" href="#stk.molecular.molecules.Periodic.cache" title="Permalink to this definition">¶</a></dt>
@@ -1766,72 +1532,6 @@ assembles to form macromolecules.</p>
 <code class="descname">bonder_ids</code><a class="headerlink" href="#stk.molecular.molecules.StructUnit.bonder_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding the atom ids of the atoms which form
 bonds during macromolecular assembly.</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="stk.molecular.molecules.StructUnit._json_init">
-<em class="property">classmethod </em><code class="descname">_json_init</code><span class="sig-paren">(</span><em>json_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._json_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._json_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Completes a JSON initialization.</p>
-<p>This function is not to be used. Use <a class="reference internal" href="#stk.molecular.molecules.Molecule.load" title="stk.molecular.molecules.Molecule.load"><code class="xref py py-meth docutils literal"><span class="pre">Molecule.load()</span></code></a>
-for loading instances from a JSON string. That function will
-automatically call this one.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json_dict</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – A dictionary holding the attribute data of the molecule.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.molecules.StructUnit._set_orientation2">
-<code class="descname">_set_orientation2</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>conformer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/molecules.html#StructUnit._set_orientation2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.molecules.StructUnit._set_orientation2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rotates the molecule by a rotation from <cite>start</cite> to <cite>end</cite>.</p>
-<p>Given two direction vectors, <cite>start</cite> and <cite>end</cite>, this method
-applies the rotation required transform <cite>start</cite> to <cite>end</cite> on
-the molecule. The rotation occurs about the centroid of the
-molecule.</p>
-<p>For example, if the <cite>start</cite> and <cite>end</cite> vectors
-are 45 degrees apart, a 45 degree rotation will be applied to
-the molecule. The rotation will be along the appropriate
-direction.</p>
-<p>The great thing about this method is that you as long as you
-can associate a gemotric feature of the molecule with a vector,
-then the molecule can be roatated so that this vector is
-aligned with <cite>end</cite>. The defined vector can be virtually
-anything. This means that any geometric feature of the molecule
-can be easily aligned with any arbitrary axis.</p>
-<p class="rubric">Notes</p>
-<p>The difference between this method and
-<a class="reference internal" href="#stk.molecular.molecules.Molecule.set_orientation" title="stk.molecular.molecules.Molecule.set_orientation"><code class="xref py py-meth docutils literal"><span class="pre">set_orientation()</span></code></a> is about which point the rotation
-occurs: centroid of bonder atoms versus centroid of entire
-molecule, respectively.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>start</strong> (<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – A vector which is to be rotated so that it transforms to
-the <cite>end</cite> vector.</li>
-<li><strong>end</strong> (<code class="xref py py-class docutils literal"><span class="pre">numpy.array</span></code>) – This array holds the vector, onto which <cite>start</cite> is rotated.</li>
-<li><strong>conformer</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The conformer to use.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <code class="docutils literal"><span class="pre">rdkit</span></code> molecule in <a class="reference internal" href="#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.Mol</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -2505,7 +2205,7 @@ shoould be aligned.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Lukas Turcani.
+        &copy; Copyright 2018, Lukas Turcani.
 
     </p>
   </div>
