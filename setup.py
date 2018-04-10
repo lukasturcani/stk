@@ -9,5 +9,4 @@ setup(name='stk',
                 'stk.molecular',
                 'stk.molecular.topologies',
                 'stk.molecular.topologies.cage',
-                'stk.optimization',
-                'stk.ga'])
+                'stk.optimization'])
