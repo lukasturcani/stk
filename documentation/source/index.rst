@@ -44,7 +44,7 @@ To assemble a polymer only a single line of code is required:
 
 .. code-block:: python
 
-    polymer = Polymer([monomer1, monomer2, monomer3], Linear('ABC', [1, -1, 0], n=3))
+    polymer = Polymer([monomer1, monomer2, monomer3], Linear('ABC', [0, 1, 0.5], n=3))
 
 Simply create a :class:`.Polymer` object by giving it a list of
 monomers and a topology object, in this
