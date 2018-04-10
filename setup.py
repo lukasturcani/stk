@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(name='stk',
       author='Lukas Turcani',
       author_email='lukasturcani93@gmail.com',
-      url='www.github.com/lukasturcani/stk',
+      url='https://www.github.com/lukasturcani/stk',
       packages=['stk',
                 'stk.convenience_tools',
                 'stk.molecular',
