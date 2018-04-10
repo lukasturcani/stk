@@ -250,6 +250,42 @@
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">2</span></div>
 
 
+<div class="viewcode-block" id="FivePlusTen"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.two_plus_four.html#stk.molecular.topologies.cage.two_plus_four.FivePlusTen">[docs]</a><span class="k">class</span> <span class="nc">FivePlusTen</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="o">-</span><span class="n">c2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="n">s2</span><span class="p">,</span> <span class="o">-</span><span class="n">c2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="n">s1</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">positions_A</span>
+
+    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">custom_position</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">positions_B</span><span class="p">[::</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">positions_B</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">])</span>
+
+    <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
 <div class="viewcode-block" id="SixPlusTwelve"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.two_plus_four.html#stk.molecular.topologies.cage.two_plus_four.SixPlusTwelve">[docs]</a><span class="k">class</span> <span class="nc">SixPlusTwelve</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A cage topology from 2 and 4 functionalized building blocks.</span>
@@ -280,6 +316,43 @@
 
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">8</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="EightPlusSixteen"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.two_plus_four.html#stk.molecular.topologies.cage.two_plus_four.EightPlusSixteen">[docs]</a><span class="k">class</span> <span class="nc">EightPlusSixteen</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="o">*</span><span class="n">x</span><span class="p">),</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="o">*</span><span class="n">x</span><span class="p">),</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="o">*</span><span class="n">x</span><span class="p">),</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.35</span><span class="o">*</span><span class="n">x</span><span class="p">),</span>
+
+                    <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="mf">0.35</span><span class="p">),</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="mf">0.35</span><span class="p">),</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="mf">0.35</span><span class="p">),</span>
+                    <span class="n">Vertex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="mf">0.35</span><span class="p">)]</span>
+
+    <span class="n">positions_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span>
+
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                   <span class="n">Edge</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">e</span><span class="p">)]</span>
+    <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">2</span></div>
 
 
 <div class="viewcode-block" id="TenPlusTwenty"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.two_plus_four.html#stk.molecular.topologies.cage.two_plus_four.TenPlusTwenty">[docs]</a><span class="k">class</span> <span class="nc">TenPlusTwenty</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>

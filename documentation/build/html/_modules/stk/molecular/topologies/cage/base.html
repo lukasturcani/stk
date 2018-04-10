@@ -598,10 +598,22 @@
                         <span class="o">*</span><span class="n">centroid</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">),</span>
                         <span class="n">id_</span><span class="p">,</span>
                         <span class="n">custom_position</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">])</span>
         <span class="n">v1</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Edge.direction"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.Edge.direction">[docs]</a>    <span class="k">def</span> <span class="nf">direction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom_position</span> <span class="ow">or</span> <span class="n">macro_mol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span>
+            <span class="k">return</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">coord</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
+
+        <span class="n">bonders</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bonder</span><span class="p">,</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">atom_position_pairs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="n">bonders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">bonder</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">normalize_vector</span><span class="p">(</span><span class="n">bonders</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bonders</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="Edge.place_mol"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.Edge.place_mol">[docs]</a>    <span class="k">def</span> <span class="nf">place_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">linker</span><span class="p">,</span> <span class="n">alignment</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -640,8 +652,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">distances</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Align then place the linker.</span>
-        <span class="n">linker</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">*</span> <span class="n">alignment</span><span class="p">)</span>
-        <span class="n">linker</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord</span><span class="o">*</span><span class="n">scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+        <span class="n">linker</span><span class="o">.</span><span class="n">set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span><span class="o">*</span><span class="n">alignment</span><span class="p">)</span>
+        <span class="n">linker</span><span class="o">.</span><span class="n">minimize_theta2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coord</span><span class="o">*</span><span class="n">scale</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">scale</span><span class="p">))</span>
         <span class="n">linker</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">scale</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div></div>
