@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.molecular.fg_info module &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="stk  documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">stk.molecular.fg_info module</a><ul>
+<li><a class="reference internal" href="#extending-stk-adding-more-functional-groups">Extending stk: Adding  more functional groups.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">stk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stk.molecular.fg_info module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stk.molecular.fg_info.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stk.molecular.fg_info">
+<span id="stk-molecular-fg-info-module"></span><h1>stk.molecular.fg_info module<a class="headerlink" href="#module-stk.molecular.fg_info" title="Permalink to this headline">¶</a></h1>
+<p>Defines <a class="reference internal" href="#stk.molecular.fg_info.FGInfo" title="stk.molecular.fg_info.FGInfo"><code class="xref py py-class docutils literal"><span class="pre">FGInfo</span></code></a> which describes functional groups.</p>
+<div class="section" id="extending-stk-adding-more-functional-groups">
+<span id="adding-functional-groups"></span><h2>Extending stk: Adding  more functional groups.<a class="headerlink" href="#extending-stk-adding-more-functional-groups" title="Permalink to this headline">¶</a></h2>
+<p>If <code class="docutils literal"><span class="pre">stk</span></code> is to incorporate a new functional group, a new
+:class:<code class="docutils literal"><span class="pre">FGInfo</span></code> instance should be added to
+<code class="xref py py-data docutils literal"><span class="pre">functional_groups</span></code>. This is a <code class="xref py py-class docutils literal"><span class="pre">list</span></code> defined in this
+module.</p>
+<p>Adding a new <code class="docutils literal"><span class="pre">FGInfo</span></code> instance to <code class="xref py py-data docutils literal"><span class="pre">functional_groups</span></code> will
+allow <code class="xref py py-meth docutils literal"><span class="pre">Topology.join_mols()</span></code> to connect the functional group to
+all others during assembly. Nothing except adding this instance
+should be necessary in order to incorporate new functional groups.</p>
+<p>Note that when adding SMARTS, if you want to make a SMARTS that targets
+an atom in an environment, for example, a bromine connected to a
+carbon:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[$([Br][C])]
+</pre></div>
+</div>
+<p>The atom you are targeting needs to be written first. The above SMARTS
+works but:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[$([C][Br])]
+</pre></div>
+</div>
+<p>does not.</p>
+<p>If a new functional group is to connect to another functional group
+with a double bond during assembly, the names of the functional groups
+should be added to <code class="xref py py-data docutils literal"><span class="pre">double_bond_combs</span></code>. The order in
+which they are placed in the tuple does not matter. Again, this is all
+that needs to be done for <code class="docutils literal"><span class="pre">stk</span></code> to create double bonds between given
+functional groups.</p>
+<dl class="class">
+<dt id="stk.molecular.fg_info.FGInfo">
+<em class="property">class </em><code class="descclassname">stk.molecular.fg_info.</code><code class="descname">FGInfo</code><span class="sig-paren">(</span><em>name</em>, <em>fg_smarts</em>, <em>bonder_smarts</em>, <em>del_smarts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/fg_info.html#FGInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.fg_info.FGInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Contains key information about functional groups.</p>
+<p>The point of this class is to register which atoms of a functional
+group form bonds, and which are deleted during assembly of
+macromolecules.</p>
+<dl class="attribute">
+<dt id="stk.molecular.fg_info.FGInfo.name">
+<code class="descname">name</code><a class="headerlink" href="#stk.molecular.fg_info.FGInfo.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – The name of the functional group.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.fg_info.FGInfo.fg_smarts">
+<code class="descname">fg_smarts</code><a class="headerlink" href="#stk.molecular.fg_info.FGInfo.fg_smarts" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – A SMARTS string which matches the functional group.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.fg_info.FGInfo.bonder_smarts">
+<code class="descname">bonder_smarts</code><a class="headerlink" href="#stk.molecular.fg_info.FGInfo.bonder_smarts" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – A SMARTS string which matches the atom on the functional group
+which forms bonds during reactions.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stk.molecular.fg_info.FGInfo.del_smarts">
+<code class="descname">del_smarts</code><a class="headerlink" href="#stk.molecular.fg_info.FGInfo.del_smarts" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – A SMARTS string, which matches the atoms removed when the
+functional group reacts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">bonder_smarts</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">del_smarts</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">fg_smarts</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">name</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
