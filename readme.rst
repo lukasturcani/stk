@@ -1,6 +1,6 @@
 :author: Lukas Turcani
 
-.. figure:: documentation/source/figures/stk.png
+.. figure:: docs/source/figures/stk.png
 
 Requires Python 3.6.
 
