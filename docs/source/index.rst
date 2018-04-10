@@ -6,6 +6,8 @@
 Welcome to ``stk``'s documentation!
 ===================================
 
+GitHub: https://www.github.com/lukasturcani/stk
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
