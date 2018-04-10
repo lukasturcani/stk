@@ -22,7 +22,7 @@ designing molecules. For more information, the documentation can be found at
 Installation
 ============
 
-Installation is simple and has 2 parts. First, installing stk, second,
+Installation is simple and has 2 parts. First, installing ``stk``, second,
 installing any libraries it requires.
 
 stk
