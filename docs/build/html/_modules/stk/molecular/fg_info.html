@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stk.molecular.fg_info &mdash; stk  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="stk  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> stk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">stk</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>stk.molecular.fg_info</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for stk.molecular.fg_info</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines :class:`FGInfo` which describes functional groups.</span>
+
+<span class="sd">.. _`adding functional groups`:</span>
+
+<span class="sd">Extending stk: Adding  more functional groups.</span>
+<span class="sd">----------------------------------------------</span>
+
+<span class="sd">If ``stk`` is to incorporate a new functional group, a new</span>
+<span class="sd">:class:``FGInfo`` instance should be added to</span>
+<span class="sd">:data:`functional_groups`. This is a :class:`list` defined in this</span>
+<span class="sd">module.</span>
+
+<span class="sd">Adding a new ``FGInfo`` instance to :data:`functional_groups` will</span>
+<span class="sd">allow :meth:`.Topology.join_mols` to connect the functional group to</span>
+<span class="sd">all others during assembly. Nothing except adding this instance</span>
+<span class="sd">should be necessary in order to incorporate new functional groups.</span>
+
+<span class="sd">Note that when adding SMARTS, if you want to make a SMARTS that targets</span>
+<span class="sd">an atom in an environment, for example, a bromine connected to a</span>
+<span class="sd">carbon::</span>
+
+<span class="sd">    [$([Br][C])]</span>
+
+<span class="sd">The atom you are targeting needs to be written first. The above SMARTS</span>
+<span class="sd">works but::</span>
+
+<span class="sd">    [$([C][Br])]</span>
+
+<span class="sd">does not.</span>
+
+<span class="sd">If a new functional group is to connect to another functional group</span>
+<span class="sd">with a double bond during assembly, the names of the functional groups</span>
+<span class="sd">should be added to :data:`double_bond_combs`. The order in</span>
+<span class="sd">which they are placed in the tuple does not matter. Again, this is all</span>
+<span class="sd">that needs to be done for ``stk`` to create double bonds between given</span>
+<span class="sd">functional groups.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="FGInfo"><a class="viewcode-back" href="../../../stk.molecular.fg_info.html#stk.molecular.fg_info.FGInfo">[docs]</a><span class="k">class</span> <span class="nc">FGInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains key information about functional groups.</span>
+
+<span class="sd">    The point of this class is to register which atoms of a functional</span>
+<span class="sd">    group form bonds, and which are deleted during assembly of</span>
+<span class="sd">    macromolecules.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : :class:`str`</span>
+<span class="sd">        The name of the functional group.</span>
+
+<span class="sd">    fg_smarts : :class:`str`</span>
+<span class="sd">        A SMARTS string which matches the functional group.</span>
+
+<span class="sd">    bonder_smarts : :class:`str`</span>
+<span class="sd">        A SMARTS string which matches the atom on the functional group</span>
+<span class="sd">        which forms bonds during reactions.</span>
+
+<span class="sd">    del_smarts : :class:`str`</span>
+<span class="sd">        A SMARTS string, which matches the atoms removed when the</span>
+<span class="sd">        functional group reacts.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;fg_smarts&#39;</span><span class="p">,</span> <span class="s1">&#39;bonder_smarts&#39;</span><span class="p">,</span> <span class="s1">&#39;del_smarts&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fg_smarts</span><span class="p">,</span> <span class="n">bonder_smarts</span><span class="p">,</span> <span class="n">del_smarts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a :class:`FGInfo` instnace.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ---------</span>
+<span class="sd">        name : :class:`str`</span>
+<span class="sd">            The name of the functional group.</span>
+
+<span class="sd">        fg_smarts : :class:`str`</span>
+<span class="sd">            A SMARTS string which matches the functional group.</span>
+
+<span class="sd">        bonder_smarts : :class:`str`</span>
+<span class="sd">            A SMARTS string which matches the atom on the functional</span>
+<span class="sd">            group which forms bonds during reactions.</span>
+
+<span class="sd">        del_smarts : :class:`str`</span>
+<span class="sd">            A SMARTS string, which matches the atoms removed when the</span>
+<span class="sd">            functional group reacts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fg_smarts</span> <span class="o">=</span> <span class="n">fg_smarts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonder_smarts</span> <span class="o">=</span> <span class="n">bonder_smarts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">del_smarts</span> <span class="o">=</span> <span class="n">del_smarts</span></div>
+
+
+<span class="n">functional_groups</span> <span class="o">=</span> <span class="p">[</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;amine&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[N]([H])[H]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([N]([H])[H])]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([H][N][H])].[$([H][N][H])]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;aldehyde&quot;</span><span class="p">,</span> <span class="s2">&quot;[C](=[O])[H]&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;[$([C](=[O])[H])]&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;[$([O]=[C][H])]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;carboxylic_acid&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[C](=[O])[O][H]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([C](=[O])[O][H])]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([H][O][C](=[O]))][O]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;amide&quot;</span><span class="p">,</span> <span class="s2">&quot;[C](=[O])[N]([H])[H]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([C](=[O])[N]([H])[H])]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([N]([H])([H])[C](=[O]))]([H])[H]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;thioacid&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[C](=[O])[S][H]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([C](=[O])[O][H])]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([H][O][C](=[O]))][S]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;alcohol&quot;</span><span class="p">,</span> <span class="s2">&quot;[O][H]&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;[$([O][H])]&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;[$([H][O])]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;thiol&quot;</span><span class="p">,</span> <span class="s2">&quot;[S][H]&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;[$([S][H])]&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;[$([H][S])]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;bromine&quot;</span><span class="p">,</span> <span class="s2">&quot;*[Br]&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;[$(*[Br])]&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;[$([Br]*)]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;iodine&quot;</span><span class="p">,</span> <span class="s2">&quot;*[I]&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;[$(*[I])]&quot;</span><span class="p">,</span>
+                                 <span class="s2">&quot;[$([I]*)]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;nitrile&quot;</span><span class="p">,</span> <span class="s2">&quot;[C][C]#[N]&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;[$([C]([H])([H])[C]#[N])]&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;[$([H][C][H])].[$([H][C][H])]&quot;</span><span class="p">),</span>
+
+
+                <span class="c1"># This amine functional group only deletes one of the</span>
+                <span class="c1"># hydrogen atoms when a bond is formed.</span>
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;amine2&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[N]([H])[H]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([N]([H])[H])]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([H][N][H])]&quot;</span><span class="p">),</span>
+
+                <span class="n">FGInfo</span><span class="p">(</span><span class="s2">&quot;secondary_amine&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[H][N]([#6])[#6]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([N]([H])([#6])[#6])]&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;[$([H][N]([#6])[#6])]&quot;</span><span class="p">)</span>
+
+
+                    <span class="p">]</span>
+
+<span class="n">double_bond_combs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;amine&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">),</span>
+                     <span class="p">(</span><span class="s1">&#39;amide&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehyde&#39;</span><span class="p">),</span>
+                     <span class="p">(</span><span class="s1">&#39;nitrile&#39;</span><span class="p">,</span><span class="s1">&#39;aldehyde&#39;</span><span class="p">),</span>
+                     <span class="p">(</span><span class="s1">&#39;amide&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)]</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Lukas Turcani.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
