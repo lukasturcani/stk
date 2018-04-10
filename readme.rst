@@ -4,11 +4,6 @@
 
 Requires Python 3.6.
 
-The forks https://www.github.com/supramolecular-toolkit/stk and
-https://github.com/JelfsMaterialsGroup/stk are placeholders. Please
-use https://www.github.com/lukasturcani/stk for up-to-date code and submitting
-any comments, bugs, pull requests etc.
-
 This code was developed while doing my PhD in the Jelfs group,
 http://www.jelfs-group.org/.
 
