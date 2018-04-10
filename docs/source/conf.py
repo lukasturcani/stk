@@ -155,6 +155,6 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'stk', 'stk Documentation',
-     author, 'stk', 'One line description of project.',
+     author, 'stk', 'stk is a Python 3 library for building, manipulating, optimizing and designing molecules.',
      'Miscellaneous'),
 ]
