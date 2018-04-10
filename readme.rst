@@ -1,6 +1,6 @@
 :author: Lukas Turcani
 
-.. figure:: documentation/source/figures/stk.png
+.. figure:: docs/source/figures/stk.png
 
 Requires Python 3.6.
 
@@ -17,7 +17,7 @@ Overview
 
 ``stk`` is a Python library for building, manipulating, optimizing and
 designing molecules. For more information, the documentation can be found at
-https://lukasturcani.github.io/stk/build/index.html
+https://lukasturcani.github.io/stk/docs/build/html.
 
 Installation
 ============
