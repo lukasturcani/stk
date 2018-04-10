@@ -22,11 +22,37 @@ designing molecules. For more information, the documentation can be found at
 Installation
 ============
 
+There are two ways to install ``stk``. The first is easier, using
+pip. The second involves downloading the source code form GitHub. Using
+GitHub is the best way to get the most up-to-date code.
+
+In both cases ``rdkit`` needs to be installed, see `installing rdkit`_.
+
+pip
+---
+
+In the terminal run
+
+.. code-block:: bash
+
+    pip install stk
+
+Make sure you download ``requirements.txt`` and run
+
+.. code-block:: bath
+
+    pip install -r requirements.txt
+
+to install any dependencies you are missing.
+
+GitHub
+------
+
 Installation is simple and has 2 parts. First, installing ``stk``, second,
 installing any libraries it requires.
 
-stk
----
+installing stk
+--------------
 
 1. Download ``stk`` from GitHub by clicking on the green "Clone or download"
    button and then on "Download ZIP".
@@ -40,8 +66,8 @@ stk
 4. ``stk`` should be installed, you can delete the downloaded and
    extracted folders.
 
-dependencies
--------------
+installing dependencies
+-----------------------
 
 Apart from ``rdkit`` all dependcies of ``stk`` are listed in
 ``requirements.txt``. ``rdkit`` cannot be installed via pip so it is
@@ -49,6 +75,20 @@ listed separately.
 
 rdkit
 .....
+
+See `installing rdkit`_.
+
+others
+......
+
+All other requirements can be installed with pip.
+
+.. code-block:: bash
+
+    pip install -r requirements.txt
+
+installing rdkit
+----------------
 
 The simplest way to get ``rdkit`` is to use the Anaconda distribution of
 Python, which can be found on https://www.anaconda.com/download/. It
@@ -63,16 +103,6 @@ After installing Anaconda run
 
 If you do not want to use Anaconda, the best place to look for advice
 on installing ``rdkit`` is https://github.com/rdkit/rdkit.
-
-
-others
-......
-
-All other requirements can be installed with pip.
-
-.. code-block:: bash
-
-    pip install -r requirements.txt
 
 Publications
 ============
