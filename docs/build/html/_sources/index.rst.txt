@@ -10,6 +10,8 @@ Welcome to ``stk``'s documentation!
    :maxdepth: 2
    :caption: Contents:
 
+GitHub: https://github.com/lukasturcani/stk
+
 Overview
 --------
 
