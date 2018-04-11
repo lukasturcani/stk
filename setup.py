@@ -14,6 +14,6 @@ setup(name='stk',
       requires=['networkx',
                 'scipy',
                 'matplotlib',
-                'scikit-learn',
+                'sklearn',
                 'psutil',
                 'pywindowx'])
