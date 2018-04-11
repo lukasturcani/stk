@@ -32,14 +32,6 @@ In the terminal run
 
     pip install stk
 
-Make sure you download ``requirements.txt`` and run
-
-.. code-block:: bath
-
-    pip install -r requirements.txt
-
-to install any dependencies you are missing.
-
 GitHub
 ------
 
