@@ -178,7 +178,7 @@ from ..convenience_tools import (flatten, periodic_table,
                                  normalize_vector, rotation_matrix,
                                  vector_theta, mol_from_mae_file,
                                  rotation_matrix_arbitrary_axis,
-                                 atom_vdw_radii, bond_dict, Cell)
+                                 atom_vdw_radii, Cell)
 
 
 logger = logging.getLogger(__name__)
