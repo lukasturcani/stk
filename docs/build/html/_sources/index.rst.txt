@@ -6,11 +6,11 @@
 Welcome to ``stk``'s documentation!
 ===================================
 
+GitHub: https://www.github.com/lukasturcani/stk
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-GitHub: https://github.com/lukasturcani/stk
 
 Overview
 --------
@@ -188,7 +188,7 @@ Where the buliding blocks are:
 .. image:: figures/cof_bbs.png
 
 The same pattern is used. First building blocks objects are created using
-:class:`StructUnit3` instances. Then a molecule is assembled by creating
+:class:`.StructUnit3` instances. Then a molecule is assembled by creating
 an instance of its class, in this case :class:`.Periodic`. The molecule
 being assembled is provided with the building blocks and the topology,
 in this case :class:`.Honeycomb`.
