@@ -563,7 +563,7 @@ class LinkerCOFLattice(COFLattice):
         indicate if the building block is placed parallel or
         anti-parallel to the edge.
 
-    multitopic_aligners : :class:`list` of :class`int`
+    multitopic_aligners : :class:`list` of :class:`int`
         For each vertex in the topology, holds the index of an
         atom in :attr:`.StructUnit.bonder_ids`. It specicifes which
         bonder atom is used for alignment of the building block on the
