@@ -515,7 +515,7 @@ def bb_size(macro_mol):
     """
     Sums the diameters of the building blocks.
 
-    Parmeters
+    Parameters
     ---------
     macro_mol : :class:`.MacroMolecule`
         The macromolecule being assembled.
@@ -535,7 +535,7 @@ def linker_cof_scale_func(macro_mol):
     """
     Calculates the scale factor for :class:`LinkerCOFLattice`.
 
-    Parmeters
+    Parameters
     ---------
     macro_mol : :class:`.MacroMolecule`
         The macromolecule being assembled.
