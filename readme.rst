@@ -97,5 +97,7 @@ Publications
 about stk
 ---------
 
+https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
+
 using stk
 ---------
