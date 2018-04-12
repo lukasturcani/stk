@@ -88,7 +88,7 @@ from collections import deque, defaultdict
 from .base import Topology
 from ...convenience_tools import (PeriodicBond,
                                   add_fragment_props,
-                                  normalize_vector)
+                                  normalize_vector, vector_theta)
 
 
 class Vertex:
@@ -347,11 +347,42 @@ class Edge:
         original_position = mol.position_matrix()
 
         mol.set_bonder_centroid(coord)
-        mol.set_orientation2(self.direction(cell_params)*alignment)
+        d = self.bonder_direction(macro_mol, cell_params)*alignment
+        mol.set_orientation2(d)
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
         return rdkit_mol
+
+    def bonder_direction(self, macro_mol, cell_params):
+        """
+        Calculates the direction vetor between the bonder atoms.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The direction vector.
+
+        """
+
+        coords = []
+        for i, position in enumerate(self.joint_positions):
+            vertex = self.connected[i]
+            bonder = vertex.bonder_map[position]
+            coords.append(macro_mol.atom_coords(bonder))
+
+        for d, param in zip(self.bond, cell_params):
+                coords[1] += d*param
+
+        return normalize_vector(coords[1] - coords[0])
 
     def direction(self, cell_params):
         """
@@ -403,6 +434,9 @@ class Edge:
         ----------
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
+
+        cell_params : :class:`list` of :class:`numpy.array`
+            The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
         Returns
         -------
@@ -477,6 +511,46 @@ def is_bonder(macro_mol, atom_id):
             else False)
 
 
+def bb_size(macro_mol):
+    """
+    Sums the diameters of the building blocks.
+
+    Parmeters
+    ---------
+    macro_mol : :class:`.MacroMolecule`
+        The macromolecule being assembled.
+
+    Returns
+    -------
+    :class:`float`
+        The sum of the diameters of the building blocks. Used to
+        scale the size of unit cells.
+
+    """
+
+    return sum(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
+
+
+def linker_cof_scale_func(macro_mol):
+    """
+    Calculates the scale factor for :class:`LinkerCOFLattice`.
+
+    Parmeters
+    ---------
+    macro_mol : :class:`.MacroMolecule`
+        The macromolecule being assembled.
+
+    Returns
+    -------
+    :class:`float`
+        A product of the sum of the diameters of the building blocks
+        and the number of vertices in the unit cell.
+
+    """
+
+    return bb_size(macro_mol)*((len(macro_mol.topology.vertices)+1)//1.5)
+
+
 class COFLattice(Topology):
     """
     A base class for periodic topologies.
@@ -488,7 +562,19 @@ class COFLattice(Topology):
     This is necessary for positioning terminating atoms on islands
     generated from the periodic structure by :meth:`.Periodic.island`.
 
+    Attributes
+    ----------
+    scale_func : :class:`function`
+        A function which takes a :class:`.MacroMolecule` as its only
+        argument returns a number. The number is used
+        to scale the size of the unit cell. See :func:`bb_size`
+        for an example.
+
     """
+
+    def __init__(self, scale_func=bb_size):
+        self.scale_func = scale_func
+        super().__init__()
 
     def del_atoms(self, macro_mol):
         """
@@ -573,8 +659,9 @@ class LinkerCOFLattice(COFLattice):
 
     def __init__(self,
                  ditopic_directions=None,
-                 multitopic_aligners=None):
-        super().__init__()
+                 multitopic_aligners=None,
+                 scale_func=linker_cof_scale_func):
+        super().__init__(scale_func=scale_func)
 
         if ditopic_directions is None:
             ditopic_directions = [1 for i in range(len(self.edges))]
@@ -612,8 +699,7 @@ class LinkerCOFLattice(COFLattice):
 
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
-        size = di.max_diameter()[0] + multi.max_diameter()[0]
-        size *= (len(self.vertices)+1)//1.5
+        size = self.scale_func(macro_mol)
         cell_params = [size*p for p in self.cell_dimensions]
         macro_mol.cell_dimensions = cell_params
 
@@ -820,9 +906,9 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
         macro_mol.mol = rdkit.Mol()
         # Get the building blocks.
         bb1, bb2 = macro_mol.building_blocks
-        cell_size = bb1.max_diameter()[0] + bb2.max_diameter()[0]
-        self.cell_dimensions = [cell_size*x for x in
-                                self.cell_dimensions]
+        cell_size = self.scale_func(macro_mol)
+        macro_mol.cell_dimensions = [cell_size*x for x in
+                                     self.cell_dimensions]
         self.vertices = [cell_size*x for x in self.vertices]
         # Place and set orientation of the first building block.
         bb1.set_bonder_centroid(self.vertices[0])
