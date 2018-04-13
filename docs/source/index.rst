@@ -18,6 +18,8 @@ Overview
 ``stk`` is a Python 3 library for building, manipulating, optimizing
 and designing molecules.
 
+For quick navigation through the modules use :ref:`modindex`.
+
 Basic Examples
 --------------
 
@@ -84,6 +86,23 @@ and viewed
 
 .. image:: figures/polymer_opt.png
 
+``stk`` also allows you to save the Python objects themselves in the JSON
+format.
+
+.. code-block:: python
+
+    polymer.dump('polymer.json')
+
+This allows you to restore a :class:`.Molecule` object from a previous session.
+
+.. code-block:: python
+
+    polymer = Molecule.load('polymer.json')
+    polymer # < Polymer NOT Molecule object >
+
+:meth:`.Molecule.load` allows you to load any dumped ``stk`` JSON object
+regardless of its class and it will returned an object of the correct
+class to you.
 
 Molecular Cages
 ...............
@@ -171,6 +190,33 @@ have been optimized quite poorly. The :func:`.macromodel_opt` function
 requires a valid ``MacroModel`` installation with a working license.
 The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 
+Note that there are many more cage topologies available (14+), which
+can be found by looking in :mod:`stk.molecular.topologies.cage`.
+
+.. image:: figures/cages_two_plus_three.png
+
+.. image:: figures/cages_two_plus_four.png
+
+.. image:: figures/cages_three_plus_four.png
+
+.. image:: figures/cages_three_plus_three.png
+
+The topologies are organized into submodules based on the building blocks
+required to build them. For example, all topologies in the
+:mod:`stk.molecular.topologies.cage.two_plus_three` submodule are composed of two and three functionalized building
+blocks, all cages in the :mod:`stk.molecular.topologies.cage.two_plus_four` submodule are composed of two and
+four functionalized building blocks, cages in :mod:`stk.molecular.topologies.cage.three_plus_three` are composed
+of three functionalized building blocks and so on.
+
+All cage topologies also support being built from more than two building
+blocks, to produce mixed or multi-component cages.
+
+.. image:: figures/advanced_cage_assembly/multi_cage.png
+
+In addition, cage topologies support a number of optional arguments which allow the many
+possible structural isomers to be easily assembled. These topics are
+discussed in :doc:`advanced_cage_building`.
+
 Covalent Organic Frameworks
 ...........................
 
@@ -188,7 +234,7 @@ Where the buliding blocks are:
 .. image:: figures/cof_bbs.png
 
 The same pattern is used. First building blocks objects are created using
-:class:`StructUnit3` instances. Then a molecule is assembled by creating
+:class:`.StructUnit3` instances. Then a molecule is assembled by creating
 an instance of its class, in this case :class:`.Periodic`. The molecule
 being assembled is provided with the building blocks and the topology,
 in this case :class:`.Honeycomb`.
@@ -218,6 +264,10 @@ Other COF topologies are available in :mod:`.topologies.cof`. For example:
 :class:`.Kagome`
 
 .. image:: figures/kagome.png
+
+``stk`` also gives tools to build a large number of structural isomers
+of each COF. This is done analogously to the organic cage case so reading
+:doc:`advanced_cage_building` is recommended.
 
 Other Materials
 ...............
@@ -262,6 +312,23 @@ Here are some examples:
     # Get the atomic symbol of atom with id of 13.
     mol.atom_symbol(13)
 
+Something to note about energy calculations, is that each time you run
+the method, the result gets saved. For example,
+
+
+.. code-block:: python
+
+    mol.energy.values # {}
+    mol.energy.rdkit('uff') # Returns 16.05
+    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501}
+    mol.energy.macromodel(forcefield=16,
+                          macromodel_path='path/to/macromodel/dir') # Returns 200
+    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501,
+                      #  FunctionData('macromodel', forcefield=16): 200}
+
+This can come in handy if you do not want to repeat expensive calculations.
+
+
 Geometric Manipulations
 .......................
 
@@ -279,6 +346,70 @@ defining the assembly process of a new class of molecules.
     mol.set_position_from_matrix(some_matrix)
     # Rotate the molecule along by pi radians about the vector (1, 1, 3)
     mol.rotate(np.pi, [1, 1, 2])
+
+Dealing with Multiple Conformers
+--------------------------------
+
+Every :class:`.Molecule`, be it a :class:`.StructUnit` or a :class:`.MacroMolecule`
+supports multiple conformers. These are stored in the underlying
+:mod:`rdkit` object held in :class:`.Molecule.mol`.
+
+Adding a new conformer to a :class:`.StructUnit` is simple
+
+.. code-block:: python
+
+    bb1 = StructUnit2('bb1_conf1.mol', 'amine') # Loads molecule into conformer 0.
+    bb1.update_from_mol('bb1_conf2.mol', conformer=1) # Load into conformer 1.
+
+Lets take a look
+
+    .. image:: figures/bb1_confs.png
+
+Well, one is clearly better than the other. At least they are easy to
+recognize.
+
+Lets try this with a another building block as well
+
+.. code-block:: python
+
+    bb2 = StructUnit3('bb2_conf1.mol', 'aldehyde')
+    bb2 = bb2.update_from_mol('bb2_conf2.mol')
+
+.. image:: figures/bb2_confs.png
+
+Also pretty distinguishable. This is good, it makes it easy to show
+that you can pick which conformers to use for assembly with :class:`.MacroMolecule`
+
+.. code-block:: python
+
+    cage = Cage([bb1, bb2], FourPlusSix(), bb_conformers=[0, 0])
+    cage.add_conformer([0, 1])
+    cage.add_conformer([1, 0])
+    cage.add_conformer([1, 1])
+
+These are the conformers we produced!
+
+.. image:: figures/1.png
+
+.. image:: figures/2.png
+
+.. image:: figures/3.png
+
+.. image:: figures/4.png
+
+``stk`` will use whichever :class:`.StructUnit` conformers you want, when
+constructing conformers of the :class:`.MacroMolecule` itself.
+
+Most methods and functions in ``stk`` also support conformers.
+
+.. code-block:: python
+
+    mol.position_matrix(conformer=1)
+    mol.energy.rdkit('uff', conformer=0)
+    mol.cavity_size(conformer=1)
+
+    # And so on ...
+
 
 Dealing with Multiple Molecules
 ...............................
@@ -364,6 +495,9 @@ Further Reading
 
     * :ref:`macromolecular assembly`
     * :ref:`cof assembly`
+    * :doc:`advanced_cage_building`
+    * :doc:`caching`
+    * https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
 
 Indices and tables
 ==================
