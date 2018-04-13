@@ -405,6 +405,12 @@ class Vertex:
                     count += 1
         return centroid / count
 
+    def __repr__(self):
+        return "Vertex({:.3}, {:.3}, {:.3})".format(*self.coord)
+
+    def __str__(self):
+        return repr(self)
+
 
 class Edge(Vertex):
     """
@@ -508,6 +514,13 @@ class Edge(Vertex):
 
         return linker.mol
 
+    def __repr__(self):
+        v1, v2 = self.connected
+        return f"Edge({v1}, {v2})"
+
+    def __str__(self):
+        return repr(self)
+
 
 class _CageTopology(Topology):
     """
@@ -521,7 +534,7 @@ class _CageTopology(Topology):
         bonder atoms of each building block is aligned with an edge
         during placement. The :class:`int` indicates which bonder atom
         is aligned. The :class:`int` corresponds to an index in
-        :attr:`.MacroMolecule.bonder_ids`.
+        :attr:`.StructUnit.bonder_ids`.
 
         If ``None`` the first atom in `bonder_ids` is always aligned.
 
@@ -537,7 +550,6 @@ class _CageTopology(Topology):
         atom aligned. The 3rd building block has the 2nd (index ``1``)
         atom aligned. The 4th building block has the 3rd (index ``2``)
         atom aligned.
-
 
     B_alignments : :class:`list` of :class:`int`
         The length of this :class:`list` should be euqal to the number
