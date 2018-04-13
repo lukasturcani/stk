@@ -660,7 +660,7 @@
         <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology">[docs]</a><span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A topology class which cage topologies should inherit.</span>
 
@@ -778,7 +778,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">edge_alignments</span> <span class="o">=</span> <span class="n">edge_alignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span> <span class="o">=</span> <span class="n">bb_assignments</span>
 
-    <span class="k">def</span> <span class="nf">_bb_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology._bb_maps"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology._bb_maps">[docs]</a>    <span class="k">def</span> <span class="nf">_bb_maps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -807,9 +807,9 @@
                 <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
                     <span class="n">map_</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">bb</span>
 
-        <span class="k">return</span> <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span>
+        <span class="k">return</span> <span class="n">bb_map</span><span class="p">,</span> <span class="n">lk_map</span></div>
 
-    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.join_mols"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Joins up the separate building blocks which form the molecule.</span>
 
@@ -858,9 +858,9 @@
                 <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
                 <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
 
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span>
+        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">pair_bonders_with_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.pair_bonders_with_positions"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.pair_bonders_with_positions">[docs]</a>    <span class="k">def</span> <span class="nf">pair_bonders_with_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Matches atoms with the closest building block position.</span>
 
@@ -919,9 +919,9 @@
                 <span class="k">continue</span>
             <span class="n">vertex</span><span class="o">.</span><span class="n">atom_position_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bonder_id</span><span class="p">,</span> <span class="n">pos</span><span class="p">))</span>
             <span class="n">paired_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder_id</span><span class="p">)</span>
-            <span class="n">paired_pos</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+            <span class="n">paired_pos</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_CageTopology.place_mols"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Places all building block molecules on correct coordinates.</span>
 
@@ -1018,19 +1018,19 @@
                     <span class="n">bonder_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
 
             <span class="c1"># Save the ids of atoms which form new bonds.</span>
-            <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
+            <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">_VertexOnlyCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+<div class="viewcode-block" id="_VertexOnlyCageTopology"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._VertexOnlyCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_VertexOnlyCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cage topolgies where all building block/linker mols have 3+ fgs.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="o">...</span>
+    <span class="o">...</span></div>
 
 
-<span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._NoLinkerCageTopology">[docs]</a><span class="k">class</span> <span class="nc">_NoLinkerCageTopology</span><span class="p">(</span><span class="n">_CageTopology</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cage topologies where all building units have equal number of fgs.</span>
 
@@ -1057,7 +1057,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bb_assignments</span> <span class="o">=</span> <span class="n">bb_assignments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology.place_mols"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._NoLinkerCageTopology.place_mols">[docs]</a>    <span class="k">def</span> <span class="nf">place_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
 
         <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Mol</span><span class="p">()</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">max_diameter</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">building_blocks</span><span class="p">)</span>
@@ -1084,9 +1084,9 @@
 
             <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bonder_ids</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pair_bonders_with_positions</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-            <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">ipos</span><span class="p">)</span>
+            <span class="n">bb</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">ipos</span><span class="p">)</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="_NoLinkerCageTopology.connect"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._NoLinkerCageTopology.connect">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates each :attr:`Vertex.connected`.</span>
@@ -1103,7 +1103,7 @@
         <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
             <span class="n">v1</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
             <span class="n">v2</span><span class="o">.</span><span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span></div></div>
 </pre></div>
 
            </div>

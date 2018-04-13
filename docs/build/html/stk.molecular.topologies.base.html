@@ -164,10 +164,10 @@
 <div class="section" id="cages">
 <h3>Cages<a class="headerlink" href="#cages" title="Permalink to this headline">¶</a></h3>
 <p>To add a new cage topology a new class should be created, named
-after the topology. This class should inherit <code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code>.
+after the topology. This class should inherit <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology" title="stk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code></a>.
 This will give access to various methods which are necessary
 for dealing with any cage molecule. See the documenation of
-<code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code> for more details.</p>
+<a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology" title="stk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code></a> for more details.</p>
 <p>The new class will only need to have five class attributes added:</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -234,6 +234,34 @@ polymer.</p>
 treated. If <code class="docutils literal"><span class="pre">'h'</span></code> the functional groups at the end of the
 polymer are converted into hydrogem atoms. If <code class="docutils literal"><span class="pre">'fg'</span></code> they are
 kept as the original functional group.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.base.Linear._x_position">
+<code class="descname">_x_position</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear._x_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear._x_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the x coordinate on which to place <cite>bb</cite>.</p>
+<p>Does this by checking the most how for down the x axis
+<cite>macro_mol</cite> stretches and checking the distance between
+the minimum x position of <cite>bb</cite> and its centroid.
+It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
+<li><strong>bb</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a>) – The building block to be added to <cite>macro_mol</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The x coordinate on which to place <cite>bb</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
