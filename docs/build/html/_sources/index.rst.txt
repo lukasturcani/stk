@@ -84,6 +84,23 @@ and viewed
 
 .. image:: figures/polymer_opt.png
 
+``stk`` also allows you to save the Python objects themselves in the JSON
+format.
+
+.. code-block:: python
+
+    polymer.dump('polymer.json')
+
+This allows you to restore a :class:`.Molecule` object from a previous session.
+
+.. code-block:: python
+
+    polymer = Molecule.load('polymer.json')
+    polymer # < Polymer NOT Molecule object >
+
+:meth:`.Molecule.load` allows you to load any dumped ``stk`` JSON object
+regardless of its class and it will returned an object of the correct
+class to you.
 
 Molecular Cages
 ...............
@@ -246,6 +263,10 @@ Other COF topologies are available in :mod:`.topologies.cof`. For example:
 
 .. image:: figures/kagome.png
 
+``stk`` also gives tools to build a large number of structural isomers
+of each COF. This is done analogously to the organic cage case so reading
+:doc:`advanced_cage_building` is recommended.
+
 Other Materials
 ...............
 
@@ -306,6 +327,59 @@ defining the assembly process of a new class of molecules.
     mol.set_position_from_matrix(some_matrix)
     # Rotate the molecule along by pi radians about the vector (1, 1, 3)
     mol.rotate(np.pi, [1, 1, 2])
+
+Dealing with Multiple Conformers
+--------------------------------
+
+Every :class:`.Molecule`, be it a :class:`.StructUnit` or a :class:`.MacroMolecule`
+supports multiple conformers. These are stored in the underlying
+:mod:`rdkit` object held in :class:`.Molecule.mol`.
+
+Adding a new conformer to a :class:`.StructUnit` is simple
+
+.. code-block:: python
+
+    bb1 = StructUnit2('bb1_conf1.mol', 'amine') # Loads molecule into conformer 0.
+    bb1.update_from_mol('bb1_conf2.mol', conformer=1) # Load into conformer 1.
+
+Lets take a look
+
+    .. image:: figures/bb1_confs.png
+
+Well, one is clearly better than the other. At least they are easy to
+recognize.
+
+Lets try this with a another building block as well
+
+.. code-block:: python
+
+    bb2 = StructUnit3('bb2_conf1.mol', 'aldehyde')
+    bb2 = bb2.update_from_mol('bb2_conf2.mol')
+
+.. image:: figures/bb2_confs.png
+
+Also pretty distinguishable. This is good, it makes it easy to show
+that you can pick a conformers to use for assembly with :class:`.MacroMolecule`
+
+.. code-block:: python
+
+    cage = Cage([bb1, bb2], FourPlusSix(), bb_conformers=[0, 0])
+    cage.add_conformer([0, 1])
+    cage.add_conformer([1, 0])
+    cage.add_conformer([1, 1])
+
+These are the conformers we produced!
+
+.. image:: figures/1.png
+
+.. image:: figures/2.png
+
+.. image:: figures/3.png
+
+.. image:: figures/4.png
+
+``stk`` will use which :class:`.StructUnit` conformers you want, for
+constructing conformers of the :class:`.MacroMolecule` itself.
 
 Dealing with Multiple Molecules
 ...............................
@@ -369,6 +443,8 @@ Further Reading
 
     * :ref:`macromolecular assembly`
     * :ref:`cof assembly`
+    * :doc:`advanced_cage_building`
+    * :doc:`caching`
     * https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
 
 Indices and tables
