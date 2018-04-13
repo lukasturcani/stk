@@ -246,24 +246,24 @@ placed.</p>
 <ol class="arabic">
 <li><p class="first">Begin by picking a topology.</p>
 <blockquote>
-<div><img alt="figures/advanced_cage_assembly/topology.png" src="figures/advanced_cage_assembly/topology.png" />
+<div><img alt="_images/topology.png" src="_images/topology.png" />
 <p>This is a <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#stk.molecular.topologies.cage.two_plus_three.FourPlusSix" title="stk.molecular.topologies.cage.two_plus_three.FourPlusSix"><code class="xref py py-class docutils literal"><span class="pre">FourPlusSix</span></code></a> with <code class="docutils literal"><span class="pre">4</span></code> vertices and <code class="docutils literal"><span class="pre">6</span></code> edges.
 The vertices a labelled <code class="docutils literal"><span class="pre">A</span></code>, <code class="docutils literal"><span class="pre">B</span></code>, <code class="docutils literal"><span class="pre">C</span></code> and <code class="docutils literal"><span class="pre">D</span></code>.</p>
 </div></blockquote>
 </li>
 <li><p class="first">Pick a three functionalized building block.</p>
 <blockquote>
-<div><img alt="figures/advanced_cage_assembly/three_func_bb.png" src="figures/advanced_cage_assembly/three_func_bb.png" />
-<p>For the purposes of this example, we can simplify it down to only
-its <code class="docutils literal"><span class="pre">bonder</span></code> atoms. These are the atoms which form bonds during
-assembly of a macromolecule. Recall, that each building block is
+<div><img alt="_images/tritopic.png" src="_images/tritopic.png" />
+<p>For the purposes of drawing, we can simplify the representation of
+our molecule.
+Recall, that each building block is
 represented within <code class="docutils literal"><span class="pre">stk</span></code> as a <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a> instance.</p>
 </div></blockquote>
 </li>
 <li><p class="first">Place the building block on each vertex of the topology.</p>
 <blockquote>
-<div><img alt="figures/advanced_cage_assembly/placement.png" src="figures/advanced_cage_assembly/placement.png" />
-<p>Notice that the because we duplicate the building block to make the
+<div><img alt="_images/placed.png" src="_images/placed.png" />
+<p>Notice that because we duplicate the building block to make the
 macromolecule, the atom ids changed. The atom id of <code class="docutils literal"><span class="pre">bonder</span></code> atom
 within the macromolecule is shown next to the atoms while the
 original atom id in the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> is shown in brackets.
@@ -275,33 +275,41 @@ in <code class="docutils literal"><span class="pre">stk</span></code> by a <a cl
 <li><p class="first">Rotate each building block while keeping it on the vertex to minimize
 the distance between the <code class="docutils literal"><span class="pre">bonder</span></code> atoms and the edges of the
 topology. Let’s take a birds eye view of each vertex.</p>
-<img alt="figures/advanced_cage_assembly/birds_eye1.png" src="figures/advanced_cage_assembly/birds_eye1.png" />
+<img alt="_images/birds_eye1.png" src="_images/birds_eye1.png" />
 <p>At each vertex, pick any arbitrary edge and select a
 <code class="docutils literal"><span class="pre">bonder</span></code> atom. We then rotate the building block until the selected
 edge and <code class="docutils literal"><span class="pre">bonder</span></code> atom are perfectly aligned. The bonder atom is
-picked by the id in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>, not by the id
+identified by the id in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit3" title="stk.molecular.molecules.StructUnit3"><code class="xref py py-class docutils literal"><span class="pre">StructUnit3</span></code></a>, not by the id
 in <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>. Once rotation is done, create the bonds
-and we have one structural isomer. The 2 functionalized building block
-which should go on the edges of the topology is implied. We can
-define this with code</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">A_alignments</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+between all the building blocks in the macromolecule and we have one
+structural isomer. We can define which <code class="docutils literal"><span class="pre">bonder</span></code> atom we picked for
+alignment at each
+vertex with the following code</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">A_alignments</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Don’t worry about why the variable is called <code class="docutils literal"><span class="pre">A_alignments</span></code>. What
-this means that at the first vertex, <code class="docutils literal"><span class="pre">A</span></code> we selected the first <code class="docutils literal"><span class="pre">bonder</span></code>
-to align with our edge. For the second vertex, <code class="docutils literal"><span class="pre">B</span></code> we selected the
-third bonder. For the third vertex, <code class="docutils literal"><span class="pre">C</span></code> we selected the second bonder
+this means, is that at the first vertex, <code class="docutils literal"><span class="pre">A</span></code> we selected the third <code class="docutils literal"><span class="pre">bonder</span></code>
+to align with our arbitrarily chosen edge. For the second vertex, <code class="docutils literal"><span class="pre">B</span></code> we selected the
+second bonder. For the third vertex, <code class="docutils literal"><span class="pre">C</span></code> we selected the first bonder
 and for the last vertex <code class="docutils literal"><span class="pre">D</span></code> we selected the third bonder again.</p>
+<p>The other bonder atoms also fell directly on edges because the
+functional groups were 120 degrees apart. Had they not been, they
+would have not been well aligned with their respective edges. Only the
+distance between the selected edge and <code class="docutils literal"><span class="pre">bonder</span></code> atom is minimized.</p>
 </li>
 <li><p class="first">If we had picked a different <code class="docutils literal"><span class="pre">bonder</span></code> atom at any of the vertices,
 while keeping the selected edge the same, we would have assembled a
 different structural isomer. This is because a different bonder atom
-ends up connected at a different edge.</p>
-<img alt="figures/advanced_cage_assembly/birds_eye2.png" src="figures/advanced_cage_assembly/birds_eye2.png" />
+ends up connected at a different edge. For example</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">A_alignments</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/birds_eye2.png" src="_images/birds_eye2.png" />
 <p>Because we have 4 vertices and at each vertex we have 3 possible
-orientations, we can build a total of 3:superscript:<cite>4</cite> (81)
+orientations, we can build a total of 3^4 (81)
 structural isomers. This is of course assuming that our building
-block does not have rotational symmetry. If it does then the number
+block does not have rotational symmetry. If it does, then the number
 of structural isomers will decrease. This is because rotating a
 symmetric building block will not change the connectivity of the
 molecule.</p>
@@ -309,8 +317,8 @@ molecule.</p>
 </ol>
 <p>The code to control structural isomers by changing the orientation of the
 building blocks is therefore</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">isomer1</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(</span><span class="n">A_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
-<span class="n">isomer2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(</span><span class="n">A_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">isomer1</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(</span><span class="n">A_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+<span class="n">isomer2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(</span><span class="n">A_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
 </pre></div>
 </div>
 <p>The length of the <code class="xref py py-class docutils literal"><span class="pre">list</span></code> <code class="docutils literal"><span class="pre">A_alignments</span></code> is equal to the number
@@ -323,6 +331,7 @@ vertices we could do</p>
 <p>The number must be between <code class="docutils literal"><span class="pre">0</span></code> and <code class="docutils literal"><span class="pre">2</span></code> because there are three
 <code class="docutils literal"><span class="pre">bonder</span></code> atoms. We do not specify the <code class="docutils literal"><span class="pre">bonder</span></code> atoms by their actual
 atomic id, only by this index.</p>
+<p>Let’s look at a different cage topology.</p>
 <img alt="_images/cages_three_plus_four.png" src="_images/cages_three_plus_four.png" />
 <p>This topology has three and four functionalized building blocks.</p>
 <p>To specify which bonder atoms get aligned</p>
@@ -340,10 +349,9 @@ of them, the number put into <code class="docutils literal"><span class="pre">B_
 2, inclusive.</p>
 <p>Look at <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.A_alignments" title="stk.molecular.topologies.cage.base._CageTopology.A_alignments"><code class="xref py py-attr docutils literal"><span class="pre">_CageTopology.A_alignments</span></code></a> and
 <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.B_alignments" title="stk.molecular.topologies.cage.base._CageTopology.B_alignments"><code class="xref py py-attr docutils literal"><span class="pre">_CageTopology.B_alignments</span></code></a> for more documentation.</p>
-<p>Finally lets look at the case where we have a two functinalized building
+<p>Finally, consider the case where we have a two functionalized building
 block. In these cases the building blocks are placed on the edges, and
 can be placed either parallel or anti-parallel along it.</p>
-<img alt="figures/two_func_placement.png" src="figures/two_func_placement.png" />
 <p>In cases like this</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">isomer</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(</span><span class="n">A_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
                                       <span class="n">B_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
@@ -367,7 +375,7 @@ structural isomer of a multi-component cage!</p>
                                           <span class="mi">3</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]}))</span>
 </pre></div>
 </div>
-<p>Put that in a loop a do some screening maybe?</p>
+<p>Next step is to put this in a loop and so some screening.</p>
 </div>
 </div>
 

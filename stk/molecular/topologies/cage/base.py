@@ -405,6 +405,12 @@ class Vertex:
                     count += 1
         return centroid / count
 
+    def __repr__(self):
+        return "Vertex({:.3}, {:.3}, {:.3})".format(*self.coord)
+
+    def __str__(self):
+        return repr(self)
+
 
 class Edge(Vertex):
     """
@@ -507,6 +513,13 @@ class Edge(Vertex):
         linker.set_bonder_centroid(self.bonder_centroid(macro_mol, scale))
 
         return linker.mol
+
+    def __repr__(self):
+        v1, v2 = self.connected
+        return f"Edge({v1}, {v2})"
+
+    def __str__(self):
+        return repr(self)
 
 
 class _CageTopology(Topology):

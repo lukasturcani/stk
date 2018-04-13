@@ -554,7 +554,13 @@
                 <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
                     <span class="n">centroid</span> <span class="o">+=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_coords</span><span class="p">(</span><span class="n">bonder</span><span class="p">)</span>
                     <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">centroid</span> <span class="o">/</span> <span class="n">count</span></div></div>
+        <span class="k">return</span> <span class="n">centroid</span> <span class="o">/</span> <span class="n">count</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Vertex(</span><span class="si">{:.3}</span><span class="s2">, </span><span class="si">{:.3}</span><span class="s2">, </span><span class="si">{:.3}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Edge"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.Edge">[docs]</a><span class="k">class</span> <span class="nc">Edge</span><span class="p">(</span><span class="n">Vertex</span><span class="p">):</span>
@@ -657,7 +663,14 @@
                                <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">scale</span><span class="p">))</span>
         <span class="n">linker</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonder_centroid</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span> <span class="n">scale</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div></div>
+        <span class="k">return</span> <span class="n">linker</span><span class="o">.</span><span class="n">mol</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;Edge(</span><span class="si">{v1}</span><span class="s2">, </span><span class="si">{v2}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_CageTopology"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology">[docs]</a><span class="k">class</span> <span class="nc">_CageTopology</span><span class="p">(</span><span class="n">Topology</span><span class="p">):</span>
