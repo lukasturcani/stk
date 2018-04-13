@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; stk  documentation</title>
+  <title>Caching &mdash; stk  documentation</title>
   
 
   
@@ -85,7 +85,8 @@
             
             
               <!-- Local TOC -->
-              <div class="local-toc"><ul class="simple">
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Caching</a></li>
 </ul>
 </div>
             
@@ -130,7 +131,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>&lt;no title&gt;</li>
+      <li>Caching</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -149,7 +150,75 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  
+  <div class="section" id="caching">
+<h1>Caching<a class="headerlink" href="#caching" title="Permalink to this headline">¶</a></h1>
+<p>One important feature of <code class="docutils literal"><span class="pre">stk</span></code>, which is often the source of unexpected
+behaviour, is that it caches every molecule it creates. In addition,
+every time the the user attempts to build or load the same molecule, the
+cached copy is returned from memory. Here are some examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Example 1</span>
+<span class="n">bb1</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
+<span class="n">bb1</span> <span class="c1"># &lt;StructUnit at 0x0012931&gt;</span>
+<span class="n">bb2</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
+<span class="n">bb2</span> <span class="c1"># &lt;StructUnit at 0x0012931&gt;</span>
+<span class="n">bb1</span> <span class="ow">is</span> <span class="n">bb2</span> <span class="c1"># True</span>
+
+<span class="c1"># Example 2 - when picking a different functional group a new</span>
+<span class="c1"># object will be created.</span>
+<span class="n">bb3</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb3</span> <span class="c1"># &lt;StructUnit at 0x13131&gt;</span>
+<span class="n">bb3</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="c1"># False</span>
+
+<span class="n">bb4</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehdye&#39;</span><span class="p">)</span>
+<span class="n">bb4</span> <span class="c1"># &lt;StructUnit at 0x243134&gt;</span>
+<span class="n">bb3</span> <span class="ow">is</span> <span class="n">bb4</span> <span class="c1"># False</span>
+
+<span class="c1"># Example 3 - if the molecule has the same structure, even if</span>
+<span class="c1"># the file is different, the cached object will be returned.</span>
+<span class="n">bb5</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;same_struct_as_bb1.mol2&#39;</span><span class="p">)</span>
+<span class="n">bb6</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;same_struct_as_bb1.mol2&#39;</span><span class="p">,</span> <span class="s1">&#39;amine&#39;</span><span class="p">)</span>
+<span class="n">bb7</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;same_struct_as_bb1.mol2&#39;</span><span class="p">,</span> <span class="s1">&#39;aldehdye&#39;</span><span class="p">)</span>
+
+<span class="n">bb5</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="ow">and</span> <span class="n">bb5</span> <span class="ow">is</span> <span class="n">bb2</span> <span class="c1"># True</span>
+<span class="n">bb6</span> <span class="ow">is</span> <span class="n">bb3</span> <span class="c1"># True</span>
+<span class="n">bb7</span> <span class="ow">is</span> <span class="n">bb4</span> <span class="c1"># True</span>
+
+<span class="c1"># Example 4 - each class has its own cache.</span>
+<span class="n">bb8</span> <span class="o">=</span> <span class="n">StructUnit2</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
+<span class="n">bb9</span> <span class="o">=</span> <span class="n">StructUnit3</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
+
+<span class="n">bb8</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="c1"># False</span>
+<span class="n">bb8</span> <span class="ow">is</span> <span class="n">bb9</span> <span class="c1"># False</span>
+</pre></div>
+</div>
+<p>and with <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># Example 5 - using the same objects for initialization results</span>
+<span class="c1"># in the same object being returned from the cache. Assembly step is</span>
+<span class="c1"># skipped!</span>
+<span class="n">mmol1</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span> <span class="c1"># Slow, have to build.</span>
+<span class="n">mmol2</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">())</span> <span class="c1"># Fast, returned from memory.</span>
+
+<span class="n">mmol1</span> <span class="ow">is</span> <span class="n">mmol2</span> <span class="c1"># True</span>
+
+<span class="c1"># Changing the topology will mean a new object is built.</span>
+<span class="n">mmol3</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(</span><span class="n">A_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="n">mmol1</span> <span class="ow">is</span> <span class="n">mmol3</span> <span class="c1"># False</span>
+</pre></div>
+</div>
+<p>The user has the option to turn the cache off and on through the
+<code class="docutils literal"><span class="pre">CACHE_SETTINGS</span></code> variable.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span> <span class="c1"># Cache is off.</span>
+<span class="n">bb10</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecele1.mol&#39;</span><span class="p">)</span>
+<span class="n">bb10</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="c1"># False</span>
+
+<span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span> <span class="c1"># Cache is back on.</span>
+<span class="n">bb11</span> <span class="o">=</span> <span class="n">StructUnit</span><span class="p">(</span><span class="s1">&#39;molecule1.mol&#39;</span><span class="p">)</span>
+<span class="n">bb11</span> <span class="ow">is</span> <span class="n">bb1</span> <span class="c1"># True</span>
+<span class="n">bb11</span> <span class="ow">is</span> <span class="n">bb10</span> <span class="c1"># False</span>
+</pre></div>
+</div>
+</div>
+
 
            </div>
            <div class="articleComments">
