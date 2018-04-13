@@ -171,6 +171,33 @@ have been optimized quite poorly. The :func:`.macromodel_opt` function
 requires a valid ``MacroModel`` installation with a working license.
 The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 
+Note that there are many more cage topologies available (14+), which
+can be found by looking in :mod:`stk.molecular.topologies.cage`.
+
+.. image:: figures/two_plus_three.png
+
+.. image:: figures/two_plus_four.png
+
+.. image:: figures/three_plus_four.png
+
+.. image:: figures/three_plus_three.png
+
+The topologies are organized into submodules based on the building blocks
+required to build them. For example, all cages in
+:mod:`stk.molecular.topologies.cage.two_plus_three` submodule are composed of two and three functionalized building
+blocks, all cages in the :mod:`stk.molecular.topologies.cage.two_plus_four` submodule are composed of two and
+four functionalized building blocks, cages in :mod:`stk.molecular.topologies.cage.three_plus_three` are composed
+of three functionalized building blocks and so on.
+
+All cage topologies also support being built from more than two building
+blocks, to produce mixed or multi-component cages.
+
+.. image:: figures/multi_cage.png
+
+In addition, cage topologies support a number of optional arguments which allow the many
+possible structural isomers to be reliably assembled. These topics are
+discussed in
+
 Covalent Organic Frameworks
 ...........................
 
