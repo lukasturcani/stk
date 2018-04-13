@@ -68,7 +68,7 @@ We want the output to be:
 .. code-block:: python
 
     OUT: {FunctionData('rdkit', forcefield=uff): 16.501,
-          FunctionData('macromolecule', forcefield=16): 200}
+          FunctionData('macromodel', forcefield=16): 200}
 
 (Assuming we are still dealing with the same ``molecule`` instance from
 the :meth:`~Energy.rdkit` example, both calculated energies will be
