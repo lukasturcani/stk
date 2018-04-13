@@ -181,6 +181,7 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal"><span class="pre">stk</span></code> is a Python 3 library for building, manipulating, optimizing
 and designing molecules.</p>
+<p>For quick navigation through the modules use <a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a>.</p>
 </div>
 <div class="section" id="basic-examples">
 <h2>Basic Examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h2>
@@ -395,6 +396,18 @@ Assembled molecules can use additional methods provided by <a class="reference i
 <span class="n">mol</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Something to note about energy calculations, is that each time you run
+the method, the result gets saved. For example,</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {}</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">)</span> <span class="c1"># Returns 16.05</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501}</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">macromodel</span><span class="p">(</span><span class="n">forcefield</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                      <span class="n">macromodel_path</span><span class="o">=</span><span class="s1">&#39;path/to/macromodel/dir&#39;</span><span class="p">)</span> <span class="c1"># Returns 200</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">values</span> <span class="c1"># {FunctionData(&#39;rdkit&#39;, forcefield=&#39;uff&#39;): 16.501,</span>
+                  <span class="c1">#  FunctionData(&#39;macromodel&#39;, forcefield=16): 200}</span>
+</pre></div>
+</div>
+<p>This can come in handy if you do not want to repeat expensive calculations.</p>
 </div>
 <div class="section" id="geometric-manipulations">
 <h3>Geometric Manipulations<a class="headerlink" href="#geometric-manipulations" title="Permalink to this headline">¶</a></h3>

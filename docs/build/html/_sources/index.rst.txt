@@ -18,6 +18,8 @@ Overview
 ``stk`` is a Python 3 library for building, manipulating, optimizing
 and designing molecules.
 
+For quick navigation through the modules use :ref:`modindex`.
+
 Basic Examples
 --------------
 
@@ -309,6 +311,23 @@ Here are some examples:
     mol.center_of_mass()
     # Get the atomic symbol of atom with id of 13.
     mol.atom_symbol(13)
+
+Something to note about energy calculations, is that each time you run
+the method, the result gets saved. For example,
+
+
+.. code-block:: python
+
+    mol.energy.values # {}
+    mol.energy.rdkit('uff') # Returns 16.05
+    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501}
+    mol.energy.macromodel(forcefield=16,
+                          macromodel_path='path/to/macromodel/dir') # Returns 200
+    mol.energy.values # {FunctionData('rdkit', forcefield='uff'): 16.501,
+                      #  FunctionData('macromodel', forcefield=16): 200}
+
+This can come in handy if you do not want to repeat expensive calculations.
+
 
 Geometric Manipulations
 .......................
