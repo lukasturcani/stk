@@ -521,7 +521,7 @@ class _CageTopology(Topology):
         bonder atoms of each building block is aligned with an edge
         during placement. The :class:`int` indicates which bonder atom
         is aligned. The :class:`int` corresponds to an index in
-        :attr:`.MacroMolecule.bonder_ids`.
+        :attr:`.StructUnit.bonder_ids`.
 
         If ``None`` the first atom in `bonder_ids` is always aligned.
 
@@ -537,7 +537,6 @@ class _CageTopology(Topology):
         atom aligned. The 3rd building block has the 2nd (index ``1``)
         atom aligned. The 4th building block has the 3rd (index ``2``)
         atom aligned.
-
 
     B_alignments : :class:`list` of :class:`int`
         The length of this :class:`list` should be euqal to the number

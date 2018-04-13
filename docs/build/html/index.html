@@ -288,6 +288,24 @@ used <a class="reference internal" href="stk.optimization.optimization.html#stk.
 have been optimized quite poorly. The <a class="reference internal" href="stk.optimization.macromodel.html#stk.optimization.macromodel.macromodel_opt" title="stk.optimization.macromodel.macromodel_opt"><code class="xref py py-func docutils literal"><span class="pre">macromodel_opt()</span></code></a> function
 requires a valid <code class="docutils literal"><span class="pre">MacroModel</span></code> installation with a working license.
 The argument <code class="docutils literal"><span class="pre">'/opt/schrodinger2017-4'</span></code> is the path to the installation.</p>
+<p>Note that there are many more cage topologies available (14+), which
+can be found by looking in <a class="reference internal" href="stk.molecular.topologies.cage.html#module-stk.molecular.topologies.cage" title="stk.molecular.topologies.cage"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage</span></code></a>.</p>
+<img alt="_images/cages_two_plus_three.png" src="_images/cages_two_plus_three.png" />
+<img alt="_images/cages_two_plus_four.png" src="_images/cages_two_plus_four.png" />
+<img alt="_images/cages_three_plus_four.png" src="_images/cages_three_plus_four.png" />
+<img alt="_images/cages_three_plus_three.png" src="_images/cages_three_plus_three.png" />
+<p>The topologies are organized into submodules based on the building blocks
+required to build them. For example, all topologies in the
+<a class="reference internal" href="stk.molecular.topologies.cage.two_plus_three.html#module-stk.molecular.topologies.cage.two_plus_three" title="stk.molecular.topologies.cage.two_plus_three"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage.two_plus_three</span></code></a> submodule are composed of two and three functionalized building
+blocks, all cages in the <a class="reference internal" href="stk.molecular.topologies.cage.two_plus_four.html#module-stk.molecular.topologies.cage.two_plus_four" title="stk.molecular.topologies.cage.two_plus_four"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage.two_plus_four</span></code></a> submodule are composed of two and
+four functionalized building blocks, cages in <a class="reference internal" href="stk.molecular.topologies.cage.three_plus_three.html#module-stk.molecular.topologies.cage.three_plus_three" title="stk.molecular.topologies.cage.three_plus_three"><code class="xref py py-mod docutils literal"><span class="pre">stk.molecular.topologies.cage.three_plus_three</span></code></a> are composed
+of three functionalized building blocks and so on.</p>
+<p>All cage topologies also support being built from more than two building
+blocks, to produce mixed or multi-component cages.</p>
+<img alt="figures/multi_cage.png" src="figures/multi_cage.png" />
+<p>In addition, cage topologies support a number of optional arguments which allow the many
+possible structural isomers to be easily assembled. These topics are
+discussed in <a class="reference internal" href="advanced_cage_building.html"><span class="doc">Advanced Cage Building</span></a>.</p>
 </div>
 <div class="section" id="covalent-organic-frameworks">
 <h3>Covalent Organic Frameworks<a class="headerlink" href="#covalent-organic-frameworks" title="Permalink to this headline">¶</a></h3>
@@ -428,6 +446,7 @@ appropriate class.</p>
 <div><ul class="simple">
 <li><a class="reference internal" href="stk.molecular.molecules.html#macromolecular-assembly"><span class="std std-ref">A more detailed description of macromolecular assembly.</span></a></li>
 <li><a class="reference internal" href="stk.molecular.topologies.cof.html#cof-assembly"><span class="std std-ref">How the assembly process works for 2D COF topologies.</span></a></li>
+<li><a class="reference external" href="https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826">https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826</a></li>
 </ul>
 </div></blockquote>
 </div>

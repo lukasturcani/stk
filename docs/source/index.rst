@@ -174,16 +174,16 @@ The argument ``'/opt/schrodinger2017-4'`` is the path to the installation.
 Note that there are many more cage topologies available (14+), which
 can be found by looking in :mod:`stk.molecular.topologies.cage`.
 
-.. image:: figures/two_plus_three.png
+.. image:: figures/cages_two_plus_three.png
 
-.. image:: figures/two_plus_four.png
+.. image:: figures/cages_two_plus_four.png
 
-.. image:: figures/three_plus_four.png
+.. image:: figures/cages_three_plus_four.png
 
-.. image:: figures/three_plus_three.png
+.. image:: figures/cages_three_plus_three.png
 
 The topologies are organized into submodules based on the building blocks
-required to build them. For example, all cages in
+required to build them. For example, all topologies in the
 :mod:`stk.molecular.topologies.cage.two_plus_three` submodule are composed of two and three functionalized building
 blocks, all cages in the :mod:`stk.molecular.topologies.cage.two_plus_four` submodule are composed of two and
 four functionalized building blocks, cages in :mod:`stk.molecular.topologies.cage.three_plus_three` are composed
@@ -195,8 +195,8 @@ blocks, to produce mixed or multi-component cages.
 .. image:: figures/multi_cage.png
 
 In addition, cage topologies support a number of optional arguments which allow the many
-possible structural isomers to be reliably assembled. These topics are
-discussed in
+possible structural isomers to be easily assembled. These topics are
+discussed in :doc:`advanced_cage_building`.
 
 Covalent Organic Frameworks
 ...........................
@@ -369,6 +369,7 @@ Further Reading
 
     * :ref:`macromolecular assembly`
     * :ref:`cof assembly`
+    * https://chemrxiv.org/articles/STK_A_Python_Toolkit_for_Supramolecular_Assembly/6127826
 
 Indices and tables
 ==================
