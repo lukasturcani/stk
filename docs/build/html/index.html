@@ -436,7 +436,7 @@ recognize.</p>
 </div>
 <img alt="_images/bb2_confs.png" src="_images/bb2_confs.png" />
 <p>Also pretty distinguishable. This is good, it makes it easy to show
-that you can pick a conformers to use for assembly with <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
+that you can pick which conformers to use for assembly with <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a></p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">cage</span> <span class="o">=</span> <span class="n">Cage</span><span class="p">([</span><span class="n">bb1</span><span class="p">,</span> <span class="n">bb2</span><span class="p">],</span> <span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">bb_conformers</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="n">cage</span><span class="o">.</span><span class="n">add_conformer</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">cage</span><span class="o">.</span><span class="n">add_conformer</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -448,8 +448,16 @@ that you can pick a conformers to use for assembly with <a class="reference inte
 <img alt="_images/2.png" src="_images/2.png" />
 <img alt="_images/3.png" src="_images/3.png" />
 <img alt="_images/4.png" src="_images/4.png" />
-<p><code class="docutils literal"><span class="pre">stk</span></code> will use which <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> conformers you want, for
+<p><code class="docutils literal"><span class="pre">stk</span></code> will use whichever <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.StructUnit" title="stk.molecular.molecules.StructUnit"><code class="xref py py-class docutils literal"><span class="pre">StructUnit</span></code></a> conformers you want, when
 constructing conformers of the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> itself.</p>
+<p>Most methods and functions in <code class="docutils literal"><span class="pre">stk</span></code> also support conformers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mol</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">rdkit</span><span class="p">(</span><span class="s1">&#39;uff&#39;</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mol</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">(</span><span class="n">conformer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># And so on ...</span>
+</pre></div>
+</div>
 <div class="section" id="dealing-with-multiple-molecules">
 <h3>Dealing with Multiple Molecules<a class="headerlink" href="#dealing-with-multiple-molecules" title="Permalink to this headline">¶</a></h3>
 <p>When batches of molecules are created, it is often desirable to optimize
