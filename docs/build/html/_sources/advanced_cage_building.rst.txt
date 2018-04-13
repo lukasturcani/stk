@@ -262,4 +262,4 @@ structural isomer of a multi-component cage!
                                               2: [0, 4, 5],
                                               3: [1, 2, 3]}))
 
-Next step is to put this in a loop and so some screening.
+Next step is to put this in a loop and do some screening.

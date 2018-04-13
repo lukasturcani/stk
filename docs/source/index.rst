@@ -359,7 +359,7 @@ Lets try this with a another building block as well
 .. image:: figures/bb2_confs.png
 
 Also pretty distinguishable. This is good, it makes it easy to show
-that you can pick a conformers to use for assembly with :class:`.MacroMolecule`
+that you can pick which conformers to use for assembly with :class:`.MacroMolecule`
 
 .. code-block:: python
 
@@ -378,8 +378,19 @@ These are the conformers we produced!
 
 .. image:: figures/4.png
 
-``stk`` will use which :class:`.StructUnit` conformers you want, for
+``stk`` will use whichever :class:`.StructUnit` conformers you want, when
 constructing conformers of the :class:`.MacroMolecule` itself.
+
+Most methods and functions in ``stk`` also support conformers.
+
+.. code-block:: python
+
+    mol.position_matrix(conformer=1)
+    mol.energy.rdkit('uff', conformer=0)
+    mol.cavity_size(conformer=1)
+
+    # And so on ...
+
 
 Dealing with Multiple Molecules
 ...............................
