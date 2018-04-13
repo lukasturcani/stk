@@ -329,7 +329,7 @@
                                  <span class="n">normalize_vector</span><span class="p">,</span> <span class="n">rotation_matrix</span><span class="p">,</span>
                                  <span class="n">vector_theta</span><span class="p">,</span> <span class="n">mol_from_mae_file</span><span class="p">,</span>
                                  <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
-                                 <span class="n">atom_vdw_radii</span><span class="p">,</span> <span class="n">bond_dict</span><span class="p">,</span> <span class="n">Cell</span><span class="p">)</span>
+                                 <span class="n">atom_vdw_radii</span><span class="p">,</span> <span class="n">Cell</span><span class="p">)</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -554,7 +554,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">atom_id</span><span class="p">)</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._cavity_size"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule._cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">_cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates diameter of the molecule from `origin`.</span>
 
@@ -588,7 +588,7 @@
         <span class="n">distances</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
                                         <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">origin</span><span class="p">))</span>
         <span class="n">distances</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">-</span> <span class="n">atom_vdw</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Molecule.cavity_size"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.cavity_size">[docs]</a>    <span class="k">def</span> <span class="nf">cavity_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1384,7 +1384,7 @@
         <span class="n">write_func</span> <span class="o">=</span> <span class="n">write_funcs</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
         <span class="n">write_func</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._write_mdl_mol_file"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule._write_mdl_mol_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_mdl_mol_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a V3000 ``.mol`` file of the molecule</span>
 
@@ -1406,9 +1406,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdl_mol_block</span><span class="p">(</span><span class="n">conformer</span><span class="p">))</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Molecule._write_pdb_file"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule._write_pdb_file">[docs]</a>    <span class="k">def</span> <span class="nf">_write_pdb_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a ``.pdb`` file of the molecule</span>
 
@@ -1446,7 +1446,7 @@
                 <span class="n">new_content</span> <span class="o">+=</span> <span class="n">line</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdb</span><span class="p">:</span>
-            <span class="n">pdb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span></div>
+            <span class="n">pdb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="StructUnit"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit">[docs]</a><span class="k">class</span> <span class="nc">StructUnit</span><span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">CachedStructUnit</span><span class="p">):</span>
@@ -1874,7 +1874,7 @@
 
         <span class="p">}</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="StructUnit._json_init"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit._json_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_json_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Completes a JSON initialization.</span>
@@ -1902,7 +1902,7 @@
                        <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;load_names&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
                       <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;note&#39;</span><span class="p">])</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">optimized</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s1">&#39;optimized&#39;</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">obj</span>
+            <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="StructUnit.gen_key"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.gen_key">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gen_key</span><span class="p">(</span><span class="n">rdkit_mol</span><span class="p">,</span> <span class="n">functional_group</span><span class="p">):</span>
@@ -2101,7 +2101,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
-    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
+<div class="viewcode-block" id="StructUnit._set_orientation2"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit._set_orientation2">[docs]</a>    <span class="k">def</span> <span class="nf">_set_orientation2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">conformer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Rotates the molecule by a rotation from `start` to `end`.</span>
 
@@ -2169,7 +2169,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_position_from_matrix</span><span class="p">(</span><span class="n">new_pos_mat</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_bonder_centroid</span><span class="p">(</span><span class="n">og_center</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span></div>
 
 <div class="viewcode-block" id="StructUnit.similar_molecules"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.StructUnit.similar_molecules">[docs]</a>    <span class="k">def</span> <span class="nf">similar_molecules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mols</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2875,7 +2875,7 @@
 
         <span class="p">}</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="MacroMolecule._json_init"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule._json_init">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_json_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">json_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Completes a JSON initialization.</span>
@@ -2934,7 +2934,7 @@
         <span class="k">if</span> <span class="n">CACHE_SETTINGS</span><span class="p">[</span><span class="s1">&#39;ON&#39;</span><span class="p">]:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
 
-        <span class="k">return</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="MacroMolecule.gen_key"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.gen_key">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">gen_key</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">):</span>
@@ -3319,7 +3319,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ids_updated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">building_blocks</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">note</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._is_subterminal"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._is_subterminal">[docs]</a>    <span class="k">def</span> <span class="nf">_is_subterminal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">,</span> <span class="n">bonded</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        ``True`` if atom is bonded to a terminal one.</span>
 
@@ -3368,7 +3368,7 @@
         <span class="k">if</span> <span class="n">bid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">periodic</span> <span class="ow">or</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="n">bonded</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="Periodic.island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic.island">[docs]</a>    <span class="k">def</span> <span class="nf">island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3402,7 +3402,7 @@
         <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_join_island</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminate_island</span><span class="p">(</span><span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._join_island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._join_island">[docs]</a>    <span class="k">def</span> <span class="nf">_join_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds bonds between unit cells of `island`.</span>
 
@@ -3480,9 +3480,9 @@
                 <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder1</span><span class="p">)</span>
                 <span class="n">bonded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">bonder2</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="n">bonded</span>
+        <span class="k">return</span> <span class="n">emol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">(),</span> <span class="n">bonded</span></div>
 
-    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._terminate_island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._terminate_island">[docs]</a>    <span class="k">def</span> <span class="nf">_terminate_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonded</span><span class="p">,</span> <span class="n">bonder_map</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds atoms to all bonder atoms at the edges of `island`.</span>
 
@@ -3546,9 +3546,9 @@
         <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coords</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span> <span class="n">atom_coords</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">mol</span>
+        <span class="k">return</span> <span class="n">mol</span></div>
 
-    <span class="k">def</span> <span class="nf">_place_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
+<div class="viewcode-block" id="Periodic._place_island"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic._place_island">[docs]</a>    <span class="k">def</span> <span class="nf">_place_island</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Places unit cells side by side to form an island.</span>
 
@@ -3610,7 +3610,7 @@
                                                <span class="n">bonders</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
                     <span class="n">bonder_map</span> <span class="o">=</span> <span class="n">bonder_map</span><span class="o">.</span><span class="n">new_child</span><span class="p">(</span><span class="n">inverse_bonders</span><span class="p">)</span>
                     <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span>
+        <span class="k">return</span> <span class="n">cells</span><span class="p">,</span> <span class="n">island</span><span class="p">,</span> <span class="n">bonder_map</span></div>
 
 <div class="viewcode-block" id="Periodic.save_ids"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Periodic.save_ids">[docs]</a>    <span class="k">def</span> <span class="nf">save_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save_ids</span><span class="p">()</span>

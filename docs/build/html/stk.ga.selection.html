@@ -271,6 +271,51 @@ selection function used for selecting molecules to mutate.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="stk.ga.selection.Selection._stochastic_sampling_guaranteed">
+<code class="descname">_stochastic_sampling_guaranteed</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection._stochastic_sampling_guaranteed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_guaranteed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yielded the members guaranteed by stochastic sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The next member whose normalized fitness integer component
+is greater than 0.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.ga.selection.Selection._stochastic_sampling_roulette">
+<code class="descname">_stochastic_sampling_roulette</code><span class="sig-paren">(</span><em>pop</em>, <em>yielded</em>, <em>duplicates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection._stochastic_sampling_roulette"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection._stochastic_sampling_roulette" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the roulette component of stochastic sampling.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pop</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecules which are being selected.</li>
+<li><strong>yielded</strong> (<code class="xref py py-class docutils literal"><span class="pre">set</span></code> of <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – Holds all previously yielded molecules.</li>
+<li><strong>duplicates</strong> (<code class="xref py py-class docutils literal"><span class="pre">bool</span></code>) – Indicates whether a member can be yielded more than once.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a> – The seleceted population member.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="stk.ga.selection.Selection.all_combinations">
 <code class="descname">all_combinations</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/ga/selection.html#Selection.all_combinations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.ga.selection.Selection.all_combinations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields every possible pairing of individuals from a population.</p>

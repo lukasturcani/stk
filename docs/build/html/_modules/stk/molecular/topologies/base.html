@@ -728,7 +728,7 @@
 
         <span class="k">return</span></div>
 
-    <span class="k">def</span> <span class="nf">_x_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">bb</span><span class="p">):</span>
+<div class="viewcode-block" id="Linear._x_position"><a class="viewcode-back" href="../../../../stk.molecular.topologies.base.html#stk.molecular.topologies.base.Linear._x_position">[docs]</a>    <span class="k">def</span> <span class="nf">_x_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">,</span> <span class="n">bb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the x coordinate on which to place `bb`.</span>
 
@@ -757,7 +757,7 @@
         <span class="n">bb_min_x</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">bb</span><span class="o">.</span><span class="n">all_atom_coords</span><span class="p">(),</span>
                        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">bb_len</span> <span class="o">=</span> <span class="n">bb</span><span class="o">.</span><span class="n">centroid</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bb_min_x</span>
-        <span class="k">return</span> <span class="n">mm_max_x</span> <span class="o">+</span> <span class="n">bb_len</span> <span class="o">+</span> <span class="mi">3</span></div>
+        <span class="k">return</span> <span class="n">mm_max_x</span> <span class="o">+</span> <span class="n">bb_len</span> <span class="o">+</span> <span class="mi">3</span></div></div>
 </pre></div>
 
            </div>
