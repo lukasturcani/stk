@@ -112,18 +112,18 @@ Building structural isomers.
 
 #. Pick a three functionalized building block.
 
-    .. image:: figures/advanced_cage_assembly/three_func_bb.png
+    .. image:: figures/advanced_cage_assembly/tritopic.png
 
-    For the purposes of this example, we can simplify it down to only
-    its ``bonder`` atoms. These are the atoms which form bonds during
-    assembly of a macromolecule. Recall, that each building block is
+    For the purposes of drawing, we can simplify the representation of
+    our molecule.
+    Recall, that each building block is
     represented within ``stk`` as a :class:`.StructUnit3` instance.
 
 #. Place the building block on each vertex of the topology.
 
-    .. image:: figures/advanced_cage_assembly/placement.png
+    .. image:: figures/advanced_cage_assembly/placed.png
 
-    Notice that the because we duplicate the building block to make the
+    Notice that because we duplicate the building block to make the
     macromolecule, the atom ids changed. The atom id of ``bonder`` atom
     within the macromolecule is shown next to the atoms while the
     original atom id in the :class:`.StructUnit` is shown in brackets.
@@ -140,34 +140,43 @@ Building structural isomers.
    At each vertex, pick any arbitrary edge and select a
    ``bonder`` atom. We then rotate the building block until the selected
    edge and ``bonder`` atom are perfectly aligned. The bonder atom is
-   picked by the id in :class:`.StructUnit3`, not by the id
+   identified by the id in :class:`.StructUnit3`, not by the id
    in :class:`.MacroMolecule`. Once rotation is done, create the bonds
-   and we have one structural isomer. The 2 functionalized building block
-   which should go on the edges of the topology is implied. We can
-   define this with code
+   between all the building blocks in the macromolecule and we have one
+   structural isomer. We can define which ``bonder`` atom we picked for
+   alignment at each
+   vertex with the following code
 
    .. code-block:: python
 
-        A_alignments = [0, 2, 1, 2]
+        A_alignments = [2, 1, 0, 2]
 
    Don't worry about why the variable is called ``A_alignments``. What
-   this means that at the first vertex, ``A`` we selected the first ``bonder``
-   to align with our edge. For the second vertex, ``B`` we selected the
-   third bonder. For the third vertex, ``C`` we selected the second bonder
+   this means, is that at the first vertex, ``A`` we selected the third ``bonder``
+   to align with our arbitrarily chosen edge. For the second vertex, ``B`` we selected the
+   second bonder. For the third vertex, ``C`` we selected the first bonder
    and for the last vertex ``D`` we selected the third bonder again.
 
+   The other bonder atoms also fell directly on edges because the
+   functional groups were 120 degrees apart. Had they not been, they
+   would have not been well aligned with their respective edges. Only the
+   distance between the selected edge and ``bonder`` atom is minimized.
 
 #. If we had picked a different ``bonder`` atom at any of the vertices,
    while keeping the selected edge the same, we would have assembled a
    different structural isomer. This is because a different bonder atom
-   ends up connected at a different edge.
+   ends up connected at a different edge. For example
+
+   .. code-block:: python
+
+        A_alignments = [1, 2, 1, 2]
 
    .. image:: figures/advanced_cage_assembly/birds_eye2.png
 
    Because we have 4 vertices and at each vertex we have 3 possible
-   orientations, we can build a total of 3:superscript:`4` (81)
+   orientations, we can build a total of 3^4 (81)
    structural isomers. This is of course assuming that our building
-   block does not have rotational symmetry. If it does then the number
+   block does not have rotational symmetry. If it does, then the number
    of structural isomers will decrease. This is because rotating a
    symmetric building block will not change the connectivity of the
    molecule.
@@ -178,8 +187,8 @@ building blocks is therefore
 
 .. code-block:: python
 
-    isomer1 = Cage([bb1, bb2], FourPlusSix(A_alignments=[0, 0, 0, 0]))
-    isomer2 = Cage([bb1, bb2], FourPlusSix(A_alignments=[1, 2, 1, 0]))
+    isomer1 = Cage([bb1, bb2], FourPlusSix(A_alignments=[2, 1, 0, 2]))
+    isomer2 = Cage([bb1, bb2], FourPlusSix(A_alignments=[1, 2, 1, 2]))
 
 The length of the :class:`list` ``A_alignments`` is equal to the number
 of vertices in a given topology. Therefore for the cube topology with 8
@@ -193,6 +202,8 @@ vertices we could do
 The number must be between ``0`` and ``2`` because there are three
 ``bonder`` atoms. We do not specify the ``bonder`` atoms by their actual
 atomic id, only by this index.
+
+Let's look at a different cage topology.
 
 .. image:: figures/cages_three_plus_four.png
 
@@ -218,11 +229,9 @@ Look at :attr:`._CageTopology.A_alignments` and
 :attr:`._CageTopology.B_alignments` for more documentation.
 
 
-Finally lets look at the case where we have a two functinalized building
+Finally, consider the case where we have a two functionalized building
 block. In these cases the building blocks are placed on the edges, and
 can be placed either parallel or anti-parallel along it.
-
-.. image:: figures/two_func_placement.png
 
 In cases like this
 

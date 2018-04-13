@@ -11,6 +11,7 @@ class SixPlusEight(_VertexOnlyCageTopology):
     A cage topology of 3 and 4 functional group building blocks.
 
     """
+
     x = 1
     positions_A = [Vertex(-x, x, 0),
                    Vertex(-x, -x, 0),
