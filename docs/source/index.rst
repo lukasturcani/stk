@@ -209,7 +209,7 @@ of three functionalized building blocks and so on.
 All cage topologies also support being built from more than two building
 blocks, to produce mixed or multi-component cages.
 
-.. image:: figures/multi_cage.png
+.. image:: figures/advanced_cage_assembly/multi_cage.png
 
 In addition, cage topologies support a number of optional arguments which allow the many
 possible structural isomers to be easily assembled. These topics are
