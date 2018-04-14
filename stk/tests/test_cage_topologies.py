@@ -14,7 +14,7 @@ def test_SixPlusEight():
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], SixPlusEight())
-    c.write(join(test_dir, 'SixPlusEight.pdb'))
+    c.write(join(test_dir, 'SixPlusEight.mol'))
 
 
 # 2 + 4 topolgy tests.
@@ -22,49 +22,49 @@ def test_TwoPlusFour():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], TwoPlusFour())
-    c.write(join(test_dir, 'TwoPlusFour.pdb'))
+    c.write(join(test_dir, 'TwoPlusFour.mol'))
 
 
 def test_ThreePlusSix():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], ThreePlusSix())
-    c.write(join(test_dir, 'ThreePlusSix.pdb'))
+    c.write(join(test_dir, 'ThreePlusSix.mol'))
 
 
 def test_FourPlusEight():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], FourPlusEight())
-    c.write(join(test_dir, 'FourPlusEight.pdb'))
+    c.write(join(test_dir, 'FourPlusEight.mol'))
 
 
 def test_FivePlusTen():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], FivePlusTen())
-    c.write(join(test_dir, 'FivePlusTen.pdb'))
+    c.write(join(test_dir, 'FivePlusTen.mol'))
 
 
 def test_SixPlusTwelve():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], SixPlusTwelve())
-    c.write(join(test_dir, 'SixPlusTwelve.pdb'))
+    c.write(join(test_dir, 'SixPlusTwelve.mol'))
 
 
 def test_EightPlusSixteen():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], EightPlusSixteen())
-    c.write(join(test_dir, 'EightPlusSixteen.pdb'))
+    c.write(join(test_dir, 'EightPlusSixteen.mol'))
 
 
 def test_TenPlusTwenty():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'amine4.mol'))
     c = Cage([bb1, bb2], TenPlusTwenty())
-    c.write(join(test_dir, 'TenPlusTwenty.pdb'))
+    c.write(join(test_dir, 'TenPlusTwenty.mol'))
 
 
 # 3 + 3 cage topologies.
@@ -72,21 +72,21 @@ def test_OnePlusOne():
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], OnePlusOne())
-    c.write(join(test_dir, 'OnePlusOne.pdb'))
+    c.write(join(test_dir, 'OnePlusOne.mol'))
 
 
 def test_TwoPlusTwo():
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], TwoPlusTwo())
-    c.write(join(test_dir, 'TwoPlusTwo.pdb'))
+    c.write(join(test_dir, 'TwoPlusTwo.mol'))
 
 
 def test_FourPlusFour():
     bb1 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], FourPlusFour())
-    c.write(join(test_dir, 'FourPlusFour.pdb'))
+    c.write(join(test_dir, 'FourPlusFour.mol'))
 
 
 # 2 + 3 cage topologies.
@@ -94,14 +94,14 @@ def test_TwoPlusThree():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], TwoPlusThree())
-    c.write(join(test_dir, 'TwoPlusThree.pdb'))
+    c.write(join(test_dir, 'TwoPlusThree.mol'))
 
 
 def test_FourPlusSix():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], FourPlusSix())
-    c.write(join(test_dir, 'FourPlusSix.pdb'))
+    c.write(join(test_dir, 'FourPlusSix.mol'))
 
 
 def test_multiFourPlusSix():
@@ -131,28 +131,28 @@ def test_FourPlusSix2():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], FourPlusSix2())
-    c.write(join(test_dir, 'FourPlusSix2.pdb'))
+    c.write(join(test_dir, 'FourPlusSix2.mol'))
 
 
 def test_SixPlusNine():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], SixPlusNine())
-    c.write(join(test_dir, 'SixPlusNine.pdb'))
+    c.write(join(test_dir, 'SixPlusNine.mol'))
 
 
 def test_EightPlusTwelve():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], EightPlusTwelve())
-    c.write(join(test_dir, 'EightPlusTwelve.pdb'))
+    c.write(join(test_dir, 'EightPlusTwelve.mol'))
 
 
 def test_Dodecahedron():
     bb1 = StructUnit2(join(data_dir, 'amine2.mol'))
     bb2 = StructUnit3(join(data_dir, 'aldehyde3.mol'))
     c = Cage([bb1, bb2], Dodecahedron())
-    c.write(join(test_dir, 'Dodecahedron.pdb'))
+    c.write(join(test_dir, 'Dodecahedron.mol'))
 
 
 def test_multiconformer():
@@ -168,7 +168,7 @@ def test_multiconformer():
     c.add_conformer([0, 1])
     c.add_conformer([1, 1])
 
-    c.write(join(test_dir, 'FourPlusSix_conf1.pdb'), 0)
-    c.write(join(test_dir, 'FourPlusSix_conf2.pdb'), 1)
-    c.write(join(test_dir, 'FourPlusSix_conf3.pdb'), 2)
-    c.write(join(test_dir, 'FourPlusSix_conf4.pdb'), 3)
+    c.write(join(test_dir, 'FourPlusSix_conf1.mol'), 0)
+    c.write(join(test_dir, 'FourPlusSix_conf2.mol'), 1)
+    c.write(join(test_dir, 'FourPlusSix_conf3.mol'), 2)
+    c.write(join(test_dir, 'FourPlusSix_conf4.mol'), 3)
