@@ -16,5 +16,5 @@ setup(name='stk',
                         'matplotlib',
                         'sklearn',
                         'psutil',
-                        'pywindowx'],
+                        'pywindowx==0.0.1'],
       python_requires='>=3.6')
