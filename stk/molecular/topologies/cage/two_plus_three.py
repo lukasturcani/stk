@@ -5,10 +5,10 @@ Defines cage topologies from 2 and 3 functionalized building blocks.
 
 import numpy as np
 
-from .base import _CageTopology, Vertex, Edge
+from .base import CageTopology, Vertex, Edge
 
 
-class TwoPlusThree(_CageTopology):
+class TwoPlusThree(CageTopology):
     """
     A cage topology from 2 and 3 functionalized building blocks.
 
@@ -30,7 +30,7 @@ class TwoPlusThree(_CageTopology):
     n_window_types = 1
 
 
-class FourPlusSix(_CageTopology):
+class FourPlusSix(CageTopology):
     """
     Defines the tetrahedral, 4+6, topology.
 
@@ -55,7 +55,7 @@ class FourPlusSix(_CageTopology):
     n_window_types = 1
 
 
-class FourPlusSix2(_CageTopology):
+class FourPlusSix2(CageTopology):
     """
     Defines the 4+6 topolgy which is not a tetrahedron.
 
@@ -79,7 +79,7 @@ class FourPlusSix2(_CageTopology):
     e4.coord = np.array([0, 1, -1])
 
 
-class SixPlusNine(_CageTopology):
+class SixPlusNine(CageTopology):
     """
     A cage topology from 2 and 3 functionalized building blocks.
 
@@ -109,7 +109,7 @@ class SixPlusNine(_CageTopology):
     n_window_types = 1
 
 
-class EightPlusTwelve(_CageTopology):
+class EightPlusTwelve(CageTopology):
     """
     A square topology from 2 and 3 functionalized building blocks.
 
@@ -147,7 +147,7 @@ class EightPlusTwelve(_CageTopology):
     n_window_types = 1
 
 
-class Dodecahedron(_CageTopology):
+class Dodecahedron(CageTopology):
     """
     A dodecahedron cage from 2 and 3 functionalized building blocks.
 

@@ -10,10 +10,10 @@ Cages
 .....
 
 To add a new cage topology a new class should be created, named
-after the topology. This class should inherit :class:`._CageTopology`.
+after the topology. This class should inherit :class:`.CageTopology`.
 This will give access to various methods which are necessary
 for dealing with any cage molecule. See the documenation of
-:class:`._CageTopology` for more details.
+:class:`.CageTopology` for more details.
 
 The new class will only need to have five class attributes added:
 
