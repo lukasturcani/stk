@@ -3,7 +3,7 @@ Advanced Cage Building
 
 This tutorial describes how more complex cages can be built and how to
 directly control which cage structural isomers are built. Everything
-covered here is documented in the :class:`._CageTopology` docstring.
+covered here is documented in the :class:`.CageTopology` docstring.
 
 Multi-component cages.
 ----------------------
@@ -225,8 +225,8 @@ building blocks with the fewer number of functional groups have three
 of them, the number put into ``B_alignments`` can be between 0 and
 2, inclusive.
 
-Look at :attr:`._CageTopology.A_alignments` and
-:attr:`._CageTopology.B_alignments` for more documentation.
+Look at :attr:`.CageTopology.A_alignments` and
+:attr:`.CageTopology.B_alignments` for more documentation.
 
 
 Finally, consider the case where we have a two functionalized building
@@ -240,7 +240,7 @@ In cases like this
     isomer = Cage([bb1, bb2], FourPlusSix(A_alignments=[0, 1, 2, 0],
                                           B_alignments=[1, 1, -1, 1, -1, 1]))
 
-The values placed into :attr:`~._CageTopology.B_alignments` are either
+The values placed into :attr:`~.CageTopology.B_alignments` are either
 ``1`` or ``-1`` to distinguish between the two possible orientations.
 Assuming the there is no symmetry in the building blocks, quite a
 few structural isomers are possible!
