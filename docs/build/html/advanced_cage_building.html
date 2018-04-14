@@ -162,7 +162,7 @@
 <h1>Advanced Cage Building<a class="headerlink" href="#advanced-cage-building" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial describes how more complex cages can be built and how to
 directly control which cage structural isomers are built. Everything
-covered here is documented in the <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology" title="stk.molecular.topologies.cage.base._CageTopology"><code class="xref py py-class docutils literal"><span class="pre">_CageTopology</span></code></a> docstring.</p>
+covered here is documented in the <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.CageTopology" title="stk.molecular.topologies.cage.base.CageTopology"><code class="xref py py-class docutils literal"><span class="pre">CageTopology</span></code></a> docstring.</p>
 <div class="section" id="multi-component-cages">
 <h2>Multi-component cages.<a class="headerlink" href="#multi-component-cages" title="Permalink to this headline">¶</a></h2>
 <p>Recall that simple cages can be built from two building blocks.</p>
@@ -347,8 +347,8 @@ with fewer. Because in this case there are at most four functional groups
 building blocks with the fewer number of functional groups have three
 of them, the number put into <code class="docutils literal"><span class="pre">B_alignments</span></code> can be between 0 and
 2, inclusive.</p>
-<p>Look at <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.A_alignments" title="stk.molecular.topologies.cage.base._CageTopology.A_alignments"><code class="xref py py-attr docutils literal"><span class="pre">_CageTopology.A_alignments</span></code></a> and
-<a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.B_alignments" title="stk.molecular.topologies.cage.base._CageTopology.B_alignments"><code class="xref py py-attr docutils literal"><span class="pre">_CageTopology.B_alignments</span></code></a> for more documentation.</p>
+<p>Look at <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.CageTopology.A_alignments" title="stk.molecular.topologies.cage.base.CageTopology.A_alignments"><code class="xref py py-attr docutils literal"><span class="pre">CageTopology.A_alignments</span></code></a> and
+<a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.CageTopology.B_alignments" title="stk.molecular.topologies.cage.base.CageTopology.B_alignments"><code class="xref py py-attr docutils literal"><span class="pre">CageTopology.B_alignments</span></code></a> for more documentation.</p>
 <p>Finally, consider the case where we have a two functionalized building
 block. In these cases the building blocks are placed on the edges, and
 can be placed either parallel or anti-parallel along it.</p>
@@ -357,7 +357,7 @@ can be placed either parallel or anti-parallel along it.</p>
                                       <span class="n">B_alignments</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </div>
-<p>The values placed into <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base._CageTopology.B_alignments" title="stk.molecular.topologies.cage.base._CageTopology.B_alignments"><code class="xref py py-attr docutils literal"><span class="pre">B_alignments</span></code></a> are either
+<p>The values placed into <a class="reference internal" href="stk.molecular.topologies.cage.base.html#stk.molecular.topologies.cage.base.CageTopology.B_alignments" title="stk.molecular.topologies.cage.base.CageTopology.B_alignments"><code class="xref py py-attr docutils literal"><span class="pre">B_alignments</span></code></a> are either
 <code class="docutils literal"><span class="pre">1</span></code> or <code class="docutils literal"><span class="pre">-1</span></code> to distinguish between the two possible orientations.
 Assuming the there is no symmetry in the building blocks, quite a
 few structural isomers are possible!</p>
