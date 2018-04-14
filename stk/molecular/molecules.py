@@ -3084,14 +3084,14 @@ class Cage(MacroMolecule):
 
             pw_molecule = pywindow.molecular.Molecule.load_rdkit_mol(new_mol)
             # Find windows and get a single array with windows' sizes.
-            all_windows = pw_molecule.calculate_windows(output='windows')
+            all_windows = pw_molecule.calculate_windows(output='windows')[0]
 
         # If pyWindow failed, return ``None``.
         if all_windows is None:
             return None
 
         all_windows = sorted(all_windows,
-                             reverse=True)[0][:self.topology.n_windows]
+                             reverse=True)[:self.topology.n_windows]
         for i, x in enumerate(all_windows):
             # Return ``None`` when pyWindow fucks up and outputs
             # a mistakenly large window size.
