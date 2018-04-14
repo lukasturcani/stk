@@ -3,10 +3,10 @@ Defines cage topologies from building blocks of 3 and 4 func groups.
 
 """
 
-from .base import _VertexOnlyCageTopology, Vertex
+from .base import VertexOnlyCageTopology, Vertex
 
 
-class SixPlusEight(_VertexOnlyCageTopology):
+class SixPlusEight(VertexOnlyCageTopology):
     """
     A cage topology of 3 and 4 functional group building blocks.
 
