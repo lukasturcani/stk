@@ -3091,7 +3091,7 @@ class Cage(MacroMolecule):
             return None
 
         all_windows = sorted(all_windows,
-                             reverse=True)[:self.topology.n_windows]
+                             reverse=True)[0][:self.topology.n_windows]
         for i, x in enumerate(all_windows):
             # Return ``None`` when pyWindow fucks up and outputs
             # a mistakenly large window size.
