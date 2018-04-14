@@ -495,10 +495,25 @@ topologies:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop3</span> <span class="o">=</span> <span class="n">Population</span><span class="o">.</span><span class="n">init_random</span><span class="p">(</span><span class="n">Cage</span><span class="p">,</span> <span class="p">[</span><span class="n">bbs1</span><span class="p">,</span> <span class="n">bbs2</span><span class="p">],</span> <span class="p">[</span><span class="n">FourPlusSix</span><span class="p">(),</span> <span class="n">EightPlusTwelve</span><span class="p">()],</span> <span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Finally, the population can be used to calculate statistics across all
+<p>The population can also be used to calculate statistics across all
 molecules. For example, if you want to know the average cavity size of
 your cages:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">cavity_size</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Finally, we can use the population to write structure files of
+all the molecules to a folder</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or we can dump the population to a JSON file</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;pop.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and recover the <code class="docutils literal"><span class="pre">stk</span></code> objects later</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;pop.json&#39;</span><span class="p">,</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_dict</span><span class="p">)</span>
+<span class="n">pop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># &lt;StructUnit2 at 0x01283&gt;</span>
+<span class="n">pop</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># &lt;Periodic at 0x12498&gt;</span>
 </pre></div>
 </div>
 </div>
