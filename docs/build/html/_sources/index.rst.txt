@@ -443,13 +443,34 @@ Or if we want to select building blocks at random and create 5 cages:
 
     pop3 = Population.init_random(Cage, [bbs1, bbs2], [FourPlusSix(), EightPlusTwelve()], 5)
 
-Finally, the population can be used to calculate statistics across all
+The population can also be used to calculate statistics across all
 molecules. For example, if you want to know the average cavity size of
 your cages:
 
 .. code-block:: python
 
     pop.mean(lambda x: x.cavity_size())
+
+Finally, we can use the population to write structure files of
+all the molecules to a folder
+
+.. code-block:: python
+
+    pop.write('dirname')
+
+or we can dump the population to a JSON file
+
+.. code-block:: python
+
+    pop.dump('pop.json')
+
+and recover the ``stk`` objects later
+
+.. code-block:: python
+
+    pop.load('pop.json', Molecule.from_dict)
+    pop[0] # <StructUnit2 at 0x01283>
+    pop[1] # <Periodic at 0x12498>
 
 .. _`extending stk`:
 
