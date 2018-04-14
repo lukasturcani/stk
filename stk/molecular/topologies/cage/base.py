@@ -522,9 +522,9 @@ class Edge(Vertex):
         return repr(self)
 
 
-class _CageTopology(Topology):
+class CageTopology(Topology):
     """
-    A topology class which cage topologies should inherit.
+    An abstract base class for cage topologies.
 
     Attributes
     ----------
@@ -882,23 +882,26 @@ class _CageTopology(Topology):
             position.bonder_ids = list(bonder_ids)
 
 
-class _VertexOnlyCageTopology(_CageTopology):
+class VertexOnlyCageTopology(CageTopology):
     """
-    Cage topolgies where all building block/linker mols have 3+ fgs.
+    Abstract base class for cage topologies using ditopics.
 
     """
 
     ...
 
 
-class _NoLinkerCageTopology(_CageTopology):
+class NoLinkerCageTopology(CageTopology):
     """
-    Cage topologies where all building units have equal number of fgs.
+    Abstract base class for cage topologies without linkers.
+
+    This means that all building blocks have the same number of
+    functional groups.
 
     Attributes
     ----------
     alignments : :class:`list` of :class:`int`
-        See :attr:`_CageTopology.A_alignments`
+        See :attr:`CageTopology.A_alignments`
 
     bb_assignments : :class:`list` of :class:`int`
         For each vertex, the :class:`int` is the index of a

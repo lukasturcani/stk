@@ -6,10 +6,10 @@ Defines cage topologies from di and 4 functionalised building blocks.
 
 import numpy as np
 
-from .base import _CageTopology,  Vertex, Edge
+from .base import CageTopology,  Vertex, Edge
 
 
-class TwoPlusFour(_CageTopology):
+class TwoPlusFour(CageTopology):
     """
     Sandwich cage topology from 2 and 4 functionalized building blocks.
 
@@ -36,7 +36,7 @@ class TwoPlusFour(_CageTopology):
     n_window_types = 1
 
 
-class ThreePlusSix(_CageTopology):
+class ThreePlusSix(CageTopology):
     """
     A cage topology from 2 and 4 functionalized building blocks.
 
@@ -66,7 +66,7 @@ class ThreePlusSix(_CageTopology):
     n_window_types = 2
 
 
-class FourPlusEight(_CageTopology):
+class FourPlusEight(CageTopology):
     """
     A cage topology from 2 and 4 functionalized building blocks.
 
@@ -99,7 +99,7 @@ class FourPlusEight(_CageTopology):
     n_window_types = 2
 
 
-class FivePlusTen(_CageTopology):
+class FivePlusTen(CageTopology):
 
     c1 = np.cos(2*np.pi/5)
     c2 = np.cos(np.pi/5)
@@ -135,7 +135,7 @@ class FivePlusTen(_CageTopology):
     n_window_types = 2
 
 
-class SixPlusTwelve(_CageTopology):
+class SixPlusTwelve(CageTopology):
     """
     A cage topology from 2 and 4 functionalized building blocks.
 
@@ -167,7 +167,7 @@ class SixPlusTwelve(_CageTopology):
     n_window_types = 1
 
 
-class EightPlusSixteen(_CageTopology):
+class EightPlusSixteen(CageTopology):
 
     x = 2
     positions_A = a, b, c, d, e, f, g, h = [
@@ -204,7 +204,7 @@ class EightPlusSixteen(_CageTopology):
     n_window_types = 2
 
 
-class TenPlusTwenty(_CageTopology):
+class TenPlusTwenty(CageTopology):
     """
     A cage topology from 2 and 4 functionalized building blocks.
 

@@ -6,10 +6,10 @@ Defines cage topologies of building blocks with 3 functional groups.
 import numpy as np
 import rdkit.Chem.AllChem as rdkit
 
-from .base import _NoLinkerCageTopology,  Vertex
+from .base import NoLinkerCageTopology,  Vertex
 
 
-class OnePlusOne(_NoLinkerCageTopology):
+class OnePlusOne(NoLinkerCageTopology):
     """
     A sandwich cage topology from tri-functionalised building blocks.
 
@@ -69,7 +69,7 @@ class OnePlusOne(_NoLinkerCageTopology):
         macro_mol.mol = editable_mol.GetMol()
 
 
-class TwoPlusTwo(_NoLinkerCageTopology):
+class TwoPlusTwo(NoLinkerCageTopology):
     """
     Tetrahedral cage topology from tri-functionalised building blocks.
 
@@ -95,7 +95,7 @@ class TwoPlusTwo(_NoLinkerCageTopology):
     n_window_types = 1
 
 
-class FourPlusFour(_NoLinkerCageTopology):
+class FourPlusFour(NoLinkerCageTopology):
     """
     A square cage topology from tri-functionalised building blocks.
 
