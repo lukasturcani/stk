@@ -3235,7 +3235,7 @@
 
             <span class="n">pw_molecule</span> <span class="o">=</span> <span class="n">pywindow</span><span class="o">.</span><span class="n">molecular</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">load_rdkit_mol</span><span class="p">(</span><span class="n">new_mol</span><span class="p">)</span>
             <span class="c1"># Find windows and get a single array with windows&#39; sizes.</span>
-            <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;windows&#39;</span><span class="p">)</span>
+            <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;windows&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># If pyWindow failed, return ``None``.</span>
         <span class="k">if</span> <span class="n">all_windows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
