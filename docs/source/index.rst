@@ -6,7 +6,7 @@
 Welcome to ``stk``'s documentation!
 ===================================
 
-GitHub: https://www.github.com/lukasturcani/stk
+GitHub: https://www.github.com/supramolecular-toolkit/stk
 
 .. toctree::
    :maxdepth: 2
