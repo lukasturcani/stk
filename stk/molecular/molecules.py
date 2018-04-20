@@ -727,16 +727,13 @@ class Molecule:
 
         """
 
-        maxid1, maxid2 = max(
-            (x for x in it.combinations(range(self.mol.GetNumAtoms()),
-                                        2)),
-            key=lambda x: self.atom_distance(*x, conformer))
-
-        maxd = self.atom_distance(maxid1, maxid2, conformer)
-        maxd += (atom_vdw_radii[self.atom_symbol(maxid1)] +
-                 atom_vdw_radii[self.atom_symbol(maxid2)])
-
-        return maxd, maxid1, maxid2
+        coords = self.position_matrix(conformer).T
+        dist = euclidean_distances(coords, coords)
+        vdw = np.matrix([atom_vdw_radii[self.atom_symbol(i)] for
+                         i in range(self.mol.GetNumAtoms())])
+        dist = dist + vdw + vdw.T
+        maxid1, maxid2 = np.unravel_index(dist.argmax(), dist.shape)
+        return dist[maxid1, maxid2], maxid1, maxid2
 
     def mdl_mol_block(self, conformer=-1):
         """
