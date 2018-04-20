@@ -3090,15 +3090,7 @@ class Cage(MacroMolecule):
         if all_windows is None:
             return None
 
-        all_windows = sorted(all_windows[0],
-                             reverse=True)[:self.topology.n_windows]
-        for i, x in enumerate(all_windows):
-            # Return ``None`` when pyWindow fucks up and outputs
-            # a mistakenly large window size.
-            if x > 500:
-                return None
-
-        return all_windows
+        return sorted(all_windows[0], reverse=True)[:self.topology.n_windows]
 
 
 class Polymer(MacroMolecule):
