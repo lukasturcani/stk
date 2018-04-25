@@ -8,11 +8,11 @@ from os.path import join, basename, abspath
 
 from .molecular import Molecule, CACHE_SETTINGS
 from .ga import GAPopulation, GAInput
-from .convenience_tools import (tar_output,
-                                errorhandler,
-                                streamhandler,
-                                archive_output,
-                                kill_macromodel)
+from .utilities import (tar_output,
+                        errorhandler,
+                        streamhandler,
+                        archive_output,
+                        kill_macromodel)
 from .ga import plotting as plot
 
 warnings.filterwarnings("ignore")

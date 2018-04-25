@@ -226,11 +226,11 @@ from uuid import uuid4
 import logging
 from threading import Thread
 
-from ..convenience_tools import (matrix_centroid,
-                                 FunctionData,
-                                 rotation_matrix_arbitrary_axis,
-                                 daemon_logger,
-                                 logged_call)
+from ..utilities import (matrix_centroid,
+                         FunctionData,
+                         rotation_matrix_arbitrary_axis,
+                         daemon_logger,
+                         logged_call)
 
 from ..molecular import Cage, StructUnit, Energy, func_key
 from .. import optimization

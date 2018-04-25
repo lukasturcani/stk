@@ -13,7 +13,7 @@ from .crossover import Crossover
 from .normalization import Normalization
 from .ga_exit import Exit
 
-from ..convenience_tools import FunctionData
+from ..utilities import FunctionData
 
 
 class GAInput:
