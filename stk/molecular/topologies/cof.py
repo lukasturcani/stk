@@ -86,9 +86,9 @@ from scipy.spatial.distance import euclidean
 from collections import deque, defaultdict
 
 from .base import Topology
-from ...convenience_tools import (PeriodicBond,
-                                  add_fragment_props,
-                                  normalize_vector)
+from ...utilities import (PeriodicBond,
+                          add_fragment_props,
+                          normalize_vector)
 
 
 class Vertex:

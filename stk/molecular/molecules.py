@@ -174,11 +174,15 @@ from . import topologies
 from .fg_info import functional_groups
 from .energy import Energy
 import pywindow
-from ..convenience_tools import (flatten, periodic_table,
-                                 normalize_vector, rotation_matrix,
-                                 vector_theta, mol_from_mae_file,
-                                 rotation_matrix_arbitrary_axis,
-                                 atom_vdw_radii, Cell)
+from ..utilities import (flatten,
+                         periodic_table,
+                         normalize_vector,
+                         rotation_matrix,
+                         vector_theta,
+                         mol_from_mae_file,
+                         rotation_matrix_arbitrary_axis,
+                         atom_vdw_radii,
+                         Cell)
 
 
 logger = logging.getLogger(__name__)

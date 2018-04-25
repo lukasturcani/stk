@@ -35,7 +35,7 @@ import logging
 from threading import Thread
 
 from .macromodel import macromodel_opt, macromodel_cage_opt
-from ..convenience_tools import daemon_logger, logged_call
+from ..utilities import daemon_logger, logged_call
 
 
 logger = logging.getLogger(__name__)
