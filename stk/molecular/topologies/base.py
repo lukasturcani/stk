@@ -54,7 +54,7 @@ from itertools import chain
 from inspect import signature
 
 from ..fg_info import double_bond_combs
-from ...convenience_tools import dedupe, flatten, add_fragment_props
+from ...utilities import dedupe, flatten, add_fragment_props
 
 
 def remove_confs(building_blocks, keep):

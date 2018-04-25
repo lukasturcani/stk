@@ -13,7 +13,7 @@ import re
 from uuid import uuid4
 import logging
 
-from ..convenience_tools import MAEExtractor
+from ..utilities import MAEExtractor
 
 
 logger = logging.getLogger(__name__)

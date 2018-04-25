@@ -13,7 +13,7 @@ import multiprocessing as mp
 import psutil
 
 from .molecular import Molecule
-from .convenience_tools import dedupe
+from .utilities import dedupe
 from .optimization.optimization import (_optimize_all_serial,
                                         _optimize_all)
 

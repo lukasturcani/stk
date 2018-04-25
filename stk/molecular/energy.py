@@ -200,7 +200,7 @@ from functools import wraps
 from inspect import signature as sig
 import logging
 
-from ..convenience_tools import FunctionData
+from ..utilities import FunctionData
 from ..optimization.mopac import mopac_opt
 
 
