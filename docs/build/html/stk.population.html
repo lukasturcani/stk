@@ -660,7 +660,7 @@ when it is applied to all members of the population.</td>
 
 <dl class="method">
 <dt id="stk.population.Population.optimize">
-<code class="descname">optimize</code><span class="sig-paren">(</span><em>func_data</em>, <em>processes=8</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">optimize</code><span class="sig-paren">(</span><em>func_data</em>, <em>processes=12</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/population.html#Population.optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.population.Population.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optimizes the structures of molecules in the population.</p>
 <p>The molecules are optimized serially or in parallel depending
 if <cite>processes</cite> is <code class="docutils literal"><span class="pre">1</span></code> or more. The serial version may be
@@ -677,7 +677,7 @@ are modified.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>func_data</strong> (<a class="reference internal" href="stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.FunctionData" title="stk.convenience_tools.convenience_tools.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the name and arguments of an optimization function
+<li><strong>func_data</strong> (<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.FunctionData" title="stk.utilities.utilities.FunctionData"><code class="xref py py-class docutils literal"><span class="pre">FunctionData</span></code></a>) – Holds the name and arguments of an optimization function
 defined in <a class="reference internal" href="stk.optimization.html#module-stk.optimization" title="stk.optimization"><code class="xref py py-mod docutils literal"><span class="pre">optimization</span></code></a>. The function is used
 to optimize the molecules in the population.</li>
 <li><strong>processes</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The number of parallel processes to create. Optimization

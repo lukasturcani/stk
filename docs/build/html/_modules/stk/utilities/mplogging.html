@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>stk.convenience_tools.mplogging &mdash; stk  documentation</title>
+  <title>stk.utilities.mplogging &mdash; stk  documentation</title>
   
 
   
@@ -131,7 +131,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>stk.convenience_tools.mplogging</li>
+      <li>stk.utilities.mplogging</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -148,7 +148,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for stk.convenience_tools.mplogging</h1><div class="highlight"><pre>
+  <h1>Source code for stk.utilities.mplogging</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Defines tools to make ``logging`` comptaible with ``multiprocessing``.</span>
 
@@ -182,17 +182,17 @@
 <span class="n">streamhandler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MPLogger"><a class="viewcode-back" href="../../../stk.convenience_tools.mplogging.html#stk.convenience_tools.mplogging.MPLogger">[docs]</a><span class="k">class</span> <span class="nc">MPLogger</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+<div class="viewcode-block" id="MPLogger"><a class="viewcode-back" href="../../../stk.utilities.mplogging.html#stk.utilities.mplogging.MPLogger">[docs]</a><span class="k">class</span> <span class="nc">MPLogger</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">log_queue</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="MPLogger.isEnabledFor"><a class="viewcode-back" href="../../../stk.convenience_tools.mplogging.html#stk.convenience_tools.mplogging.MPLogger.isEnabledFor">[docs]</a>    <span class="k">def</span> <span class="nf">isEnabledFor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+<div class="viewcode-block" id="MPLogger.isEnabledFor"><a class="viewcode-back" href="../../../stk.utilities.mplogging.html#stk.utilities.mplogging.MPLogger.isEnabledFor">[docs]</a>    <span class="k">def</span> <span class="nf">isEnabledFor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="MPLogger.handle"><a class="viewcode-back" href="../../../stk.convenience_tools.mplogging.html#stk.convenience_tools.mplogging.MPLogger.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+<div class="viewcode-block" id="MPLogger.handle"><a class="viewcode-back" href="../../../stk.utilities.mplogging.html#stk.utilities.mplogging.MPLogger.handle">[docs]</a>    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -208,7 +208,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="logged_call"><a class="viewcode-back" href="../../../stk.convenience_tools.mplogging.html#stk.convenience_tools.mplogging.logged_call">[docs]</a><span class="k">def</span> <span class="nf">logged_call</span><span class="p">(</span><span class="n">log_queue</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="logged_call"><a class="viewcode-back" href="../../../stk.utilities.mplogging.html#stk.utilities.mplogging.logged_call">[docs]</a><span class="k">def</span> <span class="nf">logged_call</span><span class="p">(</span><span class="n">log_queue</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -223,7 +223,7 @@
     <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="daemon_logger"><a class="viewcode-back" href="../../../stk.convenience_tools.mplogging.html#stk.convenience_tools.mplogging.daemon_logger">[docs]</a><span class="k">def</span> <span class="nf">daemon_logger</span><span class="p">(</span><span class="n">log_queue</span><span class="p">):</span>
+<div class="viewcode-block" id="daemon_logger"><a class="viewcode-back" href="../../../stk.utilities.mplogging.html#stk.utilities.mplogging.daemon_logger">[docs]</a><span class="k">def</span> <span class="nf">daemon_logger</span><span class="p">(</span><span class="n">log_queue</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logs messages from subprocesses in the main process.</span>
 

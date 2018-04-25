@@ -6,10 +6,10 @@ Subpackages
 
 .. toctree::
 
-    stk.convenience_tools
     stk.ga
     stk.molecular
     stk.optimization
+    stk.utilities
 
 Submodules
 ----------
