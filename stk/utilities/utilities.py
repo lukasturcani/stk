@@ -2,7 +2,7 @@
 This module defines general-purpose objects, functions and classes.
 
 Functions, classes, etc. defined here should not depend on any other
-part of MMEA. They must be completely self-sufficient.
+part of ``stk``. They must be completely self-sufficient.
 
 """
 
