@@ -1,4 +1,4 @@
-from .convenience_tools import *
+from .utilities import *
 from .ga import *
 from .molecular import *
 from .optimization import *
