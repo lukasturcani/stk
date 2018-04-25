@@ -978,7 +978,13 @@ class Population:
 
         """
 
-        return len(list(self.all_members()))
+        size = len(self.members)
+        stack = list(self.populations)
+        while stack:
+            subpop = stack.pop()
+            stack.extend(subpop.populations)
+            size += len(subpop.members)
+        return size
 
     def __sub__(self, other):
         """
