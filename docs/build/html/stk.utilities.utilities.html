@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>stk.convenience_tools.convenience_tools module &mdash; stk  documentation</title>
+  <title>stk.utilities.utilities module &mdash; stk  documentation</title>
   
 
   
@@ -86,7 +86,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">stk.convenience_tools.convenience_tools module</a></li>
+<li><a class="reference internal" href="#">stk.utilities.utilities module</a></li>
 </ul>
 </div>
             
@@ -131,13 +131,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>stk.convenience_tools.convenience_tools module</li>
+      <li>stk.utilities.utilities module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/stk.convenience_tools.convenience_tools.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/stk.utilities.utilities.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -150,14 +150,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-stk.convenience_tools.convenience_tools">
-<span id="stk-convenience-tools-convenience-tools-module"></span><h1>stk.convenience_tools.convenience_tools module<a class="headerlink" href="#module-stk.convenience_tools.convenience_tools" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-stk.utilities.utilities">
+<span id="stk-utilities-utilities-module"></span><h1>stk.utilities.utilities module<a class="headerlink" href="#module-stk.utilities.utilities" title="Permalink to this headline">¶</a></h1>
 <p>This module defines general-purpose objects, functions and classes.</p>
 <p>Functions, classes, etc. defined here should not depend on any other
 part of MMEA. They must be completely self-sufficient.</p>
 <dl class="class">
-<dt id="stk.convenience_tools.convenience_tools.Cell">
-<em class="property">class </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>bonders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.Cell" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.Cell">
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>bonders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents an individual cell in a supercell.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -175,15 +175,15 @@ equivalent bonder atoms in the cell.</li>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.Cell.id">
-<code class="descname">id</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.Cell.id" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.Cell.id">
+<code class="descname">id</code><a class="headerlink" href="#stk.utilities.utilities.Cell.id" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member array holding the x, y and z index
 of the cell within the supercell.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.Cell.bonders">
-<code class="descname">bonders</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.Cell.bonders" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.Cell.bonders">
+<code class="descname">bonders</code><a class="headerlink" href="#stk.utilities.utilities.Cell.bonders" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the bonder atoms in the original unit cell to the
 equivalent bonder atoms in the cell.</p>
 </dd></dl>
@@ -191,25 +191,25 @@ equivalent bonder atoms in the cell.</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="stk.convenience_tools.convenience_tools.ChargedMolError">
-<em class="property">exception </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">ChargedMolError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#ChargedMolError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.ChargedMolError" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.ChargedMolError">
+<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">ChargedMolError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#ChargedMolError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.ChargedMolError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
-<dt id="stk.convenience_tools.convenience_tools.FunctionData">
-<em class="property">class </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">FunctionData</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#FunctionData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.FunctionData" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.FunctionData">
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">FunctionData</code><span class="sig-paren">(</span><em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#FunctionData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.FunctionData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Stores information about functions and their parameters.</p>
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.FunctionData.name">
-<code class="descname">name</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.FunctionData.name" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.FunctionData.name">
+<code class="descname">name</code><a class="headerlink" href="#stk.utilities.utilities.FunctionData.name" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>str</em> – The name of a function or method.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.FunctionData.params">
-<code class="descname">params</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.FunctionData.params" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.FunctionData.params">
+<code class="descname">params</code><a class="headerlink" href="#stk.utilities.utilities.FunctionData.params" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> – The parameters of the function or method who’s name is held by
 <cite>name</cite>.</p>
 </dd></dl>
@@ -227,15 +227,15 @@ equivalent bonder atoms in the cell.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="stk.convenience_tools.convenience_tools.LazyAttr">
-<em class="property">class </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">LazyAttr</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#LazyAttr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.LazyAttr" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.LazyAttr">
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">LazyAttr</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#LazyAttr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.LazyAttr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A descriptor for creating lazy attributes.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor">
-<em class="property">class </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">MAEExtractor</code><span class="sig-paren">(</span><em>file</em>, <em>n=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#MAEExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor">
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">MAEExtractor</code><span class="sig-paren">(</span><em>file</em>, <em>n=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Extracts the lowest energy conformer from a .maegz file.</p>
 <p>Macromodel conformer searches produce -out.maegz files containing
@@ -246,30 +246,30 @@ MacroMolecules -out.maegz file and converts it to a .mae file. It
 then creates and additional .mae file holding only the lowest
 energy conformer found.</p>
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.maegz_path">
-<code class="descname">maegz_path</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.maegz_path" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.maegz_path">
+<code class="descname">maegz_path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.maegz_path" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – The path to the <code class="docutils literal"><span class="pre">-out.maegz</span></code> file generated by the macromodel
 conformer search.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.mae_path">
-<code class="descname">mae_path</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.mae_path" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.mae_path">
+<code class="descname">mae_path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.mae_path" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – The path to the <code class="docutils literal"><span class="pre">.mae</span></code> file holding the conformers generated by
 the macromodel conformer search.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.content">
-<code class="descname">content</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.content" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.content">
+<code class="descname">content</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.content" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – The content of the <code class="docutils literal"><span class="pre">.mae</span></code> file hodling all the conformers from
 the macromodel conformer search. This holds other data such as
 their energies too.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.energies">
-<code class="descname">energies</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.energies" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.energies">
+<code class="descname">energies</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.energies" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">list</span></code> – The <code class="xref py py-class docutils literal"><span class="pre">list</span></code> has the form</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">231.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">144.4</span><span class="p">),</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
@@ -279,33 +279,33 @@ their energies too.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.min_energy">
-<code class="descname">min_energy</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.min_energy" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.min_energy">
+<code class="descname">min_energy</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.min_energy" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">float</span></code> – The minimum energy found in the <code class="docutils literal"><span class="pre">.mae</span></code> file.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.path">
-<code class="descname">path</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.path" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.path">
+<code class="descname">path</code><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.path" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">str</span></code> – The full path of the <code class="docutils literal"><span class="pre">.mae</span></code> file holding the extracted lowest
 energy conformer.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.extract_conformers">
-<code class="descname">extract_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#MAEExtractor.extract_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.extract_conformers" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.extract_conformers">
+<code class="descname">extract_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.extract_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_conformers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a series of <code class="docutils literal"><span class="pre">.mae</span></code> files holding the lowest energy conformers.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.extract_energy">
-<code class="descname">extract_energy</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#MAEExtractor.extract_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.extract_energy" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.extract_energy">
+<code class="descname">extract_energy</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.extract_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.extract_energy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the energy value from a .mae energy data block.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.lowest_energy_conformers">
-<code class="descname">lowest_energy_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#MAEExtractor.lowest_energy_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.lowest_energy_conformers" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.lowest_energy_conformers">
+<code class="descname">lowest_energy_conformers</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.lowest_energy_conformers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.lowest_energy_conformers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the id and energy of the lowest energy conformers.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -327,22 +327,22 @@ lowest energy conformers, respectively</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.convenience_tools.convenience_tools.MAEExtractor.maegz_to_mae">
-<code class="descname">maegz_to_mae</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#MAEExtractor.maegz_to_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MAEExtractor.maegz_to_mae" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MAEExtractor.maegz_to_mae">
+<code class="descname">maegz_to_mae</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MAEExtractor.maegz_to_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MAEExtractor.maegz_to_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the .maegz file to a .mae file.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="exception">
-<dt id="stk.convenience_tools.convenience_tools.MolFileError">
-<em class="property">exception </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">MolFileError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#MolFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.MolFileError" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.MolFileError">
+<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">MolFileError</code><span class="sig-paren">(</span><em>mol_file</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#MolFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.MolFileError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
-<dt id="stk.convenience_tools.convenience_tools.PeriodicBond">
-<em class="property">class </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.PeriodicBond" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.PeriodicBond">
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents a periodic bond.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -362,20 +362,20 @@ in the positive direction.</li>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.PeriodicBond.atom1">
-<code class="descname">atom1</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.PeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.PeriodicBond.atom1">
+<code class="descname">atom1</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The id of first atom in the bond.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.PeriodicBond.atom2">
-<code class="descname">atom2</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.PeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.PeriodicBond.atom2">
+<code class="descname">atom2</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The id of the second atom in the bond.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.convenience_tools.convenience_tools.PeriodicBond.direction">
-<code class="descname">direction</code><a class="headerlink" href="#stk.convenience_tools.convenience_tools.PeriodicBond.direction" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.PeriodicBond.direction">
+<code class="descname">direction</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.direction" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
 periodic, when going from <cite>atom1</cite> to <cite>atom2</cite>. For example,
 <code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along the x axis
@@ -385,20 +385,20 @@ in the positive direction.</p>
 </dd></dl>
 
 <dl class="exception">
-<dt id="stk.convenience_tools.convenience_tools.PopulationSizeError">
-<em class="property">exception </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">PopulationSizeError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#PopulationSizeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.PopulationSizeError" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.PopulationSizeError">
+<em class="property">exception </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PopulationSizeError</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#PopulationSizeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.PopulationSizeError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
 </dd></dl>
 
 <dl class="class">
-<dt id="stk.convenience_tools.convenience_tools.StopLogging">
-<em class="property">class </em><code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">StopLogging</code><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#StopLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.StopLogging" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.StopLogging">
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">StopLogging</code><a class="reference internal" href="_modules/stk/utilities/utilities.html#StopLogging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.StopLogging" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.add_fragment_props">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">add_fragment_props</code><span class="sig-paren">(</span><em>mol</em>, <em>bb_index</em>, <em>mol_index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#add_fragment_props"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.add_fragment_props" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.add_fragment_props">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">add_fragment_props</code><span class="sig-paren">(</span><em>mol</em>, <em>bb_index</em>, <em>mol_index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#add_fragment_props"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.add_fragment_props" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds properties to <cite>mol</cite> of <cite>bb_index</cite> and <cite>mol_index</cite>.</p>
 <p>Properties called ‘bb_index’ and ‘mol_index’ are added to every
 atom in <cite>mol</cite>.</p>
@@ -426,8 +426,8 @@ to be added to a macromolecule, <cite>mol_index</cite> is 4.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.archive_output">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">archive_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#archive_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.archive_output" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.archive_output">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">archive_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#archive_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.archive_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places the <code class="docutils literal"><span class="pre">output</span></code> folder into <code class="docutils literal"><span class="pre">old_output</span></code>.</p>
 <p>This function assumes that the <code class="docutils literal"><span class="pre">output</span></code> folder is in the current
 working directory.</p>
@@ -444,8 +444,8 @@ working directory.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.centroid">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">centroid</code><span class="sig-paren">(</span><em>*coords</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.centroid" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.centroid">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">centroid</code><span class="sig-paren">(</span><em>*coords</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the centroid of a group of coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -462,8 +462,8 @@ working directory.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.dedupe">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">dedupe</code><span class="sig-paren">(</span><em>iterable</em>, <em>seen=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#dedupe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.dedupe" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.dedupe">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">dedupe</code><span class="sig-paren">(</span><em>iterable</em>, <em>seen=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#dedupe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.dedupe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields items from <cite>iterable</cite> barring duplicates.</p>
 <p>If <cite>seen</cite> is provided it contains elements which are not to be
 yielded at all.</p>
@@ -489,8 +489,8 @@ yielded before.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.flatten">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">flatten</code><span class="sig-paren">(</span><em>iterable</em>, <em>excluded_types={&lt;class 'str'&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.flatten" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.flatten">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">flatten</code><span class="sig-paren">(</span><em>iterable</em>, <em>excluded_types={&lt;class 'str'&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transforms an nested iterable into a flat one.</p>
 <p>For example</p>
 <blockquote>
@@ -523,8 +523,8 @@ For example if <cite>str</cite> is in <cite>excluded_types</cite></p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.kabsch">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">kabsch</code><span class="sig-paren">(</span><em>coords1</em>, <em>coords2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#kabsch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.kabsch" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.kabsch">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">kabsch</code><span class="sig-paren">(</span><em>coords1</em>, <em>coords2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#kabsch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.kabsch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a rotation matrix to minimize dstance between 2 coord sets.</p>
 <p>This is essentially an implementation of the Kabsch algorithm.
 Given two sets of coordinates, <cite>coords1</cite> and <cite>coords2</cite>, this
@@ -562,8 +562,8 @@ of one point, respectively. Here <code class="docutils literal"><span class="pre
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.kill_macromodel">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">kill_macromodel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#kill_macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.kill_macromodel" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.kill_macromodel">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">kill_macromodel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#kill_macromodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.kill_macromodel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kills any applications left open as a result running MacroModel.</p>
 <p>Applications that are typically left open are
 <code class="docutils literal"><span class="pre">jserver-watcher.exe</span></code> and <code class="docutils literal"><span class="pre">jservergo.exe</span></code>.</p>
@@ -580,8 +580,8 @@ of one point, respectively. Here <code class="docutils literal"><span class="pre
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.matrix_centroid">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">matrix_centroid</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#matrix_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.matrix_centroid" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.matrix_centroid">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">matrix_centroid</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#matrix_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.matrix_centroid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the centroid of the coordinates held in <cite>matrix</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -600,8 +600,8 @@ centroid of the coordinates in <cite>matrix</cite>.</td>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.mol_from_mae_file">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">mol_from_mae_file</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#mol_from_mae_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.mol_from_mae_file" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.mol_from_mae_file">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mae_file</code><span class="sig-paren">(</span><em>mae_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#mol_from_mae_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.mol_from_mae_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a rdkit molecule from a <code class="docutils literal"><span class="pre">.mae</span></code> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -619,8 +619,8 @@ should be instantiated.</td>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.mol_from_mol_file">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">mol_from_mol_file</code><span class="sig-paren">(</span><em>mol_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#mol_from_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.mol_from_mol_file" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.mol_from_mol_file">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">mol_from_mol_file</code><span class="sig-paren">(</span><em>mol_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#mol_from_mol_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.mol_from_mol_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a rdkit molecule from a <code class="docutils literal"><span class="pre">.mol</span></code> (V3000) file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -637,10 +637,10 @@ be instantiated.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="#stk.convenience_tools.convenience_tools.ChargedMolError" title="stk.convenience_tools.convenience_tools.ChargedMolError"><code class="xref py py-exc docutils literal"><span class="pre">ChargedMolError</span></code></a> – If an atom row has more than 8 coloumns it is usually because
+<li><a class="reference internal" href="#stk.utilities.utilities.ChargedMolError" title="stk.utilities.utilities.ChargedMolError"><code class="xref py py-exc docutils literal"><span class="pre">ChargedMolError</span></code></a> – If an atom row has more than 8 coloumns it is usually because
 there is a 9th coloumn indicating atomic charge. Such molecules
 are not currently supported, so an error is raised.</li>
-<li><a class="reference internal" href="#stk.convenience_tools.convenience_tools.MolFileError" title="stk.convenience_tools.convenience_tools.MolFileError"><code class="xref py py-exc docutils literal"><span class="pre">MolFileError</span></code></a> – If the file is not a V3000 .mol file.</li>
+<li><a class="reference internal" href="#stk.utilities.utilities.MolFileError" title="stk.utilities.utilities.MolFileError"><code class="xref py py-exc docutils literal"><span class="pre">MolFileError</span></code></a> – If the file is not a V3000 .mol file.</li>
 </ul>
 </td>
 </tr>
@@ -649,8 +649,8 @@ are not currently supported, so an error is raised.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.normalize_vector">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">normalize_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#normalize_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.normalize_vector" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.normalize_vector">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">normalize_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#normalize_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.normalize_vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalizes the given vector.</p>
 <p>A new vector is returned, the original vector is not modified.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -668,8 +668,8 @@ are not currently supported, so an error is raised.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.rotation_matrix">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">rotation_matrix</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#rotation_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.rotation_matrix" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.rotation_matrix">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">rotation_matrix</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#rotation_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.rotation_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a rotation matrix which transforms <cite>vector1</cite> to <cite>vector2</cite>.</p>
 <p>Multiplying <cite>vector1</cite> by the rotation matrix returned by this
 function yields <cite>vector2</cite>.</p>
@@ -697,8 +697,8 @@ function yields <cite>vector2</cite>.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.rotation_matrix_arbitrary_axis">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">rotation_matrix_arbitrary_axis</code><span class="sig-paren">(</span><em>angle</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#rotation_matrix_arbitrary_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.rotation_matrix_arbitrary_axis" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.rotation_matrix_arbitrary_axis">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">rotation_matrix_arbitrary_axis</code><span class="sig-paren">(</span><em>angle</em>, <em>axis</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#rotation_matrix_arbitrary_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.rotation_matrix_arbitrary_axis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a rotation matrix of <cite>angle</cite> radians about <cite>axis</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -722,8 +722,8 @@ axis about which the rotation is carried out.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.tar_output">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">tar_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#tar_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.tar_output" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.tar_output">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">tar_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#tar_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.tar_output" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places all the content in the <cite>output</cite> folder into a .tgz file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -738,8 +738,8 @@ axis about which the rotation is carried out.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.time_it">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">time_it</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#time_it"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.time_it" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.time_it">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">time_it</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#time_it"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.time_it" title="Permalink to this definition">¶</a></dt>
 <dd><p>Times the code executed within the indent.</p>
 <p>This is a context manager so it should be used as:</p>
 <blockquote>
@@ -755,8 +755,8 @@ the time taken to process the entire block is printed.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="stk.convenience_tools.convenience_tools.vector_theta">
-<code class="descclassname">stk.convenience_tools.convenience_tools.</code><code class="descname">vector_theta</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/convenience_tools/convenience_tools.html#vector_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.convenience_tools.convenience_tools.vector_theta" title="Permalink to this definition">¶</a></dt>
+<dt id="stk.utilities.utilities.vector_theta">
+<code class="descclassname">stk.utilities.utilities.</code><code class="descname">vector_theta</code><span class="sig-paren">(</span><em>vector1</em>, <em>vector2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#vector_theta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.vector_theta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the angle between two vectors in radians.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

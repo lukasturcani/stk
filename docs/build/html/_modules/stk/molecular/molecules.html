@@ -325,11 +325,15 @@
 <span class="kn">from</span> <span class="nn">.fg_info</span> <span class="k">import</span> <span class="n">functional_groups</span>
 <span class="kn">from</span> <span class="nn">.energy</span> <span class="k">import</span> <span class="n">Energy</span>
 <span class="kn">import</span> <span class="nn">pywindow</span>
-<span class="kn">from</span> <span class="nn">..convenience_tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">flatten</span><span class="p">,</span> <span class="n">periodic_table</span><span class="p">,</span>
-                                 <span class="n">normalize_vector</span><span class="p">,</span> <span class="n">rotation_matrix</span><span class="p">,</span>
-                                 <span class="n">vector_theta</span><span class="p">,</span> <span class="n">mol_from_mae_file</span><span class="p">,</span>
-                                 <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
-                                 <span class="n">atom_vdw_radii</span><span class="p">,</span> <span class="n">Cell</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="p">(</span><span class="n">flatten</span><span class="p">,</span>
+                         <span class="n">periodic_table</span><span class="p">,</span>
+                         <span class="n">normalize_vector</span><span class="p">,</span>
+                         <span class="n">rotation_matrix</span><span class="p">,</span>
+                         <span class="n">vector_theta</span><span class="p">,</span>
+                         <span class="n">mol_from_mae_file</span><span class="p">,</span>
+                         <span class="n">rotation_matrix_arbitrary_axis</span><span class="p">,</span>
+                         <span class="n">atom_vdw_radii</span><span class="p">,</span>
+                         <span class="n">Cell</span><span class="p">)</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -878,16 +882,13 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()),</span>
-                                        <span class="mi">2</span><span class="p">)),</span>
-            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">conformer</span><span class="p">))</span>
-
-        <span class="n">maxd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span><span class="p">,</span> <span class="n">conformer</span><span class="p">)</span>
-        <span class="n">maxd</span> <span class="o">+=</span> <span class="p">(</span><span class="n">atom_vdw_radii</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="n">maxid1</span><span class="p">)]</span> <span class="o">+</span>
-                 <span class="n">atom_vdw_radii</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="n">maxid2</span><span class="p">)])</span>
-
-        <span class="k">return</span> <span class="n">maxd</span><span class="p">,</span> <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span></div>
+        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position_matrix</span><span class="p">(</span><span class="n">conformer</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">coords</span><span class="p">)</span>
+        <span class="n">vdw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([</span><span class="n">atom_vdw_radii</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_symbol</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span>
+                         <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">())])</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">+</span> <span class="n">vdw</span> <span class="o">+</span> <span class="n">vdw</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="n">dist</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dist</span><span class="p">[</span><span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span><span class="p">],</span> <span class="n">maxid1</span><span class="p">,</span> <span class="n">maxid2</span></div>
 
 <div class="viewcode-block" id="Molecule.mdl_mol_block"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Molecule.mdl_mol_block">[docs]</a>    <span class="k">def</span> <span class="nf">mdl_mol_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conformer</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -3235,21 +3236,13 @@
 
             <span class="n">pw_molecule</span> <span class="o">=</span> <span class="n">pywindow</span><span class="o">.</span><span class="n">molecular</span><span class="o">.</span><span class="n">Molecule</span><span class="o">.</span><span class="n">load_rdkit_mol</span><span class="p">(</span><span class="n">new_mol</span><span class="p">)</span>
             <span class="c1"># Find windows and get a single array with windows&#39; sizes.</span>
-            <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;windows&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">all_windows</span> <span class="o">=</span> <span class="n">pw_molecule</span><span class="o">.</span><span class="n">calculate_windows</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="s1">&#39;windows&#39;</span><span class="p">)</span>
 
         <span class="c1"># If pyWindow failed, return ``None``.</span>
         <span class="k">if</span> <span class="n">all_windows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">all_windows</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_windows</span><span class="p">,</span>
-                             <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">all_windows</span><span class="p">):</span>
-            <span class="c1"># Return ``None`` when pyWindow fucks up and outputs</span>
-            <span class="c1"># a mistakenly large window size.</span>
-            <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">500</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">return</span> <span class="n">all_windows</span></div></div>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_windows</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_windows</span><span class="p">]</span></div></div>
 
 
 <div class="viewcode-block" id="Polymer"><a class="viewcode-back" href="../../../stk.molecular.molecules.html#stk.molecular.molecules.Polymer">[docs]</a><span class="k">class</span> <span class="nc">Polymer</span><span class="p">(</span><span class="n">MacroMolecule</span><span class="p">):</span>

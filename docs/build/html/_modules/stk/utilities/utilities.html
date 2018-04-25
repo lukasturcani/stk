@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>stk.convenience_tools.convenience_tools &mdash; stk  documentation</title>
+  <title>stk.utilities.utilities &mdash; stk  documentation</title>
   
 
   
@@ -131,7 +131,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>stk.convenience_tools.convenience_tools</li>
+      <li>stk.utilities.utilities</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -148,7 +148,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for stk.convenience_tools.convenience_tools</h1><div class="highlight"><pre>
+  <h1>Source code for stk.utilities.utilities</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module defines general-purpose objects, functions and classes.</span>
 
@@ -225,7 +225,7 @@
               <span class="mi">117</span><span class="p">:</span> <span class="s1">&#39;Uus&#39;</span><span class="p">,</span> <span class="mi">118</span><span class="p">:</span> <span class="s1">&#39;Uuo&#39;</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
+<div class="viewcode-block" id="Cell"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.Cell">[docs]</a><span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents an individual cell in a supercell.</span>
 
@@ -256,24 +256,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bonders</span> <span class="o">=</span> <span class="n">bonders</span></div>
 
 
-<div class="viewcode-block" id="ChargedMolError"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.ChargedMolError">[docs]</a><span class="k">class</span> <span class="nc">ChargedMolError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="ChargedMolError"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.ChargedMolError">[docs]</a><span class="k">class</span> <span class="nc">ChargedMolError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol_file</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol_file</span> <span class="o">=</span> <span class="n">mol_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span></div>
 
 
-<div class="viewcode-block" id="MolFileError"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.MolFileError">[docs]</a><span class="k">class</span> <span class="nc">MolFileError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="MolFileError"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.MolFileError">[docs]</a><span class="k">class</span> <span class="nc">MolFileError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol_file</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol_file</span> <span class="o">=</span> <span class="n">mol_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span></div>
 
 
-<div class="viewcode-block" id="PopulationSizeError"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.PopulationSizeError">[docs]</a><span class="k">class</span> <span class="nc">PopulationSizeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationSizeError"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.PopulationSizeError">[docs]</a><span class="k">class</span> <span class="nc">PopulationSizeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span></div>
 
 
-<div class="viewcode-block" id="FunctionData"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.FunctionData">[docs]</a><span class="k">class</span> <span class="nc">FunctionData</span><span class="p">:</span>
+<div class="viewcode-block" id="FunctionData"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.FunctionData">[docs]</a><span class="k">class</span> <span class="nc">FunctionData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores information about functions and their parameters.</span>
 
@@ -318,7 +318,7 @@
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="LazyAttr"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.LazyAttr">[docs]</a><span class="k">class</span> <span class="nc">LazyAttr</span><span class="p">:</span>
+<div class="viewcode-block" id="LazyAttr"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.LazyAttr">[docs]</a><span class="k">class</span> <span class="nc">LazyAttr</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A descriptor for creating lazy attributes.</span>
 
@@ -335,7 +335,7 @@
         <span class="k">return</span> <span class="n">val</span></div>
 
 
-<div class="viewcode-block" id="MAEExtractor"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.MAEExtractor">[docs]</a><span class="k">class</span> <span class="nc">MAEExtractor</span><span class="p">:</span>
+<div class="viewcode-block" id="MAEExtractor"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.MAEExtractor">[docs]</a><span class="k">class</span> <span class="nc">MAEExtractor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts the lowest energy conformer from a .maegz file.</span>
 
@@ -389,7 +389,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">maegz_to_mae</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extract_conformers</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MAEExtractor.extract_conformers"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.MAEExtractor.extract_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">extract_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="MAEExtractor.extract_conformers"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.MAEExtractor.extract_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">extract_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a series of ``.mae`` files holding the lowest energy conformers.</span>
 
@@ -422,7 +422,7 @@
                 <span class="c1"># Save the path of the newly created file.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">new_name</span></div>
 
-<div class="viewcode-block" id="MAEExtractor.extract_energy"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.MAEExtractor.extract_energy">[docs]</a>    <span class="k">def</span> <span class="nf">extract_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+<div class="viewcode-block" id="MAEExtractor.extract_energy"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.MAEExtractor.extract_energy">[docs]</a>    <span class="k">def</span> <span class="nf">extract_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extracts the energy value from a .mae energy data block.</span>
 
@@ -434,7 +434,7 @@
             <span class="k">if</span> <span class="s1">&#39;r_mmod_Potential_Energy&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MAEExtractor.lowest_energy_conformers"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.MAEExtractor.lowest_energy_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">lowest_energy_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="MAEExtractor.lowest_energy_conformers"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.MAEExtractor.lowest_energy_conformers">[docs]</a>    <span class="k">def</span> <span class="nf">lowest_energy_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the id and energy of the lowest energy conformers.</span>
 
@@ -488,7 +488,7 @@
         <span class="c1"># Return a list with id and energy of the lowest energy conformers.</span>
         <span class="k">return</span> <span class="n">confs</span></div>
 
-<div class="viewcode-block" id="MAEExtractor.maegz_to_mae"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.MAEExtractor.maegz_to_mae">[docs]</a>    <span class="k">def</span> <span class="nf">maegz_to_mae</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MAEExtractor.maegz_to_mae"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.MAEExtractor.maegz_to_mae">[docs]</a>    <span class="k">def</span> <span class="nf">maegz_to_mae</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the .maegz file to a .mae file.</span>
 
@@ -500,7 +500,7 @@
                 <span class="n">mae_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">maegz_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div></div>
 
 
-<div class="viewcode-block" id="PeriodicBond"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.PeriodicBond">[docs]</a><span class="k">class</span> <span class="nc">PeriodicBond</span><span class="p">:</span>
+<div class="viewcode-block" id="PeriodicBond"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.PeriodicBond">[docs]</a><span class="k">class</span> <span class="nc">PeriodicBond</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a periodic bond.</span>
 
@@ -545,11 +545,11 @@
                 <span class="s2">&quot;</span><span class="si">{0.atom2}</span><span class="s2">, </span><span class="si">{0.direction}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="StopLogging"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.StopLogging">[docs]</a><span class="k">class</span> <span class="nc">StopLogging</span><span class="p">:</span>
+<div class="viewcode-block" id="StopLogging"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.StopLogging">[docs]</a><span class="k">class</span> <span class="nc">StopLogging</span><span class="p">:</span>
     <span class="o">...</span></div>
 
 
-<div class="viewcode-block" id="add_fragment_props"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.add_fragment_props">[docs]</a><span class="k">def</span> <span class="nf">add_fragment_props</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb_index</span><span class="p">,</span> <span class="n">mol_index</span><span class="p">):</span>
+<div class="viewcode-block" id="add_fragment_props"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.add_fragment_props">[docs]</a><span class="k">def</span> <span class="nf">add_fragment_props</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">bb_index</span><span class="p">,</span> <span class="n">mol_index</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds properties to `mol` of `bb_index` and `mol_index`.</span>
 
@@ -580,7 +580,7 @@
         <span class="n">atom</span><span class="o">.</span><span class="n">SetIntProp</span><span class="p">(</span><span class="s1">&#39;mol_index&#39;</span><span class="p">,</span> <span class="n">mol_index</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="archive_output"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.archive_output">[docs]</a><span class="k">def</span> <span class="nf">archive_output</span><span class="p">():</span>
+<div class="viewcode-block" id="archive_output"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.archive_output">[docs]</a><span class="k">def</span> <span class="nf">archive_output</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Places the ``output`` folder into ``old_output``.</span>
 
@@ -607,7 +607,7 @@
     <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="n">new_dir</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="centroid"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.centroid">[docs]</a><span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">):</span>
+<div class="viewcode-block" id="centroid"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.centroid">[docs]</a><span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the centroid of a group of coordinates.</span>
 
@@ -629,7 +629,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="dedupe"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.dedupe">[docs]</a><span class="k">def</span> <span class="nf">dedupe</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">seen</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="dedupe"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.dedupe">[docs]</a><span class="k">def</span> <span class="nf">dedupe</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">seen</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Yields items from `iterable` barring duplicates.</span>
 
@@ -666,7 +666,7 @@
             <span class="k">yield</span> <span class="n">x</span></div>
 
 
-<div class="viewcode-block" id="flatten"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.flatten">[docs]</a><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">excluded_types</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">}):</span>
+<div class="viewcode-block" id="flatten"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.flatten">[docs]</a><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">excluded_types</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">}):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Transforms an nested iterable into a flat one.</span>
 
@@ -709,7 +709,7 @@
             <span class="k">yield</span> <span class="n">x</span></div>
 
 
-<div class="viewcode-block" id="kabsch"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.kabsch">[docs]</a><span class="k">def</span> <span class="nf">kabsch</span><span class="p">(</span><span class="n">coords1</span><span class="p">,</span> <span class="n">coords2</span><span class="p">):</span>
+<div class="viewcode-block" id="kabsch"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.kabsch">[docs]</a><span class="k">def</span> <span class="nf">kabsch</span><span class="p">(</span><span class="n">coords1</span><span class="p">,</span> <span class="n">coords2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a rotation matrix to minimize dstance between 2 coord sets.</span>
 
@@ -755,7 +755,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="kill_macromodel"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.kill_macromodel">[docs]</a><span class="k">def</span> <span class="nf">kill_macromodel</span><span class="p">():</span>
+<div class="viewcode-block" id="kill_macromodel"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.kill_macromodel">[docs]</a><span class="k">def</span> <span class="nf">kill_macromodel</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kills any applications left open as a result running MacroModel.</span>
 
@@ -783,7 +783,7 @@
                <span class="n">stdout</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="matrix_centroid"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.matrix_centroid">[docs]</a><span class="k">def</span> <span class="nf">matrix_centroid</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
+<div class="viewcode-block" id="matrix_centroid"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.matrix_centroid">[docs]</a><span class="k">def</span> <span class="nf">matrix_centroid</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the centroid of the coordinates held in `matrix`.</span>
 
@@ -804,7 +804,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="mol_from_mae_file"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.mol_from_mae_file">[docs]</a><span class="k">def</span> <span class="nf">mol_from_mae_file</span><span class="p">(</span><span class="n">mae_path</span><span class="p">):</span>
+<div class="viewcode-block" id="mol_from_mae_file"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.mol_from_mae_file">[docs]</a><span class="k">def</span> <span class="nf">mol_from_mae_file</span><span class="p">(</span><span class="n">mae_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a rdkit molecule from a ``.mae`` file.</span>
 
@@ -890,7 +890,7 @@
     <span class="k">return</span> <span class="n">mol</span></div>
 
 
-<div class="viewcode-block" id="mol_from_mol_file"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.mol_from_mol_file">[docs]</a><span class="k">def</span> <span class="nf">mol_from_mol_file</span><span class="p">(</span><span class="n">mol_file</span><span class="p">):</span>
+<div class="viewcode-block" id="mol_from_mol_file"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.mol_from_mol_file">[docs]</a><span class="k">def</span> <span class="nf">mol_from_mol_file</span><span class="p">(</span><span class="n">mol_file</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a rdkit molecule from a ``.mol`` (V3000) file.</span>
 
@@ -971,7 +971,7 @@
     <span class="k">return</span> <span class="n">mol</span></div>
 
 
-<div class="viewcode-block" id="normalize_vector"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.normalize_vector">[docs]</a><span class="k">def</span> <span class="nf">normalize_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+<div class="viewcode-block" id="normalize_vector"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.normalize_vector">[docs]</a><span class="k">def</span> <span class="nf">normalize_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Normalizes the given vector.</span>
 
@@ -993,7 +993,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rotation_matrix"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.rotation_matrix">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">vector2</span><span class="p">):</span>
+<div class="viewcode-block" id="rotation_matrix"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.rotation_matrix">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">vector2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a rotation matrix which transforms `vector1` to `vector2`.</span>
 
@@ -1052,7 +1052,7 @@
     <span class="k">return</span> <span class="n">I</span> <span class="o">+</span> <span class="n">vx</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vx</span><span class="p">,</span> <span class="n">vx</span><span class="p">),</span> <span class="n">mult_factor</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rotation_matrix_arbitrary_axis"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.rotation_matrix_arbitrary_axis">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<div class="viewcode-block" id="rotation_matrix_arbitrary_axis"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.rotation_matrix_arbitrary_axis">[docs]</a><span class="k">def</span> <span class="nf">rotation_matrix_arbitrary_axis</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">    Returns a rotation matrix of `angle` radians about `axis`.</span>
@@ -1095,7 +1095,7 @@
                      <span class="p">[</span><span class="n">e31</span><span class="p">,</span> <span class="n">e32</span><span class="p">,</span> <span class="n">e33</span><span class="p">]])</span></div>
 
 
-<div class="viewcode-block" id="tar_output"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.tar_output">[docs]</a><span class="k">def</span> <span class="nf">tar_output</span><span class="p">():</span>
+<div class="viewcode-block" id="tar_output"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.tar_output">[docs]</a><span class="k">def</span> <span class="nf">tar_output</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Places all the content in the `output` folder into a .tgz file.</span>
 
@@ -1110,7 +1110,7 @@
         <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="time_it"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.time_it">[docs]</a><span class="nd">@contextmanager</span>
+<div class="viewcode-block" id="time_it"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.time_it">[docs]</a><span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">time_it</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Times the code executed within the indent.</span>
@@ -1136,7 +1136,7 @@
                                                     <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">s</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="vector_theta"><a class="viewcode-back" href="../../../stk.convenience_tools.convenience_tools.html#stk.convenience_tools.convenience_tools.vector_theta">[docs]</a><span class="k">def</span> <span class="nf">vector_theta</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">vector2</span><span class="p">):</span>
+<div class="viewcode-block" id="vector_theta"><a class="viewcode-back" href="../../../stk.utilities.utilities.html#stk.utilities.utilities.vector_theta">[docs]</a><span class="k">def</span> <span class="nf">vector_theta</span><span class="p">(</span><span class="n">vector1</span><span class="p">,</span> <span class="n">vector2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the angle between two vectors in radians.</span>
 
