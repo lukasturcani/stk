@@ -140,6 +140,20 @@ functional_groups = [
                                   "[$([C]([H])([H])[C]#[N])]",
                                   "[$([H][C][H])].[$([H][C][H])]"),
 
+                FGInfo('alkyne', '[C]#[C][H]',
+                                 '[$([C]([H])#[C])]',
+                                 '[$([H][C]#[C])]'),
+
+                FGInfo('terminal_alkene', '[C]=[C]([H])[H]',
+                                          '[$([C]=[C]([H])[H])]',
+                                          ('[$([H][C]([H])=[C])].'
+                                           '[$([H][C]([H])=[C])].'
+                                           '[$([C](=[C])([H])[H])]')),
+
+                FGInfo('boronic_acid', '[B]([O][H])[O][H]',
+                                       '[$([B]([O][H])[O][H])]',
+                                       ('[$([O]([H])[B][O][H])].'
+                                        '[$([H][O][B][O][H])]')),
 
                 # This amine functional group only deletes one of the
                 # hydrogen atoms when a bond is formed.
@@ -158,5 +172,6 @@ functional_groups = [
 
 double_bond_combs = [('amine', 'aldehyde'),
                      ('amide', 'aldehyde'),
-                     ('nitrile','aldehyde'),
-                     ('amide', 'amine')]
+                     ('nitrile', 'aldehyde'),
+                     ('amide', 'amine'),
+                     ('terminal_alkene', 'terminal_alkene')]
