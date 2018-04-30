@@ -62,7 +62,7 @@ import numpy as np
 from itertools import chain
 from inspect import signature
 
-from ..functional_groups import join_fgs
+from ..functional_groups import react
 from ...utilities import dedupe, flatten, add_fragment_props
 
 
@@ -206,8 +206,8 @@ class Topology(metaclass=TopologyMeta):
                                       bb_conformers)
 
         self.place_mols(macro_mol)
-        for fg1, fg2 in self.bonded_fgs(macro_mol):
-            macro_mol.mol = join_fgs(macro_mol.mol, fg1, fg2)
+        for fgs in self.bonded_fgs(macro_mol):
+            macro_mol.mol = react(macro_mol.mol, *fgs)
 
         # Make sure that the property cache of each atom is up to date.
         for atom in macro_mol.mol.GetAtoms():
@@ -230,10 +230,24 @@ class Topology(metaclass=TopologyMeta):
 
         The ``rdkit`` molecules of the building blocks are
         combined into a single ``rdkit`` molecule and placed into
-        `macro_mol.mol`.
+        `macro_mol.mol`. Beyond this, the function must give every
+        functional group in the macromolecule a unique id. This is
+        done by adding the property ``'fg_id'`` to every atom part
+        of a functional group in `macro_mol`. Atoms in the same
+        functional group will have the same value of ``'fg_id'`` while
+        atoms in different functional groups will have a different
+        ``'fg_id'``.
 
-        The function has a couple of responsibilities.
-
+        Finally, this function must also add the tags ``'bb_index'``
+        and ``'mol_index'`` to every atom in the molecule. The
+        ``'bb_index'`` tag identifies which building block the atom
+        belongs to. The building block is identified by its index
+        within :attr:`MacroMolecule.building_blocks` (as a string).
+        The ``'mol_index'`` identifies which molecule of a specific
+        building the atom belongs to. For example, if
+        ``bb_index = '1'`` and ``mol_index = '3'`` the atom belongs to
+        the 4th molecule of ``macro_mol.building_blocks[1]`` to
+        be added to the macromolecule.
 
         Parameters
         ----------
@@ -259,7 +273,7 @@ class Topology(metaclass=TopologyMeta):
         bonded to create the final macromolecule. It then yields the
         ids functional groups as a :class:`tuple`.
 
-        This :class:`tuple` gets passed to :func:`.join_fgs`.
+        This :class:`tuple` gets passed to :func:`.react`.
 
         Parameters
         ----------

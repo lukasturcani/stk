@@ -92,7 +92,9 @@ and a :class:`tuple` of instances of this class called
     4. Using :class:`.FGInfo`, tag atoms in the building block as
        either ``'bonder'`` or ``'del'``. ``'bonder'`` signifies that
        the atoms form a bond during macromolecular assembly, while
-       ``'del'`` means they are deleted.
+       ``'del'`` means they are deleted. Also tag all atoms in the
+       functional group with the tag ``'fg'`` which holds the name
+       of the functional group.
 
     5. Give the :class:`StructUnit` and :class:`.Topology` instances to
        the macromolecule's initializer.
@@ -119,22 +121,14 @@ and a :class:`tuple` of instances of this class called
     8. Use :meth:`.Topology.place_mols` to combine the ``rdkit`
        molecules of all the building blocks into a single ``rdkit``
        instance. The combined ``rdkit`` instance is placed into
-       ``macro_mol.mol``.
+       ``macro_mol.mol``. :meth:`.Topology.place_mols` also gives
+       each functional group a unique id. Every atom in the
+       assembled molecule that belong to a functional group is
+       given the tag ``'fg_id'``, whose value holds a unique id for
+       each functional group.
 
-    9. Use :meth:`.Topology.bonded_fgs` to get the ids
-
-    8. Combine the ``rdkit`` molecules in :attr:`StructUnit.mol`
-       into a single ``rdkit`` molecule. Make sure that the building
-       blocks are arranged in the shape of the macromolecule. All the
-       manipulations available through :class:`StructUnit` are
-       useful here to make sure all building blocks are oriented
-       correctly when forming the macromolecule.
-
-    9. Create bonds between all the disjoined building block
-       molecules. This is where the tagging done by :class:`StructUnit`
-       is needed.
-
-    10. Delete all atoms tagged for deletion.
+    9. Use :meth:`.Topology.bonded_fgs` to get the ids of functional
+       groups in the molecule to react using :func:`.react`.
 
 After all this you should have a ``rdkit`` instance of the
 macromolecule which should be placed into :attr:`MacroMolecule.mol`.

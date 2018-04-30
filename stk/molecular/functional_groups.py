@@ -30,7 +30,7 @@ works but::
 does not.
 
 If a new functional group is to connect to another functional group
-with a double other than a single, the names of the functional groups
+with a bond other than a single, the names of the functional groups
 should be added to :data:`bond_orders`, along with the desired bond
 order.
 
@@ -38,11 +38,12 @@ Supporting complex reactions.
 .............................
 
 During assembly, two functional groups are provided to
-:func:`join_fgs`. By default, placing an :class:`FGInfo` instance into
+:func:`react`. By default, placing an :class:`FGInfo` instance into
 :data:`functional_groups` will result in the creation of a single bond
-between the atoms tagged as 'bonder' in the two functional groups.
-In addtion, any atoms tagged as 'del' will be removed. The bond order
-of the created bond can be modified by editing :data:`bond_orders`.
+between the atoms tagged as ``'bonder'`` in the two functional groups.
+In addtion, any atoms tagged as ``'del'`` will be removed. The bond
+order of the created bond can be modified by editing
+:data:`bond_orders`.
 
 However, some reactions cannot be described by a simple combination of
 adding a bond while deleting some existing atoms. For example, consider
@@ -53,13 +54,14 @@ the aldol reaction:
 Here a ketone is converted into an alcohol. In order to support more
 complex conversions, a specific function needs to be defined which
 modifies the molecule as desired. The function then needs
-to be added to :data:`custom_joins`. See
-:func:`join_boronic_acid_with_diol`
+to be added to :data:`custom_reactions`. See
+:func:`boronic_acid_with_diol`
 as an example.
 
 """
 
 import rdkit.Chem.AllChem as rdkit
+from collections import Counter
 
 
 class FGInfo:
@@ -146,24 +148,26 @@ def react(mol, *fgs):
     """
     Crates bonds between functional groups.
 
-    Except for cases in :data:`custom_joins`, this function operates
-    on atoms where the 'fg_id' tag is either `fg1` or `fg2`. All such
-    atoms with the tag 'del' are deleted and the ones with the tag
-    'bonder' are joined with a bond. The bond order is ``1`` unless
-    listed otherwise in :data:`bond_orders`.
+    This function first looks at the functional group ids provided via
+    the `*fgs` argument and checks which functional groups are
+    involved in the reaction. If the functional groups are handled
+    by one of the custom reactions specified in
+    :data:`custom_reactions` then that function is executed.
+
+    In all other cases the function is assumed to have received two
+    functional groups to react via `*fgs`. In these functional groups
+    the atoms tagged ``'del'`` are deleted and the atoms tagged
+    ``'bonder'`` have a bond added. The bond is a single, unless
+    specified otherwise in :data:`bond_orders`.
 
     Parameters
     ----------
     mol : :class:`rdkit.Chem.rdchem.Mol`
         A molecule being assembled.
 
-    fg1 : :class:`str`
-        The id of the first functional group which
-        is to be joined, as given by the 'fg_id' property.
-
-    fg2 : :class:str`
-        The id of the second functional group which
-        is to be joined, as given by the 'fg_id' property.
+    *fgs : :class:`str`
+        The ids of the functional groups to react. The ids are held
+        by atom of `mol` in the ``'fg_id'`` property.
 
     Returns
     -------
@@ -172,16 +176,15 @@ def react(mol, *fgs):
 
     """
 
-    ids = {fg1, fg2}
-    name1, name2 = fg_name(mol, fg1), fg_name(mol, fg2)
-    join_key = frozenset((name1, name2))
-    if join_key in custom_joins:
-        return custom_joins[join_key](fg1, fg2)
+    names = [fg_name(fg) for fg in fgs]
+    reaction_key = tuple(sorted(Counter(names).items()))
+    if reaction_key in custom_reactions:
+        return custom_reactions[reaction_key](mol, *fgs)
 
     emol = rdkit.EditableMol(mol)
     bonders = []
     for atom in reversed(mol.GetAtoms()):
-        if not (atom.HasProp('fg_id') and atom.GetProp('fg_id') in ids):
+        if not (atom.HasProp('fg_id') and atom.GetProp('fg_id') in fgs):
             continue
 
         if atom.HasProp('del'):
@@ -190,13 +193,13 @@ def react(mol, *fgs):
         if atom.HasProp('bonder'):
             bonders.append(atom)
 
-    bond = bond_orders.get(join_key, rdkit.rdchem.BondType.SINGLE)
+    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
     bonder1, bonder2 = bonders
     emol.AddBond(bonder1.GetIdx(), bonder2.GetIdx(), bond)
     return emol.GetMol()
 
 
-def join_boronic_acid_with_diol(mol, fg1, fg2):
+def boronic_acid_with_diol(mol, fg1, fg2):
     """
     Crates bonds between functional groups.
 
@@ -221,8 +224,13 @@ def join_boronic_acid_with_diol(mol, fg1, fg2):
     ...
 
 
-custom_joins = {
-    frozenset(('boronic_acid', 'diol')): join_boronic_acid_with_diol}
+# If some functional groups react via a special mechanism not covered
+# in by the base "react()" function the function should be placed
+# in this dict. The key should be a sorted tuple which holds the name
+# of every functional group involved in the reaction along with how
+# many such functional groups are invovled.
+custom_reactions = {
+    tuple(sorted((('boronic_acid', 1), ('diol', 1)))): boronic_acid_with_diol}
 
 
 functional_groups = (
@@ -316,4 +324,4 @@ bond_orders = {
     frozenset(('amide', 'aldehyde')): double,
     frozenset(('nitrile', 'aldehyde')): double,
     frozenset(('amide', 'amine')): double,
-    frozenset(('terminal_alkene', 'terminal_alkene')): double}
+    frozenset(('terminal_alkene', )): double}
