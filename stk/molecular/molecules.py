@@ -121,6 +121,8 @@ and a :class:`tuple` of instances of this class called
        instance. The combined ``rdkit`` instance is placed into
        ``macro_mol.mol``.
 
+    9. Use :meth:`.Topology.bonded_fgs` to get the ids
+
     8. Combine the ``rdkit`` molecules in :attr:`StructUnit.mol`
        into a single ``rdkit`` molecule. Make sure that the building
        blocks are arranged in the shape of the macromolecule. All the

@@ -142,7 +142,7 @@ def fg_name(mol, fg):
             return atom.GetProp('fg')
 
 
-def join_fgs(mol, fg1, fg2):
+def react(mol, *fgs):
     """
     Crates bonds between functional groups.
 

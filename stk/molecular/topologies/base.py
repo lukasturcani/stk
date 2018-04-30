@@ -9,8 +9,11 @@ Extending stk: Adding new topologies.
 General
 .......
 
-
-
+A new topology class must be defined. The class must inherit
+:class:`Topology`. The new topology class will have to define
+the methods :meth:`place_mols` and :meth:`bonded_fgs`. A description
+of what these methods should do is given by :meth:`Topology.place_mols`
+and :meth:`Topology.bonded_fgs`.
 
 Cages
 .....
@@ -231,14 +234,41 @@ class Topology(metaclass=TopologyMeta):
 
         The function has a couple of responsibilities.
 
+
         Parameters
         ----------
         macro_mol : :class:`MacroMolecule`
             The molecule being assembled.
 
-        Returns
-        -------
-        None : :class:`NoneType`
+        Raises
+        ------
+        :class:`NotImplementedError`
+
+        """
+
+        raise NotImplementedError()
+
+    def bonded_fgs(self, macro_mol):
+        """
+        An iterator which yields ids of functional groups to be bonded.
+
+        The ids of functional groups in `macro_mol` are assigned by
+        :meth:`place_mols`. The ids are stored as atom properties
+        under the name ``'fg_id'``, This method looks at the
+        macromolecule and determines which functional groups should be
+        bonded to create the final macromolecule. It then yields the
+        ids functional groups as a :class:`tuple`.
+
+        This :class:`tuple` gets passed to :func:`.join_fgs`.
+
+        Parameters
+        ----------
+        macro_mol : :class:`MacroMolecule`
+            The molecule being assembled.
+
+        Raises
+        ------
+        :class:`NotImplementedError`
 
         """
 
