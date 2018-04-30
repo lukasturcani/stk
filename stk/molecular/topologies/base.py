@@ -212,7 +212,7 @@ class Topology(metaclass=TopologyMeta):
         self.place_mols(macro_mol)
         for fgs in self.bonded_fgs(macro_mol):
             macro_mol.mol = react(macro_mol.mol, *fgs)
-        self.cleanup()
+        self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
         for atom in macro_mol.mol.GetAtoms():
@@ -525,7 +525,7 @@ class Linear(Topology):
 
         """
 
-        for i in range(0, len(self.repeating_unit)*self.n, 2):
+        for i in range(1, 2*len(self.repeating_unit)*self.n-1, 2):
             yield i, i+1
 
     def _x_position(self, macro_mol, bb):

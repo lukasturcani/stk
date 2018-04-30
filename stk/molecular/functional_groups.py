@@ -176,13 +176,24 @@ def react(mol, *fgs):
 
     """
 
-    names = [fg_name(fg) for fg in fgs]
+    names = [fg_name(mol, fg) for fg in fgs]
     reaction_key = tuple(sorted(Counter(names).items()))
     if reaction_key in custom_reactions:
         return custom_reactions[reaction_key](mol, *fgs)
 
     emol = rdkit.EditableMol(mol)
+
     bonders = []
+    for atom in mol.GetAtoms():
+        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
+            continue
+        if atom.HasProp('bonder'):
+            bonders.append(atom.GetIdx())
+
+    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
+    bonder1, bonder2 = bonders
+    emol.AddBond(bonder1, bonder2, bond)
+
     for atom in reversed(mol.GetAtoms()):
         if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
             continue
@@ -190,12 +201,6 @@ def react(mol, *fgs):
         if atom.HasProp('del'):
             emol.RemoveAtom(atom.GetIdx())
 
-        if atom.HasProp('bonder'):
-            bonders.append(atom)
-
-    bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
-    bonder1, bonder2 = bonders
-    emol.AddBond(bonder1.GetIdx(), bonder2.GetIdx(), bond)
     return emol.GetMol()
 
 
