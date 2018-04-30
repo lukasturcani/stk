@@ -8,8 +8,7 @@ Extending stk: Adding  more functional groups.
 
 If ``stk`` is to incorporate a new functional group, a new
 :class:``FGInfo`` instance should be added to
-:data:`functional_groups`. This is a :class:`dict` defined in this
-module.
+:data:`functional_groups`.
 
 Adding a new ``FGInfo`` instance to :data:`functional_groups` will
 allow :meth:`.Topology.build` to connect the functional group to
@@ -226,90 +225,90 @@ custom_joins = {
     frozenset(('boronic_acid', 'diol')): join_boronic_acid_with_diol}
 
 
-functional_groups = {
+functional_groups = (
 
-                'amine': FGInfo("amine",
-                                "[N]([H])[H]",
-                                "[$([N]([H])[H])]",
-                                "[$([H][N][H])].[$([H][N][H])]"),
+                FGInfo("amine",
+                       "[N]([H])[H]",
+                       "[$([N]([H])[H])]",
+                       "[$([H][N][H])].[$([H][N][H])]"),
 
-                'aldehyde': FGInfo("aldehyde",
-                                   "[C](=[O])[H]",
-                                   "[$([C](=[O])[H])]",
-                                   "[$([O]=[C][H])]"),
+                FGInfo("aldehyde",
+                       "[C](=[O])[H]",
+                       "[$([C](=[O])[H])]",
+                       "[$([O]=[C][H])]"),
 
-                'carboxylic_acid': FGInfo("carboxylic_acid",
-                                          "[C](=[O])[O][H]",
-                                          "[$([C](=[O])[O][H])]",
-                                          "[$([H][O][C](=[O]))][O]"),
+                FGInfo("carboxylic_acid",
+                       "[C](=[O])[O][H]",
+                       "[$([C](=[O])[O][H])]",
+                       "[$([H][O][C](=[O]))][O]"),
 
-                'amide': FGInfo("amide",
-                                "[C](=[O])[N]([H])[H]",
-                                "[$([C](=[O])[N]([H])[H])]",
-                                "[$([N]([H])([H])[C](=[O]))]([H])[H]"),
+                FGInfo("amide",
+                       "[C](=[O])[N]([H])[H]",
+                       "[$([C](=[O])[N]([H])[H])]",
+                       "[$([N]([H])([H])[C](=[O]))]([H])[H]"),
 
-                'thioacid': FGInfo("thioacid",
-                                   "[C](=[O])[S][H]",
-                                   "[$([C](=[O])[O][H])]",
-                                   "[$([H][O][C](=[O]))][S]"),
+                FGInfo("thioacid",
+                       "[C](=[O])[S][H]",
+                       "[$([C](=[O])[O][H])]",
+                       "[$([H][O][C](=[O]))][S]"),
 
-                'alcohol': FGInfo("alcohol",
-                                  "[O][H]",
-                                  "[$([O][H])]",
-                                  "[$([H][O])]"),
+                FGInfo("alcohol",
+                       "[O][H]",
+                       "[$([O][H])]",
+                       "[$([H][O])]"),
 
-                'thiol': FGInfo("thiol",
-                                "[S][H]",
-                                "[$([S][H])]",
-                                "[$([H][S])]"),
+                FGInfo("thiol",
+                       "[S][H]",
+                       "[$([S][H])]",
+                       "[$([H][S])]"),
 
-                'bromine': FGInfo("bromine",
-                                  "*[Br]",
-                                  "[$(*[Br])]",
-                                  "[$([Br]*)]"),
+                FGInfo("bromine",
+                       "*[Br]",
+                       "[$(*[Br])]",
+                       "[$([Br]*)]"),
 
-                'iodine': FGInfo("iodine",
-                                 "*[I]",
-                                 "[$(*[I])]",
-                                 "[$([I]*)]"),
+                FGInfo("iodine",
+                       "*[I]",
+                       "[$(*[I])]",
+                       "[$([I]*)]"),
 
-                'nitrile': FGInfo("nitrile",
-                                  "[C][C]#[N]",
-                                  "[$([C]([H])([H])[C]#[N])]",
-                                  "[$([H][C][H])].[$([H][C][H])]"),
+                FGInfo("nitrile",
+                       "[C][C]#[N]",
+                       "[$([C]([H])([H])[C]#[N])]",
+                       "[$([H][C][H])].[$([H][C][H])]"),
 
-                'alkyne': FGInfo('alkyne',
-                                 '[C]#[C][H]',
-                                 '[$([C]([H])#[C])]',
-                                 '[$([H][C]#[C])]'),
+                FGInfo('alkyne',
+                       '[C]#[C][H]',
+                       '[$([C]([H])#[C])]',
+                       '[$([H][C]#[C])]'),
 
-                'terminal_alkene': FGInfo('terminal_alkene',
-                                          '[C]=[C]([H])[H]',
-                                          '[$([C]=[C]([H])[H])]',
-                                          ('[$([H][C]([H])=[C])].'
-                                           '[$([H][C]([H])=[C])].'
-                                           '[$([C](=[C])([H])[H])]')),
+                FGInfo('terminal_alkene',
+                       '[C]=[C]([H])[H]',
+                       '[$([C]=[C]([H])[H])]',
+                       ('[$([H][C]([H])=[C])].'
+                        '[$([H][C]([H])=[C])].'
+                        '[$([C](=[C])([H])[H])]')),
 
-                'boronic_acid': FGInfo('boronic_acid',
-                                       '[B]([O][H])[O][H]',
-                                       '[$([B]([O][H])[O][H])]',
-                                       ('[$([O]([H])[B][O][H])].'
-                                        '[$([H][O][B][O][H])]')),
+                FGInfo('boronic_acid',
+                       '[B]([O][H])[O][H]',
+                       '[$([B]([O][H])[O][H])]',
+                       ('[$([O]([H])[B][O][H])].'
+                        '[$([H][O][B][O][H])]')),
 
                 # This amine functional group only deletes one of the
                 # hydrogen atoms when a bond is formed.
-                'amine2': FGInfo("amine2",
-                                 "[N]([H])[H]",
-                                 "[$([N]([H])[H])]",
-                                 "[$([H][N][H])]"),
+                FGInfo("amine2",
+                       "[N]([H])[H]",
+                       "[$([N]([H])[H])]",
+                       "[$([H][N][H])]"),
 
-                'secondary_amine': FGInfo("secondary_amine",
-                                          "[H][N]([#6])[#6]",
-                                          "[$([N]([H])([#6])[#6])]",
-                                          "[$([H][N]([#6])[#6])]")
+                FGInfo("secondary_amine",
+                       "[H][N]([#6])[#6]",
+                       "[$([N]([H])([#6])[#6])]",
+                       "[$([H][N]([#6])[#6])]")
 
 
-                    }
+                    )
 
 double = rdkit.rdchem.BondType.DOUBLE
 bond_orders = {

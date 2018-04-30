@@ -6,6 +6,12 @@ Defines the base :class:`Topology` type.
 Extending stk: Adding new topologies.
 -------------------------------------
 
+General
+.......
+
+
+
+
 Cages
 .....
 
@@ -53,7 +59,7 @@ import numpy as np
 from itertools import chain
 from inspect import signature
 
-from ..fg_info import double_bond_combs
+from ..functional_groups import join_fgs
 from ...utilities import dedupe, flatten, add_fragment_props
 
 
@@ -197,8 +203,8 @@ class Topology(metaclass=TopologyMeta):
                                       bb_conformers)
 
         self.place_mols(macro_mol)
-        self.join_mols(macro_mol)
-        self.del_atoms(macro_mol)
+        for fg1, fg2 in self.bonded_fgs(macro_mol):
+            macro_mol.mol = join_fgs(macro_mol.mol, fg1, fg2)
 
         # Make sure that the property cache of each atom is up to date.
         for atom in macro_mol.mol.GetAtoms():
@@ -215,14 +221,20 @@ class Topology(metaclass=TopologyMeta):
             for conf in confs:
                 bb.mol.AddConformer(conf)
 
-    def del_atoms(self, macro_mol):
+    def place_mols(self, macro_mol):
         """
-        Deletes the atoms which are lost during assembly.
+        Places building blocks.
+
+        The ``rdkit`` molecules of the building blocks are
+        combined into a single ``rdkit`` molecule and placed into
+        `macro_mol.mol`.
+
+        The function has a couple of responsibilities.
 
         Parameters
         ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
+        macro_mol : :class:`MacroMolecule`
+            The molecule being assembled.
 
         Returns
         -------
@@ -230,69 +242,7 @@ class Topology(metaclass=TopologyMeta):
 
         """
 
-        mol = rdkit.EditableMol(macro_mol.mol)
-        # Delete atoms with largest id last, so that when deleting
-        # later atoms their ids do not change.
-        for atom in reversed(macro_mol.mol.GetAtoms()):
-            if atom.HasProp('del'):
-                mol.RemoveAtom(atom.GetIdx())
-
-        macro_mol.mol = mol.GetMol()
-
-    @staticmethod
-    def determine_bond_type(macro_mol, atom1_id, atom2_id):
-        """
-        Returns the bond order to be formed between the atoms.
-
-        Some atoms will need to have a double bond created between
-        them. This is defined in the :data:`fg_info.double_bond_combs`.
-        If the atom ids provided as parameters belong to functional
-        groups found in this list, the ``rdkit`` double bond type will
-        be returned. If not, the ``rdkit`` single bond type will be
-        returned. These types are needed when adding bonds to an
-        ``rdkit`` molecule.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
-
-        atom1_id : :class:`int`
-            The id number of the first atom.
-
-        atom2_id : :class:`int`
-            The id number of the second atom.
-
-        Returns
-        -------
-        :class:`rdkit.Chem.rdchem.BondType.SINGLE`
-            If the atoms don't belong to functional groups which form
-            a double bond.
-
-        :class:`rdkit.Chem.rdchem.BondType.DOUBLE`
-            If the atoms belong to functional groups which form a
-            double bond.
-
-        """
-
-        # Get the functional groups of the of the atoms whose atom ids
-        # were supplied as arguments. If the groups form a tuple in
-        # `double_bond_combs` return a rdkit double bond type. If they
-        # do not, return a rdkit single bond type.
-
-        atom1 = macro_mol.mol.GetAtomWithIdx(atom1_id)
-        atom1_grp = atom1.GetProp('fg')
-        atom2 = macro_mol.mol.GetAtomWithIdx(atom2_id)
-        atom2_grp = atom2.GetProp('fg')
-
-        double_bond_present = ((atom1_grp, atom2_grp) == tup or
-                               (atom2_grp, atom1_grp) == tup for
-                               tup in double_bond_combs)
-
-        if any(double_bond_present):
-            return rdkit.rdchem.BondType.DOUBLE
-        else:
-            return rdkit.rdchem.BondType.SINGLE
+        raise NotImplementedError()
 
     def __str__(self):
         return repr(self)

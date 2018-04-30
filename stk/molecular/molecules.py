@@ -81,8 +81,8 @@ automatically completes steps 1 to 4.)
 
 Which functional groups are recognized by ``stk``?
 
-The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a
-:class:`list` of instances of this class called
+The module :mod:`.functional_groups` defines the class :class:`.FGInfo`
+and a :class:`tuple` of instances of this class called
 :data:`functional_groups`. If you put an :class:`.FGInfo` instance into
 :data:`functional_groups`, the functional group will be recognized.
 
@@ -115,6 +115,11 @@ The module :mod:`.fg_info` defines the class :class:`.FGInfo` and a
     7. The details of :meth:`.Topology.build` will vary depending on
        the :class:`.Topology` class used. However, the basic structure
        is the same (steps 8 - 10).
+
+    8. Use :meth:`.Topology.place_mols` to combine the ``rdkit`
+       molecules of all the building blocks into a single ``rdkit``
+       instance. The combined ``rdkit`` instance is placed into
+       ``macro_mol.mol``.
 
     8. Combine the ``rdkit`` molecules in :attr:`StructUnit.mol`
        into a single ``rdkit`` molecule. Make sure that the building
@@ -171,7 +176,7 @@ from collections import Counter, defaultdict, ChainMap
 from inspect import signature
 
 from . import topologies
-from .fg_info import functional_groups
+from .functional_groups import functional_groups
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
