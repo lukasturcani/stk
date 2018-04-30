@@ -15,6 +15,12 @@ the methods :meth:`place_mols` and :meth:`bonded_fgs`. A description
 of what these methods should do is given by :meth:`Topology.place_mols`
 and :meth:`Topology.bonded_fgs`.
 
+The new class may optionally define a method :meth:`cleanup`. This
+performs any final cleanup operations on the assembled molecule. For
+example, converting the end functional groups of a polymer into
+hydrogen atoms. See also :meth:`Topology.cleanup`.
+
+
 Cages
 .....
 
@@ -208,6 +214,7 @@ class Topology(metaclass=TopologyMeta):
         self.place_mols(macro_mol)
         for fgs in self.bonded_fgs(macro_mol):
             macro_mol.mol = react(macro_mol.mol, *fgs)
+        self.cleanup()
 
         # Make sure that the property cache of each atom is up to date.
         for atom in macro_mol.mol.GetAtoms():
@@ -242,12 +249,14 @@ class Topology(metaclass=TopologyMeta):
         and ``'mol_index'`` to every atom in the molecule. The
         ``'bb_index'`` tag identifies which building block the atom
         belongs to. The building block is identified by its index
-        within :attr:`MacroMolecule.building_blocks` (as a string).
+        within :attr:`MacroMolecule.building_blocks`.
         The ``'mol_index'`` identifies which molecule of a specific
         building the atom belongs to. For example, if
-        ``bb_index = '1'`` and ``mol_index = '3'`` the atom belongs to
+        ``bb_index = 1`` and ``mol_index = 3`` the atom belongs to
         the 4th molecule of ``macro_mol.building_blocks[1]`` to
-        be added to the macromolecule.
+        be added to the macromolecule. The utility function
+        :func:`.add_fragment_props` is provided to help with this.
+
 
         Parameters
         ----------
@@ -287,6 +296,23 @@ class Topology(metaclass=TopologyMeta):
         """
 
         raise NotImplementedError()
+
+    def cleanup(self, macro_mol):
+        """
+        Performs final clean up actions on an assembled molecule.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The molecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        return
 
     def __str__(self):
         return repr(self)
@@ -375,7 +401,7 @@ class Linear(Topology):
         self.n = n
         self.ends = ends
 
-    def del_atoms(self, macro_mol):
+    def cleanup(self, macro_mol):
         """
         Deletes the atoms which are lost during assembly.
 
@@ -392,50 +418,6 @@ class Linear(Topology):
 
         if self.ends == 'h':
             self.hygrogen_ends(macro_mol)
-        elif self.ends == 'fg':
-            self.fg_ends(macro_mol)
-
-    def fg_ends(self, macro_mol):
-        """
-        Removes almost all atoms tagged for deletion.
-
-        In polymers, you don't want to delete the atoms at the ends of
-        the chain.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.Polymer`
-            The polymer being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        fgs = set()
-        # Get all atoms tagged for deletion, held in tuples
-        # corresponding to individual functional groups.
-        for bb in macro_mol.building_blocks:
-            delmol = rdkit.MolFromSmarts(bb.func_grp.del_smarts)
-            fgs = fgs.union(macro_mol.mol.GetSubstructMatches(delmol))
-
-        # Get the functional groups which hold the atoms with the
-        # smallest and largest values for the x coordinate need to have
-        # deletion tags removed.
-        maxid = max(flatten(fgs),
-                    key=lambda x: macro_mol.atom_coords(x)[0])
-        maxfg = next(fg for fg in fgs if maxid in fg)
-
-        minid = min(flatten(fgs),
-                    key=lambda x: macro_mol.atom_coords(x)[0])
-        minfg = next(fg for fg in fgs if minid in fg)
-
-        for atom_id in chain(flatten(minfg), flatten(maxfg)):
-            atom = macro_mol.mol.GetAtomWithIdx(atom_id)
-            atom.ClearProp('del')
-
-        super().del_atoms(macro_mol)
 
     def hygrogen_ends(self, macro_mol):
         """
@@ -455,8 +437,13 @@ class Linear(Topology):
 
         """
 
+        emol = rdkit.EditableMol(macro_mol.mol)
         # Remove all extra atoms.
-        super().del_atoms(macro_mol)
+        for atom in reversed(macro_mol.mol.GetAtoms()):
+            if atom.HasProp('del'):
+                emol.RemoveAtom(atom.GetIdx())
+
+        macro_mol.mol = emol.GetMol()
         # Add hydrogens.
         for atom in macro_mol.mol.GetAtoms():
             atom.UpdatePropertyCache()
@@ -464,10 +451,12 @@ class Linear(Topology):
 
     def place_mols(self, macro_mol):
         """
-        Places monomers side by side and joins them.
+        Places monomers side by side.
 
         The monomers are placed along the x-axis, so that the vector
-        running between the functional groups is placed on the axis.
+        running between the functional groups is placed along the axis.
+        Functional groups are tagged with ``'fg_id'`` such that
+        ``'fg_id'`` increases along the x-axis.
 
         Parameters
         ----------
@@ -487,8 +476,6 @@ class Linear(Topology):
                                   macro_mol.building_blocks):
             mapping[label] = monomer
 
-        # Make a que for holding bonder atom ids.
-        self.bonders = deque(maxlen=2)
         # Make string representing the entire polymer, not just the
         # repeating unit.
         polymer = self.repeating_unit*self.n
@@ -496,13 +483,9 @@ class Linear(Topology):
         # not just the repeating unit.
         dirs = self.orientation*self.n
 
-        # Go through the repeating unit. Place each monomer 50 A apart.
-        # Also create a bond.
+        # Go through the repeating unit and place each monomer.
         macro_mol.mol = rdkit.Mol()
         for i, (label, mdir) in enumerate(zip(polymer, dirs)):
-            self.bonders.append([
-                macro_mol.mol.GetNumAtoms() + id_ for
-                id_ in mapping[label].bonder_ids])
 
             # Flip or not flip the monomer as given by the probability
             # in `mdir`.
@@ -517,59 +500,35 @@ class Linear(Topology):
             bb_index = macro_mol.building_blocks.index(mapping[label])
             add_fragment_props(monomer_mol, bb_index, i)
 
+            # Add fg_id tags.
+            monomer_conf = monomer_mol.GetConformer()
+            for atom in monomer_mol.GetAtoms():
+                if atom.HasProp('fg'):
+                    coord = monomer_conf.GetAtomPosition(atom.GetIdx())
+                    fg_id = 2*i if coord.x < x_coord else 2*i+1
+                    atom.SetIntProp('fg_id', fg_id)
+
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
                                               monomer_mol)
-            if i != 0:
-                self.join(macro_mol)
 
-    def join(self, macro_mol):
+    def bonded_fgs(self, macro_mol):
         """
-        Joins 2 monomers.
+        Yields functional groups to react.
 
         Parameters
         ----------
         macro_mol : :class:`.Polymer`
             The polymer being assembled.
 
-        Returns
+        Yields
         -------
-        None : :class:`NoneType`
+        :class:`tuple` of :class:`int`
+            Holds the ids of the functional groups set to react.
 
         """
 
-        distances = []
-        for bonder1 in self.bonders[0]:
-            for bonder2 in self.bonders[1]:
-                distances.append(
-                        (macro_mol.atom_distance(bonder1, bonder2),
-                         bonder1,
-                         bonder2))
-
-        _, bonder1, bonder2 = min(distances)
-        emol = rdkit.EditableMol(macro_mol.mol)
-        emol.AddBond(bonder1, bonder2, self.determine_bond_type(
-                                                            macro_mol,
-                                                            bonder1,
-                                                            bonder2))
-
-        macro_mol.mol = emol.GetMol()
-
-    def join_mols(self, macro_mol):
-        """
-        Does nothing, :meth:`place_mols` joins up the molecules too.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.Polymer`
-            The polymer being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        return
+        for i in range(0, len(self.repeating_unit)*self.n, 2):
+            yield i, i+1
 
     def _x_position(self, macro_mol, bb):
         """

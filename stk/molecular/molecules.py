@@ -123,12 +123,15 @@ and a :class:`tuple` of instances of this class called
        instance. The combined ``rdkit`` instance is placed into
        ``macro_mol.mol``. :meth:`.Topology.place_mols` also gives
        each functional group a unique id. Every atom in the
-       assembled molecule that belong to a functional group is
+       assembled molecule that belongs to a functional group is
        given the tag ``'fg_id'``, whose value holds a unique id for
        each functional group.
 
     9. Use :meth:`.Topology.bonded_fgs` to get the ids of functional
        groups in the molecule to react using :func:`.react`.
+
+    10. Run :meth:`.Topology.cleanup` to perform any final operations
+        on the assembled molecule. Can be nothing.
 
 After all this you should have a ``rdkit`` instance of the
 macromolecule which should be placed into :attr:`MacroMolecule.mol`.

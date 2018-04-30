@@ -129,7 +129,7 @@ def fg_name(mol, fg):
     mol : :class:`rdkit.Chem.rdchem.Mol`
         An ``rdkit`` molecule with its functional groups tagged.
 
-    fg : :class:`str`
+    fg : :class:`int`
         The id of a functional group as given by the 'fg_id' property.
 
     Returns
@@ -140,7 +140,7 @@ def fg_name(mol, fg):
     """
 
     for atom in mol.GetAtoms():
-        if atom.HasProp('fg_id') and atom.GetProp('fg_id') == fg:
+        if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') == fg:
             return atom.GetProp('fg')
 
 
@@ -165,7 +165,7 @@ def react(mol, *fgs):
     mol : :class:`rdkit.Chem.rdchem.Mol`
         A molecule being assembled.
 
-    *fgs : :class:`str`
+    *fgs : :class:`int`
         The ids of the functional groups to react. The ids are held
         by atom of `mol` in the ``'fg_id'`` property.
 
@@ -184,7 +184,7 @@ def react(mol, *fgs):
     emol = rdkit.EditableMol(mol)
     bonders = []
     for atom in reversed(mol.GetAtoms()):
-        if not (atom.HasProp('fg_id') and atom.GetProp('fg_id') in fgs):
+        if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
             continue
 
         if atom.HasProp('del'):
@@ -207,11 +207,11 @@ def boronic_acid_with_diol(mol, fg1, fg2):
     ----------
     mol : :class:`rdkit.Chem.rdchem.Mol`
 
-    fg1 : :class:`str`
+    fg1 : :class:`int`
         The id of the first functional group which
         is to be joined, as given by the 'fg_id' property.
 
-    fg2 : :class:str`
+    fg2 : :class:`int`
         The id of the second functional group which
         is to be joined, as given by the 'fg_id' property.
 
