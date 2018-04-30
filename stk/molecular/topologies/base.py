@@ -63,13 +63,11 @@ topology is at the origin.
 """
 
 import rdkit.Chem.AllChem as rdkit
-from collections import deque
 import numpy as np
-from itertools import chain
 from inspect import signature
 
 from ..functional_groups import react
-from ...utilities import dedupe, flatten, add_fragment_props
+from ...utilities import dedupe, add_fragment_props
 
 
 def remove_confs(building_blocks, keep):
