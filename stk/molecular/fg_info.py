@@ -95,14 +95,51 @@ class FGInfo:
         self.del_smarts = del_smarts
 
 
-functional_groups = [
+def join_fgs(mol, fg1, fg2):
+    """
+    Crates bonds between functional groups.
 
-                FGInfo("amine",
-                       "[N]([H])[H]",
-                       "[$([N]([H])[H])]",
-                       "[$([H][N][H])].[$([H][N][H])]"),
+    Parameters
+    ----------
+    mol : :class:`rdkit.Chem.rdchem.Mol`
 
-                FGInfo("aldehyde", "[C](=[O])[H]",
+    fg1 : :class:`str`
+        The id of the first functional group which
+        is to be joined, as given by the 'fg_id' property.
+
+    fg2 : :class:str`
+        The id of the second functional group which
+        is to be joined, as given by the 'fg_id' property.
+
+    Returns
+    -------
+    None : :class:`NoneType`
+
+    """
+
+    ...
+
+
+def join_boronic_acid_with_diol(mol, fg1, fg2):
+    """
+
+    """
+
+    ...
+
+
+custom_joins = {('boronic_acid', 'diol'): join_boronic_acid_with_diol}
+
+
+functional_groups = {
+
+                'amine': FGInfo("amine",
+                                "[N]([H])[H]",
+                                "[$([N]([H])[H])]",
+                                "[$([H][N][H])].[$([H][N][H])]"),
+
+                'aldehyde': FGInfo("aldehyde",
+                                   "[C](=[O])[H]",
                                    "[$([C](=[O])[H])]",
                                    "[$([O]=[C][H])]"),
 
@@ -168,10 +205,10 @@ functional_groups = [
                        "[$([H][N]([#6])[#6])]")
 
 
-                    ]
+                    }
 
-double_bond_combs = [('amine', 'aldehyde'),
+double_bond_combs = {('amine', 'aldehyde'),
                      ('amide', 'aldehyde'),
                      ('nitrile', 'aldehyde'),
                      ('amide', 'amine'),
-                     ('terminal_alkene', 'terminal_alkene')]
+                     ('terminal_alkene', 'terminal_alkene')}
