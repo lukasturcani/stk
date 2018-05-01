@@ -15,8 +15,10 @@ the methods :meth:`place_mols` and :meth:`bonded_fgs`. A description
 of what these methods should do is given by :meth:`Topology.place_mols`
 and :meth:`Topology.bonded_fgs`.
 
-The new class may optionally define a method :meth:`cleanup`. This
-performs any final cleanup operations on the assembled molecule. For
+The new class may optionally define the methods :meth:`prepare` and
+:meth:`cleanup`. The former perfroms operations on the molecule
+before it is joined up and has atoms deleted via :func:`.react`.
+The latter any final cleanup operations on the assembled molecule. For
 example, converting the end functional groups of a polymer into
 hydrogen atoms. See also :meth:`Topology.cleanup`.
 
@@ -210,6 +212,7 @@ class Topology(metaclass=TopologyMeta):
                                       bb_conformers)
 
         self.place_mols(macro_mol)
+        self.prepare(macro_mol)
         for fgs in self.bonded_fgs(macro_mol):
             macro_mol.mol = react(macro_mol.mol, *fgs)
         self.cleanup(macro_mol)
@@ -298,6 +301,23 @@ class Topology(metaclass=TopologyMeta):
     def cleanup(self, macro_mol):
         """
         Performs final clean up actions on an assembled molecule.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The molecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        return
+
+    def prepare(self, macro_mol):
+        """
+        Performs ops between placing and reacting building blocks.
 
         Parameters
         ----------

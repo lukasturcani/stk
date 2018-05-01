@@ -175,7 +175,7 @@ def react(mol, *fgs):
         The molecule with bonds added between the functional groups.
 
     """
-
+    print(mol, *fgs)
     names = [fg_name(mol, fg) for fg in fgs]
     reaction_key = tuple(sorted(Counter(names).items()))
     if reaction_key in custom_reactions:
@@ -189,7 +189,7 @@ def react(mol, *fgs):
             continue
         if atom.HasProp('bonder'):
             bonders.append(atom.GetIdx())
-
+    print(bonders)
     bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
     bonder1, bonder2 = bonders
     emol.AddBond(bonder1, bonder2, bond)

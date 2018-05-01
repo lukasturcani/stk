@@ -576,14 +576,10 @@ class COFLattice(Topology):
         self.scale_func = scale_func
         super().__init__()
 
-    def del_atoms(self, macro_mol):
+    def prepare(self, macro_mol):
         """
-        Deletes the atoms which are lost during assembly.
+        Updates :attr:`~.Periodic.deleters`.
 
-        Notes
-        -----
-        The parameter `macro_mol` has two attributes changed.
-        :attr:`~.MacroMolecule.mol` has deleter atoms removed, while
         :attr:`~.Periodic.deleters` is updated with the
         coordinates, element type and bond type of every removed atom.
 
@@ -619,7 +615,6 @@ class COFLattice(Topology):
                                                neighbor.GetAtomicNum(),
                                                bond.GetBondType()])
 
-        super().del_atoms(macro_mol)
         macro_mol._ids_updated = False
 
 
@@ -705,13 +700,21 @@ class LinkerCOFLattice(COFLattice):
 
         # For each vertex in the topology, place a multitopic building
         # block on it. The Vertex object takes care of alignment.
-
+        self._add_fg_id(multi, 0)
         for i, v in enumerate(self.vertices):
             aligner = self.multitopic_aligners[i]
             mol = v.place_mol(cell_params, multi, aligner)
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(multi),
                                i)
+
+            # Update fg_ids.
+            for atom in mol.GetAtoms():
+                if atom.HasProp('fg_id'):
+                    atom.SetIntProp('fg_id',
+                                    atom.GetIntProp('fg_id')+i*nbonders)
+
+            # Combine.
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([multi])
 
@@ -720,6 +723,7 @@ class LinkerCOFLattice(COFLattice):
             # process.
             v.create_bonder_map(macro_mol, cell_params, nbonders, aligner)
 
+        self._add_fg_id(di, nbonders+i*nbonders)
         for i, e in enumerate(self.edges):
             mol = e.place_mol(macro_mol,
                               cell_params,
@@ -728,6 +732,13 @@ class LinkerCOFLattice(COFLattice):
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(di),
                                i)
+
+            # Update fg_ids.
+            for atom in mol.GetAtoms():
+                if atom.HasProp('fg_id'):
+                    atom.SetIntProp('fg_id',
+                                    atom.GetIntProp('fg_id')+i*2)
+
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([di])
             bonder_ids = deque(maxlen=2)
@@ -739,14 +750,54 @@ class LinkerCOFLattice(COFLattice):
 
         super(macro_mol.__class__, macro_mol).save_ids()
 
-    def join_mols(self, macro_mol):
+    def bonded_fgs(self, macro_mol):
         """
-        Creates bonds between the building blocks.
+        Yields functional groups which undergo a reaction.
 
         Parameters
         ----------
         macor_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
+
+        Yields
+        ------
+        :class:`tuple` of :class:`int`
+            Holds the ids of the functional groups set to react.
+
+        """
+
+        for e in self.edges:
+            bonder1 = e.bonder_map[0]
+            bonder2 = e.v1.bonder_map[e.joint_positions[0]]
+
+            bonder1 = macro_mol.mol.GetAtomWithIdx(bonder1)
+            bonder2 = macro_mol.mol.GetAtomWithIdx(bonder2)
+
+            yield bonder1.GetIntProp('fg_id'), bonder2.GetIntProp('fg_id')
+            bonder3 = e.bonder_map[1]
+            print(11, macro_mol.mol.GetAtomWithIdx(bonder3).HasProp('bonder'))
+            bonder4 = e.v2.bonder_map[e.joint_positions[1]]
+            if all(b == 0 for b in e.bond):
+                bonder3 = macro_mol.mol.GetAtomWithIdx(bonder3)
+                bonder4 = macro_mol.mol.GetAtomWithIdx(bonder4)
+                print(bonder3.HasProp('bonder'), bonder4.HasProp('bonder'))
+                yield bonder3.GetIntProp('fg_id'), bonder4.GetIntProp('fg_id')
+
+            else:
+                macro_mol.periodic_bonds.append(
+                    PeriodicBond(macro_mol.bonder_ids.index(bonder3),
+                                 macro_mol.bonder_ids.index(bonder4),
+                                 e.bond))
+
+    def _add_fg_id(self, bb, start):
+        """
+        Creates initial fg_info properties for each functional group.
+
+        Parameters
+        ----------
+        bb : :class:`.StructUnit`
+            A building block which is to have the ``'fg_id``
+            property added to its atoms.
 
         Returns
         -------
@@ -754,32 +805,9 @@ class LinkerCOFLattice(COFLattice):
 
         """
 
-        macro_mol.bonds_made = 0
-        emol = rdkit.EditableMol(macro_mol.mol)
-        for e in self.edges:
-            bonder1 = e.bonder_map[0]
-            bonder2 = e.v1.bonder_map[e.joint_positions[0]]
-            bond_type = self.determine_bond_type(macro_mol,
-                                                 bonder1,
-                                                 bonder2)
-            emol.AddBond(bonder1, bonder2, bond_type)
-
-            bonder3 = e.bonder_map[1]
-            bonder4 = e.v2.bonder_map[e.joint_positions[1]]
-            if all(b == 0 for b in e.bond):
-                bond_type = self.determine_bond_type(macro_mol,
-                                                     bonder3,
-                                                     bonder4)
-                emol.AddBond(bonder3, bonder4, bond_type)
-            else:
-                macro_mol.periodic_bonds.append(
-                    PeriodicBond(macro_mol.bonder_ids.index(bonder3),
-                                 macro_mol.bonder_ids.index(bonder4),
-                                 e.bond))
-
-            macro_mol.bonds_made += 2
-
-        macro_mol.mol = emol.GetMol()
+        for fg_id, fg in enumerate(bb.functional_group_atoms(), start):
+            for atomid in fg:
+                bb.mol.GetAtomWithIdx(atomid).SetIntProp('fg_id', fg_id)
 
 
 class NoLinkerCOFLattice(COFLattice):

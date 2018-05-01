@@ -127,10 +127,14 @@ and a :class:`tuple` of instances of this class called
        given the tag ``'fg_id'``, whose value holds a unique id for
        each functional group.
 
-    9. Use :meth:`.Topology.bonded_fgs` to get the ids of functional
-       groups in the molecule to react using :func:`.react`.
+    9. Use :meth:`.Topology.prepare` to run any additional operations
+       before joining up the building blocks and deleting extra
+       atoms, this method may do nothing.
 
-    10. Run :meth:`.Topology.cleanup` to perform any final operations
+    10. Use :meth:`.Topology.bonded_fgs` to get the ids of functional
+        groups in the molecule to react using :func:`.react`.
+
+    11. Run :meth:`.Topology.cleanup` to perform any final operations
         on the assembled molecule. Can be nothing.
 
 After all this you should have a ``rdkit`` instance of the
