@@ -179,7 +179,7 @@ from collections import Counter, defaultdict, ChainMap
 from inspect import signature
 
 from . import topologies
-from .functional_groups import functional_groups, bond_orders
+from .functional_groups import functional_groups, react
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
@@ -3164,57 +3164,6 @@ class Periodic(MacroMolecule):
         self._ids_updated = False
         super().__init__(building_blocks, topology, name, note)
 
-    def _is_subterminal(self, atom_id, bonder_map, bonded):
-        """
-        ``True`` if atom is bonded to a terminal one.
-
-        Notes
-        -----
-        For internal use by :meth:`island`.
-
-        Parameters
-        ----------
-        atom_id : :class:`int`
-            The id of the atom being checked.
-
-        bonder_map : :class:`dict`
-            A dictionary which maps the atom id in the island to the
-            equivalent bonder atom in the unit cell.
-
-        bonded : :class:`set`
-            A set of atom ids of all bonder atoms which have had a
-            bond added by :meth:`_join_island`.
-
-        Returns
-        -------
-        :class:`bool`
-            ``True`` if atom is bonded to a terminal atom, ``False``
-            otherwise.
-
-        """
-
-        # If `atom_id` is not in the `bonder_map` it means that the
-        # atom is not a bonder and therefore no terminal atoms need to
-        # be added to it.
-        if atom_id not in bonder_map:
-            return False
-
-        # Get id of the equivalent bonder atom in the original unit
-        # cell.
-        bid = bonder_map[atom_id]
-        # Make a set of all bonder atoms in the original unit cell
-        # which were registered as having bonds crossing periodic
-        # boundaries.
-        periodic = {x.atom1 for x in self.periodic_bonds}
-        periodic.update(x.atom2 for x in self.periodic_bonds)
-        # If that atom does have a periodic bond and has not had a
-        # bond added while building the island - it is subterminal and
-        # needs to have a terminal atom attached.
-        if bid not in periodic or atom_id in bonded:
-            return False
-
-        return True
-
     def island(self, dimensions):
         """
         Build a terminated supercell.
@@ -3243,9 +3192,8 @@ class Periodic(MacroMolecule):
 
         """
 
-        cells, island, bonder_map = self._place_island(dimensions)
-        island, bonded = self._join_island(cells, island)
-        return self._terminate_island(island, bonded, bonder_map)
+        cells, island = self._place_island(dimensions)
+        return self._join_island(cells, island)
 
     def _join_island(self, cells, island):
         """
@@ -3266,17 +3214,11 @@ class Periodic(MacroMolecule):
 
         Returns
         -------
-        :class:`tuple`
-            The first member of the tuple an ``rdkit`` molecule of the
-            island with all bonds between the unit cells added. The
-            second member of the tuple is a :class:`set` of
-            :class:`int`, where each :class:`int` is id of a bonder
-            atom which had a bond added by this function.
+        :class:`rdkit.Chem.rdchem.Mol`
+            The island with bonds added.
 
         """
 
-        emol = rdkit.EditableMol(island)
-        bonded = set()
         # `self.periodic_bonds` holds objects of the
         # ``PeriodicBond`` class. Each ``PeriodicBond`` object has the
         # ids of two bonder atoms in the unit cell which are connected
@@ -3306,117 +3248,13 @@ class Periodic(MacroMolecule):
                     y >= len(cells[0]) or
                    z >= len(cells[0][0])):
                     continue
-                # ccel as in "connected cell".
-                ccell = cells[x][y][z]
 
-                # `bonder1` is the id of a bonder atom, found in `cell`
-                # and equivalent to `periodic_bond.atom1`, having a
-                # bond added.
-                bonder1 = cell.bonders[periodic_bond.atom1]
-                # `bonder2` is the id of a bonder atom, found in
-                # `ccell` and equivalent to `periodic_bond.atom2`,
-                # having a bond added.
-                bonder2 = ccell.bonders[periodic_bond.atom2]
+                island = react(island,
+                               True,
+                               periodic_bond.atom1,
+                               periodic_bond.atom2)
 
-                bond_key = self._bond_key(periodic_bond.atom1,
-                                          periodic_bond.atom2)
-                bond = bond_orders.get(bond_key,
-                                       rdkit.rdchem.BondType.SINGLE)
-
-                emol.AddBond(bonder1, bonder2, bond)
-                bonded.add(bonder1)
-                bonded.add(bonder2)
-
-        return emol.GetMol(), bonded
-
-    def _bond_key(self, atom1, atom2):
-        """
-        Returns a key for :data:`bond_orders`.
-
-        Parameters
-        ----------
-        atom1 : :class:`int`
-            The id of some atom.
-
-        atom2 : :class:`int`
-            The id of another atom.
-
-        Returns
-        -------
-        :class:`frozenset`
-            A key for :data:`bond_orders`.
-
-        """
-
-        fg1 = self.mol.GetAtomWithIdx(atom1).GetProp('fg')
-        fg2 = self.mol.GetAtomWithIdx(atom2).GetProp('fg')
-        return frozenset((fg1, fg2))
-
-    def _terminate_island(self, island, bonded, bonder_map):
-        """
-        Adds atoms to all bonder atoms at the edges of `island`.
-
-        Notes
-        -----
-        For internal use by :meth:`island`.
-
-        Parameters
-        ----------
-        island : :class:`rdkit.Chem.rdchem.Mol`
-            The island molecule which needs to have terminating atoms
-            added.
-
-        bonded : :class:`set` of :class:`int`
-            Contains all the ids of all bonder atoms in `island` which
-            have already had a bonded added by :meth:`_join_island`.
-
-        bonder_map : :class:`dict`
-            This is a mapping of the ids of bonder atoms in the island
-            back to the id of the equivalent atom in the original unit
-            cell.
-
-        Returns
-        -------
-        :class:`rdkit.Chem.rdchem.Mol`
-            The ``rdkit`` molecule of the final, assembled island.
-
-        """
-
-        iconf = island.GetConformer()
-        emol = rdkit.EditableMol(island)
-        coords = {}
-        for atom in island.GetAtoms():
-            atom_id = atom.GetIdx()
-            # If the atom is not connected to a terminal atom, move on
-            # to the next one.
-            if not self._is_subterminal(atom_id, bonder_map, bonded):
-                continue
-
-            # Get the id of bonder atom in the original unit cell
-            # which is equivalent to `atom`.
-            bi = bonder_map[atom_id]
-            for rcoords, element, bond_type in self.deleters[bi]:
-                tid = emol.AddAtom(rdkit.Atom(element))
-                emol.AddBond(tid, atom_id, bond_type)
-
-                # Using the equivalent bonder atom get the position
-                # of the terminating atom relative to the bonder atom. Add
-                # the relative position of the terminating atom and the
-                # position of `atom` to get the final position of the
-                # terminating atom.
-                tcoords = (np.array(iconf.GetAtomPosition(atom_id)) +
-                           rcoords)
-                rdkit_coords = rdkit_geo.Point3D(*tcoords)
-                coords[tid] = rdkit_coords
-
-        mol = emol.GetMol()
-        conf = mol.GetConformer()
-        # Update the positions of all the terminating atoms in the
-        # conformer.
-        for atom_id, atom_coords in coords.items():
-            conf.SetAtomPosition(atom_id, atom_coords)
-
-        return mol
+        return island
 
     def _place_island(self, dimensions):
         """
@@ -3460,27 +3298,29 @@ periodic._place_island([4, 4, 4])
         a, b, c = self.cell_dimensions
         cells = np.full(dimensions, None, object).tolist()
         island = rdkit.Mol()
-        bonder_map = ChainMap()
-        i = 0
+
+        xdim, ydim, zdim = (range(d) for d in dimensions)
+        nfgs = 1 + max(atom.GetIntProp('fg_id') for atom in
+                       self.mol.GetAtoms() if atom.HasProp('fg_id'))
         # For each dimension place a unit cell.
-        for x in range(dimensions[0]):
-            for y in range(dimensions[1]):
-                for z in range(dimensions[2]):
-                    island = rdkit.CombineMols(
-                                island, self.shift(x*a + y*b + z*c))
-                    # `bonders` maps a bonder id in the original unit
-                    # cell to the one currently being added to the
-                    # island.
-                    bonders = {bi: i*self.mol.GetNumAtoms() + bi for
-                               bi in self.bonder_ids}
-                    cells[x][y][z] = Cell((x, y, z), bonders)
-                    # 'bonder_map' maps all bonder ids in the island
-                    # to the bonder ids in the original unit cell.
-                    inverse_bonders = dict(zip(bonders.values(),
-                                               bonders.keys()))
-                    bonder_map = bonder_map.new_child(inverse_bonders)
-                    i += 1
-        return cells, island, bonder_map
+        for i, (x, y, z) in enumerate(it.product(xdim, ydim, zdim)):
+            unit_cell = self.shift(x*a + y*b + z*c)
+
+            # Update fg_ids.
+            for atom in unit_cell.GetAtoms():
+                if not atom.HasProp('fg_id'):
+                    continue
+                atom.SetIntProp('fg_id', atom.GetIntProp('fg_id')+i*nfgs)
+
+            island = rdkit.CombineMols(island, unit_cell)
+            # `bonders` maps a bonder id in the original unit
+            # cell to the one currently being added to the
+            # island.
+            bonders = {bi: i*self.mol.GetNumAtoms() + bi for
+                       bi in self.bonder_ids}
+            cells[x][y][z] = Cell((x, y, z), bonders)
+
+        return cells, island
 
     def save_ids(self):
         super().save_ids()
@@ -3494,14 +3334,6 @@ periodic._place_island([4, 4, 4])
         for pb in self.periodic_bonds:
             pb.atom1 = self.bonder_ids[pb.atom1]
             pb.atom2 = self.bonder_ids[pb.atom2]
-
-        # Update deleters to hold atom ids directly instead
-        # of indices of the atom ids within `bonder_ids`.
-        deleters = {}
-        for index, data in self.deleters.items():
-            bonder_id = self.bonder_ids[index]
-            deleters[bonder_id] = data
-        self.deleters = deleters
 
         self._ids_updated = True
 

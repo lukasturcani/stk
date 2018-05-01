@@ -104,9 +104,9 @@ class Vertex:
     connected : :class:`list` of :class:`Edge`
         The edges connected to this vertex.
 
-    bonder_map : :class:`dict`
-        Maps the id of a bonder position on the vertex to the atom
-        id of the bonder sitting on it.
+    fg_map : :class:`dict`
+        Maps the id of a bonder position on the vertex to the
+        ``'fg_id'`` sitting on it.
 
     """
 
@@ -180,13 +180,13 @@ class Vertex:
 
         return coord
 
-    def create_bonder_map(self,
-                          macro_mol,
-                          cell_params,
-                          nbonders,
-                          aligned_bonder):
+    def create_fg_map(self,
+                      macro_mol,
+                      cell_params,
+                      nfgs,
+                      aligned_bonder):
         """
-        Creates the attribute :attr:`bonder_map`.
+        Creates the attribute :attr:`fg_map`.
 
         Parameters
         ----------
@@ -196,9 +196,9 @@ class Vertex:
         cell_params : :class:`list` of :class:`numpy.array`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
-        nbonders : :class:`int`
-            The number of bonder atoms the building block placed on the
-            vertex has.
+        nfgs : :class:`int`
+            The number of functional groups the building block placed
+            on the vertex has.
 
         aligned_bonder : :class:`int`
             The index of a bonder atom in
@@ -214,7 +214,7 @@ class Vertex:
         center = self.calc_coord(cell_params)
 
         # Get all the bonder ids.
-        bonder_ids = deque(maxlen=nbonders)
+        bonder_ids = deque(maxlen=nfgs)
         for atom in macro_mol.mol.GetAtoms():
             if atom.HasProp('bonder'):
                 bonder_ids.append(atom.GetIdx())
@@ -242,6 +242,7 @@ class Vertex:
 
         self.bonder_map = {}
         for bonder, position in zip(bonders, positions):
+            bonder = macro_mol.mol.GetAtomWithIdx(bonder).GetIntProp('fg_id')
             self.bonder_map[position] = bonder
 
     def aligned_position(self):
@@ -295,8 +296,8 @@ class Edge:
         The position of the edge in terms of the fractional positions
         along the ``a``, ``b`` and ``c`` vectors of a unit cell.
 
-    bonder_map : :class:`dict`
-        Maps the id of a position to the id of the bonder atom which
+    fg_map : :class:`dict`
+        Maps the id of a position to the ``'fg_id'`` which
         sits on it. The positions are ``0`` and ``1`` where ``0`` is
         the  position which is closer to :attr:`v1` while ``1``
         is the position closer to :attr:`v2`.
@@ -457,7 +458,7 @@ class Edge:
 
         return coord / (i+1)
 
-    def create_bonder_map(self, macro_mol, cell_params):
+    def create_fg_map(self, macro_mol, cell_params):
         """
         Creates the attribute :attr:`bonder_map`.
 
@@ -486,6 +487,9 @@ class Edge:
                          key=lambda x: euclidean(
                                              v1coord,
                                              macro_mol.atom_coords(x)))
+
+        bonders = [macro_mol.mol.GetAtomWithIdx(b).GetIntProp('fg_id')
+                   for b in bonders]
         self.bonder_map = {0: bonders[0],
                            1: bonders[1]}
 
@@ -572,74 +576,9 @@ class COFLattice(Topology):
 
     """
 
-    def __init__(self, react_del, scale_func=bb_size):
+    def __init__(self, scale_func=bb_size):
         self.scale_func = scale_func
-        super().__init__(react_del=react_del)
-
-    def prepare(self, macro_mol):
-        """
-        Updates :attr:`~.Periodic.deleters`.
-
-        :attr:`~.Periodic.deleters` is updated with the
-        coordinates, element type and bond type of every removed atom.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.Periodic`
-            The periodic macromolecule being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # This loop checks if an atom is an bonder and if its is finds
-        # a neighboring deleter atom. The deleter atom has its
-        # coordinates relative to the bonder found and saved in
-        # `terminator_coords`.
-        macro_mol.deleters = defaultdict(list)
-        for atom in macro_mol.mol.GetAtoms():
-            if not atom.HasProp('bonder'):
-                continue
-            for neighbor in atom.GetNeighbors():
-                if not neighbor.HasProp('del'):
-                    continue
-                bi = macro_mol.bonder_ids.index(atom.GetIdx())
-                nid = neighbor.GetIdx()
-                tcoords = (macro_mol.atom_coords(nid) -
-                           macro_mol.atom_coords(atom.GetIdx()))
-
-                bond = macro_mol.mol.GetBondBetweenAtoms(nid, atom.GetIdx())
-                macro_mol.deleters[bi].append([tcoords,
-                                               neighbor.GetAtomicNum(),
-                                               bond.GetBondType()])
-
-        macro_mol._ids_updated = False
-
-    def cleanup(self, macro_mol):
-        """
-        Deletes atoms with ``'del'`` property.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.Periodic`
-            The periodic macromolecule being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        mol = rdkit.EditableMol(macro_mol.mol)
-        # Delete atoms with largest id last, so that when deleting
-        # later atoms their ids do not change.
-        for atom in reversed(macro_mol.mol.GetAtoms()):
-            if atom.HasProp('del'):
-                mol.RemoveAtom(atom.GetIdx())
-
-        macro_mol.mol = mol.GetMol()
+        super().__init__()
 
 
 class LinkerCOFLattice(COFLattice):
@@ -680,7 +619,7 @@ class LinkerCOFLattice(COFLattice):
                  ditopic_directions=None,
                  multitopic_aligners=None,
                  scale_func=linker_cof_scale_func):
-        super().__init__(react_del=False, scale_func=scale_func)
+        super().__init__(scale_func=scale_func)
 
         if ditopic_directions is None:
             ditopic_directions = [1 for i in range(len(self.edges))]
@@ -745,7 +684,7 @@ class LinkerCOFLattice(COFLattice):
             # Save the ids of the bonder atoms in the assembled molecule.
             # This is used when creating bonds later in the assembly
             # process.
-            v.create_bonder_map(macro_mol, cell_params, nbonders, aligner)
+            v.create_fg_map(macro_mol, cell_params, nbonders, aligner)
 
         self._add_fg_id(di, nbonders+i*nbonders)
         for i, e in enumerate(self.edges):
@@ -793,23 +732,16 @@ class LinkerCOFLattice(COFLattice):
         for e in self.edges:
             bonder1 = e.bonder_map[0]
             bonder2 = e.v1.bonder_map[e.joint_positions[0]]
+            yield bonder1, bonder2
 
-            bonder1 = macro_mol.mol.GetAtomWithIdx(bonder1)
-            bonder2 = macro_mol.mol.GetAtomWithIdx(bonder2)
-
-            yield bonder1.GetIntProp('fg_id'), bonder2.GetIntProp('fg_id')
             bonder3 = e.bonder_map[1]
             bonder4 = e.v2.bonder_map[e.joint_positions[1]]
             if all(b == 0 for b in e.bond):
-                bonder3 = macro_mol.mol.GetAtomWithIdx(bonder3)
-                bonder4 = macro_mol.mol.GetAtomWithIdx(bonder4)
-                yield bonder3.GetIntProp('fg_id'), bonder4.GetIntProp('fg_id')
+                yield bonder3, bonder4
 
             else:
                 macro_mol.periodic_bonds.append(
-                    PeriodicBond(macro_mol.bonder_ids.index(bonder3),
-                                 macro_mol.bonder_ids.index(bonder4),
-                                 e.bond))
+                                PeriodicBond(bonder3, bonder4, e.bond))
 
     def _add_fg_id(self, bb, start):
         """
