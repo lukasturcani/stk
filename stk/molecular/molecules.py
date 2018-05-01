@@ -287,6 +287,10 @@ class Molecule:
     energy : :class:`.Energy`
         Handles all things energy.
 
+    bonder_ids : :class:`list` of :class:`int`
+        A :class:`list` holding the atom ids of the atoms which form
+        bonds during macromolecular assembly.
+
     optimized : :class:`bool`
         Indicates whether a :class:`Molecule` has been passed through
         an optimization function or not.
@@ -1329,10 +1333,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         The :class:`.FGInfo` instance holding information about the
         functional group which will react when the building block
         assembles to form macromolecules.
-
-    bonder_ids : :class:`list` of :class:`int`
-        A :class:`list` holding the atom ids of the atoms which form
-        bonds during macromolecular assembly.
 
     """
 
@@ -2472,13 +2472,8 @@ class MacroMolecule(Molecule, metaclass=Cached):
             unscaled_fitness = {'fitness_func1': [8, 49]
                                 'fitness_func2': [78, 4.2, 32.3]}
 
-
     bonds_made : :class:`int`
         The number of bonds made during assembly.
-
-    bonder_ids : :class:`list` of :class:`int`
-        The ids of atoms which have bonds added during assembly. Sorted
-        from lowest to highest id.
 
     fg_ids : :class:`set` of :class:`int`
         The ids of atoms which were part of the functional group of
