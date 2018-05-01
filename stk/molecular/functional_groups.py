@@ -144,7 +144,7 @@ def fg_name(mol, fg):
             return atom.GetProp('fg')
 
 
-def react(mol, *fgs):
+def react(mol, del_atoms, *fgs):
     """
     Crates bonds between functional groups.
 
@@ -165,6 +165,9 @@ def react(mol, *fgs):
     mol : :class:`rdkit.Chem.rdchem.Mol`
         A molecule being assembled.
 
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
+
     *fgs : :class:`int`
         The ids of the functional groups to react. The ids are held
         by atom of `mol` in the ``'fg_id'`` property.
@@ -175,11 +178,11 @@ def react(mol, *fgs):
         The molecule with bonds added between the functional groups.
 
     """
-    print(mol, *fgs)
+
     names = [fg_name(mol, fg) for fg in fgs]
     reaction_key = tuple(sorted(Counter(names).items()))
     if reaction_key in custom_reactions:
-        return custom_reactions[reaction_key](mol, *fgs)
+        return custom_reactions[reaction_key](mol, del_atoms, *fgs)
 
     emol = rdkit.EditableMol(mol)
 
@@ -189,7 +192,7 @@ def react(mol, *fgs):
             continue
         if atom.HasProp('bonder'):
             bonders.append(atom.GetIdx())
-    print(bonders)
+
     bond = bond_orders.get(frozenset(names), rdkit.rdchem.BondType.SINGLE)
     bonder1, bonder2 = bonders
     emol.AddBond(bonder1, bonder2, bond)
@@ -198,19 +201,23 @@ def react(mol, *fgs):
         if not (atom.HasProp('fg_id') and atom.GetIntProp('fg_id') in fgs):
             continue
 
-        if atom.HasProp('del'):
+        if atom.HasProp('del') and del_atoms:
             emol.RemoveAtom(atom.GetIdx())
 
     return emol.GetMol()
 
 
-def boronic_acid_with_diol(mol, fg1, fg2):
+def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
     """
     Crates bonds between functional groups.
 
     Parameters
     ----------
     mol : :class:`rdkit.Chem.rdchem.Mol`
+        A molecule being assembled.
+
+    del : :class:`bool`
+        Toggles if atoms with the ``'del'`` property are deleted.
 
     fg1 : :class:`int`
         The id of the first functional group which

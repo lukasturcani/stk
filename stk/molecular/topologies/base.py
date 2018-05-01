@@ -165,7 +165,16 @@ class Topology(metaclass=TopologyMeta):
     built. In addition, each child class must define methods which
     place the building blocks in approriate positions.
 
+    Attributes
+    ----------
+    react_del : :class:`bool`
+        Toggles whether atoms with the ``'del'`` propety are deleted
+        by :func:`.react`.
+
     """
+
+    def __init__(self, react_del=True):
+        self.react_del = react_del
 
     def build(self, macro_mol, bb_conformers=None):
         """
@@ -214,7 +223,7 @@ class Topology(metaclass=TopologyMeta):
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
         for fgs in self.bonded_fgs(macro_mol):
-            macro_mol.mol = react(macro_mol.mol, *fgs)
+            macro_mol.mol = react(macro_mol.mol, self.react_del, *fgs)
         self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
@@ -418,6 +427,7 @@ class Linear(Topology):
         self.orientation = tuple(orientation)
         self.n = n
         self.ends = ends
+        super().__init__()
 
     def cleanup(self, macro_mol):
         """

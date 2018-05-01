@@ -572,9 +572,9 @@ class COFLattice(Topology):
 
     """
 
-    def __init__(self, scale_func=bb_size):
+    def __init__(self, react_del, scale_func=bb_size):
         self.scale_func = scale_func
-        super().__init__()
+        super().__init__(react_del=react_del)
 
     def prepare(self, macro_mol):
         """
@@ -617,6 +617,30 @@ class COFLattice(Topology):
 
         macro_mol._ids_updated = False
 
+    def cleanup(self, macro_mol):
+        """
+        Deletes atoms with ``'del'`` property.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.Periodic`
+            The periodic macromolecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        mol = rdkit.EditableMol(macro_mol.mol)
+        # Delete atoms with largest id last, so that when deleting
+        # later atoms their ids do not change.
+        for atom in reversed(macro_mol.mol.GetAtoms()):
+            if atom.HasProp('del'):
+                mol.RemoveAtom(atom.GetIdx())
+
+        macro_mol.mol = mol.GetMol()
+
 
 class LinkerCOFLattice(COFLattice):
     """
@@ -656,7 +680,7 @@ class LinkerCOFLattice(COFLattice):
                  ditopic_directions=None,
                  multitopic_aligners=None,
                  scale_func=linker_cof_scale_func):
-        super().__init__(scale_func=scale_func)
+        super().__init__(react_del=False, scale_func=scale_func)
 
         if ditopic_directions is None:
             ditopic_directions = [1 for i in range(len(self.edges))]
@@ -775,12 +799,10 @@ class LinkerCOFLattice(COFLattice):
 
             yield bonder1.GetIntProp('fg_id'), bonder2.GetIntProp('fg_id')
             bonder3 = e.bonder_map[1]
-            print(11, macro_mol.mol.GetAtomWithIdx(bonder3).HasProp('bonder'))
             bonder4 = e.v2.bonder_map[e.joint_positions[1]]
             if all(b == 0 for b in e.bond):
                 bonder3 = macro_mol.mol.GetAtomWithIdx(bonder3)
                 bonder4 = macro_mol.mol.GetAtomWithIdx(bonder4)
-                print(bonder3.HasProp('bonder'), bonder4.HasProp('bonder'))
                 yield bonder3.GetIntProp('fg_id'), bonder4.GetIntProp('fg_id')
 
             else:

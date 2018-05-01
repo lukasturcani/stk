@@ -179,7 +179,7 @@ from collections import Counter, defaultdict, ChainMap
 from inspect import signature
 
 from . import topologies
-from .functional_groups import functional_groups
+from .functional_groups import functional_groups, bond_orders
 from .energy import Energy
 import pywindow
 from ..utilities import (flatten,
@@ -3317,15 +3317,40 @@ class Periodic(MacroMolecule):
                 # `ccell` and equivalent to `periodic_bond.atom2`,
                 # having a bond added.
                 bonder2 = ccell.bonders[periodic_bond.atom2]
-                bond_type = self.topology.determine_bond_type(
-                              self,
-                              periodic_bond.atom1,
-                              periodic_bond.atom2)
-                emol.AddBond(bonder1, bonder2, bond_type)
+
+                bond_key = self._bond_key(periodic_bond.atom1,
+                                          periodic_bond.atom2)
+                bond = bond_orders.get(bond_key,
+                                       rdkit.rdchem.BondType.SINGLE)
+
+                emol.AddBond(bonder1, bonder2, bond)
                 bonded.add(bonder1)
                 bonded.add(bonder2)
 
         return emol.GetMol(), bonded
+
+    def _bond_key(self, atom1, atom2):
+        """
+        Returns a key for :data:`bond_orders`.
+
+        Parameters
+        ----------
+        atom1 : :class:`int`
+            The id of some atom.
+
+        atom2 : :class:`int`
+            The id of another atom.
+
+        Returns
+        -------
+        :class:`frozenset`
+            A key for :data:`bond_orders`.
+
+        """
+
+        fg1 = self.mol.GetAtomWithIdx(atom1).GetProp('fg')
+        fg2 = self.mol.GetAtomWithIdx(atom2).GetProp('fg')
+        return frozenset((fg1, fg2))
 
     def _terminate_island(self, island, bonded, bonder_map):
         """
