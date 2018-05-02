@@ -580,6 +580,23 @@ class COFLattice(Topology):
         self.scale_func = scale_func
         super().__init__()
 
+    def cleanup(self):
+        """
+
+        """
+
+        # If the ids of periodic bonds have already been updated, stop.
+        if self._ids_updated:
+            return
+
+        # Update periodic bonds to hold atom ids directly instead of
+        # indices of the atom ids within `bonder_ids`.
+        for pb in self.periodic_bonds:
+            pb.atom1 = self.bonder_ids[pb.atom1]
+            pb.atom2 = self.bonder_ids[pb.atom2]
+
+        self._ids_updated = True
+
 
 class LinkerCOFLattice(COFLattice):
     """

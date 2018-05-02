@@ -292,13 +292,17 @@ class Molecule:
         Handles all things energy.
 
     atom_props : :class:`dict`
-        Maps atom id to a :class:`set` holding the ``rdkit`` atom
+        Maps atom id to a :class:`dict` holding the ``rdkit`` atom
         properties of the atom. For example
 
         .. code-block:: python
 
-        atom_tags = {0: {('bonder', '1'), ('fg', 'amine'), ('fg_id', 1)},
-                     5: {('fg', 'amine'), ('fg_id', 2), ('del', '1')}}
+        atom_props = {0: {'bonder': 1,
+                          'fg': 'amine',
+                          'fg_id': 1},
+                      5: {'fg': 'amine',
+                          'fg_id': 2,
+                          'del': 1}}
 
     bonder_ids : :class:`list`
         Holds the id of bonder atoms in a nested :class:`list`
@@ -943,12 +947,12 @@ class Molecule:
         """
 
         self.bonder_ids = bonder_ids = []
-        self.atom_props = atom_props = defaultdict(set)
+        self.atom_props = atom_props = defaultdict(dict)
 
         for atom in self.mol.GetAtoms():
             atomid = atom.GetIdx()
             for name, value in atom.GetPropsAsDict(False, False).items():
-                atom_props[atomid].add((name, value))
+                atom_props[atomid][name] = value
 
                 if name == 'bonder':
                     fg_id = atom.GetIntProp('fg_id')
@@ -2184,9 +2188,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         group.
 
         The atoms which form bonds during assembly have the property
-        called ``'bonder'`` added and set to ``'1'``. Atoms which are
+        called ``'bonder'`` added and set to ``1``. Atoms which are
         deleted during reactions have the property ``'del'`` set to
-        ``'1'``.
+        ``1``.
 
         Returns
         -------
@@ -2207,7 +2211,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         bond_atoms = self.mol.GetSubstructMatches(bond_mol)
         for atom_id in flatten(bond_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetProp('bonder', '1')
+            atom.SetIntProp('bonder', 1)
 
         # Give all atoms which form bonds during reactions the tag
         # 'del' and set its value to '1'.
@@ -2215,7 +2219,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         del_atoms = self.mol.GetSubstructMatches(del_mol)
         for atom_id in flatten(del_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetProp('del', '1')
+            atom.SetIntProp('del', 1)
 
     def untag_atoms(self):
         """
@@ -2522,27 +2526,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         The ids of atoms which were part of the functional group of
         the building blocks.
 
-    fragments : :class:`dict`
-        The :class:`dict` has the form
-
-        .. code-block:: python
-
-            fragments = {(0, 0): {1, 2, 3, 4},
-                         (0, 1): {5, 6, 7, 8},
-                         (1, 0): {9, 10, 11},
-                         (1, 1): {12, 13, 14},
-                         (1, 2): {15, 16, 17}}
-
-        The key in this dictionary is a tuple of form ``(5, 2)``. The
-        first element is the index of a building block within
-        :attr:`building_blocks`. The second element indentifies a
-        molecule of that building block. For example, ``(1, 3)``
-        identifies the 4th molecule of  ``building_blocks[1]`` to be
-        added to the macromolecule during assembly.
-
-        The value in the dictionary is a set of ints. These hold the
-        atom ids belonging to a particular molecule before assembly.
-
     """
 
     def __init__(self,
@@ -2587,9 +2570,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
         self.building_blocks = building_blocks
         self.bb_counter = Counter()
         self.topology = topology
-        self.fg_ids = set()
-        self.bonds_made = 0
-        self.fragments = defaultdict(set)
 
         try:
             # Ask the ``Topology`` instance to assemble/build the
@@ -2619,7 +2599,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
             logger.error(errormsg, exc_info=True)
 
         super().__init__(name, note)
-        self.save_ids()
 
     def add_conformer(self, bb_conformers):
         """
@@ -2699,13 +2678,15 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         """
 
-        for (bb_index, mol_index), atoms in self.fragments.items():
+        done = set()
+        for atom_id, props in self.atom_props.items():
             # Ignore fragments which do not correspond to the molecule
             # `bb`.
-            if bb_index != bb:
+            if props['bb_index'] != bb or props['mol_index'] in done:
                 continue
 
-            # For each fragment make a new core. To preserver bond
+            done.add(props['mol_index'])
+            # For each fragment make a new core. To preserve bond
             # information, start with the macromolecule.
             coremol = rdkit.EditableMol(self.mol)
             # Remove any atoms not part of the core - atoms not in the
@@ -2713,9 +2694,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
             # group.
             for atom in reversed(self.mol.GetAtoms()):
                 atomid = atom.GetIdx()
-                if (atomid not in atoms or
-                    atomid in self.fg_ids or
-                   atom.GetAtomicNum() == 1):
+                bb_index = self.atom_props[atomid]['bb_index']
+                mol_index = self.atom_props[atomid]['mol_index']
+                fg = self.atom_props[atomid].get('fg', None)
+                if (bb_index != props['bb_index'] or
+                    mol_index != props['mol_index'] or
+                    atom.GetAtomicNum() == 1 or
+                   fg is not None):
                     coremol.RemoveAtom(atomid)
             yield coremol.GetMol()
 
@@ -2750,8 +2735,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
             'bb_counter': [(key.json(), val) for key, val in
                            self.bb_counter.items()],
             'bonds_made': self.bonds_made,
-            'bonder_ids': self.bonder_ids,
-            'fg_ids': list(self.fg_ids),
             'class': self.__class__.__name__,
             'mol_block': self.mdl_mol_block(),
             'building_blocks': [x.json() for x in
@@ -2761,9 +2744,7 @@ class MacroMolecule(Molecule, metaclass=Cached):
             'progress_params': self.progress_params,
             'note': self.note,
             'name': self.name,
-            'fragments': dict(zip(
-                          (str(x) for x in self.fragments.keys()),
-                          (list(x) for x in self.fragments.values())))
+            'atom_props': self.atom_props
 
         }
 
@@ -2809,19 +2790,22 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                   key, val in json_dict['bb_counter']})
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
-        obj.bonder_ids = json_dict['bonder_ids']
-        obj.fg_ids = set(json_dict['fg_ids'])
+        obj.atom_props = json_dict['atom_props']
         obj.optimized = json_dict['optimized']
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
         obj.key = key
         obj.building_blocks = bbs
-        obj.fragments = defaultdict(set)
-        obj.fragments.update(zip(
-            (tuple(int(y) for y in x.strip('()').split(','))
-             for x in json_dict['fragments'].keys()),
-            (set(x) for x in json_dict['fragments'].values())
-        ))
+
+        # Remake bonder_ids
+        obj.bonder_ids = bonder_ids = []
+        for atom_id, props in obj.atom_props.items():
+            if 'bonder' in props:
+                fg_id = props['fg_id']
+                if len(bonder_ids) < fg_id + 1:
+                    diff = fg_id + 1 - len(bonder_ids)
+                    bonder_ids.extend([] for i in range(diff))
+                bonder_ids[fg_id].append(atom_id)
 
         if CACHE_SETTINGS['ON']:
             cls.cache[key] = obj
@@ -2903,25 +2887,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
                 n += 1
         return rmsd / n
 
-    def save_ids(self):
-        """
-        Updates `bonder_ids` and `fg_ids` attributes.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.bonder_ids = []
-        self.fg_ids = set()
-        for atom in self.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                self.bonder_ids.append(atom.GetIdx())
-            if atom.HasProp('fg'):
-                self.fg_ids.add(atom.GetIdx())
-        self.bonder_ids = sorted(self.bonder_ids)
-
     def update_cache(self):
         """
         Update attributes of cached molecule.
@@ -2941,30 +2906,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
         if self.key in self.__class__.cache:
             self.__class__.cache[self.key].__dict__ = dict(vars(self))
-
-    def update_fragments(self):
-        """
-        Saves ``rdkit`` atom properties in :attr:`fragments`.
-
-        The properties saved are ``'bb_index'`` and ``'mol_index'``.
-        These should be added to the atoms by
-        :meth:`.Topology.place_mols` when running
-        :meth:`.Topology.build`.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        self.fragments = defaultdict(set)
-        for atom in self.mol.GetAtoms():
-            if not atom.HasProp('bb_index'):
-                continue
-
-            molkey = (int(atom.GetProp('bb_index')),
-                      int(atom.GetProp('mol_index')))
-            self.fragments[molkey].add(atom.GetIdx())
 
     def __eq__(self, other):
         return self.fitness == other.fitness
@@ -3360,21 +3301,6 @@ periodic._place_island([4, 4, 4])
             cells[x][y][z] = Cell((x, y, z), bonders)
 
         return cells, island
-
-    def save_ids(self):
-        super().save_ids()
-
-        # If the ids of periodic bonds have already been updated, stop.
-        if self._ids_updated:
-            return
-
-        # Update periodic bonds to hold atom ids directly instead of
-        # indices of the atom ids within `bonder_ids`.
-        for pb in self.periodic_bonds:
-            pb.atom1 = self.bonder_ids[pb.atom1]
-            pb.atom2 = self.bonder_ids[pb.atom2]
-
-        self._ids_updated = True
 
     def write_gulp_input(self, path, keywords,
                          cell_fix=[0, 0, 0, 0, 0, 0], atom_fix=None):

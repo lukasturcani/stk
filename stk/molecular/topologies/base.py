@@ -220,20 +220,19 @@ class Topology(metaclass=TopologyMeta):
         original_confs = remove_confs(macro_mol.building_blocks,
                                       bb_conformers)
 
+        macro_mol.bonds_made = 0
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
         for fgs in self.bonded_fgs(macro_mol):
-            macro_mol.mol = react(macro_mol.mol, self.react_del, *fgs)
+            macro_mol.mol, new_bonds = react(macro_mol.mol,
+                                             self.react_del,
+                                             *fgs)
+            macro_mol.bonds_made += new_bonds
         self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
         for atom in macro_mol.mol.GetAtoms():
             atom.UpdatePropertyCache()
-
-        # Make sure that the tags showing which building block each
-        # atom belongs to are saved in `fragment_assignments` and not
-        # lost due to parallelism.
-        macro_mol.update_fragments()
 
         # Restore the original conformers.
         for bb, confs in zip(macro_mol.building_blocks, original_confs):
@@ -254,6 +253,9 @@ class Topology(metaclass=TopologyMeta):
         functional group will have the same value of ``'fg_id'`` while
         atoms in different functional groups will have a different
         ``'fg_id'``.
+
+        The function is also reponsible for updating
+        :attr:`~.MacroMolecule.bb_counter`.
 
         Finally, this function must also add the tags ``'bb_index'``
         and ``'mol_index'`` to every atom in the molecule. The
