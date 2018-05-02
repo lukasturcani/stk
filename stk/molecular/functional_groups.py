@@ -174,8 +174,12 @@ def react(mol, del_atoms, *fgs):
 
     Returns
     -------
-    :class:`rdkit.Chem.rdchem.Mol`
-        The molecule with bonds added between the functional groups.
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule with bonds added between the functional groups.
+
+        The seoncd element is a :class:`int`. It is the number
+        of bonds added.
 
     """
 
@@ -204,7 +208,7 @@ def react(mol, del_atoms, *fgs):
         if atom.HasProp('del') and del_atoms:
             emol.RemoveAtom(atom.GetIdx())
 
-    return emol.GetMol()
+    return emol.GetMol(), 1
 
 
 def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):

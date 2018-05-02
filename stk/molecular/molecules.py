@@ -2790,12 +2790,13 @@ class MacroMolecule(Molecule, metaclass=Cached):
                                   key, val in json_dict['bb_counter']})
         obj.bonds_made = json_dict['bonds_made']
         obj.energy = Energy(obj)
-        obj.atom_props = json_dict['atom_props']
         obj.optimized = json_dict['optimized']
         obj.note = json_dict['note']
         obj.name = json_dict['name'] if json_dict['load_names'] else ""
         obj.key = key
         obj.building_blocks = bbs
+        obj.atom_props = {int(key): value for key, value in
+                          json_dict['atom_props'].items()}
 
         # Remake bonder_ids
         obj.bonder_ids = bonder_ids = []
