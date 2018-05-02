@@ -291,9 +291,26 @@ class Molecule:
     energy : :class:`.Energy`
         Handles all things energy.
 
-    bonder_ids : :class:`list` of :class:`int`
-        A :class:`list` holding the atom ids of the atoms which form
-        bonds during macromolecular assembly.
+    atom_props : :class:`dict`
+        Maps atom id to a :class:`set` holding the ``rdkit`` atom
+        properties of the atom. For example
+
+        .. code-block:: python
+
+        atom_tags = {0: {('bonder', '1'), ('fg', 'amine'), ('fg_id', 1)},
+                     5: {('fg', 'amine'), ('fg_id', 2), ('del', '1')}}
+
+    bonder_ids : :class:`list`
+        Holds the id of bonder atoms in a nested :class:`list`
+
+        .. code-block:: python
+
+            bonder_ids = [[1, 3], [5, 6], [11, 14]]
+
+        This means atoms with ids ``1`` and ``3`` are bonder atoms with
+        ``fg_id`` of ``0``, atoms ``5`` and ``6`` are bonder atoms with
+        ``fg_id`` of ``1`` and ``11`` and ``14`` are bonder atoms with
+        ``fg_id`` of ``2``.
 
     optimized : :class:`bool`
         Indicates whether a :class:`Molecule` has been passed through
@@ -312,9 +329,10 @@ class Molecule:
     def __init__(self, name="", note=""):
         self.optimized = False
         self.energy = Energy(self)
-        self.bonder_ids = []
         self.name = name
         self.note = note
+
+        self.save_atom_props()
 
     def all_atom_coords(self, conformer=-1):
         """
@@ -914,9 +932,9 @@ class Molecule:
         # Return the centroid of the molecule to the origin position.
         self.set_position(og_position, conformer)
 
-    def save_bonders(self):
+    def save_atom_props(self):
         """
-        Adds atoms tagged with 'bonder' to `bonder_ids`.
+        Updates :attr:`atom_props` and :attr:`bonder_ids`.
 
         Returns
         -------
@@ -924,11 +942,23 @@ class Molecule:
 
         """
 
-        # Clear the set in case the method is run twice.
-        self.bonder_ids = []
+        self.bonder_ids = bonder_ids = []
+        self.atom_props = atom_props = defaultdict(set)
+
         for atom in self.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                self.bonder_ids.append(atom.GetIdx())
+            atomid = atom.GetIdx()
+            for name, value in atom.GetPropsAsDict(False, False).items():
+                atom_props[atomid].add((name, value))
+
+                if name == 'bonder':
+                    fg_id = atom.GetIntProp('fg_id')
+
+                    # Make sure bonder_ids does not raise an index error.
+                    if len(bonder_ids) < fg_id + 1:
+                        diff = fg_id + 1 - len(bonder_ids)
+                        bonder_ids.extend([] for i in range(diff))
+
+                    bonder_ids[fg_id].append(atomid)
 
     def set_orientation(self, start, end, conformer=-1):
         """
@@ -1384,16 +1414,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         _, ext = os.path.splitext(file)
 
         if ext not in self.init_funcs:
-            raise TypeError(
-                   'Unable to initialize from "{}" files.'.format(ext))
+            raise TypeError(f'Unable to initialize from "{ext}" files.')
 
         self.mol = self.init_funcs[ext](file)
         # Update the property cache of each atom. This updates things
         # like valence.
         for atom in self.mol.GetAtoms():
             atom.UpdatePropertyCache()
-
-        super().__init__(name, note)
 
         # Define a generator which yields an ``FGInfo`` instance from
         # `functional_groups`. The yielded ``FGInfo``instance
@@ -1424,6 +1451,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         # which get removed.
         if self.func_grp:
             self.tag_atoms()
+
+        super().__init__(name, note)
 
     @classmethod
     def init_random(cls, db, fg=None, name="", note=""):
@@ -1470,12 +1499,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def all_bonder_distances(self, conformer=-1):
         """
-        Yield distances between all pairs of bonder atoms.
-
-        All distances are only yielded once. This means that if the
-        distance between atoms with ids ``1`` and ``2``is yielded as
-        ``(12.4, 1, 2)``, no tuple of the form ``(12.4, 2, 1)`` will be
-        yielded.
+        Yield distances between all pairs of bonder centroids.
 
         Parameters
         ----------
@@ -1491,21 +1515,23 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
                (3, 54, 12.54)
 
-            The first two elements are the ids of the involved atoms
-            and the third element is the distance between them.
+            The first two elements are the ``fg_id` of the involved
+            functional groups and the third element is the distance
+            between them.
 
         """
 
-        # Iterate through each pair of atoms - do not allow
-        # recombinations.
-        for atom1, atom2 in it.combinations(self.bonder_ids, 2):
-                yield (atom1,
-                       atom2,
-                       self.atom_distance(atom1, atom2, conformer))
+        centroids = it.combinations(self.bonder_centroids(conformer), 2)
+        ids = it.combinations(range(len(self.bonder_ids)), 2)
+        for (id1, id2), (c1, c2) in zip(ids, centroids):
+                yield id1, id2, euclidean(c1, c2)
 
-    def fg_centroids(self, conformer=-1):
+    def bonder_centroids(self, conformer=-1):
         """
-        Yields the centroids of the functional groups.
+        Calculates the centriod of bonder atoms in each fg.
+
+        The centroids are yielded in order, with the centroid of
+        the functional group with ``fg_id`` of ``0`` first.
 
         Parameters
         ----------
@@ -1514,20 +1540,23 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         Yields
         ------
-        :class:`tuple`
-            The first element is a :class:`int` which is the ``fg_id``
-            of the functional group.
-
-            The second element is a :class:`numpy.array` holding the
-            centroid of that functional group.            
+        :class:`numpy.array`
+            The bonder centroid of a functional group.
 
         """
 
-
+        for atoms in self.bonder_ids:
+            yield (sum(self.atom_coords(a, conformer) for a in atoms)
+                   / len(atoms))
 
     def bonder_centroid(self, conformer=-1):
         """
         Returns the centroid of the bonder atoms.
+
+        The calculation has two stages. First, the centroids of
+        bonder atoms within the same functional groups are found.
+        Second, the centroid of the centroids found in stage 1 is
+        calculated and returned.
 
         Parameters
         ----------
@@ -1541,16 +1570,17 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        centroid = sum(self.atom_coords(x, conformer) for
-                       x in self.bonder_ids)
-        return np.divide(centroid, len(self.bonder_ids))
+        return sum(self.bonder_centroids(conformer)) / len(self.bonder_ids)
 
     def bonder_direction_vectors(self, conformer=-1):
         """
-        Yields the direction vectors between all pairs of bonder atoms.
+        Yields the direction vectors between bonder atoms.
 
-        The yielded vector is normalized. If the pair ``(1, 2)`` is
-        yielded, the pair ``(2, 1)`` will not be.
+        First the centroids of bonder atoms within the same functional
+        group are found. Then direction vectors between all pairs of
+        these centroids are yielded. Each pair is only yielded once.
+
+        The yielded vector is normalized.
 
         Parameters
         ----------
@@ -1566,22 +1596,21 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
                 (3, 54, np.array([12.2, 43.3, 9.78]))
 
-            The first two elements of the tuple represent the ids of
-            the start and end atoms of the vector, respectively. The
-            array is the direction vector running between the atomic
-            positions.
+            The first two elements of the tuple represent the
+            ``fg_id`` of the start and end fgs of the vector,
+            respectively. The array is the direction vector running
+            between the functional group positions.
 
         """
 
-        for atom1_id, atom2_id in it.combinations(self.bonder_ids, 2):
-            p1 = self.atom_coords(atom1_id, conformer)
-            p2 = self.atom_coords(atom2_id, conformer)
-
-            yield atom2_id, atom1_id, normalize_vector(p1-p2)
+        centroids = it.combinations(self.bonder_centroids(conformer), 2)
+        ids = it.combinations(range(len(self.bonder_ids)), 2)
+        for (id1, id2), (c1, c2) in zip(ids, centroids):
+            yield id2, id1, normalize_vector(c1-c2)
 
     def bonder_position_matrix(self, conformer=-1):
         """
-        Returns a matrix holding the positions of bonder atoms.
+        Returns a matrix holding the positions of bonder centroids.
 
         Parameters
         ----------
@@ -1591,28 +1620,22 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Returns
         -------
         :class:`numpy.matrix`
-            The matrix has the shape ``[3, n``. Each column holds the
-            x, y and z coordinates of a bonder atom. The index of the
-            column corresponds to the index of the atom id in
-            :attr:`bonder_ids`.
+            The matrix has the shape ``[3, n]``. Each column holds the
+            x, y and z coordinates of a bonder centroid. The index of
+            the column corresponds to the ``fg_id`` of the bonder
+            centroid.
 
         """
 
-        pos_array = np.array([])
-
-        for atom_id in self.bonder_ids:
-            pos_vect = np.array([*self.atom_coords(atom_id, conformer)])
-            pos_array = np.append(pos_array, pos_vect)
-
-        return np.matrix(pos_array.reshape(-1, 3).T)
+        return np.matrix([self.bonder_centroids(conformer)]).T
 
     def centroid_centroid_dir_vector(self, conformer=-1):
         """
         Returns the direction vector between the 2 molecular centroids.
 
         The first molecular centroid is the centroid of the entire
-        molecule. The second molecular centroid is the centroid of the
-        bonder atoms.
+        molecule. The second molecular centroid is given by
+        :meth:`bonder_centroid`.
 
         Parameters
         ---------
@@ -1662,7 +1685,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
             atomid = atom.GetIdx()
             if not self.is_core_atom(atomid):
                 emol.RemoveAtom(atomid)
-                continue
         return emol.GetMol()
 
     def functional_group_atoms(self):
@@ -1696,7 +1718,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def is_core_atom(self, atomid):
         """
-        Returns ``True`` if atom is not H or part of the fg.
+        Returns ``True`` if atom is not H or part of a fg.
 
         Parameters
         ----------
@@ -1711,13 +1733,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        # Tags are removed by multiprocessing - make sure to reapply
-        # them.
-        self.tag_atoms()
         atom = self.mol.GetAtomWithIdx(atomid)
-        if atom.HasProp('fg') or atom.GetAtomicNum() == 1:
+        if atom.GetAtomicNum() == 1:
             return False
-        return True
+        if atomid not in self.atom_props:
+            return True
+
+        return ('fg', self.func_grp.name) not in self.atom_props[atomid]
 
     def json(self):
         """
@@ -2005,9 +2027,9 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         Notes
         -----
         The difference between this method and
-        :meth:`~Molecule.set_orientation` is about which point the rotation
-        occurs: centroid of bonder atoms versus centroid of entire
-        molecule, respectively.
+        :meth:`~Molecule.set_orientation` is about which point the
+        rotation occurs: centroid of bonder atoms versus centroid of
+        entire molecule, respectively.
 
         Parameters
         ----------
@@ -2137,7 +2159,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if key in cls.cache:
             return cls.cache[key]
 
-        rdkit.EmbedMolecule(mol)
+        rdkit.EmbedMolecule(mol, rdkit.ETKDG())
         obj = cls.__new__(cls)
         Molecule.__init__(obj, note, name)
         obj.file = smarts
@@ -2153,11 +2175,13 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
     def tag_atoms(self):
         """
-        Adds bonding and deletion tags to atoms.
+        Adds atom properties to atoms.
 
         All atoms which form the functional group of the molecule have
         the property ``'fg'`` added. Its value is set to the name of
-        the functional group.
+        the functional group. In addition each such atom is given
+        the property ``'fg_id'`` which is unique to each functional
+        group.
 
         The atoms which form bonds during assembly have the property
         called ``'bonder'`` added and set to ``'1'``. Atoms which are
@@ -2170,14 +2194,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        # Clear this list in case the method is being rerun.
-        self.bonder_ids = []
-
-        # Give all atoms in functional groups the tag 'fg' and set its
-        # value to the name of the functional group.
-        for atom_id in flatten(self.functional_group_atoms()):
-            atom = self.mol.GetAtomWithIdx(atom_id)
-            atom.SetProp('fg', self.func_grp.name)
+        for fg_id, fg in enumerate(self.functional_group_atoms()):
+            for atom_id in fg:
+                atom = self.mol.GetAtomWithIdx(atom_id)
+                atom.SetProp('fg', self.func_grp.name)
+                atom.SetIntProp('fg_id', fg_id)
 
         # Give all atoms which form bonds during reactions the tag
         # 'bonder' and set its value to '1'. Add their ids to
@@ -2187,7 +2208,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         for atom_id in flatten(bond_atoms):
             atom = self.mol.GetAtomWithIdx(atom_id)
             atom.SetProp('bonder', '1')
-            self.bonder_ids.append(atom_id)
 
         # Give all atoms which form bonds during reactions the tag
         # 'del' and set its value to '1'.
@@ -2207,12 +2227,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        self.bonder_ids = []
-
         for atom in self.mol.GetAtoms():
             atom.ClearProp('fg')
             atom.ClearProp('bonder')
             atom.ClearProp('del')
+            atom.ClearProp('fg_id')
 
     def __str__(self):
         return "{} {}".format(self.__class__.__name__, list(self.key))
@@ -2233,7 +2252,7 @@ class StructUnit2(StructUnit):
 
         The molecule is rotated about the centroid of the bonder atoms.
         It is rotated so that the direction vector running between the
-        2 bonder atoms is aligned with the vector `end`.
+        2 bonder centroids is aligned with the vector `end`.
 
         Parameters
         ----------
@@ -2294,7 +2313,7 @@ class StructUnit3(StructUnit):
 
     def bonder_plane(self, conformer=-1):
         """
-        Returns the coefficients of the plane formed by bonder atoms.
+        Returns coeffs of the plane formed by the bonder centroids.
 
         A plane is defined by the scalar plane equation::
 
@@ -2302,13 +2321,13 @@ class StructUnit3(StructUnit):
 
         This method returns the ``a``, ``b``, ``c`` and ``d``
         coefficients of this equation for the plane formed by the
-        bonder atoms. The coefficents ``a``, ``b`` and ``c`` decribe
-        the normal vector to the plane. The coefficent ``d`` is found
-        by substituting these coefficients along with the ``x``, ``y``
-        and ``z`` variables in the scalar equation and solving for
-        ``d``. The variables ``x``, ``y`` and ``z`` are substituted by
-        the coordinates of some point on the plane. For example, the
-        position of one of the bonder atoms.
+        bonder centroids. The coefficents ``a``, ``b`` and ``c``
+        describe the normal vector to the plane. The coefficent ``d``
+        is found by substituting these coefficients along with the
+        ``x``, ``y`` and ``z`` variables in the scalar equation and
+        solving for ``d``. The variables ``x``, ``y`` and ``z`` are
+        substituted by the coordinates of some point on the plane. For
+        example, the position of one of the bonder centroids.
 
         Parameters
         ----------
@@ -2319,7 +2338,8 @@ class StructUnit3(StructUnit):
         -------
         :class:`numpy.array`
             This array has the form ``[a, b, c, d]`` and represents the
-            scalar equation of the plane formed by the bonder atoms.
+            scalar equation of the plane formed by the bonder
+            centroids.
 
         References
         ----------
@@ -2327,13 +2347,13 @@ class StructUnit3(StructUnit):
 
         """
 
-        bonder_coord = self.atom_coords(self.bonder_ids[0], conformer)
-        d = -np.sum(self.bonder_plane_normal(conformer) * bonder_coord)
+        centroid = next(self.bonder_centroids(conformer))
+        d = -np.sum(self.bonder_plane_normal(conformer) * centroid)
         return np.append(self.bonder_plane_normal(conformer), d)
 
     def bonder_plane_normal(self, conformer=-1):
         """
-        Returns the normal vector to the plane formed by bonder atoms.
+        Returns the normal to the plane formed by bonder centroids.
 
         The normal of the plane is defined such that it goes in the
         direction toward the centroid of the molecule.
@@ -2347,7 +2367,7 @@ class StructUnit3(StructUnit):
         -------
         :class:`numpy.array`
             A unit vector which describes the normal to the plane of
-            the bonder atoms.
+            the bonder centroids.
 
         """
 
@@ -2373,7 +2393,8 @@ class StructUnit3(StructUnit):
         Rotates molecule to minimize angle between `atom` and `vector`.
 
         The rotation is done about `axis` and is centered on the
-        bonder centroid.
+        bonder centroid, as given by
+        :meth:`~.StructUnit.bonder_centroid`.
 
         Parameters
         ----------
@@ -2395,28 +2416,24 @@ class StructUnit3(StructUnit):
 
         """
 
-        v1 = (self.atom_coords(atom, conformer) -
-              self.bonder_centroid(conformer))
-        self.minimize_theta(v1,
-                            vector,
-                            axis,
-                            self.bonder_centroid(conformer),
-                            conformer)
+        centroid = self.bonder_centroid(conformer)
+        v1 = self.atom_coords(atom, conformer) - centroid
+        self.minimize_theta(v1, vector, axis, centroid, conformer)
 
     def set_orientation2(self, end, conformer=-1):
         """
         Rotates the molecule so the plane normal is aligned with `end`.
 
         Here "plane normal" referes to the normal of the plane formed
-        by the bonder atoms. The molecule is rotated about the centroid
-        of the bonder atoms. The rotation results in the normal of
-        their plane being aligned with `end`.
+        by the bonder centroids. The molecule is rotated about
+        :meth:`~.bonder_centroid`. The rotation results in the normal
+        of the plane being aligned with `end`.
 
         Parameters
         ----------
         end : :class:`numpy.array`
-            The vector with which the normal of plane of bonder atoms
-            shoould be aligned.
+            The vector with which the normal of plane of bonder
+            centroids shoould be aligned.
 
         conformer : :class:`int`, optional
             The conformer to use.
