@@ -1503,6 +1503,28 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                        atom2,
                        self.atom_distance(atom1, atom2, conformer))
 
+    def fg_centroids(self, conformer=-1):
+        """
+        Yields the centroids of the functional groups.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Yields
+        ------
+        :class:`tuple`
+            The first element is a :class:`int` which is the ``fg_id``
+            of the functional group.
+
+            The second element is a :class:`numpy.array` holding the
+            centroid of that functional group.            
+
+        """
+
+
+
     def bonder_centroid(self, conformer=-1):
         """
         Returns the centroid of the bonder atoms.
