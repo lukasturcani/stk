@@ -2124,18 +2124,18 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         return sorted(similarities, reverse=True, key=lambda x: x[0])
 
     @classmethod
-    def smarts_init(cls,
-                    smarts,
+    def smiles_init(cls,
+                    smiles,
                     functional_group=None,
                     note="",
                     name=""):
         """
-        Initialize from a SMARTS string.
+        Initialize from a SMILES string.
 
         Parameters
         ----------
         smiles : :class:`str`
-            A SMARTS string of the molecule.
+            A SMILES string of the molecule.
 
         functional_group : :class:`str`, optional
             The name of the functional group which is to have atoms
@@ -2156,7 +2156,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        mol = rdkit.MolFromSmarts(smarts)
+        mol = rdkit.MolFromSmiles(smiles)
         rdkit.SanitizeMol(mol)
         mol = rdkit.AddHs(mol)
         key = cls.gen_key(mol, functional_group)
@@ -2165,7 +2165,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         rdkit.EmbedMolecule(mol, rdkit.ETKDG())
         obj = cls.__new__(cls)
-        obj.file = smarts
+        obj.file = smiles
         obj.key = key
         obj.mol = mol
         obj.func_grp = next((x for x in functional_groups if
@@ -2522,10 +2522,6 @@ class MacroMolecule(Molecule, metaclass=Cached):
 
     bonds_made : :class:`int`
         The number of bonds made during assembly.
-
-    fg_ids : :class:`set` of :class:`int`
-        The ids of atoms which were part of the functional group of
-        the building blocks.
 
     """
 
