@@ -233,7 +233,12 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
 
     Returns
     -------
-    None : :class:`NoneType`
+    :class:`tuple`
+        The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
+        the molecule with bonds added between the functional groups.
+
+        The seoncd element is a :class:`int`. It is the number
+        of bonds added.
 
     """
 
