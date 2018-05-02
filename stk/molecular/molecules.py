@@ -1631,7 +1631,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
 
         """
 
-        return np.matrix([self.bonder_centroids(conformer)]).T
+        return np.matrix(list(self.bonder_centroids(conformer))).T
 
     def centroid_centroid_dir_vector(self, conformer=-1):
         """
@@ -1743,7 +1743,7 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         if atomid not in self.atom_props:
             return True
 
-        return ('fg', self.func_grp.name) not in self.atom_props[atomid]
+        return 'fg' not in self.atom_props[atomid]
 
     def json(self):
         """
@@ -2160,12 +2160,11 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         rdkit.SanitizeMol(mol)
         mol = rdkit.AddHs(mol)
         key = cls.gen_key(mol, functional_group)
-        if key in cls.cache:
+        if key in cls.cache and CACHE_SETTINGS['ON']:
             return cls.cache[key]
 
         rdkit.EmbedMolecule(mol, rdkit.ETKDG())
         obj = cls.__new__(cls)
-        Molecule.__init__(obj, note, name)
         obj.file = smarts
         obj.key = key
         obj.mol = mol
@@ -2173,6 +2172,8 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
                             x.name == functional_group), None)
         if obj.func_grp:
             obj.tag_atoms()
+
+        Molecule.__init__(obj, note, name)
 
         cls.cache[key] = obj
         return obj

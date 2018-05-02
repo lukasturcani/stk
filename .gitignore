@@ -3,13 +3,8 @@
 **/.cache
 *.ipynb_checkpoints
 
-# This folder gets created by running tests for macromodel functions
-# in test_macromodel.py. Ignore it.
-stk/tests/macromodel_tests_output
-
-# This folder gets created by running tests for mopac functions
-# in test_mopac.py. Ignore it.
-stk/tests/mopac_tests_output
+#Some folders get created by tests.
+**/*tests_output
 
 # This folder gets created by running tests for fitness functions.
 stk/tests/cage_target
