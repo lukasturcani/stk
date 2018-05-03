@@ -175,7 +175,7 @@ from scipy.spatial.distance import euclidean
 from scipy.optimize import minimize
 from sklearn.metrics.pairwise import euclidean_distances
 
-from collections import Counter, defaultdict, ChainMap
+from collections import Counter, defaultdict
 from inspect import signature
 
 from . import topologies
@@ -3261,10 +3261,19 @@ class Periodic(MacroMolecule):
                    z >= len(cells[0][0])):
                     continue
 
-                island = react(island,
-                               True,
-                               periodic_bond.atom1,
-                               periodic_bond.atom2)
+                # ccel as in "connected cell".
+                ccell = cells[x][y][z]
+
+                # `bonder1` is the id of a bonder atom, found in `cell`
+                # and equivalent to `periodic_bond.atom1`, having a
+                # bond added.
+                fg1 = cell.bonders[periodic_bond.fg1]
+                # `bonder2` is the id of a bonder atom, found in
+                # `ccell` and equivalent to `periodic_bond.atom2`,
+                # having a bond added.
+                fg2 = ccell.bonders[periodic_bond.fg2]
+
+                island, _ = react(island, True, fg1, fg2)
 
         return island
 
@@ -3328,8 +3337,8 @@ periodic._place_island([4, 4, 4])
             # `bonders` maps a bonder id in the original unit
             # cell to the one currently being added to the
             # island.
-            bonders = {bi: i*self.mol.GetNumAtoms() + bi for
-                       bi in self.bonder_ids}
+            bonders = {fg: i*len(self.bonder_ids) + fg for
+                       fg in range(len(self.bonder_ids))}
             cells[x][y][z] = Cell((x, y, z), bonders)
 
         return cells, island
