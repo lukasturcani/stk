@@ -3,7 +3,7 @@
 **/.cache
 *.ipynb_checkpoints
 
-#Some folders get created by tests.
+# Some folders get created by tests.
 **/*tests_output
 
 # This folder gets created by running tests for fitness functions.
