@@ -127,9 +127,8 @@ class Vertex:
             The building block to be placed.
 
         aligner : :class:`int`
-            The index of a bonder atom in
-            :attr:`.StructUnit.bonder_ids` of `mol`. This is the
-            bonder atom which gets aligned with an edge.
+            The ``fg_id`` of the functional group which gets
+            aligned with the edge.
 
         Returns
         -------
@@ -147,8 +146,7 @@ class Vertex:
                              all(b == 0 for b in e.bond)),
                             self.connected[0])
         vector = (aligner_edge.calc_coord(cell_params) - coord)
-        atom = mol.bonder_ids[aligner]
-        mol.minimize_theta2(atom, vector, [0, 0, 1])
+        mol.minimize_theta2(aligner, vector, [0, 0, 1])
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
@@ -184,7 +182,7 @@ class Vertex:
                       macro_mol,
                       cell_params,
                       nfgs,
-                      aligned_bonder):
+                      aligned):
         """
         Creates the attribute :attr:`fg_map`.
 
@@ -200,10 +198,10 @@ class Vertex:
             The number of functional groups the building block placed
             on the vertex has.
 
-        aligned_bonder : :class:`int`
-            The index of a bonder atom in
-            :attr:`.StructUnit.bonder_ids` of `mol`. This is the
-            bonder atom which gets aligned with an edge.
+        aligned : :class:`int`
+            The ``fg_id`` of the functional group which gets aligned
+            with an edge. The ``fg_id`` corresponds to the value in
+            the building block, not the macromolecule.
 
         Returns
         -------
@@ -213,37 +211,38 @@ class Vertex:
 
         center = self.calc_coord(cell_params)
 
-        # Get all the bonder ids.
-        bonder_ids = deque(maxlen=nfgs)
+        # Get all the fg ids.
+        fg_ids = deque(maxlen=nfgs)
         for atom in macro_mol.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                bonder_ids.append(atom.GetIdx())
+            if (atom.HasProp('fg_id') and
+               atom.GetIntProp('fg_id') not in fg_ids):
+                fg_ids.append(atom.GetIntProp('fg_id'))
 
         start = np.array([0, 1])
         angles = []
-        for bonder in bonder_ids:
-            bonder_coords = macro_mol.atom_coords(bonder) - center
-            x, y, _ = normalize_vector(bonder_coords)
+        for fg_id in fg_ids:
+            fg_coords = macro_mol.fg_centroid(fg_id) - center
+            x, y, _ = normalize_vector(fg_coords)
             angle = np.arccos(start@np.array([x, y]))
             if x < 0:
                 angle = 2*np.pi - angle
 
-            angles.append((angle, bonder))
+            angles.append((angle, fg_id))
         angles.sort()
 
-        bonders = [bonder for angle, bonder in angles]
-        aligned = bonder_ids[aligned_bonder]
-        bonders = (bonders[bonders.index(aligned):] +
-                   bonders[:bonders.index(aligned)])
+        fgs = [fg for angle, fg in angles]
+        aligned = fg_ids[aligned]
+        # Order the fgs list so that aligned fg comes first, while
+        # keeping the rest of the order the same.
+        fgs = fgs[fgs.index(aligned):] + fgs[:fgs.index(aligned)]
 
         aligned_pos = self.aligned_position()
-        positions = (list(range(aligned_pos, nbonders)) +
+        positions = (list(range(aligned_pos, nfgs)) +
                      list(range(0, aligned_pos)))
 
         self.bonder_map = {}
-        for bonder, position in zip(bonders, positions):
-            bonder = macro_mol.mol.GetAtomWithIdx(bonder).GetIntProp('fg_id')
-            self.bonder_map[position] = bonder
+        for fg, position in zip(fgs, positions):
+            self.bonder_map[position] = fg
 
     def aligned_position(self):
         """
@@ -476,22 +475,21 @@ class Edge:
 
         """
 
-        # Get all the bonder ids.
-        bonder_ids = deque(maxlen=2)
+        # Get all the fg ids.
+        fg_ids = deque(maxlen=2)
         for atom in macro_mol.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                bonder_ids.append(atom.GetIdx())
+            if (atom.HasProp('fg_id') and
+               atom.GetIntProp('fg_id') not in fg_ids):
+                fg_ids.append(atom.GetIntProp('fg_id'))
 
         v1coord = self.v1.calc_coord(cell_params)
-        bonders = sorted(bonder_ids,
-                         key=lambda x: euclidean(
+        fgs = sorted(fg_ids,
+                     key=lambda x: euclidean(
                                              v1coord,
-                                             macro_mol.atom_coords(x)))
+                                             macro_mol.fg_centroid(x)))
 
-        bonders = [macro_mol.mol.GetAtomWithIdx(b).GetIntProp('fg_id')
-                   for b in bonders]
-        self.bonder_map = {0: bonders[0],
-                           1: bonders[1]}
+        self.bonder_map = {0: fgs[0],
+                           1: fgs[1]}
 
 
 def is_bonder(macro_mol, atom_id):
@@ -580,22 +578,16 @@ class COFLattice(Topology):
         self.scale_func = scale_func
         super().__init__()
 
-    def cleanup(self):
+    def cleanup(self, macro_mol):
         """
 
         """
-
-        # If the ids of periodic bonds have already been updated, stop.
-        if self._ids_updated:
-            return
-
-        # Update periodic bonds to hold atom ids directly instead of
+        return
+        # Update periodic bonds to hold fg ids directly instead of
         # indices of the atom ids within `bonder_ids`.
         for pb in self.periodic_bonds:
             pb.atom1 = self.bonder_ids[pb.atom1]
             pb.atom2 = self.bonder_ids[pb.atom2]
-
-        self._ids_updated = True
 
 
 class LinkerCOFLattice(COFLattice):
@@ -670,7 +662,7 @@ class LinkerCOFLattice(COFLattice):
                   len(bb.functional_group_atoms()) == 2)
         multi = next(bb for bb in macro_mol.building_blocks if
                      len(bb.functional_group_atoms()) >= 3)
-        nbonders = len(multi.functional_group_atoms())
+        nfgs = len(multi.functional_group_atoms())
 
         # Calculate the size of the unit cell by scaling to the size of
         # building blocks.
@@ -692,7 +684,7 @@ class LinkerCOFLattice(COFLattice):
             for atom in mol.GetAtoms():
                 if atom.HasProp('fg_id'):
                     atom.SetIntProp('fg_id',
-                                    atom.GetIntProp('fg_id')+i*nbonders)
+                                    atom.GetIntProp('fg_id')+i*nfgs)
 
             # Combine.
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
@@ -726,9 +718,7 @@ class LinkerCOFLattice(COFLattice):
                 if atom.HasProp('bonder'):
                     bonder_ids.append(atom.GetIdx())
 
-            e.create_bonder_map(macro_mol, cell_params)
-
-        super(macro_mol.__class__, macro_mol).save_ids()
+            e.create_fg_map(macro_mol, cell_params)
 
     def bonded_fgs(self, macro_mol):
         """
@@ -745,7 +735,7 @@ class LinkerCOFLattice(COFLattice):
             Holds the ids of the functional groups set to react.
 
         """
-
+        return
         for e in self.edges:
             bonder1 = e.bonder_map[0]
             bonder2 = e.v1.bonder_map[e.joint_positions[0]]

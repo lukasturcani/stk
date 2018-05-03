@@ -441,6 +441,52 @@ class Molecule:
 
         return self.mol.GetAtomWithIdx(atom_id).GetSymbol()
 
+    def bonder_centroids(self, conformer=-1):
+        """
+        Calculates the centriod of bonder atoms in each fg.
+
+        The centroids are yielded in order, with the centroid of
+        the functional group with ``fg_id`` of ``0`` first.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Yields
+        ------
+        :class:`numpy.array`
+            The bonder centroid of a functional group.
+
+        """
+
+        for atoms in self.bonder_ids:
+            yield (sum(self.atom_coords(a, conformer) for a in atoms)
+                   / len(atoms))
+
+    def bonder_centroid(self, conformer=-1):
+        """
+        Returns the centroid of the bonder atoms.
+
+        The calculation has two stages. First, the centroids of
+        bonder atoms within the same functional groups are found.
+        Second, the centroid of the centroids found in stage 1 is
+        calculated and returned.
+
+        Parameters
+        ----------
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            An array holding the midpoint of the bonder atoms.
+
+        """
+
+        return sum(self.bonder_centroids(conformer)) / len(self.bonder_ids)
+
     def _cavity_size(self, origin, conformer):
         """
         Calculates diameter of the molecule from `origin`.
@@ -633,6 +679,35 @@ class Molecule:
 
         with open(path, 'w') as f:
             json.dump(self.json(), f, indent=4)
+
+    def fg_centroid(self, fg_id, conformer=-1):
+        """
+        The centroid of bonder atoms in a functional group.
+
+        Parameters
+        ----------
+        fg_id : :class:`int`
+            The id of the functional group.
+
+        conformer : :class:`int`, optional
+            The conformer to use.
+
+        Returns
+        -------
+        :class:`numpy.array`
+            The coordinates of a bonder centroid.
+
+        """
+
+        s = np.array([0., 0., 0.])
+        c = 0
+        for a in self.mol.GetAtoms():
+            if (a.HasProp('fg_id') and
+                a.GetIntProp('fg_id') == fg_id and
+               a.HasProp('bonder')):
+                s += self.atom_coords(a.GetIdx())
+                c += 1
+        return s / c
 
     @classmethod
     def from_dict(self, json_dict, optimized=True, load_names=True):
@@ -1530,52 +1605,6 @@ class StructUnit(Molecule, metaclass=CachedStructUnit):
         for (id1, id2), (c1, c2) in zip(ids, centroids):
                 yield id1, id2, euclidean(c1, c2)
 
-    def bonder_centroids(self, conformer=-1):
-        """
-        Calculates the centriod of bonder atoms in each fg.
-
-        The centroids are yielded in order, with the centroid of
-        the functional group with ``fg_id`` of ``0`` first.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Yields
-        ------
-        :class:`numpy.array`
-            The bonder centroid of a functional group.
-
-        """
-
-        for atoms in self.bonder_ids:
-            yield (sum(self.atom_coords(a, conformer) for a in atoms)
-                   / len(atoms))
-
-    def bonder_centroid(self, conformer=-1):
-        """
-        Returns the centroid of the bonder atoms.
-
-        The calculation has two stages. First, the centroids of
-        bonder atoms within the same functional groups are found.
-        Second, the centroid of the centroids found in stage 1 is
-        calculated and returned.
-
-        Parameters
-        ----------
-        conformer : :class:`int`, optional
-            The conformer to use.
-
-        Returns
-        -------
-        :class:`numpy.array`
-            An array holding the midpoint of the bonder atoms.
-
-        """
-
-        return sum(self.bonder_centroids(conformer)) / len(self.bonder_ids)
-
     def bonder_direction_vectors(self, conformer=-1):
         """
         Yields the direction vectors between bonder atoms.
@@ -2393,9 +2422,9 @@ class StructUnit3(StructUnit):
 
         return normal_v
 
-    def minimize_theta2(self, atom, vector, axis, conformer=-1):
+    def minimize_theta2(self, fg_id, vector, axis, conformer=-1):
         """
-        Rotates molecule to minimize angle between `atom` and `vector`.
+        Rotate molecule to minimize angle between `fg_id` and `vector`.
 
         The rotation is done about `axis` and is centered on the
         bonder centroid, as given by
@@ -2403,8 +2432,9 @@ class StructUnit3(StructUnit):
 
         Parameters
         ----------
-        atom : :class:`int`
-            The id of atom which is to have angle minimized.
+        fg_id : :class:`int`
+            The id of functional group which is to have angle
+            minimized.
 
         vector : :class:`numpy.array`
             A vector with which the angle is minimized.
@@ -2422,7 +2452,11 @@ class StructUnit3(StructUnit):
         """
 
         centroid = self.bonder_centroid(conformer)
-        v1 = self.atom_coords(atom, conformer) - centroid
+
+        fg_centroids = self.bonder_centroids(conformer)
+        for i in range(fg_id+1):
+            fg_centroid = next(fg_centroids)
+        v1 = fg_centroid - centroid
         self.minimize_theta(v1, vector, axis, centroid, conformer)
 
     def set_orientation2(self, end, conformer=-1):
