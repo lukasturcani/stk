@@ -9,7 +9,8 @@
 # This folder gets created by running tests for fitness functions.
 stk/tests/cage_target
 
-# This folder gets created by running tests for cage topologies.
+# These folders get created when running tests for topologies.
+stk/tests/linear_topology_tests
 stk/tests/cage_topology_tests
 stk/tests/cof_topology_tests
 stk/tests/failures.txt

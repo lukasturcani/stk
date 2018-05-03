@@ -237,12 +237,38 @@ def boronic_acid_with_diol(mol, del_atoms, fg1, fg2):
         The first element is an :class:`rdkit.Chem.rdchem.Mol`. It is
         the molecule with bonds added between the functional groups.
 
-        The seoncd element is a :class:`int`. It is the number
+        The second element is a :class:`int`. It is the number
         of bonds added.
 
     """
 
-    ...
+    bond = rdkit.rdchem.BondType.SINGLE
+    fgs = {fg1, fg2}
+    oxygens = []
+    deleters = []
+
+    for a in reversed(mol.GetAtoms()):
+        if not a.HasProp('fg_id') or a.GetIntProp('fg_id') not in fgs:
+            continue
+
+        if a.HasProp('del'):
+            deleters.append(a)
+
+        if a.GetProp('fg') == 'boronic_acid' and a.HasProp('bonder'):
+            boron = a
+
+        if a.GetProp('fg') == 'diol' and a.HasProp('bonder'):
+            oxygens.append(a)
+
+    emol = rdkit.EditableMol(mol)
+    emol.AddBond(boron.GetIdx(), oxygens[0].GetIdx(), bond)
+    emol.AddBond(boron.GetIdx(), oxygens[1].GetIdx(), bond)
+
+    if del_atoms:
+        for a in deleters:
+            emol.RemoveAtom(a.GetIdx())
+
+    return emol.GetMol(), 2
 
 
 # If some functional groups react via a special mechanism not covered
@@ -334,7 +360,14 @@ functional_groups = (
                 FGInfo("secondary_amine",
                        "[H][N]([#6])[#6]",
                        "[$([N]([H])([#6])[#6])]",
-                       "[$([H][N]([#6])[#6])]")
+                       "[$([H][N]([#6])[#6])]"),
+
+                FGInfo('diol',
+                       '[H][O][#6][#6][O][H]',
+                       ('[$([O]([H])[#6][#6][O][H])].'
+                        '[$([O]([H])[#6][#6][O][H])]'),
+                       ('[$([H][O][#6][#6][O][H])].'
+                        '[$([H][O][#6][#6][O][H])]'))
 
 
                     )
