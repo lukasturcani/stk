@@ -14,69 +14,56 @@ functional groups and a building block with three or more functional
 groups. These are implemented as subclasses to
 :class:`LinkerCOFLattice`.
 
-As for any assembly process, there are 3 stages: placement of
-building blocks, joining of building blocks and deletion of extra
-atoms.
+As for any assembly process, there are 2 main stages: placement of
+building blocks and yielding of functional groups which react.
 
-A 2D COF topology can be defined by the vertices and edges which
-connected them. The building block with 3 or more functional groups
+A 2D COF topology can be defined through vertices and the edges which
+connect them. The building block with 3 or more functional groups
 sits on the vertices while the building block with 2 functional groups
 sits on the edges. To assemble a COF topology, first the vertices
 and edges are defined. They are represented by the classes
 :class:`Vertex` and :class:`Edge`. Each of these objects defines their
-positions in term of the fractional coordinates along the
+positions in terms of the fractional coordinates along the
 ``a``, ``b`` and ``c`` vectors of a unit cell. In addtion, each
-of these objects defines a set of "atomic positiions".
+of these objects defines a set of "fg positiions".
 
-For edges, there are two atomic positions, 0 and 1. 0 is the position
-of the atom which gets connected to an atom on the first vertex
+For edges, there are two fg positions, 0 and 1. 0 is the position
+of the fg which gets connected to an fg on the first vertex
 connected by the edge, while 1 is the
-position of the atom which gets connected to the second vertex
-connected by the edge. Identification of which bonder atom of a
-di-functinalized building block sits on which atom position is done
-in the following way. Check the distance of each bonder atom to the
-first vertex. The closer one is on position 0 the further one is on
+position of the fg which gets connected to the second vertex
+connected by the edge. Identification of which fg of a
+di-functionalized building block sits on which fg position is done
+in the following way. Check the distance of each fg to the
+first vertex. The closer one is on position 0, the further one is on
 position 1.
 
-For vertices there are multiple atomic positions. The number of
-atomic positions on a vertex is equal to the number of functional
-groups the building block placed on the vertex has. The atomic
+For vertices there are multiple fg positions. The number of
+fg positions on a vertex is equal to the number of functional
+groups the building block placed on the vertex has. The fg
 positions are labelled from ``0`` to ``n`` where ``n`` is one less than
 the number of functional groups in the building block. Going clockwise
 around the vertex, starting at the 12 o clock position, the positions
 are labelled starting at 0. After placing and aligning a building block
-on a vertex, it is necessary to identify which bonder atom sits on
-which atomic position. Alignment is done by rotating the builing block
-around the z axis so that the distance of one of the bonder atoms
+on a vertex, it is necessary to identify which fg sits on
+which fg position. Alignment is done by rotating the building block
+around the z axis so that the distance of one of the fgs
 and one of the edges is minimized. Because each edge keeps a record
-of which position it connects, the aligned bonder can be assigned to
-a position. Then the bonder atoms are assigned to the next positions
+of which position it connects, the aligned fg can be assigned to
+a position. Then the fgs are assigned to the next positions
 in clockwise order.
 
 To join molecules simply go through all the edges in a topology. Each
 edge holds the vertices it is connected to and the positions on those
 vertices it connects. Each edge and vertex defines
-a dictionary which maps the position to the bonder atom which sits on
-it. For each edge take the bonder at position ``0`` and the atomic
-position on the vertex which is connceted to it. Use the atomic
-position on the connected vertex to get the id of the bonder atom which
-is to be connected. The same can be done for the bonder at position
+a dictionary which maps the position to the fg which sits on
+it. For each edge take the fg at position ``0`` and the fg
+position on the vertex which is connceted to it. Use the fg
+position on the connected vertex to get the id of the fg which
+is to be connected. The same can be done for the fg at position
 ``1`` on the edge.
 
-Periodic bonds are not added to the rdkit molelecule, instead they
-are registered in :attr:`.Periodic.periodic_bonds`. The method
-:meth:`COFLattice.del_atoms` is slightly modified, so that the
-coordinates of any deleted atoms are saved. This is necessary for
-restoring those atoms when using :meth:`.Periodic.island`.
-
-When creating periodic bonds during :meth:`LinkerCOFLattice.join_mols`
-the ids of the bonder atoms involved are saved as the indices within
-:attr:`.MacroMolecule.bonder_ids`. This is because deleting atoms
-will change the atom ids but not the ordering in
-:attr:`~.MacroMolecule.bonder_ids`. However, these are automatically
-updated to bonder ids after assembly is completed by
-:meth:`.Perdiodic.save_ids`. This is run automatically after assembly
-and does not impact implementation but is noted here for completeness.
+Periodic bonds are not added to the rdkit molecule, instead they
+are registered in :attr:`.Periodic.periodic_bonds`.
 
 """
 
@@ -104,9 +91,9 @@ class Vertex:
     connected : :class:`list` of :class:`Edge`
         The edges connected to this vertex.
 
-    bonder_map : :class:`dict`
-        Maps the id of a bonder position on the vertex to the atom
-        id of the bonder sitting on it.
+    fg_map : :class:`dict`
+        Maps the id of a fg position on the vertex to the ``fg_id``
+        of the functional group sitting on it.
 
     """
 
@@ -127,9 +114,8 @@ class Vertex:
             The building block to be placed.
 
         aligner : :class:`int`
-            The index of a bonder atom in
-            :attr:`.StructUnit.bonder_ids` of `mol`. This is the
-            bonder atom which gets aligned with an edge.
+            The ``fg_id`` of a functional group. This is the
+            fg which gets aligned with an edge.
 
         Returns
         -------
@@ -147,8 +133,8 @@ class Vertex:
                              all(b == 0 for b in e.bond)),
                             self.connected[0])
         vector = (aligner_edge.calc_coord(cell_params) - coord)
-        atom = mol.bonder_ids[aligner]
-        mol.minimize_theta2(atom, vector, [0, 0, 1])
+
+        mol.minimize_theta2(aligner, vector, [0, 0, 1])
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
@@ -180,13 +166,13 @@ class Vertex:
 
         return coord
 
-    def create_bonder_map(self,
-                          macro_mol,
-                          cell_params,
-                          nbonders,
-                          aligned_bonder):
+    def create_fg_map(self,
+                      macro_mol,
+                      cell_params,
+                      nfgs,
+                      aligned_fg):
         """
-        Creates the attribute :attr:`bonder_map`.
+        Creates the attribute :attr:`fg_map`.
 
         Parameters
         ----------
@@ -196,14 +182,14 @@ class Vertex:
         cell_params : :class:`list` of :class:`numpy.array`
             The ``a``, ``b`` and ``c`` vectors of the unit cell.
 
-        nbonders : :class:`int`
-            The number of bonder atoms the building block placed on the
-            vertex has.
+        nfgs : :class:`int`
+            The number of functional groups the building block placed
+            on the vertex has.
 
-        aligned_bonder : :class:`int`
-            The index of a bonder atom in
-            :attr:`.StructUnit.bonder_ids` of `mol`. This is the
-            bonder atom which gets aligned with an edge.
+        aligned_fg : :class:`int`
+            The ``fg_id`` of a functional group. This is the
+            fg which gets aligned with an edge. The ``fg_id``
+            corresponods to the value in the building block.
 
         Returns
         -------
@@ -213,45 +199,44 @@ class Vertex:
 
         center = self.calc_coord(cell_params)
 
-        # Get all the bonder ids.
-        bonder_ids = deque(maxlen=nbonders)
-        for atom in macro_mol.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                bonder_ids.append(atom.GetIdx())
+        # Get all the fg ids.
+        fg_ids = deque(maxlen=nfgs)
+        for a in macro_mol.mol.GetAtoms():
+            if a.HasProp('fg_id') and a.GetIntProp('fg_id') not in fg_ids:
+                fg_ids.append(a.GetIntProp('fg_id'))
 
         start = np.array([0, 1])
         angles = []
-        for bonder in bonder_ids:
-            bonder_coords = macro_mol.atom_coords(bonder) - center
-            x, y, _ = normalize_vector(bonder_coords)
+        for fg in fg_ids:
+            fg_coords = macro_mol.fg_centroid(fg) - center
+            x, y, _ = normalize_vector(fg_coords)
             angle = np.arccos(start@np.array([x, y]))
             if x < 0:
                 angle = 2*np.pi - angle
 
-            angles.append((angle, bonder))
+            angles.append((angle, fg))
         angles.sort()
 
-        bonders = [bonder for angle, bonder in angles]
-        aligned = bonder_ids[aligned_bonder]
-        bonders = (bonders[bonders.index(aligned):] +
-                   bonders[:bonders.index(aligned)])
+        fgs = [fg for angle, fg in angles]
+        aligned = fg_ids[aligned_fg]
+        fgs = fgs[fgs.index(aligned):] + fgs[:fgs.index(aligned)]
 
         aligned_pos = self.aligned_position()
-        positions = (list(range(aligned_pos, nbonders)) +
+        positions = (list(range(aligned_pos, nfgs)) +
                      list(range(0, aligned_pos)))
 
-        self.bonder_map = {}
-        for bonder, position in zip(bonders, positions):
-            self.bonder_map[position] = bonder
+        self.fg_map = {}
+        for fg, position in zip(fgs, positions):
+            self.fg_map[position] = fg
 
     def aligned_position(self):
         """
-        Returns the position of the atom aligned by :meth:`place_mol`.
+        Returns the position of the fg aligned by :meth:`place_mol`.
 
         Returns
         -------
         :class:`int`
-            The id of a position of on the vertex. The bonder atom
+            The id of a position of on the vertex. The fg
             which gets aligned during :meth:`place_mol` sits on this
             position.
 
@@ -295,8 +280,8 @@ class Edge:
         The position of the edge in terms of the fractional positions
         along the ``a``, ``b`` and ``c`` vectors of a unit cell.
 
-    bonder_map : :class:`dict`
-        Maps the id of a position to the id of the bonder atom which
+    fg_map : :class:`dict`
+        Maps the id of a position to the ``fg_id`` of the fg which
         sits on it. The positions are ``0`` and ``1`` where ``0`` is
         the  position which is closer to :attr:`v1` while ``1``
         is the position closer to :attr:`v2`.
@@ -343,20 +328,20 @@ class Edge:
 
         """
 
-        coord = self.bonder_centroid(macro_mol, cell_params)
+        coord = self.fg_centroid(macro_mol, cell_params)
         original_position = mol.position_matrix()
 
         mol.set_bonder_centroid(coord)
-        d = self.bonder_direction(macro_mol, cell_params)*alignment
+        d = self.fg_direction(macro_mol, cell_params)*alignment
         mol.set_orientation2(d)
 
         rdkit_mol = rdkit.Mol(mol.mol)
         mol.set_position_from_matrix(original_position)
         return rdkit_mol
 
-    def bonder_direction(self, macro_mol, cell_params):
+    def fg_direction(self, macro_mol, cell_params):
         """
-        Calculates the direction vetor between the bonder atoms.
+        Calculates the direction vector between the fgs.
 
         Parameters
         ----------
@@ -376,8 +361,8 @@ class Edge:
         coords = []
         for i, position in enumerate(self.joint_positions):
             vertex = self.connected[i]
-            bonder = vertex.bonder_map[position]
-            coords.append(macro_mol.atom_coords(bonder))
+            fg = vertex.fg_map[position]
+            coords.append(macro_mol.fg_centroid(fg))
 
         for d, param in zip(self.bond, cell_params):
                 coords[1] += d*param
@@ -424,11 +409,11 @@ class Edge:
             coord += frac * dim
         return coord
 
-    def bonder_centroid(self, macro_mol, cell_params):
+    def fg_centroid(self, macro_mol, cell_params):
         """
-        The centroid of the bonder molecules connected to the edge.
+        The centroid of the fgs connected to the edge.
 
-        So the bonders NOT sitting on the edge itself.
+        So the fgs NOT sitting on the edge itself.
 
         Parameters
         ----------
@@ -441,25 +426,24 @@ class Edge:
         Returns
         -------
         :class:`numpy.array`
-            The centroid of the bonder attoms connected to those on the
-            edge.
+            The centroid of the fgs connected to those on the edge.
 
         """
 
         coord = np.zeros((3, ))
         for i, position in enumerate(self.joint_positions):
             vertex = self.connected[i]
-            bonder = vertex.bonder_map[position]
-            coord += macro_mol.atom_coords(bonder)
+            fg = vertex.fg_map[position]
+            coord += macro_mol.fg_centroid(fg)
 
         for d, param in zip(self.bond, cell_params):
             coord += d*param
 
         return coord / (i+1)
 
-    def create_bonder_map(self, macro_mol, cell_params):
+    def create_fg_map(self, macro_mol, cell_params):
         """
-        Creates the attribute :attr:`bonder_map`.
+        Creates the attribute :attr:`fg_map`.
 
         Parameters
         ----------
@@ -475,19 +459,17 @@ class Edge:
 
         """
 
-        # Get all the bonder ids.
-        bonder_ids = deque(maxlen=2)
-        for atom in macro_mol.mol.GetAtoms():
-            if atom.HasProp('bonder'):
-                bonder_ids.append(atom.GetIdx())
+        # Get all the fg ids.
+        fg_ids = deque(maxlen=2)
+        for a in macro_mol.mol.GetAtoms():
+            if a.HasProp('fg_id') and a.GetIntProp('fg_id') not in fg_ids:
+                fg_ids.append(a.GetIntProp('fg_id'))
 
         v1coord = self.v1.calc_coord(cell_params)
-        bonders = sorted(bonder_ids,
-                         key=lambda x: euclidean(
+        fgs = sorted(fg_ids, key=lambda x: euclidean(
                                              v1coord,
-                                             macro_mol.atom_coords(x)))
-        self.bonder_map = {0: bonders[0],
-                           1: bonders[1]}
+                                             macro_mol.fg_centroid(x)))
+        self.fg_map = {0: fgs[0], 1: fgs[1]}
 
 
 def is_bonder(macro_mol, atom_id):
@@ -576,6 +558,155 @@ class COFLattice(Topology):
         self.scale_func = scale_func
         super().__init__()
 
+
+class LinkerCOFLattice(COFLattice):
+    """
+    For 2D COF topologies which use a linker.
+
+    These are topologies which consist of 2 building blocks. One
+    which has two functional groups and one which has 3 or more
+    functional groups.
+
+    This class will have to be extended by sublcasses which define
+    the vertices and edges which a particular topology consists of.
+
+    Attributes
+    ----------
+    vertices : :class:`list` of :class:`Vertex`
+        Class attribute added when defining a subclass. Holds the
+        vertices which make up the topology.
+
+    edges : :class:`list` of :class:`Edge`
+        Class attribute added when defining a subclass. Holds the
+        edges which make up the topology.
+
+    ditopic_directions : :class:`list` of :class:`int`
+        For each edge in the topology, holds ``1`` or ``-1`` to
+        indicate if the building block is placed parallel or
+        anti-parallel to the edge.
+
+    multitopic_aligners : :class:`list` of :class:`int`
+        For each vertex in the topology, holds the value of a
+        ``fg_id`` of the multitopic bulding block. This is the
+        functional group which gets aligned at a given edge.
+
+    """
+
+    def __init__(self,
+                 ditopic_directions=None,
+                 multitopic_aligners=None,
+                 scale_func=linker_cof_scale_func):
+        super().__init__(scale_func=scale_func)
+
+        if ditopic_directions is None:
+            ditopic_directions = [1 for i in range(len(self.edges))]
+        if multitopic_aligners is None:
+            multitopic_aligners = [0 for i in range(len(self.vertices))]
+
+        self.ditopic_directions = ditopic_directions
+        self.multitopic_aligners = multitopic_aligners
+
+    def bonded_fgs(self, macro_mol):
+        """
+
+        """
+
+        for e in self.edges:
+            fg1 = e.fg_map[0]
+            fg2 = e.v1.fg_map[e.joint_positions[0]]
+            yield fg1, fg2
+
+            fg3 = e.fg_map[1]
+            fg4 = e.v2.fg_map[e.joint_positions[1]]
+            if all(b == 0 for b in e.bond):
+                yield fg3, fg4
+            else:
+                macro_mol.periodic_bonds.append(
+                                        PeriodicBond(fg3, fg4, e.bond))
+
+    def place_mols(self, macro_mol):
+        """
+        Places the building blocks on the topology.
+
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # Create the rdkit molecule of the assembled molecule.
+        macro_mol.mol = rdkit.Mol()
+
+        # Identify which building block is ditopic and which is
+        # tri or more topic.
+        di = next(bb for bb in macro_mol.building_blocks if
+                  len(bb.functional_group_atoms()) == 2)
+        multi = next(bb for bb in macro_mol.building_blocks if
+                     len(bb.functional_group_atoms()) >= 3)
+        nfgs = len(multi.functional_group_atoms())
+
+        # Calculate the size of the unit cell by scaling to the size of
+        # building blocks.
+        size = self.scale_func(macro_mol)
+        cell_params = [size*p for p in self.cell_dimensions]
+        macro_mol.cell_dimensions = cell_params
+
+        # For each vertex in the topology, place a multitopic building
+        # block on it. The Vertex object takes care of alignment.
+
+        for i, v in enumerate(self.vertices):
+            aligner = self.multitopic_aligners[i]
+            mol = v.place_mol(cell_params, multi, aligner)
+            add_fragment_props(mol,
+                               macro_mol.building_blocks.index(multi),
+                               i)
+
+            self._update_fg_id(macro_mol, mol)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
+            macro_mol.bb_counter.update([multi])
+
+            # Save the ids of the fgs in the assembled molecule.
+            # This is used when creating bonds later in the assembly
+            # process.
+            v.create_fg_map(macro_mol, cell_params, nfgs, aligner)
+
+        for i, e in enumerate(self.edges):
+
+            mol = e.place_mol(macro_mol,
+                              cell_params,
+                              di,
+                              self.ditopic_directions[i])
+
+            add_fragment_props(mol,
+                               macro_mol.building_blocks.index(di),
+                               i)
+            self._update_fg_id(macro_mol, mol)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
+            macro_mol.bb_counter.update([di])
+
+            e.create_fg_map(macro_mol, cell_params)
+
+        # super(macro_mol.__class__, macro_mol).save_ids()
+
+    def _update_fg_id(self, macro_mol, mol):
+        """
+
+        """
+
+        max_id = max((a.GetIntProp('fg_id') for
+                      a in macro_mol.mol.GetAtoms() if
+                      a.HasProp('fg_id')), default=-1) + 1
+        for a in mol.GetAtoms():
+            if a.HasProp('fg_id'):
+                a.SetIntProp('fg_id', a.GetIntProp('fg_id')+max_id)
+
+
+class NoLinkerCOFLattice(COFLattice):
     def del_atoms(self, macro_mol):
         """
         Deletes the atoms which are lost during assembly.
@@ -621,169 +752,6 @@ class COFLattice(Topology):
 
         super().del_atoms(macro_mol)
         macro_mol._ids_updated = False
-
-
-class LinkerCOFLattice(COFLattice):
-    """
-    For 2D COF topologies which use a linker.
-
-    These are topologies which consist of 2 building blocks. One
-    which has two functional groups and one which has 3 or more
-    functional groups.
-
-    This class will have to be extended by sublcasses which define
-    the vertices and edges which a particular topology consists of.
-
-    Attributes
-    ----------
-    vertices : :class:`list` of :class:`Vertex`
-        Class attribute added when defining a subclass. Holds the
-        vertices which make up the topology.
-
-    edges : :class:`list` of :class:`Edge`
-        Class attribute added when defining a subclass. Holds the
-        edges which make up the topology.
-
-    ditopic_directions : :class:`list` of :class:`int`
-        For each edge in the topology, holds ``1`` or ``-1`` to
-        indicate if the building block is placed parallel or
-        anti-parallel to the edge.
-
-    multitopic_aligners : :class:`list` of :class:`int`
-        For each vertex in the topology, holds the index of an
-        atom in :attr:`.StructUnit.bonder_ids`. It specicifes which
-        bonder atom is used for alignment of the building block on the
-        vertex.
-
-    """
-
-    def __init__(self,
-                 ditopic_directions=None,
-                 multitopic_aligners=None,
-                 scale_func=linker_cof_scale_func):
-        super().__init__(scale_func=scale_func)
-
-        if ditopic_directions is None:
-            ditopic_directions = [1 for i in range(len(self.edges))]
-        if multitopic_aligners is None:
-            multitopic_aligners = [0 for i in range(len(self.vertices))]
-
-        self.ditopic_directions = ditopic_directions
-        self.multitopic_aligners = multitopic_aligners
-
-    def place_mols(self, macro_mol):
-        """
-        Places the building blocks on the topology.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        # Create the rdkit molecule of the assembled molecule.
-        macro_mol.mol = rdkit.Mol()
-
-        # Identify which building block is ditopic and which is
-        # tri or more topic.
-        di = next(bb for bb in macro_mol.building_blocks if
-                  len(bb.functional_group_atoms()) == 2)
-        multi = next(bb for bb in macro_mol.building_blocks if
-                     len(bb.functional_group_atoms()) >= 3)
-        nbonders = len(multi.functional_group_atoms())
-
-        # Calculate the size of the unit cell by scaling to the size of
-        # building blocks.
-        size = self.scale_func(macro_mol)
-        cell_params = [size*p for p in self.cell_dimensions]
-        macro_mol.cell_dimensions = cell_params
-
-        # For each vertex in the topology, place a multitopic building
-        # block on it. The Vertex object takes care of alignment.
-
-        for i, v in enumerate(self.vertices):
-            aligner = self.multitopic_aligners[i]
-            mol = v.place_mol(cell_params, multi, aligner)
-            add_fragment_props(mol,
-                               macro_mol.building_blocks.index(multi),
-                               i)
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
-            macro_mol.bb_counter.update([multi])
-
-            # Save the ids of the bonder atoms in the assembled molecule.
-            # This is used when creating bonds later in the assembly
-            # process.
-            v.create_bonder_map(macro_mol, cell_params, nbonders, aligner)
-
-        for i, e in enumerate(self.edges):
-            mol = e.place_mol(macro_mol,
-                              cell_params,
-                              di,
-                              self.ditopic_directions[i])
-            add_fragment_props(mol,
-                               macro_mol.building_blocks.index(di),
-                               i)
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
-            macro_mol.bb_counter.update([di])
-            bonder_ids = deque(maxlen=2)
-            for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('bonder'):
-                    bonder_ids.append(atom.GetIdx())
-
-            e.create_bonder_map(macro_mol, cell_params)
-
-        super(macro_mol.__class__, macro_mol).save_ids()
-
-    def join_mols(self, macro_mol):
-        """
-        Creates bonds between the building blocks.
-
-        Parameters
-        ----------
-        macor_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-        macro_mol.bonds_made = 0
-        emol = rdkit.EditableMol(macro_mol.mol)
-        for e in self.edges:
-            bonder1 = e.bonder_map[0]
-            bonder2 = e.v1.bonder_map[e.joint_positions[0]]
-            bond_type = self.determine_bond_type(macro_mol,
-                                                 bonder1,
-                                                 bonder2)
-            emol.AddBond(bonder1, bonder2, bond_type)
-
-            bonder3 = e.bonder_map[1]
-            bonder4 = e.v2.bonder_map[e.joint_positions[1]]
-            if all(b == 0 for b in e.bond):
-                bond_type = self.determine_bond_type(macro_mol,
-                                                     bonder3,
-                                                     bonder4)
-                emol.AddBond(bonder3, bonder4, bond_type)
-            else:
-                macro_mol.periodic_bonds.append(
-                    PeriodicBond(macro_mol.bonder_ids.index(bonder3),
-                                 macro_mol.bonder_ids.index(bonder4),
-                                 e.bond))
-
-            macro_mol.bonds_made += 2
-
-        macro_mol.mol = emol.GetMol()
-
-
-class NoLinkerCOFLattice(COFLattice):
-    ...
 
 
 class NoLinkerHoneycomb(NoLinkerCOFLattice):

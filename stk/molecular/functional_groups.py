@@ -142,6 +142,7 @@ def fg_name(mol, fg):
     for atom in mol.GetAtoms():
         if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') == fg:
             return atom.GetProp('fg')
+    raise RuntimeError(f'No functional group with id {fg} found.')
 
 
 def react(mol, del_atoms, *fgs):
