@@ -84,9 +84,9 @@ class Cell:
         A 3 member :class:`list` holding the x, y and z index
         of the cell within the supercell.
 
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
+    fgs : :class:`dict`
+        Maps the fgs in the original unit cell to the
+        equivalent fgs in the cell.
 
     Attributes
     ----------
@@ -94,15 +94,15 @@ class Cell:
         A 3 member array holding the x, y and z index
         of the cell within the supercell.
 
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
+    fgs : :class:`dict`
+        Maps the fgs in the original unit cell to the
+        equivalent fgs in the cell.
 
     """
 
-    def __init__(self, id_, bonders):
+    def __init__(self, id_, fgs):
         self.id = np.array(id_)
-        self.bonders = bonders
+        self.fgs = fgs
 
 
 class ChargedMolError(Exception):

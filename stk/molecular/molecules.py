@@ -3233,21 +3233,21 @@ class Periodic(MacroMolecule):
 
         # `self.periodic_bonds` holds objects of the
         # ``PeriodicBond`` class. Each ``PeriodicBond`` object has the
-        # ids of two bonder atoms in the unit cell which are connected
+        # ids of two fgs in the unit cell which are connected
         # by a bond running across the periodic boundary. The
         # `direction` attribute descibes the axes along which the
         # bond is periodic. For example, if `direction1` is [1, 0, 0]
-        # it means that the bonder atom in `periodic_bond.atom1` has a
-        # perdiodic bond connecting it to `periodic_bond.atom2` going
+        # it means that the fg in `periodic_bond.fg1` has a
+        # perdiodic bond connecting it to `periodic_bond.fg2` going
         # in the positive direction along the x-axis.
 
         # When iterating through all the unit cells composing the
         # island, you can use the `direction` vector to get index of
-        # the unit cell which holds atoms connected the present cell.
-        # Then just form bonds between the correct atoms by mapping
-        # the atom ids in the unit cells to the ids of the equivalent
-        # atoms in the original unit cell  and checking the
-        # `periodic_bond` to see which atom ids are connected.
+        # the unit cell which holds fg connected the present cell.
+        # Then just form bonds between the correct fgs by mapping
+        # the fg ids in the unit cells to the ids of the equivalent
+        # fgs in the original unit cell  and checking the
+        # `periodic_bond` to see which fg ids are connected.
         for cell in flatten(cells):
             for periodic_bond in self.periodic_bonds:
 
@@ -3264,14 +3264,14 @@ class Periodic(MacroMolecule):
                 # ccel as in "connected cell".
                 ccell = cells[x][y][z]
 
-                # `bonder1` is the id of a bonder atom, found in `cell`
-                # and equivalent to `periodic_bond.atom1`, having a
+                # `fg1` is the id of a fg, found in `cell`
+                # and equivalent to `periodic_bond.fg1`, having a
                 # bond added.
-                fg1 = cell.bonders[periodic_bond.fg1]
-                # `bonder2` is the id of a bonder atom, found in
-                # `ccell` and equivalent to `periodic_bond.atom2`,
+                fg1 = cell.fgs[periodic_bond.fg1]
+                # `fg2` is the id of a fg, found in
+                # `ccell` and equivalent to `periodic_bond.fg2`,
                 # having a bond added.
-                fg2 = ccell.bonders[periodic_bond.fg2]
+                fg2 = ccell.fgs[periodic_bond.fg2]
 
                 island, _ = react(island, True, fg1, fg2)
 
@@ -3311,8 +3311,8 @@ periodic._place_island([4, 4, 4])
 
             The second member is an ``rdkit`` molecule of the island
             being built. The third member is a :class:`dict` mapping
-            the ids of bonder atoms in the island back to the id of the
-            equivalent atom in the original unit cell.
+            the ids of fgs in the island back to the id of the
+            equivalent fg in the original unit cell.
 
         """
 
@@ -3337,9 +3337,9 @@ periodic._place_island([4, 4, 4])
             # `bonders` maps a bonder id in the original unit
             # cell to the one currently being added to the
             # island.
-            bonders = {fg: i*len(self.bonder_ids) + fg for
-                       fg in range(len(self.bonder_ids))}
-            cells[x][y][z] = Cell((x, y, z), bonders)
+            fgs = {fg: i*len(self.bonder_ids) + fg for
+                   fg in range(len(self.bonder_ids))}
+            cells[x][y][z] = Cell((x, y, z), fgs)
 
         return cells, island
 
