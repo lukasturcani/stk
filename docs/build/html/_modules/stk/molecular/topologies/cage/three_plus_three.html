@@ -155,7 +155,6 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">rdkit.Chem.AllChem</span> <span class="k">as</span> <span class="nn">rdkit</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">NoLinkerCageTopology</span><span class="p">,</span>  <span class="n">Vertex</span>
 
@@ -167,8 +166,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="n">positions_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
+                   <span class="n">Vertex</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)]</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">positions_A</span>
     <span class="n">connections</span> <span class="o">=</span> <span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span>
 
@@ -181,43 +180,33 @@
     <span class="n">n_windows</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">n_window_types</span> <span class="o">=</span> <span class="mi">1</span>
 
-<div class="viewcode-block" id="OnePlusOne.join_mols"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.three_plus_three.html#stk.molecular.topologies.cage.three_plus_three.OnePlusOne.join_mols">[docs]</a>    <span class="k">def</span> <span class="nf">join_mols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
-
-        <span class="n">editable_mol</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+<div class="viewcode-block" id="OnePlusOne.bonded_fgs"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.three_plus_three.html#stk.molecular.topologies.cage.three_plus_three.OnePlusOne.bonded_fgs">[docs]</a>    <span class="k">def</span> <span class="nf">bonded_fgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">macro_mol</span><span class="p">):</span>
 
         <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">:</span>
             <span class="n">other_position</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span> <span class="k">if</span>
                                   <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">position</span><span class="p">)</span>
 
-            <span class="n">position</span><span class="o">.</span><span class="n">atom_position_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">atom</span><span class="p">,</span> <span class="n">other_position</span><span class="p">)</span> <span class="k">for</span>
-                                            <span class="n">atom</span> <span class="ow">in</span> <span class="n">position</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">]</span>
+            <span class="n">position</span><span class="o">.</span><span class="n">fg_position_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">fg</span><span class="p">,</span> <span class="n">other_position</span><span class="p">)</span> <span class="k">for</span>
+                                          <span class="n">fg</span> <span class="ow">in</span> <span class="n">position</span><span class="o">.</span><span class="n">fg_ids</span><span class="p">]</span>
 
-            <span class="k">for</span> <span class="n">atom_id</span><span class="p">,</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">position</span><span class="o">.</span><span class="n">atom_position_pairs</span><span class="p">:</span>
-                <span class="c1"># Get all the distances between the atom and the bonder</span>
-                <span class="c1"># atoms on the vertex. Store this information on the</span>
-                <span class="c1"># vertex.</span>
-                <span class="k">for</span> <span class="n">atom2_id</span> <span class="ow">in</span> <span class="n">vertex</span><span class="o">.</span><span class="n">bonder_ids</span><span class="p">:</span>
-                    <span class="n">distance</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">atom_distance</span><span class="p">(</span><span class="n">atom_id</span><span class="p">,</span>
-                                                       <span class="n">atom2_id</span><span class="p">)</span>
-                    <span class="n">position</span><span class="o">.</span><span class="n">distances</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">distance</span><span class="p">,</span>
-                                              <span class="n">atom_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">position</span><span class="o">.</span><span class="n">fg_position_pairs</span><span class="p">:</span>
+                <span class="c1"># Get all the distances between the fg and the fgs</span>
+                <span class="c1"># on the vertex. Store this information on the vertex.</span>
+
+                <span class="k">for</span> <span class="n">fg2</span> <span class="ow">in</span> <span class="n">vertex</span><span class="o">.</span><span class="n">fg_ids</span><span class="p">:</span>
+                    <span class="n">distance</span> <span class="o">=</span> <span class="n">macro_mol</span><span class="o">.</span><span class="n">fg_distance</span><span class="p">(</span><span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">)</span>
+                    <span class="n">position</span><span class="o">.</span><span class="n">distances</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">distance</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span><span class="p">))</span>
 
         <span class="n">paired</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions_A</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">distances</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">atom1_id</span> <span class="ow">in</span> <span class="n">paired</span> <span class="ow">or</span> <span class="n">atom2_id</span> <span class="ow">in</span> <span class="n">paired</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">distances</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">fg1</span> <span class="ow">in</span> <span class="n">paired</span> <span class="ow">or</span> <span class="n">fg2</span> <span class="ow">in</span> <span class="n">paired</span><span class="p">:</span>
                     <span class="k">continue</span>
 
-                <span class="n">bond_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">determine_bond_type</span><span class="p">(</span><span class="n">macro_mol</span><span class="p">,</span>
-                                                     <span class="n">atom1_id</span><span class="p">,</span>
-                                                     <span class="n">atom2_id</span><span class="p">)</span>
                 <span class="c1"># Add the bond.</span>
-                <span class="n">editable_mol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">,</span> <span class="n">atom2_id</span><span class="p">,</span> <span class="n">bond_type</span><span class="p">)</span>
-                <span class="n">macro_mol</span><span class="o">.</span><span class="n">bonds_made</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom1_id</span><span class="p">)</span>
-                <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom2_id</span><span class="p">)</span>
-
-        <span class="n">macro_mol</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">editable_mol</span><span class="o">.</span><span class="n">GetMol</span><span class="p">()</span></div></div>
+                <span class="k">yield</span> <span class="n">fg1</span><span class="p">,</span> <span class="n">fg2</span>
+                <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fg1</span><span class="p">)</span>
+                <span class="n">paired</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fg2</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TwoPlusTwo"><a class="viewcode-back" href="../../../../../stk.molecular.topologies.cage.three_plus_three.html#stk.molecular.topologies.cage.three_plus_three.TwoPlusTwo">[docs]</a><span class="k">class</span> <span class="nc">TwoPlusTwo</span><span class="p">(</span><span class="n">NoLinkerCageTopology</span><span class="p">):</span>

@@ -88,6 +88,7 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">stk.molecular.topologies.base module</a><ul>
 <li><a class="reference internal" href="#extending-stk-adding-new-topologies">Extending stk: Adding new topologies.</a><ul>
+<li><a class="reference internal" href="#general">General</a></li>
 <li><a class="reference internal" href="#cages">Cages</a></li>
 </ul>
 </li>
@@ -161,6 +162,20 @@
 <p>Defines the base <a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a> type.</p>
 <div class="section" id="extending-stk-adding-new-topologies">
 <span id="adding-topologies"></span><h2>Extending stk: Adding new topologies.<a class="headerlink" href="#extending-stk-adding-new-topologies" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general">
+<h3>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
+<p>A new topology class must be defined. The class must inherit
+<a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a>. The new topology class will have to define
+the methods <code class="xref py py-meth docutils literal"><span class="pre">place_mols()</span></code> and <code class="xref py py-meth docutils literal"><span class="pre">bonded_fgs()</span></code>. A description
+of what these methods should do is given by <a class="reference internal" href="#stk.molecular.topologies.base.Topology.place_mols" title="stk.molecular.topologies.base.Topology.place_mols"><code class="xref py py-meth docutils literal"><span class="pre">Topology.place_mols()</span></code></a>
+and <a class="reference internal" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="stk.molecular.topologies.base.Topology.bonded_fgs"><code class="xref py py-meth docutils literal"><span class="pre">Topology.bonded_fgs()</span></code></a>.</p>
+<p>The new class may optionally define the methods <code class="xref py py-meth docutils literal"><span class="pre">prepare()</span></code> and
+<code class="xref py py-meth docutils literal"><span class="pre">cleanup()</span></code>. The former perfroms operations on the molecule
+before it is joined up and has atoms deleted via <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal"><span class="pre">react()</span></code></a>.
+The latter any final cleanup operations on the assembled molecule. For
+example, converting the end functional groups of a polymer into
+hydrogen atoms. See also <a class="reference internal" href="#stk.molecular.topologies.base.Topology.cleanup" title="stk.molecular.topologies.base.Topology.cleanup"><code class="xref py py-meth docutils literal"><span class="pre">Topology.cleanup()</span></code></a>.</p>
+</div>
 <div class="section" id="cages">
 <h3>Cages<a class="headerlink" href="#cages" title="Permalink to this headline">¶</a></h3>
 <p>To add a new cage topology a new class should be created, named
@@ -265,29 +280,25 @@ It then tries to place <cite>bb</cite> about 3 A away from <cite>macro_mol</cite
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.topologies.base.Linear.del_atoms">
-<code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.del_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the atoms which are lost during assembly.</p>
+<dt id="stk.molecular.topologies.base.Linear.bonded_fgs">
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.bonded_fgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.bonded_fgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields functional groups to react.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a>) – The polymer being assembled.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – Holds the ids of the functional groups set to react.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.topologies.base.Linear.fg_ends">
-<code class="descname">fg_ends</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.fg_ends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.fg_ends" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes almost all atoms tagged for deletion.</p>
-<p>In polymers, you don’t want to delete the atoms at the ends of
-the chain.</p>
+<dt id="stk.molecular.topologies.base.Linear.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the atoms which are lost during assembly.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -323,47 +334,13 @@ ends with hydrogen atoms.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.topologies.base.Linear.join">
-<code class="descname">join</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.join" title="Permalink to this definition">¶</a></dt>
-<dd><p>Joins 2 monomers.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a>) – The polymer being assembled.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="stk.molecular.topologies.base.Linear.join_mols">
-<code class="descname">join_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.join_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.join_mols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Does nothing, <a class="reference internal" href="#stk.molecular.topologies.base.Linear.place_mols" title="stk.molecular.topologies.base.Linear.place_mols"><code class="xref py py-meth docutils literal"><span class="pre">place_mols()</span></code></a> joins up the molecules too.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Polymer" title="stk.molecular.molecules.Polymer"><code class="xref py py-class docutils literal"><span class="pre">Polymer</span></code></a>) – The polymer being assembled.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="stk.molecular.topologies.base.Linear.place_mols">
 <code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Linear.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Linear.place_mols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Places monomers side by side and joins them.</p>
+<dd><p>Places monomers side by side.</p>
 <p>The monomers are placed along the x-axis, so that the vector
-running between the functional groups is placed on the axis.</p>
+running between the functional groups is placed along the axis.
+Functional groups are tagged with <code class="docutils literal"><span class="pre">'fg_id'</span></code> such that
+<code class="docutils literal"><span class="pre">'fg_id'</span></code> increases along the x-axis.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -382,7 +359,7 @@ running between the functional groups is placed on the axis.</p>
 
 <dl class="class">
 <dt id="stk.molecular.topologies.base.Topology">
-<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Topology</code><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.molecular.topologies.base.</code><code class="descname">Topology</code><span class="sig-paren">(</span><em>react_del=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Builds macromolecules.</p>
 <p>More accurately, child classes of <a class="reference internal" href="#stk.molecular.topologies.base.Topology" title="stk.molecular.topologies.base.Topology"><code class="xref py py-class docutils literal"><span class="pre">Topology</span></code></a> take care of
@@ -398,6 +375,36 @@ between the building blocks of a macromolecule. The way in which
 this is done will depend on what kind of macromolecules are being
 built. In addition, each child class must define methods which
 place the building blocks in approriate positions.</p>
+<dl class="attribute">
+<dt id="stk.molecular.topologies.base.Topology.react_del">
+<code class="descname">react_del</code><a class="headerlink" href="#stk.molecular.topologies.base.Topology.react_del" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">bool</span></code> – Toggles whether atoms with the <code class="docutils literal"><span class="pre">'del'</span></code> propety are deleted
+by <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal"><span class="pre">react()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.base.Topology.bonded_fgs">
+<code class="descname">bonded_fgs</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.bonded_fgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.bonded_fgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>An iterator which yields ids of functional groups to be bonded.</p>
+<p>The ids of functional groups in <cite>macro_mol</cite> are assigned by
+<a class="reference internal" href="#stk.molecular.topologies.base.Topology.place_mols" title="stk.molecular.topologies.base.Topology.place_mols"><code class="xref py py-meth docutils literal"><span class="pre">place_mols()</span></code></a>. The ids are stored as atom properties
+under the name <code class="docutils literal"><span class="pre">'fg_id'</span></code>, This method looks at the
+macromolecule and determines which functional groups should be
+bonded to create the final macromolecule. It then yields the
+ids functional groups as a <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code>.</p>
+<p>This <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> gets passed to <a class="reference internal" href="stk.molecular.functional_groups.html#stk.molecular.functional_groups.react" title="stk.molecular.functional_groups.react"><code class="xref py py-func docutils literal"><span class="pre">react()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code>) – The molecule being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NotImplementedError</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="stk.molecular.topologies.base.Topology.build">
 <code class="descname">build</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>bb_conformers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.build" title="Permalink to this definition">¶</a></dt>
@@ -406,7 +413,7 @@ place the building blocks in approriate positions.</p>
 macromolecule into the <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.Molecule.mol" title="stk.molecular.molecules.Molecule.mol"><code class="xref py py-attr docutils literal"><span class="pre">mol</span></code></a> attribute of
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>. It also updates the
 <a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.bb_counter" title="stk.molecular.molecules.MacroMolecule.bb_counter"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.bb_counter</span></code></a> and
-<code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.bonds_made</span></code> attributes.</p>
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.bonds_made" title="stk.molecular.molecules.MacroMolecule.bonds_made"><code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.bonds_made</span></code></a> attributes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -432,14 +439,14 @@ building blocks.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="stk.molecular.topologies.base.Topology.del_atoms">
-<code class="descname">del_atoms</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.del_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.del_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deletes the atoms which are lost during assembly.</p>
+<dt id="stk.molecular.topologies.base.Topology.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs final clean up actions on an assembled molecule.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecule being assembled.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
 </tr>
@@ -449,40 +456,66 @@ building blocks.</li>
 </table>
 </dd></dl>
 
-<dl class="staticmethod">
-<dt id="stk.molecular.topologies.base.Topology.determine_bond_type">
-<em class="property">static </em><code class="descname">determine_bond_type</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>atom1_id</em>, <em>atom2_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.determine_bond_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.determine_bond_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the bond order to be formed between the atoms.</p>
-<p>Some atoms will need to have a double bond created between
-them. This is defined in the <code class="xref py py-data docutils literal"><span class="pre">fg_info.double_bond_combs</span></code>.
-If the atom ids provided as parameters belong to functional
-groups found in this list, the <code class="docutils literal"><span class="pre">rdkit</span></code> double bond type will
-be returned. If not, the <code class="docutils literal"><span class="pre">rdkit</span></code> single bond type will be
-returned. These types are needed when adding bonds to an
-<code class="docutils literal"><span class="pre">rdkit</span></code> molecule.</p>
+<dl class="method">
+<dt id="stk.molecular.topologies.base.Topology.place_mols">
+<code class="descname">place_mols</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.place_mols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.place_mols" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places building blocks.</p>
+<p>The <code class="docutils literal"><span class="pre">rdkit</span></code> molecules of the building blocks are
+combined into a single <code class="docutils literal"><span class="pre">rdkit</span></code> molecule and placed into
+<cite>macro_mol.mol</cite>. Beyond this, the function must give every
+functional group in the macromolecule a unique id. This is
+done by adding the property <code class="docutils literal"><span class="pre">'fg_id'</span></code> to every atom part
+of a functional group in <cite>macro_mol</cite>. Atoms in the same
+functional group will have the same value of <code class="docutils literal"><span class="pre">'fg_id'</span></code> while
+atoms in different functional groups will have a different
+<code class="docutils literal"><span class="pre">'fg_id'</span></code>.</p>
+<p>The function is also reponsible for updating
+<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule.bb_counter" title="stk.molecular.molecules.MacroMolecule.bb_counter"><code class="xref py py-attr docutils literal"><span class="pre">bb_counter</span></code></a>.</p>
+<p>Finally, this function must also add the tags <code class="docutils literal"><span class="pre">'bb_index'</span></code>
+and <code class="docutils literal"><span class="pre">'mol_index'</span></code> to every atom in the molecule. The
+<code class="docutils literal"><span class="pre">'bb_index'</span></code> tag identifies which building block the atom
+belongs to. The building block is identified by its index
+within <code class="xref py py-attr docutils literal"><span class="pre">MacroMolecule.building_blocks</span></code>.
+The <code class="docutils literal"><span class="pre">'mol_index'</span></code> identifies which molecule of a specific
+building the atom belongs to. For example, if
+<code class="docutils literal"><span class="pre">bb_index</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal"><span class="pre">mol_index</span> <span class="pre">=</span> <span class="pre">3</span></code> the atom belongs to
+the 4th molecule of <code class="docutils literal"><span class="pre">macro_mol.building_blocks[1]</span></code> to
+be added to the macromolecule. The utility function
+<a class="reference internal" href="stk.utilities.utilities.html#stk.utilities.utilities.add_fragment_props" title="stk.utilities.utilities.add_fragment_props"><code class="xref py py-func docutils literal"><span class="pre">add_fragment_props()</span></code></a> is provided to help with this.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The macromolecule being assembled.</li>
-<li><strong>atom1_id</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id number of the first atom.</li>
-<li><strong>atom2_id</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id number of the second atom.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code>) – The molecule being assembled.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.BondType.SINGLE</span></code> – If the atoms don’t belong to functional groups which form
-a double bond.</li>
-<li><code class="xref py py-class docutils literal"><span class="pre">rdkit.Chem.rdchem.BondType.DOUBLE</span></code> – If the atoms belong to functional groups which form a
-double bond.</li>
-</ul>
-</p>
-</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NotImplementedError</span></code></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.base.Topology.prepare">
+<code class="descname">prepare</code><span class="sig-paren">(</span><em>macro_mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs ops between placing and reacting building blocks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>macro_mol</strong> (<a class="reference internal" href="stk.molecular.molecules.html#stk.molecular.molecules.MacroMolecule" title="stk.molecular.molecules.MacroMolecule"><code class="xref py py-class docutils literal"><span class="pre">MacroMolecule</span></code></a>) – The molecule being assembled.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">NoneType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="stk.molecular.topologies.base.Topology.update_fg_id">
+<code class="descname">update_fg_id</code><span class="sig-paren">(</span><em>macro_mol</em>, <em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/molecular/topologies/base.html#Topology.update_fg_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.molecular.topologies.base.Topology.update_fg_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

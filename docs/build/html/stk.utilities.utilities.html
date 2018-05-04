@@ -157,7 +157,7 @@
 part of <code class="docutils literal"><span class="pre">stk</span></code>. They must be completely self-sufficient.</p>
 <dl class="class">
 <dt id="stk.utilities.utilities.Cell">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>bonders</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.Cell" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">Cell</code><span class="sig-paren">(</span><em>id_</em>, <em>fgs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#Cell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents an individual cell in a supercell.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -167,8 +167,8 @@ part of <code class="docutils literal"><span class="pre">stk</span></code>. They
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>id</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member <code class="xref py py-class docutils literal"><span class="pre">list</span></code> holding the x, y and z index
 of the cell within the supercell.</li>
-<li><strong>bonders</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the bonder atoms in the original unit cell to the
-equivalent bonder atoms in the cell.</li>
+<li><strong>fgs</strong> (<code class="xref py py-class docutils literal"><span class="pre">dict</span></code>) – Maps the fgs in the original unit cell to the
+equivalent fgs in the cell.</li>
 </ul>
 </td>
 </tr>
@@ -182,10 +182,10 @@ of the cell within the supercell.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.utilities.utilities.Cell.bonders">
-<code class="descname">bonders</code><a class="headerlink" href="#stk.utilities.utilities.Cell.bonders" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the bonder atoms in the original unit cell to the
-equivalent bonder atoms in the cell.</p>
+<dt id="stk.utilities.utilities.Cell.fgs">
+<code class="descname">fgs</code><a class="headerlink" href="#stk.utilities.utilities.Cell.fgs" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">dict</span></code> – Maps the fgs in the original unit cell to the
+equivalent fgs in the cell.</p>
 </dd></dl>
 
 </dd></dl>
@@ -342,7 +342,7 @@ lowest energy conformers, respectively</p>
 
 <dl class="class">
 <dt id="stk.utilities.utilities.PeriodicBond">
-<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">stk.utilities.utilities.</code><code class="descname">PeriodicBond</code><span class="sig-paren">(</span><em>fg1</em>, <em>fg2</em>, <em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stk/utilities/utilities.html#PeriodicBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Represents a periodic bond.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -350,10 +350,12 @@ lowest energy conformers, respectively</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>atom1</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of first atom in the bond.</li>
-<li><strong>atom2</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The id of the second atom in the bond.</li>
+<li><strong>fg1</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The value of the <code class="docutils literal"><span class="pre">'fg_id'</span></code> for atoms in the first functional
+group.</li>
+<li><strong>fg2</strong> (<code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – The value of the <code class="docutils literal"><span class="pre">'fg_id'</span></code> for atoms in the second
+functional group.</li>
 <li><strong>direction</strong> (<code class="xref py py-class docutils literal"><span class="pre">list</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code>) – A 3 member list describing the axes along which the bond is
-periodic, when going from <cite>atom1</cite> to <cite>atom2</cite>. For example,
+periodic, when going from <cite>fg1</cite> to <cite>fg2</cite>. For example,
 <code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along the x axis
 in the positive direction.</li>
 </ul>
@@ -362,22 +364,24 @@ in the positive direction.</li>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="stk.utilities.utilities.PeriodicBond.atom1">
-<code class="descname">atom1</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.atom1" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The id of first atom in the bond.</p>
+<dt id="stk.utilities.utilities.PeriodicBond.fg1">
+<code class="descname">fg1</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.fg1" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The value of the <code class="docutils literal"><span class="pre">'fg_id'</span></code> for atoms in the first functional
+group.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="stk.utilities.utilities.PeriodicBond.atom2">
-<code class="descname">atom2</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.atom2" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The id of the second atom in the bond.</p>
+<dt id="stk.utilities.utilities.PeriodicBond.fg2">
+<code class="descname">fg2</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.fg2" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">int</span></code> – The value of the <code class="docutils literal"><span class="pre">'fg_id'</span></code> for atoms in the second
+functional group.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stk.utilities.utilities.PeriodicBond.direction">
 <code class="descname">direction</code><a class="headerlink" href="#stk.utilities.utilities.PeriodicBond.direction" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> of <code class="xref py py-class docutils literal"><span class="pre">int</span></code> – A 3 member list describing the axes along which the bond is
-periodic, when going from <cite>atom1</cite> to <cite>atom2</cite>. For example,
+periodic, when going from <cite>fg1</cite> to <cite>fg2</cite>. For example,
 <code class="docutils literal"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code> means that the bond is periodic along the x axis
 in the positive direction.</p>
 </dd></dl>

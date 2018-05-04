@@ -14,7 +14,7 @@ Submodules
 .. toctree::
 
    stk.molecular.energy
-   stk.molecular.fg_info
+   stk.molecular.functional_groups
    stk.molecular.molecules
 
 Module contents
