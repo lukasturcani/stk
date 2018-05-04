@@ -697,6 +697,11 @@ class Molecule:
         :class:`numpy.array`
             The coordinates of a bonder centroid.
 
+        Raises
+        ------
+        :class:`RuntimeError`
+            If `fg_id` is not found on any atoms.
+
         """
 
         s = np.array([0., 0., 0.])
@@ -707,7 +712,35 @@ class Molecule:
                a.HasProp('bonder')):
                 s += self.atom_coords(a.GetIdx())
                 c += 1
+        if not c:
+            raise RuntimeError(f'No fg_id of {fg_id}.')
         return s / c
+
+    def fg_distance(self, fg1, fg2, conformer=-1):
+        """
+        The distance between the bonder centroids of two fgs.
+
+        Parameters
+        ----------
+        fg1 : :class:`int`
+            The ``fg_id`` of the first fg.
+
+        fg2 : :class:`int`
+            The ``fg_id`` of the second fg.
+
+        conformer : :class:`int`, optional
+            The id of the conformer to use.
+
+        Returns
+        -------
+        :class:`float`
+            The distance between `fg1` and `fg2`.
+
+        """
+
+        c1 = self.fg_centroid(fg1, conformer)
+        c2 = self.fg_centroid(fg2, conformer)
+        return euclidean(c1, c2)
 
     @classmethod
     def from_dict(self, json_dict, optimized=True, load_names=True):

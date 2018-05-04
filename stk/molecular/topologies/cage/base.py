@@ -214,11 +214,10 @@ class Vertex:
                             self.bonder_centroid(macro_mol, scale))
         vector = (self.connected[aligner_edge].coord*scale -
                   self.edge_centroid(scale))
-        # Get the id of the atom which is being aligned.
-        atom = building_block.bonder_ids[aligner]
+
         # Minimize the angle between these things by rotating about the
         # normal of the edge plane.
-        building_block.minimize_theta2(atom,
+        building_block.minimize_theta2(aligner,
                                        vector,
                                        self.edge_plane_normal(scale))
 
@@ -402,7 +401,7 @@ class Vertex:
         for v in self.connected:
             for bonder, edge in v.atom_position_pairs:
                 if edge is self:
-                    centroid += macro_mol.atom_coords(bonder)
+                    centroid += macro_mol.fg_centroid(bonder)
                     count += 1
         return centroid / count
 
@@ -468,7 +467,7 @@ class Edge(Vertex):
         for v in self.connected:
             for bonder, edge in v.atom_position_pairs:
                 if edge is self:
-                    bonders.append(macro_mol.atom_coords(bonder))
+                    bonders.append(macro_mol.fg_centroid(bonder))
         return normalize_vector(bonders[0] - bonders[1])
 
     def place_mol(self, scale, linker, alignment, macro_mol):
@@ -671,7 +670,7 @@ class CageTopology(Topology):
 
         return bb_map, lk_map
 
-    def join_mols(self, macro_mol):
+    def bonded_fgs(self, macro_mol):
         """
         Joins up the separate building blocks which form the molecule.
 
@@ -686,9 +685,6 @@ class CageTopology(Topology):
 
         """
 
-        editable_mol = rdkit.EditableMol(macro_mol.mol)
-        macro_mol.bonds_made = 0
-
         # This loop finds all the distances between an atom paired with
         # a postion and all other atoms at the paired position.
         for position in self.positions_A:
@@ -697,8 +693,8 @@ class CageTopology(Topology):
                 # bonding atoms on the vertex. Store this information
                 # on the vertex.
                 for atom2_id in vertex.bonder_ids:
-                    distance = macro_mol.atom_distance(atom_id,
-                                                       atom2_id)
+                    distance = macro_mol.fg_distance(atom_id,
+                                                     atom2_id)
                     position.distances.append((distance,
                                                atom_id, atom2_id))
 
@@ -711,16 +707,9 @@ class CageTopology(Topology):
                 if atom1_id in paired or atom2_id in paired:
                     continue
 
-                bond_type = self.determine_bond_type(macro_mol,
-                                                     atom1_id,
-                                                     atom2_id)
-                # Add the bond.
-                editable_mol.AddBond(atom1_id, atom2_id, bond_type)
-                macro_mol.bonds_made += 1
+                yield atom1_id, atom2_id
                 paired.add(atom1_id)
                 paired.add(atom2_id)
-
-        macro_mol.mol = editable_mol.GetMol()
 
     def pair_bonders_with_positions(self, scale, macro_mol, vertex):
         """
@@ -758,7 +747,7 @@ class CageTopology(Topology):
         # finds the distances of all the options.
         distances = []
         for bonder_id in vertex.bonder_ids:
-            atom_coord = macro_mol.atom_coords(bonder_id)
+            atom_coord = macro_mol.fg_centroid(bonder_id)
             for position in vertex.connected:
                 distance = euclidean(atom_coord, position.coord*scale)
                 distances.append((distance, bonder_id, position))
@@ -836,6 +825,7 @@ class CageTopology(Topology):
                                macro_mol.building_blocks.index(bb),
                                i)
 
+            self.update_fg_id(macro_mol, bb_mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
@@ -843,8 +833,8 @@ class CageTopology(Topology):
             # Get ids of atoms which form new bonds.
             bonder_ids = deque(maxlen=n_bb)
             for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('bonder'):
-                    bonder_ids.append(atom.GetIdx())
+                if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') not in bonder_ids:
+                    bonder_ids.append(atom.GetIntProp('fg_id'))
 
             # Save the ids of atoms which form new bonds and pair them
             # up with positions.
@@ -868,7 +858,7 @@ class CageTopology(Topology):
             add_fragment_props(lk_mol,
                                macro_mol.building_blocks.index(lk),
                                i)
-
+            self.update_fg_id(macro_mol, lk_mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, lk_mol)
             # Update the counter each time a linker is added.
             macro_mol.bb_counter.update([lk])
@@ -876,8 +866,8 @@ class CageTopology(Topology):
             # Get ids of atoms which form new bonds.
             bonder_ids = deque(maxlen=n_lk)
             for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('bonder'):
-                    bonder_ids.append(atom.GetIdx())
+                if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') not in bonder_ids:
+                    bonder_ids.append(atom.GetIntProp('fg_id'))
 
             # Save the ids of atoms which form new bonds.
             position.bonder_ids = list(bonder_ids)

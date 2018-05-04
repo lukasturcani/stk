@@ -223,11 +223,11 @@ class Topology(metaclass=TopologyMeta):
         macro_mol.bonds_made = 0
         self.place_mols(macro_mol)
         self.prepare(macro_mol)
-        # for fgs in self.bonded_fgs(macro_mol):
-        #     macro_mol.mol, new_bonds = react(macro_mol.mol,
-        #                                      self.react_del,
-        #                                      *fgs)
-        #     macro_mol.bonds_made += new_bonds
+        for fgs in self.bonded_fgs(macro_mol):
+            macro_mol.mol, new_bonds = react(macro_mol.mol,
+                                             self.react_del,
+                                             *fgs)
+            macro_mol.bonds_made += new_bonds
         self.cleanup(macro_mol)
 
         # Make sure that the property cache of each atom is up to date.
