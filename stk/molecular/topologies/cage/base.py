@@ -196,6 +196,7 @@ class Vertex:
 
         """
 
+        icoord = building_block.position_matrix()
         # Flush the list of data from previous molecules.
         self.distances = []
 
@@ -219,7 +220,9 @@ class Vertex:
                                        vector,
                                        self.edge_plane_normal(scale))
 
-        return building_block.mol
+        mol = rdkit.Mol(building_block.mol)
+        building_block.set_position_from_matrix(icoord)
+        return mol
 
     def edge_plane_normal(self, scale):
         """
@@ -501,6 +504,8 @@ class Edge(Vertex):
 
         """
 
+        icoord = linker.position_matrix()
+
         # Flush the lists from data of previous molecules.
         self.distances = []
 
@@ -510,7 +515,9 @@ class Edge(Vertex):
                                self.direction(macro_mol, scale))
         linker.set_bonder_centroid(self.bonder_centroid(macro_mol, scale))
 
-        return linker.mol
+        mol = rdkit.Mol(linker.mol)
+        linker.set_position_from_matrix(icoord)
+        return mol
 
     def __repr__(self):
         v1, v2 = self.connected
@@ -677,24 +684,10 @@ class CageTopology(Topology):
         macro_mol : :class:`.MacroMolecule`
             The macromolecule being assembled.
 
-        Returns
-        -------
-        None : :class:`NoneType`
-
-        """
-
-    def bonded_fgs(self, macro_mol):
-        """
-        Joins up the separate building blocks which form the molecule.
-
-        Parameters
-        ----------
-        macro_mol : :class:`.MacroMolecule`
-            The macromolecule being assembled.
-
-        Returns
-        -------
-        None : :class:`NoneType`
+        Yields
+        ------
+        :class:`tuple` of :class:`int`
+            The ``fg_ids`` of functional groups to be bonded.
 
         """
 
@@ -705,7 +698,7 @@ class CageTopology(Topology):
                 # Get all the distances between the fg and the other
                 # fgs on the vertex. Store this information
                 # on the vertex.
-                for fg2 in vertex.bonder_ids:
+                for fg2 in vertex.fg_ids:
                     distance = macro_mol.fg_distance(fg1, fg2)
                     position.distances.append((distance, fg1, fg2))
 
@@ -806,12 +799,6 @@ class CageTopology(Topology):
         macro_mol.mol = rdkit.Mol()
         bb_map, lk_map = self._bb_maps(macro_mol)
         scale = max(bb.max_diameter()[0] for bb in macro_mol.building_blocks)
-        # Save the original orientationss of building blocks.
-        # This means that when orienation of molecules is done,
-        # the starting position is always the same. Ensures
-        # consistency.
-        ipositions = {bb: bb.position_matrix() for
-                      bb in macro_mol.building_blocks}
 
         # This loop places all building-blocks* on the points at
         # `positions_A`. It then pairs all fgs which form a new bond
@@ -820,10 +807,8 @@ class CageTopology(Topology):
         # structure.
         for i, position in enumerate(self.positions_A):
             bb = bb_map[i]
-            bb_pos = ipositions[bb]
             n_bb = len(bb.functional_group_atoms())
             # Position the molecule on the vertex.
-            bb.set_position_from_matrix(bb_pos)
             aligner_edge_id = self.edge_alignments[i]
             aligner_edge = next((position.connected.index(x) for x in
                                  position.connected if
@@ -836,7 +821,7 @@ class CageTopology(Topology):
                                macro_mol.building_blocks.index(bb),
                                i)
 
-            self.update_fg_id(macro_mol, bb_mol)
+            bb_mol = self.update_fg_id(macro_mol, bb_mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, bb_mol)
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
@@ -859,10 +844,7 @@ class CageTopology(Topology):
         # make up the structure.
         for i, position in enumerate(self.positions_B):
             lk = lk_map[i]
-            lk_pos = ipositions[lk]
             n_lk = len(lk.functional_group_atoms())
-
-            lk.set_position_from_matrix(lk_pos)
             lk_mol = position.place_mol(scale,
                                         lk,
                                         int(self.B_alignments[i]),
@@ -870,7 +852,7 @@ class CageTopology(Topology):
             add_fragment_props(lk_mol,
                                macro_mol.building_blocks.index(lk),
                                i)
-            self.update_fg_id(macro_mol, lk_mol)
+            lk_mol = self.update_fg_id(macro_mol, lk_mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, lk_mol)
             # Update the counter each time a linker is added.
             macro_mol.bb_counter.update([lk])
@@ -883,7 +865,7 @@ class CageTopology(Topology):
                     fg_ids.append(atom.GetIntProp('fg_id'))
 
             # Save the ids of fgs which form new bonds.
-            position.bonder_ids = list(fg_ids)
+            position.fg_ids = list(fg_ids)
 
 
 class VertexOnlyCageTopology(CageTopology):
@@ -924,6 +906,7 @@ class NoLinkerCageTopology(CageTopology):
         self.alignments = alignments
         self.bb_assignments = bb_assignments
         self.connect()
+        self.react_del = True
 
     def place_mols(self, macro_mol):
 
@@ -940,17 +923,18 @@ class NoLinkerCageTopology(CageTopology):
             ipos = bb.position_matrix()
             n_bb = len(bb.functional_group_atoms())
 
-            macro_mol.mol = rdkit.CombineMols(macro_mol.mol,
-                                              position.place_mol(
-                                                scale, bb, int(orientation)))
+            mol = position.place_mol(scale, bb, int(orientation))
+            mol = self.update_fg_id(macro_mol, mol)
+            macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([bb])
 
-            bonder_ids = deque(maxlen=n_bb)
+            fg_ids = deque(maxlen=n_bb)
             for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('bonder'):
-                    bonder_ids.append(atom.GetIdx())
+                if (atom.HasProp('fg_id') and
+                   atom.GetIntProp('fg_id') not in fg_ids):
+                    fg_ids.append(atom.GetIntProp('fg_id'))
 
-            position.bonder_ids = sorted(bonder_ids)
+            position.fg_ids = sorted(fg_ids)
             self.pair_fgs_with_positions(scale, macro_mol, position)
             bb.set_position_from_matrix(ipos)
 

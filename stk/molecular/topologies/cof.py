@@ -645,7 +645,7 @@ class LinkerCOFLattice(COFLattice):
                                macro_mol.building_blocks.index(multi),
                                i)
 
-            self.update_fg_id(macro_mol, mol)
+            mol = self.update_fg_id(macro_mol, mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([multi])
 
@@ -664,7 +664,7 @@ class LinkerCOFLattice(COFLattice):
             add_fragment_props(mol,
                                macro_mol.building_blocks.index(di),
                                i)
-            self.update_fg_id(macro_mol, mol)
+            mol = self.update_fg_id(macro_mol, mol)
             macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
             macro_mol.bb_counter.update([di])
 
@@ -794,7 +794,7 @@ class NoLinkerHoneycomb(NoLinkerCOFLattice):
                            0)
 
         mol = rdkit.Mol(bb2.mol)
-        self.update_fg_id(macro_mol, mol)
+        mol = self.update_fg_id(macro_mol, mol)
         macro_mol.mol = rdkit.CombineMols(macro_mol.mol, mol)
 
 

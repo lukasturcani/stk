@@ -348,12 +348,14 @@ class Topology(metaclass=TopologyMeta):
 
         """
 
+        mol = rdkit.Mol(mol)
         max_id = max((a.GetIntProp('fg_id') for
                       a in macro_mol.mol.GetAtoms() if
                       a.HasProp('fg_id')), default=-1) + 1
         for a in mol.GetAtoms():
             if a.HasProp('fg_id'):
                 a.SetIntProp('fg_id', a.GetIntProp('fg_id')+max_id)
+        return mol
 
     def __str__(self):
         return repr(self)
