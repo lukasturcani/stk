@@ -29,25 +29,25 @@ class Vertex:
         instances which represent the edges or vertices connected to
         this one.
 
-    bonder_ids : :class:`list` of :class:`int`
-        This :class:`list` holds the ids of atoms which belong to the
+    fg_ids : :class:`list` of :class:`int`
+        This :class:`list` holds the ids of fgs which belong to the
         building block placed on the vertex and will form bonds. The
-        ids reflect those in the macromolecule not in the building block
-        itself.
+        ids reflect those in the macromolecule not in the building
+        block itself.
 
-    atom_position_pairs : :class:`list`
+    fg_position_pairs : :class:`list`
         A :class:`list` of the form
 
         .. code-block:: python
 
-            atom_position_pairs = [(4, v1), (8, v2)]
+            fg_position_pairs = [(4, v1), (8, v2)]
 
         Where ``v1`` and ``v2`` are :class:`Vertex` instances.
 
-        Each atom which  is paired to a neighboring vertex or
-        edge first. Only after this is the atom-atom pairing
-        performed. The atom-edge/vertex pairing is stored here. The
-        int represents the id of the atom.
+        Each fg which  is paired to a neighboring vertex or
+        edge first. Only after this is the fg-fg pairing
+        performed. The fg-edge/vertex pairing is stored here. The
+        :class:`int` represents the id of the fg.
 
     distances : :class:`list`
         A :class:`list` of the form
@@ -56,13 +56,13 @@ class Vertex:
 
             distances = [(15.2, 5, 10), (18.4, 3, 8), ...]
 
-        After bonder atoms have been associated with vertices to which
-        they join, the idividual atoms are paired up. To do this the
-        distance between every bonder atom on the paired vertex and the
-        bonder atom which is paired to the vertex is found. This
+        After fgs have been associated with vertices to which
+        they join, the idividual fgs are paired up. To do this the
+        distance between every fg on the paired vertex and the
+        fg which is paired to the vertex is found. This
         information is stored here the first element of each
         :class:`tuple` the distance, and the second and third elements
-        represent the bonder atoms.
+        represent the fgs.
 
     id_ : :class:`object`, optional
         An id to identify the vertex. Used by
@@ -103,8 +103,8 @@ class Vertex:
         self.coord = np.array([x, y, z])
         self.custom_position = custom_position
         self.connected = []
-        self.bonder_ids = []
-        self.atom_position_pairs = []
+        self.fg_ids = []
+        self.fg_position_pairs = []
         self.distances = []
         self.id = id_
 
@@ -153,17 +153,17 @@ class Vertex:
         Place a :class:`.StructUnit3` building block on the vertex.
 
         The orientation of the building block is aligned with 2
-        parameters. Firstly, the normal of the plane of bonder atoms of
+        parameters. Firstly, the normal of the plane of fgs of
         the building block is aligned with the normal of the plane
         formed by the edges connected to the vertex. Because the normal
-        of the plane of bonder atoms always points in the direction of
+        of the plane of fgs always points in the direction of
         the building block's centroid, this alignment causes the bulk
         of the building block  molecule to point away from the center
         of the cage.
 
-        Secondly, the building block is rotated so that a bonder atom
+        Secondly, the building block is rotated so that a fg
         is aligned perfectly with an edge. This reduces the rms
-        distance between the edges and bonder atoms to some extent,
+        distance between the edges and fgs to some extent,
         probably.
 
         Parameters
@@ -175,9 +175,7 @@ class Vertex:
             The building block molecule to be placed on a vertex.
 
         aligner : :class:`int`, optional
-            The index of the atom within
-            :attr`.StructUnit.bonder_ids` which is to be aligned
-            with an edge.
+            The ``fg_id`` of the aligned fg.
 
         aligner_edge : :class:`int`, optional
             The index of an edge in :attr:`connected`. It is the edge
@@ -186,8 +184,8 @@ class Vertex:
         macro_mol : :class:`.MacroMolecule`, optional
             The macromolecule being built. Used for vertex only cage
             topologies where the position of some of the vertices
-            is derived from the positions of the bonder atoms of
-            connceted vertices.
+            is derived from the positions of the fgs on
+            connected vertices.
 
         Returns
         -------
@@ -201,14 +199,14 @@ class Vertex:
         # Flush the list of data from previous molecules.
         self.distances = []
 
-        # The method first aligns the normal of the bonder atom plane
+        # The method first aligns the normal of the fg plane
         # to the normal of the edge plane. This means the bulk of the
         # building block is always pointed away from the center of the
         # molecule.
         building_block.set_orientation2(self.edge_plane_normal(scale))
 
         # Next, define the direction vector going from the edge
-        # centroid to the edge with which the atom is aligned.
+        # centroid to the edge with which the fg is aligned.
 
         building_block.set_bonder_centroid(
                             self.bonder_centroid(macro_mol, scale))
@@ -373,7 +371,7 @@ class Vertex:
 
     def bonder_centroid(self, macro_mol, scale):
         """
-        Calculates the centroid of the bonder atoms on the vertex.
+        Calculates the centroid of the fgs on the vertex.
 
         However if :attr:`custom_position` is ``True`` or
         `macro_mol` is ``None``, then :attr:`coord` is returned.
@@ -399,9 +397,9 @@ class Vertex:
         centroid = np.zeros((3, ))
         count = 0
         for v in self.connected:
-            for bonder, edge in v.atom_position_pairs:
+            for fg, edge in v.fg_position_pairs:
                 if edge is self:
-                    centroid += macro_mol.fg_centroid(bonder)
+                    centroid += macro_mol.fg_centroid(fg)
                     count += 1
         return centroid / count
 
@@ -463,18 +461,18 @@ class Edge(Vertex):
             v1, v2 = self.connected
             return normalize_vector(v1.coord - v2.coord)
 
-        bonders = []
+        fgs = []
         for v in self.connected:
-            for bonder, edge in v.atom_position_pairs:
+            for fg, edge in v.fg_position_pairs:
                 if edge is self:
-                    bonders.append(macro_mol.fg_centroid(bonder))
-        return normalize_vector(bonders[0] - bonders[1])
+                    fgs.append(macro_mol.fg_centroid(fg))
+        return normalize_vector(fgs[0] - fgs[1])
 
     def place_mol(self, scale, linker, alignment, macro_mol):
         """
         Places a linker molecule on the coordinates of an edge.
 
-        It also orientates the linker so that a the bonder atoms sit
+        It also orientates the linker so that a the fgs sit
         exactly on the edge and the bulk of the linker points away from
         the center of the cage.
 
@@ -685,43 +683,56 @@ class CageTopology(Topology):
 
         """
 
-        # This loop finds all the distances between an atom paired with
-        # a postion and all other atoms at the paired position.
-        for position in self.positions_A:
-            for atom_id, vertex in position.atom_position_pairs:
-                # Get all the distances between the atom and the other
-                # bonding atoms on the vertex. Store this information
-                # on the vertex.
-                for atom2_id in vertex.bonder_ids:
-                    distance = macro_mol.fg_distance(atom_id,
-                                                     atom2_id)
-                    position.distances.append((distance,
-                                               atom_id, atom2_id))
+    def bonded_fgs(self, macro_mol):
+        """
+        Joins up the separate building blocks which form the molecule.
 
-        # This loop creates bonds between atoms at two different
-        # positions so that each atom only bonds once and so that the
+        Parameters
+        ----------
+        macro_mol : :class:`.MacroMolecule`
+            The macromolecule being assembled.
+
+        Returns
+        -------
+        None : :class:`NoneType`
+
+        """
+
+        # This loop finds all the distances between a fg paired with
+        # a postion and all other fgs at the paired position.
+        for position in self.positions_A:
+            for fg1, vertex in position.fg_position_pairs:
+                # Get all the distances between the fg and the other
+                # fgs on the vertex. Store this information
+                # on the vertex.
+                for fg2 in vertex.bonder_ids:
+                    distance = macro_mol.fg_distance(fg1, fg2)
+                    position.distances.append((distance, fg1, fg2))
+
+        # This loop creates bonds between fgs at two different
+        # positions so that each fg only bonds once and so that the
         # total length of all bonds made is minimzed.
         paired = set()
         for position in self.positions_A:
-            for _, atom1_id, atom2_id in sorted(position.distances):
-                if atom1_id in paired or atom2_id in paired:
+            for _, fg1, fg2 in sorted(position.distances):
+                if fg1 in paired or fg2 in paired:
                     continue
 
-                yield atom1_id, atom2_id
-                paired.add(atom1_id)
-                paired.add(atom2_id)
+                yield fg1, fg2
+                paired.add(fg1)
+                paired.add(fg2)
 
-    def pair_bonders_with_positions(self, scale, macro_mol, vertex):
+    def pair_fgs_with_positions(self, scale, macro_mol, vertex):
         """
-        Matches atoms with the closest building block position.
+        Matches fgs with the closest building block position.
 
-        After a building block is placed on a position, each atom
+        After a building block is placed on a position, each fg
         which forms a bond must be paired with the location of the
-        building block to which it bonds. This function matches atoms
+        building block to which it bonds. This function matches fgs
         and positions so that each is only present in one pairing and
         so that the total distance of the pairings is minimized.
 
-        This updates of :attr:`Vertex.atom_position_pairs` attribute of
+        This updates of :attr:`Vertex.fg_position_pairs` attribute of
         `vertex`.
 
         Parameters
@@ -742,34 +753,34 @@ class CageTopology(Topology):
 
         """
 
-        # This loop looks at each atom which forms a new bond and all
-        # the positions (not atoms) to which it may end up bonding. It
+        # This loop looks at each fg which forms a new bond and all
+        # the positions (not fgs) to which it may end up bonding. It
         # finds the distances of all the options.
         distances = []
-        for bonder_id in vertex.bonder_ids:
-            atom_coord = macro_mol.fg_centroid(bonder_id)
+        for fg in vertex.fg_ids:
+            fg_coord = macro_mol.fg_centroid(fg)
             for position in vertex.connected:
-                distance = euclidean(atom_coord, position.coord*scale)
-                distances.append((distance, bonder_id, position))
+                distance = euclidean(fg_coord, position.coord*scale)
+                distances.append((distance, fg, position))
 
-        # Sort the pairings of atoms with potential bonding position,
+        # Sort the pairings of fgs with potential bonding position,
         # smallest first.
         distances.sort(key=lambda x: x[0])
 
-        # This loop looks at all the potential pairings of atoms to
-        # positions. It pairs the shortest combinations of atoms and
-        # positions, making sure that each atom and position is only
+        # This loop looks at all the potential pairings of fgs to
+        # positions. It pairs the shortest combinations of fgs and
+        # positions, making sure that each fg and position is only
         # paired once. The pairings are saved to the `
-        # atom_positions_pairs` attribute of the position on which all
-        # the bonder atoms are placed.
+        # fg_positions_pairs` attribute of the position on which all
+        # the fgs are placed.
         paired_pos = set()
         paired_ids = set()
-        vertex.atom_position_pairs = []
-        for _, bonder_id, pos in distances:
-            if bonder_id in paired_ids or pos in paired_pos:
+        vertex.fg_position_pairs = []
+        for _, fg, pos in distances:
+            if fg in paired_ids or pos in paired_pos:
                 continue
-            vertex.atom_position_pairs.append((bonder_id, pos))
-            paired_ids.add(bonder_id)
+            vertex.fg_position_pairs.append((fg, pos))
+            paired_ids.add(fg)
             paired_pos.add(pos)
 
     def place_mols(self, macro_mol):
@@ -803,7 +814,7 @@ class CageTopology(Topology):
                       bb in macro_mol.building_blocks}
 
         # This loop places all building-blocks* on the points at
-        # `positions_A`. It then pairs all atoms which form a new bond
+        # `positions_A`. It then pairs all fgs which form a new bond
         # with the positions to which they will be bonding. It also
         # counts the nubmer of building-blocks* which make up the
         # structure.
@@ -830,19 +841,20 @@ class CageTopology(Topology):
             # Update the counter each time a building-block* is added.
             macro_mol.bb_counter.update([bb])
 
-            # Get ids of atoms which form new bonds.
-            bonder_ids = deque(maxlen=n_bb)
+            # Get ids of fgs which form new bonds.
+            fg_ids = deque(maxlen=n_bb)
             for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') not in bonder_ids:
-                    bonder_ids.append(atom.GetIntProp('fg_id'))
+                if (atom.HasProp('fg_id') and
+                   atom.GetIntProp('fg_id') not in fg_ids):
+                    fg_ids.append(atom.GetIntProp('fg_id'))
 
-            # Save the ids of atoms which form new bonds and pair them
+            # Save the ids of fgs which form new bonds and pair them
             # up with positions.
-            position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(scale, macro_mol, position)
+            position.fg_ids = sorted(fg_ids)
+            self.pair_fgs_with_positions(scale, macro_mol, position)
 
         # This loop places all linkers on the points at `positions_B`.
-        # It then saves all atoms which form a new bond to the position
+        # It then saves all fgs which form a new bond to the position
         # they are found at. It also counts the number of linkers which
         # make up the structure.
         for i, position in enumerate(self.positions_B):
@@ -863,14 +875,15 @@ class CageTopology(Topology):
             # Update the counter each time a linker is added.
             macro_mol.bb_counter.update([lk])
 
-            # Get ids of atoms which form new bonds.
-            bonder_ids = deque(maxlen=n_lk)
+            # Get ids of fgs which form new bonds.
+            fg_ids = deque(maxlen=n_lk)
             for atom in macro_mol.mol.GetAtoms():
-                if atom.HasProp('fg_id') and atom.GetIntProp('fg_id') not in bonder_ids:
-                    bonder_ids.append(atom.GetIntProp('fg_id'))
+                if (atom.HasProp('fg_id') and
+                   atom.GetIntProp('fg_id') not in fg_ids):
+                    fg_ids.append(atom.GetIntProp('fg_id'))
 
-            # Save the ids of atoms which form new bonds.
-            position.bonder_ids = list(bonder_ids)
+            # Save the ids of fgs which form new bonds.
+            position.bonder_ids = list(fg_ids)
 
 
 class VertexOnlyCageTopology(CageTopology):
@@ -938,7 +951,7 @@ class NoLinkerCageTopology(CageTopology):
                     bonder_ids.append(atom.GetIdx())
 
             position.bonder_ids = sorted(bonder_ids)
-            self.pair_bonders_with_positions(scale, macro_mol, position)
+            self.pair_fgs_with_positions(scale, macro_mol, position)
             bb.set_position_from_matrix(ipos)
 
     @classmethod
