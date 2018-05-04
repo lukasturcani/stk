@@ -70,7 +70,7 @@ are registered in :attr:`.Periodic.periodic_bonds`.
 import rdkit.Chem.AllChem as rdkit
 import numpy as np
 from scipy.spatial.distance import euclidean
-from collections import deque, defaultdict
+from collections import deque
 
 from .base import Topology
 from ...utilities import (PeriodicBond,
