@@ -84,9 +84,9 @@ class Cell:
         A 3 member :class:`list` holding the x, y and z index
         of the cell within the supercell.
 
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
+    fgs : :class:`dict`
+        Maps the fgs in the original unit cell to the
+        equivalent fgs in the cell.
 
     Attributes
     ----------
@@ -94,15 +94,15 @@ class Cell:
         A 3 member array holding the x, y and z index
         of the cell within the supercell.
 
-    bonders : :class:`dict`
-        Maps the bonder atoms in the original unit cell to the
-        equivalent bonder atoms in the cell.
+    fgs : :class:`dict`
+        Maps the fgs in the original unit cell to the
+        equivalent fgs in the cell.
 
     """
 
-    def __init__(self, id_, bonders):
+    def __init__(self, id_, fgs):
         self.id = np.array(id_)
-        self.bonders = bonders
+        self.fgs = fgs
 
 
 class ChargedMolError(Exception):
@@ -355,43 +355,46 @@ class PeriodicBond:
 
     Parameters
     ----------
-    atom1 : :class:`int`
-        The id of first atom in the bond.
+    fg1 : :class:`int`
+        The value of the ``'fg_id'`` for atoms in the first functional
+        group.
 
-    atom2 : :class:`int`
-        The id of the second atom in the bond.
+    fg2 : :class:`int`
+        The value of the ``'fg_id'`` for atoms in the second
+        functional group.
 
     direction : :class:`list` of :class:`int`
         A 3 member list describing the axes along which the bond is
-        periodic, when going from `atom1` to `atom2`. For example,
+        periodic, when going from `fg1` to `fg2`. For example,
         ``[1, 0, 0]`` means that the bond is periodic along the x axis
         in the positive direction.
 
 
     Attributes
     ----------
-    atom1 : :class:`int`
-        The id of first atom in the bond.
+    fg1 : :class:`int`
+        The value of the ``'fg_id'`` for atoms in the first functional
+        group.
 
-    atom2 : :class:`int`
-        The id of the second atom in the bond.
+    fg2 : :class:`int`
+        The value of the ``'fg_id'`` for atoms in the second
+        functional group.
 
     direction : :class:`numpy.ndarray` of :class:`int`
         A 3 member list describing the axes along which the bond is
-        periodic, when going from `atom1` to `atom2`. For example,
+        periodic, when going from `fg1` to `fg2`. For example,
         ``[1, 0, 0]`` means that the bond is periodic along the x axis
         in the positive direction.
 
     """
 
-    def __init__(self, atom1, atom2, direction):
-        self.atom1 = atom1
-        self.atom2 = atom2
+    def __init__(self, fg1, fg2, direction):
+        self.fg1 = fg1
+        self.fg2 = fg2
         self.direction = np.array(direction)
 
     def __str__(self):
-        return ("PeriodicBond({0.atom1}, "
-                "{0.atom2}, {0.direction})").format(self)
+        return f"PeriodicBond({self.fg1}, {self.fg2}, {self.direction})"
 
 
 class StopLogging:

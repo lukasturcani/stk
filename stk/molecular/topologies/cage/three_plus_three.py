@@ -4,7 +4,6 @@ Defines cage topologies of building blocks with 3 functional groups.
 """
 
 import numpy as np
-import rdkit.Chem.AllChem as rdkit
 
 from .base import NoLinkerCageTopology,  Vertex
 
@@ -16,8 +15,8 @@ class OnePlusOne(NoLinkerCageTopology):
     """
 
     x = 1
-    positions_A = [Vertex(x, 0, 0),
-                   Vertex(-x, 0, 0)]
+    positions_A = [Vertex(x, 0., 0.),
+                   Vertex(-x, 0., 0.)]
     a, b = positions_A
     connections = [(a, b)]
 
@@ -30,43 +29,33 @@ class OnePlusOne(NoLinkerCageTopology):
     n_windows = 3
     n_window_types = 1
 
-    def join_mols(self, macro_mol):
-
-        editable_mol = rdkit.EditableMol(macro_mol.mol)
+    def bonded_fgs(self, macro_mol):
 
         for position in self.positions_A:
             other_position = next(x for x in self.positions_A if
                                   x is not position)
 
-            position.atom_position_pairs = [(atom, other_position) for
-                                            atom in position.bonder_ids]
+            position.fg_position_pairs = [(fg, other_position) for
+                                          fg in position.fg_ids]
 
-            for atom_id, vertex in position.atom_position_pairs:
-                # Get all the distances between the atom and the bonder
-                # atoms on the vertex. Store this information on the
-                # vertex.
-                for atom2_id in vertex.bonder_ids:
-                    distance = macro_mol.atom_distance(atom_id,
-                                                       atom2_id)
-                    position.distances.append((distance,
-                                              atom_id, atom2_id))
+            for fg1, vertex in position.fg_position_pairs:
+                # Get all the distances between the fg and the fgs
+                # on the vertex. Store this information on the vertex.
+
+                for fg2 in vertex.fg_ids:
+                    distance = macro_mol.fg_distance(fg1, fg2)
+                    position.distances.append((distance, fg1, fg2))
 
         paired = set()
         for position in self.positions_A:
-            for _, atom1_id, atom2_id in sorted(position.distances):
-                if atom1_id in paired or atom2_id in paired:
+            for _, fg1, fg2 in sorted(position.distances):
+                if fg1 in paired or fg2 in paired:
                     continue
 
-                bond_type = self.determine_bond_type(macro_mol,
-                                                     atom1_id,
-                                                     atom2_id)
                 # Add the bond.
-                editable_mol.AddBond(atom1_id, atom2_id, bond_type)
-                macro_mol.bonds_made += 1
-                paired.add(atom1_id)
-                paired.add(atom2_id)
-
-        macro_mol.mol = editable_mol.GetMol()
+                yield fg1, fg2
+                paired.add(fg1)
+                paired.add(fg2)
 
 
 class TwoPlusTwo(NoLinkerCageTopology):
